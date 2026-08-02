@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Orrery"
+  short_description: "Build a living, traceable project documentation observatory"
+  default_prompt: "Use $project-orrery to install or upgrade a portable project documentation observatory in this repository."

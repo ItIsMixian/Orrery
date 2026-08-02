@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+docs/_site/
+scripts/docsite/.doccache.json
+ai-config.json
+.project-orrery-backup/

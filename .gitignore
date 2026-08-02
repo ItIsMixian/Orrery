@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.project-orrery-backup/
+skills/project-orrery/assets/project-template/docs/_site/
+skills/project-orrery/assets/project-template/scripts/docsite/.doccache.json
