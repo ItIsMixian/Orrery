@@ -38,6 +38,16 @@ After installing the viewer dependencies, add `--build`. Use `--require-integrat
 
 The v0.1 reader UI is Chinese-first while project content can use any language.
 
+## Validate a contribution
+
+The repository smoke test installs Orrery into isolated temporary projects, verifies that authored files are preserved, exercises managed-tool backup and upgrade behavior, and optionally builds the static reader.
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+Set `ORRERY_TEST_BUILD=1` after installing `scripts/docsite/requirements.txt` from the bundled project template to include the static build. GitHub Actions runs that full path on Windows and Linux.
+
 ## Documentation model
 
 ```text
