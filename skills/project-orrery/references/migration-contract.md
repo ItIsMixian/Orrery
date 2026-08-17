@@ -21,3 +21,30 @@ The dynamic local observatory may configure an OpenAI-compatible provider throug
 ## Two-root and monorepo projects
 
 Install Orrery in the documentation authority root. State Docs may link to implementation files outside that root with relative paths. Do not move or merge repositories merely to satisfy the template.
+
+## Release and compatibility contract
+
+Project Orrery versions four related surfaces independently:
+
+| Surface | Recorded in | Meaning |
+|---|---|---|
+| Distributed Skill | `release-manifest.json:version` and `.project-orrery.json:installed_skill_version` | The agent workflow, installer, validator, and bundled release tools currently in use |
+| Target toolchain | `.project-orrery.json:toolchain_version` | The managed reader files actually installed in the target repository |
+| Project manifest | `.project-orrery.json:manifest_format` | The machine-readable installation metadata format |
+| Document schema | `.project-orrery.json:document_schema` | The authority roles and authored-document contract understood by the release |
+
+The legacy `.project-orrery.json:version` field remains as a compatibility alias for the Skill that last ran the installer. It must not be used to claim that a mixed target toolchain or authored document migration completed.
+
+The stable release manifest declares the target manifest formats, document schemas, and earlier Skill versions that support a direct upgrade. Semantic Versioning describes release intent:
+
+- Patch releases contain compatible fixes.
+- Minor releases add backward-compatible capability.
+- Major releases may require migration.
+
+These categories do not override the declared compatibility ranges. The update checker must report `update_available_compatible`, `update_available_migration_required`, `installed_newer`, `current_incompatible`, or `unknown` instead of guessing.
+
+Update checks are read-only, cache remote results for 24 hours by default, tolerate an unavailable network, and never install a release automatically. Users can also subscribe to tagged GitHub Releases. Public release archives contain the versioned Skill and a SHA-256 checksum; release tags, rather than the moving `main` branch, are the installation authority.
+
+Updating the installed Skill and upgrading a target project are two separate approvals. A compatible Skill update is obtained and validated first. The target viewer then receives its own `--upgrade-tools --dry-run`, backup review, and explicit apply step. Authored documents are never bulk-migrated. If a document-schema change is required, write a project-specific migration plan and decision record before changing authority-bearing files.
+
+Installations created by v0.1 predate the update checker. They require one deliberate bootstrap to v0.2 or later. The current validator recognizes the legacy project manifest, and the next safe installer run records all four version dimensions without treating that metadata upgrade as proof of document migration.

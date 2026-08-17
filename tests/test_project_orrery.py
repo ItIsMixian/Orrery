@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import json
+import hashlib
 import importlib.util
+import json
 import os
 import re
 import subprocess
@@ -11,6 +12,7 @@ import time
 import unittest
 import urllib.error
 import urllib.request
+import zipfile
 from pathlib import Path
 from unittest import mock
 
@@ -19,6 +21,10 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 SKILL_ROOT = REPOSITORY_ROOT / "skills" / "project-orrery"
 INSTALLER = SKILL_ROOT / "scripts" / "install_project_orrery.py"
 VALIDATOR = SKILL_ROOT / "scripts" / "validate_installation.py"
+UPDATE_CHECKER = SKILL_ROOT / "scripts" / "check_project_orrery_update.py"
+RELEASE_MANIFEST = SKILL_ROOT / "release-manifest.json"
+PACKAGER = REPOSITORY_ROOT / "scripts" / "package_release.py"
+CURRENT_VERSION = str(json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))["version"])
 
 
 def run_python(script: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
@@ -64,6 +70,10 @@ class ProjectOrreryTests(unittest.TestCase):
             manifest = json.loads((target / ".project-orrery.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["title"], "Orrery Test Project")
             self.assertEqual(manifest["authority_status"], "migration_pending")
+            self.assertEqual(manifest["manifest_format"], 1)
+            self.assertEqual(manifest["installed_skill_version"], CURRENT_VERSION)
+            self.assertEqual(manifest["toolchain_version"], CURRENT_VERSION)
+            self.assertEqual(manifest["document_schema"], 1)
 
             arguments = ["--target", str(target)]
             if os.environ.get("ORRERY_TEST_BUILD") == "1":
@@ -91,6 +101,7 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertEqual(custom_tool.read_text(encoding="utf-8"), "# existing viewer tool\n")
             manifest = json.loads((target / ".project-orrery.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["toolchain_status"], "mixed")
+            self.assertEqual(manifest["toolchain_version"], "unknown")
 
             upgraded = run_python(INSTALLER, "--target", str(target), "--upgrade-tools")
             self.assertEqual(upgraded.returncode, 0, upgraded.stdout + upgraded.stderr)
@@ -99,6 +110,88 @@ class ProjectOrreryTests(unittest.TestCase):
             backups = list((target / ".project-orrery-backup").glob("*/scripts/docsite/serve.py"))
             self.assertEqual(len(backups), 1)
             self.assertEqual(backups[0].read_text(encoding="utf-8"), "# existing viewer tool\n")
+            manifest = json.loads((target / ".project-orrery.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["toolchain_status"], "current")
+            self.assertEqual(manifest["toolchain_version"], CURRENT_VERSION)
+
+    def test_update_checker_distinguishes_compatible_and_migrating_releases(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="project-orrery-update-") as temporary:
+            root = Path(temporary)
+            target = root / "target"
+            target.mkdir()
+            installed = run_python(INSTALLER, "--target", str(target), "--title", "Update Project")
+            self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
+
+            compatible = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
+            compatible["version"] = "0.3.0"
+            compatible["distribution"]["tag"] = "v0.3.0"
+            compatible_path = root / "compatible.json"
+            compatible_path.write_text(json.dumps(compatible), encoding="utf-8")
+            checked = run_python(
+                UPDATE_CHECKER,
+                "--target", str(target),
+                "--manifest-file", str(compatible_path),
+                "--json",
+            )
+            self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+            result = json.loads(checked.stdout)
+            self.assertEqual(result["status"], "update_available_compatible")
+            self.assertFalse(result["migration_required"])
+
+            migrating = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
+            migrating["version"] = "1.0.0"
+            migrating["compatibility"]["direct_upgrade_from"] = {
+                "minimum": "1.0.0",
+                "maximum_exclusive": "2.0.0",
+            }
+            migrating_path = root / "migrating.json"
+            migrating_path.write_text(json.dumps(migrating), encoding="utf-8")
+            checked = run_python(
+                UPDATE_CHECKER,
+                "--target", str(target),
+                "--manifest-file", str(migrating_path),
+                "--json",
+            )
+            result = json.loads(checked.stdout)
+            self.assertEqual(result["status"], "update_available_migration_required")
+            self.assertTrue(result["migration_required"])
+
+    def test_update_checker_reports_unsupported_target_schema(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="project-orrery-schema-") as temporary:
+            target = Path(temporary)
+            installed = run_python(INSTALLER, "--target", str(target), "--title", "Future Project")
+            self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
+            path = target / ".project-orrery.json"
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+            manifest["document_schema"] = 99
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            checked = run_python(
+                UPDATE_CHECKER,
+                "--target", str(target),
+                "--manifest-file", str(RELEASE_MANIFEST),
+                "--json",
+            )
+            result = json.loads(checked.stdout)
+            self.assertEqual(result["status"], "current_incompatible")
+            self.assertTrue(result["migration_required"])
+
+    def test_release_package_contains_clean_versioned_skill_and_checksum(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="project-orrery-package-") as temporary:
+            output = Path(temporary)
+            packaged = run_python(PACKAGER, "--output-dir", str(output), "--check-tag", f"v{CURRENT_VERSION}")
+            self.assertEqual(packaged.returncode, 0, packaged.stdout + packaged.stderr)
+            archive = output / f"project-orrery-v{CURRENT_VERSION}.zip"
+            checksum = output / f"project-orrery-v{CURRENT_VERSION}.sha256"
+            self.assertTrue(archive.is_file())
+            expected = checksum.read_text(encoding="ascii").split()[0]
+            self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest(), expected)
+            with zipfile.ZipFile(archive) as bundle:
+                names = bundle.namelist()
+            self.assertIn("project-orrery/SKILL.md", names)
+            self.assertIn("project-orrery/release-manifest.json", names)
+            self.assertIn("project-orrery/scripts/check_project_orrery_update.py", names)
+            self.assertFalse(any("__pycache__" in name or name.endswith((".pyc", ".pyo")) for name in names))
 
     def test_provider_config_persists_models_without_plaintext_key(self) -> None:
         with tempfile.TemporaryDirectory(prefix="project-orrery-config-") as temporary:

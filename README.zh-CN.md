@@ -64,9 +64,9 @@ Project Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模�
 
 向 Codex 提出：
 
-> Install Project Orrery from https://github.com/yw9299-stack/project-orrery/tree/main/skills/project-orrery
+> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
 
-Skill 会从下一轮对话开始可用。你也可以把 [`skills/project-orrery`](skills/project-orrery/) 手动复制到 Codex 的 Skill 目录。
+Skill 会从下一轮对话开始可用。请通过 [GitHub 最新发布页](https://github.com/yw9299-stack/project-orrery/releases/latest)确认当前稳定标签。你也可以先验证发布包的 SHA-256 校验和，再把其中的 `project-orrery` 文件夹手动复制到 Codex Skill 目录。
 
 ### 2. 审计并建立文档系统
 
@@ -126,6 +126,39 @@ python project-orrery/skills/project-orrery/scripts/validate_installation.py \
   --build
 ```
 
+## 更新通知与兼容性
+
+Project Orrery 可以提醒用户存在新的稳定版 Skill，但不会静默修改已安装 Skill 或项目文档。对已经安装 Orrery 的项目使用该 Skill 时，工作流默认最多每 24 小时执行一次只读更新检查；如果用户要求离线，则不会访问网络：
+
+```bash
+python /path/to/project-orrery-skill/scripts/check_project_orrery_update.py \
+  --target /path/to/project
+```
+
+检查结果会明确区分**可直接兼容更新**、**需要迁移审查**、**本地版本比稳定版更新**、**当前目标不兼容**和**无法得知最新版本**。网络失败不会阻塞普通文档工作；检查器可以使用缓存，也可以显式传入 `--offline`。
+
+兼容性不会被压缩成一个含糊的版本号：
+
+| 版本维度 | 表示什么 |
+|---|---|
+| Skill 版本 | Agent 工作流、安装器、验证器和发布工具 |
+| 目标工具链版本 | 项目内实际安装的观测台托管文件 |
+| 项目清单格式 | `.project-orrery.json` 的机器可读结构 |
+| 文档架构版本 | 作者文档中被当前版本理解的权威职责 |
+
+Project Orrery 遵循语义化版本，但是否能够直接兼容，以机器可读的 [`release-manifest.json`](skills/project-orrery/release-manifest.json) 为准。补丁版和次版本以保持兼容为目标；主版本可能需要显式迁移。任何版本都无权批量改写项目作者文档。
+
+如果希望主动收到版本通知，可在 [GitHub 仓库](https://github.com/yw9299-stack/project-orrery)选择 **Watch → Custom → Releases**。正式发布包来自不可变标签，并附带 SHA-256 校验和。先安装精确标签对应的新 Skill，再单独预演目标项目的阅读器升级：
+
+```bash
+python /path/to/new-project-orrery-skill/scripts/install_project_orrery.py \
+  --target /path/to/project \
+  --upgrade-tools \
+  --dry-run
+```
+
+确认兼容性和备份位置后才能正式应用。已有 v0.1 安装需要有意识地升级一次到 v0.2 或更高版本，才能获得更新检查器；完成这次引导后，每次使用 Skill 都会按缓存周期报告后续稳定版。由于 Skill 安装器通常不会覆盖已存在目录，正确做法是先下载到临时位置、验证并备份，而不是先删除仍可工作的旧 Skill。
+
 ## 采纳与升级安全
 
 Project Orrery 对既有项目采取保守策略。
@@ -144,11 +177,13 @@ Project Orrery 对既有项目采取保守策略。
 | 路径 | 用途 |
 |---|---|
 | [`skills/project-orrery/SKILL.md`](skills/project-orrery/SKILL.md) | Codex Skill 入口与操作规则 |
+| [`skills/project-orrery/release-manifest.json`](skills/project-orrery/release-manifest.json) | 稳定发布与兼容性契约 |
 | [`skills/project-orrery/scripts/`](skills/project-orrery/scripts/) | 安全安装器与安装验证器 |
 | [`skills/project-orrery/assets/project-template/`](skills/project-orrery/assets/project-template/) | 可迁移文档脚手架与本地阅读器 |
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | 权威架构与迁移契约 |
 | [`tests/`](tests/) | 隔离安装和升级烟雾测试 |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | Windows 与 Linux 持续验证 |
+| [`.github/workflows/release.yml`](.github/workflows/release.yml) | 标签发布的打包与公开流程 |
 
 ## 可选能力与隐私
 
@@ -158,7 +193,7 @@ Project Orrery 对既有项目采取保守策略。
 
 ## 当前状态
 
-Project Orrery 目前处于早期公开版本。迁移契约、安装器安全规则、隔离烟雾测试、静态构建、图形化 AI 服务配置以及 Windows／Linux CI 已可运行。当前阅读器界面以中文为主，但仓库内容可以使用任意语言；更完整的阅读器国际化将作为独立工作推进，不与本次双语项目说明混为一谈。
+Project Orrery 目前处于早期公开版本。迁移契约、安装器安全规则、带缓存的兼容性检查器、版本化发布打包、隔离烟雾测试、静态构建、图形化 AI 服务配置以及 Windows／Linux CI 已可运行。当前阅读器界面以中文为主，但仓库内容可以使用任意语言；更完整的阅读器国际化将作为独立工作推进，不与本次双语项目说明混为一谈。
 
 ## 参与贡献
 

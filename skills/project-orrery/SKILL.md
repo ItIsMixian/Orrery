@@ -15,6 +15,25 @@ Build a living project observatory without confusing ideas, decisions, plans, im
 - **Documentation maintenance:** follow the target repository's `AGENTS.md`, then update the correct authority layer.
 - **Architecture explanation or migration:** read [architecture.md](references/architecture.md) and [migration-contract.md](references/migration-contract.md).
 
+## Check the release channel
+
+For an installed target, tell the user that the Skill is checking the stable release manifest, then run the cached checker before maintenance, migration, or viewer upgrades unless the user requested an offline-only workflow:
+
+`python <skill>/scripts/check_project_orrery_update.py --target <repo>`
+
+Use `--offline` when network access is unavailable or undesired. The checker is read-only, uses a 24-hour cache by default, and must not block ordinary documentation work merely because the release service is unavailable.
+
+- `up_to_date`: continue with the installed Skill.
+- `update_available_compatible`: show the tagged release and explain that updating the Skill is separate from upgrading the target viewer. Do not install either silently.
+- `update_available_migration_required`: stop automatic upgrading and read the tagged migration notes against the target's manifest and authored documents.
+- `installed_newer`: preserve the installed version and do not downgrade unless the user explicitly requests it.
+- `current_incompatible`: do not mutate the target; obtain a compatible Skill or write an explicit migration plan.
+- `unknown`: report that compatibility could not be verified, then continue only with work that does not depend on a new release.
+
+Treat `release-manifest.json` as the machine-readable release contract. The distributed Skill version, installed target toolchain version, project-manifest format, and document schema are separate dimensions. Semantic Versioning communicates release intent; direct compatibility is decided by the manifest's declared ranges.
+
+To update the installed Skill, fetch the exact tagged release into a temporary location, verify the packaged SHA-256 checksum when using a release archive, validate the new Skill, compare any local modifications, and back up the current Skill directory. Replace it only after user confirmation. A repository Skill installer may refuse to overwrite an existing destination; never delete the old Skill first or update from a moving `main` branch.
+
 ## Scaffold safely
 
 1. Inspect the repository root, `AGENTS.md`, existing docs directories, and worktree status.
@@ -49,6 +68,12 @@ Build a living project observatory without confusing ideas, decisions, plans, im
 Run the installer with `--upgrade-tools`. It may replace only the viewer paths on Orrery's upgrade whitelist under `scripts/docsite/` and `start-docsite.bat`; it backs up differing copies under `.project-orrery-backup/<timestamp>/` first. A matching path does not prove Orrery originally created the file, so review the dry run and backup location.
 
 Never bulk-overwrite `AGENTS.md` or authored files under `docs/`. Migrate those semantically, one authority layer at a time.
+
+After installing a compatible tagged Skill, preview the target-toolchain update separately:
+
+`python <new-skill>/scripts/install_project_orrery.py --target <repo> --upgrade-tools --dry-run`
+
+Review the version dimensions in `.project-orrery.json` and every backup path before removing `--dry-run`. A current Skill does not imply that the target viewer or document schema has already been upgraded.
 
 ## Maintain the authority chain
 
