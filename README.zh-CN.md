@@ -22,17 +22,7 @@ Project Orrery 把仓库内的 Markdown 文档组织成一个持续生长的项�
 
 Project Orrery 为不同知识赋予清晰职责：
 
-```text
-产品意图 -> Seed 原则 -> 有效 ADR -> 已批准 Design -> Implementation Plan
-                                 |                          |
-                                 +------> 实际实现 <--------+
-                                              |
-                                         State Docs
-                                              |
-                                          Validation
-                                              |
-                                           Snapshot
-```
+![Project Orrery 文档系统架构](docs/assets/document-architecture.zh-CN.svg)
 
 核心规则很简单：**已经接受不等于已经实现，列入计划也不等于已经证明。**
 

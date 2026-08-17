@@ -22,17 +22,7 @@ Conventional documentation folders often mix proposals, decisions, plans, and cu
 
 Project Orrery gives each kind of knowledge a distinct role:
 
-```text
-Product intent -> Seed -> effective ADR -> approved Design -> Implementation Plan
-                                  |                        |
-                                  +----> implementation <--+
-                                               |
-                                           State Docs
-                                               |
-                                           Validation
-                                               |
-                                            Snapshot
-```
+![Project Orrery documentation architecture](docs/assets/document-architecture.en.svg)
 
 The governing rule is simple: **accepted does not mean implemented, and planned does not mean proven.**
 

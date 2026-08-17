@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" role="img" aria-labelledby="title desc">
+  <title id="title">Project Orrery documentation architecture overview</title>
+  <desc id="desc">The central authority and evidence spine connects README, Product Philosophy, Seed, effective ADRs, Actual Implementation, State Docs, Validation, and Snapshot. Research on the left flows through Backlog and Design Draft into ADRs. Effective ADRs produce Approved Design on the right, which reaches implementation through an Implementation Plan. All connectors run horizontally or vertically.</desc>
+
+  <style>
+    text { font-family: "Segoe UI", Arial, sans-serif; fill: #18202c; text-anchor: middle; }
+    .title { font-size: 14px; font-weight: 600; }
+    .sub { font-size: 12px; font-weight: 400; fill: #3f4855; }
+    .node rect { stroke: #d8dde5; stroke-width: 1; }
+    .core rect { fill: #e7f1ff; }
+    .reference rect { fill: #edf8ef; }
+    .process rect { fill: #fff2e8; }
+    .neutral rect { fill: #f3f4f6; }
+    .link { fill: none; stroke: #9aa1ab; stroke-width: 1.6; marker-end: url(#arrow); }
+    .core-link { fill: none; stroke: #5799ef; stroke-width: 2.2; marker-end: url(#arrow-core); }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #f3f4f6; }
+      .sub { fill: #c4cad4; }
+      .node rect { stroke: #475569; }
+      .core rect { fill: #203148; }
+      .reference rect { fill: #203628; }
+      .process rect { fill: #3b2b21; }
+      .neutral rect { fill: #292d33; }
+      .link { stroke: #aab2bd; }
+      .core-link { stroke: #72aef5; }
+    }
+  </style>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L8 4L0 8Z" fill="#9aa1ab"/>
+    </marker>
+    <marker id="arrow-core" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L8 4L0 8Z" fill="#5799ef"/>
+    </marker>
+  </defs>
+
+  <!-- Central authority and evidence spine -->
+  <path class="core-link" d="M500 66V85"/>
+  <path class="core-link" d="M500 141V160"/>
+  <path class="core-link" d="M500 216V235"/>
+  <path class="core-link" d="M500 291V385"/>
+  <path class="core-link" d="M500 441V460"/>
+  <path class="core-link" d="M500 516V535"/>
+  <path class="core-link" d="M500 591V610"/>
+  <path class="core-link" d="M500 666V685"/>
+
+  <!-- Library to design proposal to ADR -->
+  <path class="link" d="M110 216V235"/>
+  <path class="link" d="M200 263H220"/>
+  <path class="link" d="M400 263H410"/>
+
+  <!-- ADR to approved design and plan; handoff to progress and plan -->
+  <path class="link" d="M590 263H610"/>
+  <path class="link" d="M700 291V385"/>
+  <path class="link" d="M890 216V235"/>
+  <path class="link" d="M890 291V413H790"/>
+  <path class="link" d="M610 413H590"/>
+
+  <!-- Reading and history outputs -->
+  <path class="link" d="M200 488H410"/>
+  <path class="link" d="M590 563H800"/>
+
+  <g class="node neutral" transform="translate(410 10)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">README</text>
+    <text class="sub" x="90" y="42">User and project entry</text>
+  </g>
+
+  <g class="node neutral" transform="translate(410 85)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Product Philosophy</text>
+    <text class="sub" x="90" y="42">Experience the project pursues</text>
+  </g>
+
+  <g class="node core" transform="translate(410 160)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Seed</text>
+    <text class="sub" x="90" y="42">Non-negotiable principles</text>
+  </g>
+
+  <g class="node core" transform="translate(410 235)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Effective ADR</text>
+    <text class="sub" x="90" y="42">Decision and rationale</text>
+  </g>
+
+  <g class="node core" transform="translate(410 385)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Actual Implementation</text>
+    <text class="sub" x="90" y="42">Code, config, assets, data</text>
+  </g>
+
+  <g class="node core" transform="translate(410 460)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">State Docs</text>
+    <text class="sub" x="90" y="42">Map of current facts</text>
+  </g>
+
+  <g class="node process" transform="translate(410 535)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Validation</text>
+    <text class="sub" x="90" y="42">Tests and human review</text>
+  </g>
+
+  <g class="node process" transform="translate(410 610)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Snapshot</text>
+    <text class="sub" x="90" y="42">Dated facts and evidence</text>
+  </g>
+
+  <g class="node neutral" transform="translate(410 685)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Gaps Identified</text>
+    <text class="sub" x="90" y="42">Feed the next Backlog / ADR</text>
+  </g>
+
+  <g class="node reference" transform="translate(20 160)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Library</text>
+    <text class="sub" x="90" y="42">Research, examples, guidance</text>
+  </g>
+
+  <g class="node reference" transform="translate(20 235)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Backlog / Influences</text>
+    <text class="sub" x="90" y="42">Directions not yet decided</text>
+  </g>
+
+  <g class="node neutral" transform="translate(220 235)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Design Draft</text>
+    <text class="sub" x="90" y="42">Proposal and trade-offs</text>
+  </g>
+
+  <g class="node neutral" transform="translate(20 460)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">AGENTS</text>
+    <text class="sub" x="90" y="42">Agents locate facts via State</text>
+  </g>
+
+  <g class="node neutral" transform="translate(800 160)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">HANDOFF</text>
+    <text class="sub" x="90" y="42">Maintainer transition entry</text>
+  </g>
+
+  <g class="node process" transform="translate(800 235)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">PROGRESS</text>
+    <text class="sub" x="90" y="42">Current tasks and milestones</text>
+  </g>
+
+  <g class="node neutral" transform="translate(610 235)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Approved Design</text>
+    <text class="sub" x="90" y="42">Specification from ADRs</text>
+  </g>
+
+  <g class="node process" transform="translate(610 385)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">Implementation Plan</text>
+    <text class="sub" x="90" y="42">Planned delivery approach</text>
+  </g>
+
+  <g class="node neutral" transform="translate(800 535)">
+    <rect width="180" height="56" rx="10"/>
+    <text class="title" x="90" y="23">DEVLOG</text>
+    <text class="sub" x="90" y="42">Append-only delivery history</text>
+  </g>
+</svg>
