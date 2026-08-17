@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-08-17-po-cr-004-b-pilot-001",
+  "task_id": "PO-CR-004",
+  "variant": "B",
+  "repository_commit": "9cccc04f565b18b200c6fca88d43609b9240165c",
+  "started_at": null,
+  "ended_at": null,
+  "execution": {
+    "model": null,
+    "harness": "Codex desktop (user-operated)",
+    "toolchain": "context-routing pilot prompt v1",
+    "permission_profile": null,
+    "prompt_revision": "po-cr-004-pilot-001-v1",
+    "prompt_sha256": null,
+    "external_context_policy": "uncontrolled",
+    "operator_interventions": []
+  },
+  "events": [
+    { "sequence": 1, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "external", "target": "external://codex-skills/project-orrery/SKILL.md", "reason_code": "manifest-initial" },
+    { "sequence": 2, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "README.md", "reason_code": "manifest-initial" },
+    { "sequence": 3, "timestamp": null, "event_type": "enumerate", "observed_by": "agent", "target_scope": "query", "target": "README.md; AGENTS.md; .project-orrery/**; docs/**; package.json; pyproject.toml; Makefile; rg --files", "reason_code": "task-localization" },
+    { "sequence": 4, "timestamp": null, "event_type": "search", "observed_by": "agent", "target_scope": "query", "target": "exact $skill-installer installation command", "reason_code": "installation-syntax" },
+    { "sequence": 5, "timestamp": null, "event_type": "search", "observed_by": "agent", "target_scope": "query", "target": "never overwritten|only a proposal|require-integrated|next Codex turn", "reason_code": "boundary-validation" },
+    { "sequence": 6, "timestamp": null, "event_type": "scope_expand", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/openai-docs/SKILL.md", "reason_code": "installation-syntax" },
+    { "sequence": 7, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/openai-docs/SKILL.md", "reason_code": "installation-syntax" },
+    { "sequence": 8, "timestamp": null, "event_type": "scope_expand", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/skill-installer/SKILL.md", "reason_code": "installation-syntax" },
+    { "sequence": 9, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/skill-installer/SKILL.md", "reason_code": "installation-syntax" },
+    { "sequence": 10, "timestamp": null, "event_type": "scope_expand", "observed_by": "agent", "target_scope": "repository", "target": ".git/config", "reason_code": "repository-identity" },
+    { "sequence": 11, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": ".git/config", "reason_code": "repository-identity" },
+    { "sequence": 12, "timestamp": null, "event_type": "write", "observed_by": "agent", "target_scope": "repository", "target": "README.md", "reason_code": "task-target" },
+    { "sequence": 13, "timestamp": null, "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "git status --short", "reason_code": "scope-validation" },
+    { "sequence": 14, "timestamp": null, "event_type": "test", "observed_by": "agent", "target_scope": "command", "target": "git diff --check -- README.md", "reason_code": "validation" },
+    { "sequence": 15, "timestamp": null, "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "git diff -- README.md", "reason_code": "validation" },
+    { "sequence": 16, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "command", "target": "git diff --check", "reason_code": "post-run-evaluation" },
+    { "sequence": 17, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "command", "target": "python -m unittest discover -s tests -v", "reason_code": "post-run-evaluation" },
+    { "sequence": 18, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "command", "observed_by": "tool_wrapper", "target_scope": "command", "target": "git diff --name-only", "reason_code": "post-run-evaluation" },
+    { "sequence": 19, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "command", "observed_by": "tool_wrapper", "target_scope": "command", "target": "rg -n github.com README.md", "reason_code": "post-run-evaluation" }
+  ],
+  "metrics": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "wall_time_seconds": null,
+    "provider_cost": null,
+    "documents_touched": 1,
+    "documentation_sync_seconds": null,
+    "conflict_warning_delay_seconds": null
+  },
+  "artifacts": {
+    "changed_paths": ["README.md"],
+    "diff_git_oid": "ecf2116ada9278e3d0d32f7d6e81260d894421cb"
+  },
+  "outcome": {
+    "task_accepted": false,
+    "validation_passed": true,
+    "missed_dependencies": null,
+    "irrelevant_reads": null,
+    "necessary_reads_missed": null,
+    "scope_expansions": 3,
+    "notes": "The change was syntactically valid and limited to README.md. It did not invent an owner, but the <owner>/<repository> placeholder means the instruction was not directly usable as requested. Reported file access remains agent self-report."
+  },
+  "evaluation": {
+    "reference_match": "partial",
+    "apparatus_valid": false,
+    "confounds": [
+      "public_repository_identity_missing_from_prompt_and_baseline",
+      "installed_project_orrery_skill_exposed_future_context",
+      "agent_self_report_only_for_original_read_events",
+      "timing_and_token_metrics_unavailable"
+    ],
+    "notes": "The Context Manifest and three expansions were visible and the response handled missing identity conservatively, but current installed Skill content was outside the historical snapshot."
+  }
+}

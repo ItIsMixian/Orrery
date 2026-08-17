@@ -1,0 +1,51 @@
+{
+  "pilot_id": "pilot-004",
+  "prompt_revision": "po-context-routing-pilot-004-v1",
+  "external_context_policy": "repository_only",
+  "baseline_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+  "task_order_seed": 4004,
+  "harness_overlay_path": ".codex/config.toml",
+  "agent_receipt_path": ".benchmark/agent-receipt.json",
+  "agent_receipt_schema": "agent-receipt.schema.json",
+  "holdout_acceptance": {
+    "path": "operator/holdout_acceptance.py",
+    "task_ids": ["PO-CR-012", "PO-CR-013", "PO-CR-014"]
+  },
+  "disabled_skill_ids": ["project-orrery", "openai-docs", "skill-installer"],
+  "common_protocol_file": "common-protocol.zh-CN.md",
+  "tasks": [
+    {
+      "task_id": "PO-CR-014",
+      "task_file": "tasks/PO-CR-014.zh-CN.md",
+      "category": "cross_module_compatibility",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "skills/project-orrery/scripts/install_project_orrery.py",
+        "skills/project-orrery/scripts/check_project_orrery_update.py",
+        "skills/project-orrery/scripts/validate_installation.py",
+        "skills/project-orrery/scripts/_compatibility.py"
+      ],
+      "validation_commands": [["git", "diff", "--check"], ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]]
+    },
+    {
+      "task_id": "PO-CR-012",
+      "task_file": "tasks/PO-CR-012.zh-CN.md",
+      "category": "security_cross_module",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py",
+        "skills/project-orrery/assets/project-template/scripts/docsite/serve.py"
+      ],
+      "validation_commands": [["git", "diff", "--check"], ["python", "-m", "py_compile", "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py", "skills/project-orrery/assets/project-template/scripts/docsite/serve.py"], ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]]
+    },
+    {
+      "task_id": "PO-CR-013",
+      "task_file": "tasks/PO-CR-013.zh-CN.md",
+      "category": "release_local",
+      "risk": "high",
+      "expected_product_write_paths": ["skills/project-orrery/scripts/check_project_orrery_update.py"],
+      "validation_commands": [["git", "diff", "--check"], ["python", "-m", "py_compile", "skills/project-orrery/scripts/check_project_orrery_update.py"], ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]]
+    }
+  ],
+  "variants": {"B": "variants/B.zh-CN.md", "H": "variants/H.zh-CN.md"}
+}

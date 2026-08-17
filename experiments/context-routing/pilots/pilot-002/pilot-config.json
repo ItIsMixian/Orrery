@@ -1,0 +1,27 @@
+{
+  "pilot_id": "pilot-002",
+  "task_id": "PO-CR-004",
+  "prompt_revision": "po-cr-004-pilot-002-v1",
+  "base_commit": "e0680523e4cacde2e8413188e04e801e9c2c1c81",
+  "canonical_skill_url": "https://github.com/yw9299-stack/project-orrery/tree/main/skills/project-orrery",
+  "external_context_policy": "repository_only",
+  "harness_overlay_path": ".codex/config.toml",
+  "disabled_skill_ids": [
+    "project-orrery",
+    "openai-docs",
+    "skill-installer"
+  ],
+  "common_task_file": "common-task.zh-CN.md",
+  "variants": {
+    "A": "variants/A.zh-CN.md",
+    "B": "variants/B.zh-CN.md",
+    "C": "variants/C.zh-CN.md"
+  },
+  "allowed_post_edit_commands": [
+    "git status --short",
+    "git diff --check",
+    "git diff -- README.md",
+    "git diff --name-only",
+    "python -m unittest discover -s tests -v"
+  ]
+}

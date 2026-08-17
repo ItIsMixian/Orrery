@@ -1,0 +1,736 @@
+{
+  "schema_version": 1,
+  "corpus_id": "project-orrery-history-v1",
+  "description": "Reconstructed, Git-grounded Project Orrery tasks for comparing context-routing variants. Prompts are reconstructed from commit intent; reference write paths are verified against Git diffs.",
+  "tasks": [
+    {
+      "id": "PO-CR-001",
+      "title": "Add portable installation smoke tests",
+      "category": "testing",
+      "risk": "medium",
+      "prompt": "Add dependency-free smoke tests that install Project Orrery into isolated temporary repositories and verify that the generated documentation structure is valid.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "e38ef8d70cc267666f8ef3c76d01eccf0f677b4e",
+        "reference_commit": "e0680523e4cacde2e8413188e04e801e9c2c1c81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["tests/test_project_orrery.py"],
+        "curated_context_paths": [
+          "skills/project-orrery/scripts/install_project_orrery.py",
+          "skills/project-orrery/scripts/validate_installation.py",
+          "skills/project-orrery/assets/project-template/AGENTS.md"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Tests use isolated temporary targets rather than the maintainer worktree.",
+          "A fresh scaffold validates without third-party viewer dependencies."
+        ]
+      },
+      "tags": ["installer", "validator", "temporary-repository"]
+    },
+    {
+      "id": "PO-CR-002",
+      "title": "Validate portable installs on Windows and Linux",
+      "category": "ci",
+      "risk": "medium",
+      "prompt": "Add continuous integration that runs Project Orrery's portable installation tests on both Windows and Linux.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "e38ef8d70cc267666f8ef3c76d01eccf0f677b4e",
+        "reference_commit": "e0680523e4cacde2e8413188e04e801e9c2c1c81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [".github/workflows/validate.yml"],
+        "curated_context_paths": ["tests/test_project_orrery.py", "README.md"],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "CI covers Windows and Linux runners.",
+          "The workflow executes the repository's smoke-test entry point."
+        ]
+      },
+      "tags": ["github-actions", "windows", "linux"]
+    },
+    {
+      "id": "PO-CR-003",
+      "title": "Document installation validation",
+      "category": "documentation",
+      "risk": "low",
+      "prompt": "Document how a user validates a freshly installed Project Orrery scaffold and its static reader.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "e38ef8d70cc267666f8ef3c76d01eccf0f677b4e",
+        "reference_commit": "e0680523e4cacde2e8413188e04e801e9c2c1c81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md"],
+        "curated_context_paths": [
+          "README.md",
+          "skills/project-orrery/scripts/validate_installation.py",
+          "skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "Dependency-free structure validation and optional static-build validation are distinguished.",
+          "Commands use portable repository-relative paths."
+        ]
+      },
+      "tags": ["readme", "validation", "quick-start"]
+    },
+    {
+      "id": "PO-CR-004",
+      "title": "Publish a direct installation entry",
+      "category": "documentation",
+      "risk": "low",
+      "prompt": "Make the public README give new users a direct, copyable way to install the Project Orrery Codex Skill from GitHub.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "e0680523e4cacde2e8413188e04e801e9c2c1c81",
+        "reference_commit": "80b17bec84b763a356f54838771d6a9d91133800",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md"],
+        "curated_context_paths": ["README.md", "skills/project-orrery/SKILL.md"],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "The installation instruction identifies the public repository and Skill path.",
+          "The README does not imply that scaffolding equals authority adoption."
+        ]
+      },
+      "tags": ["installation", "github", "onboarding"]
+    },
+    {
+      "id": "PO-CR-005",
+      "title": "Rewrite the English public README",
+      "category": "documentation",
+      "risk": "medium",
+      "prompt": "Rewrite the English README as a professional public introduction covering Project Orrery's purpose, authority model, safe adoption, local observatory, repository layout, and contribution path.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "80b17bec84b763a356f54838771d6a9d91133800",
+        "reference_commit": "6a93a4469d27e46403f0250f6663ffbf9564251d",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md"],
+        "curated_context_paths": [
+          "README.md",
+          "skills/project-orrery/SKILL.md",
+          "skills/project-orrery/references/architecture.md",
+          "skills/project-orrery/references/migration-contract.md"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "The README distinguishes decisions, plans, implementation, State, and evidence.",
+          "Safety and non-destructive adoption rules remain visible."
+        ]
+      },
+      "tags": ["readme", "public-documentation", "authority-model"]
+    },
+    {
+      "id": "PO-CR-006",
+      "title": "Add a separate Simplified Chinese README",
+      "category": "documentation",
+      "risk": "medium",
+      "prompt": "Add a professional Simplified Chinese README as a separate document, with clear language switching and the same technical meaning as the English README.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "80b17bec84b763a356f54838771d6a9d91133800",
+        "reference_commit": "6a93a4469d27e46403f0250f6663ffbf9564251d",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md", "README.zh-CN.md"],
+        "curated_context_paths": [
+          "README.md",
+          "skills/project-orrery/SKILL.md",
+          "skills/project-orrery/references/architecture.md"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "English and Chinese introductions live in separate files.",
+          "Both files provide reciprocal language links and preserve the same authority boundaries."
+        ]
+      },
+      "tags": ["i18n", "simplified-chinese", "readme"]
+    },
+    {
+      "id": "PO-CR-007",
+      "title": "Create the English documentation architecture diagram",
+      "category": "architecture",
+      "risk": "low",
+      "prompt": "Create an English SVG overview of the Project Orrery documentation architecture with a clear, untangled main authority chain and supporting inputs.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "98b4d847ec5ca0010d148105d083c5529872998c",
+        "reference_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["docs/assets/document-architecture.en.svg"],
+        "curated_context_paths": [
+          "skills/project-orrery/references/architecture.md",
+          "README.md",
+          "docs/assets/document-architecture.en.svg"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "The SVG distinguishes authority-bearing sources from supporting inputs and derived outputs.",
+          "The diagram remains readable without crossing the main chain repeatedly."
+        ]
+      },
+      "tags": ["svg", "diagram", "english"]
+    },
+    {
+      "id": "PO-CR-008",
+      "title": "Create the Chinese documentation architecture diagram",
+      "category": "architecture",
+      "risk": "low",
+      "prompt": "Create a Simplified Chinese SVG counterpart to the Project Orrery architecture overview while preserving the English diagram's structure and meaning.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "98b4d847ec5ca0010d148105d083c5529872998c",
+        "reference_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["docs/assets/document-architecture.zh-CN.svg"],
+        "curated_context_paths": [
+          "skills/project-orrery/references/architecture.md",
+          "README.zh-CN.md",
+          "docs/assets/document-architecture.zh-CN.svg"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "The Chinese labels preserve the authority semantics of the English diagram.",
+          "The SVG remains editable and repository-local."
+        ]
+      },
+      "tags": ["svg", "diagram", "simplified-chinese"]
+    },
+    {
+      "id": "PO-CR-009",
+      "title": "Embed localized architecture diagrams",
+      "category": "documentation",
+      "risk": "low",
+      "prompt": "Embed the English and Chinese architecture SVGs into their matching README files using repository-relative links.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "98b4d847ec5ca0010d148105d083c5529872998c",
+        "reference_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md", "README.zh-CN.md"],
+        "curated_context_paths": [
+          "README.md",
+          "README.zh-CN.md",
+          "docs/assets/document-architecture.en.svg",
+          "docs/assets/document-architecture.zh-CN.svg"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "Each README embeds the matching language asset.",
+          "No external image host is required."
+        ]
+      },
+      "tags": ["readme", "svg", "localization"]
+    },
+    {
+      "id": "PO-CR-010",
+      "title": "Add a graphical AI provider settings API",
+      "category": "cross_module",
+      "risk": "high",
+      "prompt": "Add local observatory endpoints that let the graphical settings panel read non-secret provider configuration, save provider and model settings, and test an OpenAI-compatible connection.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "reference_commit": "56ef1b44f7e27753cf265acead4182901d7783de",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/assets/project-template/scripts/docsite/serve.py",
+          "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/assets/project-template/scripts/docsite/serve.py",
+          "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py",
+          "skills/project-orrery/assets/project-template/scripts/docsite/set_key.py"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "The browser can configure non-secret provider and model fields.",
+          "Connection testing uses a minimal request and reports failure without exposing credentials."
+        ]
+      },
+      "tags": ["ai-settings", "local-server", "openai-compatible"]
+    },
+    {
+      "id": "PO-CR-011",
+      "title": "Persist AI settings without plaintext secrets",
+      "category": "security",
+      "risk": "high",
+      "prompt": "Persist API keys only in the operating-system credential store, keep non-secret provider settings in a gitignored project file, and never return the stored key to the browser.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "reference_commit": "56ef1b44f7e27753cf265acead4182901d7783de",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py",
+          "skills/project-orrery/assets/project-template/.gitignore"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py",
+          "skills/project-orrery/assets/project-template/scripts/docsite/set_key.py",
+          "skills/project-orrery/references/migration-contract.md",
+          "skills/project-orrery/assets/project-template/.gitignore"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "API keys are absent from ai-config.json and HTTP responses.",
+          "Non-secret provider settings remain project-local and gitignored."
+        ]
+      },
+      "tags": ["credentials", "keyring", "privacy"]
+    },
+    {
+      "id": "PO-CR-012",
+      "title": "Restrict settings mutation to the local server session",
+      "category": "security",
+      "risk": "high",
+      "prompt": "Protect graphical settings mutations so they are loopback-only and require a per-server-start token; add coverage proving that keys are never echoed.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "reference_commit": "56ef1b44f7e27753cf265acead4182901d7783de",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/assets/project-template/scripts/docsite/serve.py",
+          "tests/test_project_orrery.py"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/assets/project-template/scripts/docsite/serve.py",
+          "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py",
+          "tests/test_project_orrery.py"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Remote clients cannot mutate settings.",
+          "A server-start token protects local mutation requests and no response exposes the API key."
+        ]
+      },
+      "tags": ["loopback", "csrf-token", "secret-redaction"]
+    },
+    {
+      "id": "PO-CR-013",
+      "title": "Validate the installed graphical settings surface",
+      "category": "testing",
+      "risk": "medium",
+      "prompt": "Extend installation validation and smoke tests so the graphical AI settings files and security behavior remain present after scaffolding.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "reference_commit": "56ef1b44f7e27753cf265acead4182901d7783de",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/scripts/validate_installation.py",
+          "tests/test_project_orrery.py"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/scripts/validate_installation.py",
+          "skills/project-orrery/scripts/install_project_orrery.py",
+          "tests/test_project_orrery.py"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "A fresh installed target contains the expected settings implementation.",
+          "Tests cover configuration persistence without plaintext keys."
+        ]
+      },
+      "tags": ["installation", "settings", "regression"]
+    },
+    {
+      "id": "PO-CR-014",
+      "title": "Document the graphical credential boundary",
+      "category": "architecture",
+      "risk": "medium",
+      "prompt": "Update the Skill and migration contract to define where graphical provider settings may be stored, how local mutation is protected, and why the static reader cannot write credentials.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "reference_commit": "56ef1b44f7e27753cf265acead4182901d7783de",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/SKILL.md",
+          "skills/project-orrery/references/migration-contract.md"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/SKILL.md",
+          "skills/project-orrery/references/migration-contract.md",
+          "skills/project-orrery/assets/project-template/scripts/docsite/serve.py",
+          "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py"
+        ],
+        "validation_commands": ["git diff --check", "python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "The contract separates secrets from non-secret configuration.",
+          "The static reader is explicitly read-only for credential management."
+        ]
+      },
+      "tags": ["migration-contract", "secrets", "static-reader"]
+    },
+    {
+      "id": "PO-CR-015",
+      "title": "Explain graphical AI configuration in both READMEs",
+      "category": "documentation",
+      "risk": "low",
+      "prompt": "Document the graphical provider settings, credential-storage boundary, test-connection cost, and terminal fallback in both English and Simplified Chinese READMEs.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "1ff3d577bc778f297130496376bbdce10271d57b",
+        "reference_commit": "56ef1b44f7e27753cf265acead4182901d7783de",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md", "README.zh-CN.md"],
+        "curated_context_paths": [
+          "README.md",
+          "README.zh-CN.md",
+          "skills/project-orrery/references/migration-contract.md",
+          "skills/project-orrery/assets/project-template/scripts/docsite/set_key.py"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "Both languages describe the same provider and secret-handling behavior.",
+          "The README does not claim that the static reader can configure credentials."
+        ]
+      },
+      "tags": ["ai-settings", "readme", "localization"]
+    },
+    {
+      "id": "PO-CR-016",
+      "title": "Explain the human-and-agent design premise",
+      "category": "documentation",
+      "risk": "medium",
+      "prompt": "Add a concise explanation of why Project Orrery provides different reading entrances for humans and agents while keeping one shared source of truth.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "56ef1b44f7e27753cf265acead4182901d7783de",
+        "reference_commit": "01c92ea16dd9c0e16e3fdc679e4702f050738b55",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md", "README.zh-CN.md"],
+        "curated_context_paths": [
+          "README.md",
+          "README.zh-CN.md",
+          "skills/project-orrery/references/architecture.md",
+          "skills/project-orrery/assets/project-template/AGENTS.md"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "Reader-specific entrances are distinguished from authority-bearing truth.",
+          "The explanation does not create separate human and agent truth stores."
+        ]
+      },
+      "tags": ["design-premise", "human-agent", "single-truth"]
+    },
+    {
+      "id": "PO-CR-017",
+      "title": "Record Project Orrery's two-stage origin",
+      "category": "documentation",
+      "risk": "medium",
+      "prompt": "Record Project Orrery's origin: first restoring control over agent-produced code and documentation, then turning growing human-facing documentation into a traceable project observatory.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "01c92ea16dd9c0e16e3fdc679e4702f050738b55",
+        "reference_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md", "README.zh-CN.md"],
+        "curated_context_paths": [
+          "README.md",
+          "README.zh-CN.md",
+          "skills/project-orrery/references/architecture.md"
+        ],
+        "validation_commands": ["git diff --check"],
+        "acceptance_criteria": [
+          "The two stages are described separately in both languages.",
+          "The observatory remains a traceable projection rather than a new source of truth."
+        ]
+      },
+      "tags": ["project-history", "observability", "readme"]
+    },
+    {
+      "id": "PO-CR-018",
+      "title": "Add a machine-readable release compatibility contract",
+      "category": "release",
+      "risk": "high",
+      "prompt": "Add a stable release manifest and update checker that distinguish Skill, target toolchain, project-manifest, and document-schema compatibility without silently changing an installed project.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "reference_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/release-manifest.json",
+          "skills/project-orrery/scripts/check_project_orrery_update.py"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/release-manifest.json",
+          "skills/project-orrery/scripts/check_project_orrery_update.py",
+          "skills/project-orrery/scripts/install_project_orrery.py",
+          "skills/project-orrery/references/migration-contract.md"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Compatibility states distinguish direct update, migration required, locally newer, incompatible, and unknown.",
+          "Network or cache failure does not silently install or block ordinary documentation work."
+        ]
+      },
+      "tags": ["release-manifest", "update-check", "compatibility"]
+    },
+    {
+      "id": "PO-CR-019",
+      "title": "Preserve authored documents during compatible upgrades",
+      "category": "cross_module",
+      "risk": "high",
+      "prompt": "Teach the installer and validator to record separate version surfaces, preserve authored documents, and avoid reporting a mixed target toolchain as fully upgraded.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "reference_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/scripts/install_project_orrery.py",
+          "skills/project-orrery/scripts/validate_installation.py"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/scripts/install_project_orrery.py",
+          "skills/project-orrery/scripts/validate_installation.py",
+          "skills/project-orrery/release-manifest.json",
+          "skills/project-orrery/references/migration-contract.md"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Authored AGENTS.md and docs are never bulk-overwritten.",
+          "Manifest metadata cannot falsely claim that a mixed toolchain or document migration completed."
+        ]
+      },
+      "tags": ["installer", "non-destructive-upgrade", "manifest"]
+    },
+    {
+      "id": "PO-CR-020",
+      "title": "Package reproducible versioned Skill archives",
+      "category": "release",
+      "risk": "high",
+      "prompt": "Add a reproducible release packager that produces a clean versioned Project Orrery Skill archive and a SHA-256 checksum without including local secrets or caches.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "reference_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["scripts/package_release.py"],
+        "curated_context_paths": [
+          "scripts/package_release.py",
+          "skills/project-orrery/release-manifest.json",
+          "skills/project-orrery/SKILL.md",
+          "tests/test_project_orrery.py"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Repeated packaging from the same source produces a controlled archive layout.",
+          "The release output includes a SHA-256 checksum and excludes machine-local material."
+        ]
+      },
+      "tags": ["archive", "sha256", "reproducible-release"]
+    },
+    {
+      "id": "PO-CR-021",
+      "title": "Publish tagged releases through GitHub Actions",
+      "category": "ci",
+      "risk": "high",
+      "prompt": "Add a tag-driven GitHub Actions workflow that validates Project Orrery, packages the exact tagged Skill, and publishes the archive and checksum as a GitHub Release.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "reference_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [".github/workflows/release.yml"],
+        "curated_context_paths": [
+          ".github/workflows/validate.yml",
+          ".github/workflows/release.yml",
+          "scripts/package_release.py",
+          "skills/project-orrery/release-manifest.json"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Only immutable tags trigger public release packaging.",
+          "The workflow validates before publishing the versioned archive and checksum."
+        ]
+      },
+      "tags": ["github-actions", "release", "tag"]
+    },
+    {
+      "id": "PO-CR-022",
+      "title": "Test compatibility and release edge cases",
+      "category": "testing",
+      "risk": "high",
+      "prompt": "Add tests for compatible and migration-required updates, unsupported document schemas, clean release archives, and mixed-toolchain upgrade behavior.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "reference_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["tests/test_project_orrery.py"],
+        "curated_context_paths": [
+          "tests/test_project_orrery.py",
+          "skills/project-orrery/scripts/check_project_orrery_update.py",
+          "skills/project-orrery/scripts/install_project_orrery.py",
+          "skills/project-orrery/scripts/validate_installation.py",
+          "scripts/package_release.py"
+        ],
+        "validation_commands": ["python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Tests distinguish all declared update outcomes.",
+          "Release and upgrade tests use isolated temporary locations and preserve authored files."
+        ]
+      },
+      "tags": ["compatibility", "release", "regression"]
+    },
+    {
+      "id": "PO-CR-023",
+      "title": "Define the update and migration contract",
+      "category": "architecture",
+      "risk": "high",
+      "prompt": "Update the Skill and reference documents so Skill installation, target-toolchain upgrade, project-manifest compatibility, and authored-document migration are separate approvals.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "reference_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": [
+          "skills/project-orrery/SKILL.md",
+          "skills/project-orrery/references/architecture.md",
+          "skills/project-orrery/references/migration-contract.md"
+        ],
+        "curated_context_paths": [
+          "skills/project-orrery/SKILL.md",
+          "skills/project-orrery/references/architecture.md",
+          "skills/project-orrery/references/migration-contract.md",
+          "skills/project-orrery/release-manifest.json",
+          "skills/project-orrery/scripts/install_project_orrery.py"
+        ],
+        "validation_commands": ["git diff --check", "python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "A current Skill does not imply that a target viewer or document schema is already upgraded.",
+          "Moving main is not treated as release authority and authored docs are never auto-migrated."
+        ]
+      },
+      "tags": ["migration-contract", "version-surfaces", "skill-workflow"]
+    },
+    {
+      "id": "PO-CR-024",
+      "title": "Document update compatibility in both languages",
+      "category": "documentation",
+      "risk": "medium",
+      "prompt": "Document Project Orrery's stable update notifications, compatibility dimensions, safe upgrade sequence, release subscriptions, and current version changes in English and Simplified Chinese.",
+      "source": {
+        "kind": "git_history",
+        "repository": "project-orrery",
+        "base_commit": "75a11301ae602f662dcef16922d1175026563a89",
+        "reference_commit": "ec0ec4a213275338ce34fe7219c5ad692bbcad81",
+        "prompt_provenance": "reconstructed_from_commit",
+        "oracle_provenance": "git_diff"
+      },
+      "oracle": {
+        "reference_changed_paths": ["README.md", "README.zh-CN.md", "CHANGELOG.md"],
+        "curated_context_paths": [
+          "README.md",
+          "README.zh-CN.md",
+          "CHANGELOG.md",
+          "skills/project-orrery/release-manifest.json",
+          "skills/project-orrery/references/migration-contract.md"
+        ],
+        "validation_commands": ["git diff --check", "python -m unittest discover -s tests -v"],
+        "acceptance_criteria": [
+          "Both README languages describe the same update states and separate approvals.",
+          "The changelog records the release behavior without claiming silent automatic upgrades."
+        ]
+      },
+      "tags": ["readme", "changelog", "compatibility"]
+    }
+  ]
+}

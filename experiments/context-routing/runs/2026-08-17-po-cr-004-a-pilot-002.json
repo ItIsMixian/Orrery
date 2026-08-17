@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-08-17-po-cr-004-a-pilot-002",
+  "task_id": "PO-CR-004",
+  "variant": "A",
+  "repository_commit": "4eb6c1d021845dd803dc36ae9dccb8d264fbd040",
+  "started_at": "2026-08-17T20:44:56.3558596+08:00",
+  "ended_at": "2026-08-17T20:45:46.1168441+08:00",
+  "execution": {
+    "model": null,
+    "harness": "Codex desktop (user-operated)",
+    "toolchain": "context-routing pilot-002 prompt packet v1",
+    "permission_profile": null,
+    "prompt_revision": "po-cr-004-pilot-002-v1",
+    "prompt_sha256": "9cca28fbe04868f633cb2b4ef15db29c1026cf3dbf4adb9cfc817500f7bbe1de",
+    "external_context_policy": "repository_only",
+    "operator_interventions": []
+  },
+  "events": [
+    { "sequence": 1, "timestamp": "2026-08-17T20:44:56.3558596+08:00", "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "Get-Date -Format o", "reason_code": "run-start" },
+    { "sequence": 2, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "README.md", "reason_code": "fixed-chain" },
+    { "sequence": 3, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/SKILL.md", "reason_code": "fixed-chain" },
+    { "sequence": 4, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/references/architecture.md", "reason_code": "fixed-chain" },
+    { "sequence": 5, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/references/migration-contract.md", "reason_code": "fixed-chain" },
+    { "sequence": 6, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/assets/project-template/AGENTS.md", "reason_code": "fixed-chain" },
+    { "sequence": 7, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/scripts/install_project_orrery.py", "reason_code": "fixed-chain" },
+    { "sequence": 8, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/scripts/validate_installation.py", "reason_code": "fixed-chain" },
+    { "sequence": 9, "timestamp": null, "event_type": "write", "observed_by": "agent", "target_scope": "repository", "target": "README.md", "reason_code": "task-target" },
+    { "sequence": 10, "timestamp": null, "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "git status --short", "reason_code": "scope-validation" },
+    { "sequence": 11, "timestamp": null, "event_type": "test", "observed_by": "agent", "target_scope": "command", "target": "git diff --check", "reason_code": "validation" },
+    { "sequence": 12, "timestamp": null, "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "git diff -- README.md", "reason_code": "validation" },
+    { "sequence": 13, "timestamp": null, "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "git diff --name-only", "reason_code": "scope-validation" },
+    { "sequence": 14, "timestamp": null, "event_type": "test", "observed_by": "agent", "target_scope": "command", "target": "python -m unittest discover -s tests -v", "reason_code": "validation" },
+    { "sequence": 15, "timestamp": "2026-08-17T20:45:46.1168441+08:00", "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "Get-Date -Format o", "reason_code": "run-end" },
+    { "sequence": 16, "timestamp": "2026-08-17T21:02:03.1105061+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "external", "target": "external://pilot-002/operator/PROMPT-A.zh-CN.md", "reason_code": "prompt-sha256-verification" },
+    { "sequence": 17, "timestamp": "2026-08-17T21:02:03.1105061+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "repository", "target": ".codex/config.toml", "reason_code": "overlay-sha256-verification" },
+    { "sequence": 18, "timestamp": "2026-08-17T21:02:03.1105061+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "command", "target": "git diff --check", "reason_code": "post-run-evaluation" },
+    { "sequence": 19, "timestamp": "2026-08-17T21:02:03.1105061+08:00", "event_type": "command", "observed_by": "tool_wrapper", "target_scope": "command", "target": "git diff --name-only", "reason_code": "post-run-evaluation" },
+    { "sequence": 20, "timestamp": "2026-08-17T21:02:03.1105061+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "command", "target": "python -m unittest discover -s tests -v", "reason_code": "post-run-evaluation" },
+    { "sequence": 21, "timestamp": "2026-08-17T21:02:03.1105061+08:00", "event_type": "command", "observed_by": "tool_wrapper", "target_scope": "external", "target": "external://historical-reference/PO-CR-004/README.md", "reason_code": "reference-comparison" }
+  ],
+  "metrics": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "wall_time_seconds": 49.760984,
+    "provider_cost": null,
+    "documents_touched": 1,
+    "documentation_sync_seconds": null,
+    "conflict_warning_delay_seconds": null
+  },
+  "artifacts": {
+    "changed_paths": ["README.md"],
+    "diff_git_oid": "2f8edb24db2757ba88111cb372b59b2bcf2bfca7"
+  },
+  "outcome": {
+    "task_accepted": true,
+    "validation_passed": true,
+    "missed_dependencies": 0,
+    "irrelevant_reads": null,
+    "necessary_reads_missed": 0,
+    "scope_expansions": null,
+    "notes": "The README now gives the canonical GitHub Skill path through $skill-installer and explicitly separates Skill installation from scaffolding, migration, and formal authority adoption. The wording differs from the historical reference but satisfies both acceptance criteria. Seven repository content reads are Agent self-report, not independent access evidence."
+  },
+  "evaluation": {
+    "reference_match": "functional",
+    "apparatus_valid": null,
+    "confounds": [
+      "agent_self_report_only_for_original_read_events",
+      "external_context_preflight_not_independently_observed",
+      "harness_overlay_effect_not_independently_logged",
+      "model_reasoning_permission_metadata_not_captured",
+      "agent_timestamps_not_independently_observed",
+      "token_and_provider_cost_metrics_unavailable"
+    ],
+    "notes": "Prompt SHA, overlay SHA, changed paths, diff validity, tests, and reference comparison were independently checked. The run is conditionally comparable at the repository boundary, but apparatus validity remains unknown until execution-profile equivalence and model-facing content access can be independently established."
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "pilot_id": "pilot-003",
+  "prompt_revision": "po-context-routing-pilot-003-v2",
+  "external_context_policy": "repository_only",
+  "harness_overlay_path": ".codex/config.toml",
+  "agent_receipt_path": ".benchmark/agent-receipt.json",
+  "agent_receipt_schema": "agent-receipt.schema.json",
+  "security_acceptance": {
+    "path": "security_acceptance.py",
+    "task_ids": ["PO-CR-010", "PO-CR-011"]
+  },
+  "disabled_skill_ids": [
+    "project-orrery",
+    "openai-docs",
+    "skill-installer"
+  ],
+  "common_protocol_file": "common-protocol.zh-CN.md",
+  "tasks": [
+    {
+      "task_id": "PO-CR-006",
+      "task_file": "tasks/PO-CR-006.zh-CN.md",
+      "validation_commands": [
+        ["git", "status", "--short"],
+        ["git", "diff", "--check"],
+        ["git", "diff", "--name-only"],
+        ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
+      ]
+    },
+    {
+      "task_id": "PO-CR-010",
+      "task_file": "tasks/PO-CR-010.zh-CN.md",
+      "validation_commands": [
+        ["git", "status", "--short"],
+        ["git", "diff", "--check"],
+        ["git", "diff", "--name-only"],
+        ["python", "-m", "py_compile", "skills/project-orrery/assets/project-template/scripts/docsite/serve.py", "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py"],
+        ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
+      ]
+    },
+    {
+      "task_id": "PO-CR-011",
+      "task_file": "tasks/PO-CR-011.zh-CN.md",
+      "validation_commands": [
+        ["git", "status", "--short"],
+        ["git", "diff", "--check"],
+        ["git", "diff", "--name-only"],
+        ["python", "-m", "py_compile", "skills/project-orrery/assets/project-template/scripts/docsite/_llm.py"],
+        ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
+      ]
+    }
+  ],
+  "variants": {
+    "A": "variants/A.zh-CN.md",
+    "B": "variants/B.zh-CN.md",
+    "C": "variants/C.zh-CN.md"
+  }
+}

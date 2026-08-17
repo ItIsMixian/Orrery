@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yw9299-stack/project-orrery/schemas/context-routing-task-corpus-v1.json",
+  "title": "Project Orrery context-routing task corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "corpus_id", "description", "tasks"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "corpus_id": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/task" }
+    }
+  },
+  "$defs": {
+    "safePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "category", "risk", "prompt", "source", "oracle", "tags"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^PO-CR-[0-9]{3}$" },
+        "title": { "type": "string", "minLength": 1 },
+        "category": {
+          "enum": ["documentation", "local_code", "cross_module", "security", "release", "architecture", "testing", "ci"]
+        },
+        "risk": { "enum": ["low", "medium", "high"] },
+        "prompt": { "type": "string", "minLength": 1 },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "repository", "base_commit", "reference_commit", "prompt_provenance", "oracle_provenance"],
+          "properties": {
+            "kind": { "const": "git_history" },
+            "repository": { "const": "project-orrery" },
+            "base_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "reference_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "prompt_provenance": { "const": "reconstructed_from_commit" },
+            "oracle_provenance": { "const": "git_diff" }
+          }
+        },
+        "oracle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reference_changed_paths", "curated_context_paths", "validation_commands", "acceptance_criteria"],
+          "properties": {
+            "reference_changed_paths": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/safePath" }
+            },
+            "curated_context_paths": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/safePath" }
+            },
+            "validation_commands": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "acceptance_criteria": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-08-17-po-cr-004-a-pilot-001",
+  "task_id": "PO-CR-004",
+  "variant": "A",
+  "repository_commit": "928ff7239bf5b3af42fe8c3aa33849062628e509",
+  "started_at": null,
+  "ended_at": null,
+  "execution": {
+    "model": null,
+    "harness": "Codex desktop (user-operated)",
+    "toolchain": "context-routing pilot prompt v1",
+    "permission_profile": null,
+    "prompt_revision": "po-cr-004-pilot-001-v1",
+    "prompt_sha256": null,
+    "external_context_policy": "uncontrolled",
+    "operator_interventions": []
+  },
+  "events": [
+    { "sequence": 1, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "README.md", "reason_code": "fixed-chain" },
+    { "sequence": 2, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/SKILL.md", "reason_code": "fixed-chain" },
+    { "sequence": 3, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/references/architecture.md", "reason_code": "fixed-chain" },
+    { "sequence": 4, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/references/migration-contract.md", "reason_code": "fixed-chain" },
+    { "sequence": 5, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/assets/project-template/AGENTS.md", "reason_code": "fixed-chain" },
+    { "sequence": 6, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/scripts/install_project_orrery.py", "reason_code": "fixed-chain" },
+    { "sequence": 7, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/scripts/validate_installation.py", "reason_code": "fixed-chain" },
+    { "sequence": 8, "timestamp": null, "event_type": "enumerate", "observed_by": "agent", "target_scope": "query", "target": "rg --files -g '!skills/project-orrery/assets/project-template/**'", "reason_code": "ordinary-search" },
+    { "sequence": 9, "timestamp": null, "event_type": "search", "observed_by": "agent", "target_scope": "query", "target": "github.com|skill installer|$skill-installer|install.*skill", "reason_code": "installation-syntax" },
+    { "sequence": 10, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "repository", "target": "skills/project-orrery/agents/openai.yaml", "reason_code": "skill-metadata" },
+    { "sequence": 11, "timestamp": null, "event_type": "scope_expand", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/openai-docs/SKILL.md", "reason_code": "local-codex-guidance" },
+    { "sequence": 12, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/openai-docs/SKILL.md", "reason_code": "local-codex-guidance" },
+    { "sequence": 13, "timestamp": null, "event_type": "scope_expand", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/skill-installer/SKILL.md", "reason_code": "installation-syntax" },
+    { "sequence": 14, "timestamp": null, "event_type": "content_read", "observed_by": "agent", "target_scope": "external", "target": "external://codex-system/skill-installer/SKILL.md", "reason_code": "installation-syntax" },
+    { "sequence": 15, "timestamp": null, "event_type": "write", "observed_by": "agent", "target_scope": "repository", "target": "README.md", "reason_code": "task-target" },
+    { "sequence": 16, "timestamp": null, "event_type": "command", "observed_by": "agent", "target_scope": "command", "target": "git remote get-url origin", "reason_code": "repository-identity" },
+    { "sequence": 17, "timestamp": null, "event_type": "test", "observed_by": "agent", "target_scope": "command", "target": "git diff --check", "reason_code": "validation" },
+    { "sequence": 18, "timestamp": null, "event_type": "test", "observed_by": "agent", "target_scope": "command", "target": "python -m unittest discover -s tests -v", "reason_code": "validation" },
+    { "sequence": 19, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "command", "target": "git diff --check", "reason_code": "post-run-evaluation" },
+    { "sequence": 20, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "test", "observed_by": "tool_wrapper", "target_scope": "command", "target": "python -m unittest discover -s tests -v", "reason_code": "post-run-evaluation" },
+    { "sequence": 21, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "command", "observed_by": "tool_wrapper", "target_scope": "command", "target": "git diff --name-only", "reason_code": "post-run-evaluation" },
+    { "sequence": 22, "timestamp": "2026-08-17T20:11:32.3614642+08:00", "event_type": "command", "observed_by": "tool_wrapper", "target_scope": "command", "target": "rg -n github.com README.md", "reason_code": "post-run-evaluation" }
+  ],
+  "metrics": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "wall_time_seconds": null,
+    "provider_cost": null,
+    "documents_touched": 1,
+    "documentation_sync_seconds": null,
+    "conflict_warning_delay_seconds": null
+  },
+  "artifacts": {
+    "changed_paths": ["README.md"],
+    "diff_git_oid": "bdb7814041586e3cee8a31a10bb436be34bae7d3"
+  },
+  "outcome": {
+    "task_accepted": false,
+    "validation_passed": true,
+    "missed_dependencies": null,
+    "irrelevant_reads": null,
+    "necessary_reads_missed": null,
+    "scope_expansions": 2,
+    "notes": "The change was syntactically valid and limited to README.md, but it fabricated the nonexistent public location github.com/openai/project-orrery after confirming that the isolated repository had no origin remote. The requested public installation instruction was therefore incorrect. Reported file access remains agent self-report."
+  },
+  "evaluation": {
+    "reference_match": "failed",
+    "apparatus_valid": false,
+    "confounds": [
+      "public_repository_identity_missing_from_prompt_and_baseline",
+      "agent_self_report_only_for_original_read_events",
+      "timing_and_token_metrics_unavailable"
+    ],
+    "notes": "Useful as an apparatus pilot only. It shows the failure mode of filling an evidence gap with a plausible but false owner."
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yw9299-stack/project-orrery/schemas/context-routing-agent-receipt-v2.json",
+  "title": "Project Orrery pilot Agent self-report receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pilot_id",
+    "prompt_revision",
+    "task_id",
+    "variant",
+    "external_context_preflight",
+    "agent_started_at",
+    "agent_ended_at",
+    "prewrite",
+    "events",
+    "operator_questions",
+    "validation",
+    "uncertainty",
+    "evidence_note"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "pilot_id": {"const": "pilot-003"},
+    "prompt_revision": {"const": "po-context-routing-pilot-003-v2"},
+    "task_id": {"pattern": "^PO-CR-[0-9]{3}$"},
+    "variant": {"enum": ["A", "B", "C"]},
+    "external_context_preflight": {"enum": ["clean", "contaminated"]},
+    "agent_started_at": {"type": ["string", "null"], "format": "date-time"},
+    "agent_ended_at": {"type": ["string", "null"], "format": "date-time"},
+    "prewrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_manifest", "selected_evidence"],
+      "properties": {
+        "context_manifest": {"type": ["object", "null"]},
+        "selected_evidence": {"type": ["array", "null"]}
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sequence", "event_type", "target_scope", "target", "reason_code", "content_extent", "range_or_query", "declared_before_access"],
+        "properties": {
+          "sequence": {"type": "integer", "minimum": 1},
+          "event_type": {"enum": ["enumerate", "search", "content_read", "scope_expand", "write", "command", "test"]},
+          "target_scope": {"enum": ["repository", "query", "command"]},
+          "target": {"type": "string", "minLength": 1},
+          "reason_code": {"type": ["string", "null"]},
+          "content_extent": {"enum": ["full", "partial", null]},
+          "range_or_query": {"type": ["string", "null"]},
+          "declared_before_access": {"type": ["boolean", "null"]}
+        }
+      }
+    },
+    "operator_questions": {"type": "array", "items": {"type": "object"}},
+    "validation": {"type": "array", "items": {"type": "string"}},
+    "uncertainty": {"type": "array", "items": {"type": "string"}},
+    "evidence_note": {"const": "Agent self-report; not an independent Harness audit"}
+  }
+}

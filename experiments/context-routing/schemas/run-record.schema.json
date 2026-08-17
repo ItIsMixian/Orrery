@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yw9299-stack/project-orrery/schemas/context-routing-run-record-v1.json",
+  "title": "Project Orrery context-routing run record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "task_id", "variant", "repository_commit", "started_at", "ended_at", "execution", "events", "metrics", "artifacts", "outcome", "evaluation"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "pattern": "^PO-CR-[0-9]{3}$" },
+    "variant": { "enum": ["A", "B", "C"] },
+    "repository_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "started_at": { "type": ["string", "null"], "format": "date-time" },
+    "ended_at": { "type": ["string", "null"], "format": "date-time" },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "harness", "toolchain", "permission_profile", "prompt_revision", "prompt_sha256", "external_context_policy", "operator_interventions"],
+      "properties": {
+        "model": { "type": ["string", "null"] },
+        "harness": { "type": ["string", "null"] },
+        "toolchain": { "type": ["string", "null"] },
+        "permission_profile": { "type": ["string", "null"] },
+        "prompt_revision": { "type": ["string", "null"] },
+        "prompt_sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "external_context_policy": { "enum": ["repository_only", "frozen_identical", "uncontrolled", null] },
+        "operator_interventions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_tokens", "output_tokens", "wall_time_seconds", "provider_cost", "documents_touched", "documentation_sync_seconds", "conflict_warning_delay_seconds"],
+      "properties": {
+        "input_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "output_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "wall_time_seconds": { "type": ["number", "null"], "minimum": 0 },
+        "provider_cost": { "type": ["number", "null"], "minimum": 0 },
+        "documents_touched": { "type": ["integer", "null"], "minimum": 0 },
+        "documentation_sync_seconds": { "type": ["number", "null"], "minimum": 0 },
+        "conflict_warning_delay_seconds": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed_paths", "diff_git_oid"],
+      "properties": {
+        "changed_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "diff_git_oid": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_accepted", "validation_passed", "missed_dependencies", "irrelevant_reads", "necessary_reads_missed", "scope_expansions", "notes"],
+      "properties": {
+        "task_accepted": { "type": ["boolean", "null"] },
+        "validation_passed": { "type": ["boolean", "null"] },
+        "missed_dependencies": { "type": ["integer", "null"], "minimum": 0 },
+        "irrelevant_reads": { "type": ["integer", "null"], "minimum": 0 },
+        "necessary_reads_missed": { "type": ["integer", "null"], "minimum": 0 },
+        "scope_expansions": { "type": ["integer", "null"], "minimum": 0 },
+        "notes": { "type": "string" }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference_match", "apparatus_valid", "confounds", "notes"],
+      "properties": {
+        "reference_match": { "enum": ["exact", "functional", "partial", "failed", "not_evaluated"] },
+        "apparatus_valid": { "type": ["boolean", "null"] },
+        "confounds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "timestamp", "event_type", "observed_by", "target_scope", "target", "reason_code"],
+      "properties": {
+        "sequence": { "type": "integer", "minimum": 1 },
+        "timestamp": { "type": ["string", "null"], "format": "date-time" },
+        "event_type": { "enum": ["enumerate", "search", "content_read", "write", "command", "test", "scope_expand"] },
+        "observed_by": { "enum": ["harness", "tool_wrapper", "manual", "agent"] },
+        "target_scope": { "enum": ["repository", "external", "query", "command"] },
+        "target": { "type": "string", "minLength": 1 },
+        "reason_code": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
