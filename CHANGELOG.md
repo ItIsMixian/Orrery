@@ -4,7 +4,7 @@ Project Orrery follows Semantic Versioning for the distributed Skill. Compatibil
 
 Project Orrery 的 Skill 发布遵循语义化版本；与既有项目能否直接兼容，以机器可读的发布清单为准，而不能只看版本号。
 
-## 0.2.0 — 2026-08-17
+## 0.2.0 — 2026-08-18
 
 - Add a stable release manifest with separate Skill, target toolchain, project-manifest, and document-schema versions.
 - Add cached, offline-tolerant update checks with explicit compatible, migration-required, newer-than-stable, and unknown states.
