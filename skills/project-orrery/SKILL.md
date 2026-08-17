@@ -70,7 +70,9 @@ After implementation or validation, update `PROGRESS`, append `DEVLOG`, update a
 - Cross-platform: `python -X utf8 <repo>/scripts/docsite/serve.py`
 - Static build only: `python -X utf8 <repo>/scripts/docsite/build_docsite.py`
 
-The AI and radar features are optional. Never package API keys, `ai-config.json`, keyring contents, `.doccache.json`, or generated `docs/_site/` into the skill or a public repository.
+The AI and radar features are optional. In the dynamic local observatory, open Ask Docs and use its settings button to configure OpenAI, DeepSeek, or another OpenAI-compatible provider. Store API keys only in the OS credential store; the panel saves non-secret base URL and model choices in the gitignored project-root `ai-config.json`. `python scripts/docsite/set_key.py` remains the terminal fallback. Testing a connection sends a minimal model request and may incur a small provider charge. The static `docs/_site/index.html` reader is read-only and cannot configure credentials.
+
+Never package API keys, `ai-config.json`, keyring contents, `.doccache.json`, `.port`, or generated `docs/_site/` into the skill or a public repository.
 
 ## Verify before handoff
 

@@ -16,6 +16,8 @@ Installation has three distinct states: scaffold installed, authority migration 
 
 Do not package API keys, local AI configuration, caches, generated `docs/_site/`, virtual environments, or user-specific paths. The installed viewer reads provider configuration from environment variables, `ai-config.json`, `package.json`, or the OS keyring.
 
+The dynamic local observatory may configure an OpenAI-compatible provider through its graphical settings panel. API keys must be written only to the OS credential store and must never be returned to the browser or persisted in `ai-config.json`; only non-secret base URL and model choices belong in that gitignored file. Settings mutations are loopback-only and require the per-server-start settings token. The generated static reader is read-only and must not expose a credential-writing interface.
+
 ## Two-root and monorepo projects
 
 Install Orrery in the documentation authority root. State Docs may link to implementation files outside that root with relative paths. Do not move or merge repositories merely to satisfy the template.

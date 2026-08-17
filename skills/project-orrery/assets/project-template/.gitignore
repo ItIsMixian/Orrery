@@ -2,5 +2,6 @@ __pycache__/
 *.py[cod]
 docs/_site/
 scripts/docsite/.doccache.json
+scripts/docsite/.port
 ai-config.json
 .project-orrery-backup/

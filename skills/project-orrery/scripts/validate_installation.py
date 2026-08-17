@@ -50,7 +50,13 @@ def main() -> int:
             problems.append(f"unresolved template token: {path.relative_to(root).as_posix()}")
 
     gitignore = root / ".gitignore"
-    safety_entries = ("docs/_site/", "scripts/docsite/.doccache.json", "ai-config.json", ".project-orrery-backup/")
+    safety_entries = (
+        "docs/_site/",
+        "scripts/docsite/.doccache.json",
+        "scripts/docsite/.port",
+        "ai-config.json",
+        ".project-orrery-backup/",
+    )
     ignored = gitignore.read_text(encoding="utf-8") if gitignore.is_file() else ""
     missing_ignores = [entry for entry in safety_entries if entry not in ignored]
     if missing_ignores:

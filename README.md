@@ -85,6 +85,16 @@ python -X utf8 scripts/docsite/serve.py
 
 On Windows, `start-docsite.bat` provides the same entry point. The server binds to the loopback interface and opens an available port from `8765` to `8784`.
 
+#### Configure optional AI features
+
+Open **Ask Docs** in the local observatory and select the settings button. The graphical panel supports OpenAI, DeepSeek, and custom OpenAI-compatible providers. It can configure the base URL, default model, optional intent and audit models, and an API key.
+
+- API keys are written to the operating system credential store and are never returned to the browser or saved in `ai-config.json`.
+- Non-secret provider and model settings are saved to the target project's gitignored `ai-config.json`.
+- **Test connection** sends a minimal model request and may incur a small provider charge.
+- The generated static reader at `docs/_site/index.html` is read-only and cannot store credentials.
+- For headless or terminal workflows, use `python scripts/docsite/set_key.py`.
+
 To validate the static reader as well:
 
 ```bash
@@ -119,13 +129,13 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 
 ## Optional features and privacy
 
-The static reader and authority model work without an AI provider. AI-assisted Q&A, roadmap synthesis, and milestone views require provider configuration supplied by the target project. The trend radar can use GitHub Search and, optionally, web search.
+The static reader and authority model work without an AI provider. AI-assisted Q&A, roadmap synthesis, and milestone views require provider configuration supplied by the target project. The dynamic local observatory provides a graphical settings panel; secrets remain in the operating system credential store. The trend radar can use GitHub Search and, optionally, web search.
 
 The observatory runs locally by default. Project Orrery does not include a hosted service, telemetry collector, or bundled credentials. Review your provider and network configuration before enabling optional online features.
 
 ## Current status
 
-Project Orrery is in an early public release. The migration contract, installer safety rules, isolated smoke tests, static build, and Windows/Linux CI are operational. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
+Project Orrery is in an early public release. The migration contract, installer safety rules, isolated smoke tests, static build, graphical AI provider configuration, and Windows/Linux CI are operational. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
 
 ## Contributing
 

@@ -9,7 +9,8 @@ in any repo. Config is resolved from several sources, **highest priority first**
        OPENAI_MODEL                         e.g. deepseek-chat / gpt-4o-mini
        OPENAI_INTENT_MODEL / OPENAI_AUDIT_MODEL  optional per-stage overrides
   2. The OS credential store — **secure, no plaintext on disk** — the key only.
-       Store it once:  python scripts/docsite/set_key.py
+       Store it through the local graphical settings panel or once with:
+       python scripts/docsite/set_key.py
        (uses `keyring`: Windows Credential Manager / macOS Keychain / Secret Service)
   3. A JSON file pointed to by  DOCSITE_AI_CONFIG
   4. <project-root>/ai-config.json
@@ -21,8 +22,14 @@ in any repo. Config is resolved from several sources, **highest priority first**
 
 baseUrl/model are not secret and still come from env or a JSON file; only the
 key is read from the credential store. Each JSON file uses the same shape an
-Electron app would write:
-    { "apiKey": "...", "baseUrl": "https://api.deepseek.com/v1", "model": "deepseek-chat" }
+Electron app would write. Project Orrery's own graphical settings never writes
+``apiKey`` to JSON and uses this non-secret shape:
+    {
+      "baseUrl": "https://api.deepseek.com/v1",
+      "model": "deepseek-chat",
+      "intentModel": "deepseek-chat",
+      "auditModel": "deepseek-chat"
+    }
 Env vars override file values field-by-field, so you can keep baseUrl/model in
 the file and inject just the key via the environment.
 
@@ -38,6 +45,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -92,6 +100,74 @@ def _read_json(path: Path) -> dict | None:
         return None
 
 
+def project_config_path() -> Path:
+    """Return the repository-local, git-ignored provider configuration path."""
+    return _PROJECT_ROOT / "ai-config.json"
+
+
+def _write_json_atomic(path: Path, data: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=".ai-config-", suffix=".tmp", dir=path.parent)
+    os.close(fd)
+    temporary_path = Path(temporary)
+    try:
+        temporary_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary_path, path)
+    finally:
+        try:
+            temporary_path.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def save_project_config(
+    *,
+    base_url: str = "",
+    model: str = "",
+    intent_model: str = "",
+    audit_model: str = "",
+) -> Path:
+    """Atomically persist non-secret provider settings.
+
+    The graphical settings flow stores API keys in the OS credential store. If
+    an older ``ai-config.json`` contains a plaintext ``apiKey``, saving through
+    this function deliberately removes it while preserving unrelated fields.
+    """
+    path = project_config_path()
+    data = _read_json(path) or {}
+    if not isinstance(data, dict):
+        data = {}
+    data.pop("apiKey", None)
+    values = {
+        "baseUrl": base_url.strip(),
+        "model": model.strip(),
+        "intentModel": intent_model.strip(),
+        "auditModel": audit_model.strip(),
+    }
+    for key, value in values.items():
+        if value:
+            data[key] = value
+        else:
+            data.pop(key, None)
+
+    _write_json_atomic(path, data)
+    return path
+
+
+def remove_project_plaintext_key() -> bool:
+    """Remove a legacy plaintext API key from the project config, if present."""
+    path = project_config_path()
+    data = _read_json(path)
+    if not isinstance(data, dict) or "apiKey" not in data:
+        return False
+    data.pop("apiKey", None)
+    _write_json_atomic(path, data)
+    return True
+
+
 def _is_real_key(k) -> bool:
     if not isinstance(k, str):
         return False
@@ -137,6 +213,8 @@ def load_config() -> dict:
     api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
     base_url = os.environ.get("OPENAI_BASE_URL") or os.environ.get("OPENAI_API_BASE")
     model = os.environ.get("OPENAI_MODEL")
+    intent_model = os.environ.get("OPENAI_INTENT_MODEL")
+    audit_model = os.environ.get("OPENAI_AUDIT_MODEL")
     source = "env" if api_key else None
 
     if not api_key:
@@ -144,27 +222,28 @@ def load_config() -> dict:
         if kr:
             api_key, source = kr, "keyring"
 
-    if not (api_key and base_url and model):
-        for p in _candidate_paths():
-            data = _read_json(p)
-            if not data:
-                continue
-            if not base_url and data.get("baseUrl"):
-                base_url = data["baseUrl"]
-            if not model and data.get("model"):
-                model = data["model"]
-            if not api_key and _is_real_key(data.get("apiKey")):
-                api_key = data["apiKey"].strip()
-                source = str(p)
-            if api_key and base_url and model:
-                break
+    for p in _candidate_paths():
+        data = _read_json(p)
+        if not data:
+            continue
+        if not base_url and data.get("baseUrl"):
+            base_url = data["baseUrl"]
+        if not model and data.get("model"):
+            model = data["model"]
+        if not intent_model and data.get("intentModel"):
+            intent_model = data["intentModel"]
+        if not audit_model and data.get("auditModel"):
+            audit_model = data["auditModel"]
+        if not api_key and _is_real_key(data.get("apiKey")):
+            api_key = data["apiKey"].strip()
+            source = str(p)
 
     return {
         "api_key": api_key,
         "base_url": base_url,
         "model": model,
-        "intent_model": os.environ.get("OPENAI_INTENT_MODEL"),
-        "audit_model": os.environ.get("OPENAI_AUDIT_MODEL"),
+        "intent_model": intent_model,
+        "audit_model": audit_model,
         "source": source,
     }
 
@@ -204,14 +283,14 @@ class OpenAICompatProvider:
 
     name = "openai-compat"
 
-    def __init__(self) -> None:
+    def __init__(self, config: dict | None = None) -> None:
         try:
             from openai import OpenAI
         except ImportError as e:  # pragma: no cover
             raise RuntimeError(
                 "需要 'openai' 包才能用 LLM 功能：pip install openai"
             ) from e
-        cfg = load_config()
+        cfg = config or load_config()
         key = cfg["api_key"]
         if not key:
             tried = " / ".join(str(p) for p in _candidate_paths())
