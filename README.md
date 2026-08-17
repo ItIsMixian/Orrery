@@ -12,19 +12,32 @@
 
 </div>
 
-Project Orrery turns repository-local Markdown into a living project observatory. It keeps product principles, architectural decisions, implementation plans, current state, and validation evidence connected without pretending they are the same kind of truth.
+Project Orrery is repository-scale project memory for humans and software agents. It turns local Markdown into a living project observatory where product intent, architectural decisions, implementation plans, current state, and validation evidence stay connected without being mistaken for the same kind of truth.
 
-It is distributed as a portable [Codex skill](skills/project-orrery/) with a safe project scaffold and a local documentation viewer. It is designed for teams and agents working on repositories where decisions outlive individual sessions and documentation drift is expensive.
+It is distributed as a portable [Codex skill](skills/project-orrery/) with a safe project scaffold and a local documentation viewer. It is designed for solo maintainers, teams, and multiple agents working across sessions—especially when the reason behind a change must remain readable long after the original conversation has disappeared.
 
 ## Why Project Orrery
 
-Conventional documentation folders often mix proposals, decisions, plans, and current behavior. Over time, an accepted design is mistaken for shipped code, a completed checklist becomes the only evidence, or an agent starts from an outdated handoff.
+Project Orrery began with two practical requirements:
+
+1. **Preserve intent.** An agent should be able to follow a human's long-term product direction and recover what was decided, what conflict caused the decision, and why a later change replaced it.
+2. **Preserve readability.** A maintainer or a new agent should be able to understand what the project is doing now without reconstructing it from old chats, scattered files, or commit archaeology.
+
+Git records versions extremely well, but it does not explain which document is a proposal, which decision is still effective, whether an approved design actually shipped, or what evidence proves the current state. In an AI-assisted repository, that ambiguity compounds quickly: more files are produced, stale alternatives survive, and a future agent may confidently read the wrong source.
+
+The same problem becomes a coordination problem in teams. Project Orrery gives contributors stable, typed places for proposals, decisions, plans, state, and evidence so parallel work can converge on shared project memory instead of producing competing narratives.
 
 Project Orrery gives each kind of knowledge a distinct role:
 
 ![Project Orrery documentation architecture](docs/assets/document-architecture.en.svg)
 
 The governing rule is simple: **accepted does not mean implemented, and planned does not mean proven.**
+
+### A project protocol, not a giant LLM wiki
+
+Project Orrery is primarily an authority and maintenance protocol for the repository and its agent harness. AI Q&A, synthesis, and retrieval are optional reading layers; they do not decide what is true and never replace the source documents.
+
+For small and medium repositories, typed Markdown, stable reading entrances, explicit links, and direct search preserve more context than prematurely chunking everything into embeddings. Larger repositories can add full-text, vector, or RAG indexes when scale justifies them, while keeping those indexes derived and replaceable. The authority chain remains readable without a model, an external database, or a hosted service.
 
 ## What it provides
 
@@ -33,7 +46,8 @@ The governing rule is simple: **accepted does not mean implemented, and planned 
 - **Non-destructive upgrades** — managed viewer files can be refreshed from a strict allowlist; changed files are backed up before replacement.
 - **A local documentation observatory** — searchable single-file reader, typed navigation, document-health signals, and project handoff views.
 - **Optional intelligence features** — AI-assisted Q&A and synthesis, plus a GitHub trend radar. Core documentation remains usable without them.
-- **Agent-friendly project memory** — clear entrances for agents and maintainers without creating a second, competing source of truth.
+- **Human-and-agent project memory** — clear entrances for maintainers and agents without creating a second, competing source of truth.
+- **Team-safe documentation surfaces** — parallel contributors write into distinct roles, reducing accidental conflict between proposals, decisions, plans, and actual state.
 
 ## Quick start
 
