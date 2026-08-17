@@ -1,0 +1,35 @@
+{
+  "name": "project-orrery",
+  "version": "0.2.0",
+  "manifest_format": 1,
+  "installed_skill_version": "0.2.0",
+  "toolchain_version": "0.2.0",
+  "document_schema": 1,
+  "update_channel": "stable",
+  "latest_manifest_url": "https://raw.githubusercontent.com/yw9299-stack/project-orrery/main/skills/project-orrery/release-manifest.json",
+  "title": "Project Orrery",
+  "installed": "2026-08-18",
+  "last_scaffold_run": "2026-08-18",
+  "authority_status": "integrated",
+  "toolchain_status": "current",
+  "managed_tools": [
+    "scripts/docsite/_llm.py",
+    "scripts/docsite/build_docsite.py",
+    "scripts/docsite/docsite_insights.py",
+    "scripts/docsite/docsite_qa.py",
+    "scripts/docsite/requirements.txt",
+    "scripts/docsite/serve.py",
+    "scripts/docsite/set_key.py",
+    "start-docsite.bat"
+  ],
+  "expected_tool_hashes": {
+    "scripts/docsite/_llm.py": "ec53e10d1fc7cdb963e55c663b13439fb06c2cc02d484aa1424edfec54c6e33d",
+    "scripts/docsite/build_docsite.py": "5c744727ebefdbf26253d56bbacc917673e09eb2f75c0692d39ba0b1a0882b36",
+    "scripts/docsite/docsite_insights.py": "c6ba4b536fea82b519c5734acd73ac773e9ed247b9372def071c00803f60663c",
+    "scripts/docsite/docsite_qa.py": "bc322e04dcd78a18d3050c850bb89ce244363fceae142e686d060ddb62712f29",
+    "scripts/docsite/requirements.txt": "b6eac48b45919a74a3e6a617a79e414fdb2eaa4e856b422fd20e0bbccbd0d437",
+    "scripts/docsite/serve.py": "f3971483b076d7064d833d5d1e503f2539f64f3a857e2a0617b17915b82a8289",
+    "scripts/docsite/set_key.py": "fb8a18f6c36af96a3ac772daaf5f6812f2068cf53437613b1f9d7c61c900bb33",
+    "start-docsite.bat": "33552fa7d91b4902279cef62481fea4e39018dd7867f1f61a4b38c81d1eabcff"
+  }
+}

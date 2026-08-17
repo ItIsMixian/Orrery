@@ -1,0 +1,12 @@
+# 文档参谋系统（可迁移版）的第三方依赖
+#   pip install -r scripts/docsite/requirements.txt
+
+mistune>=3.0      # markdown -> HTML，交互式阅读器需要 (build_docsite.py)
+openai>=1.0       # 所有 LLM 能力：问答 / 态势 / 路线图 / 里程碑 / 社区对标 (_llm.py)
+httpx>=0.24       # 社区对标里的 GitHub 检索 (docsite_qa.py)；openai 也会带上它
+
+# 可选 —— 只有社区对标的「网页搜索」这一支需要；缺了它 radar 仍可只靠 GitHub 工作：
+ddgs>=6.0         # DuckDuckGo 搜索
+
+# 可选 —— 把 API key 存进系统凭据库（set_key.py），避免明文落盘：
+keyring>=24       # Windows 凭据管理器 / macOS Keychain / Linux Secret Service

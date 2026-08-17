@@ -48,6 +48,8 @@ Project Orrery is primarily an authority and maintenance protocol for the reposi
 
 For small and medium repositories, typed Markdown, stable reading entrances, explicit links, and direct search preserve more context than prematurely chunking everything into embeddings. Larger repositories can add full-text, vector, or RAG indexes when scale justifies them, while keeping those indexes derived and replaceable. The authority chain remains readable without a model, an external database, or a hosted service.
 
+The evidence and open questions behind the next context-routing experiments are recorded in the non-authoritative research note [Task-centered context, provenance, and documentation overhead](docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.md). It proposes a benchmark before any new architecture ADR is accepted.
+
 ## What it provides
 
 - **A traceable authority model** — Seed principles, append-only ADR history, approved design, implementation plans, factual State Docs, validation records, and dated snapshots.
@@ -181,6 +183,9 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 | [`skills/project-orrery/scripts/`](skills/project-orrery/scripts/) | Safe installer and installation validator |
 | [`skills/project-orrery/assets/project-template/`](skills/project-orrery/assets/project-template/) | Portable documentation scaffold and local reader |
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | Authority architecture and migration contract |
+| [`docs/`](docs/) | Project Orrery's own self-hosted authority chain, current State, validation, and history |
+| [`docs/library/`](docs/library/) | Non-authoritative research, literature reviews, experiments, and design hypotheses |
+| [`experiments/context-routing/`](experiments/context-routing/) | Pre-ADR benchmark corpus, run schema, and validation tooling for context-routing research |
 | [`tests/`](tests/) | Isolated installation and upgrade smoke tests |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | Windows and Linux continuous validation |
 | [`.github/workflows/release.yml`](.github/workflows/release.yml) | Tagged release packaging and publication |
@@ -193,7 +198,7 @@ The observatory runs locally by default. Project Orrery does not include a hoste
 
 ## Current status
 
-Project Orrery is in an early public release. The migration contract, installer safety rules, cached compatibility checker, versioned release packaging, isolated smoke tests, static build, graphical AI provider configuration, and Windows/Linux CI are operational. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
+Project Orrery is in an early public release. The migration contract, installer safety rules, cached compatibility checker, versioned release packaging, isolated smoke tests, static build, graphical AI provider configuration, and Windows/Linux CI are operational. The repository now uses Project Orrery's own authority chain under [`docs/`](docs/) to manage its architecture, State, experiments, and validation. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
 
 ## Contributing
 

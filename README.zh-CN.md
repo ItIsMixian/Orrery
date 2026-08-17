@@ -48,6 +48,8 @@ Project Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模�
 
 对于中小型仓库，分类明确的 Markdown、稳定的阅读入口、显式链接和直接搜索，通常比过早把全部资料切块并向量化更能保留上下文。等仓库规模真正需要时，可以再叠加全文索引、向量索引或 RAG，但这些索引始终是可重建、可替换的派生层。即使没有模型、外部数据库或托管服务，核心权威链仍然能够被阅读和维护。
 
+下一阶段上下文路由实验所依据的证据与开放问题，已经记录在非权威研究笔记[《任务中心上下文、可追溯证据与文档开销》](docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md)中。它明确要求先完成本地基准，再决定是否提出新的架构 ADR。
+
 ## 主要能力
 
 - **可追溯的权威模型**：以 Seed 原则、不可改写的 ADR 历史、已批准设计、实施计划、事实型 State Docs、验证记录和带日期快照组成完整链路。
@@ -181,6 +183,9 @@ Project Orrery 对既有项目采取保守策略。
 | [`skills/project-orrery/scripts/`](skills/project-orrery/scripts/) | 安全安装器与安装验证器 |
 | [`skills/project-orrery/assets/project-template/`](skills/project-orrery/assets/project-template/) | 可迁移文档脚手架与本地阅读器 |
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | 权威架构与迁移契约 |
+| [`docs/`](docs/) | Project Orrery 自身的自托管权威链、当前 State、验证与历史 |
+| [`docs/library/`](docs/library/) | 非权威研究、文献综述、实验方案与设计假设 |
+| [`experiments/context-routing/`](experiments/context-routing/) | 用于上下文路由研究的 ADR 前置基准语料、运行结构与验证工具 |
 | [`tests/`](tests/) | 隔离安装和升级烟雾测试 |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | Windows 与 Linux 持续验证 |
 | [`.github/workflows/release.yml`](.github/workflows/release.yml) | 标签发布的打包与公开流程 |
@@ -193,7 +198,7 @@ Project Orrery 对既有项目采取保守策略。
 
 ## 当前状态
 
-Project Orrery 目前处于早期公开版本。迁移契约、安装器安全规则、带缓存的兼容性检查器、版本化发布打包、隔离烟雾测试、静态构建、图形化 AI 服务配置以及 Windows／Linux CI 已可运行。当前阅读器界面以中文为主，但仓库内容可以使用任意语言；更完整的阅读器国际化将作为独立工作推进，不与本次双语项目说明混为一谈。
+Project Orrery 目前处于早期公开版本。迁移契约、安装器安全规则、带缓存的兼容性检查器、版本化发布打包、隔离烟雾测试、静态构建、图形化 AI 服务配置以及 Windows／Linux CI 已可运行。仓库现在也使用 [`docs/`](docs/) 下的 Project Orrery 权威链管理自身架构、State、实验和验证。当前阅读器界面以中文为主，但仓库内容可以使用任意语言；更完整的阅读器国际化将作为独立工作推进，不与本次双语项目说明混为一谈。
 
 ## 参与贡献
 

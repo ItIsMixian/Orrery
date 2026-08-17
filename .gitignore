@@ -6,3 +6,9 @@ dist/
 skills/project-orrery.zip
 skills/project-orrery/assets/project-template/docs/_site/
 skills/project-orrery/assets/project-template/scripts/docsite/.doccache.json
+docs/_site/
+scripts/docsite/.doccache.json
+scripts/docsite/.port
+ai-config.json
+.venv/
+venv/
