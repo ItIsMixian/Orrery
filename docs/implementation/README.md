@@ -15,4 +15,4 @@ A completed checklist is not evidence by itself; implementation, validation, and
 ## Plans
 
 - [2026-08-18 self-hosting completion](plans/2026-08-18-self-hosting-completion.md) — completed migration plan; see its linked State and Validation records for current facts.
-- [2026-08-18 v0.2.0 first public release](plans/2026-08-18-v0.2.0-first-public-release.md) — ready; separates product, research, self-hosting, and release-state commits before the first tag.
+- [2026-08-18 v0.2.0 first public release](plans/2026-08-18-v0.2.0-first-public-release.md) — completed; records product, research, self-hosting, CI correction, tag, and release-state boundaries.

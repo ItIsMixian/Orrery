@@ -17,7 +17,7 @@ Governing ADR: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md)
 
 - 模板源与本仓库安装副本是两个角色：模板位于 `skills/project-orrery/assets/project-template/`，根观测台用于本仓库阅读。
 - `docs/_site/`、缓存、凭据和 benchmark 原始输出不是作者文档或发布资产。
-- 当前工作树包含尚未提交的自托管、实验和测试变化；`origin/main` 包含 v0.2.0 发布候选，但 GitHub 尚无对应 tag／Release。
+- 自托管、实验和测试资产已进入 `main`；v0.2.0 tag／Release 指向发布提交 `20fc95b`，后续当前事实由 main 上的发布后文档继续维护。
 
 ## 实现证据
 

@@ -9,6 +9,7 @@ Updated: 2026-08-18
 - `.github/workflows/validate.yml` 在 Windows／Ubuntu 上运行验证；动态文档站测试需要额外依赖和 `ORRERY_TEST_BUILD=1`。
 - 自托管补全新增 installer 排除模板 Python 缓存的回归断言。
 - 2026-08-18 基线结果：默认套件 28 项中 27 项通过、动态 reader 测试按设计跳过；设置 `ORRERY_TEST_BUILD=1` 后完整 28/28 通过。24 项 benchmark 语料与工作树中的 6 份 run record 也通过验证。
+- 发布分支 CI `32057247222` 与 main CI `32057443759` 均在 Windows／Ubuntu 通过；最初失败轮 `32057075492` 暴露浅克隆缺少历史 commit，workflow 已改为 `fetch-depth: 0`。
 
 ## 验证证据
 
@@ -22,3 +23,4 @@ Updated: 2026-08-18
 - 动态图形化 AI 设置测试默认跳过，除非安装 reader 依赖。
 - 没有 Harness 独立证明模型接收文件字节的端到端测试。
 - 外部 benchmark 原始数据的长期完整性目前依赖本机目录和报告内 hash。
+- 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。

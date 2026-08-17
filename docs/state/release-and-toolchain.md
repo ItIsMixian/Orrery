@@ -4,10 +4,11 @@ Updated: 2026-08-18
 
 ## 当前事实
 
-- GitHub 仓库当前没有 tag 或 Release。`origin/main` 已包含 Project Orrery v0.2.0 的候选 `release-manifest.json`、兼容协议和发布工作流，但它们尚未完成公开发布。
+- Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/yw9299-stack/project-orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。
+- 正式 zip SHA-256 为 `13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`，发布资产中的 checksum 已通过重新下载复核。
 - Skill、目标工具链、项目 manifest 格式和文档 schema 分别版本化。
 - 默认安装只创建缺失文件；`--upgrade-tools` 只处理白名单并先备份。
-- 工作树新增了 installer 对 `__pycache__`、`.pyc`、`.pyo` 的排除规则；该修复尚未进入稳定发布。
+- installer 对 `__pycache__`、`.pyc`、`.pyo` 的排除，以及模板 `.venv/`／`venv/` 忽略规则已进入 v0.2.0。
 - Pilot 004 中产生的共享 compatibility gate、凭据撤销和缓存实现都在隔离仓库中，不属于当前产品实现。
 
 ## 实现证据
@@ -20,5 +21,5 @@ Updated: 2026-08-18
 
 ## 已知缺口
 
-- 下一发布版本已决定为首次公开 `v0.2.0`；提交边界、门禁和发布后同步见活动发布计划。
+- v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
 - 架构维护工作区和公开发行面的长期组织方式仍在 Backlog，尚无 ADR。

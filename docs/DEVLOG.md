@@ -26,3 +26,10 @@
 - 明确可版本控制实验与仓库外大型原始结果的证据边界。
 - 修复 installer 会复制模板 Python 缓存的问题，并增加回归断言。
 - 以 `authority_status: integrated` 完成结构、静态阅读器、动态设置边界、28 项默认测试、benchmark 语料／run record 和 Markdown 本地链接验证；结果记录在自托管基线 Validation。
+
+## 2026-08-18 — v0.2.0 首次公开发布
+
+- 将产品修复、上下文路由研究、自托管文档和发布准备拆分提交并快进 `main`。
+- 首轮 CI 暴露 shallow checkout 无法读取历史 benchmark commit；为验证与发布 workflow 增加 `fetch-depth: 0` 后，分支和 main 的 Windows／Ubuntu 全部通过。
+- 创建 annotated tag `v0.2.0`，Release workflow `32057644595` 发布 zip 与 SHA-256；重新下载校验一致。
+- 发现 Windows／Ubuntu 重建 zip 会受行尾和权限元数据影响，未达到跨平台 byte-for-byte 可重复性；保留 v0.2.0，并把修复列入下一补丁。

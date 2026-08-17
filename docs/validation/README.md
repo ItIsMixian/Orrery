@@ -14,3 +14,4 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 ## Records
 
 - [2026-08-18 self-hosting baseline](2026-08-18-self-hosting-baseline.md) — structure, manifest, static reader, test suite, and link/source coverage for the initial self-hosted repository.
+- [2026-08-18 v0.2.0 release](2026-08-18-v0.2.0-release.md) — branch/main CI, tag, GitHub Release, downloaded checksum, remote manifest, and known cross-platform archive gap.
