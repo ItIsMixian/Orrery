@@ -18,10 +18,19 @@ It is distributed as a portable [Codex skill](skills/project-orrery/) with a saf
 
 ## Why Project Orrery
 
-Project Orrery began with two practical requirements:
+Project Orrery grew in two stages from a specific feeling: losing control of a personal codebase because an agent could keep producing source files and documentation faster than their purpose, authority, and relationships could be understood.
 
-1. **Preserve intent.** An agent should be able to follow a human's long-term product direction and recover what was decided, what conflict caused the decision, and why a later change replaced it.
-2. **Preserve readability.** A maintainer or a new agent should be able to understand what the project is doing now without reconstructing it from old chats, scattered files, or commit archaeology.
+### Stage 1: separate reading surfaces without splitting the truth
+
+The first design insight was that agents and humans do not enter a project in the same way. Agents need precise routing, current constraints, file-level facts, and safe next actions. Humans need explanations, decision context, milestones, and a legible overview. Giving both readers the same undifferentiated document pile serves neither well.
+
+Project Orrery therefore separates **reader-specific entrances and views**, not the underlying truth. `AGENTS.md`, State maps, and operational handoffs orient agents; narrative documentation and the observatory orient people. Both resolve to the same Seed, effective ADRs, implementation, current State, and validation evidence. This was the first mechanism for restoring control: an agent can act from explicit boundaries while the maintainer can still see why the project is moving in that direction.
+
+### Stage 2: turn document growth into project observability
+
+As the project progressed, even the human-facing documents became numerous enough to blur key decisions, milestones, priorities, and the repository's overall condition. That produced a second need: not more documents, but a project-level instrument panel.
+
+The local observatory grew from that need. Its dashboard, roadmap, milestone, health, and trend views use structured documents—and optionally a dedicated model API—to summarize where the project is, surface what deserves attention, and support planning. Every synthesis must remain traceable back to source documents; the dashboard is a projection and navigation layer, never a new source of truth.
 
 Git records versions extremely well, but it does not explain which document is a proposal, which decision is still effective, whether an approved design actually shipped, or what evidence proves the current state. In an AI-assisted repository, that ambiguity compounds quickly: more files are produced, stale alternatives survive, and a future agent may confidently read the wrong source.
 
