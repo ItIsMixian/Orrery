@@ -32,3 +32,16 @@ The primary chain is:
 4. An intentional change to a durable decision requires a new ADR; do not rewrite accepted history.
 5. A Snapshot is a dated assessment, not a mutable status page.
 6. Library material informs proposals but cannot silently constrain implementation.
+
+## Release and compatibility surfaces
+
+The authority chain and the distributed tooling evolve at different speeds. Project Orrery therefore records four version surfaces instead of treating a single package version as proof that a target repository is current:
+
+`tagged Skill -> compatible target toolchain -> supported project manifest -> deliberate document migration`
+
+- The tagged Skill contains the agent workflow, installer, validator, and release contract.
+- The target toolchain records which managed observatory files are actually installed.
+- The project-manifest format versions machine-readable installation metadata.
+- The document schema versions authored authority roles and is never upgraded by bulk overwrite.
+
+The stable release manifest declares compatibility ranges across these surfaces. Update checks are advisory and read-only; installing a Skill, upgrading managed viewer files, and migrating authored documents remain separate approvals. See [migration-contract.md](migration-contract.md) for the operational rules.

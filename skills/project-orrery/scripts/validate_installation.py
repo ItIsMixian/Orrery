@@ -9,6 +9,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+RELEASE = json.loads((SKILL_ROOT / "release-manifest.json").read_text(encoding="utf-8"))
+
 REQUIRED = (
     "AGENTS.md",
     "docs/README.md",
@@ -68,8 +71,28 @@ def main() -> int:
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             if manifest.get("toolchain_status") == "mixed":
                 warnings.append("viewer toolchain is marked partial/mixed")
+            legacy_manifest = manifest.get("name") == "project-orrery" and "manifest_format" not in manifest
+            manifest_format = 1 if legacy_manifest else manifest.get("manifest_format")
+            schema = manifest.get("document_schema", 1 if legacy_manifest else None)
+            if legacy_manifest:
+                warnings.append("legacy v0.1 project manifest detected; rerun the current installer to record version dimensions")
+            if manifest_format != RELEASE["project_manifest_format"]:
+                problems.append(
+                    "unsupported .project-orrery.json format: "
+                    f"{manifest_format!r}; expected {RELEASE['project_manifest_format']}"
+                )
+            schema_rule = RELEASE["compatibility"]["document_schema"]
+            if not isinstance(schema, int) or not schema_rule["minimum"] <= schema <= schema_rule["maximum"]:
+                problems.append(
+                    f"unsupported document schema: {schema!r}; supported range is "
+                    f"{schema_rule['minimum']}..{schema_rule['maximum']}"
+                )
+            if manifest.get("toolchain_status") == "current" and not manifest.get("toolchain_version"):
+                warnings.append("current viewer toolchain has no recorded toolchain_version")
         except json.JSONDecodeError:
             warnings.append(".project-orrery.json is not valid JSON")
+    else:
+        problems.append("missing required file: .project-orrery.json")
 
     agents_text = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").is_file() else ""
     progress_text = (root / "docs" / "PROGRESS.md").read_text(encoding="utf-8") if (root / "docs" / "PROGRESS.md").is_file() else ""

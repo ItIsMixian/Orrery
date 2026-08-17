@@ -1,0 +1,35 @@
+name: Release Project Orrery
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install reader dependencies
+        run: python -m pip install -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+
+      - name: Run portable installation tests
+        env:
+          ORRERY_TEST_BUILD: "1"
+        run: python -m unittest discover -s tests -v
+
+      - name: Package tagged Skill
+        run: python scripts/package_release.py --check-tag "$GITHUB_REF_NAME"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes

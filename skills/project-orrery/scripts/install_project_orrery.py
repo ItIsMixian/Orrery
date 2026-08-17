@@ -12,7 +12,11 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_ROOT = SKILL_ROOT / "assets" / "project-template"
-VERSION = "0.1.0"
+RELEASE_MANIFEST_PATH = SKILL_ROOT / "release-manifest.json"
+RELEASE = json.loads(RELEASE_MANIFEST_PATH.read_text(encoding="utf-8"))
+VERSION = str(RELEASE["version"])
+PROJECT_MANIFEST_FORMAT = int(RELEASE["project_manifest_format"])
+DOCUMENT_SCHEMA = int(RELEASE["document_schema"])
 
 MANAGED_TOOLS = {
     Path("start-docsite.bat"),
@@ -115,10 +119,24 @@ def main() -> int:
             if relative in MANAGED_TOOLS:
                 mixed_tools.append(relative.as_posix())
 
+    toolchain_version = VERSION
+    if mixed_tools:
+        toolchain_version = str(
+            existing_manifest.get("toolchain_version")
+            or existing_manifest.get("version")
+            or "unknown"
+        )
+
     manifest = dict(existing_manifest)
     manifest.update({
         "name": "project-orrery",
         "version": VERSION,
+        "manifest_format": PROJECT_MANIFEST_FORMAT,
+        "installed_skill_version": VERSION,
+        "toolchain_version": toolchain_version,
+        "document_schema": existing_manifest.get("document_schema", DOCUMENT_SCHEMA),
+        "update_channel": existing_manifest.get("update_channel", RELEASE.get("channel", "stable")),
+        "latest_manifest_url": RELEASE.get("latest_manifest_url"),
         "title": title,
         "installed": existing_manifest.get("installed", today),
         "last_scaffold_run": today,

@@ -64,9 +64,9 @@ For small and medium repositories, typed Markdown, stable reading entrances, exp
 
 Ask Codex:
 
-> Install Project Orrery from https://github.com/yw9299-stack/project-orrery/tree/main/skills/project-orrery
+> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
 
-The skill becomes available on the next turn. You can also copy [`skills/project-orrery`](skills/project-orrery/) into your Codex skills directory manually.
+The skill becomes available on the next turn. Use the [latest GitHub Release](https://github.com/yw9299-stack/project-orrery/releases/latest) to confirm the current stable tag. You can also verify the release archive's SHA-256 checksum and copy its `project-orrery` folder into your Codex skills directory manually.
 
 ### 2. Audit and scaffold a repository
 
@@ -126,6 +126,39 @@ python project-orrery/skills/project-orrery/scripts/validate_installation.py \
   --build
 ```
 
+## Updates and compatibility
+
+Project Orrery can notify users about a stable Skill release without silently changing either the installed Skill or a project's documentation. When the Skill is used against an installed project, its workflow performs a read-only update check at most once every 24 hours (unless offline mode is requested):
+
+```bash
+python /path/to/project-orrery-skill/scripts/check_project_orrery_update.py \
+  --target /path/to/project
+```
+
+The result distinguishes **compatible update**, **migration required**, **installed version newer than stable**, **current target incompatible**, and **latest release unknown**. A network failure does not block normal documentation work; the checker can use its cache or run with `--offline`.
+
+Compatibility is not reduced to one version number:
+
+| Version surface | What it identifies |
+|---|---|
+| Skill version | Agent workflow, installer, validator, and release tools |
+| Target toolchain version | Managed observatory files actually installed in a project |
+| Project-manifest format | Shape of `.project-orrery.json` |
+| Document schema | Authority roles understood in authored project documents |
+
+Project Orrery follows Semantic Versioning, but the machine-readable [`release-manifest.json`](skills/project-orrery/release-manifest.json) decides direct compatibility. Patch and minor updates are intended to remain compatible; major updates may require an explicit migration. No release may bulk-rewrite authored documentation.
+
+To receive releases proactively, select **Watch → Custom → Releases** on the [GitHub repository](https://github.com/yw9299-stack/project-orrery). Published release archives are built from immutable tags and include a SHA-256 checksum. Install the exact tagged Skill first, then preview a target viewer update separately:
+
+```bash
+python /path/to/new-project-orrery-skill/scripts/install_project_orrery.py \
+  --target /path/to/project \
+  --upgrade-tools \
+  --dry-run
+```
+
+Review backups and compatibility before applying. Existing v0.1 installations need one deliberate update to v0.2 or later to gain the checker; after that bootstrap, the Skill reports future stable releases whenever it is used. Because Skill installers commonly refuse to overwrite an existing destination, update through a temporary download, validation, and backup rather than deleting the working Skill first.
+
 ## Adoption and upgrade safety
 
 Project Orrery is intentionally conservative around existing repositories.
@@ -144,11 +177,13 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 | Path | Purpose |
 |---|---|
 | [`skills/project-orrery/SKILL.md`](skills/project-orrery/SKILL.md) | Codex skill entry and operating rules |
+| [`skills/project-orrery/release-manifest.json`](skills/project-orrery/release-manifest.json) | Stable release and compatibility contract |
 | [`skills/project-orrery/scripts/`](skills/project-orrery/scripts/) | Safe installer and installation validator |
 | [`skills/project-orrery/assets/project-template/`](skills/project-orrery/assets/project-template/) | Portable documentation scaffold and local reader |
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | Authority architecture and migration contract |
 | [`tests/`](tests/) | Isolated installation and upgrade smoke tests |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | Windows and Linux continuous validation |
+| [`.github/workflows/release.yml`](.github/workflows/release.yml) | Tagged release packaging and publication |
 
 ## Optional features and privacy
 
@@ -158,7 +193,7 @@ The observatory runs locally by default. Project Orrery does not include a hoste
 
 ## Current status
 
-Project Orrery is in an early public release. The migration contract, installer safety rules, isolated smoke tests, static build, graphical AI provider configuration, and Windows/Linux CI are operational. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
+Project Orrery is in an early public release. The migration contract, installer safety rules, cached compatibility checker, versioned release packaging, isolated smoke tests, static build, graphical AI provider configuration, and Windows/Linux CI are operational. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
 
 ## Contributing
 
