@@ -28,6 +28,14 @@ MANAGED_TOOLS = {
     Path("scripts/docsite/serve.py"),
     Path("scripts/docsite/set_key.py"),
 }
+EXCLUDED_TEMPLATE_PARTS = {"__pycache__", ".DS_Store"}
+EXCLUDED_TEMPLATE_SUFFIXES = {".pyc", ".pyo"}
+
+
+def is_template_asset(path: Path) -> bool:
+    """Return whether a file is an authored scaffold asset, not local build debris."""
+    relative = path.relative_to(TEMPLATE_ROOT)
+    return not any(part in EXCLUDED_TEMPLATE_PARTS for part in relative.parts) and path.suffix not in EXCLUDED_TEMPLATE_SUFFIXES
 
 
 def parse_args() -> argparse.Namespace:
@@ -90,7 +98,7 @@ def main() -> int:
     actions: list[str] = []
     mixed_tools: list[str] = []
     expected_hashes: dict[str, str] = {}
-    for source in sorted(p for p in TEMPLATE_ROOT.rglob("*") if p.is_file()):
+    for source in sorted(p for p in TEMPLATE_ROOT.rglob("*") if p.is_file() and is_template_asset(p)):
         relative = source.relative_to(TEMPLATE_ROOT)
         destination = target / relative
         content = rendered_bytes(source, replacements)

@@ -74,6 +74,10 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertEqual(manifest["installed_skill_version"], CURRENT_VERSION)
             self.assertEqual(manifest["toolchain_version"], CURRENT_VERSION)
             self.assertEqual(manifest["document_schema"], 1)
+            self.assertFalse(any("__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"} for path in target.rglob("*")))
+            ignore_rules = (target / ".gitignore").read_text(encoding="utf-8")
+            self.assertIn(".venv/", ignore_rules)
+            self.assertIn("venv/", ignore_rules)
 
             arguments = ["--target", str(target)]
             if os.environ.get("ORRERY_TEST_BUILD") == "1":
