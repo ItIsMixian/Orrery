@@ -6,9 +6,13 @@ It ships as a portable Codex skill plus a project template. The generated local 
 
 ## Install the skill
 
-Copy `skills/project-orrery` into your Codex skills directory, or install this repository with the Codex skill installer once it is hosted on GitHub.
+Ask Codex to install the public skill:
 
-Then ask Codex:
+> Install Project Orrery from https://github.com/yw9299-stack/project-orrery/tree/main/skills/project-orrery
+
+Codex installs it as `project-orrery` in the user skill directory. It becomes available on the next turn. You can also copy `skills/project-orrery` into your Codex skills directory manually.
+
+Then open the target repository and ask Codex:
 
 > Use Project Orrery to scaffold a documentation observatory in this repository.
 
