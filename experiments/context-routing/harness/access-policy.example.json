@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "proxy_script": ".benchmark/context_read_proxy.py",
+  "allowed_non_content_tools": ["update_plan"],
+  "postwrite_commands": [
+    "git status --short",
+    "git diff --check",
+    "python -m unittest discover -s tests -v"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yw9299-stack/project-orrery/schemas/raw-evidence-manifest-v1.json",
+  "title": "Project Orrery raw benchmark evidence manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pilot_id",
+    "run_id",
+    "classification",
+    "sensitivity",
+    "created_at",
+    "expires_at",
+    "source_commit",
+    "apparatus_version",
+    "sealed_by",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "pilot_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "classification": {
+      "enum": ["contaminated", "exploratory", "decision_supporting", "release_supporting"]
+    },
+    "sensitivity": {"const": "restricted"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": ["string", "null"], "format": "date-time"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "apparatus_version": {"type": "string", "minLength": 1},
+    "sealed_by": {"const": "project-orrery/seal_raw_evidence.py@1"},
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "bytes": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "derived_exports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "reviewed"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "reviewed": {"type": "boolean"}
+        }
+      },
+      "default": []
+    }
+  }
+}

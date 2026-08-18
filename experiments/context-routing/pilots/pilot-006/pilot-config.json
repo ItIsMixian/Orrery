@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "pilot_id": "pilot-006",
+  "prompt_revision": "po-context-routing-pilot-006-v1",
+  "baseline_commit": "20fc95be7b9616fa2de90fc1ffe33b35d5c3f3fd",
+  "task_order_seed": 6006,
+  "model": "gpt-5.6-terra",
+  "reasoning_effort": "medium",
+  "timeout_minutes": 20,
+  "evidence_mode": "codex-exec-jsonl-posthoc",
+  "variants": ["B", "H2"],
+  "tasks": [
+    {
+      "task_id": "PO-CR-025",
+      "task_file": "tasks/PO-CR-025.zh-CN.md",
+      "category": "security_local",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "skills/project-orrery/scripts/install_project_orrery.py"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m py_compile skills/project-orrery/scripts/install_project_orrery.py",
+        "python -m unittest discover -s tests -v"
+      ]
+    },
+    {
+      "task_id": "PO-CR-026",
+      "task_file": "tasks/PO-CR-026.zh-CN.md",
+      "category": "cross_module_contract",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "skills/project-orrery/managed-tools.json",
+        "skills/project-orrery/release-manifest.json",
+        "skills/project-orrery/scripts/install_project_orrery.py",
+        "skills/project-orrery/scripts/validate_installation.py"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m py_compile skills/project-orrery/scripts/install_project_orrery.py skills/project-orrery/scripts/validate_installation.py",
+        "python -m unittest discover -s tests -v"
+      ]
+    }
+  ]
+}

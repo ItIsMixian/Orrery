@@ -1,0 +1,33 @@
+{
+  "description": "Controlled content-read evidence hooks for Project Orrery benchmark repositories.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .benchmark/hook_audit.py",
+            "commandWindows": "python .benchmark/hook_audit.py",
+            "timeout": 30,
+            "statusMessage": "Checking controlled benchmark tool access"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .benchmark/hook_audit.py",
+            "commandWindows": "python .benchmark/hook_audit.py",
+            "timeout": 30,
+            "statusMessage": "Recording benchmark tool response evidence"
+          }
+        ]
+      }
+    ]
+  }
+}

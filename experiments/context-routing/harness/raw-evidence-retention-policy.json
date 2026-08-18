@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "default_sensitivity": "restricted",
+  "classifications": {
+    "contaminated": {"retention_days": 30},
+    "exploratory": {"retention_days": 90},
+    "decision_supporting": {"retention_days": 365},
+    "release_supporting": {"retention_days": null}
+  },
+  "automatic_deletion": false,
+  "repository_export_requires_sanitization": true
+}

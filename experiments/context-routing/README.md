@@ -1,6 +1,6 @@
 # Context-routing benchmark
 
-> **Status:** research infrastructure; not part of the released Project Orrery Skill  
+> **Status:** research infrastructure; not part of the released Project Orrery Skill
 > **Authority:** none; results may support a future ADR but do not change the current architecture
 
 This benchmark is the first implementation step proposed by the [task-context and provenance research note](../../docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.md). It compares context-routing strategies before Project Orrery adopts a Context Manifest, access receipts, or selective retrieval as a product requirement.
@@ -33,16 +33,19 @@ The repaired Harness has also completed a smaller [B/C confirmatory run](results
 
 Pilot 004 has completed the three prospective B/H holdout tasks proposed in its [task design](pilots/pilot-004/TASK-DESIGN.zh-CN.md): recoverable credential revocation, trustworthy update-manifest caching, and a shared pre-upgrade compatibility gate. Read the [Pilot 004 report](results/2026-08-18-pilot-004-bh-holdout-terra-medium.md). The frozen v1 Oracle produced false positives and remains preserved as an apparatus failure; a read-only v2 review passed all six repositories. B and H both achieved 3/3 corrected acceptance, but H used 47% more input tokens overall and took about 15% longer, so H is not adopted. B remains the comparison baseline while a slimmer H2 is designed.
 
-## What does not exist yet
+The slimmer [Context Aperture H2 candidate](designs/context-aperture-v0.2-h2.zh-CN.md) and its [content-read apparatus](harness/README.md) now exist. H2 removes model-authored Manifest, Selected Evidence, and receipt prose. The controlled read proxy marks exact UTF-8 slices, and an independent validator rejects any unapproved command or unexpected item in the complete `codex exec --json` stream before cross-checking output hashes. Hooks remain an optional real-time enforcement layer: ten Windows CLI 0.147.0 smoke attempts did not emit Hook audit events, so no current run may claim Hook enforcement. Pilot 005 preserved a shared apparatus failure; corrected Pilot 006 passed B and H2 on both new high-risk tasks. H2 still used 18.5% more total input tokens, 22.5% more output tokens, and 7.2% more Agent time, so it is not adopted. Read the [combined result](results/2026-08-18-pilot-005-006-bh2-terra-medium.md) and [validation](../../docs/validation/2026-08-18-pilot-005-006-bh2.md).
 
-Project Orrery does not currently control Codex's filesystem tools and cannot independently prove which file contents were shown to a model. Git records changes, not reads. Therefore:
+## Current independent-access boundary
+
+Project Orrery still does not provide a general filesystem security boundary. In controlled benchmark runs it can now independently prove that a proxy slice appeared in a captured CLI command output, while rejecting runs whose JSONL contains direct reads, unknown tools, missing outputs, or mismatched hashes. Therefore:
 
 - an agent-authored list of files is classified as `agent` evidence, not independent observation;
 - `manual` evidence is reviewable but not tool-generated;
-- only `harness` or `tool_wrapper` events count as independently observed access in benchmark summaries;
-- no run should claim content-read compliance until its harness can emit those events.
+- only validated `harness` or `tool_wrapper` events count as independently observed access in benchmark summaries;
+- JSONL validation is post-hoc rejection, not real-time prevention;
+- no run should claim Hook enforcement unless its Hook audit log independently validates.
 
-This boundary prevents the experiment from claiming that access auditing has already been solved.
+This boundary prevents the experiment from extending a controlled-run result to ordinary Codex sessions, Hosted tools, attention, comprehension, or causal use of evidence.
 
 ## Variants
 
