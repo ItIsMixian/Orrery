@@ -30,5 +30,5 @@ Governing ADR: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md)
 ## 已知缺口
 
 - 已定义 R0 受限原始层、R1 脱敏可移植层和 R2 权威结论层；尚未实现自动 R1 导出器。
-- H2／Harness／retention 研究资产已在工作分支提交为 `bb2c768`，尚待快进进入本地 `main`。
+- H2／Harness／retention 研究资产已随 `bb2c768` 与 `96bfd21` 进入本地 `main`；远端 `origin/main` 尚未包含本轮提交。
 - Pilot 005／006 的版本化控制包位于 `experiments/context-routing/pilots/`；R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与可复现控制面。
