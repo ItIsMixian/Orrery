@@ -10,10 +10,15 @@ Updated: 2026-08-18
 - 自托管补全新增 installer 排除模板 Python 缓存的回归断言。
 - 2026-08-18 基线结果：默认套件 28 项中 27 项通过、动态 reader 测试按设计跳过；设置 `ORRERY_TEST_BUILD=1` 后完整 28/28 通过。24 项 benchmark 语料与工作树中的 6 份 run record 也通过验证。
 - 发布分支 CI `32057247222` 与 main CI `32057443759` 均在 Windows／Ubuntu 通过；最初失败轮 `32057075492` 暴露浅克隆缺少历史 commit，workflow 已改为 `fetch-depth: 0`。
+- `tests/test_context_routing_h2.py` 当前 11 项专项测试，保护读取预算、路径边界、哈希／换行规范、Windows CRLF stdout 恢复且拒绝正文篡改、Hook 语义、CLI JSONL 独立审计、命令／写路径归一化、未知工具拒绝、原始证据篡改检测及 Pilot 005／006 冻结控制包 dry-run；2026-08-18 本地为 11/11 通过。
+- Pilot 005／006 与 CRLF 修复集成后的全仓结果：默认 39 项中 38 通过、1 项按设计跳过；设置 `ORRERY_TEST_BUILD=1` 后 39/39 通过。24 项 corpus、6 份既有 run record、integrated static build、文档站生成、本地 Markdown 链接和 `git diff --check` 均通过。
+- 十份仓库外 Hook smoke manifest 已全部重新 verify；真实 Windows CLI 0.147.0 未产出 Hook 日志，因此正式 B/H2 前只允许使用经 validator 证明的 JSONL 事后模式。
 
 ## 验证证据
 
 - [2026-08-18 自托管基线](../validation/2026-08-18-self-hosting-baseline.md)
+- [2026-08-18 H2 读取证明装置](../validation/2026-08-18-h2-read-proof-apparatus.md)
+- [2026-08-18 Pilot 005 / 006 B/H2](../validation/2026-08-18-pilot-005-006-bh2.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -21,6 +26,6 @@ Updated: 2026-08-18
 ## 已知缺口
 
 - 动态图形化 AI 设置测试默认跳过，除非安装 reader 依赖。
-- 没有 Harness 独立证明模型接收文件字节的端到端测试。
-- 外部 benchmark 原始数据的长期完整性目前依赖本机目录和报告内 hash。
+- 当前端到端强度止于代理+完整 CLI JSONL 的事后交叉证明；没有可工作的实时 Hook 阻断。
+- 外部原始数据已有 manifest 与保留策略，但仍依赖本机存储，且尚无自动脱敏导出器或异地备份。
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
