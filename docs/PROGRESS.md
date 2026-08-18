@@ -4,7 +4,7 @@ Updated: 2026-08-18
 
 ## 当前阶段
 
-Project Orrery v0.2.0 已公开发布。发布后的 B/H2 小样本和本地合并已经完成：B 与 H2 在两个新高风险任务上均通过 2/2 独立验收，但 H2 总 input token 高 18.5%，没有通过采纳成本门。H2 不进入发布 Skill；读取证明和原始证据工具仅保留为研究 Harness。研究提交已进入本地 `main`，尚未推送远端，也没有发布新版本。
+Project Orrery v0.2.0 已公开发布。B/H2 研究、自托管状态和本地整合提交已经全部推送到 `origin/main`，远端当前落点为 `f9cd508`；没有发布新版本。H2 因总 input token 高 18.5% 不采纳。新的 Pilot 007 已在独立分支准备，用三项新任务直接比较当前流程 P 与冻结的 Context Manifest B；控制包 dry-run 已通过，六次模型运行尚未启动。
 
 ## 已完成
 
@@ -23,6 +23,9 @@ Project Orrery v0.2.0 已公开发布。发布后的 B/H2 小样本和本地合�
 - [x] 保留 Pilot 005 的四个装置失败 run，并以修正后的 Pilot 006 完成 4 个正式运行；四份 raw manifest 均可验证。
 - [x] 以 v3 规则只读复核 Windows CRLF stdout 假阴性；Pilot 006 四个运行的内容读取证明均有效，原始分类没有被改写。
 - [x] 完成研究轮最终回归：默认 39 项中 38 通过、1 项按设计跳过；动态 reader 开启后 39/39 通过；24 项 corpus、6 份 run record、integrated static build、文档站、本地链接和 diff 检查通过。
+- [x] 将 `bb2c768`、`96bfd21`、`f9cd508` 全部推送到公开 `origin/main`。
+- [x] 冻结 Pilot 007 的 P/B treatment、三项新任务、独立 Oracle、Terra medium 配置和采纳门；baseline negative control 与 dry-run 通过，未启动模型调用。
+- [x] 完成 Pilot 007 准备回归：专项 12/12、默认 39/40（1 skip）、动态 reader 40/40，corpus／run records、文档站、本地链接与 diff 检查通过。
 
 ## 当前结论
 
@@ -30,7 +33,7 @@ Project Orrery v0.2.0 已公开发布。发布后的 B/H2 小样本和本地合�
 - 发布版 Skill 仍不强制 Context Manifest、Selected Evidence 或访问回执。
 - H2 正确性与 B 持平，但总 input token 高 18.5%、output 高 22.5%、代理正文高 23.7%、墙钟高 7.2%；非缓存 input 低 31.9% 不足以抵消总成本，因此 H2 不采纳。
 - 当前装置只证明受控命令输出与代理切片一致，不证明模型理解，也不提供实时阻断。
-- 下一项上下文路由工作回到更简单的“固定入口／任务定位 + Harness 外部专项验收”；如再提出候选，必须用新假设和新 Pilot，而不是继续给 H2 叠加回执。
+- Pilot 007 将直接回答 B 是否优于当前流程 P；在正式运行、R2 复核和维护者接受之前，B 仍不是发布策略。
 
 ## 待办
 
@@ -43,6 +46,9 @@ Project Orrery v0.2.0 已公开发布。发布后的 B/H2 小样本和本地合�
 - [x] 运行小规模 B/H2 对照，并按正确性、必要依赖召回、input token、代理字节和墙钟时间决定是否继续；结论为不采纳 H2。
 - [x] 审阅并提交 H2 研究设施、Pilot 005／006 控制包和 R2 结论；研究层提交为 `bb2c768`，仓库外 R0 原始输出未进入 Git。
 - [x] 将研究分支以 `--ff-only` 快进合并到本地 `main`；`main` 已包含 `bb2c768` 与 `96bfd21`，本轮不发布新 Skill 版本。
+- [x] 将本轮全部提交推送到 `origin/main`；远端 `main` 与本地推送点一致。
+- [x] 准备 Pilot 007 B 采纳实验及独立 Oracle，不执行正式模型样本。
+- [ ] 经维护者再次确认后运行 Pilot 007 的 3 对 P/B 样本，并按冻结门生成 R2 结论。
 - [ ] 跨平台 byte-for-byte 可重复打包暂不进入本阶段；v0.2.0 已发布资产的 checksum 仍有效。
 
 ## Blockers / risks
@@ -55,4 +61,4 @@ Project Orrery v0.2.0 已公开发布。发布后的 B/H2 小样本和本地合�
 
 ## 下一里程碑
 
-本轮 H2 研究已关闭。后续如继续，先提出更简单的固定入口／任务定位 + Harness 专项验收假设，再冻结新质量门；在此之前不修改发布 Skill。
+Pilot 007 控制包准备完成。下一里程碑是在维护者明确确认后启动三项任务的 P/B 成对运行；运行前不得修改控制包，运行后先做独立 R2 评估，不直接创建 ADR。

@@ -18,11 +18,14 @@ Authority: research state; no routing candidate is accepted product policy
 - Pilot 005 用两个新高风险任务启动 B/H2，但共同 Harness 存在命令包装、绝对路径、Git 历史和 Oracle 契约问题；四份 run 只作为 apparatus failure 保留。
 - Pilot 006 修正共同装置后，B 与 H2 的候选和独立任务 Oracle 均为 2/2 通过。冻结 validator 对 CRLF→CRCRLF 产生两个访问假阴性；v3 只读复核在不改原始分类的前提下证明四个 run 的代理读取均有效。
 - Pilot 006 聚合成本：H2 相对 B 的总 input +18.5%、cached input +24.7%、non-cached input -31.9%、output +22.5%、代理正文 +23.7%、Agent 时间 +7.2%。H2 没有达到“总 input 不高于 B”的预设门。
+- Pilot 007 已准备但尚未运行。它把此前漂移的 B 冻结为“首次正文读取前 Context Manifest、扩张前 reason-coded Scope Expansion、最终 Access Summary、无 receipt 文件”，并直接与当前发布流程 P 对照。
+- Pilot 007 基线固定为已推送的 `f9cd508696280e41c933680f3b8c5090fe71cd9d`，模型固定为 `gpt-5.6-terra` / medium；PO-CR-027／028／029 的独立 Oracle、自测和 baseline negative control 已通过 dry-run。
 
 ## 当前产品影响
 
 - 发布版 Skill 不强制 Context Manifest、Selected Evidence 或 Access Receipt。
 - B 只是实验基线，不是发布策略。
+- Pilot 007 的 B 是采纳候选而非已采纳策略；准备控制包、通过 dry-run 或未来通过自动门都不会自动修改发布 Skill，仍需 R2 复核和维护者明确接受后才能新增 ADR。
 - H1、Context Aperture v0.1 和 H2 都没有成为发布策略；H2 对照已结束且不采纳。受控读取代理与 validator 继续作为研究 Harness，不是普通用户要求。
 
 ## 证据
@@ -37,6 +40,9 @@ Authority: research state; no routing candidate is accepted product policy
 - [装置验证](../validation/2026-08-18-h2-read-proof-apparatus.md)
 - [Pilot 005 / 006 结果](../../experiments/context-routing/results/2026-08-18-pilot-005-006-bh2-terra-medium.md)
 - [Pilot 005 / 006 验证](../validation/2026-08-18-pilot-005-006-bh2.md)
+- [B 采纳候选](../../experiments/context-routing/designs/context-manifest-b-adoption-v0.1.zh-CN.md)
+- [Pilot 007 实施计划](../implementation/plans/2026-08-18-context-manifest-b-adoption-experiment.md)
+- [Pilot 007 准备验证](../validation/2026-08-18-pilot-007-preparation.md)
 
 ## 已知边界
 
@@ -45,3 +51,4 @@ Authority: research state; no routing candidate is accepted product policy
 - token 统计受 Codex 缓存上下文和工具输出影响，不能只用“读取文件数”解释。
 - JSONL 是事后审计；Hook 未工作时不能宣称直接读取已被执行前阻断。
 - Pilot 006 样本只有两个高风险任务；它足以判定当前 H2 未达到冻结质量门，不足以支持普遍模型结论。
+- Pilot 007 只有三项新任务；即使全部通过，也只能支持当前 Project Orrery、当前模型和当前受控 CLI 工具面下的受限采纳讨论。

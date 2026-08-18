@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "pilot_id": "pilot-007",
+  "prompt_revision": "po-context-routing-pilot-007-v1",
+  "baseline_commit": "f9cd508696280e41c933680f3b8c5090fe71cd9d",
+  "task_order_seed": 7007,
+  "model": "gpt-5.6-terra",
+  "reasoning_effort": "medium",
+  "timeout_minutes": 25,
+  "evidence_mode": "codex-exec-jsonl-posthoc",
+  "variants": ["P", "B"],
+  "adoption_gate": {
+    "b_required_passes": 3,
+    "b_input_ratio_max": 1.10,
+    "b_output_ratio_max": 1.15,
+    "b_agent_seconds_ratio_max": 1.15,
+    "b_proxy_bytes_ratio_max_for_direct_benefit": 0.85
+  },
+  "tasks": [
+    {
+      "task_id": "PO-CR-027",
+      "task_file": "tasks/PO-CR-027.zh-CN.md",
+      "category": "release_reproducibility",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "scripts/package_release.py",
+        "tests/test_project_orrery.py"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m py_compile scripts/package_release.py",
+        "python -m unittest discover -s tests -v"
+      ]
+    },
+    {
+      "task_id": "PO-CR-028",
+      "task_file": "tasks/PO-CR-028.zh-CN.md",
+      "category": "research_evidence_security",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "experiments/context-routing/harness/export_sanitized_evidence.py",
+        "experiments/context-routing/harness/README.md",
+        "tests/test_context_routing_h2.py"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m py_compile experiments/context-routing/harness/export_sanitized_evidence.py",
+        "python -m unittest tests.test_context_routing_h2 -v"
+      ]
+    },
+    {
+      "task_id": "PO-CR-029",
+      "task_file": "tasks/PO-CR-029.zh-CN.md",
+      "category": "public_documentation",
+      "risk": "medium",
+      "expected_product_write_paths": [
+        "README.md",
+        "README.zh-CN.md"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m unittest discover -s tests -v"
+      ]
+    }
+  ]
+}

@@ -686,6 +686,34 @@ class Pilot005ApparatusTests(unittest.TestCase):
             report["control_hashes"],
         )
 
+    def test_pilot_007_b_adoption_apparatus_dry_run(self):
+        runner = (
+            REPO_ROOT
+            / "experiments"
+            / "context-routing"
+            / "pilots"
+            / "pilot-007"
+            / "run_pilot.py"
+        )
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", str(runner), "--dry-run"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+            timeout=90,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["pilot"], "pilot-007")
+        self.assertEqual(report["dry_run"], "passed")
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-007/operator/acceptance.py",
+            report["control_hashes"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
