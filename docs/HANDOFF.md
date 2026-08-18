@@ -14,7 +14,8 @@ Updated: 2026-08-18
 - Pilot 005 四个 B/H2 run 因共同装置缺陷全部按 `contaminated` 封存；Pilot 006 修正共同 Harness 后完成相同两个任务。B/H2 均通过 2/2 任务验收。
 - Pilot 006 的 PO-CR-026 两份冻结访问结果受 CRLF→CRCRLF 假阴性影响，原始分类仍为 `contaminated`；v3 只读复核证明四个 run 的访问均有效，且四份 manifest 始终有效。
 - H2 相对 B 的总 input 高 18.5%，没有通过预设成本门，不采纳、不新增 ADR、不修改发布 Skill。R2 结论见 [Pilot 005 / 006 报告](../experiments/context-routing/results/2026-08-18-pilot-005-006-bh2-terra-medium.md)。
-- `codex/b-adoption-pilot` 正在准备 Pilot 007：P 是当前发布流程，B 固定为 Context Manifest／Scope Expansion／Access Summary 且不生成 receipt 文件。三项新任务的 Oracle 与 dry-run 已通过，正式 6 个 run 尚未启动。
+- `codex/b-adoption-pilot` 已完成 Pilot 007 六次运行。仓库外原始根为 `D:\coding warehouse\project-orrery-benchmark\pilot-007-20260818-143450`；六份 manifest 有效，不得回写、重分类或复制进 Git。
+- Pilot 007 的共同 nested-branch formal-validation 缺陷使原 raw 0/3 对 0/3 不能直接解释；R2 语义复核为 P/B 均 2/3。B 的成本／收益门仍全部失败，因此不采纳、不新增 ADR。
 
 ## 风险与常见陷阱
 
@@ -27,7 +28,8 @@ Updated: 2026-08-18
 - JSONL 模式是完整事件流上的事后作废，不是实时权限边界；任何 MCP／Hosted／未知 item、直接读取命令或输出哈希不匹配都必须使 run 失败。
 - 原始 run sealing 后不得增补文件或“修正”分类；派生复核进入新 R1／Validation 文件并引用原 run。
 - 读取代理已改为直接写 UTF-8 bytes；不要恢复为 Windows TextIO 输出，否则 CRLF 会再次变成 CRCRLF。兼容旧 run 的恢复形式仍必须命中代理独立 SHA-256，不能接受无哈希的换行宽松比较。
-- Pilot 007 一旦首个模型 run 启动即冻结；共同装置问题必须进入 Pilot 008。不要把 dry-run 通过写成 B 已通过或已采纳。
+- Pilot 007 已冻结；共同装置问题必须进入 Pilot 008。不要修复 raw summary、frozen Oracle、协议检查或候选仓库后再冒充同一轮结果。
+- 未来 runner 的外层隔离分支不能再命名为 `benchmark`，否则既有 Pilot 006 dry-run 会在嵌套 clone 中创建同名分支失败。
 
 ## 安全接续点
 
@@ -35,5 +37,5 @@ Updated: 2026-08-18
 2. 运行自托管结构验证和完整测试，确认 Validation 仍匹配。
 3. 阅读 [H2 装置验证](validation/2026-08-18-h2-read-proof-apparatus.md)、[Pilot 005 / 006 验证](validation/2026-08-18-pilot-005-006-bh2.md)和活动 Implementation Plan。
 4. Pilot 007 准备后的专项测试为 12/12；全仓默认 39/40（1 skip），动态 reader 开启后 40/40；benchmark、integrated build、文档站、本地链接与 diff 检查通过。若涉及既有 raw run，只可执行 verify／只读派生。
-5. H2 研究轮已经关闭。Pilot 007 是新的直接采纳实验，基线固定为 `f9cd508696280e41c933680f3b8c5090fe71cd9d`；正式运行必须输出到仓库外新目录，并使用 Terra medium。
-6. Pilot 007 运行前再次执行 `python experiments/context-routing/pilots/pilot-007/run_pilot.py --dry-run`。未得到维护者启动确认时只准备，不运行；通过自动门后仍先请求维护者决定，再考虑 ADR。
+5. 阅读 [Pilot 007 R2 结果](../experiments/context-routing/results/2026-08-18-pilot-007-pb-adoption-terra-medium.md)和 [运行验证](validation/2026-08-18-pilot-007-pb-adoption.md)；不要只看 frozen raw 的 0/3。
+6. 当前没有活动采纳实验。若用户要求继续，先写 Pilot 008 Design／Plan／Oracle 并完成真正嵌套的 preflight；不得直接重跑 Pilot 007。

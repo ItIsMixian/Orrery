@@ -1,6 +1,6 @@
 # Context Manifest B 采纳实验实施计划
 
-Status: apparatus prepared; model runs not started
+Status: completed; Pilot 007 contaminated and B not adopted
 Updated: 2026-08-18
 Authority: implementation intent; does not change the released Skill
 
@@ -16,11 +16,12 @@ Authority: implementation intent; does not change the released Skill
 - [x] 在运行前冻结正确性、依赖召回、成本和最小收益门。
 - [x] 为三项任务建立独立 Oracle、自测与 baseline negative control。
 - [x] 完成控制包 dry-run 和仓库回归。
-- [ ] 用 `gpt-5.6-terra` / medium 启动 3 对 P/B run；同任务成对并行，不隐藏重试。
-- [ ] 封存 R0，生成 R1/R2，只读复核采纳门。
-- [ ] 由维护者决定拒绝、继续补样本或接受；只有接受才新增 ADR。
+- [x] 用 `gpt-5.6-terra` / medium 启动 3 对 P/B run；同任务成对并行，没有隐藏重试。
+- [x] 封存 6 份 R0，以 pilot summary 作为 R1 聚合，并生成 R2 只读复核。
+- [x] 按冻结门停止采纳：B 成本／收益门失败，且 Pilot 007 有共同装置缺陷；不新增 ADR。
 
 准备证据见 [Pilot 007 准备验证](../../validation/2026-08-18-pilot-007-preparation.md)。
+完成证据见 [Pilot 007 运行验证](../../validation/2026-08-18-pilot-007-pb-adoption.md)与 [R2 结果](../../../experiments/context-routing/results/2026-08-18-pilot-007-pb-adoption-terra-medium.md)。
 
 ## 运行边界
 
@@ -28,6 +29,10 @@ Authority: implementation intent; does not change the released Skill
 - 正式输出根使用新的仓库外目录，例如 `D:\coding warehouse\project-orrery-benchmark\pilot-007-<timestamp>`。
 - 运行开始后不得修改 `pilot-007/`；装置修复进入 Pilot 008。
 - 本计划的勾选只说明准备工作，不证明 B 已通过或已被采纳。
+
+## 完成结论
+
+六份 R0 manifest 均有效，但共同 formal-validation 分支冲突使本轮不能作为完全干净的采纳实验。只读复核后 P/B 任务质量同为 2/3；B 聚合 input、output、时间均超过门槛，只减少 6.95% 代理正文，未达到 15% 最小收益。B 不采纳，发布 Skill 保持不变；任何后续修复进入 Pilot 008。
 
 ## 决策出口
 

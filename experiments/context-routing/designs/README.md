@@ -14,4 +14,4 @@ Designs in this directory are research proposals. They have no authority over th
 
 All current candidates remain non-authoritative. H2 removed model-authored protocol prose and used a Harness read proxy plus independent CLI-event auditing, but the paired Pilot 006 tasks found 18.5% higher total input than B. H2 therefore failed its frozen adoption gate and will not receive an adoption ADR.
 
-Pilot 007 now freezes the historical B label into one direct adoption candidate and compares it with the current released process P. Its control packet and Oracle are prepared, but no model run or adoption decision exists yet.
+Pilot 007 froze the historical B label and completed a direct comparison with current process P. The run exposed a shared formal-validation defect; corrected task quality remained equal while B missed every cost/benefit gate. B is not adopted. See the [Pilot 007 R2 result](../results/2026-08-18-pilot-007-pb-adoption-terra-medium.md).

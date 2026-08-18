@@ -4,7 +4,7 @@ Updated: 2026-08-18
 
 ## 当前阶段
 
-Project Orrery v0.2.0 已公开发布。B/H2 研究、自托管状态和本地整合提交已经全部推送到 `origin/main`，远端当前落点为 `f9cd508`；没有发布新版本。H2 因总 input token 高 18.5% 不采纳。新的 Pilot 007 已在独立分支准备，用三项新任务直接比较当前流程 P 与冻结的 Context Manifest B；控制包 dry-run 已通过，六次模型运行尚未启动。
+Project Orrery v0.2.0 已公开发布。Pilot 007 的六次 P/B 运行已经完成并封存：六份 R0 manifest 有效，但共同 formal-validation 分支冲突和一份 B 访问装置无效使本轮不能成为干净的因果对照。只读复核后 P/B 任务质量同为 2/3；B 的 input、output、时间和最小正文收益门全部失败。因此 B 不采纳，不新增 ADR，不修改发布 Skill。
 
 ## 已完成
 
@@ -26,6 +26,8 @@ Project Orrery v0.2.0 已公开发布。B/H2 研究、自托管状态和本地�
 - [x] 将 `bb2c768`、`96bfd21`、`f9cd508` 全部推送到公开 `origin/main`。
 - [x] 冻结 Pilot 007 的 P/B treatment、三项新任务、独立 Oracle、Terra medium 配置和采纳门；baseline negative control 与 dry-run 通过，未启动模型调用。
 - [x] 完成 Pilot 007 准备回归：专项 12/12、默认 39/40（1 skip）、动态 reader 40/40，corpus／run records、文档站、本地链接与 diff 检查通过。
+- [x] 完成 Pilot 007 六次 Terra medium P/B 运行；所有 CLI 最终 exit 0，六份 R0 manifest 6/6 校验有效，没有隐藏重试。
+- [x] 完成 Pilot 007 R2 只读复核：记录共同装置缺陷，将 029 的固定词形 Oracle 假阴性与 027 的真实跨平台排序遗漏分离，并按冻结成本门停止 B 采纳。
 
 ## 当前结论
 
@@ -33,7 +35,8 @@ Project Orrery v0.2.0 已公开发布。B/H2 研究、自托管状态和本地�
 - 发布版 Skill 仍不强制 Context Manifest、Selected Evidence 或访问回执。
 - H2 正确性与 B 持平，但总 input token 高 18.5%、output 高 22.5%、代理正文高 23.7%、墙钟高 7.2%；非缓存 input 低 31.9% 不足以抵消总成本，因此 H2 不采纳。
 - 当前装置只证明受控命令输出与代理切片一致，不证明模型理解，也不提供实时阻断。
-- Pilot 007 将直接回答 B 是否优于当前流程 P；在正式运行、R2 复核和维护者接受之前，B 仍不是发布策略。
+- Pilot 007 没有显示 B 的质量收益；B 相对 P 聚合 input +25.68%、output +23.56%、Agent 时间 +16.89%，代理正文仅 -6.95%，不满足采纳门。
+- 共同装置缺陷意味着不能把本轮宣传为普遍“科学证伪 B”；项目层面的保守决定仍是不采纳、不继续给当前 B 增加协议。
 
 ## 待办
 
@@ -48,7 +51,7 @@ Project Orrery v0.2.0 已公开发布。B/H2 研究、自托管状态和本地�
 - [x] 将研究分支以 `--ff-only` 快进合并到本地 `main`；`main` 已包含 `bb2c768` 与 `96bfd21`，本轮不发布新 Skill 版本。
 - [x] 将本轮全部提交推送到 `origin/main`；远端 `main` 与本地推送点一致。
 - [x] 准备 Pilot 007 B 采纳实验及独立 Oracle，不执行正式模型样本。
-- [ ] 经维护者再次确认后运行 Pilot 007 的 3 对 P/B 样本，并按冻结门生成 R2 结论。
+- [x] 运行 Pilot 007 的 3 对 P/B 样本并生成 R2；结论为装置受污染且 B 成本／收益门失败，不采纳。
 - [ ] 跨平台 byte-for-byte 可重复打包暂不进入本阶段；v0.2.0 已发布资产的 checksum 仍有效。
 
 ## Blockers / risks
@@ -58,7 +61,9 @@ Project Orrery v0.2.0 已公开发布。B/H2 研究、自托管状态和本地�
 - v0.2.0 的 GitHub 资产和 checksum 一致，但 Windows 与 Ubuntu 从同一 tag 本地打包得到的 zip 字节不同；已确认条目集合一致，差异来自行尾与权限元数据，列入下一补丁。
 - Windows Codex CLI 0.147.0 的 `codex exec` 未执行项目或会话内联 Hook；当前 JSONL 模式只能事后判废，不能执行前阻断。
 - Pilot 006 只有两个高风险任务，足以否决当前 H2 的预设成本门，不足以推导所有模型和任务的普遍规律。
+- Pilot 007 的外层 `benchmark` 分支会使嵌套 Pilot 006 dry-run 创建同名分支失败；任何未来 Pilot 必须在启动前用不同外层分支名覆盖该路径。
+- Pilot 007 frozen Oracle 对 029 过度要求英文精确词形 `ExecutionPolicy`；R2 已修正语义判断，但没有回写原始 Oracle 或 raw summary。
 
 ## 下一里程碑
 
-Pilot 007 控制包准备完成。下一里程碑是在维护者明确确认后启动三项任务的 P/B 成对运行；运行前不得修改控制包，运行后先做独立 R2 评估，不直接创建 ADR。
+上下文路由采纳实验暂时停止。下一里程碑回到发布产品 backlog；若维护者仍希望研究 Manifest，先提出明显更低成本的新候选并建立 Pilot 008，而不是补跑或改写 Pilot 007。
