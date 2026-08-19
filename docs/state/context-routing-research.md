@@ -1,6 +1,6 @@
 # 上下文路由研究 State
 
-Updated: 2026-08-18
+Updated: 2026-08-19
 Authority: research state; no routing candidate is accepted product policy
 
 ## 当前事实
@@ -21,6 +21,8 @@ Authority: research state; no routing candidate is accepted product policy
 - Pilot 007 已完成 3 项任务 × P/B 六次运行；基线为 `f9cd508696280e41c933680f3b8c5090fe71cd9d`，模型为 `gpt-5.6-terra` / medium，六份 R0 manifest 全部有效且没有隐藏重试。
 - Pilot 007 存在共同 formal-validation 分支冲突；`PO-CR-028-B` 另有 failed proxy command 和协议检查假阴性，因此不能作为完全干净的采纳因果对照。
 - 只读语义复核后 P/B 任务质量同为 2/3。B 相对 P 的聚合 input +25.68%、output +23.56%、Agent 时间 +16.89%、代理正文 -6.95%，没有通过 input、output、时间或 15% 最小正文收益门。
+- 用户已通过 ADR-0002 接受新的长期评测政策：后续采纳实验必须加入隔离的真实应用开发任务，滚动组合目标约为 60% 产品代码、20% 安全／迁移／跨模块、20% 文档／发布治理；三任务 Pilot 至少两项以可运行代码为主要交付物。
+- Marglo／NextStep Seed_2 已被确认适合作为任务模式来源，但真实工作树、用户数据、凭据和未提交改动不得进入实验。真实开发 fixture、任务和 Pilot 008 尚未实现。
 
 ## 当前产品影响
 
@@ -28,6 +30,7 @@ Authority: research state; no routing candidate is accepted product policy
 - B 只是实验基线，不是发布策略。
 - Pilot 007 没有支持采纳 B；不新增 ADR、不修改发布 Skill。若未来仍研究显式 Manifest，应先形成不同假设并建立 Pilot 008，不能改写或补跑 Pilot 007。
 - H1、Context Aperture v0.1 和 H2 都没有成为发布策略；H2 对照已结束且不采纳。受控读取代理与 validator 继续作为研究 Harness，不是普通用户要求。
+- ADR-0002 只约束未来研究设计，不改变当前发布 Skill，也不重新解释 Pilot 001–007。
 
 ## 证据
 
@@ -46,6 +49,9 @@ Authority: research state; no routing candidate is accepted product policy
 - [Pilot 007 准备验证](../validation/2026-08-18-pilot-007-preparation.md)
 - [Pilot 007 R2 结果](../../experiments/context-routing/results/2026-08-18-pilot-007-pb-adoption-terra-medium.md)
 - [Pilot 007 运行验证](../validation/2026-08-18-pilot-007-pb-adoption.md)
+- [ADR-0002 真实开发任务组合](../decisions/0002-real-development-benchmark-portfolio.md)
+- [真实开发基准 Approved Design](../design/real-development-context-routing-benchmark.md)
+- [Marglo 素材观察](../library/2026-08-19-marglo-benchmark-source-notes.zh-CN.md)
 
 ## 已知边界
 
@@ -55,3 +61,4 @@ Authority: research state; no routing candidate is accepted product policy
 - JSONL 是事后审计；Hook 未工作时不能宣称直接读取已被执行前阻断。
 - Pilot 006 样本只有两个高风险任务；它足以判定当前 H2 未达到冻结质量门，不足以支持普遍模型结论。
 - Pilot 007 只有三项新任务且存在共同装置缺陷；原始成本差异是反对采纳的风险信号，不是对所有模型／任务的普遍因果估计。
+- 真实开发任务会增加 fixture 和 Oracle 成本；在独立 Plan、脱敏检查和嵌套 preflight 完成前，不得直接启动新 Pilot。

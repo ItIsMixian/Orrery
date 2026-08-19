@@ -52,7 +52,7 @@
 
 **What**: 测量 Agent 文档负担、上下文路由、访问证据与 Harness 验收。
 **Truth**: `experiments/context-routing/` 与仓库外封存输出；当前没有任何实验策略进入发布版 Skill。
-**Dig**: [研究 State](docs/state/context-routing-research.md) | [研究综述](docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md)。
+**Dig**: [研究 State](docs/state/context-routing-research.md) | [研究综述](docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md) | [ADR-0002](docs/decisions/0002-real-development-benchmark-portfolio.md)。
 
 ## test coverage
 

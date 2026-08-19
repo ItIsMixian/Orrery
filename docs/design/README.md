@@ -7,3 +7,4 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 ## Approved designs
 
 - [Self-hosting documentation system](self-hosting-documentation-system.md) — the reader paths, storage boundaries, and synchronization rules governed by ADR-0001.
+- [Real-development context-routing benchmark](real-development-context-routing-benchmark.md) — isolated application-development task mix, Oracle hierarchy, and fixture boundaries governed by ADR-0002.

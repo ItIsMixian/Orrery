@@ -65,3 +65,9 @@
 - 发现外层隔离分支 `benchmark` 与嵌套 Pilot 006 dry-run 分支冲突，导致六边 formal validation 共同失败；`PO-CR-028-B` 另有 failed proxy read 与协议检查假阴性。本轮不能作为干净因果对照。
 - 冻结 Oracle 原始结果为 P 0/3、B 0/3；R2 语义复核将 029 固定词形假阴性修正后，P/B 质量同为 2/3，027 两边仍真实遗漏跨平台大小写排序。
 - B 相对 P 聚合 input +25.68%、output +23.56%、Agent 时间 +16.89%、代理正文 -6.95%；正确性无收益且四项成本／收益门均失败。B 不采纳，不新增 ADR，不修改发布 Skill。
+
+## 2026-08-19 — 真实开发基准政策采纳
+
+- 复核 Marglo／NextStep Seed_2 的双入口、ADR／State 演化、SQLite 迁移、安全门、UI、测试与发布文档，确认它能提供比纯文档维护更真实的开发任务模式。
+- 用户接受 ADR-0002：未来上下文路由采纳实验采用真实产品开发、安全／迁移／跨模块和文档治理的滚动任务组合；三任务 Pilot 至少两项以可运行代码为主要交付物。
+- 建立 Approved Design，固定代码优先的 Oracle 层级、隔离／脱敏要求和首批候选任务族。真实 fixture、Implementation Plan 和 Pilot 008 尚未创建，发布 Skill 保持不变。

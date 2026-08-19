@@ -1,6 +1,6 @@
 # 跨会话交接
 
-Updated: 2026-08-18
+Updated: 2026-08-19
 
 ## 当前情况
 
@@ -16,6 +16,8 @@ Updated: 2026-08-18
 - H2 相对 B 的总 input 高 18.5%，没有通过预设成本门，不采纳、不新增 ADR、不修改发布 Skill。R2 结论见 [Pilot 005 / 006 报告](../experiments/context-routing/results/2026-08-18-pilot-005-006-bh2-terra-medium.md)。
 - `codex/b-adoption-pilot` 已完成 Pilot 007 六次运行。仓库外原始根为 `D:\coding warehouse\project-orrery-benchmark\pilot-007-20260818-143450`；六份 manifest 有效，不得回写、重分类或复制进 Git。
 - Pilot 007 的共同 nested-branch formal-validation 缺陷使原 raw 0/3 对 0/3 不能直接解释；R2 语义复核为 P/B 均 2/3。B 的成本／收益门仍全部失败，因此不采纳、不新增 ADR。
+- ADR-0002 已接受：未来上下文路由采纳实验必须含隔离的真实应用开发任务。Approved Design 已完成，真实 fixture、Oracle 和 Pilot 008 尚未开始。
+- Marglo／NextStep Seed_2 是首批素材来源；只可提炼模式或从固定提交构造脱敏 fixture，不能在真实工作树运行，也不能复制用户数据、凭据、缓存或未提交改动。
 
 ## 风险与常见陷阱
 
@@ -30,6 +32,7 @@ Updated: 2026-08-18
 - 读取代理已改为直接写 UTF-8 bytes；不要恢复为 Windows TextIO 输出，否则 CRLF 会再次变成 CRCRLF。兼容旧 run 的恢复形式仍必须命中代理独立 SHA-256，不能接受无哈希的换行宽松比较。
 - Pilot 007 已冻结；共同装置问题必须进入 Pilot 008。不要修复 raw summary、frozen Oracle、协议检查或候选仓库后再冒充同一轮结果。
 - 未来 runner 的外层隔离分支不能再命名为 `benchmark`，否则既有 Pilot 006 dry-run 会在嵌套 clone 中创建同名分支失败。
+- 不要把 ADR-0002 的“政策已接受”写成“Pilot 008 已准备”或“真实开发任务已通过”；当前没有新的控制包或运行证据。
 
 ## 安全接续点
 
@@ -39,3 +42,4 @@ Updated: 2026-08-18
 4. Pilot 007 准备后的专项测试为 12/12；全仓默认 39/40（1 skip），动态 reader 开启后 40/40；benchmark、integrated build、文档站、本地链接与 diff 检查通过。若涉及既有 raw run，只可执行 verify／只读派生。
 5. 阅读 [Pilot 007 R2 结果](../experiments/context-routing/results/2026-08-18-pilot-007-pb-adoption-terra-medium.md)和 [运行验证](validation/2026-08-18-pilot-007-pb-adoption.md)；不要只看 frozen raw 的 0/3。
 6. 当前没有活动采纳实验。若用户要求继续，先写 Pilot 008 Design／Plan／Oracle 并完成真正嵌套的 preflight；不得直接重跑 Pilot 007。
+7. 下一轮先读取 [ADR-0002](decisions/0002-real-development-benchmark-portfolio.md)与[真实开发基准 Design](design/real-development-context-routing-benchmark.md)，再为 fixture 构建创建独立 Implementation Plan；正式模型运行仍需再次确认。
