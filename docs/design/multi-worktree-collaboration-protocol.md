@@ -1,7 +1,9 @@
 # 多人／多 worktree 协作协议
 
-Status: Draft  
-Governing ADR: none; this document is not authoritative  
+Status: Approved for integration (Candidate scope)
+
+Governing decision: [PO-DEC-WT-001](../decisions/proposals/PO-DEC-WT-001-multi-worktree-collaboration.md); not canonical until a formal ADR is allocated and integrated
+
 Evidence date: 2026-08-19
 
 ## 问题
@@ -186,13 +188,13 @@ orrery integrate --target <integration-ref> --validate
 8. 合流完成前，release 视图仍指向原 tag／release commit。
 9. 两个分支同时提出决策时使用不同临时 ID；集成时按顺序获得唯一正式 ADR 编号并保持引用正确。
 
-## 进入 ADR 前需要确认的选择
+## 已确认的首版选择
 
-1. 是否正式保留主 worktree 仅供集成，并允许工具对普通任务的主目录写入给出硬错误。
-2. 分布式 branch handoff 使用平台 PR／Issue、仓库内短期 Task Record，还是两者可选。
-3. 是否在首版启用 `extensions.worktreeConfig`；本设计建议先不启用，以私有 `$GIT_DIR/orrery/` 文件保持兼容。
-4. canonical integration ref 是固定 `main`，还是由 `.project-orrery.json` 配置。
-5. 第一版冲突检测止于路径＋权威文档＋验证面，还是立即加入符号／依赖分析。
-6. 是否采用 `docs/decisions/proposals/` + 临时决策 ID，并只在集成时分配正式 ADR 编号。
+1. 主 worktree 默认只供集成；工具在明确识别出普通实现任务误入主目录时应阻止写入，并给出创建独立 worktree 的恢复路径。
+2. 分布式 branch handoff 优先复用平台 PR／Issue；没有平台能力时允许导出非权威的最小 Task Record，但首版不把它升级为新的文档层。
+3. 首版不启用 `extensions.worktreeConfig`，使用私有 `$GIT_DIR/orrery/` session 保持兼容。
+4. canonical integration ref 默认为 `main`，允许由项目配置覆盖，并在 session 中固定实际 ref 和 OID。
+5. 第一版检测路径、权威文档和验证面；符号／依赖分析延后，在结果中诚实保留 Semantic／Unknown 边界。
+6. 分支决策使用 `docs/decisions/proposals/` 和稳定临时 ID，只在集成时分配正式 ADR 编号。
 
-这些选择会改变跨模块协作和文档权威语义。用户接受后应形成新 ADR，再把本 Draft 升级为 Approved Design 并建立 Implementation Plan。
+维护者已于 2026-08-19 同意上述方向。本 Design 在当前分支属于 Candidate Approved Design；只有临时决策转换为正式 ADR 并进入 integration ref 后才成为 canonical 约束。
