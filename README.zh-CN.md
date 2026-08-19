@@ -8,13 +8,13 @@
 
 [![Validate Project Orrery](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml/badge.svg)](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Codex Skill](https://img.shields.io/badge/Codex-Skill-111827)](skills/project-orrery/SKILL.md)
+[![Agent & Harness](https://img.shields.io/badge/Agent_%26_Harness-Platform_Neutral-111827)](#可用集成)
 
 </div>
 
 Project Orrery 是一套平台中立、同时面向人类与软件 Agent 的仓库级项目记忆。它把本地 Markdown 组织成持续生长的项目观测台，让产品意图、架构决策、实施计划、当前状态和验证证据保持关联，同时避免把这些性质不同的信息误当成同一种事实。
 
-当前版本以可迁移的 [Codex Skill](skills/project-orrery/) 形式发布，包含安全脚手架和本地文档阅读器。它的文档模型和命令行工具面向任何 Agent 或 Harness 平台；Codex 是当前的打包集成方式，不是项目边界。
+它的权威模型、Markdown 结构、命令行工具和本地阅读器都面向任何 Agent 或 Harness 平台。特定平台的集成只是可选的交付层，不是 Project Orrery 的身份或边界。
 
 ## 为什么需要 Project Orrery
 
@@ -60,23 +60,16 @@ Project Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模�
 - **同时面向人和 Agent 的项目记忆**：为维护者与 Agent 提供清晰入口，同时不制造第二套互相竞争的事实源。
 - **适合团队协作的稳定输出面**：并行贡献者分别写入不同职责的文档，减少提案、决策、计划与实际状态之间的意外冲突。
 
+## 可用集成
+
+Project Orrery 的核心工作流可以直接通过命令行运行。打包集成只负责补充特定平台的安装和调用方式，不改变底层权威模型。
+
+- **Codex**：v0.2.0 已提供打包好的 [Codex Skill](skills/project-orrery/)。
+- **其他 Agent 与 Harness 平台**：现在即可使用平台中立的 CLI；其他打包集成尚未发布。
+
 ## 快速开始
 
-### 1. 安装 Codex Skill
-
-向 Codex 提出：
-
-> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
-
-Skill 会从下一轮对话开始可用。请通过 [GitHub 最新发布页](https://github.com/yw9299-stack/project-orrery/releases/latest)确认当前稳定标签。你也可以先验证发布包的 SHA-256 校验和，再把其中的 `project-orrery` 文件夹手动复制到 Codex Skill 目录。
-
-### 2. 审计并建立文档系统
-
-打开目标仓库，然后告诉 Codex：
-
-> 使用 Project Orrery 审计这个仓库。先展示 dry run，再建立文档观测台。
-
-也可以直接通过命令行执行：
+### 1. 通过平台中立 CLI 审计并建立文档系统
 
 ```bash
 git clone https://github.com/yw9299-stack/project-orrery.git
@@ -87,6 +80,16 @@ python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
 ```
 
 检查所有 `CREATE`、`SKIP`、`UPGRADE` 和 mixed-toolchain 警告，再去掉 `--dry-run` 正式安装。
+
+你可以直接运行这些命令，也可以让所使用的 Agent 或 Harness 执行同一套可审计流程。
+
+### 2. 可选：安装 Codex 集成
+
+向 Codex 提出：
+
+> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
+
+Skill 会从下一轮对话开始可用。请通过 [GitHub 最新发布页](https://github.com/yw9299-stack/project-orrery/releases/latest)确认当前稳定标签。你也可以先验证发布包的 SHA-256 校验和，再把其中的 `project-orrery` 文件夹手动复制到 Codex Skill 目录。
 
 ### 3. 验证安装结果
 

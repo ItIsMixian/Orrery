@@ -8,13 +8,13 @@
 
 [![Validate Project Orrery](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml/badge.svg)](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Codex Skill](https://img.shields.io/badge/Codex-Skill-111827)](skills/project-orrery/SKILL.md)
+[![Agent & Harness](https://img.shields.io/badge/Agent_%26_Harness-Platform_Neutral-111827)](#available-integrations)
 
 </div>
 
 Project Orrery is platform-neutral, repository-scale project memory for humans and software agents. It turns local Markdown into a living project observatory where product intent, architectural decisions, implementation plans, current state, and validation evidence stay connected without being mistaken for the same kind of truth.
 
-The current release is distributed as a portable [Codex skill](skills/project-orrery/) with a safe project scaffold and a local documentation viewer. The documentation model and command-line toolchain are intended for use with any Agent or Harness platform; Codex is the current packaged integration, not the boundary of the project.
+Its authority model, Markdown schema, command-line toolchain, and local viewer are designed for use with any Agent or Harness platform. Platform-specific integrations are optional delivery layers, not the identity or boundary of the project.
 
 ## Why Project Orrery
 
@@ -60,23 +60,16 @@ The evidence and open questions behind the next context-routing experiments are 
 - **Human-and-agent project memory** — clear entrances for maintainers and agents without creating a second, competing source of truth.
 - **Team-safe documentation surfaces** — parallel contributors write into distinct roles, reducing accidental conflict between proposals, decisions, plans, and actual state.
 
+## Available integrations
+
+Project Orrery's core workflow can be operated directly from the command line. Packaged integrations add platform-specific installation and invocation without changing the underlying authority model.
+
+- **Codex** — a packaged [Codex Skill](skills/project-orrery/) is available in v0.2.0.
+- **Other Agent and Harness platforms** — the platform-neutral CLI can be used today; additional packaged integrations have not yet been published.
+
 ## Quick start
 
-### 1. Install the Codex skill
-
-Ask Codex:
-
-> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
-
-The skill becomes available on the next turn. Use the [latest GitHub Release](https://github.com/yw9299-stack/project-orrery/releases/latest) to confirm the current stable tag. You can also verify the release archive's SHA-256 checksum and copy its `project-orrery` folder into your Codex skills directory manually.
-
-### 2. Audit and scaffold a repository
-
-Open the target repository and ask Codex:
-
-> Use Project Orrery to audit this repository. Show me the dry run before scaffolding the documentation observatory.
-
-For direct command-line use:
+### 1. Audit and scaffold with the platform-neutral CLI
 
 ```bash
 git clone https://github.com/yw9299-stack/project-orrery.git
@@ -87,6 +80,16 @@ python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
 ```
 
 Review every `CREATE`, `SKIP`, `UPGRADE`, and mixed-toolchain warning, then rerun without `--dry-run`.
+
+You may run this directly or ask your Agent or Harness to execute the same auditable workflow.
+
+### 2. Optional: install the Codex integration
+
+Ask Codex:
+
+> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
+
+The skill becomes available on the next turn. Use the [latest GitHub Release](https://github.com/yw9299-stack/project-orrery/releases/latest) to confirm the current stable tag. You can also verify the release archive's SHA-256 checksum and copy its `project-orrery` folder into your Codex skills directory manually.
 
 ### 3. Validate the installation
 
