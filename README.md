@@ -12,9 +12,9 @@
 
 </div>
 
-Project Orrery is repository-scale project memory for humans and software agents. It turns local Markdown into a living project observatory where product intent, architectural decisions, implementation plans, current state, and validation evidence stay connected without being mistaken for the same kind of truth.
+Project Orrery is platform-neutral, repository-scale project memory for humans and software agents. It turns local Markdown into a living project observatory where product intent, architectural decisions, implementation plans, current state, and validation evidence stay connected without being mistaken for the same kind of truth.
 
-It is distributed as a portable [Codex skill](skills/project-orrery/) with a safe project scaffold and a local documentation viewer. It is designed for solo maintainers, teams, and multiple agents working across sessions—especially when the reason behind a change must remain readable long after the original conversation has disappeared.
+The current release is distributed as a portable [Codex skill](skills/project-orrery/) with a safe project scaffold and a local documentation viewer. The documentation model and command-line toolchain are intended for use with any Agent or Harness platform; Codex is the current packaged integration, not the boundary of the project.
 
 ## Why Project Orrery
 
