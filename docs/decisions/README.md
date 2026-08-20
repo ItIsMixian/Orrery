@@ -25,4 +25,6 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-No active provisional decision proposals. Concurrent branches should still use stable IDs under `docs/decisions/proposals/` until an integrator allocates the next canonical ADR number.
+These records use stable provisional IDs so concurrent branches do not compete for the next canonical ADR number. They are not effective until an integrator allocates `ADR-NNNN`, updates references, and merges them into the integration ref.
+
+- [PO-DEC-WT-002: Local-first Team Mode and cross-machine metadata visibility](proposals/PO-DEC-WT-002-local-first-team-coordination.md) — maintainer approved for integration; proposes a narrow amendment to ADR-0007 so opt-in Local-only telemetry can coordinate unpushed work without becoming code evidence.
