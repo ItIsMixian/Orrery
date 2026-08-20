@@ -13,6 +13,7 @@ Material in this directory is **non-authoritative**. It may inform a proposal, b
 - [Task-centered context, provenance, and documentation overhead](2026-08-17-task-context-provenance-and-documentation-overhead.md) — evidence review and a proposed local benchmark for context routing, access receipts, documentation cost, and parallel development.
 - [任务中心上下文、可追溯证据与文档开销](2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md) — 中文版本。
 - [Marglo as a real-development benchmark source](2026-08-19-marglo-benchmark-source-notes.zh-CN.md) — Chinese source notes on deriving isolated code, migration, security, and cross-module tasks without copying live data or worktree changes.
+- [sivtr as a unified work-memory evidence layer](2026-08-19-sivtr-work-memory-source-notes.zh-CN.md) — Chinese source study of typed work records, stable refs, progressive retrieval, local-first boundaries, and the distinction between episodic evidence and authoritative project state.
 - [Context-routing benchmark](../../experiments/context-routing/) — non-authoritative experiment infrastructure and Git-grounded historical task corpus.
 - [Pilot 004 B/H holdout](../../experiments/context-routing/results/2026-08-18-pilot-004-bh-holdout-terra-medium.md) — both strategies passed the corrected independent acceptance surface; H was not adopted because it used 47% more input tokens overall.
 - [Current research State](../state/context-routing-research.md) — the authoritative current-project summary derived from the non-authoritative evidence above.
@@ -28,6 +29,7 @@ Material in this directory is **non-authoritative**. It may inform a proposal, b
 - [任务中心上下文、可追溯证据与文档开销](2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md)——关于上下文路由、访问回执、文档成本与并行开发的证据综述及本地基准方案。
 - [Task-centered context, provenance, and documentation overhead](2026-08-17-task-context-provenance-and-documentation-overhead.md)——英文版本。
 - [Marglo 真实开发基准素材观察](2026-08-19-marglo-benchmark-source-notes.zh-CN.md)——提炼代码、迁移、安全与跨模块任务的模式，同时排除真实数据和活跃工作树。
+- [sivtr 统一工作记忆层观察](2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)——分析类型化工作记录、稳定引用、渐进检索、local-first 边界，以及情境证据与权威项目事实的区别。
 - [上下文路由基准](../../experiments/context-routing/)——非权威实验基础设施与可由 Git 复核的历史任务语料。
 - [Pilot 004 B/H 留出任务结果](../../experiments/context-routing/results/2026-08-18-pilot-004-bh-holdout-terra-medium.md)——修正后的独立验收面上两种策略都通过；H 因总 input token 高 47% 而暂不采纳。
 - [当前研究 State](../state/context-routing-research.md)——由上述非权威证据派生的项目当前事实摘要。
