@@ -209,3 +209,4 @@
 - 临时决策 `PO-DEC-WT-001` 在最新集成历史上获得正式 ADR-0007；Approved Design 与活动 Plan 明确 Canonical／Candidate／Worktree 作用域、主 worktree 集成专用和临时 ADR 编号规则。
 - 首次默认回归发现通用 EOF 空行清理改变 Pilot 008／009 冻结输入哈希；没有修改冻结哈希，而是从恢复提交逐字节还原 27 个文件。定向 apparatus 2/2、默认 59 passed + 2 expected skips、动态 61/61、integrated structure、691 KB 静态站和 235 份 Markdown／420 个本地链接随后通过。
 - 本轮只采纳并验证人工工作法；私有 session、自动重叠检测、主 worktree 守卫、integration CLI 和观测台作用域投影仍未实现。没有推送 `origin/main`，也没有发布版本。
+- 已从本地集成点建立 `codex/agent-context-routing`、`codex/agent-platform-adapters` 与 `codex/agent-docsite` 三个 clean linked worktree；它们共享对象库但拥有独立 Git 管理目录、索引和工作目录。

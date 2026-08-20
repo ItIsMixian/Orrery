@@ -52,6 +52,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 完成 `Ariestar/sivtr@4fae091` 外部源码观察，区分其情境工作记忆层与 Orrery 权威事实层；记录 WorkRef／WorkSet 渐进披露、只读 MCP、检索评估、隐私生命周期和文档漂移启发。没有采纳依赖、Adapter、路由策略或新 Pilot。
 - [x] 恢复共享工作目录中的三项并发成果：保留 `a87c5a4` 恢复提交，在独立 integration worktree 中形成研究、产品、Library 和权威状态提交，并将临时协作决策分配为 ADR-0007。
 - [x] 完成 ADR-0007 人工采纳验证：冻结 Pilot 输入逐字节保留，默认／动态全仓、结构、静态站、Markdown 链接与 Git 检查通过。
+- [x] 从已验证本地 `main` 为 context-routing、platform／adapters 和 docsite／broker 建立三个独立 linked worktree；各目录初始 clean，HEAD、索引和工作目录隔离。
 
 ## 当前结论
 

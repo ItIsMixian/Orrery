@@ -6,7 +6,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 ## 当前事实
 
 - 单一 Git 仓库根：`D:\coding warehouse\project-orrery`。
-- 并发协作采用“一项任务／一个 Agent = 一个分支 + 一个独立 linked worktree 或 clone”；主 worktree 只供维护者集成。2026-08-20 已用独立 integration worktree 恢复并拆分三个共享工作目录任务，证明人工隔离与干净集成路径可行。
+- 并发协作采用“一项任务／一个 Agent = 一个分支 + 一个独立 linked worktree 或 clone”；主 worktree 只供维护者集成。2026-08-20 已用独立 integration worktree 恢复并拆分三个共享工作目录任务，随后为 context-routing、platform／adapters 和 docsite／broker 分配三个干净 linked worktree，证明人工隔离与干净集成路径可行。
 - 已发布 v0.2.0 产品源仍是 `skills/project-orrery/`；当前工作树新增未发布的 `packages/project-orrery-{core,cli,observatory}/` 源码边界和 `adapters/codex/` 薄平台 Adapter。
 - Core 持有 schema、manifest／兼容判定和 canonical 作者模板；CLI 组合 Core 与 Observatory；Observatory 持有 managed-tool 清单与模板投影规则。
 - 项目文档权威根：`AGENTS.md` 与 `docs/`。

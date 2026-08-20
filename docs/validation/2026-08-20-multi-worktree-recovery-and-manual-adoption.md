@@ -59,6 +59,18 @@ Approved Design: [多人／多 worktree 协作协议](../design/multi-worktree-c
 
 默认回归第一次运行的两项失败被保留在本记录中，不计作最终通过前的无效噪声：它直接发现了格式清理对冻结输入的破坏，并触发逐字节恢复，而不是修改测试或哈希来迎合当前工作树。
 
+## 后续工作目录分配
+
+本地 `main` fast-forward 到已验证集成提交后，创建了三个没有未提交文件的 linked worktree：
+
+| 任务域 | 分支 | 绝对路径 |
+|---|---|---|
+| Context routing | `codex/agent-context-routing` | `D:\coding warehouse\project-orrery-agent-context-routing` |
+| Platform／Adapters | `codex/agent-platform-adapters` | `D:\coding warehouse\project-orrery-agent-platform-adapters` |
+| Docsite／Broker | `codex/agent-docsite` | `D:\coding warehouse\project-orrery-agent-docsite` |
+
+三者初始 HEAD 均为已验证集成提交，`git status --porcelain` 均为空。每个 linked worktree 的 `$GIT_DIR` 位于主仓库 `.git/worktrees/<name>` 下且互不相同，`$GIT_COMMON_DIR` 均指向主仓库 `.git`；这证明对象库共享而索引、HEAD 与工作目录隔离。尚未给任何目录创建 worktree session，因为下一项任务的 expected writes 和 validation 尚未确定。
+
 ## 已知缺口
 
 - 没有自动阻止 Agent 在主 worktree 实现任务。

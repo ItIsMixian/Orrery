@@ -38,6 +38,7 @@ Updated: 2026-08-20
 - 三个 Agent 在同一 `main@96eee5a` 工作目录留下的交错改动已先封存到 `codex/recovery-shared-main-20260820@a87c5a4`，再在 `D:\coding warehouse\project-orrery-integration-20260820` 拆分为研究、产品、Library 和权威状态提交。恢复分支不可改写或删除。
 - ADR-0007 已接受一任务一分支／worktree、Canonical／Candidate／Worktree 作用域和干净集成规则。完整动态回归为 61/61，默认 59 passed + 2 expected skips；235 份 Markdown／420 个本地链接无缺失。当前仍是本地集成结果，没有推送或新 Release。
 - 自动 session、overlap、主 worktree 守卫、`orrery integrate` 与观测台 scope banner 尚未实现。三个后续 Agent 必须各自进入新分配的 worktree，不能继续复用原共享目录。
+- 已分配目录：context-routing 使用 `D:\coding warehouse\project-orrery-agent-context-routing`，platform／adapters 使用 `D:\coding warehouse\project-orrery-agent-platform-adapters`，docsite／broker 使用 `D:\coding warehouse\project-orrery-agent-docsite`。三者都是 clean linked worktree；尚未创建 session，开始新任务时再声明 expected writes 与 validation。
 
 ## 风险与常见陷阱
 
