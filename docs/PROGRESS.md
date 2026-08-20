@@ -1,6 +1,6 @@
 # 当前进度
 
-Updated: 2026-08-20
+Updated: 2026-08-21
 
 ## 当前阶段
 
@@ -9,6 +9,8 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 2026-08-20 已把三个 Agent 交错留在共享 `main` 工作目录的成果先封存为不可变恢复提交，再在独立 integration worktree 中按研究、产品和权威状态拆分并合入。ADR-0007 已正式接受一任务一分支／worktree、三层事实作用域与干净集成规则；默认 59 passed + 2 expected skips、动态 61/61、结构／静态站／235 份 Markdown 本地链接验证通过。当前只完成人工采纳与恢复流程，自动 session、重叠检测、主 worktree 守卫和 integration CLI 仍未实现；改动尚未推送或发布。
 
 同日完成多人／多 Agent 产品层收敛并接受 ADR-0008：默认 Personal Mode 为单成员多 Agent、zero-network；Team Mode 必须显式开启，只同步 Local-only 元数据且中央只读。Approved Design 进一步固定 Workstream／Scope、subsystem mapping、冲突处置、风险审查、人工集成、保守清理和渐进式指挥台。Plan 现在按 Personal foundation → 本地 review loop → opt-in Team extension → self-host/release 排序；这些均未实现、未发布。
+
+2026-08-21 接受并正式编号 ADR-0009，落地 Authority Meta Model 的文档规范：Project Seed 与协议 meta-rules 分离，各对象 lifecycle 与 Decision／Implementation／Validation 独立 claim dimensions 分离，Authority scope、provider-neutral evidence 和 derived-view conformance 获得 Approved Design。机器 Meta Model、版本字段、conformance fixture 和代码所有者均未实现／未决定；Implementation Plan 留到下一次对话。
 
 ## 已完成
 
@@ -56,6 +58,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 完成 ADR-0007 人工采纳验证：冻结 Pilot 输入逐字节保留，默认／动态全仓、结构、静态站、Markdown 链接与 Git 检查通过。
 - [x] 从已验证本地 `main` 为 context-routing、platform／adapters 和 docsite／broker 建立三个独立 linked worktree；各目录初始 clean，HEAD、索引和工作目录隔离。
 - [x] 完成协作产品层讨论与权威链审计：以 ADR-0008 正式修订 ADR-0007 的跨机器输入边界，并收敛 Personal／Team 模式、Workstream、Scope B、权限、审查、清理和指挥台 Approved Design／Plan。
+- [x] 通过 ADR-0009 与 Approved Design 建立 Authority Meta Model 规范层，澄清非线性 Authority Graph、独立 claim dimensions、作用域／证据／派生视图边界和 self-hosting 分层；没有启动代码重构。
 
 ## 当前结论
 
@@ -76,6 +79,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - 动态 docsite 已没有直接 Provider 路径；默认同用户托管 Broker 只提供统一路由和成本门，只有在独立 OS 身份或等价边界中配置并运行外部 Broker，才能把 Provider Key 隔离出 docsite／Agent 身份。
 - `sivtr` 可作为未来“情境证据来源”的研究对象，但不能替代 State／ADR／实现真值；任何可选 memory evidence Adapter 都需要新的权威／证据分层、隐私生命周期和可复现验证决定，当前不进入发布版或下一 Pilot。
 - 多人／多 Agent 现在有可执行的人工安全工作法和完整的目标 Design，但还不是自动协调系统：独立 worktree 能隔离写入，唯一整合者能对齐权威文档；当前工具不能自动阻止误入主目录、生成 session／finding／review，也没有 Personal 指挥台或 Team telemetry。ADR-0008 允许未来成员主动上报 Local-only 元数据，但未上报内容和语义证据不足处仍是 Unknown。
+- Authority Meta Model 现在是有效规范而非机器实现：当前 consumers 仍可能含分散语义，且没有 `authority_model_version`、domain API 或统一 conformance fixture。AUTH-1 产品核心定位与 AUTH-4 单一 semantics owner 继续 pending。
 
 ## 待办
 
@@ -103,6 +107,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 完成 Broker-first docsite gateway：所有 API 入口统一经 Broker 注册，默认托管不强制连接测试，外部模式只接收 client token；根／模板、README 和 Validation 已同步。
 - [ ] 在明确授权后，把独立 CLI 与 Adapter 安装到隔离的真实 Codex 用户技能位置，记录精确 runtime／OS 的发现、调用、失败、更新和卸载 E2E；完成前保持 `experimental`，且不发布组件。
 - [ ] 按 ADR-0007／ADR-0008 活动 Plan 先实现 Personal foundation Phase 0：版本化 Workstream／session／scope／finding schema、subsystem registry、Git fixture、integration ref 解析和主 worktree 识别；在此之前继续人工创建独立 worktree，且不启动 Team 网络能力。
+- [ ] 下一次对话再为 ADR-0009 设计 Authority Meta Model 的盘点／conformance／渐进提取 Plan；在此之前不决定 API／package owner，不重构 Observatory，不提升 document schema 或 Core API。
 
 ## Blockers / risks
 

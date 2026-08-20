@@ -46,6 +46,12 @@
 **Truth**: `AGENTS.md`, `docs/`, 根 `scripts/docsite/`。
 **Dig**: [文档系统 State](docs/state/documentation-system.md) | [Approved Design](docs/design/self-hosting-documentation-system.md)。
 
+## authority semantics
+
+**What**: 定义 Orrery 解释项目权威体系的 Meta Model：authority roles、各对象 lifecycle、独立 claim dimensions、fact scopes、evidence categories、derived-view constraints 和 conformance 输入边界。
+**Truth**: [Authority Meta Model State](docs/state/authority-meta-model.md)；当前只有 ADR／Design 规范，尚无机器可读 domain model、公共 API、语义版本字段或 conformance fixture 套件。
+**Dig**: [ADR-0009](docs/decisions/0009-authority-meta-model-and-semantic-conformance.md) | [Approved Design](docs/design/authority-meta-model.md) | [来源讨论](docs/library/2026-08-20-authority-semantics-and-product-complexity-discussion.zh-CN.md)。
+
 ## released skill and compatibility
 
 **What**: 平台中立 Core／CLI／Observatory、Codex Skill 兼容入口和发布兼容契约。

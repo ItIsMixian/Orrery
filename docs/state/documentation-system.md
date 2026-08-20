@@ -1,13 +1,14 @@
 # 文档系统 State
 
 Updated: 2026-08-20
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md)
 
 ## 当前事实
 
 - Project Orrery 已在本仓库正式采纳自身权威链。
 - Agent 入口是根 `AGENTS.md`；维护者入口是本目录 `README.md`、`PROGRESS.md` 与本地观测台。
 - Seed、ADR、Approved Design、Implementation Plan、State、Validation 和 Snapshot 已各有独立职责。
+- ADR-0009 已把这些职责、各对象 lifecycle、独立 Decision／Implementation／Validation claim dimensions、fact scopes、evidence categories 和 derived-view constraints 正式定义为 Authority Meta Model；`docs/core/principles.md` 明确只是 Project Orrery Product Seed。
 - 文档事实现在显式区分 Canonical（integration ref 已集成）、Candidate（功能分支 HEAD）和 Worktree（本地未提交）三个作用域；分支 State 只能陈述候选事实，不能冒充 canonical 当前状态。
 - 根 `PROGRESS.md` 与 `HANDOFF.md` 是集成视角入口。普通功能分支应让代码、测试和 subsystem State 同行，并在合流时由唯一整合者同步全局入口，避免多个 Agent 持续争写同一份全局状态。
 - ADR-0008 已接受默认 zero-network Personal Mode、手动开启 Team Mode、Local-only 元数据和中央只读／本机执行边界；这些目前只是有效设计约束，现有观测台还没有 Workstream 指挥台、Team 页签、成员或同步实现。
@@ -46,3 +47,4 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - 尚未建立自动检查 State 与实现链接是否过期的机制。
 - 观测台尚未显示 branch、HEAD、integration OID、merge base、dirty、Workstream 生命周期或事实作用域；worktree 私有 session、自动重叠报告、审查包、清理建议和 Team Mode 也未实现。因此当前作用域纪律依赖入口规则、独立目录和集成者审阅。
+- Authority Meta Model 尚无机器可读 parser／domain API、`authority_model_version` manifest 字段或跨消费者 conformance fixture；当前规范化不等于代码实现。

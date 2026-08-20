@@ -14,6 +14,8 @@ Project Orrery 诞生于一种具体的失控感：Agent 可以高速生成源�
 
 Project Orrery 区分人类与 Agent 的阅读路径，但不建立两套互相竞争的事实。观测台是对权威 Markdown 的投影；Git、实际代码与外部运行状态仍是实现事实。
 
+Project Orrery 还区分产品 Seed 与 Authority Meta Model：前者描述 Project Orrery 想成为什么，后者定义 Orrery 如何解释项目中的 Seed、ADR、Design、Plan、State、Validation、Snapshot、事实作用域和证据。Meta Model 是协议语义层，不覆盖用户项目的 Seed 内容，也不新增一种作者文档。
+
 ## 不是什么
 
 - 不是自动替用户决定架构的 Agent 管理器。

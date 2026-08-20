@@ -14,6 +14,8 @@ Updated: 2026-08-19
 Observatory 源码边界和 Codex Adapter，尚未实现 Harness Adapter、独立组件发行物或多组件发布；
 因此目录图同时包含已实现与后续目标，精确当前事实以 State Docs 为准。
 
+ADR-0009 已接受 Authority Meta Model 与 conformance 边界，但 AUTH-4“Core 是唯一 semantics implementation owner”仍未决定。当前表格中的 “Core 持有权威角色、schema” 继续表达 ADR-0004 的平台中立存储／合约边界，不应被扩读为 Meta Model API、parser ownership 或单一实现已经完成。
+
 ## 组件职责
 
 | 组件 | 拥有 | 不拥有 |

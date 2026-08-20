@@ -218,3 +218,11 @@
 - Approved Design 现固定默认 zero-network Personal Mode、显式 Team Mode、Agent-first／Orrery-first 混合入口、Workstream／Scope／subsystem、L0–L3 finding、双维度状态、风险审查、人工合流、保守清理和渐进式 Observatory。
 - Implementation Plan 改为 Personal foundation → 本地 review loop → opt-in Team extension → self-host／release，并把新实现目标指向平台中立 Core／CLI／Observatory／Adapter；发布 Skill 继续只是兼容投影。
 - 本轮只更新决策与文档，没有实现协作 CLI／UI／网络能力、改变支持状态或创建发布；精确集成检查见 `docs/validation/2026-08-20-adr-0008-collaboration-design-integration.md`。
+
+## 2026-08-21 — ADR-0009 Authority Meta Model 规范落地
+
+- 把维护者网页讨论先保存为非权威 Library，再提炼为临时 `PO-DEC-AUTH-001`；逐项审计 ADR-0001～0008 后，接受 AUTH-2／3／5／6／7／8 的限定版本，AUTH-1／4 继续 pending。
+- 外部复核纠正了早期“状态转换”表述：各 authority object 拥有自己的 lifecycle，Decision／Implementation／Validation 是独立但相关的 claim dimensions，不能压缩为 `planned → implemented → validated` 单一状态机。
+- 正式分配 ADR-0009，并建立 Authority Meta Model Approved Design／State：规范角色、非线性 Authority Graph、Canonical／Candidate／Worktree／Local-only／Historical／Unknown、provider-neutral evidence 和 derived-view semantic constraints。
+- `docs/core/principles.md` 明确为 Project Orrery Product Seed，不再与通用 Meta Model 职责混写；平台中立 Design 同时保留 AUTH-4 单一 implementation owner 未决定的边界。
+- 本轮没有创建 Implementation Plan、修改产品代码、拆分 Observatory、增加 `authority_model_version` 字段或改变发布状态；这些留到下一次对话。
