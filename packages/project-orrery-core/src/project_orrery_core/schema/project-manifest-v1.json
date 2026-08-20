@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project Orrery project manifest v1",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "manifest_format",
+    "installed_skill_version",
+    "toolchain_version",
+    "document_schema",
+    "authority_status",
+    "toolchain_status",
+    "managed_tools",
+    "expected_tool_hashes"
+  ],
+  "properties": {
+    "name": {"const": "project-orrery"},
+    "manifest_format": {"const": 1},
+    "document_schema": {"type": "integer", "minimum": 1},
+    "authority_status": {"enum": ["migration_pending", "integrated"]},
+    "toolchain_status": {"enum": ["current", "mixed"]},
+    "managed_tools": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "expected_tool_hashes": {"type": "object", "additionalProperties": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

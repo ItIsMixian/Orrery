@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-orrery-cli"
+version = "0.1.0"
+description = "Platform-neutral command line interface for Project Orrery"
+requires-python = ">=3.10"
+dependencies = [
+  "project-orrery-core==0.1.0",
+  "project-orrery-observatory==0.1.0"
+]
+
+[project.scripts]
+project-orrery = "project_orrery_cli.__main__:main"
+project-orrery-scaffold = "project_orrery_cli.scaffold:main"
+project-orrery-validate = "project_orrery_cli.validate:main"
+project-orrery-check-update = "project_orrery_cli.update:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

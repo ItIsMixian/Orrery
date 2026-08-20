@@ -1,0 +1,28 @@
+"""Unified source-checkout entry point for the Project Orrery CLI."""
+from __future__ import annotations
+
+import sys
+
+from . import scaffold, update, validate
+
+
+def main(argv: list[str] | None = None) -> int:
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    if not arguments or arguments[0] in {"-h", "--help"}:
+        print("usage: project-orrery {scaffold|validate|check-update} [options]")
+        return 0
+    command = arguments.pop(0)
+    commands = {
+        "scaffold": scaffold.main,
+        "validate": validate.main,
+        "check-update": update.main,
+    }
+    selected = commands.get(command)
+    if selected is None:
+        print(f"ERROR: unknown command: {command}", file=sys.stderr)
+        return 2
+    return selected(arguments)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

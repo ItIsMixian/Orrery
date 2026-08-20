@@ -1199,7 +1199,7 @@ function loadBriefing(){
 }
 function refreshBriefing(){ _brfDone=false; const m=document.getElementById('brf-main');
   if(m) m.innerHTML='<div class="brf-loading">更新中…（约 30–60 秒）</div>';
-  fetch('/briefing?refresh=1').then(()=>loadBriefing()).catch(()=>loadBriefing()); }
+  fetch('/api/refresh/briefing',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(()=>loadBriefing()).catch(()=>loadBriefing()); }
 let _rmDone=false;
 function roadmapUnavailable(message){
   const note='<div class="brf-note">'+esc1(message)+'</div>';
@@ -1220,7 +1220,7 @@ function loadRoadmap(){
 }
 function refreshRoadmap(){ _rmDone=false; const w=document.getElementById('rm-week');
   if(w) w.innerHTML='<div class="brf-loading">更新中…（约 30–60 秒）</div>';
-  fetch('/roadmap?refresh=1').then(()=>loadRoadmap()).catch(()=>loadRoadmap()); }
+  fetch('/api/refresh/roadmap',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(()=>loadRoadmap()).catch(()=>loadRoadmap()); }
 let _msDone=false;
 function loadMilestones(){
   if(_msDone) return;
@@ -1238,7 +1238,7 @@ function loadMilestones(){
 }
 function refreshMilestones(){ _msDone=false; const h=document.getElementById('tl-host');
   if(h) h.innerHTML='<div class="brf-loading">更新中…（约 30–60 秒）</div>';
-  fetch('/milestones?refresh=1').then(()=>loadMilestones()).catch(()=>loadMilestones()); }
+  fetch('/api/refresh/milestones',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(()=>loadMilestones()).catch(()=>loadMilestones()); }
 function refreshTrends(){ refreshRoadmap(); refreshMilestones(); refreshRadar(); }
 let _rdDone=false;
 function loadRadar(){
@@ -1259,7 +1259,7 @@ function loadRadar(){
 }
 function refreshRadar(){ _rdDone=false; const h=document.getElementById('radar-host');
   if(h) h.innerHTML='<div class="brf-loading">更新中…（联网，约 30–60 秒）</div>';
-  fetch('/radar?refresh=1').then(()=>loadRadar()).catch(()=>loadRadar()); }
+  fetch('/api/refresh/radar',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(()=>loadRadar()).catch(()=>loadRadar()); }
 function toggleGraphFull(){
   const t=document.getElementById('graph-tile'); if(!t) return;
   t.classList.toggle('full');

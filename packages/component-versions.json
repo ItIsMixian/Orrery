@@ -1,0 +1,40 @@
+{
+  "manifest_format": 1,
+  "status": "unreleased",
+  "components": {
+    "core": {
+      "distribution": "project-orrery-core",
+      "version": "0.1.0",
+      "api_version": 1
+    },
+    "cli": {
+      "distribution": "project-orrery-cli",
+      "version": "0.1.0",
+      "core_api": 1
+    },
+    "observatory": {
+      "distribution": "project-orrery-observatory",
+      "version": "0.1.0",
+      "inventory_format": 1
+    }
+  },
+  "adapters": {
+    "codex": {
+      "distribution": "project-orrery-codex-adapter",
+      "version": "0.1.0",
+      "adapter_api_version": 1,
+      "support_status": "experimental",
+      "core_api": 1,
+      "cli": {
+        "minimum": "0.1.0",
+        "maximum_exclusive": "0.2.0"
+      },
+      "runtime_evidence": []
+    }
+  },
+  "legacy_compatibility": {
+    "published_skill_version": "0.2.0",
+    "wrapper_supported_through": "0.3.x",
+    "removal_not_before": "0.4.0"
+  }
+}

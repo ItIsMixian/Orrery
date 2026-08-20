@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "baseline_name": "Project Orrery v0.2.0 published Skill contract",
+  "published_release": {
+    "version": "0.2.0",
+    "tag": "v0.2.0",
+    "archive_sha256": "13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394",
+    "archive_entry_count": 36,
+    "skill_paths": [
+      "SKILL.md",
+      "agents/openai.yaml",
+      "assets/project-template/.gitignore",
+      "assets/project-template/AGENTS.md",
+      "assets/project-template/docs/DEVLOG.md",
+      "assets/project-template/docs/HANDOFF.md",
+      "assets/project-template/docs/PROGRESS.md",
+      "assets/project-template/docs/README.md",
+      "assets/project-template/docs/backlog.md",
+      "assets/project-template/docs/core/principles.md",
+      "assets/project-template/docs/decisions/0000-orrery-adoption-proposal.md",
+      "assets/project-template/docs/decisions/0000-template.md",
+      "assets/project-template/docs/decisions/README.md",
+      "assets/project-template/docs/design/README.md",
+      "assets/project-template/docs/implementation/README.md",
+      "assets/project-template/docs/library/README.md",
+      "assets/project-template/docs/product-philosophy.md",
+      "assets/project-template/docs/snapshots/README.md",
+      "assets/project-template/docs/state/_TEMPLATE.md",
+      "assets/project-template/docs/state/project-structure.md",
+      "assets/project-template/docs/state/test-coverage.md",
+      "assets/project-template/docs/validation/README.md",
+      "assets/project-template/scripts/docsite/_llm.py",
+      "assets/project-template/scripts/docsite/build_docsite.py",
+      "assets/project-template/scripts/docsite/docsite_insights.py",
+      "assets/project-template/scripts/docsite/docsite_qa.py",
+      "assets/project-template/scripts/docsite/requirements.txt",
+      "assets/project-template/scripts/docsite/serve.py",
+      "assets/project-template/scripts/docsite/set_key.py",
+      "assets/project-template/start-docsite.bat",
+      "references/architecture.md",
+      "references/migration-contract.md",
+      "release-manifest.json",
+      "scripts/check_project_orrery_update.py",
+      "scripts/install_project_orrery.py",
+      "scripts/validate_installation.py"
+    ],
+    "managed_tools": [
+      "start-docsite.bat",
+      "scripts/docsite/_llm.py",
+      "scripts/docsite/build_docsite.py",
+      "scripts/docsite/docsite_insights.py",
+      "scripts/docsite/docsite_qa.py",
+      "scripts/docsite/requirements.txt",
+      "scripts/docsite/serve.py",
+      "scripts/docsite/set_key.py"
+    ]
+  },
+  "cli_entrypoints": {
+    "installer": "scripts/install_project_orrery.py",
+    "validator": "scripts/validate_installation.py",
+    "update_checker": "scripts/check_project_orrery_update.py"
+  },
+  "release_manifest_required_fields": [
+    "manifest_format",
+    "name",
+    "version",
+    "channel",
+    "released",
+    "project_manifest_format",
+    "document_schema",
+    "compatibility",
+    "distribution",
+    "latest_manifest_url"
+  ],
+  "project_manifest_required_fields": [
+    "name",
+    "version",
+    "manifest_format",
+    "installed_skill_version",
+    "toolchain_version",
+    "document_schema",
+    "update_channel",
+    "latest_manifest_url",
+    "title",
+    "installed",
+    "last_scaffold_run",
+    "authority_status",
+    "toolchain_status",
+    "managed_tools",
+    "expected_tool_hashes"
+  ],
+  "human_output_fragments": {
+    "installer_dry_run": [
+      "Project Orrery 0.2.0 ->",
+      "CREATE  AGENTS.md",
+      "WRITE   .project-orrery.json",
+      "Authority status: migration pending; copying files does not adopt the model.",
+      "Dry run only; no files changed."
+    ],
+    "validator": [
+      "Project Orrery scaffold structure valid:",
+      "Authority status: migration pending"
+    ],
+    "update_checker": [
+      "Project Orrery update status",
+      "- Local Skill: 0.2.0",
+      "- Latest stable: 0.2.0 (file)",
+      "- Result: up to date"
+    ]
+  },
+  "template_agent_heading": "# Orrery Baseline: Agent state index",
+  "public_support_markers": {
+    "README.md": [
+      "`experimental`",
+      "`target`",
+      "not yet a separately packaged Core/CLI distribution"
+    ],
+    "README.zh-CN.md": [
+      "`experimental`",
+      "`target`",
+      "尚未作为独立 Core/CLI 包发布"
+    ]
+  }
+}

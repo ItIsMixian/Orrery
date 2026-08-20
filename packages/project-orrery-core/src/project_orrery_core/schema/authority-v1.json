@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "canonical_agent_entry": "AGENTS.md",
+  "required_scaffold_files": [
+    "AGENTS.md",
+    "docs/README.md",
+    "docs/HANDOFF.md",
+    "docs/PROGRESS.md",
+    "docs/DEVLOG.md",
+    "docs/core/principles.md",
+    "docs/decisions/0000-template.md",
+    "docs/state/project-structure.md",
+    "scripts/docsite/build_docsite.py",
+    "scripts/docsite/llm_broker.py",
+    "scripts/docsite/serve.py",
+    "start-docsite.bat"
+  ],
+  "authority_roles": [
+    "seed",
+    "adr",
+    "approved_design",
+    "implementation_plan",
+    "state",
+    "validation",
+    "snapshot",
+    "library",
+    "progress",
+    "handoff"
+  ]
+}

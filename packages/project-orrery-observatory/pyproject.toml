@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-orrery-observatory"
+version = "0.1.0"
+description = "Versioned managed-tool inventory for the Project Orrery observatory"
+requires-python = ">=3.10"
+
+[tool.setuptools.package-data]
+project_orrery_observatory = ["component.json"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

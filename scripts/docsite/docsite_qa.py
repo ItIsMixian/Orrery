@@ -14,8 +14,8 @@ This module is import-friendly: a future local server can call
 ``build_corpus()`` + ``ask()`` directly. Run as a CLI to validate answer
 quality first:
 
-    # PowerShell (host network; set your LLM env first — see _llm.py)
-    $env:OPENAI_API_KEY="sk-..."     # or DEEPSEEK_API_KEY (+ OPENAI_BASE_URL)
+    # Register the managed or external Broker first
+    python scripts/docsite/set_key.py
     python -X utf8 scripts/docsite/docsite_qa.py "为什么这样设计?"
 """
 from __future__ import annotations
@@ -114,10 +114,10 @@ def build_corpus(docs_dir: Path, agents_file: Path):
 # provider
 # ---------------------------------------------------------------------------
 
-def get_provider():
+def get_provider(*, require_broker=True):
     from _llm import make_provider
-    p = make_provider()
-    return p, p.name, "(env: OPENAI_API_KEY / OPENAI_BASE_URL / OPENAI_MODEL)"
+    p = make_provider(require_broker=require_broker)
+    return p, p.name, "(Broker-only project configuration)"
 
 
 # ---------------------------------------------------------------------------
@@ -558,7 +558,7 @@ def main():
     corpus = build_corpus(docs_dir, agents_file)
     print("corpus: %d docs" % len(corpus))
     try:
-        provider, pname, cfg_path = get_provider()
+        provider, pname, cfg_path = get_provider(require_broker=True)
     except Exception as e:
         print("FAILED to build provider:", repr(e))
         return

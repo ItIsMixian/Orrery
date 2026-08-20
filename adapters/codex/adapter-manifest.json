@@ -1,0 +1,43 @@
+{
+  "manifest_format": 1,
+  "adapter": {
+    "id": "project-orrery-codex",
+    "name": "Project Orrery Codex Adapter",
+    "platform": "codex",
+    "version": "0.1.0",
+    "api_version": 1,
+    "support_status": "experimental"
+  },
+  "requires": {
+    "core_api": 1,
+    "cli": {
+      "distribution": "project-orrery-cli",
+      "minimum": "0.1.0",
+      "maximum_exclusive": "0.2.0",
+      "entrypoint": "project-orrery"
+    }
+  },
+  "runtime_compatibility": {
+    "runtime": "Codex",
+    "status": "experimental",
+    "verified": [],
+    "evidence": [],
+    "note": "No Codex runtime version or operating system is verified by this unreleased manifest."
+  },
+  "distribution": {
+    "install_directory": "project-orrery",
+    "files": [
+      "README.md",
+      "SKILL.md",
+      "adapter-manifest.json",
+      "agents/openai.yaml",
+      "scripts/install_adapter.py"
+    ]
+  },
+  "lifecycle": {
+    "default_conflict_policy": "refuse",
+    "upgrade_policy": "backup_outside_discovery_root_then_replace_adapter_directory",
+    "uninstall_policy": "move_adapter_directory_to_recoverable_trash_outside_discovery_root",
+    "target_project_mutation": "none"
+  }
+}

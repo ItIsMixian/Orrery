@@ -1,0 +1,26 @@
+{
+  "manifest_format": 1,
+  "name": "project-orrery-observatory",
+  "version": "0.1.0",
+  "status": "unreleased",
+  "legacy_toolchain_version": "0.2.0",
+  "template_projection": {
+    "scripts/docsite/build_docsite.py": {
+      "Project Orrery · Documentation": "{{PROJECT_TITLE_PY}} · Documentation"
+    },
+    "scripts/docsite/serve.py": {
+      "Project Orrery · Documentation": "{{PROJECT_TITLE_PY}} · Documentation"
+    }
+  },
+  "managed_tools": [
+    "start-docsite.bat",
+    "scripts/docsite/_llm.py",
+    "scripts/docsite/build_docsite.py",
+    "scripts/docsite/docsite_insights.py",
+    "scripts/docsite/docsite_qa.py",
+    "scripts/docsite/llm_broker.py",
+    "scripts/docsite/requirements.txt",
+    "scripts/docsite/serve.py",
+    "scripts/docsite/set_key.py"
+  ]
+}

@@ -4,6 +4,7 @@
 mistune>=3.0      # markdown -> HTML，交互式阅读器需要 (build_docsite.py)
 openai>=1.0       # 所有 LLM 能力：问答 / 态势 / 路线图 / 里程碑 / 社区对标 (_llm.py)
 httpx>=0.24       # 社区对标里的 GitHub 检索 (docsite_qa.py)；openai 也会带上它
+                  # 可选本地 Broker 也用它直连固定上游并拒绝重定向
 
 # 可选 —— 只有社区对标的「网页搜索」这一支需要；缺了它 radar 仍可只靠 GitHub 工作：
 ddgs>=6.0         # DuckDuckGo 搜索
