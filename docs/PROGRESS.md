@@ -1,10 +1,12 @@
 # 当前进度
 
-Updated: 2026-08-19
+Updated: 2026-08-20
 
 ## 当前阶段
 
 Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR-0005 把当前效率目标定义为从任务 Prompt 到首次允许产品写入前的累计 input；Harness 被动派生 Scope Lock，不要求 Agent 输出 Manifest 或回执。Pilot 008 的首对正式运行因 P 读取外部已安装 Skill 和共同 Oracle 假阴性而停止并封存。修正后的 Pilot 009 已完成三项 P/S、共六个 Terra medium run：装置、exact Scope、formal validation 和 R0 全部有效，S/P 聚合写前 input 为 `0.8274`，所有成本门通过；只读任务质量 P/S 均为 2/3，迁移任务共同遗漏 PROGRESS 的未来版本拒绝事实，因此 3/3 质量门失败，S 不采纳。下一步先落实分层任务／Oracle v0.2 的 paraphrase 与 mutation controls，不自动补跑模型。平台适配方向另由 ADR-0004 接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime 验证门；Phase 0、Phase 1 和 Phase 2 的仓库实现检查点已完成，当前工作树已有未发布 Core／CLI／Observatory 源码包、旧 Skill 兼容入口，以及可独立归档和可恢复安装的薄 Codex Adapter，但没有真实 Codex runtime E2E、独立组件发布或第二平台实现。ADR-0003 的凭据加固已由 ADR-0006 收敛为 Broker-only docsite：本机托管为默认，外部隔离只绑定 client token，直接 Provider UI／运行／Q&A CLI 入口均已移除并通过本地验证，但尚未提交或进入公开 v0.2.0。
+
+2026-08-20 已把三个 Agent 交错留在共享 `main` 工作目录的成果先封存为不可变恢复提交，再在独立 integration worktree 中按研究、产品和权威状态拆分并合入。ADR-0007 已正式接受一任务一分支／worktree、三层事实作用域与干净集成规则；默认 59 passed + 2 expected skips、动态 61/61、结构／静态站／235 份 Markdown 本地链接验证通过。当前只完成人工采纳与恢复流程，自动 session、重叠检测、主 worktree 守卫和 integration CLI 仍未实现；改动尚未推送或发布。
 
 ## 已完成
 
@@ -48,6 +50,8 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 完成 ADR-0004 Phase 1：建立 Core／CLI／Observatory 0.1.0 源码包、canonical 作者模板、schema／兼容模型、managed-tool 清单和旧 Skill wrapper／fallback，并验证新旧入口等价。
 - [x] 完成 ADR-0004 Phase 2 仓库实现检查点：建立独立 Codex Adapter 0.1.0、组件／runtime manifest、确定性 ZIP／checksum 和只管理 Adapter 目录的 dry-run／备份升级／可恢复卸载；临时目录专项 5/5 通过，真实 runtime 验证仍待授权。
 - [x] 完成 `Ariestar/sivtr@4fae091` 外部源码观察，区分其情境工作记忆层与 Orrery 权威事实层；记录 WorkRef／WorkSet 渐进披露、只读 MCP、检索评估、隐私生命周期和文档漂移启发。没有采纳依赖、Adapter、路由策略或新 Pilot。
+- [x] 恢复共享工作目录中的三项并发成果：保留 `a87c5a4` 恢复提交，在独立 integration worktree 中形成研究、产品、Library 和权威状态提交，并将临时协作决策分配为 ADR-0007。
+- [x] 完成 ADR-0007 人工采纳验证：冻结 Pilot 输入逐字节保留，默认／动态全仓、结构、静态站、Markdown 链接与 Git 检查通过。
 
 ## 当前结论
 
@@ -67,6 +71,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - Codex Adapter 已成为独立的未发布薄产物，但它只声明对 Core API 1 和 CLI `>=0.1.0,<0.2.0` 的依赖；Core／CLI 尚未发布，因此它不是新的完整公共安装路径，也没有改变 v0.2.0 发布事实。
 - 动态 docsite 已没有直接 Provider 路径；默认同用户托管 Broker 只提供统一路由和成本门，只有在独立 OS 身份或等价边界中配置并运行外部 Broker，才能把 Provider Key 隔离出 docsite／Agent 身份。
 - `sivtr` 可作为未来“情境证据来源”的研究对象，但不能替代 State／ADR／实现真值；任何可选 memory evidence Adapter 都需要新的权威／证据分层、隐私生命周期和可复现验证决定，当前不进入发布版或下一 Pilot。
+- 多人／多 Agent 现在有可执行的人工安全工作法，但还不是自动协调系统：独立 worktree 能隔离写入，唯一整合者能对齐权威文档；工具目前不能自动证明 Agent 没有误入主目录、发现跨 worktree 语义重叠或观察另一台机器的未 push 工作。
 
 ## 待办
 
@@ -93,6 +98,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 建立 Codex Adapter 独立产物与安装／卸载边界：未知目录拒绝、已识别旧 Skill／Adapter 先备份再升级、卸载移入可恢复回收目录；Adapter 只声明外部 CLI 依赖。
 - [x] 完成 Broker-first docsite gateway：所有 API 入口统一经 Broker 注册，默认托管不强制连接测试，外部模式只接收 client token；根／模板、README 和 Validation 已同步。
 - [ ] 在明确授权后，把独立 CLI 与 Adapter 安装到隔离的真实 Codex 用户技能位置，记录精确 runtime／OS 的发现、调用、失败、更新和卸载 E2E；完成前保持 `experimental`，且不发布组件。
+- [ ] 按 ADR-0007 活动 Plan 实现 Phase 0：版本化 worktree identity／session／overlap schema、Git fixture、integration ref 解析和主 worktree 识别；在此之前继续人工创建独立 worktree。
 
 ## Blockers / risks
 
@@ -107,6 +113,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
   回写 0/3 raw summary。下一 Oracle 必须用 paraphrase controls 在模型运行前发现这类问题。
 - Marglo 来源仓库包含活跃工作树和潜在用户数据；未来只能从固定提交或显式白名单构造脱敏 fixture，不能直接复制当前工作目录。
 - Broker client token 仍具有受模型白名单和每日预算约束的消费能力；同用户运行 Broker 只能减少重复调用和限制开销，不能宣称 Provider Key 已隔离。
+- 当前多 worktree 规则没有强制执行器；若 Agent 仍在 `D:\coding warehouse\project-orrery` 共享主目录工作，Git 不会替项目区分所有权。恢复分支不可删除，功能 Agent 必须切换到分配的独立目录。
 
 ## 下一里程碑
 
@@ -115,3 +122,5 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 成本方向信号可以作为继续研究的理由，但 S 在 3/3 质量门和维护者明确接受前不得进入发布 Skill 或模板。
 
 平台适配线路的下一安全里程碑是 ADR-0004 Phase 2 的真实 Codex runtime E2E。仓库内产物和生命周期测试已就绪，但实际安装会改变用户技能目录并可能需要重启／新会话，因此必须先获得明确授权；在此之前保持 `experimental`，也不得宣称第二平台兼容。
+
+多人协作线路的下一安全里程碑是 ADR-0007 Phase 0 的最小机器合约和 Git fixture；在任何自动命令完成前，继续使用一任务一个独立 worktree、主目录只集成、唯一整合者同步全局 State 的人工协议。

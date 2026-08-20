@@ -201,3 +201,11 @@
   Skill／Observatory／路由 treatment，也未创建或运行新 Pilot。
 - Orrery `--build --require-integrated` 结构／静态站验证通过，231 份 Markdown 的 395 个本地链接无缺失，
   相关文件 `git diff --check` 通过。
+
+## 2026-08-20 — 共享工作树恢复与多 worktree 协作采纳
+
+- 三个并发 Agent 曾共享 `main@96eee5a` 和同一工作目录；先建立 `codex/recovery-shared-main-20260820@a87c5a4`，完整封存 198 个路径的交错改动，没有 reset、覆盖、推送或删除原证据。
+- 在独立 integration worktree 中将恢复提交拆分为 context-routing 研究、平台 Core／Codex Adapter + Broker docsite、sivtr Library 和权威状态四组提交，再合入协作协议分支。
+- 临时决策 `PO-DEC-WT-001` 在最新集成历史上获得正式 ADR-0007；Approved Design 与活动 Plan 明确 Canonical／Candidate／Worktree 作用域、主 worktree 集成专用和临时 ADR 编号规则。
+- 首次默认回归发现通用 EOF 空行清理改变 Pilot 008／009 冻结输入哈希；没有修改冻结哈希，而是从恢复提交逐字节还原 27 个文件。定向 apparatus 2/2、默认 59 passed + 2 expected skips、动态 61/61、integrated structure、691 KB 静态站和 235 份 Markdown／420 个本地链接随后通过。
+- 本轮只采纳并验证人工工作法；私有 session、自动重叠检测、主 worktree 守卫、integration CLI 和观测台作用域投影仍未实现。没有推送 `origin/main`，也没有发布版本。

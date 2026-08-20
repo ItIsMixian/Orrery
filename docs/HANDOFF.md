@@ -1,6 +1,6 @@
 # 跨会话交接
 
-Updated: 2026-08-19
+Updated: 2026-08-20
 
 ## 当前情况
 
@@ -35,6 +35,9 @@ Updated: 2026-08-19
 - ADR-0003 的 docsite 凭据安全实现已在工作树完成：Provider／Base URL 绑定、显式端点、失败关闭、同源 POST、安全响应头、语料／Provider 缓存签名，以及可选确定性 Broker 的缓存、single-flight、模型与预算门均已同步到根工具和发布模板。它尚未提交、推送或发布。
 - ADR-0006 已在工作树把上述可选 Broker 收敛为唯一 docsite 网关：设置页的 OpenAI／DeepSeek／Custom 只注册上游，默认本机托管自动启动，外部隔离只保存 client token；`set_key.py`、独立 Q&A CLI、仪表盘与测试路径都要求 Broker。动态产品专项 16/16、默认全仓 57 passed + 2 expected skips，尚未提交或发布。
 - 已完成 `Ariestar/sivtr@4fae091` 固定提交的源码观察并写入 Library。当前结论是其 WorkRecord／WorkRef／WorkSet、渐进检索和只读 MCP 可作为情境证据层参考，但不能替代 Orrery 权威链；没有采纳依赖、Adapter、路由策略或新 Pilot。
+- 三个 Agent 在同一 `main@96eee5a` 工作目录留下的交错改动已先封存到 `codex/recovery-shared-main-20260820@a87c5a4`，再在 `D:\coding warehouse\project-orrery-integration-20260820` 拆分为研究、产品、Library 和权威状态提交。恢复分支不可改写或删除。
+- ADR-0007 已接受一任务一分支／worktree、Canonical／Candidate／Worktree 作用域和干净集成规则。完整动态回归为 61/61，默认 59 passed + 2 expected skips；235 份 Markdown／420 个本地链接无缺失。当前仍是本地集成结果，没有推送或新 Release。
+- 自动 session、overlap、主 worktree 守卫、`orrery integrate` 与观测台 scope banner 尚未实现。三个后续 Agent 必须各自进入新分配的 worktree，不能继续复用原共享目录。
 
 ## 风险与常见陷阱
 
@@ -61,6 +64,8 @@ Updated: 2026-08-19
 - 不要把默认同用户托管 Broker 宣称为进程隔离。它统一路由、缓存和预算门，但只有外部 Broker 确实运行在独立 OS 身份或等价外层边界下时才隔离 Provider Key；client token 仍能在预算内发起调用。
 - 旧共享 keyring 槽不会被启动流程读取或自动迁移；用户重新保存当前 Provider Key 时会写入绑定槽并清理旧槽。若旧 Key 曾进入不受信任进程或测试上下文，轮换仍是 Provider 侧动作，代码无法替代。
 - 不要把 `sivtr` README／Roadmap 或私有 retrieval snapshot 指标写成独立验证事实：其公开仓库没有评估快照，固定提交的完整 Rust 测试在本机因 build-script `os error 5` 未进入测试阶段，且 Agent 入口、架构、Roadmap 与实现存在漂移。任何 transcript 读取还必须先解决缓存副本、保留／删除、脱敏和 Windows daemon token 权限边界。
+- 不要为了通过 `git diff --check` 删除冻结 Pilot fixture 的 EOF 空行；Pilot 008／009 对这些文件做逐字节 SHA-256 校验。2026-08-20 首次集成回归已实际捕获该问题，正确修复是从恢复提交还原原始字节，不是更新冻结哈希。
+- 不要把 ADR-0007 Accepted 或人工 worktree 验证写成自动协调已实现；跨机器未 push 工作必须继续显示为不可观察 Unknown。
 
 ## 安全接续点
 
@@ -78,3 +83,4 @@ Updated: 2026-08-19
 8. 平台适配工作先读取 [ADR-0004](decisions/0004-platform-neutral-core-and-adapter-boundaries.md)、[Approved Design](design/platform-neutral-core-and-adapter-architecture.md)、[Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)、[Phase 1 Validation](validation/2026-08-19-platform-neutral-phase-1-core-cli.md)和[Phase 2 仓库实现 Validation](validation/2026-08-19-platform-neutral-phase-2-codex-adapter.md)；下一步须经明确授权后才进行真实 Codex runtime E2E，不先选择第二平台或发布组件。
 9. docsite 安全接续先读取 [ADR-0003](decisions/0003-provider-bound-credentials-and-optional-local-broker.md)、[ADR-0006](decisions/0006-broker-only-docsite-provider-gateway.md)、[Broker-first Design](design/broker-first-docsite-provider-gateway.md)和[Validation](validation/2026-08-19-broker-first-docsite-gateway.md)；公开 v0.2.0 尚不包含这些工作树改动。
 10. 若继续研究外部工作记忆层，先读取 [sivtr 观察](library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)；除非用户明确接受新的 ADR／Plan，不安装 sivtr、不扫描真实 transcript、不修改 Scope Router，也不自动创建 Pilot 010。
+11. 多人协作先读取 [ADR-0007](decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)、[Approved Design](design/multi-worktree-collaboration-protocol.md)、[活动 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)和[恢复 Validation](validation/2026-08-20-multi-worktree-recovery-and-manual-adoption.md)。后续任务只在独立 worktree 中继续，根 `PROGRESS`／`HANDOFF` 由整合者同步。
