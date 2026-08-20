@@ -1,14 +1,14 @@
 # 实施计划：多 worktree 协作协议
 
-Status: Ready after integration
+Status: Active
 
 Date: 2026-08-19
 
-Governing decision: [PO-DEC-WT-001](../../decisions/proposals/PO-DEC-WT-001-multi-worktree-collaboration.md), pending formal ADR allocation
+Governing ADR: [ADR-0007](../../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)
 
-Candidate Approved Design: [多人／多 worktree 协作协议](../../design/multi-worktree-collaboration-protocol.md)
+Approved Design: [多人／多 worktree 协作协议](../../design/multi-worktree-collaboration-protocol.md)
 
-> 本 Plan 描述候选分支已经获维护者认可的实施路径。正式开发前，集成者必须先把临时决策转换为 canonical ADR；完成清单不等于功能已实现。
+> ADR-0007 已接受，本 Plan 进入活动状态。当前恢复与集成工作只证明人工隔离流程可行；完成清单仍不等于功能已经实现，State 只能记录已经验证的实际行为。
 
 ## 实施边界
 

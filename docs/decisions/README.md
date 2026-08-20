@@ -18,12 +18,11 @@ Use `0000-template.md` as the starting point.
 - [ADR-0004: Platform-neutral Core and Agent/Harness Adapter boundaries](0004-platform-neutral-core-and-adapter-boundaries.md) — Accepted; adopts single-repository component packages, a canonical neutral Agent entrance, independent component versions, and evidence-gated runtime support.
 - [ADR-0005: Pre-write scope-acquisition input](0005-prewrite-scope-acquisition-input.md) — Accepted; makes cumulative input before the first product write the primary routing-cost metric and requires passive Harness measurement without Agent manifests or receipts.
 - [ADR-0006: Broker-only docsite Provider gateway](0006-broker-only-docsite-provider-gateway.md) — Accepted; makes Broker the only dynamic docsite model-call path while separating default same-user cost control from external OS-identity isolation.
+- [ADR-0007: Multi-worktree collaboration and branch fact scopes](0007-multi-worktree-collaboration-and-branch-fact-scopes.md) — Accepted; separates Canonical, Candidate, and Worktree facts and requires one branch plus one isolated worktree or clone per concurrent task.
 - [Adoption proposal](0000-orrery-adoption-proposal.md) — Superseded by ADR-0001; retained as migration history.
 
 An accepted ADR constrains later Approved Design and implementation work. It does not prove that code or documents already implement the decision; current State and Validation provide that evidence.
 
 ## Pending integration proposals
 
-These records use stable provisional IDs so concurrent branches do not compete for the next sequential ADR number. They are not effective ADRs until an integrator allocates `ADR-NNNN`, updates references, and merges them into the integration ref.
-
-- [PO-DEC-WT-001: Multi-worktree collaboration and branch fact scopes](proposals/PO-DEC-WT-001-multi-worktree-collaboration.md) — maintainer approved for integration; still Proposed and non-canonical.
+No active provisional decision proposals. Concurrent branches should still use stable IDs under `docs/decisions/proposals/` until an integrator allocates the next canonical ADR number.

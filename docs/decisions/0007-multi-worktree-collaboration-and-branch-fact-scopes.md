@@ -1,14 +1,12 @@
-# PO-DEC-WT-001: 多 worktree 协作与分支事实作用域
+# ADR-0007: 多 worktree 协作与分支事实作用域
 
-Status: Proposed
+Status: Accepted
 
-Date: 2026-08-19
+Date: 2026-08-20
 
-Maintainer disposition: Approved for integration on 2026-08-19
+Origin: integrated from provisional decision `PO-DEC-WT-001`, approved for integration on 2026-08-19
 
-Formal ADR: pending integration-time allocation
-
-> 这是候选分支上的临时决策记录，不是 canonical ADR。只有集成者基于最新集成分支分配正式 `ADR-NNNN`、更新引用并合流后，它才成为全项目有效决定。
+> 本 ADR 在独立 integration worktree 中基于最新集成历史获得正式编号。原临时 ID 仅保留为来源记录，不再作为有效决策标识。
 
 ## Context
 
@@ -56,7 +54,7 @@ Project Orrery 已经区分原则、决策、实现、State 与验证，但多�
 
 ## Implementation and validation mapping
 
-- Candidate Approved Design: [多人／多 worktree 协作协议](../../design/multi-worktree-collaboration-protocol.md)
-- Implementation Plan: [2026-08-19 多 worktree 协作协议](../../implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)
+- Approved Design: [多人／多 worktree 协作协议](../design/multi-worktree-collaboration-protocol.md)
+- Implementation Plan: [2026-08-19 多 worktree 协作协议](../implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)
 - State Docs after implementation: `docs/state/project-structure.md`, `docs/state/documentation-system.md`, `docs/state/release-and-toolchain.md`, `docs/state/test-coverage.md`
 - Validation: linked-worktree isolation, untracked-path detection, direct／authority／semantic／unknown overlap, candidate-scope rendering, provisional ADR allocation, and clean speculative integration scenarios defined by the Plan

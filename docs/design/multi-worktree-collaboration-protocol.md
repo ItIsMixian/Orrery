@@ -1,8 +1,8 @@
 # 多人／多 worktree 协作协议
 
-Status: Approved for integration (Candidate scope)
+Status: Approved
 
-Governing decision: [PO-DEC-WT-001](../decisions/proposals/PO-DEC-WT-001-multi-worktree-collaboration.md); not canonical until a formal ADR is allocated and integrated
+Governing ADR: [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)
 
 Evidence date: 2026-08-19
 
@@ -197,4 +197,4 @@ orrery integrate --target <integration-ref> --validate
 5. 第一版检测路径、权威文档和验证面；符号／依赖分析延后，在结果中诚实保留 Semantic／Unknown 边界。
 6. 分支决策使用 `docs/decisions/proposals/` 和稳定临时 ID，只在集成时分配正式 ADR 编号。
 
-维护者已于 2026-08-19 同意上述方向。本 Design 在当前分支属于 Candidate Approved Design；只有临时决策转换为正式 ADR 并进入 integration ref 后才成为 canonical 约束。
+维护者已于 2026-08-19 同意上述方向，ADR-0007 已在 2026-08-20 的集成工作中正式接受。本 Design 现为 Approved Design。当前仅完成了工作目录隔离、恢复与人工集成流程；私有 session、自动重叠检测、集成命令和观测台作用域投影仍待实现，不能把协议获批误写为工具已经完成。
