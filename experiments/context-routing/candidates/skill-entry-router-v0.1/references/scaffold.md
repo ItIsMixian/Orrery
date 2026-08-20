@@ -8,3 +8,4 @@
    claiming authority integration. Generated proposals are not accepted decisions.
 6. Run dependency-free validation first. Install viewer requirements and run `--build` only when the viewer
    is in scope.
+

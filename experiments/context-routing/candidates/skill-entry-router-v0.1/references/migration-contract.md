@@ -7,3 +7,4 @@ not by bulk replacement.
 Keep scaffold installation, authority adoption, compatible Skill update, managed viewer upgrade and document
 schema migration as separate states and approvals. Two-root projects keep Orrery in the documentation
 authority root and link to implementation rather than moving repositories.
+

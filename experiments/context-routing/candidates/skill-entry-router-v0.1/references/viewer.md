@@ -7,3 +7,4 @@
 The static reader is read-only. Dynamic AI features are optional; connection tests may incur provider cost.
 Secrets belong only in protected credential storage and must never be echoed, cached in project documents,
 or packaged.
+

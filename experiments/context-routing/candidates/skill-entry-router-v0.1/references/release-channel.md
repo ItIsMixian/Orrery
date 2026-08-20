@@ -7,3 +7,4 @@ project-manifest format and document schema as separate surfaces.
 Never install silently. Obtain an exact tagged release, verify its checksum, validate it, compare local
 changes and back up the installed Skill before replacement. Updating the Skill and upgrading target viewer
 tools are separate approvals. Preview `--upgrade-tools`, review backup paths, then apply explicitly.
+

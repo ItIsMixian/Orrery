@@ -47,3 +47,4 @@ Manifest、Scope Expansion、Selected Evidence 或 Access Summary；读取事实
   non-cached input、output、墙钟、代理正文和固定 Prompt 字节。
 - Pilot 008 的准备和 dry-run 不构成采纳证据。正式模型运行需维护者再次确认，结果通过后仍需
   R2 复核和明确接受，才能新增产品 ADR。
+

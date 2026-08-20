@@ -10,3 +10,4 @@ Current adapters:
 - `codex/`: experimental Codex Skill adapter. Its repository tests cover the
   artifact and installer lifecycle; real Codex runtime verification is still
   required before the adapter can be marked `verified`.
+

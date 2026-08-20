@@ -2,3 +2,4 @@ interface:
   display_name: "Project Orrery"
   short_description: "Route traceable project documentation through Orrery CLI"
   default_prompt: "Use $project-orrery to operate the platform-neutral Project Orrery CLI while following this repository's AGENTS.md authority chain."
+

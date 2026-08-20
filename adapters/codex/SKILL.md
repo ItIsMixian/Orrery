@@ -33,3 +33,4 @@ Observatory files and has reviewed the planned backups.
 After implementation or validation work, update the authority layers required
 by the target repository's own `AGENTS.md`. Do not create a parallel state
 summary in Codex-specific files.
+
