@@ -26,4 +26,6 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-No active provisional decision proposals. Concurrent branches should still use stable IDs under `docs/decisions/proposals/` until an integrator allocates the next canonical ADR number.
+These records use stable provisional IDs so concurrent branches do not compete for the next canonical ADR number. They are not effective until the maintainer confirms the decision and an integrator allocates `ADR-NNNN`, updates references, and merges them into the integration ref.
+
+- [PO-DEC-AUTH-001: Authority Meta Model, semantic conformance, and complexity boundaries](proposals/PO-DEC-AUTH-001-authority-meta-model.md) — AUTH-2／3／5／6／7／8 were accepted by the maintainer with compatibility clarifications; formal ADR allocation is pending, AUTH-1／4 remain outside this proposal, and no refactor is authorized.

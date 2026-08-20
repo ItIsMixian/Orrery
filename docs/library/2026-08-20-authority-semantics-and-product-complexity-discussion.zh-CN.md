@@ -54,12 +54,15 @@ Git 擅长回答“发生过什么”；Orrery 更希望回答：
 - 光是一种资源；
 - 怪物应该可学习但不可完全预测。
 
-Orrery 自身还需要一层更高阶的 meta layer，定义：
+Orrery 自身还需要一层更高阶的 meta layer，描述 Orrery 解释和运行项目权威链的元规则，包括但不限于：
 
-- Seed 是什么；
-- ADR、Design、Plan、State、Validation、Snapshot 分别是什么；
-- 这些角色之间如何转化、引用和约束；
-- 哪些状态词可以或不可以等同。
+- Seed、ADR、Design、Plan、State、Validation、Snapshot 分别是什么；
+- 各 authority object 自己的 lifecycle，以及不同角色的 claim 如何引用、约束、失效、被 supersede 或获得证据支持；
+- accepted／implemented／validated 等状态词如何区分；
+- historical／effective、planned／current、observed／authoritative 如何判定；
+- Canonical／Candidate／Worktree／Local-only 等事实作用域如何影响结论；
+- 哪类来源能构成事实、证据、批准或仅是派生投影；
+- Viewer、AI、CLI 和 coordinator 在什么边界内消费和呈现同一套语义。
 
 讨论中将它称为：
 
@@ -68,14 +71,18 @@ Orrery 自身还需要一层更高阶的 meta layer，定义：
 关系可以表达为：
 
 ```text
-Orrery Authority Model
-          ↓ defines
-Seed / ADR / Design / Plan / State / Validation / Snapshot
-          ↓
-用户填入自己的项目内容
+Orrery Authority Meta Model
+  roles / relations / invariants / scopes / evidence rules / model version
+          ↓ interprets and validates
+Project Authority Instance
+  Seed / ADR / Design / Plan / State / Validation / Snapshot
+          ↓ describes
+Implementation / configuration / assets / data / external state
 ```
 
-因此，Orrery semantics 定义“Seed 是什么”；用户定义“自己的 Seed 内容是什么”。Authority Model 不是又一种作者文档，而是解释现有文档角色的领域语义。
+因此，“Orrery semantics 定义 Seed 是什么”只是一个例子，不是 Meta Model 的全部职责。它描述 Orrery 的整套 authority runtime semantics；用户定义自己的项目内容。Authority Model 不是又一种作者文档，而是解释、校验和约束现有文档角色及事实来源的领域语义。
+
+维护者于 2026-08-21 进一步澄清：Meta Model 不应被缩窄为 Seed 类型说明，它应被理解为 Orrery 的 domain kernel／interpreter。该澄清已进入 PO-DEC-AUTH-001，但尚未形成正式 ADR 或代码实现。
 
 ## 3. Self-hosting 为什么容易混淆两者
 
@@ -130,6 +137,10 @@ CLI   Viewer   Agent   Coordinator
 - Multi-Agent coordinator 又复制一套当前事实判定。
 
 否则 accepted／implemented／validated、effective ADR、State 当前性等规则会在组件之间漂移。真正值得形成稳定 Core 抽象的是 Authority／domain semantics，而不只是因为某个 Python 文件过长。
+
+维护者随后提供的外部复核进一步指出：Decision、Implementation 和 Validation 不应被压缩为 `planned → implemented → validated` 单一状态机。它们是独立但相关的 claim dimensions；Meta Model 只分别定义各 authority object 的 lifecycle，并描述跨角色 claim 与 evidence 的关系。
+
+同一复核还收紧了三条边界：Authority scope 包含 Canonical／Candidate／Worktree／Local-only／Historical／Unknown，但不包含 Agent ownership、依赖等待和文件 lock；Evidence 规则描述 provider-neutral 类别而不绑定 GitHub Actions 等服务；Viewer／AI 受 derived-view semantic constraints 约束，但布局、颜色和输出章节不属于 Meta Model。
 
 ## 5. Observatory “偏 monolithic” 的含义
 
@@ -207,3 +218,7 @@ Context-routing 研究产生的 benchmark Harness、Oracle、read proxy、JSONL 
 > “甚至成熟产品经常是：为了：”
 
 原始摘录在此中断。本记录不推测或补写其后内容；若维护者以后提供续文，应追加来源说明，而不是把推测写成原讨论结论。
+
+## 9. 决策提炼
+
+本讨论中的维护者判断已被拆分并审计，见 [PO-DEC-AUTH-001：Authority Meta Model、语义一致性与复杂性边界](../decisions/proposals/PO-DEC-AUTH-001-authority-meta-model.md)。维护者已经接受 AUTH-2／3／5／6／7／8 的限定版本；AUTH-1／4 继续 pending，正式 ADR 编号仍待 integration-time allocation。本 Library 原文继续作为来源记录，不因提炼而获得决策权。
