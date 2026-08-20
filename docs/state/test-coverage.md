@@ -36,6 +36,7 @@ Updated: 2026-08-20
   61 项中 59 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、
   227 份 Markdown 本地链接和 diff 检查通过。正式六份 manifest 全部有效：P 各 85/85、S 各 88/88。
 - 2026-08-20 多 worktree 恢复验证已证明：共享脏工作树可先封存为不可变恢复提交，再在独立干净 integration worktree 中按研究、产品和权威状态拆分提交并合入协议分支；恢复分支保持不变。默认全仓为 59 passed + 2 expected skips，启用动态依赖后为 61/61；integrated structure、静态站和 235 份 Markdown／420 个本地链接通过。此证据只覆盖人工流程，不覆盖尚未实现的 session、untracked overlap、Authority／Semantic／Unknown 自动分类或 integration CLI。
+- 2026-08-20 协作 Design 收敛验证审计了 ADR-0007 与 Team Mode telemetry 的冲突，并通过正式 ADR-0008 amendment、Workstream 术语、session 示例、平台中立实现目标和 Personal-before-Team 交付顺序完成文档级闭环。该证据不包含任何协作 runtime 或网络测试。
 
 ## 验证证据
 
@@ -54,6 +55,8 @@ Updated: 2026-08-20
 - [2026-08-19 平台中立 Phase 2 Codex Adapter 仓库实现](../validation/2026-08-19-platform-neutral-phase-2-codex-adapter.md)
 - [2026-08-19 Broker-first docsite gateway](../validation/2026-08-19-broker-first-docsite-gateway.md)
 - [2026-08-20 多 worktree 恢复与人工采纳](../validation/2026-08-20-multi-worktree-recovery-and-manual-adoption.md)
+- [2026-08-20 多 Workstream 协作 Design 收敛](../validation/2026-08-20-multi-worktree-collaboration-design-consolidation.md)
+- [2026-08-20 ADR-0008 协作 Design 集成](../validation/2026-08-20-adr-0008-collaboration-design-integration.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -65,4 +68,4 @@ Updated: 2026-08-20
 - 外部原始数据已有 manifest 与保留策略，但仍依赖本机存储，且尚无自动脱敏导出器或异地备份。
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 生命周期目前只在临时目录验证；真实 Codex runtime 发现、调用、失败路径、更新与卸载尚无证据，因此不能标记 `verified`。
-- ADR-0007 的 Phase 0–4 自动化矩阵尚未建立；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠检测或推测性集成测试。
+- ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。

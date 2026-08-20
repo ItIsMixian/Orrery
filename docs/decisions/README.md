@@ -19,6 +19,7 @@ Use `0000-template.md` as the starting point.
 - [ADR-0005: Pre-write scope-acquisition input](0005-prewrite-scope-acquisition-input.md) — Accepted; makes cumulative input before the first product write the primary routing-cost metric and requires passive Harness measurement without Agent manifests or receipts.
 - [ADR-0006: Broker-only docsite Provider gateway](0006-broker-only-docsite-provider-gateway.md) — Accepted; makes Broker the only dynamic docsite model-call path while separating default same-user cost control from external OS-identity isolation.
 - [ADR-0007: Multi-worktree collaboration and branch fact scopes](0007-multi-worktree-collaboration-and-branch-fact-scopes.md) — Accepted; separates Canonical, Candidate, and Worktree facts and requires one branch plus one isolated worktree or clone per concurrent task.
+- [ADR-0008: Local-first Team Mode and cross-machine metadata visibility](0008-local-first-team-coordination-and-cross-machine-metadata.md) — Accepted; amends ADR-0007 so opt-in Local-only telemetry can coordinate unpushed work without becoming code evidence, while Personal Mode remains zero-network by default.
 - [Adoption proposal](0000-orrery-adoption-proposal.md) — Superseded by ADR-0001; retained as migration history.
 
 An accepted ADR constrains later Approved Design and implementation work. It does not prove that code or documents already implement the decision; current State and Validation provide that evidence.

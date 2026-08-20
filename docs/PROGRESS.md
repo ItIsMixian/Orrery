@@ -8,6 +8,8 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 
 2026-08-20 已把三个 Agent 交错留在共享 `main` 工作目录的成果先封存为不可变恢复提交，再在独立 integration worktree 中按研究、产品和权威状态拆分并合入。ADR-0007 已正式接受一任务一分支／worktree、三层事实作用域与干净集成规则；默认 59 passed + 2 expected skips、动态 61/61、结构／静态站／235 份 Markdown 本地链接验证通过。当前只完成人工采纳与恢复流程，自动 session、重叠检测、主 worktree 守卫和 integration CLI 仍未实现；改动尚未推送或发布。
 
+同日完成多人／多 Agent 产品层收敛并接受 ADR-0008：默认 Personal Mode 为单成员多 Agent、zero-network；Team Mode 必须显式开启，只同步 Local-only 元数据且中央只读。Approved Design 进一步固定 Workstream／Scope、subsystem mapping、冲突处置、风险审查、人工集成、保守清理和渐进式指挥台。Plan 现在按 Personal foundation → 本地 review loop → opt-in Team extension → self-host/release 排序；这些均未实现、未发布。
+
 ## 已完成
 
 - [x] 通过 ADR-0001 正式采纳 Project Orrery 自托管权威链。
@@ -53,6 +55,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 恢复共享工作目录中的三项并发成果：保留 `a87c5a4` 恢复提交，在独立 integration worktree 中形成研究、产品、Library 和权威状态提交，并将临时协作决策分配为 ADR-0007。
 - [x] 完成 ADR-0007 人工采纳验证：冻结 Pilot 输入逐字节保留，默认／动态全仓、结构、静态站、Markdown 链接与 Git 检查通过。
 - [x] 从已验证本地 `main` 为 context-routing、platform／adapters 和 docsite／broker 建立三个独立 linked worktree；各目录初始 clean，HEAD、索引和工作目录隔离。
+- [x] 完成协作产品层讨论与权威链审计：以 ADR-0008 正式修订 ADR-0007 的跨机器输入边界，并收敛 Personal／Team 模式、Workstream、Scope B、权限、审查、清理和指挥台 Approved Design／Plan。
 
 ## 当前结论
 
@@ -72,7 +75,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - Codex Adapter 已成为独立的未发布薄产物，但它只声明对 Core API 1 和 CLI `>=0.1.0,<0.2.0` 的依赖；Core／CLI 尚未发布，因此它不是新的完整公共安装路径，也没有改变 v0.2.0 发布事实。
 - 动态 docsite 已没有直接 Provider 路径；默认同用户托管 Broker 只提供统一路由和成本门，只有在独立 OS 身份或等价边界中配置并运行外部 Broker，才能把 Provider Key 隔离出 docsite／Agent 身份。
 - `sivtr` 可作为未来“情境证据来源”的研究对象，但不能替代 State／ADR／实现真值；任何可选 memory evidence Adapter 都需要新的权威／证据分层、隐私生命周期和可复现验证决定，当前不进入发布版或下一 Pilot。
-- 多人／多 Agent 现在有可执行的人工安全工作法，但还不是自动协调系统：独立 worktree 能隔离写入，唯一整合者能对齐权威文档；工具目前不能自动证明 Agent 没有误入主目录、发现跨 worktree 语义重叠或观察另一台机器的未 push 工作。
+- 多人／多 Agent 现在有可执行的人工安全工作法和完整的目标 Design，但还不是自动协调系统：独立 worktree 能隔离写入，唯一整合者能对齐权威文档；当前工具不能自动阻止误入主目录、生成 session／finding／review，也没有 Personal 指挥台或 Team telemetry。ADR-0008 允许未来成员主动上报 Local-only 元数据，但未上报内容和语义证据不足处仍是 Unknown。
 
 ## 待办
 
@@ -99,7 +102,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 建立 Codex Adapter 独立产物与安装／卸载边界：未知目录拒绝、已识别旧 Skill／Adapter 先备份再升级、卸载移入可恢复回收目录；Adapter 只声明外部 CLI 依赖。
 - [x] 完成 Broker-first docsite gateway：所有 API 入口统一经 Broker 注册，默认托管不强制连接测试，外部模式只接收 client token；根／模板、README 和 Validation 已同步。
 - [ ] 在明确授权后，把独立 CLI 与 Adapter 安装到隔离的真实 Codex 用户技能位置，记录精确 runtime／OS 的发现、调用、失败、更新和卸载 E2E；完成前保持 `experimental`，且不发布组件。
-- [ ] 按 ADR-0007 活动 Plan 实现 Phase 0：版本化 worktree identity／session／overlap schema、Git fixture、integration ref 解析和主 worktree 识别；在此之前继续人工创建独立 worktree。
+- [ ] 按 ADR-0007／ADR-0008 活动 Plan 先实现 Personal foundation Phase 0：版本化 Workstream／session／scope／finding schema、subsystem registry、Git fixture、integration ref 解析和主 worktree 识别；在此之前继续人工创建独立 worktree，且不启动 Team 网络能力。
 
 ## Blockers / risks
 
@@ -124,4 +127,4 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 
 平台适配线路的下一安全里程碑是 ADR-0004 Phase 2 的真实 Codex runtime E2E。仓库内产物和生命周期测试已就绪，但实际安装会改变用户技能目录并可能需要重启／新会话，因此必须先获得明确授权；在此之前保持 `experimental`，也不得宣称第二平台兼容。
 
-多人协作线路的下一安全里程碑是 ADR-0007 Phase 0 的最小机器合约和 Git fixture；在任何自动命令完成前，继续使用一任务一个独立 worktree、主目录只集成、唯一整合者同步全局 State 的人工协议。
+多人协作线路的下一安全里程碑是 ADR-0007／ADR-0008 Personal foundation 的最小机器合约和 Git fixture；在任何自动命令完成前，继续使用一个 Workstream 一个独立 worktree、主目录只集成、唯一整合者同步全局 State 的人工协议。Team Mode 必须等 Personal 路径稳定且通过 zero-network 默认验证后再实施。

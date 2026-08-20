@@ -210,3 +210,11 @@
 - 首次默认回归发现通用 EOF 空行清理改变 Pilot 008／009 冻结输入哈希；没有修改冻结哈希，而是从恢复提交逐字节还原 27 个文件。定向 apparatus 2/2、默认 59 passed + 2 expected skips、动态 61/61、integrated structure、691 KB 静态站和 235 份 Markdown／420 个本地链接随后通过。
 - 本轮只采纳并验证人工工作法；私有 session、自动重叠检测、主 worktree 守卫、integration CLI 和观测台作用域投影仍未实现。没有推送 `origin/main`，也没有发布版本。
 - 已从本地集成点建立 `codex/agent-context-routing`、`codex/agent-platform-adapters` 与 `codex/agent-docsite` 三个 clean linked worktree；它们共享对象库但拥有独立 Git 管理目录、索引和工作目录。
+
+## 2026-08-20 — ADR-0008 与多 Workstream 产品 Design 收敛
+
+- 在独立 `codex/agent-context-routing` worktree 中完成安全并行、指挥台、冲突预警和多人多 Agent 的产品层讨论，并以单一候选提交交给 integration worktree 审阅。
+- 最终审计发现 Team Mode 的未 push 元数据同步超出了 ADR-0007 仅认 pushed／PR／CI 输入的边界；没有改写历史，而是把临时 `PO-DEC-WT-002` 在集成时分配为 ADR-0008，正式修订跨机器可见性。
+- Approved Design 现固定默认 zero-network Personal Mode、显式 Team Mode、Agent-first／Orrery-first 混合入口、Workstream／Scope／subsystem、L0–L3 finding、双维度状态、风险审查、人工合流、保守清理和渐进式 Observatory。
+- Implementation Plan 改为 Personal foundation → 本地 review loop → opt-in Team extension → self-host／release，并把新实现目标指向平台中立 Core／CLI／Observatory／Adapter；发布 Skill 继续只是兼容投影。
+- 本轮只更新决策与文档，没有实现协作 CLI／UI／网络能力、改变支持状态或创建发布；精确集成检查见 `docs/validation/2026-08-20-adr-0008-collaboration-design-integration.md`。

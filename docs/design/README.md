@@ -11,7 +11,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 - [Docsite credential isolation and local broker](docsite-credential-isolation-and-broker.md) — provider binding, fail-closed activation, local HTTP hardening, and the optional deterministic broker governed by ADR-0003.
 - [Platform-neutral Core and Adapter architecture](platform-neutral-core-and-adapter-architecture.md) — component responsibilities, canonical Agent entrance, compatibility model, support states, and migration boundaries governed by ADR-0004.
 - [Broker-first docsite Provider gateway](broker-first-docsite-provider-gateway.md) — Broker-only runtime, managed default, external isolation and explicit migration governed by ADR-0006.
-- [Multi-worktree collaboration protocol](multi-worktree-collaboration-protocol.md) — Canonical, Candidate, and Worktree scopes, isolation, overlap detection, and clean integration rules governed by ADR-0007.
+- [Multi-worktree collaboration protocol](multi-worktree-collaboration-protocol.md) — isolation and fact scopes under ADR-0007, amended by ADR-0008 with default Personal Mode, opt-in Team Mode, Local-only telemetry, review, cleanup, and progressive command-center UX.
 
 ## Draft designs
 

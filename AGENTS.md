@@ -29,14 +29,16 @@
 - Git 只证明写入；Agent 回执只属于自述。没有 Harness／工具边界证据时，不得宣称已精确审计模型读取内容。
 - 大型原始实验根 `D:\coding warehouse\project-orrery-benchmark` 不自动进入 Git；可发布结论必须提炼到 `experiments/context-routing/results/`。
 - 修改发布契约、文档架构或跨模块安全边界时必须新增 ADR，不得只改 README。
-- 并发任务必须各自使用独立分支和 linked worktree／clone；主 worktree 只用于集成。不得让两个 Agent 共享同一工作目录或把 Candidate／Worktree State 表述为 canonical。
+- 并发 Workstream 必须各自使用独立分支和 linked worktree／clone；主 worktree 只用于集成。不得让两个 Agent 共享同一工作目录或把 Candidate／Worktree State 表述为 canonical。
 - 普通功能分支不持续改写根 `docs/PROGRESS.md` 与 `docs/HANDOFF.md`；受影响的 subsystem State、实现和验证在分支同行，由唯一整合者在干净 integration worktree 中同步全局入口。
+- 协作功能默认必须保持 zero-network Personal Mode；Team Mode 只能由用户按项目显式开启。中央视图只读且只能发送请求，任何执行必须由成员本机确认。
+- Team Mode 不得同步完整 Prompt／回答／transcript、源码正文、未 push diff 或成员执行凭据；Local-only telemetry 必须标注来源，证据不足的语义关系保持 Unknown。
 
 ## project structure
 
 **What**: 管理发布 Skill、根文档、实验控制面、自托管观测台和外部原始运行之间的边界。
 **Truth**: 当前仓库树、`.project-orrery.json`、`docs/PROGRESS.md`。
-**Dig**: [项目结构 State](docs/state/project-structure.md) | [ADR-0001](docs/decisions/0001-project-orrery-self-hosting.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)。
+**Dig**: [项目结构 State](docs/state/project-structure.md) | [ADR-0001](docs/decisions/0001-project-orrery-self-hosting.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)。
 
 ## documentation system
 
@@ -54,7 +56,7 @@
 
 **What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅和干净集成。
 **Truth**: Git branch／HEAD／worktree 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；当前只实现人工隔离与集成流程，自动 session、overlap 与 integration 命令尚未实现。
-**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
+**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
 
 ## context-routing research
 

@@ -1,12 +1,12 @@
 # 项目结构 State
 
 Updated: 2026-08-20
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)
 
 ## 当前事实
 
 - 单一 Git 仓库根：`D:\coding warehouse\project-orrery`。
-- 并发协作采用“一项任务／一个 Agent = 一个分支 + 一个独立 linked worktree 或 clone”；主 worktree 只供维护者集成。2026-08-20 已用独立 integration worktree 恢复并拆分三个共享工作目录任务，随后为 context-routing、platform／adapters 和 docsite／broker 分配三个干净 linked worktree，证明人工隔离与干净集成路径可行。
+- 并发协作当前人工采用“一个 Workstream = 一个分支 + 一个独立 linked worktree 或 clone”；一个平台会话可以在该 Workstream 中完成多个相关 Change Set。主 worktree 只供维护者集成。2026-08-20 已用独立 integration worktree 恢复并拆分三个共享工作目录任务，随后为 context-routing、platform／adapters 和 docsite／broker 分配三个干净 linked worktree，证明人工隔离与干净集成路径可行。
 - 已发布 v0.2.0 产品源仍是 `skills/project-orrery/`；当前工作树新增未发布的 `packages/project-orrery-{core,cli,observatory}/` 源码边界和 `adapters/codex/` 薄平台 Adapter。
 - Core 持有 schema、manifest／兼容判定和 canonical 作者模板；CLI 组合 Core 与 Observatory；Observatory 持有 managed-tool 清单与模板投影规则。
 - 项目文档权威根：`AGENTS.md` 与 `docs/`。
@@ -24,7 +24,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `adapters/codex/` 只包含 Codex 发现／调用元数据和 Adapter 生命周期安装器；它通过 manifest 引用 Core／CLI，不复制 canonical 作者模板、schema、兼容规则或项目状态。平台安装器只管理目标 skills 根下的 `project-orrery` Adapter 目录。
 - `docs/_site/`、缓存、凭据和 benchmark 原始输出不是作者文档或发布资产。
 - 自托管、实验和测试资产已进入 `main`；v0.2.0 tag／Release 指向发布提交 `20fc95b`，后续当前事实由 main 上的发布后文档继续维护。
-- linked worktree 共享 Git 对象库和普通 refs，但拥有独立 HEAD、索引与工作目录。未提交文件仍只属于所在 Worktree scope；跨机器未 push 工作不可观察。
+- linked worktree 共享 Git 对象库和普通 refs，但拥有独立 HEAD、索引与工作目录。未提交文件仍只属于所在 Worktree scope。当前没有 ADR-0008 所设计的 Team Node／Coordinator，因此跨机器未 push 工作在实际产品中仍不可观察；未来 opt-in Team Mode 只能增加标注为 Local-only 的元数据，不会成为代码证据。
 
 ## 实现证据
 
@@ -48,4 +48,4 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并有安装说明，但尚未进入 release workflow 或真实 Codex runtime 验证。
-- ADR-0007 的私有 session、自动路径／权威／语义重叠检测、推测性集成命令和观测台 scope banner 尚未实现；当前只有协议、人工恢复流程和独立 worktree 结构，不能宣称多 Agent 协调已经自动化。
+- ADR-0007／ADR-0008 的私有 session、主目录守卫、subsystem mapping、自动重叠检测、审查／清理命令、Personal 指挥台和 opt-in Team Mode 均尚未实现；当前只有协议、人工恢复流程和独立 worktree 结构，不能宣称多 Agent 协调已经自动化。
