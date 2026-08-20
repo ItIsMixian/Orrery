@@ -16,8 +16,25 @@ Updated: 2026-08-19
 - H2 相对 B 的总 input 高 18.5%，没有通过预设成本门，不采纳、不新增 ADR、不修改发布 Skill。R2 结论见 [Pilot 005 / 006 报告](../experiments/context-routing/results/2026-08-18-pilot-005-006-bh2-terra-medium.md)。
 - `codex/b-adoption-pilot` 已完成 Pilot 007 六次运行。仓库外原始根为 `D:\coding warehouse\project-orrery-benchmark\pilot-007-20260818-143450`；六份 manifest 有效，不得回写、重分类或复制进 Git。
 - Pilot 007 的共同 nested-branch formal-validation 缺陷使原 raw 0/3 对 0/3 不能直接解释；R2 语义复核为 P/B 均 2/3。B 的成本／收益门仍全部失败，因此不采纳、不新增 ADR。
-- ADR-0002 已接受：未来上下文路由采纳实验必须含隔离的真实应用开发任务。Approved Design 已完成，真实 fixture、Oracle 和 Pilot 008 尚未开始。
+- Pilot 008 原 P/R Skill Entry Router 只完成静态准备，没有运行模型；ADR-0005 已在执行前取代其固定入口成本假设，历史候选与 Validation 保留但不作为当前 treatment。
+- Pilot 008 的正式 transport 已实现；首对迁移任务中 P 读取外部已安装 Skill 而 contaminated，P/S 又共同
+  暴露冻结 Oracle 的索引名和自然语言词形假阴性。runner 停止后续任务，两份 R0 保持有效且只读。
+- Pilot 009 保持完整 Skill、P/S 入口 treatment、任务目标和 Terra medium 配置，只修正上述装置问题。
+  六次正式运行的 access audit、exact Scope、formal validation 和 R0 全部有效；外部原始根为
+  `D:\coding warehouse\project-orrery-benchmark\pilot-009-scope-20260819-142948`。
+- Pilot 009 的 S/P 聚合写前 input 为 `0.8274`，全部成本门通过；冻结 0/3 经只读语义复核为 P/S 2/3。
+  两侧迁移实现行为正确，但 PROGRESS 都遗漏未来版本写前拒绝，3/3 质量门失败，因此 S 不采纳。
+- 任务／Oracle v0.2 已作为研究候选成文：下一步先构造分层 verdict、公开结构化 State 字段、paraphrase
+  和 mutation controls，不自动创建或运行 Pilot 010。
 - Marglo／NextStep Seed_2 是首批素材来源；只可提炼模式或从固定提交构造脱敏 fixture，不能在真实工作树运行，也不能复制用户数据、凭据、缓存或未提交改动。
+- 工作树新增未发布的 docsite UI 小优化：动态页 AI 设置入口位于顶栏主题按钮左侧，根观测台与发布模板已同步；桌面／移动端浏览器验证、动态全仓 40/40、集成结构、静态站和 diff 检查通过。没有新增 ADR，也没有提交、推送或发布。
+- ADR-0004 已接受平台中立 Core／CLI／Observatory／Adapter 的单仓库分包边界；Approved Design 与 Active Plan 已建立。Phase 0／1 和 Phase 2 仓库实现检查点已落地，但没有改变 v0.2.0 资产、实现第二平台或产生任何新的 runtime `verified` 证据。
+- ADR-0004 Phase 0 已完成：v0.2.0 发布清单和三项 CLI 人类输出由 fixture／回归保护，模板 `AGENTS.md` 使用中立标题；README 将可移植 CLI、`experimental` Codex 和 `target` 其他平台明确分开。
+- ADR-0004 Phase 1 已完成：`packages/*/src` 下建立 Core／CLI／Observatory 0.1.0 源码边界；旧 Skill 路径为薄 wrapper，单独 Skill 使用冻结 v0.2 fallback。12 项产品测试通过，2 个动态依赖测试按设计跳过。
+- ADR-0004 Phase 2 仓库实现检查点已完成：`adapters/codex/` 是不含模板／schema／项目事实的薄 Adapter，`scripts/package_codex_adapter.py` 生成独立 ZIP／checksum，平台安装器的 dry-run、冲突拒绝、旧 Skill 备份迁移、升级与可恢复卸载在临时目录 5/5 通过。真实 Codex E2E 未执行，状态仍为 `experimental`。
+- ADR-0003 的 docsite 凭据安全实现已在工作树完成：Provider／Base URL 绑定、显式端点、失败关闭、同源 POST、安全响应头、语料／Provider 缓存签名，以及可选确定性 Broker 的缓存、single-flight、模型与预算门均已同步到根工具和发布模板。它尚未提交、推送或发布。
+- ADR-0006 已在工作树把上述可选 Broker 收敛为唯一 docsite 网关：设置页的 OpenAI／DeepSeek／Custom 只注册上游，默认本机托管自动启动，外部隔离只保存 client token；`set_key.py`、独立 Q&A CLI、仪表盘与测试路径都要求 Broker。动态产品专项 16/16、默认全仓 57 passed + 2 expected skips，尚未提交或发布。
+- 已完成 `Ariestar/sivtr@4fae091` 固定提交的源码观察并写入 Library。当前结论是其 WorkRecord／WorkRef／WorkSet、渐进检索和只读 MCP 可作为情境证据层参考，但不能替代 Orrery 权威链；没有采纳依赖、Adapter、路由策略或新 Pilot。
 
 ## 风险与常见陷阱
 
@@ -30,9 +47,20 @@ Updated: 2026-08-19
 - JSONL 模式是完整事件流上的事后作废，不是实时权限边界；任何 MCP／Hosted／未知 item、直接读取命令或输出哈希不匹配都必须使 run 失败。
 - 原始 run sealing 后不得增补文件或“修正”分类；派生复核进入新 R1／Validation 文件并引用原 run。
 - 读取代理已改为直接写 UTF-8 bytes；不要恢复为 Windows TextIO 输出，否则 CRLF 会再次变成 CRCRLF。兼容旧 run 的恢复形式仍必须命中代理独立 SHA-256，不能接受无哈希的换行宽松比较。
-- Pilot 007 已冻结；共同装置问题必须进入 Pilot 008。不要修复 raw summary、frozen Oracle、协议检查或候选仓库后再冒充同一轮结果。
+- Pilot 007／008／009 都已冻结；不要修复 raw summary、frozen Oracle、协议检查或候选仓库后再冒充
+  同一轮结果。任何新任务或 Oracle 必须使用新 Pilot ID 和外部输出根。
 - 未来 runner 的外层隔离分支不能再命名为 `benchmark`，否则既有 Pilot 006 dry-run 会在嵌套 clone 中创建同名分支失败。
-- 不要把 ADR-0002 的“政策已接受”写成“Pilot 008 已准备”或“真实开发任务已通过”；当前没有新的控制包或运行证据。
+- Pilot 009 已观察到 S 的写前 input 低于 P，但不能把成本门通过写成“S 已采纳”：质量门失败，样本只有
+  三项、一个模型和一个 runtime。
+- 不要把 Smoke 001 的最终 58,541 input 写成 Scope Lock input；该 turn 没有首次写入边界，唯一有效分类是 apparatus-contaminated／measurement unavailable。
+- 不要把 Smoke 002 的写前 19,361 input 写成 P/S 路由成本或收益；它只验证当前 CLI 的事件顺序，策略允许 0 次写前代理读取，因此没有内容交付 proof。
+- 不要因 Pilot 009 的成本方向信号直接修改发布 `skills/project-orrery/SKILL.md` 或模板；S 仍是
+  experiments 候选且本轮明确不采纳。
+- 不要把工作树中的 Core 源码分包写成“独立组件已发布”或“其他 Agent 平台已兼容”；当前公开发布源和唯一发布集成仍是 `skills/project-orrery/` 下的 Codex Skill。
+- 不要把仓库内 Codex Adapter 的归档／临时目录测试写成真实 runtime 兼容证据；在没有明确授权前，不要安装、升级或卸载维护者真实用户技能目录中的 `project-orrery`。
+- 不要把默认同用户托管 Broker 宣称为进程隔离。它统一路由、缓存和预算门，但只有外部 Broker 确实运行在独立 OS 身份或等价外层边界下时才隔离 Provider Key；client token 仍能在预算内发起调用。
+- 旧共享 keyring 槽不会被启动流程读取或自动迁移；用户重新保存当前 Provider Key 时会写入绑定槽并清理旧槽。若旧 Key 曾进入不受信任进程或测试上下文，轮换仍是 Provider 侧动作，代码无法替代。
+- 不要把 `sivtr` README／Roadmap 或私有 retrieval snapshot 指标写成独立验证事实：其公开仓库没有评估快照，固定提交的完整 Rust 测试在本机因 build-script `os error 5` 未进入测试阶段，且 Agent 入口、架构、Roadmap 与实现存在漂移。任何 transcript 读取还必须先解决缓存副本、保留／删除、脱敏和 Windows daemon token 权限边界。
 
 ## 安全接续点
 
@@ -41,5 +69,12 @@ Updated: 2026-08-19
 3. 阅读 [H2 装置验证](validation/2026-08-18-h2-read-proof-apparatus.md)、[Pilot 005 / 006 验证](validation/2026-08-18-pilot-005-006-bh2.md)和活动 Implementation Plan。
 4. Pilot 007 准备后的专项测试为 12/12；全仓默认 39/40（1 skip），动态 reader 开启后 40/40；benchmark、integrated build、文档站、本地链接与 diff 检查通过。若涉及既有 raw run，只可执行 verify／只读派生。
 5. 阅读 [Pilot 007 R2 结果](../experiments/context-routing/results/2026-08-18-pilot-007-pb-adoption-terra-medium.md)和 [运行验证](validation/2026-08-18-pilot-007-pb-adoption.md)；不要只看 frozen raw 的 0/3。
-6. 当前没有活动采纳实验。若用户要求继续，先写 Pilot 008 Design／Plan／Oracle 并完成真正嵌套的 preflight；不得直接重跑 Pilot 007。
-7. 下一轮先读取 [ADR-0002](decisions/0002-real-development-benchmark-portfolio.md)与[真实开发基准 Design](design/real-development-context-routing-benchmark.md)，再为 fixture 构建创建独立 Implementation Plan；正式模型运行仍需再次确认。
+6. 读取 [Pilot 008 apparatus stop](validation/2026-08-19-pilot-008-formal-apparatus-stop.md)、
+   [Pilot 009 Validation](validation/2026-08-19-pilot-009-ps-scope-run.md)和
+   [R2](../experiments/context-routing/results/2026-08-19-pilot-009-ps-scope-terra-medium.md)；raw 0/3 必须与
+   只读 2/3 复核一起解释。
+7. 下一步先按[任务／Oracle v0.2](../experiments/context-routing/designs/real-development-task-oracle-v0.2.zh-CN.md)
+   建立无模型 controls。Pilot 010 尚未创建，也没有自动补跑授权。
+8. 平台适配工作先读取 [ADR-0004](decisions/0004-platform-neutral-core-and-adapter-boundaries.md)、[Approved Design](design/platform-neutral-core-and-adapter-architecture.md)、[Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)、[Phase 1 Validation](validation/2026-08-19-platform-neutral-phase-1-core-cli.md)和[Phase 2 仓库实现 Validation](validation/2026-08-19-platform-neutral-phase-2-codex-adapter.md)；下一步须经明确授权后才进行真实 Codex runtime E2E，不先选择第二平台或发布组件。
+9. docsite 安全接续先读取 [ADR-0003](decisions/0003-provider-bound-credentials-and-optional-local-broker.md)、[ADR-0006](decisions/0006-broker-only-docsite-provider-gateway.md)、[Broker-first Design](design/broker-first-docsite-provider-gateway.md)和[Validation](validation/2026-08-19-broker-first-docsite-gateway.md)；公开 v0.2.0 尚不包含这些工作树改动。
+10. 若继续研究外部工作记忆层，先读取 [sivtr 观察](library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)；除非用户明确接受新的 ADR／Plan，不安装 sivtr、不扫描真实 transcript、不修改 Scope Router，也不自动创建 Pilot 010。

@@ -4,7 +4,7 @@ Updated: 2026-08-19
 
 ## 当前阶段
 
-Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。用户已通过 ADR-0002 接受后续评测的新边界：上下文路由采纳实验必须包含隔离的真实应用开发任务，不能继续用文档维护题代表一般开发。该政策已有 Approved Design，但真实开发 fixture、Oracle 与 Pilot 008 尚未实施，也不改变发布 Skill。
+Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR-0005 把当前效率目标定义为从任务 Prompt 到首次允许产品写入前的累计 input；Harness 被动派生 Scope Lock，不要求 Agent 输出 Manifest 或回执。Pilot 008 的首对正式运行因 P 读取外部已安装 Skill 和共同 Oracle 假阴性而停止并封存。修正后的 Pilot 009 已完成三项 P/S、共六个 Terra medium run：装置、exact Scope、formal validation 和 R0 全部有效，S/P 聚合写前 input 为 `0.8274`，所有成本门通过；只读任务质量 P/S 均为 2/3，迁移任务共同遗漏 PROGRESS 的未来版本拒绝事实，因此 3/3 质量门失败，S 不采纳。下一步先落实分层任务／Oracle v0.2 的 paraphrase 与 mutation controls，不自动补跑模型。平台适配方向另由 ADR-0004 接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime 验证门；Phase 0、Phase 1 和 Phase 2 的仓库实现检查点已完成，当前工作树已有未发布 Core／CLI／Observatory 源码包、旧 Skill 兼容入口，以及可独立归档和可恢复安装的薄 Codex Adapter，但没有真实 Codex runtime E2E、独立组件发布或第二平台实现。ADR-0003 的凭据加固已由 ADR-0006 收敛为 Broker-only docsite：本机托管为默认，外部隔离只绑定 client token，直接 Provider UI／运行／Q&A CLI 入口均已移除并通过本地验证，但尚未提交或进入公开 v0.2.0。
 
 ## 已完成
 
@@ -29,6 +29,25 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。用
 - [x] 完成 Pilot 007 六次 Terra medium P/B 运行；所有 CLI 最终 exit 0，六份 R0 manifest 6/6 校验有效，没有隐藏重试。
 - [x] 完成 Pilot 007 R2 只读复核：记录共同装置缺陷，将 029 的固定词形 Oracle 假阴性与 027 的真实跨平台排序遗漏分离，并按冻结成本门停止 B 采纳。
 - [x] 通过 ADR-0002 采纳真实开发基准任务组合，并形成隔离、脱敏、任务比例与 Oracle 层级的 Approved Design。
+- [x] 将动态 docsite 的 AI 服务设置入口移到顶栏主题按钮左侧，同步根观测台与发布模板，并完成桌面／移动端和全仓 40/40 回归；该 UI 小优化不新增 ADR、尚未发布。
+- [x] 完成 Pilot 008 Skill Entry Router 历史准备：P 已冻结为 Pilot 内 9,109-byte 快照，R 为 2,386 bytes，三项 Prompt 降至 P 的约 44.5%–44.7%；3/3 negative、3/3 positive、嵌套 preflight、dry-run 和专项 13/13 通过。该 treatment 未运行模型，并在执行前由 ADR-0005 取代。
+- [x] 完成 Pilot 008 Scope Acquisition 重构：P/S 共享 9,109-byte Skill，三项 Prompt 逐项等长；实现被动写前 usage analyzer、无 reason-code 代理模式、P/S 嵌套 preflight 和 formal fail-closed。分析器 4-case、上下文专项 17/17、默认全仓 49 passed + 2 expected skips、benchmark 与 integrated static build 通过，未运行模型。
+- [x] 执行 App-server Scope Ordering Smoke 001：当前桌面包为 `codex-cli 0.148.0-alpha.15`，89 个服务端消息中有 3 次单调 usage 更新；因临时运行时遗漏 code-mode host，0 次命令、0 次 `fileChange`，按 contaminated 封存且 manifest 36/36 有效。修正后 smoke 自测 2/2、上下文专项 18/18、默认全仓 50 passed + 2 expected skips；该运行没有产生 Scope Lock 结论。
+- [x] 执行修正后的 App-server Scope Ordering Smoke 002：同版本 runtime sibling 哈希一致；读取命令在事件 59 完成，写前累计 usage 在事件 60 到达，首次产品 `fileChange` 在事件 62 启动。独立 analyzer 报告 `input-to-scope-lock = 19,361`、`cached = 9,984`、`non-cached = 9,377`，测量链有效且顺序通过；原始根按 `decision_supporting` 封存，manifest 39/39 有效。该值仅是兼容性 smoke 的 ordering 指标，不是 P/S 成本结果，且本轮没有代理 proof。
+- [x] 完成 Smoke 002 权威链与无模型回归：analyzer 4/4、ordering 2/2、上下文专项 18/18、默认全仓 57 passed + 2 expected skips、24 项 corpus、6 份 run record、integrated structure、docsite build、205 份 Markdown 链接与 diff 检查通过；Pilot 008 formal guard 继续生效。
+- [x] 完成 Pilot 008 正式 transport 与首对运行：P/S Scope measurement 均 exact，但 P 的外部 Skill 读取
+  使对照污染，共同迁移 Oracle 又暗中要求索引名和文档词形；两份 R0 有效，后续任务按设计停止。
+- [x] 完成 Pilot 009 三对 P/S 正式运行：6/6 装置与 Scope 有效、6/6 manifest 可验证；S/P 写前 input
+  `0.8274` 且所有成本门通过。只读质量 P/S 均 2/3，未过 3/3 门，S 不采纳。
+- [x] 形成真实开发任务／Oracle v0.2：分离行为、数据安全、范围、结构化 State 和叙事一致性 verdict，
+  并要求 paraphrase、contradiction、mutation controls；当前只是研究候选。
+- [x] 通过 ADR-0004 接受平台中立 Core／CLI／Observatory／Adapter 分包边界，并形成 Approved Design 与分阶段 Implementation Plan；当前发布实现仍是 Codex Skill。
+- [x] 完成 ADR-0003：直接模式凭据按 Provider／Base URL 绑定并失败关闭，本地写操作改为同源 POST，旧刷新 GET 不再调用模型，可选 Broker 提供固定端点、去重缓存和预算门；根观测台、模板、安装器、测试与 Validation 已同步。
+- [x] 完成 ADR-0006：默认托管与外部隔离两种模式都以 Broker 为唯一 docsite 调用通道；UI 只注册上游，`set_key.py` 和独立 Q&A CLI 也失败关闭到 Broker。动态产品专项 16/16、默认全仓 57 passed + 2 expected skips，integrated build 与模板投影通过。
+- [x] 完成 ADR-0004 Phase 0：固化 v0.2.0 发布清单与 CLI 人类输出，模板入口改为中立标题，并在 README 将 CLI 可移植路径、`experimental` Codex 与 `target` 其他平台分开表述。
+- [x] 完成 ADR-0004 Phase 1：建立 Core／CLI／Observatory 0.1.0 源码包、canonical 作者模板、schema／兼容模型、managed-tool 清单和旧 Skill wrapper／fallback，并验证新旧入口等价。
+- [x] 完成 ADR-0004 Phase 2 仓库实现检查点：建立独立 Codex Adapter 0.1.0、组件／runtime manifest、确定性 ZIP／checksum 和只管理 Adapter 目录的 dry-run／备份升级／可恢复卸载；临时目录专项 5/5 通过，真实 runtime 验证仍待授权。
+- [x] 完成 `Ariestar/sivtr@4fae091` 外部源码观察，区分其情境工作记忆层与 Orrery 权威事实层；记录 WorkRef／WorkSet 渐进披露、只读 MCP、检索评估、隐私生命周期和文档漂移启发。没有采纳依赖、Adapter、路由策略或新 Pilot。
 
 ## 当前结论
 
@@ -39,6 +58,15 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。用
 - Pilot 007 没有显示 B 的质量收益；B 相对 P 聚合 input +25.68%、output +23.56%、Agent 时间 +16.89%，代理正文仅 -6.95%，不满足采纳门。
 - 共同装置缺陷意味着不能把本轮宣传为普遍“科学证伪 B”；项目层面的保守决定仍是不采纳、不继续给当前 B 增加协议。
 - 后续研究以滚动组合覆盖真实产品代码、安全／迁移／跨模块和文档治理；代码任务先验收行为与安全，再验收必要的文档同步。
+- Pilot 009 已证明正式 Harness 能在 6/6 run 精确统计 `input-to-scope-lock`；S 的聚合成本方向优于 P，
+  但任务质量只有 2/3，因此不能由“成本门通过”推导“路由可采纳”。
+- Smoke 001 的最终 58,541 input 是无写入边界的整轮累计值，不是 `input-to-scope-lock`；不能用它估算或代替主指标。
+- Smoke 002 的 19,361 input 是单个 ordering-only 兼容性 turn 的精确写前累计值，不是任一正式 P/S 样本，也不能支持路由收益结论；其 `minimum_prewrite_content_reads` 为 0，因此没有独立内容交付证明。
+- 平台中立 Core／CLI／Observatory 源码边界已经实现，但 `implemented` 不等于 `released`：当前没有独立组件发布产物、Harness JSON Adapter、第二平台集成或可声明的第二平台 `verified` 证据。
+- v0.2.0 CLI 仍随 Codex Skill 分发；源码 wrapper 调用新 CLI，独立 Skill 使用冻结 fallback。Codex 因缺少完整真实 runtime E2E 继续保持 `experimental`。
+- Codex Adapter 已成为独立的未发布薄产物，但它只声明对 Core API 1 和 CLI `>=0.1.0,<0.2.0` 的依赖；Core／CLI 尚未发布，因此它不是新的完整公共安装路径，也没有改变 v0.2.0 发布事实。
+- 动态 docsite 已没有直接 Provider 路径；默认同用户托管 Broker 只提供统一路由和成本门，只有在独立 OS 身份或等价边界中配置并运行外部 Broker，才能把 Provider Key 隔离出 docsite／Agent 身份。
+- `sivtr` 可作为未来“情境证据来源”的研究对象，但不能替代 State／ADR／实现真值；任何可选 memory evidence Adapter 都需要新的权威／证据分层、隐私生命周期和可复现验证决定，当前不进入发布版或下一 Pilot。
 
 ## 待办
 
@@ -55,7 +83,16 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。用
 - [x] 准备 Pilot 007 B 采纳实验及独立 Oracle，不执行正式模型样本。
 - [x] 运行 Pilot 007 的 3 对 P/B 样本并生成 R2；结论为装置受污染且 B 成本／收益门失败，不采纳。
 - [ ] 跨平台 byte-for-byte 可重复打包暂不进入本阶段；v0.2.0 已发布资产的 checksum 仍有效。
-- [ ] 为真实开发基准建立单独 Implementation Plan、脱敏 fixture、独立 Oracle 和嵌套 preflight；未获再次启动确认前不运行 Pilot 008。
+- [x] 为真实开发基准建立独立 Plan、脱敏 fixture、独立 Oracle、positive/negative controls 和嵌套 preflight。
+- [x] 将 app-server 事件协议、代理 proof、R0 封存与汇总接入正式 transport，并在 Pilot 008／009 运行中
+  验证成对失败关闭与六次完整证据链。
+- [ ] 按任务／Oracle v0.2 为下一 Pilot 构造公开结构化 State 字段、分层 verdict、paraphrase 与 mutation
+  controls；完成静态装置后再决定是否授权新模型样本。
+- [x] 按[平台中立 Core 与 Adapter Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)完成 Phase 0 基线、命名和兼容测试。
+- [x] 采用 `packages/*/src` 布局，Core／CLI／Observatory 初始未发布版本为 0.1.0；旧 Skill wrapper 保留至 0.3.x，最早 0.4.0 移除。
+- [x] 建立 Codex Adapter 独立产物与安装／卸载边界：未知目录拒绝、已识别旧 Skill／Adapter 先备份再升级、卸载移入可恢复回收目录；Adapter 只声明外部 CLI 依赖。
+- [x] 完成 Broker-first docsite gateway：所有 API 入口统一经 Broker 注册，默认托管不强制连接测试，外部模式只接收 client token；根／模板、README 和 Validation 已同步。
+- [ ] 在明确授权后，把独立 CLI 与 Adapter 安装到隔离的真实 Codex 用户技能位置，记录精确 runtime／OS 的发现、调用、失败、更新和卸载 E2E；完成前保持 `experimental`，且不发布组件。
 
 ## Blockers / risks
 
@@ -66,8 +103,15 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。用
 - Pilot 006 只有两个高风险任务，足以否决当前 H2 的预设成本门，不足以推导所有模型和任务的普遍规律。
 - Pilot 007 的外层 `benchmark` 分支会使嵌套 Pilot 006 dry-run 创建同名分支失败；任何未来 Pilot 必须在启动前用不同外层分支名覆盖该路径。
 - Pilot 007 frozen Oracle 对 029 过度要求英文精确词形 `ExecutionPolicy`；R2 已修正语义判断，但没有回写原始 Oracle 或 raw summary。
+- Pilot 009 frozen Oracle 对 033／035 仍存在自然语言固定词形假阴性；R2 只读复核为 P/S 2/3，没有
+  回写 0/3 raw summary。下一 Oracle 必须用 paraphrase controls 在模型运行前发现这类问题。
 - Marglo 来源仓库包含活跃工作树和潜在用户数据；未来只能从固定提交或显式白名单构造脱敏 fixture，不能直接复制当前工作目录。
+- Broker client token 仍具有受模型白名单和每日预算约束的消费能力；同用户运行 Broker 只能减少重复调用和限制开销，不能宣称 Provider Key 已隔离。
 
 ## 下一里程碑
 
-为 ADR-0002 建立首批真实开发 fixture 与独立 Oracle 的 Implementation Plan。下一轮先验证任务装置本身，不直接复用或补跑 Pilot 007；正式模型运行仍需用户再次确认。
+上下文路由线路的下一安全里程碑是不调用模型地把任务／Oracle v0.2 变成新 Pilot 控制包：公开所有 exact
+字段契约、分离五层 verdict，并用 paraphrase／contradiction／mutation controls 证明 Oracle。Pilot 009 的
+成本方向信号可以作为继续研究的理由，但 S 在 3/3 质量门和维护者明确接受前不得进入发布 Skill 或模板。
+
+平台适配线路的下一安全里程碑是 ADR-0004 Phase 2 的真实 Codex runtime E2E。仓库内产物和生命周期测试已就绪，但实际安装会改变用户技能目录并可能需要重启／新会话，因此必须先获得明确授权；在此之前保持 `experimental`，也不得宣称第二平台兼容。

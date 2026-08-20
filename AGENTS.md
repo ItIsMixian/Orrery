@@ -44,15 +44,15 @@
 
 ## released skill and compatibility
 
-**What**: Codex Skill、模板、安装器、验证器、更新检查和发布兼容契约。
-**Truth**: `skills/project-orrery/`, `scripts/package_release.py`, `.github/workflows/`。
-**Dig**: [发布与工具链 State](docs/state/release-and-toolchain.md)。
+**What**: 平台中立 Core／CLI／Observatory、Codex Skill 兼容入口和发布兼容契约。
+**Truth**: `packages/`, `adapters/codex/`, `skills/project-orrery/`, `scripts/package_release.py`, `scripts/package_codex_adapter.py`, `.github/workflows/`。
+**Dig**: [发布与工具链 State](docs/state/release-and-toolchain.md) | [ADR-0004](docs/decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [Approved Design](docs/design/platform-neutral-core-and-adapter-architecture.md)。
 
 ## context-routing research
 
 **What**: 测量 Agent 文档负担、上下文路由、访问证据与 Harness 验收。
 **Truth**: `experiments/context-routing/` 与仓库外封存输出；当前没有任何实验策略进入发布版 Skill。
-**Dig**: [研究 State](docs/state/context-routing-research.md) | [研究综述](docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md) | [ADR-0002](docs/decisions/0002-real-development-benchmark-portfolio.md)。
+**Dig**: [研究 State](docs/state/context-routing-research.md) | [研究综述](docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md) | [ADR-0002](docs/decisions/0002-real-development-benchmark-portfolio.md) | [ADR-0005](docs/decisions/0005-prewrite-scope-acquisition-input.md)。
 
 ## test coverage
 

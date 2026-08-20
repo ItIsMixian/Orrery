@@ -62,10 +62,13 @@ Project Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模�
 
 ## 可用集成
 
-Project Orrery 的核心工作流可以直接通过命令行运行。打包集成只负责补充特定平台的安装和调用方式，不改变底层权威模型。
+Project Orrery 的核心工作流可以直接通过命令行运行。当前源码树已经建立内部 Core、CLI 与 Observatory 包边界，以及可独立打包的 Codex Adapter，但这些新组件都尚未发布；在 v0.2.0 中，受支持脚本仍随旧 Codex Skill 分发，Core／CLI 尚未作为独立 Core/CLI 包发布。平台集成只负责补充特定平台的安装和调用方式，不改变底层权威模型。
 
-- **Codex**：v0.2.0 已提供打包好的 [Codex Skill](skills/project-orrery/)。
-- **其他 Agent 与 Harness 平台**：现在即可使用平台中立的 CLI；其他打包集成尚未发布。
+| 能力面 | 当前已有内容 | 支持状态 |
+| --- | --- | --- |
+| Core / CLI | installer、validator 和 update checker 可在没有 Codex runtime 的情况下直接调用；未发布源码包现已持有共享契约。 | 可移植源码与命令路径；尚未独立发布。 |
+| Codex | v0.2.0 已提供打包好的旧 [Codex Skill](skills/project-orrery/)；工作树另有未发布的薄 [Codex Adapter](adapters/codex/) 与生命周期安装器。 | `experimental`：产物与临时目录生命周期测试已通过，但在形成新 Adapter 的真实 runtime 发现、调用、失败、更新和卸载证据前不升级为 `verified`。 |
+| 其他 Agent 与 Harness 平台 | 尚未发布平台 Adapter。 | `target`：在完成真实集成与 runtime 验证前，不宣称兼容。 |
 
 ## 快速开始
 
@@ -91,6 +94,12 @@ python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
 
 Skill 会从下一轮对话开始可用。请通过 [GitHub 最新发布页](https://github.com/yw9299-stack/project-orrery/releases/latest)确认当前稳定标签。你也可以先验证发布包的 SHA-256 校验和，再把其中的 `project-orrery` 文件夹手动复制到 Codex Skill 目录。
 
+仅供开发验证：未发布薄 Adapter 可用 `python scripts/package_codex_adapter.py`
+生成归档，并用
+`python adapters/codex/scripts/install_adapter.py --destination-root <skills-directory> --dry-run`
+预演安装。它依赖另行提供的未发布 CLI，不替代 v0.2.0 稳定安装路径；升级与卸载只处理
+Adapter 目录，并通过可恢复的备份或回收目录完成。
+
 ### 3. 验证安装结果
 
 第一次结构验证不需要安装第三方依赖：
@@ -115,13 +124,24 @@ Windows 用户也可以运行 `start-docsite.bat`。服务默认只监听本机�
 
 #### 配置可选 AI 能力
 
-在本地观测台中打开**问文档**，点击设置按钮即可进入图形化配置面板。面板支持 OpenAI、DeepSeek 和自定义 OpenAI 兼容服务，可配置 Base URL、默认模型、可选的意图／审计模型以及 API Key。
+本地观测台顶栏的主题切换按钮左侧提供 **AI 服务设置**入口。动态 docsite 只通过 Broker 调用模型；OpenAI、DeepSeek 和自定义 OpenAI-compatible 仅是 Broker 的上游注册预设，不再是 docsite 的直连入口。
 
-- API Key 只写入操作系统凭据存储，不会返回浏览器，也不会保存到 `ai-config.json`。
-- 非敏感的服务商和模型配置保存到目标项目根目录下、已被 Git 忽略的 `ai-config.json`。
+- 默认的“本机托管”模式会把上游 Provider Key 写入 Broker 专用的操作系统凭据槽，docsite 只绑定 Broker client token。
+- 非敏感的 Broker 方式、模型和上游元数据保存到目标项目根目录下、已被 Git 忽略的 `ai-config.json`；Provider Key 和 client token 都不写入该文件。
+- **保存并启用**只做本地校验，不会额外发送“连接测试”请求；激活后正常的仪表盘生成可能随即开始。
 - **测试连接**会发起一次最小模型请求，可能产生少量服务商费用。
 - 生成的静态阅读器 `docs/_site/index.html` 是只读的，不能写入凭据。
-- 无界面或终端工作流仍可使用 `python scripts/docsite/set_key.py`。
+- 无界面或终端工作流可使用 `python scripts/docsite/set_key.py`；该入口同样只会注册 Broker。
+
+本机托管 Broker 会统一提供端点固定、重定向拒绝、模型白名单、缓存、并发去重和每日请求／token 预算；它能减少重复 LLM 开销，但同一 OS 用户下不构成 Provider Key 隔离。需要真正隔离时，在独立 OS 账户或等价外层沙箱中运行外部 Broker：
+
+```bash
+python scripts/docsite/llm_broker.py configure --provider deepseek --base-url https://api.deepseek.com --model deepseek-chat
+python scripts/docsite/llm_broker.py client-token
+python scripts/docsite/llm_broker.py serve
+```
+
+随后在 docsite 中选择 **外部隔离 Broker**，填入环回 Broker URL 和输出的 client token。Broker 不提供上游 Provider Key 导出接口。
 
 如需同时验证静态阅读器构建：
 
@@ -147,6 +167,9 @@ python /path/to/project-orrery-skill/scripts/check_project_orrery_update.py \
 | 版本维度 | 表示什么 |
 |---|---|
 | Skill 版本 | Agent 工作流、安装器、验证器和发布工具 |
+| Core API／CLI 版本 | 平台中立契约与命令实现 |
+| Adapter 版本 | 单个平台的发现、调用提示与生命周期实现 |
+| Runtime 证据 | 精确 Agent／Harness runtime、OS、测试范围和 Validation 记录 |
 | 目标工具链版本 | 项目内实际安装的观测台托管文件 |
 | 项目清单格式 | `.project-orrery.json` 的机器可读结构 |
 | 文档架构版本 | 作者文档中被当前版本理解的权威职责 |
@@ -186,6 +209,9 @@ Project Orrery 对既有项目采取保守策略。
 | [`skills/project-orrery/scripts/`](skills/project-orrery/scripts/) | 安全安装器与安装验证器 |
 | [`skills/project-orrery/assets/project-template/`](skills/project-orrery/assets/project-template/) | 可迁移文档脚手架与本地阅读器 |
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | 权威架构与迁移契约 |
+| [`packages/`](packages/) | 未发布的平台中立 Core、CLI 与 Observatory 源码包 |
+| [`adapters/codex/`](adapters/codex/) | 未发布的薄 Codex Adapter、manifest、元数据与生命周期安装器 |
+| [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | 版本化 Codex Adapter 归档与 checksum 构建器 |
 | [`docs/`](docs/) | Project Orrery 自身的自托管权威链、当前 State、验证与历史 |
 | [`docs/library/`](docs/library/) | 非权威研究、文献综述、实验方案与设计假设 |
 | [`experiments/context-routing/`](experiments/context-routing/) | 用于上下文路由研究的 ADR 前置基准语料、运行结构与验证工具 |
@@ -195,7 +221,7 @@ Project Orrery 对既有项目采取保守策略。
 
 ## 可选能力与隐私
 
-静态阅读器和文档权威模型不依赖 AI 服务。AI 文档问答、路线图综合和里程碑视图需要由目标项目自行提供服务商配置；动态本地观测台提供图形化配置面板，密钥仍只保存在操作系统凭据存储中。趋势雷达可以使用 GitHub Search，并可选接入网页搜索。
+静态阅读器和文档权威模型不依赖 AI 服务。AI 文档问答、路线图综合和里程碑视图需要由目标项目注册 Broker；动态本地观测台不再提供直接 Provider 调用路径。默认托管 Broker 偏向成本与流量控制，外部 Broker 可把上游 Key 保留在独立 OS 身份内。趋势雷达可以使用 GitHub Search，并可选接入网页搜索。
 
 观测台默认只在本地运行。Project Orrery 不包含托管服务、遥测收集器或预置凭据。启用可选联网能力前，请先审查目标项目的服务商和网络配置。
 

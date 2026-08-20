@@ -62,10 +62,13 @@ The evidence and open questions behind the next context-routing experiments are 
 
 ## Available integrations
 
-Project Orrery's core workflow can be operated directly from the command line. Packaged integrations add platform-specific installation and invocation without changing the underlying authority model.
+Project Orrery's core workflow can be operated directly from the command line. The current source tree now has internal Core, CLI, and Observatory package boundaries plus an independently packageable Codex Adapter, but all of those new components are unreleased. In v0.2.0, the supported scripts are still distributed inside the legacy Codex Skill, and there is not yet a separately packaged Core/CLI distribution. Packaged integrations add platform-specific installation and invocation without changing the underlying authority model.
 
-- **Codex** — a packaged [Codex Skill](skills/project-orrery/) is available in v0.2.0.
-- **Other Agent and Harness platforms** — the platform-neutral CLI can be used today; additional packaged integrations have not yet been published.
+| Surface | What exists today | Support status |
+| --- | --- | --- |
+| Core / CLI | The installer, validator, and update checker can be invoked directly without a Codex runtime; unreleased source packages now own the shared contracts. | Portable source and command path; not yet separately published. |
+| Codex | A packaged legacy [Codex Skill](skills/project-orrery/) is available in v0.2.0; the worktree also contains an unreleased thin [Codex Adapter](adapters/codex/) and lifecycle installer. | `experimental`: artifact and temporary-directory lifecycle tests pass, but no new Adapter is promoted to `verified` until real runtime discovery, invocation, failure, update, and uninstall evidence is recorded. |
+| Other Agent and Harness platforms | No packaged Adapter has been published. | `target`: compatibility is not claimed until a real integration and runtime validation exist. |
 
 ## Quick start
 
@@ -91,6 +94,13 @@ Ask Codex:
 
 The skill becomes available on the next turn. Use the [latest GitHub Release](https://github.com/yw9299-stack/project-orrery/releases/latest) to confirm the current stable tag. You can also verify the release archive's SHA-256 checksum and copy its `project-orrery` folder into your Codex skills directory manually.
 
+For development only, the unreleased thin Adapter can be packaged with
+`python scripts/package_codex_adapter.py` and previewed with
+`python adapters/codex/scripts/install_adapter.py --destination-root <skills-directory> --dry-run`.
+It requires the separate unreleased CLI and does not replace the stable v0.2.0
+installation path. Upgrade and uninstall operate only on the Adapter directory,
+with recoverable backup or trash moves.
+
 ### 3. Validate the installation
 
 The first validation has no third-party dependencies:
@@ -115,13 +125,24 @@ On Windows, `start-docsite.bat` provides the same entry point. The server binds 
 
 #### Configure optional AI features
 
-Open **Ask Docs** in the local observatory and select the settings button. The graphical panel supports OpenAI, DeepSeek, and custom OpenAI-compatible providers. It can configure the base URL, default model, optional intent and audit models, and an API key.
+Use the **AI settings** button in the top bar, immediately left of the theme toggle. The dynamic docsite calls models only through a Broker. OpenAI, DeepSeek, and custom OpenAI-compatible choices are upstream registration presets for that Broker, not direct docsite providers.
 
-- API keys are written to the operating system credential store and are never returned to the browser or saved in `ai-config.json`.
-- Non-secret provider and model settings are saved to the target project's gitignored `ai-config.json`.
+- The default managed mode stores the upstream Provider key in the Broker's operating-system credential namespace; docsite binds only a Broker client token.
+- Non-secret Broker mode, model, and upstream metadata are saved to the target project's gitignored `ai-config.json`; neither Provider keys nor client tokens are written there.
+- **Save and enable** performs local validation without a separate connection-test request; after activation, normal dashboard generation may begin.
 - **Test connection** sends a minimal model request and may incur a small provider charge.
 - The generated static reader at `docs/_site/index.html` is read-only and cannot store credentials.
-- For headless or terminal workflows, use `python scripts/docsite/set_key.py`.
+- For headless or terminal workflows, use `python scripts/docsite/set_key.py`; this entry point also registers Broker access only.
+
+The managed Broker pins the endpoint, refuses redirects, allowlists models, caches identical non-stream requests, coalesces duplicates, and enforces daily request/token budgets. It reduces repeated LLM spending but does not isolate the Provider key from processes running as the same OS user. For actual isolation, run an external Broker under a separate OS account or equivalent outer sandbox:
+
+```bash
+python scripts/docsite/llm_broker.py configure --provider deepseek --base-url https://api.deepseek.com --model deepseek-chat
+python scripts/docsite/llm_broker.py client-token
+python scripts/docsite/llm_broker.py serve
+```
+
+Select **External isolated Broker** in docsite and enter the loopback Broker URL plus the printed client token. The Broker never exposes an upstream Provider-key export endpoint.
 
 To validate the static reader as well:
 
@@ -147,6 +168,9 @@ Compatibility is not reduced to one version number:
 | Version surface | What it identifies |
 |---|---|
 | Skill version | Agent workflow, installer, validator, and release tools |
+| Core API / CLI version | Platform-neutral contracts and command implementation |
+| Adapter version | One platform's discovery, invocation guidance, and lifecycle implementation |
+| Runtime evidence | Exact Agent/Harness runtime, OS, tested scope, and Validation record |
 | Target toolchain version | Managed observatory files actually installed in a project |
 | Project-manifest format | Shape of `.project-orrery.json` |
 | Document schema | Authority roles understood in authored project documents |
@@ -186,6 +210,9 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 | [`skills/project-orrery/scripts/`](skills/project-orrery/scripts/) | Safe installer and installation validator |
 | [`skills/project-orrery/assets/project-template/`](skills/project-orrery/assets/project-template/) | Portable documentation scaffold and local reader |
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | Authority architecture and migration contract |
+| [`packages/`](packages/) | Unreleased platform-neutral Core, CLI, and Observatory source packages |
+| [`adapters/codex/`](adapters/codex/) | Unreleased thin Codex Adapter, manifest, metadata, and lifecycle installer |
+| [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | Versioned Codex Adapter archive and checksum builder |
 | [`docs/`](docs/) | Project Orrery's own self-hosted authority chain, current State, validation, and history |
 | [`docs/library/`](docs/library/) | Non-authoritative research, literature reviews, experiments, and design hypotheses |
 | [`experiments/context-routing/`](experiments/context-routing/) | Pre-ADR benchmark corpus, run schema, and validation tooling for context-routing research |
@@ -195,7 +222,7 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 
 ## Optional features and privacy
 
-The static reader and authority model work without an AI provider. AI-assisted Q&A, roadmap synthesis, and milestone views require provider configuration supplied by the target project. The dynamic local observatory provides a graphical settings panel; secrets remain in the operating system credential store. The trend radar can use GitHub Search and, optionally, web search.
+The static reader and authority model work without an AI provider. AI-assisted Q&A, roadmap synthesis, and milestone views require a Broker registration supplied by the target project; the dynamic local observatory no longer exposes a direct Provider path. The default managed Broker focuses on cost and traffic control, while an external Broker can keep the upstream key under a separate OS identity. The trend radar can use GitHub Search and, optionally, web search.
 
 The observatory runs locally by default. Project Orrery does not include a hosted service, telemetry collector, or bundled credentials. Review your provider and network configuration before enabling optional online features.
 

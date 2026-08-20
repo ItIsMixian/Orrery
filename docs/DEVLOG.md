@@ -71,3 +71,133 @@
 - 复核 Marglo／NextStep Seed_2 的双入口、ADR／State 演化、SQLite 迁移、安全门、UI、测试与发布文档，确认它能提供比纯文档维护更真实的开发任务模式。
 - 用户接受 ADR-0002：未来上下文路由采纳实验采用真实产品开发、安全／迁移／跨模块和文档治理的滚动任务组合；三任务 Pilot 至少两项以可运行代码为主要交付物。
 - 建立 Approved Design，固定代码优先的 Oracle 层级、隔离／脱敏要求和首批候选任务族。真实 fixture、Implementation Plan 和 Pilot 008 尚未创建，发布 Skill 保持不变。
+
+## 2026-08-19 — docsite AI 设置入口优化
+
+- 将动态 docsite 的 AI 服务设置入口从“问文档”面板移到顶栏主题按钮左侧；静态 HTML 继续不注入设置 UI。
+- 统一设置与主题按钮尺寸，并在窄屏收起副标题和搜索框，使 390px 视口保留两个工具按钮且不产生横向滚动。
+- 同步根观测台和发布模板，增加入口唯一性／顺序断言，并让动态测试使用空 keyring backend，避免读取维护者真实凭据。
+- 1280px 与 390px 浏览器交互验证通过；启用动态 reader 后全仓 40/40、集成结构验证、静态站生成和 `git diff --check` 通过。该变更未新增 ADR，也尚未提交、推送或发布。
+
+## 2026-08-19 — Pilot 008 Skill Entry Router 准备
+
+- 停止继续叠加 Agent Manifest／Receipt 协议，提出直接缩短必读 Skill 入口、按操作加载低频 references 的 R 候选；发布 Skill 保持不变。
+- 建立人工脱敏的真实开发 fixture，覆盖反馈状态 Bug、SQLite v1→v2 幂等迁移和实现／State／Handoff 对齐；不复制 Marglo 代码、数据库、凭据、缓存或未提交改动。
+- 建立独立行为 Oracle，完成 3/3 baseline negative 与 3/3 positive controls；首次自测发现并修正 `__pycache__` 越界噪音和 Windows SQLite 未关闭句柄问题。
+- 修正 Pilot 007 的同名分支盲点，在外层 `pilot-008-outer` 与内层 `pilot-008-fixture` 中完成真正嵌套 preflight；Pilot 008 dry-run 与专项 13/13 通过。
+- 将 P 冻结为 Pilot 内 9,109-byte 快照，消除活动发布源并行写入造成的基线漂移；R 为 2,386 bytes，三项完整 Prompt 的 R/P 字节比为 44.48%–44.67%。没有启动模型，没有 R0/token/质量结论，也没有采纳 R。
+
+## 2026-08-19 — Pilot 008 Scope Acquisition 重构
+
+- 用户通过 ADR-0005 明确效率目标：统计 Agent 从任务 Prompt 到首次允许产品写入前，为确认实现范围累计消耗的 input；由 Harness 被动派生，不要求 Agent 生成 Manifest、Receipt、Selected Evidence、访问总结或 reason code。
+- Pilot 008 treatment 从 P/R 不同 Skill 改为 P/S 相同完整 Skill：P 保留 598-byte 线性入口，S 使用 1,638-byte 任务优先入口；三项完整 Prompt 在 P/S 间逐项等长为 11,708、11,705、11,666 bytes。
+- 新增 app-server Scope analyzer，校验首次 `fileChange`、边界前最后累计 usage、单调性、thread／turn、允许写路径和写前代理 proof；4-case self-test 包含旧 `codex exec` 整轮聚合流的明确拒绝。
+- 读取代理增加 passive 模式；P/S 外层／内层 preflight、Pilot dry-run、上下文专项 17/17、默认全仓 51 项中的 49 passed + 2 expected skips、24 项 corpus、6 份既有 run record、integrated static build、195 份 Markdown 本地链接和 diff 检查通过。
+- 本机 schema 只证明事件字段存在，不证明真实 ordering；配置保持 `scope_usage_ordering_verified: false`，正式路径在创建输出根或调用模型前失败关闭。本轮没有模型运行、仓库外输出根、R0、Scope Lock token 或采纳结论。
+
+## 2026-08-19 — App-server Scope Ordering Smoke 001
+
+- 维护者授权一次隔离兼容性 smoke，不授权三对 P/S 正式样本。PATH 中的 Store alias 从工作区终端执行被 Windows 拒绝；复制桌面包二进制后确认实际版本为 `codex-cli 0.148.0-alpha.15` 并生成精确 schema。
+- 在仓库外一次性 Git 仓库启动一个 `gpt-5.6-terra` / medium turn；89 个服务端消息包含 3 次同 turn 单调累计 usage，最终整轮 input 为 58,541，但没有命令、`fileChange` 或产品改动。
+- 根因是临时目录只复制了 `codex.exe`，遗漏同版本 `codex-code-mode-host.exe`；模型两次工具启动失败后结束。该运行不能判断 usage／首次写入顺序，最终 usage 不能冒充 Scope Lock 指标。
+- 原始根 `appserver-scope-smoke-20260819-130447` 按 contaminated 封存；manifest 36/36 验证有效。runner 已新增 code-mode host、command runner、sandbox setup 与 `rg` sibling 前置检查和 2-case ordering self-test。
+- 同版本 runtime 已补齐，但没有自动发起第二个模型 turn。配置保持未验证、Pilot 008 正式路径保持失败关闭；修正后 smoke 自测 2/2、上下文专项 18/18、默认全仓 52 项中的 50 passed + 2 expected skips、benchmark、integrated static build、202 份 Markdown 链接与 diff 检查通过。修正 smoke 与正式样本分别等待维护者确认。
+
+## 2026-08-19 — 平台中立 Core 与 Adapter 架构采纳
+
+- 审计确认权威模型、Python CLI 和观测台具备平台中立基础，但唯一发布单元、版本命名、入口元数据和测试仍围绕 Codex Skill。
+- 用户通过 ADR-0004 接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime E2E 才能标记 `verified` 的边界。
+- 建立 Approved Design 与分阶段 Implementation Plan，明确 Core／CLI／Observatory／Agent Adapter／Harness Adapter／平台安装器的职责和迁移回滚路径。
+- 完成权威索引、本地链接、尾随空白、`git diff --check` 和 integrated structure 的文档级验证；没有把该结果扩展为实现或 runtime 兼容证据。
+- 本轮没有抽取代码、修改发布资产、运行 Pilot 008、选择第二平台或生成平台兼容证据；当前发布实现仍是 v0.2.0 Codex Skill。
+
+## 2026-08-19 — docsite Provider 凭据加固与可选 Broker
+
+- 用户接受凭据端点绑定、失败关闭、错误脱敏、本地 HTTP 防护和可选 Broker，但否决“必须先测试连接再启用”的两步体验；实现保留一次“保存并启用”，成功后可直接触发正常仪表盘生成。
+- 新增 ADR-0003、Approved Design 和完成态 Implementation Plan。直接模式先解析非秘密 Provider 配置，再读取对应环境变量或 Provider／Base URL 指纹绑定的 keyring 槽；旧共享槽不在启动时读取或自动迁移。
+- OpenAI／DeepSeek 固定官方 HTTPS 主机，自定义远程端点强制 HTTPS，本地 Broker 只允许环回；SDK 与 Broker 均拒绝跟随重定向。设置、问答和仪表盘刷新改为同源 POST，并补充 Host、请求体、安全响应头和错误脱敏防护。
+- 增加确定性 `llm_broker.py`：独立凭据 namespace、固定上游、Bearer client token、模型白名单、SQLite 内容寻址缓存、并发 single-flight、每日请求和保守 token 预算。只有独立 OS 身份或等价外层隔离才可称为 Provider-Key 隔离。
+- 根观测台、发布模板、installer managed tools、validator、README、Skill 和自动化测试已同步。测试使用空 keyring、非环回网络禁用和环回假上游，不接触真实 Provider Key。
+- 本轮完成专项动态测试、全仓动态回归、integrated static build、根／模板 diff、本地链接和 `git diff --check`；精确结果见 `docs/validation/2026-08-19-docsite-credential-hardening.md`。改动尚未提交、推送或发布。
+
+## 2026-08-19 — 平台中立 Phase 0 发布基线
+
+- 以 v0.2.0 tag 和已发布 checksum 为边界，固化 36 个 Skill 归档路径、8 个 managed tools、三个 CLI 入口以及 release／project manifest 必需字段。
+- 新增两项回归，保护 installer／validator／update checker 的人类输出、既有发布契约子集和 canonical `AGENTS.md`；当前并行新增工具不被倒写为 v0.2.0 事实。
+- 将模板入口标题从 `Codex state index` 改为 `Agent state index`，保持文件路径与权威职责不变。
+- 中英文 README 明确 CLI 尚未独立打包、Codex 为 `experimental`、其他平台为 `target`；没有新增平台兼容声明。
+- Project Orrery 产品专项 9 项通过、2 项动态依赖按设计跳过；integrated structure、链接与 diff 检查通过。未运行任何 Pilot、模型调用或 context-routing 测试。
+
+## 2026-08-19 — 平台中立 Phase 1 Core／CLI 抽取
+
+- 建立 Core、CLI、Observatory 三个 `packages/*/src` 源码包，初始版本均为未发布的 0.1.0，Core API 为 1。
+- Core 接管 authority／project-manifest schema、release bridge、兼容判定和 canonical 作者模板；Observatory 独立清点 9 个 managed tools，并显式记录自托管源码到目标模板的标题投影。
+- CLI 组合 Core 与 Observatory，提供统一 `scaffold`、`validate`、`check-update` 源码入口；现有 Skill 三个脚本改为薄 wrapper。
+- 单独复制或解压 Skill 时，wrapper 回退到冻结的 v0.2 实现；兼容路径承诺保留至 0.3.x，最早 0.4.0 移除。
+- 三项 Phase 1 回归和完整产品专项通过：新旧入口输出／manifest／文件逐项一致，作者 `AGENTS.md` 不覆盖，发布 ZIP fallback 可独立安装验证；结果为 12 passed + 2 expected skips。
+- 这些组件尚未独立发布，也没有 Codex runtime E2E、第二平台实现或 `verified` 状态；未运行任何 Pilot 或 context-routing 测试。
+
+## 2026-08-19 — 平台中立 Phase 2 Codex Adapter 仓库实现
+
+- 建立 `adapters/codex/` 独立薄 Adapter 0.1.0，只包含 Codex `SKILL.md`、`agents/openai.yaml`、安装说明、Adapter manifest 与生命周期安装器；不复制 canonical 模板、schema、兼容规则或项目事实。
+- manifest 分别声明 Adapter/API 版本、Core API 1、CLI `>=0.1.0,<0.2.0`、`experimental` 支持状态和空 runtime evidence；`packages/component-versions.json` 同步该投影。
+- 新增确定性 `scripts/package_codex_adapter.py`，生成独立 ZIP 与 SHA-256；归档解压后可直接使用自身安装器。
+- 平台安装器默认未知目录失败关闭；新装和 dry-run 不触碰目标项目，旧 Skill／已识别 Adapter 仅在显式 `--upgrade` 下先整目录备份，卸载移入可恢复回收目录。备份／回收均位于 skills discovery 根之外，避免旧 `SKILL.md` 被重复发现。
+- Adapter 专项 5/5、当前既有产品专项 13 passed + 2 expected skips；合计 18 passed + 2 expected skips。没有运行 Pilot、context-routing 或真实 Codex runtime，也没有写入维护者用户技能目录。
+- Phase 2 只完成前三项仓库实现清单；真实发现、调用、失败、更新和卸载 E2E 仍待明确授权，Codex 继续为 `experimental`，v0.2.0 发布事实不变。
+
+## 2026-08-19 — Broker 成为 docsite 唯一 API 网关
+
+- 用户要求不再把 Local Broker 与 OpenAI／DeepSeek／Custom 并列；通过 ADR-0006 将后三者改为 Broker 上游注册预设，动态 docsite 的有效 Provider 恒为 `broker`。
+- 默认本机托管模式在 docsite 进程内启动环回 Broker，自动分配端口，使用独立 Provider namespace 和 client token，并为所有请求提供缓存、single-flight、模型白名单和预算门。
+- 外部隔离模式只接收 Broker URL 和 client token；从本机模式切换时删除同用户托管 Provider Key 与 Broker token，但不把“同用户托管”误述为隔离。
+- `set_key.py` 已改为 Broker 注册器；`serve.py` 重载与测试、`docsite_qa.py` 默认和 CLI 入口都要求 Broker。旧直接配置只报迁移错误，不读凭据或后台直连。
+- 根观测台、Skill 发布模板、中英文 README 和权威文档已同步。动态产品专项 16/16，默认全仓 59 项中 57 通过、2 项按设计跳过；integrated static build、语法、投影与 diff 检查通过。本改动未提交、推送或发布。
+
+## 2026-08-19 — App-server Scope Ordering Smoke 002
+
+- 维护者重新授权一次修正后的隔离兼容性 turn，不授权 Pilot 008 三对 P/S 正式样本。临时运行目录补齐 `codex.exe`、code-mode host、command runner、sandbox setup 与 `rg`，并逐项确认其 SHA-256 与当前桌面包一致；实际版本为 `codex-cli 0.148.0-alpha.15`。
+- 真实事件流中，冻结指令读取命令在事件 59 完成，累计 usage 在事件 60 到达，首次产品 `fileChange` 在事件 62 启动；仓库最终只把 `marker.txt` 从 `BEFORE` 改为 `AFTER`。
+- 独立 analyzer 判定 `measurement_valid: true`、`precision: exact`，写前 input 19,361、cached input 9,984、non-cached input 9,377、output 99；最终整轮 input 为 58,481。
+- Smoke policy 的 `minimum_prewrite_content_reads` 为 0，所以该结果只证明 usage／首次写入的真实事件顺序，不证明代理正文交付，也不是 P/S 成本样本。无关 MCP startup 产生 HTTP 502 噪音但未进入任务调用链，正式 transport 仍需隔离或明确分类。
+- 原始根 `appserver-scope-smoke-002-20260819-132227` 按 `decision_supporting` 封存，manifest 39/39 有效，保留至 2027-08-19。Pilot 配置已改为 ordering verified；正式 app-server transport、proxy proof、R0 封存与汇总仍未实现，runner 继续在模型调用前失败关闭。
+- 权威链同步后，Scope analyzer 4/4、ordering 2/2、上下文专项 18/18、默认全仓 59 项中的 57 passed + 2 expected skips、24 项 corpus、6 份 run record、integrated structure、docsite build、205 份 Markdown 本地链接与 diff 检查通过；没有启动额外模型 turn 或正式 P/S 样本。
+
+## 2026-08-19 — Pilot 008 正式装置停止与 Pilot 009 修正
+
+- 为 Pilot 008 接入 app-server 正式 transport、完整事件生命周期审计、真实 proxy proof、exact Scope
+  analyzer、独立 Oracle、正式验证、成对失败关闭、R0 seal/verify 和聚合汇总。
+- 首对 `PO-CR-031` 的 P/S Scope measurement 均有效；P 额外直接读取用户目录已安装 Skill，因此
+  contaminated。两侧实现与测试满足迁移行为，但冻结 Oracle 暗中要求固定索引名和文档词形。
+- runner 正确停止后续两项；P 85/85、S 88/88 manifest 有效。原始证据保持只读，修正进入 Pilot 009。
+- Pilot 009 使用新 task ID，Prompt 明确排除已安装 Skill，app-server 关闭 `skill_search`；迁移 Oracle
+  改为索引列顺序和可观察行为，并放宽第一轮已知词形假设。Oracle 自测与 synthetic formal pipeline 通过。
+
+## 2026-08-19 — Pilot 009 P/S Scope Acquisition 正式运行
+
+- 运行前通过上下文专项 20/20、默认全仓 61 项中的 59 passed + 2 expected skips、24 项 corpus、6 份
+  run record、integrated static build、227 份 Markdown 本地链接与 diff 检查。
+- 使用 `gpt-5.6-terra` / medium 和 `codex-cli 0.148.0-alpha.15` 完成 3 项 × P/S 六次运行；6/6 access
+  audit、exact Scope、formal validation 和 R0 有效，未发生仓库外读取或隐藏重试。
+- P/S 聚合写前 input 为 540,105／446,904，S/P 0.8274；non-cached input、唯一 slice bytes、完整
+  input、output 和 Agent seconds 比分别为 0.8711、0.8126、0.9059、0.9453、0.9595，成本门全过。
+- 冻结 Oracle 0/3 对 0/3 中，033 与 035 是自然语言固定词形假阴性；只读复核为 P/S 各 2/3。034
+  两侧行为与数据安全通过，但 PROGRESS 都遗漏未来版本写前拒绝，维持失败；S 不采纳。
+- 形成 R2、Validation 和任务／Oracle v0.2 研究候选。下一轮先分离 behavior／data safety／scope／
+  structured State／narrative verdict，并通过 paraphrase、contradiction 与 mutation controls；不自动补跑模型。
+
+## 2026-08-19 — sivtr 外部工作记忆层观察
+
+- 固定读取 `Ariestar/sivtr@4fae091`，核对 README、Agent 指令、Skill／MCP、WorkRecord／WorkRef／WorkSet、
+  provider registry、BM25／eval、remote／privacy、Roadmap、known issues 与发布状态。
+- 结论是 `sivtr` 更适合作为终端与 Agent transcript 的情境证据层，Orrery 继续负责 ADR／State／实现／
+  Validation 的权威事实层；二者互补，但历史 memory 不能自动升级为当前事实。
+- 记录可研究模式：类型化 provider-neutral record、稳定 ref、`records + anchors` 渐进披露、只读 MCP 与
+  Skill 分层、冻结 corpus／逐查询检索指标、显式 opt-in 的 remote origin。
+- 同时保留反向证据：Agent 入口／架构／Roadmap 与代码漂移，公开 retrieval snapshot 缺失，regex redaction
+  不是安全边界，WorkSet／parse cache 扩大敏感副本与 lifecycle 负担，MCP contract 尚未稳定。
+- 两次 `cargo test --workspace --locked` 都在依赖 build script 启动时被本机 Windows `os error 5` 阻断，
+  没有进入项目测试；静态 659 个 `#[test]` 不冒充通过数。未安装 sivtr、未读取真实 transcript、未改发布
+  Skill／Observatory／路由 treatment，也未创建或运行新 Pilot。
+- Orrery `--build --require-integrated` 结构／静态站验证通过，231 份 Markdown 的 395 个本地链接无缺失，
+  相关文件 `git diff --check` 通过。
