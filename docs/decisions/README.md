@@ -21,3 +21,9 @@ Use `0000-template.md` as the starting point.
 - [Adoption proposal](0000-orrery-adoption-proposal.md) — Superseded by ADR-0001; retained as migration history.
 
 An accepted ADR constrains later Approved Design and implementation work. It does not prove that code or documents already implement the decision; current State and Validation provide that evidence.
+
+## Pending integration proposals
+
+These records use stable provisional IDs so concurrent branches do not compete for the next sequential ADR number. They are not effective ADRs until an integrator allocates `ADR-NNNN`, updates references, and merges them into the integration ref.
+
+- [PO-DEC-WT-001: Multi-worktree collaboration and branch fact scopes](proposals/PO-DEC-WT-001-multi-worktree-collaboration.md) — maintainer approved for integration; still Proposed and non-canonical.
