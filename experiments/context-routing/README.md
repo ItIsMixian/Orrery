@@ -37,6 +37,16 @@ The slimmer [Context Aperture H2 candidate](designs/context-aperture-v0.2-h2.zh-
 
 [Pilot 007](pilots/pilot-007/README.md) completed the direct P/B adoption experiment. All six raw manifests verify, but a shared nested-branch validation failure and one invalid B access run prevent a clean causal comparison. Corrected task quality was equal at 2/3, while B used 25.68% more input, 23.56% more output, and 16.89% more Agent time for only 6.95% fewer proxy bytes. The [R2 result](results/2026-08-18-pilot-007-pb-adoption-terra-medium.md) does not adopt B.
 
+[Pilot 008](pilots/pilot-008/README.md) first established the app-server Scope boundary, but its first formal pair
+stopped after P read an external installed Skill and the shared Oracle imposed hidden names and prose forms. The
+sealed directional values are apparatus diagnostics only.
+
+[Pilot 009](pilots/pilot-009/README.md) corrected those demonstrated apparatus issues without changing the P/S
+treatment. All six runs have valid event/proxy/Scope/formal/R0 evidence. S used 82.74% of P's aggregate pre-write
+input and passed every frozen cost guard, but read-only task quality was only 2/3 for both variants because both
+migration runs omitted a required PROGRESS fact. The [R2 result](results/2026-08-19-pilot-009-ps-scope-terra-medium.md)
+does not adopt S. The next candidate improves task/Oracle diagnostics and paraphrase tolerance before another run.
+
 ## Current independent-access boundary
 
 Project Orrery still does not provide a general filesystem security boundary. In controlled benchmark runs it can now independently prove that a proxy slice appeared in a captured CLI command output, while rejecting runs whose JSONL contains direct reads, unknown tools, missing outputs, or mismatched hashes. Therefore:

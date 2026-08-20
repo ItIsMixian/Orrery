@@ -14,6 +14,9 @@ PROXY = HARNESS / "context_read_proxy.py"
 HOOK = HARNESS / "hook_audit.py"
 VALIDATOR = HARNESS / "validate_access_audit.py"
 CLI_VALIDATOR = HARNESS / "validate_cli_events.py"
+SCOPE_ANALYZER = HARNESS / "analyze_scope_acquisition.py"
+SCOPE_SMOKE = HARNESS / "smoke_app_server_scope_ordering.py"
+APP_SERVER_VALIDATOR = HARNESS / "validate_app_server_events.py"
 SEALER = HARNESS / "seal_raw_evidence.py"
 RETENTION_POLICY = HARNESS / "raw-evidence-retention-policy.json"
 
@@ -112,6 +115,30 @@ class ContextReadProxyTests(unittest.TestCase):
             self.assertEqual(len(selected), reads[0]["returned_bytes"])
             self.assertFalse(reads[0]["expansion"])
             self.assertTrue(reads[2]["expansion"])
+
+    def test_proxy_passive_mode_records_expansion_without_agent_reason(self):
+        with tempfile.TemporaryDirectory(prefix="orrery-passive-proxy-") as temporary:
+            parent = Path(temporary)
+            root = parent / "repo"
+            audit = parent / "audit"
+            root.mkdir()
+            for name in ("a.txt", "b.txt", "c.txt"):
+                (root / name).write_text(name + "\n", encoding="utf-8", newline="\n")
+            env = self.make_environment(root, audit)
+            state_path = Path(env["ORRERY_ACCESS_STATE"])
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            state["require_expansion_reason"] = False
+            state_path.write_text(json.dumps(state), encoding="utf-8")
+
+            for name in ("a.txt", "b.txt", "c.txt"):
+                completed = self.run_proxy(env, "read", "--path", name)
+                self.assertEqual(0, completed.returncode, completed.stderr)
+
+            reads = [event for event in read_jsonl(audit / "proxy.jsonl") if event["operation"] == "read"]
+            self.assertEqual(3, len(reads))
+            self.assertTrue(reads[-1]["expansion"])
+            self.assertFalse(reads[-1]["expansion_reason_required"])
+            self.assertIsNone(reads[-1]["reason_code"])
 
     def test_proxy_rejects_traversal_and_forbidden_metadata(self):
         with tempfile.TemporaryDirectory(prefix="orrery-h2-paths-") as temporary:
@@ -564,6 +591,117 @@ class ContextReadProxyTests(unittest.TestCase):
             self.assertEqual(["validation-1"], report["failed_postwrite_commands"])
 
 
+class ScopeAcquisitionAnalyzerTests(unittest.TestCase):
+    def test_app_server_event_validator_self_test(self):
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", str(APP_SERVER_VALIDATOR), "--self-test"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+            timeout=30,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        self.assertEqual({"cases": 3, "self_test": "passed"}, json.loads(completed.stdout))
+
+    def test_app_server_scope_ordering_smoke_self_test(self):
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", str(SCOPE_SMOKE), "--self-test"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+            timeout=30,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        self.assertEqual({"cases": 2, "self_test": "passed"}, json.loads(completed.stdout))
+
+    def test_scope_analyzer_self_test_covers_boundary_and_failure_cases(self):
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", str(SCOPE_ANALYZER), "--self-test"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual("passed", report["self_test"])
+        self.assertEqual(4, report["cases"])
+
+    def test_scope_analyzer_rejects_legacy_turn_aggregate_as_exact_prewrite_usage(self):
+        with tempfile.TemporaryDirectory(prefix="orrery-scope-legacy-") as temporary:
+            root = Path(temporary)
+            events = root / "events.jsonl"
+            proxy = root / "proxy.jsonl"
+            policy = root / "policy.json"
+            events.write_text(
+                "".join(
+                    json.dumps(event) + "\n"
+                    for event in (
+                        {"type": "turn.started"},
+                        {
+                            "type": "item.started",
+                            "item": {
+                                "id": "write-1",
+                                "type": "file_change",
+                                "changes": [{"path": "src/a.py"}],
+                            },
+                        },
+                        {"type": "turn.completed", "usage": {"input_tokens": 999}},
+                    )
+                ),
+                encoding="utf-8",
+            )
+            proxy.write_text("", encoding="utf-8")
+            policy.write_text(
+                json.dumps(
+                    {
+                        "expected_write_paths": ["src/a.py"],
+                        "scope_usage_ordering_verified": True,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-X",
+                    "utf8",
+                    str(SCOPE_ANALYZER),
+                    "--events",
+                    str(events),
+                    "--proxy-log",
+                    str(proxy),
+                    "--policy",
+                    str(policy),
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(1, completed.returncode, completed.stdout + completed.stderr)
+            report = json.loads(completed.stdout)
+            self.assertFalse(report["measurement_valid"])
+            self.assertEqual("unavailable", report["precision"])
+            self.assertIn(
+                "legacy_codex_exec_has_only_turn_aggregate_usage",
+                report["unavailable_reasons"],
+            )
+            self.assertIsNone(report["prewrite_usage"])
+
+
 class RawEvidenceRetentionTests(unittest.TestCase):
     def run_sealer(self, *arguments: str):
         return subprocess.run(
@@ -712,6 +850,138 @@ class Pilot005ApparatusTests(unittest.TestCase):
         self.assertIn(
             "experiments/context-routing/pilots/pilot-007/operator/acceptance.py",
             report["control_hashes"],
+        )
+
+    def test_pilot_008_scope_acquisition_apparatus_dry_run(self):
+        runner = (
+            REPO_ROOT
+            / "experiments"
+            / "context-routing"
+            / "pilots"
+            / "pilot-008"
+            / "run_pilot.py"
+        )
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", str(runner), "--dry-run"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+            timeout=120,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["pilot"], "pilot-008")
+        self.assertEqual(report["dry_run"], "passed")
+        hashes = report["control_hashes"]
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-008/operator/acceptance.py",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/harness/analyze_scope_acquisition.py",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/harness/smoke_app_server_scope_ordering.py",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/harness/validate_app_server_events.py",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-008/variants/S-AGENTS.md",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-008/fixture-source/src/orrery_fixture/storage.py",
+            hashes,
+        )
+
+    def test_pilot_008_formal_path_fails_before_output_for_missing_runtime(self):
+        runner = (
+            REPO_ROOT
+            / "experiments"
+            / "context-routing"
+            / "pilots"
+            / "pilot-008"
+            / "run_pilot.py"
+        )
+        with tempfile.TemporaryDirectory(prefix="orrery-p008-runtime-guard-") as temporary:
+            root = Path(temporary)
+            output_root = root / "raw"
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-X",
+                    "utf8",
+                    str(runner),
+                    "--output-root",
+                    str(output_root),
+                    "--codex",
+                    str(root / "missing-codex.exe"),
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+                timeout=30,
+                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+            )
+            self.assertNotEqual(0, completed.returncode)
+            self.assertIn("runtime preflight failed", completed.stderr)
+            self.assertFalse(output_root.exists())
+
+    def test_pilot_009_corrected_scope_acquisition_apparatus_dry_run(self):
+        runner = (
+            REPO_ROOT
+            / "experiments"
+            / "context-routing"
+            / "pilots"
+            / "pilot-009"
+            / "run_pilot.py"
+        )
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", str(runner), "--dry-run"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+            timeout=120,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["pilot"], "pilot-009")
+        self.assertEqual(report["dry_run"], "passed")
+        hashes = report["control_hashes"]
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-009/operator/acceptance.py",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-009/common-protocol.zh-CN.md",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/harness/validate_app_server_events.py",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-009/variants/S-AGENTS.md",
+            hashes,
+        )
+        self.assertIn(
+            "experiments/context-routing/pilots/pilot-009/fixture-source/src/orrery_fixture/storage.py",
+            hashes,
         )
 
 

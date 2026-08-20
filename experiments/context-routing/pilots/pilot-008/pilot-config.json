@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "pilot_id": "pilot-008",
+  "prompt_revision": "po-scope-acquisition-pilot-008-v3",
+  "baseline_commit": "c18c2d2a3a5ea15360701df210f56f24ed12dca2",
+  "fixture_version": "orrery-real-dev-fixture-v1",
+  "task_order_seed": 8008,
+  "model": "gpt-5.6-terra",
+  "reasoning_effort": "medium",
+  "timeout_minutes": 25,
+  "evidence_mode": "codex-app-server-jsonrpc-scope-lock-v1",
+  "variants": ["P", "S"],
+  "shared_skill_path": "experiments/context-routing/pilots/pilot-008/controls/P-SKILL.md",
+  "shared_skill_sha256": "96bae11b985becc94a1ca60ec0386bdf1a6787632762c2931f743fec2a311155",
+  "p_agent_entry_path": "experiments/context-routing/pilots/pilot-008/fixture-source/AGENTS.md",
+  "p_agent_entry_sha256": "8d9488313a6d475fc1fadef82b387d8f6883aee9b1c8989f4b768df960b06ef2",
+  "s_agent_entry_path": "experiments/context-routing/pilots/pilot-008/variants/S-AGENTS.md",
+  "s_agent_entry_sha256": "d07da84cce3e408bfa603dda81001151c71c8b226d764812f30ac510e22e15a4",
+  "scope_usage_ordering_verified": true,
+  "scope_usage_ordering_evidence": "docs/validation/2026-08-19-app-server-scope-ordering-smoke-002.md",
+  "scope_usage_ordering_codex_version": "codex-cli 0.148.0-alpha.15",
+  "scope_usage_ordering_run_id": "appserver-scope-smoke-002-20260819-132227",
+  "adoption_gate": {
+    "s_required_passes": 3,
+    "s_prewrite_input_ratio_max": 0.85,
+    "s_high_risk_pair_prewrite_input_ratio_max": 1.05,
+    "s_prewrite_non_cached_input_ratio_max": 1.00,
+    "s_prewrite_unique_slice_bytes_ratio_max": 1.05,
+    "s_total_input_ratio_max": 1.05,
+    "s_output_ratio_max": 1.05,
+    "s_agent_seconds_ratio_max": 1.05,
+    "s_proxy_bytes_ratio_max": 1.05
+  },
+  "tasks": [
+    {
+      "task_id": "PO-CR-030",
+      "task_file": "tasks/PO-CR-030.zh-CN.md",
+      "category": "product_feedback_state",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "src/orrery_fixture/feedback.py",
+        "tests/test_feedback.py",
+        "docs/state/application.md",
+        "docs/PROGRESS.md"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m unittest discover -s tests -v"
+      ]
+    },
+    {
+      "task_id": "PO-CR-031",
+      "task_file": "tasks/PO-CR-031.zh-CN.md",
+      "category": "sqlite_migration",
+      "risk": "high",
+      "expected_product_write_paths": [
+        "src/orrery_fixture/storage.py",
+        "tests/test_storage.py",
+        "docs/state/application.md",
+        "docs/PROGRESS.md"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m unittest discover -s tests -v"
+      ]
+    },
+    {
+      "task_id": "PO-CR-032",
+      "task_file": "tasks/PO-CR-032.zh-CN.md",
+      "category": "state_alignment",
+      "risk": "medium",
+      "expected_product_write_paths": [
+        "docs/state/application.md",
+        "docs/PROGRESS.md",
+        "docs/HANDOFF.md"
+      ],
+      "validation_commands": [
+        "git status --short",
+        "git diff --check",
+        "python -m unittest discover -s tests -v"
+      ]
+    }
+  ]
+}

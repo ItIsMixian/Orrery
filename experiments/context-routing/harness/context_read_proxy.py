@@ -61,7 +61,8 @@ def _register_read(path: str, start: int, end: int | None, reason: str | None) -
     prior_ranges = ranges_by_path.get(path, [])
     expands_range = bool(prior_ranges) and not _range_is_covered(prior_ranges, start, end)
     exceeds_initial_budget = path not in ranges_by_path and len(existing_paths) >= 2
-    if (expands_range or exceeds_initial_budget) and reason not in REASON_CODES:
+    require_reason = bool(state.get("require_expansion_reason", True))
+    if require_reason and (expands_range or exceeds_initial_budget) and reason not in REASON_CODES:
         raise ValueError(
             "this read expands the initial aperture; pass --reason with an approved reason code"
         )
@@ -71,6 +72,7 @@ def _register_read(path: str, start: int, end: int | None, reason: str | None) -
     atomic_write_json(state_path, state)
     return {
         "expansion": expands_range or exceeds_initial_budget,
+        "expansion_reason_required": require_reason,
         "initial_unique_paths_before": len(existing_paths),
     }
 

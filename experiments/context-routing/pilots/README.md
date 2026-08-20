@@ -9,3 +9,13 @@ Each pilot directory is an immutable experiment packet once its first run starts
 - `pilot-005` freezes the first two-task B/H2 packet. All four raw runs are retained as apparatus failures because the common validator and isolation layer mishandled Windows command wrappers, absolute paths, Git history, and contract keys.
 - `pilot-006` keeps the same task goals and treatment while correcting only the shared apparatus. B and H2 passed both task Oracles. A checksummed v3 read-only review resolves a CRLF stdout false negative without rewriting the sealed runs. The [combined result](../results/2026-08-18-pilot-005-006-bh2-terra-medium.md) does not adopt H2 because it used 18.5% more total input tokens than B.
 - `pilot-007` completed six P/B runs. All R0 manifests verify, but a shared nested-branch validation defect and one invalid B access run prevent a clean adoption comparison. Read-only review found equal corrected task quality (2/3 each), while B exceeded the input, output, and time gates and missed the minimum proxy-byte benefit. The [R2 result](../results/2026-08-18-pilot-007-pb-adoption-terra-medium.md) does not adopt B.
+- `pilot-008` started one formal P/S pair and stopped as designed. Both exact Scope measurements and R0 manifests
+  are preserved, but P was contaminated by an external installed-Skill read and the shared migration Oracle imposed
+  names and document wording absent from the task. Its directional ratios are diagnostic only and cannot support
+  adoption; see the [apparatus-stop validation](../../../docs/validation/2026-08-19-pilot-008-formal-apparatus-stop.md).
+- `pilot-009` keeps the same complete Skill, task goals, P/S entrance treatment, model profile, and adoption gates.
+  It assigns new task IDs, corrects the demonstrated semantic Oracle false negatives, explicitly excludes installed
+  Skill input, disables app-server skill search, and retains full-event rejection plus paired fail-stop behavior.
+  Six formal runs completed with valid apparatus and Scope evidence. S used 82.74% of P's aggregate pre-write input,
+  but read-only quality was only 2/3 on both sides; the [R2 result](../results/2026-08-19-pilot-009-ps-scope-terra-medium.md)
+  does not adopt S.

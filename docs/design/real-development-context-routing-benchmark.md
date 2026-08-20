@@ -1,7 +1,8 @@
 # 真实开发上下文路由基准
 
 Status: Approved
-Governing ADR: [ADR-0002](../decisions/0002-real-development-benchmark-portfolio.md)
+Governing ADRs: [ADR-0002](../decisions/0002-real-development-benchmark-portfolio.md),
+[ADR-0005](../decisions/0005-prewrite-scope-acquisition-input.md)
 Updated: 2026-08-19
 
 ## 目标
@@ -30,6 +31,23 @@ Updated: 2026-08-19
 4. **受保护范围**：用户数据、凭据、无关模块、历史 ADR 和预置脏文件的不可触碰条件。
 5. **独立 Oracle**：由 Harness 在 Agent 结束后执行，不依赖 Agent 自报。
 6. **成本记录**：输入、输出、墙钟、代理正文、读取集合和范围扩张。
+
+## Scope Acquisition 阶段
+
+上下文路由的主观测区间从任务 Prompt 开始，到首次允许的产品 `fileChange` 启动为止。首次写入是
+“Agent 已取得足够范围信息并开始实施”的可审计近似点，称为 Scope Lock；它不证明模型已经理解，
+也不替代最终 Oracle。
+
+Harness 在该边界前被动派生：
+
+- 累计 input、cached input、non-cached input、output 与 reasoning output；
+- 已证明的代理读取次数、唯一路径、唯一切片 bytes 与读取顺序；
+- 首次写入的产品路径、事件索引和边界前最后一份 usage 更新；
+- 完整任务 usage、墙钟、正文量与返工作为后续护栏。
+
+Agent 不为实验生成 Context Manifest、Scope Receipt、Selected Evidence、Access Summary 或其他额外
+协议。若运行时只有整轮 usage，分段 token 必须标记为不可用；只有逐响应 usage 与首次写入事件的顺序
+经过真实兼容性 smoke 后，才可声明精确 `input-to-scope-lock`。
 
 ## 验收层级
 
@@ -71,7 +89,14 @@ Oracle 按以下顺序判定，前一层失败时不能靠后一层补偿：
 - 启动前在真实的嵌套隔离路径上跑 preflight，避免再次出现 Pilot 007 的分支名冲突。
 - 自动门至少同时覆盖正确性、装置有效性、必要依赖召回、总 input、output、墙钟和正文读取成本。
 - 文档同步得分单独报告，不能把代码失败平均掉。
+- 主成本门使用 Scope Lock 前累计 input；完整任务总成本只作为护栏和诊断。
+- 候选的首次写入必须落在任务允许范围，且 Scope Lock 测量链本身有效，才能进入成本比较。
+- 不得为了测量要求 Agent 输出额外 Manifest、Receipt 或访问总结。
 
 ## 当前实施状态
 
-本 Design 已批准，但真实开发 fixture、任务编号、Oracle 和 Pilot 008 控制包尚未创建。后续开工前需要单独的 Implementation Plan 和用户启动确认。
+Pilot 008 已实现正式 app-server transport、代理 proof、R0 封存和成对失败关闭；首对因 P 的外部 Skill
+读取和共同 Oracle 假阴性停止。修正后的 Pilot 009 完成六个装置有效、exact Scope 的正式 P/S run。
+S 通过所有成本门，但只读质量 P/S 均为 2/3，未达到 3/3 质量门，因此不采纳。下一轮先按任务／Oracle
+v0.2 分离行为、数据安全、范围、结构化 State 和叙事一致性，并用 paraphrase 与 mutation controls
+消除隐藏词形假阴性；这项实验改进不改变本 Approved Design 的行为优先验收原则。

@@ -22,15 +22,47 @@ Authority: research state; no routing candidate is accepted product policy
 - Pilot 007 存在共同 formal-validation 分支冲突；`PO-CR-028-B` 另有 failed proxy command 和协议检查假阴性，因此不能作为完全干净的采纳因果对照。
 - 只读语义复核后 P/B 任务质量同为 2/3。B 相对 P 的聚合 input +25.68%、output +23.56%、Agent 时间 +16.89%、代理正文 -6.95%，没有通过 input、output、时间或 15% 最小正文收益门。
 - 用户已通过 ADR-0002 接受新的长期评测政策：后续采纳实验必须加入隔离的真实应用开发任务，滚动组合目标约为 60% 产品代码、20% 安全／迁移／跨模块、20% 文档／发布治理；三任务 Pilot 至少两项以可运行代码为主要交付物。
-- Marglo／NextStep Seed_2 已被确认适合作为任务模式来源，但真实工作树、用户数据、凭据和未提交改动不得进入实验。真实开发 fixture、任务和 Pilot 008 尚未实现。
+- Marglo／NextStep Seed_2 已被确认适合作为任务模式来源，但真实工作树、用户数据、凭据和未提交改动不得进入实验。
+- Pilot 008 的 Skill Entry Router R 曾完成静态准备，但没有启动模型；其固定入口成本假设已在执行前退出当前 Pilot，历史文件和 Validation 保留且不冒充运行证据。
+- 用户已通过 ADR-0005 接受新的主成本口径：从任务 Prompt 到首次允许产品 `fileChange` 启动前的累计 `input-to-scope-lock`；由 Harness 被动派生，不要求 Agent 输出 Manifest、Receipt、Selected Evidence 或访问总结。
+- Pilot 008 当前比较共享同一 9,109-byte 完整 Skill 的 P/S：P 使用 598-byte 线性入口，S 使用 1,638-byte 任务路由入口；三项 P/S Prompt 分别完全等长为 11,708、11,705、11,666 bytes。
+- app-server Scope analyzer 已实现首次写入边界、边界前最后累计 usage、单调性、thread／turn、允许路径和写前代理 proof 检查；合成 4-case self-test、passive 无 reason-code 代理、P/S 嵌套 preflight 和 dry-run 通过。
+- 首次授权的 app-server compatibility smoke 使用当前桌面包 `codex-cli 0.148.0-alpha.15`，观察到同 turn
+  三次单调累计 usage；但临时目录只复制了 CLI、遗漏同版本 code-mode host，Agent 无法启动读取工具，
+  因而没有 `commandExecution` 或 `fileChange`。该运行按 contaminated 封存，不能判断目标顺序。
+- Smoke 002 使用与当前桌面包逐文件哈希一致的完整 0.148.0-alpha.15 runtime。读取命令在 event 59
+  完成，累计 usage 在 event 60 更新，首次 `fileChange` 在 event 62 启动；只修改 `marker.txt` 且 turn
+  完成。ordering-only analyzer 得到 exact pre-write input 19,361、cached 9,984、non-cached 9,377。
+- Smoke 002 原始根按 decision-supporting 封存且 manifest 39/39 有效；配置现可标记
+  `scope_usage_ordering_verified: true`。该证据只验证事件顺序，没有要求或证明真实 proxy slice。
+- Pilot 008 接入正式 app-server transport、完整事件 validator、proxy proof、Scope analyzer、正式验证、
+  成对失败关闭和 R0 封存后启动首对迁移任务。P 直接读取仓库外已安装 Skill 而 contaminated；P/S 又
+  共同暴露索引名和文档词形 Oracle 假阴性，runner 正确停止后续任务。两份 manifest 仍有效，该 Pilot
+  不产生采纳比较。
+- Pilot 009 保持相同任务目标、完整 Skill、P/S 入口 treatment、Terra medium 和采纳门，只修正已证明的
+  外部 Skill 输入边界和 Oracle 问题。六个正式 run 的装置、exact Scope、formal validation 和 R0 全部
+  有效；未出现仓库外读取。
+- Pilot 009 聚合写前 input 为 P `540,105`、S `446,904`，S/P `0.8274`；写前 non-cached input、唯一
+  slice bytes、完整 input、output 和 Agent seconds 比分别为 `0.8711`、`0.8126`、`0.9059`、`0.9453`、
+  `0.9595`，所有冻结成本门通过。
+- Pilot 009 冻结 Oracle 报告 P/S 0/3；只读语义复核确认 feedback 与事实对齐任务只是自然语言词形
+  假阴性，P/S 真实质量均为 2/3。迁移任务行为与数据安全通过，但两侧 PROGRESS 都遗漏未来版本写前
+  拒绝事实，维持失败。3/3 质量门未通过，S 不采纳。
+- 新的任务／Oracle v0.2 研究候选把 behavior、data safety、scope、structured State 和 narrative
+  consistency 分开报告，并要求 paraphrase／contradiction／mutation controls；尚未形成新 Pilot 或产品规则。
+- 已完成 `Ariestar/sivtr` 固定提交 `4fae091` 的外部源码观察：其类型化 WorkRecord／WorkRef、WorkSet
+  anchors、渐进检索与只读 MCP 适合作为“情境证据层”参考，但不具备 Orrery 的权威事实职责。研究没有
+  采纳依赖、Adapter、路由策略或新 Pilot；隐私生命周期、公开检索快照缺失和文档漂移仍是明确边界。
 
 ## 当前产品影响
 
 - 发布版 Skill 不强制 Context Manifest、Selected Evidence 或 Access Receipt。
 - B 只是实验基线，不是发布策略。
-- Pilot 007 没有支持采纳 B；不新增 ADR、不修改发布 Skill。若未来仍研究显式 Manifest，应先形成不同假设并建立 Pilot 008，不能改写或补跑 Pilot 007。
+- Pilot 007 没有支持采纳 B；不新增产品 ADR、不修改发布 Skill。若未来仍研究显式 Manifest，应形成独立假设和新 Pilot，不能改写或补跑 Pilot 007／008。
 - H1、Context Aperture v0.1 和 H2 都没有成为发布策略；H2 对照已结束且不采纳。受控读取代理与 validator 继续作为研究 Harness，不是普通用户要求。
-- ADR-0002 只约束未来研究设计，不改变当前发布 Skill，也不重新解释 Pilot 001–007。
+- ADR-0002 与 ADR-0005 只约束研究设计，不改变当前发布 Skill，也不重新解释 Pilot 001–007。
+- Pilot 009 的 S 仍只存在于 `experiments/`；成本方向信号不足以越过质量门。R 作为未运行历史候选保留，
+  S 不进入发布 Skill 或模板，也不新增产品 ADR。
 
 ## 证据
 
@@ -50,8 +82,23 @@ Authority: research state; no routing candidate is accepted product policy
 - [Pilot 007 R2 结果](../../experiments/context-routing/results/2026-08-18-pilot-007-pb-adoption-terra-medium.md)
 - [Pilot 007 运行验证](../validation/2026-08-18-pilot-007-pb-adoption.md)
 - [ADR-0002 真实开发任务组合](../decisions/0002-real-development-benchmark-portfolio.md)
+- [ADR-0005 Scope Lock 前 input](../decisions/0005-prewrite-scope-acquisition-input.md)
 - [真实开发基准 Approved Design](../design/real-development-context-routing-benchmark.md)
 - [Marglo 素材观察](../library/2026-08-19-marglo-benchmark-source-notes.zh-CN.md)
+- [Skill Entry Router R 候选](../../experiments/context-routing/designs/skill-entry-router-v0.1.zh-CN.md)
+- [Pilot 008 历史 Skill Entry Router 实施计划](../implementation/plans/2026-08-19-skill-entry-router-pilot-008.md)
+- [Pilot 008 历史准备验证](../validation/2026-08-19-pilot-008-preparation.md)
+- [Scope Acquisition Router S 候选](../../experiments/context-routing/designs/scope-acquisition-router-v0.1.zh-CN.md)
+- [Pilot 008 Scope Acquisition Plan](../implementation/plans/2026-08-19-scope-acquisition-pilot-008.md)
+- [Pilot 008 Scope Acquisition 重构验证](../validation/2026-08-19-pilot-008-scope-acquisition-reframe.md)
+- [App-server Scope Ordering Smoke 001](../validation/2026-08-19-app-server-scope-ordering-smoke-001.md)
+- [App-server Scope Ordering Smoke 002](../validation/2026-08-19-app-server-scope-ordering-smoke-002.md)
+- [Pilot 008 formal apparatus stop](../validation/2026-08-19-pilot-008-formal-apparatus-stop.md)
+- [Pilot 009 Plan](../implementation/plans/2026-08-19-scope-acquisition-pilot-009.md)
+- [Pilot 009 Validation](../validation/2026-08-19-pilot-009-ps-scope-run.md)
+- [Pilot 009 R2 结果](../../experiments/context-routing/results/2026-08-19-pilot-009-ps-scope-terra-medium.md)
+- [真实开发任务与 Oracle v0.2](../../experiments/context-routing/designs/real-development-task-oracle-v0.2.zh-CN.md)
+- [sivtr 统一工作记忆层观察](../library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)
 
 ## 已知边界
 
@@ -62,3 +109,9 @@ Authority: research state; no routing candidate is accepted product policy
 - Pilot 006 样本只有两个高风险任务；它足以判定当前 H2 未达到冻结质量门，不足以支持普遍模型结论。
 - Pilot 007 只有三项新任务且存在共同装置缺陷；原始成本差异是反对采纳的风险信号，不是对所有模型／任务的普遍因果估计。
 - 真实开发任务会增加 fixture 和 Oracle 成本；在独立 Plan、脱敏检查和嵌套 preflight 完成前，不得直接启动新 Pilot。
+- Smoke 002 已证明当前 0.148.0-alpha.15 app-server 能在首次写入前提供同 turn 累计 usage；该能力仍可能
+  随 Codex 版本变化，正式运行必须记录版本并先做 preflight。Smoke 未使用读取代理，不能替代正式 run 的
+  proxy proof、允许路径和完整事件流验证。
+- Pilot 009 只有三项任务和一个模型/runtime，且写前 input 中 cached token 占比很高；一致的成本下降是
+  值得复测的方向信号，不是跨仓库普遍因果结论。自然语言 Oracle 的 lexical false negative 必须在后续
+  Pilot 前由 paraphrase controls 阻断。
