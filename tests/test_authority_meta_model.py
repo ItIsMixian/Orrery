@@ -1,13 +1,23 @@
 from __future__ import annotations
 
 import json
+import sys
 import unittest
 from pathlib import Path
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+CORE_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-core" / "src"
 FIXTURE_ROOT = REPOSITORY_ROOT / "tests" / "fixtures" / "authority-meta-model"
 CONFORMANCE_V1 = FIXTURE_ROOT / "v1" / "conformance.json"
+
+sys.path.insert(0, str(CORE_SOURCE))
+
+from project_orrery_core.authority import (  # noqa: E402
+    AUTHORITY_MODEL_VERSION,
+    AuthorityEvaluationError,
+    evaluate_authority,
+)
 
 
 class AuthorityMetaModelFixtureTests(unittest.TestCase):
@@ -39,6 +49,7 @@ class AuthorityMetaModelFixtureTests(unittest.TestCase):
                 self.assertIn(case["input"]["fact_scope"], allowed_scopes)
                 self.assertTrue(set(case["input"]["evidence_visibility"]).issubset(allowed_evidence))
                 self.assertTrue(case["input"]["repository_snapshot"])
+                self.assertIsInstance(case["observations"], list)
                 self.assertIn("claims", case["expected"])
                 self.assertIn("must_not_infer", case["expected"])
 
@@ -140,6 +151,84 @@ class AuthorityMetaModelFixtureTests(unittest.TestCase):
         for relative in self.fixture["normative_sources"]:
             with self.subTest(path=relative):
                 self.assertTrue((REPOSITORY_ROOT / relative).is_file())
+
+    def test_core_shadow_evaluator_satisfies_every_golden_expectation(self) -> None:
+        for case_id, case in self.cases.items():
+            with self.subTest(case=case_id):
+                result = evaluate_authority(case["input"], case["observations"])
+                for key, value in case["expected"]["claims"].items():
+                    self.assertEqual(result["claims"].get(key), value, key)
+                for key, value in case["expected"].get("relations", {}).items():
+                    self.assertEqual(result["relations"].get(key), value, key)
+                for key, value in case["expected"].get("coordinator_runtime", {}).items():
+                    self.assertEqual(result["coordinator_runtime"].get(key), value, key)
+                self.assertTrue(
+                    set(case["expected"]["must_not_infer"]).issubset(result["must_not_infer"]),
+                    (case["expected"]["must_not_infer"], result["must_not_infer"]),
+                )
+
+    def test_shadow_differences_are_explicitly_classified(self) -> None:
+        policy = self.fixture["contract"]["shadow_policy"]
+        allowed_claims = set(policy["allowed_extra_claims"])
+        allowed_prohibitions = set(policy["allowed_extra_prohibitions"])
+        exercised_claims: set[str] = set()
+        exercised_prohibitions: set[str] = set()
+
+        for case_id, case in self.cases.items():
+            with self.subTest(case=case_id):
+                result = evaluate_authority(case["input"], case["observations"])
+                expected = case["expected"]
+                extra_claims = set(result["claims"]) - set(expected["claims"])
+                extra_prohibitions = set(result["must_not_infer"]) - set(expected["must_not_infer"])
+                self.assertTrue(extra_claims.issubset(allowed_claims), extra_claims)
+                self.assertTrue(extra_prohibitions.issubset(allowed_prohibitions), extra_prohibitions)
+                self.assertEqual(result["relations"], expected.get("relations", {}))
+                self.assertEqual(result["coordinator_runtime"], expected.get("coordinator_runtime", {}))
+                exercised_claims.update(extra_claims)
+                exercised_prohibitions.update(extra_prohibitions)
+
+        self.assertEqual(exercised_claims, allowed_claims)
+        self.assertEqual(exercised_prohibitions, allowed_prohibitions)
+
+    def test_core_shadow_evaluator_is_deterministic_and_visibility_sensitive(self) -> None:
+        left = self.cases["deterministic-input-a"]
+        right = self.cases["deterministic-input-b"]
+        self.assertEqual(
+            evaluate_authority(left["input"], left["observations"]),
+            evaluate_authority(right["input"], right["observations"]),
+        )
+
+        visible = self.cases["visibility-with-validation"]
+        hidden = self.cases["visibility-without-validation"]
+        visible_result = evaluate_authority(visible["input"], visible["observations"])
+        hidden_result = evaluate_authority(hidden["input"], hidden["observations"])
+        self.assertEqual(visible_result["claims"]["validation_evidence"], "passed")
+        self.assertEqual(hidden_result["claims"]["validation_evidence"], "unknown")
+        self.assertNotEqual(visible_result, hidden_result)
+
+    def test_core_shadow_evaluator_fails_closed(self) -> None:
+        case = self.cases["scope-canonical"]
+        invalid_version = dict(case["input"], authority_model_version="future-version")
+        with self.assertRaises(AuthorityEvaluationError):
+            evaluate_authority(invalid_version, case["observations"])
+
+        invalid_scope = dict(case["input"], fact_scope="coordinator")
+        with self.assertRaises(AuthorityEvaluationError):
+            evaluate_authority(invalid_scope, case["observations"])
+
+        invalid_observation = [{"kind": "magic-authority", "evidence_category": "revision-content"}]
+        with self.assertRaises(AuthorityEvaluationError):
+            evaluate_authority(case["input"], invalid_observation)
+
+        invalid_evidence = dict(case["input"], evidence_visibility=["provider-specific-ci"])
+        with self.assertRaises(AuthorityEvaluationError):
+            evaluate_authority(invalid_evidence, case["observations"])
+
+    def test_core_owner_is_not_yet_a_top_level_public_api(self) -> None:
+        import project_orrery_core
+
+        self.assertEqual(AUTHORITY_MODEL_VERSION, "amm-fixture-v1")
+        self.assertFalse(hasattr(project_orrery_core, "evaluate_authority"))
 
 
 if __name__ == "__main__":

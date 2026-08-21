@@ -93,9 +93,9 @@ Fixture 还必须覆盖“相同输入得到相同结果”以及“仅 evidence
 
 ### Gate A：实现 owner（AUTH-4）
 
-在 fixture 已被审阅、但任何生产 evaluator 落位前，决定是否：由 Core 单独拥有解释器、建立独立
-conformance package，或暂时让多个消费者通过同一 fixture 防漂移。该选择不得由当前某个文件的
-体积或方便性决定。AUTH-1 不在此 Gate 中被解决。
+Resolved by [ADR-0010](../../decisions/0010-core-owned-authority-evaluator.md): platform-neutral Core owns the
+deterministic evaluator. Parsing, projection, AI prose and Coordinator runtime remain outside. The first
+implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 remains unresolved.
 
 ### Gate B：公开版本与兼容契约
 
@@ -107,7 +107,7 @@ conformance package，或暂时让多个消费者通过同一 fixture 防漂移�
 
 1. **Baseline 与 inventory**：冻结上述区域级盘点，补齐现有行为对 fixture 的可追溯映射；不改变运行路径。
 2. **Fixture first**：实现 versioned fixture/golden contract，并以现有 CLI、docsite parser、AI prompt 的输出做差异报告；不选择 owner。
-3. **最小 evaluator / shadow mode**：Gate A 后，仅实现纯 roles/relations/claim dimensions/scopes/evidence 的确定性解释；双轨运行并把差异分类为 legacy bug、model gap、parser gap、presentation-only 或 expected scope difference。
+3. **最小 evaluator / shadow mode**：Gate A 已由 ADR-0010 解决；Core 先实现 normalized observations 到 roles/relations/claim dimensions/scopes/evidence 的确定性解释，并把 fixture comparison 分类为 missing expectation、extra observation 或 expected visibility difference。CLI/docsite 尚不切换生产行为。
 4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。
 5. **AI 派生视图**：`docsite_qa.py`/`serve.py` 仅消费已确定的语义、scope、visibility 与引用；对“AI 把 Unknown/Local-only/observed 升级为事实”的响应建立负向测试。
 6. **兼容、自托管与发布**：Gate B 后才设计 manifest 变更、legacy/unknown-version 行为、升级/降级和 release contract；最后在集成分支同步 State、Validation 与全局入口。

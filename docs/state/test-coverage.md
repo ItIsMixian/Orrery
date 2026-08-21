@@ -39,6 +39,7 @@ Updated: 2026-08-21
 - 2026-08-20 协作 Design 收敛验证审计了 ADR-0007 与 Team Mode telemetry 的冲突，并通过正式 ADR-0008 amendment、Workstream 术语、session 示例、平台中立实现目标和 Personal-before-Team 交付顺序完成文档级闭环。该证据不包含任何协作 runtime 或网络测试。
 - 2026-08-21 ADR-0009 文档级采纳区分了 role lifecycle 与独立 claim dimensions，并固定 Authority scope、provider-neutral evidence 与 derived-view conformance 边界；尚未建立可执行 fixture 或跨消费者一致性测试。
 - 2026-08-21 Authority Meta Model Candidate fixture checkpoint 新增 `amm-fixture-v1`：21 个 versioned cases 与 2 个 comparison contracts 覆盖 accepted≠implemented≠validated、失败验证、历史/current、supersede/amend、Draft/Approved、Plan/State、六类 fact scope、Snapshot、五类 evidence、AI non-escalation 与 scope≠Coordinator；专项为 9/9 通过。它只验证 golden contract 的结构与不变量，尚未验证任何生产 evaluator 或 consumer conformance。
+- 2026-08-21 ADR-0010 Core shadow evaluator 将 fixture cases 扩展为 normalized observations，新增 deterministic evaluation、all-case expected comparison、显式 extra-output 分类、visibility-sensitive output、unsupported version/scope/evidence/observation fail-closed 和非顶层 API 断言；Authority 专项为 14/14。CLI/docsite 尚未双轨运行，不能据此声称 consumer 已一致。
 
 ## 验证证据
 
@@ -61,6 +62,7 @@ Updated: 2026-08-21
 - [2026-08-20 ADR-0008 协作 Design 集成](../validation/2026-08-20-adr-0008-collaboration-design-integration.md)
 - [2026-08-21 ADR-0009 Authority Meta Model 采纳](../validation/2026-08-21-authority-meta-model-adoption.md)
 - [2026-08-21 Authority Meta Model fixture baseline](../validation/2026-08-21-authority-meta-model-fixture-baseline.md)
+- [2026-08-21 Authority Meta Model Core shadow evaluator](../validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -73,4 +75,4 @@ Updated: 2026-08-21
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 生命周期目前只在临时目录验证；真实 Codex runtime 发现、调用、失败路径、更新与卸载尚无证据，因此不能标记 `verified`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009 已有 Candidate fixture corpus 与 AI non-escalation contract test，但仍没有生产 evaluator、跨消费者 shadow comparison、公开 `authority_model_version` 兼容矩阵或 runtime conformance 证据。
+- ADR-0009/0010 已有 Candidate fixture corpus 与 experimental Core evaluator，但仍没有真实 CLI/Observatory parser 的 shadow comparison、公开 `authority_model_version` 兼容矩阵或 runtime conformance 证据。

@@ -2,7 +2,7 @@
 
 Status: Approved
 
-Governing ADR: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md)
+Governing ADRs: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../decisions/0010-core-owned-authority-evaluator.md)
 
 Updated: 2026-08-21
 
@@ -125,6 +125,17 @@ AI 自由文本不要求措辞一致，但必须：
 
 这些是 derived-view semantic constraints，不是 UI 规范。颜色、布局、删除线和 summary section 数量由消费者 Design 决定。
 
+## Core-owned evaluator boundary
+
+ADR-0010 resolves AUTH-4: platform-neutral Core is the single deterministic semantics implementation owner.
+The evaluator consumes pre-normalized observations plus the four conformance inputs. Markdown/Git/Harness
+parsers, Coordinator runtime, UI projections and AI prose remain outside Core and must adapt into or consume the
+Core result.
+
+The first evaluator is experimental and fixture-bound. It may run in shadow mode but is not yet a stable
+top-level Core API or manifest contract. Consumers must dual-run before switching, and an individual consumer
+must be independently rollbackable.
+
 ## Meta Model version 与 document schema
 
 Authority Meta Model 必须可版本识别，但具体字段与兼容策略留给后续 Design／Plan。
@@ -165,7 +176,6 @@ Project Orrery Product Seed 可以启发 Meta Model，但两者职责不同。`d
 ## 明确未决定
 
 - AUTH-1：Authority 是否是最主要的产品核心；
-- AUTH-4：Core 是否是唯一 semantics implementation owner；
 - 最终 Python API、JSON schema、package path 和类型设计；
 - 解析器／Observatory 拆分顺序；
 - document schema／Core API 升级与发布版本。

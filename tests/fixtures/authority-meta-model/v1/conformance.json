@@ -42,7 +42,20 @@
       "tool-runtime-trace",
       "human-or-agent-assertion",
       "derived-ai-summary"
-    ]
+    ],
+    "shadow_policy": {
+      "allowed_extra_claims": {
+        "scope": "every evaluator result exposes its fact scope",
+        "authority_level": "every evaluator result exposes the authority level implied by scope or derivation"
+      },
+      "allowed_extra_prohibitions": {
+        "validated": "accepted decisions without visible validation remain unvalidated",
+        "current": "historical scope cannot be silently promoted to current",
+        "canonical": "non-canonical scopes cannot be silently promoted",
+        "candidate": "Unknown scope cannot be silently promoted to Candidate",
+        "worktree": "Unknown scope cannot be silently promoted to Worktree"
+      }
+    }
   },
   "cases": [
     {
@@ -54,6 +67,11 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["ADR-0100 status is Accepted"],
+      "observations": [
+        {"kind": "decision", "status": "accepted", "evidence_category": "revision-content"},
+        {"kind": "implementation", "state": "unknown", "evidence_category": "revision-content"},
+        {"kind": "validation", "result": "absent", "evidence_category": "revision-content"}
+      ],
       "expected": {
         "claims": {
           "decision_status": "accepted",
@@ -72,6 +90,11 @@
         "evidence_visibility": ["revision-content", "reproducible-executable-validation"]
       },
       "source_facts": ["implementation exists in r2", "validation run V2 failed"],
+      "observations": [
+        {"kind": "decision", "status": "accepted", "evidence_category": "revision-content"},
+        {"kind": "implementation", "state": "present", "evidence_category": "revision-content"},
+        {"kind": "validation", "result": "failed", "evidence_category": "reproducible-executable-validation"}
+      ],
       "expected": {
         "claims": {
           "decision_status": "accepted",
@@ -90,6 +113,10 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["implementation existed in r3", "current r4 removes it"],
+      "observations": [
+        {"kind": "implementation", "state": "present", "time": "historical", "evidence_category": "revision-content"},
+        {"kind": "implementation", "state": "absent", "time": "current", "evidence_category": "revision-content"}
+      ],
       "expected": {
         "claims": {
           "historical_implementation_claim": "present",
@@ -107,6 +134,10 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["ADR-0101 Accepted", "ADR-0102 Accepted and supersedes ADR-0101"],
+      "observations": [
+        {"kind": "decision", "id": "ADR-0101", "status": "accepted", "evidence_category": "revision-content"},
+        {"kind": "decision", "id": "ADR-0102", "status": "accepted", "supersedes": ["ADR-0101"], "evidence_category": "revision-content"}
+      ],
       "expected": {
         "claims": {"effective_decision": "ADR-0102"},
         "relations": {"ADR-0102": {"supersedes": ["ADR-0101"]}},
@@ -122,6 +153,10 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["ADR-0103 Accepted", "ADR-0104 Accepted and amends ADR-0103"],
+      "observations": [
+        {"kind": "decision", "id": "ADR-0103", "status": "accepted", "evidence_category": "revision-content"},
+        {"kind": "decision", "id": "ADR-0104", "status": "accepted", "amends": ["ADR-0103"], "evidence_category": "revision-content"}
+      ],
       "expected": {
         "claims": {"effective_decisions": ["ADR-0103", "ADR-0104"]},
         "relations": {"ADR-0104": {"amends": ["ADR-0103"]}},
@@ -137,6 +172,9 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["Design D1 lifecycle is Draft"],
+      "observations": [
+        {"kind": "design", "lifecycle": "draft", "evidence_category": "revision-content"}
+      ],
       "expected": {
         "claims": {"design_lifecycle": "draft"},
         "must_not_infer": ["approved-design", "implemented"]
@@ -151,6 +189,10 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["Plan P1 intends feature F", "State S1 says feature F is absent"],
+      "observations": [
+        {"kind": "plan", "planned": true, "evidence_category": "revision-content"},
+        {"kind": "state", "current": false, "evidence_category": "revision-content"}
+      ],
       "expected": {
         "claims": {"planned": true, "current": false},
         "must_not_infer": ["planned-is-current", "implemented"]
@@ -165,6 +207,7 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["claim is integrated at canonical ref"],
+      "observations": [],
       "expected": {"claims": {"scope": "canonical", "authority_level": "authoritative"}, "must_not_infer": []}
     },
     {
@@ -176,6 +219,7 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["claim exists at candidate branch HEAD"],
+      "observations": [],
       "expected": {"claims": {"scope": "candidate", "authority_level": "candidate"}, "must_not_infer": ["canonical"]}
     },
     {
@@ -187,6 +231,7 @@
         "evidence_visibility": ["revision-content", "tool-runtime-trace"]
       },
       "source_facts": ["uncommitted worktree metadata reports a change"],
+      "observations": [],
       "expected": {"claims": {"scope": "worktree", "authority_level": "worktree"}, "must_not_infer": ["committed", "canonical"]}
     },
     {
@@ -198,6 +243,7 @@
         "evidence_visibility": ["human-or-agent-assertion"]
       },
       "source_facts": ["member device reports a dirty path count"],
+      "observations": [],
       "expected": {"claims": {"scope": "local-only", "authority_level": "reported"}, "must_not_infer": ["source-code-content", "canonical"]}
     },
     {
@@ -209,6 +255,7 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["claim was true at old revision r3"],
+      "observations": [],
       "expected": {"claims": {"scope": "historical", "authority_level": "historical"}, "must_not_infer": ["current"]}
     },
     {
@@ -220,6 +267,7 @@
         "evidence_visibility": []
       },
       "source_facts": ["scope cannot be established from visible evidence"],
+      "observations": [],
       "expected": {"claims": {"scope": "unknown", "authority_level": "unknown"}, "must_not_infer": ["canonical", "candidate", "worktree"]}
     },
     {
@@ -231,6 +279,9 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["Snapshot N1 records an evaluation on 2026-08-01"],
+      "observations": [
+        {"kind": "snapshot", "live_state": false, "evidence_category": "revision-content"}
+      ],
       "expected": {"claims": {"role": "snapshot", "live_state": false}, "must_not_infer": ["current-state"]}
     },
     {
@@ -242,6 +293,9 @@
         "evidence_visibility": ["revision-content", "reproducible-executable-validation", "tool-runtime-trace", "human-or-agent-assertion", "derived-ai-summary"]
       },
       "source_facts": ["all evidence categories are visible"],
+      "observations": [
+        {"kind": "evidence-capabilities"}
+      ],
       "expected": {
         "claims": {
           "revision-content": "supports-bytes-at-revision",
@@ -262,6 +316,9 @@
         "evidence_visibility": ["derived-ai-summary"]
       },
       "source_facts": ["AI summary says feature F is complete"],
+      "observations": [
+        {"kind": "ai-summary", "implementation_claim": "complete", "evidence_category": "derived-ai-summary"}
+      ],
       "expected": {"claims": {"authority_level": "derived", "implementation_claim": "unknown"}, "must_not_infer": ["approved", "implemented", "validated"]}
     },
     {
@@ -273,6 +330,9 @@
         "evidence_visibility": ["tool-runtime-trace"]
       },
       "source_facts": ["candidate claim is assigned to Agent A", "Coordinator lock L1 is held"],
+      "observations": [
+        {"kind": "coordinator", "owner": "Agent A", "lock": "L1", "evidence_category": "tool-runtime-trace"}
+      ],
       "expected": {
         "claims": {"scope": "candidate"},
         "coordinator_runtime": {"owner": "Agent A", "lock": "L1"},
@@ -288,6 +348,9 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["ADR-0200 is Accepted"],
+      "observations": [
+        {"kind": "decision", "status": "accepted", "evidence_category": "revision-content"}
+      ],
       "expected": {"claims": {"decision_status": "accepted"}, "must_not_infer": ["implemented"]}
     },
     {
@@ -299,6 +362,9 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["ADR-0200 is Accepted"],
+      "observations": [
+        {"kind": "decision", "status": "accepted", "evidence_category": "revision-content"}
+      ],
       "expected": {"claims": {"decision_status": "accepted"}, "must_not_infer": ["implemented"]}
     },
     {
@@ -310,6 +376,10 @@
         "evidence_visibility": ["revision-content", "reproducible-executable-validation"]
       },
       "source_facts": ["implementation exists", "passing validation V15 is visible"],
+      "observations": [
+        {"kind": "implementation", "state": "present", "evidence_category": "revision-content"},
+        {"kind": "validation", "result": "passed", "evidence_category": "reproducible-executable-validation"}
+      ],
       "expected": {"claims": {"implementation_claim": "present", "validation_evidence": "passed"}, "must_not_infer": []}
     },
     {
@@ -321,6 +391,10 @@
         "evidence_visibility": ["revision-content"]
       },
       "source_facts": ["implementation exists", "validation evidence is not visible"],
+      "observations": [
+        {"kind": "implementation", "state": "present", "evidence_category": "revision-content"},
+        {"kind": "validation", "result": "passed", "evidence_category": "reproducible-executable-validation"}
+      ],
       "expected": {"claims": {"implementation_claim": "present", "validation_evidence": "unknown"}, "must_not_infer": ["validated"]}
     }
   ],
