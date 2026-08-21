@@ -278,3 +278,9 @@
 - 首轮全仓回归正确捕获仓库级 amend 关系冻结集合缺少 ADR-0012；只补充 `ADR-0012 → ADR-0001` 的精确预期，未放宽 Authority evaluator 或测试。
 - 修正后全仓 231 项中 226 通过、5 项按既有环境／可选依赖跳过；integrated build、默认／显式 Authority projection 回滚、282 份 Markdown／686 个本地链接和 diff 检查完成。
 - 候选提交 `15e0071` 在 clean `main@3e4847b` 上通过 `--ff-only` 进入本地 Canonical；没有 push、tag、Release 或公开模板迁移。
+
+## 2026-08-21 — Harness JSON State 漂移修正
+
+- `docs/state/project-structure.md` 仍保留 Phase 3 候选早期的“尚未经过 Windows／Ubuntu CI”描述，与平台 Plan、Release State、Test Coverage State 和既有 Phase 3 Validation 冲突。
+- 依据同一候选提交 Windows／Ubuntu 双 PASS 的既有证据，将当前事实修正为“CI 已完成，但仍为 `experimental`／`unreleased`，不证明第三方 Agent runtime 兼容”。
+- 本轮只修复 State 漂移并追加历史记录，没有修改实现、测试、Adapter、组件版本、PROGRESS、HANDOFF 或发布状态。
