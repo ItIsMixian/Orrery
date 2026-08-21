@@ -52,14 +52,18 @@ Approved Design: [多人／多 worktree 协作协议](../../design/multi-worktre
 
 ### Phase 0 — 合约与隔离 fixture
 
-- [ ] 为 worktree identity、session、overlap finding 和 integration report 定义版本化 JSON schema。
-- [ ] 建立最小 Git fixture：干净主分支、两个 linked worktree、独立 clone、untracked 文件和未 push 分支。
-- [ ] 固定 integration ref 的配置键、默认值和 OID 解析规则。
-- [ ] 定义主 worktree 识别方法与显式维护者覆盖机制。
-- [ ] 在 schema 中保留 `member_id`、`host_id`、visibility 和 observability 字段；首版默认一个 Workstream 一个 active host，不提前实现多设备迁移。
-- [ ] 从 AGENTS／State 索引定义 stable subsystem registry 和 `primary_subsystem_id`、`affected_subsystem_ids`、`Unmapped`／project-wide 表达；registry 只投影现有权威文档，不自动创造 State。
-- [ ] 为 Member 基础身份和 Reviewer／Integrator／Admin capability 定义可组合权限 schema、bootstrap maintainer、授予／撤销审计与本地凭据失效规则。
-- [ ] 定义 `personal`／`team` project mode；默认 personal 使用隐式本地成员和全部本地 capability，且证明没有网络监听、发现、Coordinator、成员认证或团队同步依赖启动。
+- [x] 为 worktree identity、session、overlap finding 和 integration report 定义版本化 JSON schema。
+- [x] 建立最小 Git fixture：干净主分支、两个 linked worktree、独立 clone、untracked 文件和未 push 分支。
+- [x] 固定 integration ref 的配置键、默认值和 OID 解析规则。
+- [x] 定义主 worktree 识别方法与显式维护者覆盖机制。
+- [x] 在 schema 中保留 `member_id`、`host_id`、visibility 和 observability 字段；首版默认一个 Workstream 一个 active host，不提前实现多设备迁移。
+- [x] 从 AGENTS／State 索引定义 stable subsystem registry 和 `primary_subsystem_id`、`affected_subsystem_ids`、`Unmapped`／project-wide 表达；registry 只投影现有权威文档，不自动创造 State。
+- [x] 为 Member 基础身份和 Reviewer／Integrator／Admin capability 定义可组合权限 schema、bootstrap maintainer、授予／撤销审计与本地凭据失效规则。
+- [x] 定义 `personal`／`team` project mode；默认 personal 使用隐式本地成员和全部本地 capability，且证明没有网络监听、发现、Coordinator、成员认证或团队同步依赖启动。
+
+Candidate checkpoint（2026-08-22）：上述 Phase 0 项已在独立分支提交 `4ae4f0a` 实现并通过
+[专项 Validation](../../validation/2026-08-22-personal-collaboration-phase-0.md)。这仍是 Candidate，
+尚未进入 integration ref、发布包或 Team 网络层；Phase 1–5 的未勾选项不因 schema 存在而视为实现。
 
 ### Phase 1 — 身份与 session
 

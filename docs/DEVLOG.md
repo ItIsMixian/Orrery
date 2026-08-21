@@ -292,3 +292,11 @@
 - 在独立 `codex/fix-release-gate-posix-lexical-path` worktree 中把夹具改为平台原生绝对词法路径；产品安全门未改动，symlink identity 不得提前 resolve 的约束保持不变。
 - 修正后 Windows focused 10 passed + 2 privilege skips、Ubuntu WSL focused 12/12；提交 `42aebae` 快进进入 `main`。最终 GitHub Actions `32492830151` 在 Windows／Ubuntu 双 PASS。
 - `main` 已同步至公开 GitHub；v0.2.0 仍是当前公开 Release，没有 tag、Release、实际 SemVer／manifest 选择、稳定 API 或 managed Authority production switch。
+
+## 2026-08-22 — W1 Personal Core／CLI Phase 0 Candidate
+
+- 在独立 linked worktree 和 `codex/w1-personal-core-contract` 分支完成协作 Phase 0；实现提交为 `4ae4f0a`，没有写入主 worktree、push、merge、tag 或 Release。
+- Core 0.1.1 新增 provider-neutral collaboration schema、dependency-free validation、integration ref／OID 和主 worktree 解析、显式 subsystem registry、Scope 特殊表达、Member capability／credential epoch 与 zero-network project mode contract；CLI 0.1.6 新增只读 `collaboration-contract`。
+- 合成 Git fixture 实际建立 clean main、两个 linked worktree、独立 clone、文件级 untracked 和未 push commit。首次实现后测试暴露 CLI fixture 缺 Observatory source path 及 Git untracked 目录折叠，均收紧 fixture 后修复。
+- 最终专项 10/10、受影响组合 67 passed + 2 expected skips、全仓 236 passed + 5 existing skips；integrated structure、隔离静态站、284 份 Markdown／696 个本地链接和 diff 检查通过。证据见 [Phase 0 Validation](validation/2026-08-22-personal-collaboration-phase-0.md)。
+- 本轮没有实现持久 session、主目录写入守卫、Scope/path collector、finding 计算、review／integration／cleanup、Observatory 或 Team 网络层；根 PROGRESS／HANDOFF 留给唯一整合者同步。
