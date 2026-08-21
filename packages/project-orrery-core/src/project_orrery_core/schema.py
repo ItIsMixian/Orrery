@@ -20,4 +20,5 @@ def _read_schema(name: str) -> dict[str, Any]:
 
 AUTHORITY_SCHEMA = _read_schema("authority-v1.json")
 PROJECT_MANIFEST_SCHEMA = _read_schema("project-manifest-v1.json")
+COLLABORATION_SCHEMA = _read_schema("collaboration-v1.json")
 REQUIRED_SCAFFOLD_FILES = tuple(AUTHORITY_SCHEMA["required_scaffold_files"])

@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-21
+Updated: 2026-08-22
 
 ## 当前事实
 
@@ -69,6 +69,7 @@ Updated: 2026-08-21
 - 2026-08-21 M2.3 release／installer gate Worktree Candidate 新增 12 项门禁专项：覆盖 candidate manifest 配对／版本／secret 失败关闭、v0.2 历史 hash、确定性离线 archive／checksum、new／legacy standalone、invalid／unsupported 与非普通 target 零写入、receipt-gated migration／restore、self-host、环境凭据隔离／timeout，以及 traversal／大小写碰撞／symlink／forbidden／plaintext-secret 二次解包检查。Gate 专项 12 项中 10 通过、2 项因 Windows symlink privilege 跳过；Authority 专项 151 项中 148 通过、3 项跳过；全仓 219 项中 214 通过、5 项按环境或可选依赖跳过。该证据不选择实际 SemVer，不证明 M2.2 consumer production switch、公开发布或稳定 Core API。
 - 2026-08-21 M2 本地 Canonical integration 把 M2.1／M2.2／M2.3 合并后的 Authority 专项扩展到 163 项，160 通过、3 项 Windows symlink privilege 跳过；全仓扩展到 231 项，226 通过、5 项按环境或可选依赖跳过。结构、默认 legacy build、显式 projection、链接与 diff 见 integration Validation；该证据不证明 managed production switch 或 release。
 - 2026-08-21 `main` 推送验收先在本机启用动态依赖执行 231 项并全部通过，3 项 Windows symlink privilege 跳过；integrated build、默认／显式 Authority projection 精确回滚、282 份 Markdown／686 个本地链接／0 缺失和发布排除边界通过。首次远端 run `32492265629` 的 Ubuntu job 发现 release-gate 测试硬编码 Windows 绝对路径；`42aebae` 改用平台原生绝对词法路径后，Windows focused 为 10 passed + 2 privilege skips、Ubuntu WSL focused 12/12，最终 GitHub Actions `32492830151` 在 Windows／Ubuntu 双 PASS。该证据只验收公开 source `main`，不构成 Release。
+- 2026-08-22 W1 Personal Core／CLI Phase 0 Candidate 新增 10 项专项，使用运行时合成 Git fixture 覆盖 clean main、两个 linked worktree、独立 clone、文件级 untracked 和未 push commit；同时覆盖 schema bundle、integration ref/OID、主 worktree 覆盖、subsystem registry、Scope 特殊表达、Member capability/credential epoch、Personal zero-network 与只读 CLI。专项 10/10，受影响组合 67 passed + 2 expected skips；最终全仓 241 项中 236 通过、5 项按既有 symlink privilege／动态依赖门跳过。
 
 ## 验证证据
 
@@ -114,6 +115,7 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Model managed Observatory shadow](../validation/2026-08-21-authority-model-managed-observatory-shadow.md)
 - [2026-08-21 Authority AI derived-view constraints](../validation/2026-08-21-authority-ai-derived-view-constraints.md)
 - [2026-08-21 Authority shadow diagnostic projection](../validation/2026-08-21-authority-shadow-diagnostic-projection.md)
+- [2026-08-22 Personal collaboration Phase 0](../validation/2026-08-22-personal-collaboration-phase-0.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -126,5 +128,5 @@ Updated: 2026-08-21
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
-- ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
+- ADR-0007／ADR-0008 的 Phase 0 Candidate 已有 schema、解析和合成 fixture 测试；Phase 1–4 的主 worktree 写入守卫、私有 session、实际重叠／review／cleanup、Personal 指挥台与 Team Mode 网络测试仍未实现。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。

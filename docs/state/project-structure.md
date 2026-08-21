@@ -1,6 +1,6 @@
 # 项目结构 State
 
-Updated: 2026-08-21
+Updated: 2026-08-22
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md)
 
 ## 当前事实
@@ -17,6 +17,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 原始运行由仓库内 `experiments/context-routing/harness/raw-evidence-retention-policy.json` 与 `seal_raw_evidence.py` 管理 manifest、校验和、分类和到期状态；工具不自动删除。
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - Codex Adapter 0.1.0 的发行支持状态仍为 `experimental`／未发布；其 runtime manifest 只对 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`。
+- 本分支 Candidate 已在平台中立 Core 0.1.1 冻结 `project-orrery-collaboration-v1`：worktree identity、Workstream session、Scope、overlap finding、integration report、subsystem registry、Member capability 和 project mode 共用一套 schema；CLI 0.1.6 新增只读 `collaboration-contract` 检查，不实现 Phase 1 的 session 写入或 worktree 创建。
 
 ## 当前边界
 
@@ -28,6 +29,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `docs/_site/`、缓存、凭据和 benchmark 原始输出不是作者文档或发布资产。
 - 自托管、实验和测试资产已进入 `main`；v0.2.0 tag／Release 指向发布提交 `20fc95b`，后续当前事实由 main 上的发布后文档继续维护。
 - linked worktree 共享 Git 对象库和普通 refs，但拥有独立 HEAD、索引与工作目录。未提交文件仍只属于所在 Worktree scope。当前没有 ADR-0008 所设计的 Team Node／Coordinator，因此跨机器未 push 工作在实际产品中仍不可观察；未来 opt-in Team Mode 只能增加标注为 Local-only 的元数据，不会成为代码证据。
+- Phase 0 配置固定在 `.project-orrery.json` 的 `collaboration.integration_ref`、`collaboration.primary_worktree` 和 `collaboration.project_mode`；integration ref 缺省为 `refs/heads/main`，只按本地 branch ref 解析精确 commit OID，不 fetch 或回退远端。主 worktree 缺省取 `git worktree list --porcelain` 的 main worktree，维护者覆盖必须是同一仓库已列出的绝对 worktree 路径。
+- 根 `AGENTS.md` 的七个 subsystem 入口已有显式稳定 ID；Core registry 只投影这些入口链接的既有 State Docs，缺失 State 时失败关闭，`unmapped` 与 `project-wide` 只是 Scope 保留表达，不自动创建作者文档。
 
 ## 实现证据
 
@@ -44,6 +47,11 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `tests/test_codex_adapter.py`
 - `adapters/harness-json/`
 - `tests/test_harness_json_adapter.py`
+- `packages/project-orrery-core/src/project_orrery_core/collaboration.py`
+- `packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json`
+- `packages/project-orrery-cli/src/project_orrery_cli/collaboration_contract.py`
+- `tests/fixtures/collaboration/git_fixture.py`
+- `tests/test_collaboration_contract.py`
 
 ## 已知缺口
 
@@ -53,4 +61,4 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- ADR-0007／ADR-0008 的私有 session、主目录守卫、subsystem mapping、自动重叠检测、审查／清理命令、Personal 指挥台和 opt-in Team Mode 均尚未实现；当前只有协议、人工恢复流程和独立 worktree 结构，不能宣称多 Agent 协调已经自动化。
+- Phase 0 只建立 Candidate contract、只读 Git identity/config 解析、subsystem registry 和合成 fixture；私有 session 持久化、主目录写入守卫、实际 Scope/path 采集、自动 overlap finding、integration/review/cleanup 命令、Observatory 投影与 Team 网络层仍未实现，不能宣称多 Agent 协调闭环已经完成。

@@ -1,6 +1,6 @@
 # 文档系统 State
 
-Updated: 2026-08-21
+Updated: 2026-08-22
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md)
 
 ## 当前事实
@@ -29,6 +29,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 默认本机托管 Broker 使用专用 Provider 凭据 namespace、client token、缓存、single-flight、模型白名单和预算门；一次“保存并启用”不强制额外测试请求。
 - 本机托管只提供统一路由和成本控制，不隔离同一 OS 用户进程；只有在独立 OS 身份或等价外层隔离下运行外部 Broker 时才能隔离 Provider Key。
 - 手动刷新、设置与问答写操作都要求同源 POST；旧查询参数 GET 不再触发模型调用。
+- 本分支 Candidate 为 `AGENTS.md` 的七个 subsystem 区块增加显式稳定 ID。Core 0.1.1 的 registry parser 只读取这些 ID 与已有 `docs/state/*.md` 链接；重复／保留 ID 或缺失 State Doc 失败关闭，并且不会因路径推断创建新 State。该 registry 是权威入口的机器投影，不是新的作者事实源。
 
 ## 同步状态
 
@@ -52,11 +53,14 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `docs/validation/2026-08-19-broker-first-docsite-gateway.md`
 - `adapters/codex/SKILL.md`
 - `adapters/codex/adapter-manifest.json`
+- `packages/project-orrery-core/src/project_orrery_core/collaboration.py`
+- `packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json`
+- `tests/test_collaboration_contract.py`
 
 ## 已知缺口
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - 尚未实现 provider-neutral `docs audit`、finding schema／registry、project soft budget、acknowledge／defer storage 或自动检查 State／实现链接是否过期的机制；当前只有 Accepted ADR、Approved Design、活动 Plan 和人工自托管规则。
-- 观测台尚未显示 branch、HEAD、integration OID、merge base、dirty、Workstream 生命周期或事实作用域；worktree 私有 session、自动重叠报告、审查包、清理建议和 Team Mode 也未实现。因此当前作用域纪律依赖入口规则、独立目录和集成者审阅。
+- 只读 CLI Candidate 已能报告 branch、HEAD、integration OID、dirty、主 worktree 和 fact scope，但观测台尚未消费该合约，也没有 merge base／ahead-behind、私有 session、自动重叠报告、审查包、清理建议或 Team Mode runtime。因此当前协作执行仍依赖入口规则、独立目录和集成者审阅。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。
