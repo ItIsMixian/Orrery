@@ -42,6 +42,7 @@ Updated: 2026-08-21
 - 2026-08-21 ADR-0010 Core shadow evaluator 将 fixture cases 扩展为 normalized observations，新增 deterministic evaluation、all-case expected comparison、显式 extra-output 分类、visibility-sensitive output、unsupported version/scope/evidence/observation fail-closed 和非顶层 API 断言；Authority 专项为 14/14。CLI/docsite 尚未双轨运行，不能据此声称 consumer 已一致。
 - 2026-08-21 CLI 第一处 shadow comparison 新增 6 项专项：保护 legacy integrated heuristic、真实 Accepted ADR 匹配、authority-visible input hash、`parser-gap` 分类，以及 mismatch／evaluator failure 时 warning-only、旧退出码不变。既有产品专项共运行 16 项，其中 14 通过、2 项动态依赖按设计跳过；默认全仓 81 项中 79 通过、2 项按设计跳过，integrated structure、静态站和 250 份 Markdown 本地链接均通过。Observatory 尚未双轨，CLI 也尚未切换生产语义。
 - 2026-08-21 Observatory parser shadow 新增 8 项专项：保护未导出内部 adapter、七类 legacy lifecycle、真实 `parse_adrs` 双轨、当前仓库 ADR、精确输入 hash／过滤、`parser-gap` 与 graph/reference legacy-only 边界。Authority 三组专项合计 28/28；默认全仓 89 项中 87 通过、2 项按设计跳过，integrated structure、905 KB 静态站和 251 份 Markdown 本地链接均通过。该 harness 未接入 build/serve，不能表述为 Observatory 生产迁移。
+- 2026-08-21 Observatory relation shadow 将专项扩展为 15 项：覆盖显式 `Amends`／`Supersedes`、`Superseded by` 方向反转、effective decision、amend 保留 base effect、真实仓库 6 条 amendment、非关系引用隔离、缺失目标保持 `Unknown` 与 malformed metadata 失败关闭。Authority 三组专项为 35/35；默认全仓 96 项中 94 通过、2 项按设计跳过，integrated structure、913 KB 静态站和 252 份 Markdown／513 个本地链接均通过。旧 build/serve graph、公开 API 与发布契约仍未切换。
 
 ## 验证证据
 
@@ -67,6 +68,7 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Meta Model Core shadow evaluator](../validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md)
 - [2026-08-21 Authority Meta Model CLI shadow comparison](../validation/2026-08-21-authority-meta-model-cli-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory parser shadow](../validation/2026-08-21-authority-meta-model-observatory-parser-shadow.md)
+- [2026-08-21 Authority Meta Model Observatory relation shadow](../validation/2026-08-21-authority-meta-model-observatory-relation-shadow.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -79,4 +81,4 @@ Updated: 2026-08-21
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 生命周期目前只在临时目录验证；真实 Codex runtime 发现、调用、失败路径、更新与卸载尚无证据，因此不能标记 `verified`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009/0010 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow 和 Observatory lifecycle parser harness，但仍没有完整 CLI claims、Observatory relation/runtime shadow、公开 `authority_model_version` 兼容矩阵或 production-switch/release 证据。
+- ADR-0009/0010 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow 和 Observatory lifecycle/explicit-relation harness，但仍没有完整 CLI claims、Observatory build/runtime projection、公开 `authority_model_version` 兼容矩阵或 production-switch/release 证据。

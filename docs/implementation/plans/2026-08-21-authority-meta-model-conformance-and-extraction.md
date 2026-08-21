@@ -108,7 +108,7 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 1. **Baseline 与 inventory**：冻结上述区域级盘点，补齐现有行为对 fixture 的可追溯映射；不改变运行路径。
 2. **Fixture first**：实现 versioned fixture/golden contract，并以现有 CLI、docsite parser、AI prompt 的输出做差异报告；不选择 owner。
 3. **最小 evaluator / shadow mode**：Gate A 已由 ADR-0010 解决；Core 先实现 normalized observations 到 roles/relations/claim dimensions/scopes/evidence 的确定性解释，并把 fixture comparison 分类为 missing expectation、extra observation 或 expected visibility difference。CLI/docsite 尚不切换生产行为。
-4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。CLI 第一检查点已在 Candidate 中完成：只比较 Accepted ADR，scope 保持 `Unknown`，不切换 legacy status／exit code。Observatory 第一检查点也已形成包级 shadow harness：使用真实 legacy parser 输出比较 ADR lifecycle，但未接入 build/serve，graph relations 与 refs 仍是 legacy-only。完整 relations、其他 claims 与运行时接线留给后续检查点。
+4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。CLI 第一检查点已在 Candidate 中完成：只比较 Accepted ADR，scope 保持 `Unknown`，不切换 legacy status／exit code。Observatory 已完成两个包级检查点：先比较 legacy ADR lifecycle，再从显式 `Amends`／`Supersedes`／`Superseded by` 构造 relation observations 并验证 Core effective-decision；两者均未接入 build/serve。`Predecessor`、普通 refs、其他 roles/claims 与运行时接线留给后续检查点。
 5. **AI 派生视图**：`docsite_qa.py`/`serve.py` 仅消费已确定的语义、scope、visibility 与引用；对“AI 把 Unknown/Local-only/observed 升级为事实”的响应建立负向测试。
 6. **兼容、自托管与发布**：Gate B 后才设计 manifest 变更、legacy/unknown-version 行为、升级/降级和 release contract；最后在集成分支同步 State、Validation 与全局入口。
 
@@ -119,7 +119,7 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 - `tests/fixtures/authority-meta-model/**` 与 `tests/test_authority_meta_model.py`：fixture、golden contract 与 consumer conformance。
 - `packages/project-orrery-core/src/project_orrery_core/authority.py`：ADR-0010 决定的最小 deterministic evaluator owner；当前实现仍是 experimental、fixture-bound Candidate。
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py`、`validate.py`：已有 Accepted ADR warning-only shadow；后续切换或扩大公开输出需要新的验证检查点。
-- `packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py`：已有未导出的 lifecycle shadow adapter；保持无公开依赖／API，直到运行时接线边界通过验证。
+- `packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py`：已有未导出的 lifecycle 与显式 relation/effective-decision shadow adapter；保持无公开依赖／API，直到运行时接线边界通过验证。
 - `scripts/docsite/build_docsite.py`、`docsite_insights.py`、`docsite_qa.py`、`serve.py`：尚未切换；解析、启发式、投影和 AI 约束继续按独立检查点接入。
 - `adapters/**` 与 template projection tests：只消费既有确定性契约。
 - `.project-orrery.json`、release manifest、schema 与 compatibility：仅在 Gate B 和 ADR/amendment 后考虑。

@@ -23,16 +23,27 @@ from project_orrery_core.authority import (  # noqa: E402
     evaluate_authority,
 )
 from project_orrery_observatory.authority_shadow import (  # noqa: E402
+    AuthorityRelationParseError,
     authority_input_snapshot,
     build_observatory_authority_shadow,
+    collect_decision_observations,
     normalize_decision_status,
 )
 
 
-def write_adr(decisions_dir: Path, number: int, status: str) -> None:
+def write_adr(
+    decisions_dir: Path,
+    number: int,
+    status: str,
+    *,
+    metadata: tuple[str, ...] = (),
+    body: str = "Test.",
+) -> None:
     decisions_dir.mkdir(parents=True, exist_ok=True)
+    metadata_text = "".join(f"{line}\n" for line in metadata)
     (decisions_dir / f"{number:04d}-test-{number}.md").write_text(
-        f"# ADR-{number:04d}: Test {number}\n\nStatus: {status}\n\n## Context\n\nTest.\n",
+        f"# ADR-{number:04d}: Test {number}\n\nStatus: {status}\n"
+        f"{metadata_text}\n## Context\n\n{body}\n",
         encoding="utf-8",
     )
 
@@ -72,7 +83,7 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
             for number, status in enumerate(
                 (
                     "Accepted",
-                    "Accepted; superseded by ADR-0099",
+                    "Accepted; superseded",
                     "Superseded",
                     "Deprecated",
                     "Proposed",
@@ -98,6 +109,125 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
         self.assertGreaterEqual(len(adrs), 10)
         self.assertEqual(report["comparison"]["checked"], len(adrs))
         self.assertEqual(report["comparison"]["status"], "match")
+
+    def test_explicit_supersedes_yields_effective_decision(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+            decisions_dir = Path(temporary) / "docs" / "decisions"
+            write_adr(decisions_dir, 1, "Accepted")
+            write_adr(
+                decisions_dir,
+                2,
+                "Accepted",
+                metadata=("Supersedes: [ADR-0001](0001-test-1.md)",),
+            )
+            _, report = self.build_shadow(decisions_dir)
+            contract = report["comparison"]["relation_contract"]
+            self.assertEqual(contract["status"], "match")
+            self.assertEqual(
+                contract["core_relations"],
+                {"ADR-0002": {"supersedes": ["ADR-0001"]}},
+            )
+            self.assertEqual(contract["effective_claims"], {"effective_decision": "ADR-0002"})
+
+    def test_status_superseded_by_is_inverted_to_normative_direction(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+            decisions_dir = Path(temporary) / "docs" / "decisions"
+            write_adr(decisions_dir, 1, "Superseded by ADR-0002")
+            write_adr(decisions_dir, 2, "Accepted")
+            adrs, report = self.build_shadow(decisions_dir)
+            self.assertEqual(adrs[0]["supersedes"], ["0002"])
+            contract = report["comparison"]["relation_contract"]
+            self.assertEqual(
+                contract["core_relations"],
+                {"ADR-0002": {"supersedes": ["ADR-0001"]}},
+            )
+            self.assertEqual(contract["legacy_superseded_by"], {"ADR-0001": ["ADR-0002"]})
+            self.assertEqual(contract["effective_claims"], {"effective_decision": "ADR-0002"})
+
+    def test_amends_preserves_base_and_amendment_as_effective(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+            decisions_dir = Path(temporary) / "docs" / "decisions"
+            write_adr(decisions_dir, 1, "Accepted")
+            write_adr(
+                decisions_dir,
+                2,
+                "Accepted",
+                metadata=("Amends: [ADR-0001](0001-test-1.md)",),
+            )
+            _, report = self.build_shadow(decisions_dir)
+            contract = report["comparison"]["relation_contract"]
+            self.assertEqual(
+                contract["core_relations"], {"ADR-0002": {"amends": ["ADR-0001"]}}
+            )
+            self.assertEqual(
+                contract["effective_claims"],
+                {"effective_decisions": ["ADR-0001", "ADR-0002"]},
+            )
+
+    def test_predecessor_and_body_refs_do_not_become_normative_relations(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+            decisions_dir = Path(temporary) / "docs" / "decisions"
+            write_adr(decisions_dir, 1, "Accepted")
+            write_adr(
+                decisions_dir,
+                2,
+                "Accepted",
+                metadata=("Predecessor: ADR-0001",),
+                body="See ADR-0001 and state/example.md.",
+            )
+            adrs = build_docsite.parse_adrs(decisions_dir)
+            normalized = collect_decision_observations(adrs, decisions_dir)
+            self.assertEqual(adrs[1]["predecessors"], ["0001"])
+            self.assertEqual(normalized["sources"], [])
+            self.assertNotIn("supersedes", normalized["observations"][1])
+            self.assertNotIn("amends", normalized["observations"][1])
+
+    def test_malformed_explicit_relation_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+            decisions_dir = Path(temporary) / "docs" / "decisions"
+            write_adr(decisions_dir, 1, "Accepted", metadata=("Amends: earlier choice",))
+            adrs = build_docsite.parse_adrs(decisions_dir)
+            with self.assertRaises(AuthorityRelationParseError):
+                collect_decision_observations(adrs, decisions_dir)
+
+    def test_missing_relation_target_remains_unknown(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+            decisions_dir = Path(temporary) / "docs" / "decisions"
+            write_adr(decisions_dir, 1, "Superseded by ADR-9999")
+            _, report = self.build_shadow(decisions_dir)
+            contract = report["comparison"]["relation_contract"]
+            self.assertEqual(contract["status"], "unknown")
+            self.assertEqual(report["comparison"]["status"], "unknown")
+            self.assertEqual(
+                contract["unresolved_targets"],
+                [
+                    {
+                        "source": "ADR-9999",
+                        "relation": "supersedes",
+                        "target": "ADR-0001",
+                        "reason": "replacement-not-visible",
+                    }
+                ],
+            )
+            self.assertEqual(contract["effective_claims"], {})
+
+    def test_repository_amendments_have_explicit_core_relations(self) -> None:
+        decisions_dir = REPOSITORY_ROOT / "docs" / "decisions"
+        _, report = self.build_shadow(decisions_dir)
+        contract = report["comparison"]["relation_contract"]
+        self.assertEqual(contract["status"], "match")
+        self.assertEqual(contract["unresolved_targets"], [])
+        self.assertEqual(
+            contract["core_relations"],
+            {
+                "ADR-0004": {"amends": ["ADR-0001"]},
+                "ADR-0005": {"amends": ["ADR-0002"]},
+                "ADR-0006": {"amends": ["ADR-0003"]},
+                "ADR-0008": {"amends": ["ADR-0007"]},
+                "ADR-0009": {"amends": ["ADR-0001"]},
+                "ADR-0010": {"amends": ["ADR-0009"]},
+            },
+        )
 
     def test_forged_legacy_difference_is_classified_without_switching(self) -> None:
         with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
@@ -160,7 +290,6 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
                 report["comparison"]["legacy_only"],
                 {
                     "predecessors": "legacy-graph-heuristic",
-                    "supersedes": "legacy-graph-heuristic",
                     "refs": "legacy-reference-graph",
                     "state_refs": "legacy-reference-graph",
                 },
