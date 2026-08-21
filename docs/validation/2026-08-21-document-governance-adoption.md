@@ -53,3 +53,7 @@ Status: Completed documentation-level adoption review
 ## Current boundary
 
 Phase 0 只完成治理规范与 Project Orrery 自托管对齐。`docs audit`、finding schema、soft budget 配置、acknowledge storage、Observatory projection、公开模板和 release 仍是活动 Plan 中的未实现工作，不得由本记录推断为 present 或 validated。
+
+## Local integration
+
+Candidate `15e0071` 在确认主 worktree clean 且 HEAD 为预期基线 `3e4847b` 后，以 `git merge --ff-only codex/document-governance-policy` 进入本地 `main`。这是本地 Canonical 集成，不是 push、tag、GitHub Release 或公开模板采纳。

@@ -21,7 +21,7 @@ Approved Design: [文档治理与信息生命周期](../../design/document-gover
 - [x] 同步 AGENTS、Documentation State、PROGRESS、HANDOFF、DEVLOG 和索引。
 - [x] 记录文档级 Validation，并确认没有 CLI／runtime／release 实现声明。
 - [x] 同步仓库级 Authority relation 回归中的 ADR-0012 amend 预期，不改变 evaluator 行为。
-- [ ] 由整合者在干净 integration worktree 审阅并进入本地 Canonical；在此之前本分支事实仍是 Candidate。
+- [x] 由整合者确认主 worktree clean 且仍在基线 `3e4847b` 后，以 `--ff-only` 将候选提交 `15e0071` 进入本地 Canonical。
 
 ## Phase 1：只读 contract 与 fixture
 

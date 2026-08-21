@@ -14,7 +14,7 @@ Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成�
 | 多 Workstream 协作 | ADR-0007／0008 与 Approved Design 已接受；当前只有人工独立 worktree、唯一整合者和三层事实作用域 | 实现 Personal foundation Phase 0 的 machine contract；继续禁止在共享主目录并发开发 |
 | Context routing 研究 | Pilot 009 的 P/S 装置与 Scope 证据有效，但质量门失败，没有策略获准进入发布 Skill | 不调用模型地完成 task／Oracle v0.2 的分层 verdict、结构化 State、paraphrase 与 mutation controls |
 | 平台与 Adapter | Phase 0–3 已本地集成；Codex 精确 runtime 范围有 verified 证据，Harness JSON 有 Windows／Ubuntu CI；组件仍未独立发布 | 另行规划 Phase 4，并在明确授权后才选择第二个真实 Agent／Harness 平台 |
-| 文档治理 | ADR-0012 与 Approved Design 已接受；self-host Phase 0 已建立当前／历史边界、事件同步和 soft review 规则，尚无 audit runtime | 集成本 Candidate 后，先冻结只读 finding contract／fixture；不增加自动改写 |
+| 文档治理 | ADR-0012、Approved Design 与 self-host Phase 0 已进入本地 Canonical，建立当前／历史边界、事件同步和 soft review 规则；尚无 audit runtime | 先冻结只读 finding contract／fixture；不增加自动改写 |
 
 ## 当前结论
 
