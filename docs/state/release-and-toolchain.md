@@ -30,6 +30,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - ADR-0011 已定义 Authority Model 的公开正整数版本与离散支持集。self-host project manifest 已显式选择模型 1，neutral CLI 0.1.5 候选源码可报告兼容能力，通过 review receipt、精确备份与原子替换显式采用 model 1，可从项目内匹配备份执行带撤销备份的恢复，并在 future release 声明模型时只读判断更新是否需要 migration review；实际 component/release manifest、standalone installer、当前 v0.2 scaffold 和发布资产仍未投影默认值或支持集，普通工具升级也不会补写字段。
 - Candidate Core 已能验证 future release 的 `authority_model_version` 与 `compatibility.authority_model_versions.supported` 必须成对、默认值必须位于离散支持集；只有新项目会从这种 future contract 选择默认模型。已有 legacy manifest 在普通 scaffold／`--upgrade-tools` 下继续缺字段。当前 `skills/project-orrery/release-manifest.json` 和 bundled bridge 仍精确代表 v0.2.0、没有模型声明；因此 standalone v0.2 fallback、公开 zip/checksum 与发布事实均未改变。
 - Candidate managed Observatory source/template 已投影同一默认关闭的 Authority shadow sidecar 接线；它只在显式环境开关下运行，且 package／manifest／scope／写入失败不改变 legacy HTML 或 stats。该 Candidate 工具变化没有改写 v0.2.0 release manifest、归档、checksum、installer 默认值或公开支持状态。
+- 同一 source/template 投影现已让 AI 派生视图消费压缩后的 shadow context，并在 JSON／正文／stream headers 标注非权威边界；缺省无 report 时失败关闭为 `Unknown`／`unavailable`。这仍是未发布 managed-tool 行为，不改变组件版本、v0.2.0 资产或公开支持声明。
 - ADR-0007／ADR-0008 的多人协作协议已经进入权威链，但 `orrery worktree create/status/overlap`、review／cleanup 和 `orrery integrate` 仍只是 Approved Design 中的目标工具面；当前 CLI、Observatory、Skill 和发布资产都没有这些命令或 Personal／Team Mode，也没有升级版本或发布新产物。
 
 ## 实现证据

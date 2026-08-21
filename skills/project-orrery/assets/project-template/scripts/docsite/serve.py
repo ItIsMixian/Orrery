@@ -373,6 +373,7 @@ if _authority_shadow_report is not None:
         % _authority_shadow_report.get("shadow", {}).get("status", "unavailable"),
         flush=True,
     )
+AUTHORITY_CONTEXT = docsite_qa.build_authority_context(_authority_shadow_report)
 
 print("building corpus…", flush=True)
 CORPUS = docsite_qa.build_corpus(DOCS, AGENTS)
@@ -841,7 +842,9 @@ def _gen_briefing():
         BRIEFING = {"error": "provider not available: %s" % PNAME}; return
     try:
         print("generating project briefing… (LLM)", flush=True)
-        BRIEFING = docsite_qa.generate_briefing(PROVIDER, CORPUS)
+        BRIEFING = docsite_qa.generate_briefing(
+            PROVIDER, CORPUS, authority_context=AUTHORITY_CONTEXT
+        )
         if not BRIEFING.get("error"):
             BRIEFING_TS = time.time(); _save_cache("briefing", BRIEFING)
             print("briefing ready", flush=True)
@@ -857,7 +860,9 @@ def _gen_roadmap():
         ROADMAP = {"error": "provider not available: %s" % PNAME}; return
     try:
         print("generating roadmap… (LLM)", flush=True)
-        ROADMAP = docsite_qa.generate_roadmap(PROVIDER, CORPUS)
+        ROADMAP = docsite_qa.generate_roadmap(
+            PROVIDER, CORPUS, authority_context=AUTHORITY_CONTEXT
+        )
         if not ROADMAP.get("error"):
             ROADMAP_TS = time.time(); _save_cache("roadmap", ROADMAP)
             print("roadmap ready", flush=True)
@@ -885,7 +890,9 @@ def _gen_milestones():
         MILESTONES = {"error": "provider not available: %s" % PNAME}; return
     try:
         print("generating milestones… (LLM)", flush=True)
-        MILESTONES = docsite_qa.generate_milestones(PROVIDER, CORPUS)
+        MILESTONES = docsite_qa.generate_milestones(
+            PROVIDER, CORPUS, authority_context=AUTHORITY_CONTEXT
+        )
         if not MILESTONES.get("error"):
             MILESTONES_TS = time.time(); _save_cache("milestones", MILESTONES)
             print("milestones ready", flush=True)
@@ -913,7 +920,13 @@ def _gen_radar():
     try:
         print("generating community radar… (LLM + 联网)", flush=True)
         extra = [k.strip() for k in os.environ.get("DOCSITE_RADAR_KEYWORDS", "").split(",") if k.strip()]
-        RADAR = docsite_qa.generate_radar(PROVIDER, CORPUS, github_token=_github_token(), extra_keywords=extra)
+        RADAR = docsite_qa.generate_radar(
+            PROVIDER,
+            CORPUS,
+            github_token=_github_token(),
+            extra_keywords=extra,
+            authority_context=AUTHORITY_CONTEXT,
+        )
         if not RADAR.get("error"):
             RADAR_TS = time.time(); _save_cache("radar", RADAR)
         print("radar ready", flush=True)
@@ -1113,6 +1126,11 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; charset=utf-8")
             self.send_header("X-Accel-Buffering", "no")
+            self.send_header("X-Orrery-View-Type", "derived-ai-view")
+            self.send_header(
+                "X-Orrery-Authority-Status",
+                AUTHORITY_CONTEXT["deterministic_status"],
+            )
             self._send_security_headers(cache_control="no-cache")
             self.end_headers()
             try:
@@ -1121,7 +1139,12 @@ class Handler(BaseHTTPRequestHandler):
                 elif PROVIDER is None:
                     self.wfile.write(("[[ERROR]] provider not available: %s" % PNAME).encode("utf-8"))
                 else:
-                    for chunk in docsite_qa.ask_stream(PROVIDER, CORPUS, q):
+                    for chunk in docsite_qa.ask_stream(
+                        PROVIDER,
+                        CORPUS,
+                        q,
+                        authority_context=AUTHORITY_CONTEXT,
+                    ):
                         self.wfile.write(chunk.encode("utf-8"))
                         self.wfile.flush()
             except Exception as e:  # noqa: BLE001
@@ -1141,7 +1164,13 @@ class Handler(BaseHTTPRequestHandler):
             elif PROVIDER is None:
                 res = {"error": "LLM provider not available: %s" % PNAME}
             else:
-                res = docsite_qa.ask(q, PROVIDER, CORPUS, verbose=True)
+                res = docsite_qa.ask(
+                    q,
+                    PROVIDER,
+                    CORPUS,
+                    verbose=True,
+                    authority_context=AUTHORITY_CONTEXT,
+                )
         except ValueError as error:
             self._send_json(400, {"error": _safe_error(error)})
             return

@@ -56,6 +56,7 @@ Updated: 2026-08-21
 - 2026-08-21 Authority release/project projection 新增 8 项专项：冻结 future release 默认值 + 离散支持集、配对／类型／重复校验、optional project schema、新项目默认选择、已有 legacy／explicit 选择保持、真实 `--upgrade-tools` 不迁移，以及 source/bundled v0.2.0 历史 contract 不改写。投影 + compatibility + migration/restore + 产品组合 69 项中 67 通过、2 项动态依赖按设计跳过；全仓 176 项中 174 通过、2 项动态依赖按设计跳过。实际下一 release、standalone installer projection 与发布状态仍未改变。
 - 2026-08-21 Authority update compatibility 新增 8 项专项：future release 的 supported／legacy／invalid／unsupported target、无 target Skill-only 查询、malformed release 失败关闭、v0.2.0 历史行为和既有 JSON schema v1 均受保护。与 projection、compatibility 和产品组合 40 项中 38 通过、2 项动态依赖按设计跳过；全仓 184 项中 182 通过、2 项动态依赖按设计跳过。266 份 Markdown／580 个本地链接无缺失；没有实际下一 release 或 target 写入。
 - 2026-08-21 managed Observatory shadow 新增 3 项专项：默认 build runtime 精确等于 legacy path，显式 sidecar 在 Candidate scope 下保持 HTML/stats 字节一致，非法 Coordinator-like scope 对 evaluator 失败关闭而不影响页面。与既有 runtime shadow、产品投影组合 26 项中 24 通过、2 项动态依赖按设计跳过；全仓 187 项中 185 通过、2 项动态依赖按设计跳过。
+- 2026-08-21 Authority AI derived-view 新增 6 项专项：覆盖无 report 的 Unknown、Local-only shadow 不升级、预构造 context／模型回执伪造、虚构引用过滤、成功／失败输出 receipt、根／模板投影与 managed serve context/header 接线。专项 6/6；全仓 193 项中 191 通过、2 项动态依赖按设计跳过；最终 268 份 Markdown／582 个本地链接无缺失，integrated scaffold 与 1088 KB 静态站通过。此证据证明系统不会把 AI 结果升级为项目权威，不证明模型自然语言绝对正确。
 
 ## 验证证据
 
@@ -93,6 +94,8 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Model restore](../validation/2026-08-21-authority-model-restore.md)
 - [2026-08-21 Authority Model release/project projection](../validation/2026-08-21-authority-model-release-projection.md)
 - [2026-08-21 Authority Model update compatibility](../validation/2026-08-21-authority-model-update-compatibility.md)
+- [2026-08-21 Authority Model managed Observatory shadow](../validation/2026-08-21-authority-model-managed-observatory-shadow.md)
+- [2026-08-21 Authority AI derived-view constraints](../validation/2026-08-21-authority-ai-derived-view-constraints.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -106,4 +109,4 @@ Updated: 2026-08-21
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow、Observatory lifecycle/explicit-relation harness、内部 Gate B capability judgment、receipt-gated 显式迁移／恢复和 future-release projection contract，但仍没有完整 CLI claims、Observatory production projection、实际下一 release 默认字段、production-switch 或 release 证据。
+- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow、Observatory lifecycle/explicit-relation harness、managed sidecar、AI derived-view guard、内部 Gate B capability judgment、receipt-gated 显式迁移／恢复和 future-release projection contract，但仍没有完整 CLI claims、Observatory production projection、实际下一 release 默认字段、production-switch 或 release 证据。

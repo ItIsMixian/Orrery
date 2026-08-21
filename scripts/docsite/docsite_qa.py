@@ -121,6 +121,195 @@ def get_provider(*, require_broker=True):
 
 
 # ---------------------------------------------------------------------------
+# Authority-derived view boundary
+# ---------------------------------------------------------------------------
+
+_AUTHORITY_DIMENSIONS = (
+    "effective",
+    "current",
+    "implemented",
+    "validated",
+    "approved",
+    "authoritative",
+)
+_DERIVED_NOTICE = (
+    "> **AI 派生解释**：此回答不会创建、批准或验证项目事实；"
+    "请以引用的权威文档、明确 scope 与 Validation 证据为准。\n\n"
+)
+
+
+def build_authority_context(runtime_report=None):
+    """Project a runtime report into a small, non-authoritative AI constraint.
+
+    This function only removes information and preserves uncertainty.  It does
+    not evaluate Markdown or promote an Observatory shadow result to project
+    authority.  Passing an already-normalized context is idempotent.
+    """
+
+    if (
+        isinstance(runtime_report, dict)
+        and runtime_report.get("context_schema")
+        == "authority-derived-view-context-v1"
+    ):
+        scope = str(runtime_report.get("fact_scope") or "unknown")
+        if scope not in (
+            "canonical",
+            "candidate",
+            "worktree",
+            "local-only",
+            "historical",
+            "unknown",
+        ):
+            scope = "unknown"
+        deterministic_status = str(
+            runtime_report.get("deterministic_status") or "unavailable"
+        )
+        if deterministic_status not in ("available", "shadow-only", "unavailable"):
+            deterministic_status = "unavailable"
+        must_not_infer = {
+            "derived-view-is-authoritative",
+            "summary-is-primary-evidence",
+            "accepted-equals-implemented",
+            "implemented-equals-validated",
+        }
+        must_not_infer.update(runtime_report.get("must_not_infer") or [])
+        if deterministic_status != "available":
+            must_not_infer.update(_AUTHORITY_DIMENSIONS)
+        if scope in ("local-only", "unknown"):
+            must_not_infer.update(("canonical", "source-code-content"))
+        return {
+            "context_schema": "authority-derived-view-context-v1",
+            "view_type": "derived-ai-view",
+            "authoritative": False,
+            "creates_project_facts": False,
+            "deterministic_status": deterministic_status,
+            "authority_model_status": runtime_report.get(
+                "authority_model_status", "unavailable"
+            ),
+            "authority_model_version": runtime_report.get(
+                "authority_model_version"
+            ),
+            "fact_scope": scope,
+            "shadow_status": runtime_report.get("shadow_status", "unavailable"),
+            "must_not_infer": sorted(must_not_infer),
+            "conformance_inputs": list(
+                runtime_report.get("conformance_inputs") or []
+            ),
+        }
+
+    model = runtime_report.get("authority_model", {}) if isinstance(runtime_report, dict) else {}
+    shadow = runtime_report.get("shadow", {}) if isinstance(runtime_report, dict) else {}
+    scope = str(shadow.get("fact_scope") or "unknown")
+    shadow_status = str(shadow.get("status") or "unavailable")
+    production_switched = bool(
+        isinstance(runtime_report, dict)
+        and runtime_report.get("production_behavior_switched") is True
+    )
+    model_read_only = model.get("read_only") is not False
+    if production_switched and not model_read_only and shadow_status == "match":
+        deterministic_status = "available"
+    elif not model_read_only and shadow_status in ("match", "unknown", "mismatch"):
+        deterministic_status = "shadow-only"
+    else:
+        deterministic_status = "unavailable"
+
+    must_not_infer = {
+        "derived-view-is-authoritative",
+        "summary-is-primary-evidence",
+        "accepted-equals-implemented",
+        "implemented-equals-validated",
+    }
+    if deterministic_status != "available":
+        must_not_infer.update(_AUTHORITY_DIMENSIONS)
+    if scope in ("local-only", "unknown"):
+        must_not_infer.update(("canonical", "source-code-content"))
+
+    conformance_inputs = []
+    for key in ("adr", "roles"):
+        value = shadow.get(key, {}) if isinstance(shadow, dict) else {}
+        candidate = value.get("conformance_input") if isinstance(value, dict) else None
+        if isinstance(candidate, dict):
+            conformance_inputs.append(
+                {
+                    "kind": key,
+                    "repository_snapshot": candidate.get("repository_snapshot"),
+                    "fact_scope": candidate.get("fact_scope"),
+                    "evidence_visibility": list(candidate.get("evidence_visibility") or []),
+                }
+            )
+
+    return {
+        "context_schema": "authority-derived-view-context-v1",
+        "view_type": "derived-ai-view",
+        "authoritative": False,
+        "creates_project_facts": False,
+        "deterministic_status": deterministic_status,
+        "authority_model_status": model.get("status", "unavailable"),
+        "authority_model_version": model.get("selected_version"),
+        "fact_scope": scope,
+        "shadow_status": shadow_status,
+        "must_not_infer": sorted(must_not_infer),
+        "conformance_inputs": conformance_inputs,
+    }
+
+
+def _authority_system(system: str, authority_context=None) -> str:
+    context = build_authority_context(authority_context)
+    contract = {
+        key: context[key]
+        for key in (
+            "view_type",
+            "authoritative",
+            "creates_project_facts",
+            "deterministic_status",
+            "authority_model_status",
+            "authority_model_version",
+            "fact_scope",
+            "must_not_infer",
+        )
+    }
+    return (
+        system
+        + "\n\n# Authority 派生视图约束\n"
+        + json.dumps(contract, ensure_ascii=False, sort_keys=True)
+        + "\n你的输出始终是 derived-ai-view，不是 State、ADR、批准或 Validation。"
+        "不得把 must_not_infer 中的状态写成项目权威事实。引用原文时必须明确写成"
+        "『该文档声称／记录』；证据不足时保留 Unknown，不得补全为否定或肯定。"
+    )
+
+
+def _derived_receipt(authority_context=None) -> dict:
+    context = build_authority_context(authority_context)
+    return {
+        key: context[key]
+        for key in (
+            "context_schema",
+            "view_type",
+            "authoritative",
+            "creates_project_facts",
+            "deterministic_status",
+            "authority_model_status",
+            "authority_model_version",
+            "fact_scope",
+            "must_not_infer",
+        )
+    }
+
+
+def _attach_derived_receipt(payload: dict, authority_context=None) -> dict:
+    result = dict(payload)
+    result["_authority"] = _derived_receipt(authority_context)
+    return result
+
+
+def _derived_failure(error: str, authority_context=None, detail=None) -> dict:
+    payload = {"error": error}
+    if detail is not None:
+        payload["detail"] = detail
+    return _attach_derived_receipt(payload, authority_context)
+
+
+# ---------------------------------------------------------------------------
 # the two-stage ask
 # ---------------------------------------------------------------------------
 
@@ -145,7 +334,14 @@ ANS_SCHEMA = {"type": "object", "properties": {
     "required": ["answer", "citations"]}
 
 
-def ask(question: str, provider, corpus, per_doc_chars: int = 4000, verbose=False):
+def ask(
+    question: str,
+    provider,
+    corpus,
+    per_doc_chars: int = 4000,
+    verbose=False,
+    authority_context=None,
+):
     from _llm import LLMRequest
 
     by_id = {c["id"]: c for c in corpus}
@@ -156,7 +352,7 @@ def ask(question: str, provider, corpus, per_doc_chars: int = 4000, verbose=Fals
         user="问题:%s\n\n# 文档目录\n%s" % (question, catalog),
         json_schema=SEL_SCHEMA, model_kind="intent", max_tokens=2500))
     if sel.get("parse_error") or sel.get("_provider_disabled"):
-        return {"error": "retrieve failed", "detail": sel}
+        return _derived_failure("retrieve failed", authority_context, sel)
     ids = [i for i in sel.get("ids", []) if i in by_id][:6]
     if not ids:
         ids = [c["id"] for c in corpus[:4]]  # fallback
@@ -166,11 +362,11 @@ def ask(question: str, provider, corpus, per_doc_chars: int = 4000, verbose=Fals
     refs = "\n\n".join("## [%s] %s\n%s" % (i, by_id[i]["title"], by_id[i]["text"][:per_doc_chars])
                        for i in ids)
     ans = provider.complete(LLMRequest(
-        system=ANS_SYS,
+        system=_authority_system(ANS_SYS, authority_context),
         user="问题:%s\n\n# 参考文档\n%s" % (question, refs),
         json_schema=ANS_SCHEMA, model_kind="audit", max_tokens=4000))
     if ans.get("parse_error") or ans.get("_provider_disabled"):
-        return {"error": "answer failed", "detail": ans}
+        return _derived_failure("answer failed", authority_context, ans)
     raw = [c for c in ans.get("citations", []) if c in by_id] or ids
     cites, seen = [], set()
     for c in raw:
@@ -179,7 +375,14 @@ def ask(question: str, provider, corpus, per_doc_chars: int = 4000, verbose=Fals
             continue
         seen.add(pg)
         cites.append({"id": c, "page": pg, "title": by_id[c]["title"]})
-    return {"answer": ans.get("answer", "").strip(), "citations": cites, "retrieved": ids}
+    return _attach_derived_receipt(
+        {
+            "answer": _DERIVED_NOTICE + ans.get("answer", "").strip(),
+            "citations": cites,
+            "retrieved": ids,
+        },
+        authority_context,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -193,7 +396,7 @@ ANS_STREAM_SYS = (
 )
 
 
-def ask_stream(provider, corpus, question, per_doc_chars=4000):
+def ask_stream(provider, corpus, question, per_doc_chars=4000, authority_context=None):
     """Yield answer text deltas, then a trailing '\\n[[CITES]]<json>' line.
 
     Falls back to one chunk if the provider has no streaming OpenAI client
@@ -221,16 +424,17 @@ def ask_stream(provider, corpus, question, per_doc_chars=4000):
     client = getattr(provider, "client", None)
     model = getattr(provider, "audit_model", None)
     if client is None or not model:
-        res = ask(question, provider, corpus)  # non-stream fallback
+        res = ask(question, provider, corpus, authority_context=authority_context)  # non-stream fallback
         yield res.get("answer", "") or res.get("error", "")
         yield "\n[[CITES]]" + json.dumps(res.get("citations", cites), ensure_ascii=False)
         return
 
     user = "问题：%s\n\n# 参考文档\n%s" % (question, refs)
+    yield _DERIVED_NOTICE
     try:
         stream = client.chat.completions.create(
             model=model, max_tokens=4000, stream=True,
-            messages=[{"role": "system", "content": ANS_STREAM_SYS},
+            messages=[{"role": "system", "content": _authority_system(ANS_STREAM_SYS, authority_context)},
                       {"role": "user", "content": user}])
         for ch in stream:
             try:
@@ -272,7 +476,7 @@ BRF_SYS = (
 )
 
 
-def generate_briefing(provider, corpus):
+def generate_briefing(provider, corpus, authority_context=None):
     """One LLM pass: turn the corpus into a human-facing status brief WITH citations."""
     from _llm import LLMRequest
     by_id = {c["id"]: c for c in corpus}
@@ -294,10 +498,10 @@ def generate_briefing(provider, corpus):
             "# 待定想法 backlog（id：lib-backlog）\n%s"
             % (seed_txt, adr_list, recent, state_lines, backlog_txt))
 
-    r = provider.complete(LLMRequest(system=BRF_SYS, user=user, json_schema=BRF_SCHEMA,
+    r = provider.complete(LLMRequest(system=_authority_system(BRF_SYS, authority_context), user=user, json_schema=BRF_SCHEMA,
                                      model_kind="audit", max_tokens=4500))
     if r.get("parse_error") or r.get("_provider_disabled"):
-        return {"error": "briefing failed", "detail": str(r)[:300]}
+        return _derived_failure("briefing failed", authority_context, str(r)[:300])
 
     def resolve(cites):
         out, seen = [], set()
@@ -317,9 +521,12 @@ def generate_briefing(provider, corpus):
             return {"text": x.get("text", ""), "cites": resolve(x.get("cites"))}
         return {"text": str(x), "cites": []}
 
-    return {"now": item(r.get("now")), "direction": item(r.get("direction")),
-            "constraints": [item(x) for x in (r.get("constraints") or [])],
-            "open": [item(x) for x in (r.get("open") or [])]}
+    return _attach_derived_receipt(
+        {"now": item(r.get("now")), "direction": item(r.get("direction")),
+         "constraints": [item(x) for x in (r.get("constraints") or [])],
+         "open": [item(x) for x in (r.get("open") or [])]},
+        authority_context,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -344,7 +551,7 @@ RM_SYS = (
 )
 
 
-def generate_roadmap(provider, corpus):
+def generate_roadmap(provider, corpus, authority_context=None):
     from _llm import LLMRequest
     by_id = {c["id"]: c for c in corpus}
     adrs = [c for c in corpus if c["kind"] == "ADR"]
@@ -363,10 +570,10 @@ def generate_roadmap(provider, corpus):
             "# 评估快照（含缺口清单）\n%s"
             % (backlog_txt, seed_txt, adr_list, snap_txt))
 
-    r = provider.complete(LLMRequest(system=RM_SYS, user=user, json_schema=RM_SCHEMA,
+    r = provider.complete(LLMRequest(system=_authority_system(RM_SYS, authority_context), user=user, json_schema=RM_SCHEMA,
                                      model_kind="audit", max_tokens=6000))
     if r.get("parse_error") or r.get("_provider_disabled"):
-        return {"error": "roadmap failed", "detail": str(r)[:300]}
+        return _derived_failure("roadmap failed", authority_context, str(r)[:300])
 
     def resolve(cites):
         out, seen = [], set()
@@ -386,7 +593,10 @@ def generate_roadmap(provider, corpus):
             return {"text": x.get("text", ""), "cites": resolve(x.get("cites"))}
         return {"text": str(x), "cites": []}
 
-    return {k: [item(x) for x in (r.get(k) or [])] for k in ("week", "month", "quarter", "year")}
+    return _attach_derived_receipt(
+        {k: [item(x) for x in (r.get(k) or [])] for k in ("week", "month", "quarter", "year")},
+        authority_context,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -408,7 +618,7 @@ MS_SYS = (
 )
 
 
-def generate_milestones(provider, corpus):
+def generate_milestones(provider, corpus, authority_context=None):
     from _llm import LLMRequest
     by_id = {c["id"]: c for c in corpus}
     adrs = [c for c in corpus if c["kind"] == "ADR"]
@@ -416,10 +626,10 @@ def generate_milestones(provider, corpus):
     adr_list = "\n".join("- [%s] %s（%s）" % (c["id"], c["title"], c.get("date") or "无日期") for c in adrs)
     seed_txt = ("\n".join(c["text"] for c in seed))[:1500]
     user = "# 所有 ADR\n%s\n\n# seed 摘录\n%s" % (adr_list, seed_txt)
-    r = provider.complete(LLMRequest(system=MS_SYS, user=user, json_schema=MS_SCHEMA,
+    r = provider.complete(LLMRequest(system=_authority_system(MS_SYS, authority_context), user=user, json_schema=MS_SCHEMA,
                                      model_kind="audit", max_tokens=5000))
     if r.get("parse_error") or r.get("_provider_disabled"):
-        return {"error": "milestones failed", "detail": str(r)[:300]}
+        return _derived_failure("milestones failed", authority_context, str(r)[:300])
     out = []
     for m in (r.get("milestones") or []):
         cites, date = [], m.get("date", "")
@@ -432,7 +642,7 @@ def generate_milestones(provider, corpus):
                 date = c["date"]  # use the real ADR date for the axis
         out.append({"label": m.get("label", ""), "date": date, "cites": cites})
     out.sort(key=lambda x: x["date"] or "9999")
-    return {"milestones": out}
+    return _attach_derived_receipt({"milestones": out}, authority_context)
 
 
 # ---------------------------------------------------------------------------
@@ -481,7 +691,7 @@ _RADAR_EVAL_SCHEMA = {"type": "object", "properties": {
     "required": ["overview", "picks", "takeaways"]}
 
 
-def generate_radar(provider, corpus, github_token=None, extra_keywords=None):
+def generate_radar(provider, corpus, github_token=None, extra_keywords=None, authority_context=None):
     from _llm import LLMRequest
     seed = [c for c in corpus if c["kind"] == "seed"]
     seed_txt = ("\n".join(c["text"] for c in seed))[:1800]
@@ -489,7 +699,7 @@ def generate_radar(provider, corpus, github_token=None, extra_keywords=None):
     kw = list(extra_keywords or [])
     try:
         kr = provider.complete(LLMRequest(
-            system=RADAR_KW_SYS, user="项目定位（seed 摘录）：\n" + seed_txt,
+            system=_authority_system(RADAR_KW_SYS, authority_context), user="项目定位（seed 摘录）：\n" + seed_txt,
             json_schema={"type": "object", "properties": {
                 "keywords": {"type": "array", "items": {"type": "string"}}}, "required": ["keywords"]},
             model_kind="intent", max_tokens=1500))
@@ -521,19 +731,23 @@ def generate_radar(provider, corpus, github_token=None, extra_keywords=None):
                         "snippet": (w.get("body") or "")[:200]})
 
     if not repos and not web:
-        return {"error": "联网取数失败（GitHub/web 都没拿到）：" + ("；".join(errs)[:200] or "无结果")}
+        return _derived_failure(
+            "联网取数失败（GitHub/web 都没拿到）："
+            + ("；".join(errs)[:200] or "无结果"),
+            authority_context,
+        )
 
     repo_block = "\n".join("[%d] %s ⭐%d  %s  (%s)  pushed:%s"
                            % (i, r["name"], r["stars"], r["desc"], " ".join(r["topics"]), r["pushed"])
                            for i, r in enumerate(repos))
     web_block = "\n".join("- %s :: %s (%s)" % (w["title"], w["snippet"], w["url"]) for w in web[:6])
     er = provider.complete(LLMRequest(
-        system=RADAR_EVAL_SYS,
+        system=_authority_system(RADAR_EVAL_SYS, authority_context),
         user="# 本项目定位（seed 摘录）\n%s\n\n# GitHub 同方向项目（编号 [i]）\n%s\n\n# web 趋势片段\n%s"
              % (seed_txt, repo_block, web_block),
         json_schema=_RADAR_EVAL_SCHEMA, model_kind="audit", max_tokens=4000))
     if er.get("parse_error") or er.get("_provider_disabled"):
-        return {"error": "radar eval failed", "detail": str(er)[:300]}
+        return _derived_failure("radar eval failed", authority_context, str(er)[:300])
 
     comps = []
     for p in (er.get("picks") or []):
@@ -541,8 +755,11 @@ def generate_radar(provider, corpus, github_token=None, extra_keywords=None):
         if isinstance(i, int) and 0 <= i < len(repos):
             r = repos[i]
             comps.append({"name": r["name"], "url": r["url"], "stars": r["stars"], "note": p.get("note", "")})
-    return {"overview": er.get("overview", ""), "competitors": comps,
-            "takeaways": er.get("takeaways") or [], "keywords": kw}
+    return _attach_derived_receipt(
+        {"overview": er.get("overview", ""), "competitors": comps,
+         "takeaways": er.get("takeaways") or [], "keywords": kw},
+        authority_context,
+    )
 
 
 # ---------------------------------------------------------------------------
