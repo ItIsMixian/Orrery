@@ -66,9 +66,10 @@ Project Orrery's core workflow can be operated directly from the command line. T
 
 | Surface | What exists today | Support status |
 | --- | --- | --- |
-| Core / CLI | The installer, validator, and update checker can be invoked directly without a Codex runtime; unreleased source packages now own the shared contracts. | Portable source and command path; not yet separately published. |
-| Codex | A packaged legacy [Codex Skill](skills/project-orrery/) is available in v0.2.0; the worktree also contains an unreleased thin [Codex Adapter](adapters/codex/) and lifecycle installer. | `experimental`: artifact and temporary-directory lifecycle tests pass, but no new Adapter is promoted to `verified` until real runtime discovery, invocation, failure, update, and uninstall evidence is recorded. |
-| Other Agent and Harness platforms | No packaged Adapter has been published. | `target`: compatibility is not claimed until a real integration and runtime validation exist. |
+| Core / CLI | The installer, validator, and update checker can be invoked directly without a Codex runtime; unreleased source packages now own the shared contracts. CLI 0.1.1 adds an opt-in JSON response envelope while preserving human output. | Portable source and command path; not yet separately published. |
+| Codex | A packaged legacy [Codex Skill](skills/project-orrery/) is available in v0.2.0; the worktree also contains an unreleased thin [Codex Adapter](adapters/codex/) and lifecycle installer. | Adapter distribution: `experimental` and unreleased. Runtime scope: `verified` only for Adapter 0.1.0 on Codex Desktop 26.818.2441.0 / `codex-cli 0.148.0-alpha.21`, Windows 11 build 26200, Core/CLI 0.1.0, and the recorded model/approval scope. See the [runtime Validation](docs/validation/2026-08-21-codex-runtime-e2e-completion.md). |
+| Harness JSON | The worktree contains an unreleased [subprocess JSON reference Adapter](adapters/harness-json/) for scaffold, validate, and update automation without an Agent runtime. | `experimental`: Windows candidate tests pass; this commit still needs the configured Windows/Ubuntu CI matrix. It is not a third-party platform claim. |
+| Other Agent platforms | No packaged Adapter has been published. | `target`: compatibility is not claimed until a real integration and runtime validation exist. |
 
 ## Quick start
 
@@ -85,6 +86,8 @@ python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
 Review every `CREATE`, `SKIP`, `UPGRADE`, and mixed-toolchain warning, then rerun without `--dry-run`.
 
 You may run this directly or ask your Agent or Harness to execute the same auditable workflow.
+For development automation, the unreleased `adapters/harness-json/` reference accepts versioned requests and returns
+stable JSON categories and exit codes. It does not load an Agent Skill or runtime and is not part of v0.2.0.
 
 ### 2. Optional: install the Codex integration
 
@@ -212,6 +215,7 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | Authority architecture and migration contract |
 | [`packages/`](packages/) | Unreleased platform-neutral Core, CLI, and Observatory source packages |
 | [`adapters/codex/`](adapters/codex/) | Unreleased thin Codex Adapter, manifest, metadata, and lifecycle installer |
+| [`adapters/harness-json/`](adapters/harness-json/) | Unreleased subprocess JSON contract and reference Harness Adapter |
 | [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | Versioned Codex Adapter archive and checksum builder |
 | [`docs/`](docs/) | Project Orrery's own self-hosted authority chain, current State, validation, and history |
 | [`docs/library/`](docs/library/) | Non-authoritative research, literature reviews, experiments, and design hypotheses |

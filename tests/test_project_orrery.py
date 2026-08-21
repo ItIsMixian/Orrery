@@ -378,7 +378,11 @@ class ProjectOrreryTests(unittest.TestCase):
                 "--json",
             )
             self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
-            result = json.loads(checked.stdout)
+            envelope = json.loads(checked.stdout)
+            self.assertEqual(envelope["schema_version"], 1)
+            self.assertEqual(envelope["command"], "check-update")
+            self.assertEqual(envelope["exit_code"], checked.returncode)
+            result = envelope["data"]
             self.assertEqual(result["status"], "update_available_compatible")
             self.assertFalse(result["migration_required"])
 
@@ -396,7 +400,10 @@ class ProjectOrreryTests(unittest.TestCase):
                 "--manifest-file", str(migrating_path),
                 "--json",
             )
-            result = json.loads(checked.stdout)
+            self.assertEqual(checked.returncode, 5, checked.stdout + checked.stderr)
+            envelope = json.loads(checked.stdout)
+            self.assertEqual(envelope["errors"][0]["code"], "compatibility_migration_required")
+            result = envelope["data"]
             self.assertEqual(result["status"], "update_available_migration_required")
             self.assertTrue(result["migration_required"])
 
@@ -416,7 +423,9 @@ class ProjectOrreryTests(unittest.TestCase):
                 "--manifest-file", str(RELEASE_MANIFEST),
                 "--json",
             )
-            result = json.loads(checked.stdout)
+            self.assertEqual(checked.returncode, 5, checked.stdout + checked.stderr)
+            envelope = json.loads(checked.stdout)
+            result = envelope["data"]
             self.assertEqual(result["status"], "current_incompatible")
             self.assertTrue(result["migration_required"])
 

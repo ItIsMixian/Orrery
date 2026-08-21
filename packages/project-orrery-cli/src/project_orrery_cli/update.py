@@ -19,6 +19,7 @@ from project_orrery_core.compatibility import (
 )
 
 from .context import CliContext, repository_context
+from .protocol import JsonExitCode, emit, issue, response
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -229,7 +230,44 @@ def main(argv: list[str] | None = None, *, context: CliContext | None = None) ->
             "reasons": [str(exc)],
         }
     if args.json:
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        status = str(result["status"])
+        warnings = []
+        if result.get("warning"):
+            warnings.append(issue("update_source_warning", str(result["warning"]), source=result.get("source")))
+        errors = []
+        exit_code = JsonExitCode.OK
+        response_status = "warning" if warnings else "ok"
+        if status in {"update_available_migration_required", "current_incompatible"}:
+            exit_code = JsonExitCode.COMPATIBILITY_FAILED
+            response_status = "error"
+            errors.append(
+                issue(
+                    "compatibility_migration_required",
+                    "the target is not compatible with an automatic update",
+                    reasons=list(result.get("reasons", [])),
+                )
+            )
+        elif status == "unknown":
+            exit_code = JsonExitCode.UPDATE_UNAVAILABLE
+            response_status = "error"
+            errors.append(
+                issue(
+                    "update_unavailable",
+                    "the latest release could not be determined",
+                    reasons=list(result.get("reasons", [])),
+                )
+            )
+        emit(
+            response(
+                "check-update",
+                status=response_status,
+                exit_code=exit_code,
+                data=result,
+                warnings=warnings,
+                errors=errors,
+            )
+        )
+        return int(exit_code)
     else:
         print_human(result)
     return 0

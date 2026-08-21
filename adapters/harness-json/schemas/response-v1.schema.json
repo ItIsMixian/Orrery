@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schemas/harness-response-v1.json",
+  "title": "Project Orrery Harness JSON response v1",
+  "type": "object",
+  "required": ["schema_version", "command", "status", "exit_code", "versions", "data", "warnings", "errors"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "command": {"type": "string", "minLength": 1},
+    "status": {"enum": ["ok", "warning", "error"]},
+    "exit_code": {"enum": [0, 2, 3, 4, 5, 6, 7]},
+    "versions": {
+      "type": "object",
+      "required": ["core", "core_api", "cli"],
+      "properties": {
+        "core": {"type": "string"},
+        "core_api": {"type": "integer", "minimum": 0},
+        "cli": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "data": {"type": "object"},
+    "warnings": {"type": "array", "items": {"$ref": "#/$defs/issue"}},
+    "errors": {"type": "array", "items": {"$ref": "#/$defs/issue"}}
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {"properties": {"command": {"const": "scaffold"}}},
+      "then": {"properties": {"data": {"$ref": "#/$defs/scaffold_data"}}}
+    },
+    {
+      "if": {"properties": {"command": {"const": "validate"}}},
+      "then": {"properties": {"data": {"$ref": "#/$defs/validate_data"}}}
+    },
+    {
+      "if": {"properties": {"command": {"const": "check-update"}}},
+      "then": {"properties": {"data": {"$ref": "#/$defs/update_data"}}}
+    }
+  ],
+  "$defs": {
+    "issue": {
+      "type": "object",
+      "required": ["code", "message"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "message": {"type": "string"},
+        "details": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "action": {
+      "type": "object",
+      "required": ["action", "path"],
+      "properties": {
+        "action": {"enum": ["create", "keep", "skip", "backup", "upgrade", "write", "update"]},
+        "path": {"type": "string"},
+        "reason": {"type": "string"},
+        "source_path": {"type": "string"},
+        "backup_path": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "scaffold_data": {
+      "type": "object",
+      "required": [
+        "target",
+        "dry_run",
+        "upgrade_tools",
+        "changed",
+        "predicted_changes",
+        "authority_status",
+        "toolchain_status",
+        "actions",
+        "preserved_authored_paths",
+        "managed_tool_conflicts"
+      ],
+      "properties": {
+        "target": {"type": "string"},
+        "dry_run": {"type": "boolean"},
+        "upgrade_tools": {"type": "boolean"},
+        "changed": {"type": "boolean"},
+        "predicted_changes": {"type": "integer", "minimum": 0},
+        "authority_status": {"const": "migration_pending"},
+        "toolchain_status": {"enum": ["current", "mixed"]},
+        "actions": {"type": "array", "items": {"$ref": "#/$defs/action"}},
+        "preserved_authored_paths": {"type": "array", "items": {"type": "string"}},
+        "managed_tool_conflicts": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "validate_data": {
+      "type": "object",
+      "required": ["target", "valid", "integrated", "build_requested", "build_completed"],
+      "properties": {
+        "target": {"type": "string"},
+        "valid": {"type": "boolean"},
+        "integrated": {"type": "boolean"},
+        "authority_status": {"enum": ["integrated_candidate", "migration_pending"]},
+        "build_requested": {"type": "boolean"},
+        "build_completed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "update_data": {
+      "type": "object",
+      "required": [
+        "status",
+        "update_available",
+        "migration_required",
+        "local_skill_version",
+        "latest_version",
+        "target_toolchain_version",
+        "target_document_schema",
+        "target_manifest_format",
+        "source",
+        "warning",
+        "release_url",
+        "skill_url",
+        "reasons"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "up_to_date",
+            "update_available_compatible",
+            "update_available_migration_required",
+            "installed_newer",
+            "current_incompatible",
+            "unknown"
+          ]
+        },
+        "update_available": {"type": "boolean"},
+        "migration_required": {"type": "boolean"},
+        "local_skill_version": {"type": "string"},
+        "latest_version": {"type": ["string", "null"]},
+        "target_toolchain_version": {"type": ["string", "null"]},
+        "target_document_schema": {"type": ["integer", "null"]},
+        "target_manifest_format": {"type": ["integer", "null"]},
+        "source": {"type": "string"},
+        "warning": {"type": ["string", "null"]},
+        "release_url": {"type": ["string", "null"]},
+        "skill_url": {"type": ["string", "null"]},
+        "reasons": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
+  }
+}

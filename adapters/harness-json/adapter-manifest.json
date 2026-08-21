@@ -1,0 +1,48 @@
+{
+  "manifest_format": 1,
+  "adapter": {
+    "name": "Project Orrery Harness JSON Adapter",
+    "distribution": "project-orrery-harness-json-adapter",
+    "version": "0.1.0",
+    "adapter_api_version": 1,
+    "support_status": "experimental"
+  },
+  "dependencies": {
+    "core_api": 1,
+    "cli": {
+      "distribution": "project-orrery-cli",
+      "minimum": "0.1.1",
+      "maximum_exclusive": "0.2.0"
+    }
+  },
+  "protocol": {
+    "transport": "subprocess-json",
+    "request_schema": "schemas/request-v1.schema.json",
+    "response_schema": "schemas/response-v1.schema.json",
+    "request_schema_version": 1,
+    "response_schema_version": 1,
+    "exit_codes": {
+      "0": "ok",
+      "2": "invalid_request",
+      "3": "operation_failed",
+      "4": "validation_failed",
+      "5": "compatibility_failed",
+      "6": "update_unavailable",
+      "7": "timeout"
+    }
+  },
+  "isolation": {
+    "loads_skill_md": false,
+    "loads_codex_config": false,
+    "invokes_agent_runtime": false,
+    "sanitized_environment": [
+      "CODEX_HOME",
+      "CODEX_CONFIG",
+      "AGENTS_HOME",
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "DEEPSEEK_API_KEY"
+    ]
+  },
+  "runtime_evidence": []
+}

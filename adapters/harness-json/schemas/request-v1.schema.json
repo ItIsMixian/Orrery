@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schemas/harness-request-v1.json",
+  "title": "Project Orrery Harness JSON request v1",
+  "type": "object",
+  "required": ["schema_version", "command", "arguments"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "command": {"enum": ["scaffold", "validate", "check-update"]},
+    "arguments": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {"properties": {"command": {"const": "scaffold"}}},
+      "then": {
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "required": ["target"],
+            "properties": {
+              "target": {"type": "string", "minLength": 1},
+              "title": {"type": "string"},
+              "dry_run": {"type": "boolean"},
+              "upgrade_tools": {"type": "boolean"}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"command": {"const": "validate"}}},
+      "then": {
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "required": ["target"],
+            "properties": {
+              "target": {"type": "string", "minLength": 1},
+              "build": {"type": "boolean"},
+              "require_integrated": {"type": "boolean"}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"command": {"const": "check-update"}}},
+      "then": {
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "target": {"type": "string", "minLength": 1},
+              "manifest_file": {"type": "string", "minLength": 1},
+              "manifest_url": {"type": "string", "minLength": 1},
+              "offline": {"type": "boolean"},
+              "cache_hours": {"type": "number", "minimum": 0}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ]
+}

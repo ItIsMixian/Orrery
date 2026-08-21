@@ -39,12 +39,17 @@ Pilot 008、不处理多人／多 worktree 协作、不修改 docsite 凭据／B
 - [x] 将 `SKILL.md`、`agents/openai.yaml` 和 Codex 安装说明收敛到独立 Codex Adapter 产物。
 - [x] Adapter 只引用 Core／CLI，不复制 canonical 模板或兼容规则。
 - [x] 定义平台安装器的 dry-run、备份、卸载和既有文件冲突行为。
-- [ ] 在真实 Codex runtime 上验证发现、调用、失败路径、更新和卸载，并记录精确版本与 OS。
-- [ ] 只有上述证据完成后，才把对应范围标为 `verified`。
+- [x] 在真实 Codex runtime 上验证发现、调用、失败路径、更新和卸载，并记录精确版本与 OS。
+- [x] 只有上述证据完成后，才把对应范围标为 `verified`。
 
-仓库实现检查点：`adapters/codex/`、独立归档器和临时目录生命周期测试已经完成；Adapter
-仍是未发布 `experimental`，且独立 CLI 发行物和真实 Codex runtime 验证尚未完成。本检查点
-不等于 Phase 2 全部完成。
+Phase 2 已完成。仓库 Adapter、独立归档器、CLI 失败关闭和临时目录生命周期测试均已实现；
+2026-08-21 的后续真实 runtime 验证使用按路径禁用旧用户 Skill 的 per-run 配置，既保留真实登录态，
+又把模型可见目录收敛为唯一 repo Adapter。精确 Windows／Codex／Adapter／Core／CLI／模型范围已覆盖
+显式与隐式调用、缺失与不兼容失败关闭、旧 Skill 显式升级、完整备份、可恢复卸载、重新发现和作者
+文件保留，因此只有该范围改为 `verified`。证据见
+[Codex Runtime E2E 完成](../../validation/2026-08-21-codex-runtime-e2e-completion.md)；此前的
+[安全停止](../../validation/2026-08-21-codex-runtime-e2e.md)继续保存首次发现同名污染的历史。
+独立 CLI 发行物和 Adapter 仍未发布；本结论不启动 Phase 3。
 
 验收证据：Codex Adapter 独立归档、checksum、实际 runtime Validation 和旧 Skill 升级路径。
 
@@ -52,11 +57,20 @@ Pilot 008、不处理多人／多 worktree 协作、不修改 docsite 凭据／B
 
 ## Phase 3：不依赖 Codex 的 Harness／CLI 样例
 
-- [ ] 为 scaffold dry-run、validate 和 update checker 建立统一 JSON schema 与稳定退出码。
-- [ ] 实现最小 `harness-json` 参考 Adapter，使用 subprocess 或公共 Python API 调用 CLI。
-- [ ] 测试环境显式排除 `SKILL.md`、Codex 配置和真实 Agent runtime。
-- [ ] 覆盖成功、mixed toolchain、schema 不兼容、离线更新和目标文件保留路径。
-- [ ] 明确测试只证明 Core／CLI／Harness 合约，不证明模型读取或第三方平台兼容。
+- [x] 为 scaffold dry-run、validate 和 update checker 建立统一 JSON schema 与稳定退出码。
+- [x] 实现最小 `harness-json` 参考 Adapter，使用 subprocess 或公共 Python API 调用 CLI。
+- [x] 测试环境显式排除 `SKILL.md`、Codex 配置和真实 Agent runtime。
+- [x] 覆盖成功、mixed toolchain、schema 不兼容、离线更新和目标文件保留路径。
+- [x] 明确测试只证明 Core／CLI／Harness 合约，不证明模型读取或第三方平台兼容。
+
+Phase 3 仓库实现检查点已在候选分支完成：CLI 0.1.1 为三个命令提供 opt-in response envelope，
+JSON 模式使用稳定退出码 0／2／3／4／5／6／7；`adapters/harness-json/` 0.1.0 只接受白名单请求，
+清理 Agent／Provider 环境变量，并直接启动 Python CLI subprocess。分支已 push；首轮 CI 暴露并修复
+了 Linux 命令夹具错误，第二轮保留了无关 Windows 本机 HTTP 超时的失败证据，第三轮在同一提交
+取得 Windows／Ubuntu 双 PASS。Phase 3 实现与跨 OS 验收已完成；Harness Adapter 发行状态仍是
+`experimental`／`unreleased`，且不构成第三方 Agent runtime 兼容。Phase 4 仍需另行选择平台与计划。
+证据见
+[Phase 3 Harness JSON](../../validation/2026-08-21-platform-neutral-phase-3-harness-json.md)。
 
 验收证据：机器可读 fixture、JSON schema 测试、跨 Windows／Ubuntu CLI CI。
 
