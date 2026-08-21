@@ -67,7 +67,7 @@ Project Orrery's core workflow can be operated directly from the command line. T
 | Surface | What exists today | Support status |
 | --- | --- | --- |
 | Core / CLI | The installer, validator, and update checker can be invoked directly without a Codex runtime; unreleased source packages now own the shared contracts. | Portable source and command path; not yet separately published. |
-| Codex | A packaged legacy [Codex Skill](skills/project-orrery/) is available in v0.2.0; the worktree also contains an unreleased thin [Codex Adapter](adapters/codex/) and lifecycle installer. | `experimental`: artifact and temporary-directory lifecycle tests pass, but no new Adapter is promoted to `verified` until real runtime discovery, invocation, failure, update, and uninstall evidence is recorded. |
+| Codex | A packaged legacy [Codex Skill](skills/project-orrery/) is available in v0.2.0; the worktree also contains an unreleased thin [Codex Adapter](adapters/codex/) and lifecycle installer. | Adapter distribution: `experimental` and unreleased. Runtime scope: `verified` only for Adapter 0.1.0 on Codex Desktop 26.818.2441.0 / `codex-cli 0.148.0-alpha.21`, Windows 11 build 26200, Core/CLI 0.1.0, and the recorded model/approval scope. See the [runtime Validation](docs/validation/2026-08-21-codex-runtime-e2e-completion.md). |
 | Other Agent and Harness platforms | No packaged Adapter has been published. | `target`: compatibility is not claimed until a real integration and runtime validation exist. |
 
 ## Quick start

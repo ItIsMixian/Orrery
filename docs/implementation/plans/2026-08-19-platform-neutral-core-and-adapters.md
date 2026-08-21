@@ -39,15 +39,17 @@ Pilot 008、不处理多人／多 worktree 协作、不修改 docsite 凭据／B
 - [x] 将 `SKILL.md`、`agents/openai.yaml` 和 Codex 安装说明收敛到独立 Codex Adapter 产物。
 - [x] Adapter 只引用 Core／CLI，不复制 canonical 模板或兼容规则。
 - [x] 定义平台安装器的 dry-run、备份、卸载和既有文件冲突行为。
-- [ ] 在真实 Codex runtime 上验证发现、调用、失败路径、更新和卸载，并记录精确版本与 OS。
-- [ ] 只有上述证据完成后，才把对应范围标为 `verified`。
+- [x] 在真实 Codex runtime 上验证发现、调用、失败路径、更新和卸载，并记录精确版本与 OS。
+- [x] 只有上述证据完成后，才把对应范围标为 `verified`。
 
-仓库实现检查点：`adapters/codex/`、独立归档器和临时目录生命周期测试已经完成；Adapter
-仍是未发布 `experimental`，且独立 CLI 发行物尚未完成。2026-08-21 的真实 runtime 检查点已验证
-无模型 discovery、升级、卸载和重新发现，但真实登录态同时加载 repo Adapter 与用户旧 Skill；安全
-隔离门阻止了模型调用，因此显式／隐式调用和模型触发依赖失败仍未完成。证据见
-[Codex Runtime E2E 安全停止](../../validation/2026-08-21-codex-runtime-e2e.md)。本检查点不等于 Phase 2
-全部完成，也不满足 `verified` 门禁。
+Phase 2 已完成。仓库 Adapter、独立归档器、CLI 失败关闭和临时目录生命周期测试均已实现；
+2026-08-21 的后续真实 runtime 验证使用按路径禁用旧用户 Skill 的 per-run 配置，既保留真实登录态，
+又把模型可见目录收敛为唯一 repo Adapter。精确 Windows／Codex／Adapter／Core／CLI／模型范围已覆盖
+显式与隐式调用、缺失与不兼容失败关闭、旧 Skill 显式升级、完整备份、可恢复卸载、重新发现和作者
+文件保留，因此只有该范围改为 `verified`。证据见
+[Codex Runtime E2E 完成](../../validation/2026-08-21-codex-runtime-e2e-completion.md)；此前的
+[安全停止](../../validation/2026-08-21-codex-runtime-e2e.md)继续保存首次发现同名污染的历史。
+独立 CLI 发行物和 Adapter 仍未发布；本结论不启动 Phase 3。
 
 验收证据：Codex Adapter 独立归档、checksum、实际 runtime Validation 和旧 Skill 升级路径。
 

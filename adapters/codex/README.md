@@ -1,6 +1,8 @@
 # Project Orrery Codex Adapter
 
-Status: `experimental` and unreleased.
+Status: `experimental` and unreleased as an Adapter distribution;
+runtime-`verified` only for the exact Codex/Windows scope recorded in
+`adapter-manifest.json`.
 
 This directory is an independently packageable Codex Skill adapter. It carries
 Codex discovery metadata and invocation guidance only. It does not bundle the
@@ -46,3 +48,22 @@ trash directory next to the discovery root rather than deleted. Keeping backup
 Skills outside that root prevents duplicate discovery. The installer manages
 only the Codex adapter directory. It never scaffolds or upgrades a target
 project.
+
+## Isolate a same-name legacy Skill during runtime validation
+
+When the authentication `CODEX_HOME` also contains the published legacy
+`project-orrery` Skill, a repository Adapter and that user Skill are both
+discoverable. Do not copy `auth.json` into a temporary home and do not treat an
+ambiguous selector as Adapter evidence. Codex supports a per-run
+`skills.config` disable override. On the verified `codex-cli
+0.148.0-alpha.21` Windows runtime, the effective override used the resolved
+legacy `SKILL.md` file path:
+
+```text
+codex exec --ignore-user-config -c 'skills.config=[{path="C:/Users/<user>/.codex/skills/project-orrery/SKILL.md",enabled=false}]' <other-verification-options> <prompt>
+```
+
+First compare `codex debug prompt-input` with and without the override. Proceed
+only when the model-visible catalog contains exactly one `project-orrery`
+entry and it is this Adapter. This path detail is scoped to the verified
+runtime; re-check it when Codex changes.

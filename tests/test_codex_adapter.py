@@ -39,7 +39,7 @@ def run_python(
 
 
 class CodexAdapterTests(unittest.TestCase):
-    def test_adapter_is_thin_versioned_and_has_no_runtime_claim(self) -> None:
+    def test_adapter_is_thin_versioned_and_has_scoped_runtime_evidence(self) -> None:
         manifest = json.loads(ADAPTER_MANIFEST.read_text(encoding="utf-8"))
         components = json.loads(COMPONENT_VERSIONS.read_text(encoding="utf-8"))
         codex = components["adapters"]["codex"]
@@ -47,9 +47,23 @@ class CodexAdapterTests(unittest.TestCase):
         self.assertEqual(manifest["adapter"]["id"], "project-orrery-codex")
         self.assertEqual(manifest["adapter"]["version"], codex["version"])
         self.assertEqual(manifest["adapter"]["support_status"], "experimental")
-        self.assertEqual(manifest["runtime_compatibility"]["status"], "experimental")
-        self.assertEqual(manifest["runtime_compatibility"]["verified"], [])
-        self.assertEqual(manifest["runtime_compatibility"]["evidence"], [])
+        self.assertEqual(manifest["adapter"]["support_status"], codex["support_status"])
+        runtime = manifest["runtime_compatibility"]
+        self.assertEqual(runtime["status"], "verified")
+        self.assertEqual(len(runtime["verified"]), 1)
+        verified = runtime["verified"][0]
+        self.assertEqual(verified["runtime_version"], "codex-cli 0.148.0-alpha.21")
+        self.assertEqual(verified["os"], "Windows 11 Pro x64 10.0.26200 (build 26200)")
+        self.assertEqual(verified["adapter_version"], manifest["adapter"]["version"])
+        self.assertEqual(verified["core_api"], manifest["requires"]["core_api"])
+        self.assertEqual(verified["cli_requirement"], ">=0.1.0,<0.2.0")
+        self.assertIn("implicit_invocation", verified["scope"])
+        self.assertIn("recoverable_uninstall", verified["scope"])
+        self.assertEqual(len(runtime["evidence"]), 1)
+        evidence = REPOSITORY_ROOT / runtime["evidence"][0]
+        self.assertTrue(evidence.is_file())
+        self.assertEqual(len(codex["runtime_evidence"]), 1)
+        self.assertEqual(codex["runtime_evidence"][0]["validation"], runtime["evidence"][0])
         self.assertEqual(manifest["requires"]["core_api"], codex["core_api"])
         self.assertEqual(manifest["requires"]["cli"]["minimum"], codex["cli"]["minimum"])
 

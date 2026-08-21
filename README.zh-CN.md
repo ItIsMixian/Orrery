@@ -67,7 +67,7 @@ Project Orrery 的核心工作流可以直接通过命令行运行。当前源�
 | 能力面 | 当前已有内容 | 支持状态 |
 | --- | --- | --- |
 | Core / CLI | installer、validator 和 update checker 可在没有 Codex runtime 的情况下直接调用；未发布源码包现已持有共享契约。 | 可移植源码与命令路径；尚未独立发布。 |
-| Codex | v0.2.0 已提供打包好的旧 [Codex Skill](skills/project-orrery/)；工作树另有未发布的薄 [Codex Adapter](adapters/codex/) 与生命周期安装器。 | `experimental`：产物与临时目录生命周期测试已通过，但在形成新 Adapter 的真实 runtime 发现、调用、失败、更新和卸载证据前不升级为 `verified`。 |
+| Codex | v0.2.0 已提供打包好的旧 [Codex Skill](skills/project-orrery/)；工作树另有未发布的薄 [Codex Adapter](adapters/codex/) 与生命周期安装器。 | Adapter 发行状态仍为 `experimental` 且未发布；仅 Adapter 0.1.0 + Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21` + Windows 11 build 26200 + Core／CLI 0.1.0 及已记录模型／审批 runtime 范围为 `verified`。见 [runtime Validation](docs/validation/2026-08-21-codex-runtime-e2e-completion.md)。 |
 | 其他 Agent 与 Harness 平台 | 尚未发布平台 Adapter。 | `target`：在完成真实集成与 runtime 验证前，不宣称兼容。 |
 
 ## 快速开始

@@ -19,10 +19,36 @@
   },
   "runtime_compatibility": {
     "runtime": "Codex",
-    "status": "experimental",
-    "verified": [],
-    "evidence": [],
-    "note": "No Codex runtime version or operating system is verified by this unreleased manifest."
+    "status": "verified",
+    "verified": [
+      {
+        "runtime_version": "codex-cli 0.148.0-alpha.21",
+        "desktop_version": "26.818.2441.0",
+        "os": "Windows 11 Pro x64 10.0.26200 (build 26200)",
+        "adapter_version": "0.1.0",
+        "core_version": "0.1.0",
+        "core_api": 1,
+        "cli_version": "0.1.0",
+        "cli_requirement": ">=0.1.0,<0.2.0",
+        "model": "gpt-5.6-terra",
+        "reasoning_effort": "medium",
+        "validated_on": "2026-08-21",
+        "scope": [
+          "discovery",
+          "explicit_invocation",
+          "implicit_invocation",
+          "dependency_failure_closed",
+          "upgrade",
+          "recoverable_uninstall",
+          "post_uninstall_discovery",
+          "author_files_preserved"
+        ]
+      }
+    ],
+    "evidence": [
+      "docs/validation/2026-08-21-codex-runtime-e2e-completion.md"
+    ],
+    "note": "Verified only for the exact Codex, Windows, Adapter, Core, CLI, model, and approval scope recorded above. The Adapter remains unreleased."
   },
   "distribution": {
     "install_directory": "project-orrery",

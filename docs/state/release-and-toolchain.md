@@ -17,14 +17,14 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - ADR-0006 进一步将未发布动态 docsite 收敛为 Broker-only：本机托管为默认，外部隔离只绑定 client token，图形、Q&A CLI 与 `set_key.py` 不再提供直接 Provider 运行入口。根工具与 Skill 模板已同步，仍未提交或发布。
 - ADR-0004 已接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime 证据门；Phase 1 已在工作树建立 Core／CLI／Observatory 源码包，但 Codex Skill 仍是当前唯一发布集成，也没有第二平台兼容实现。
 - ADR-0004 Phase 0 已完成：v0.2.0 的 36 个发布路径、8 个 managed tools、checksum、CLI 入口与 manifest 必需字段已进入机器可读基线；installer／validator／update checker 的人类输出有回归断言，模板 `AGENTS.md` 标题已中立化。
-- 公开 README 当前把可直接运行但仍随 Skill 分发的 Core／CLI 路径，与 `experimental` Codex 集成、`target` 其他平台分开表述；这不构成独立 Core 包或任何 runtime `verified` 证据。
+- 公开 README 当前把可直接运行但仍随 Skill 分发的 Core／CLI 路径、整体仍为 `experimental`／未发布但精确 runtime 范围为 `verified` 的 Codex Adapter，以及 `target` 其他平台分开表述；这不构成独立 Core／CLI 包发布，也不得把验证范围外推到其他 runtime 或 OS。
 - 三个未发布组件初始版本均为 `0.1.0`；Core API 为 1。旧 `skills/project-orrery/scripts/` 路径是薄 wrapper，并保留可独立运行的冻结 v0.2 fallback；保留承诺覆盖 `0.3.x`，最早 `0.4.0` 才可移除。
 - Observatory 的 9 个当前 managed tools 由独立 component manifest 清点；根观测台与 Skill 模板之间的标题差异通过显式模板投影表达，不复制项目事实。
 - 工作树新增未发布的 Codex Adapter 0.1.0：独立 manifest、`SKILL.md`、`agents/openai.yaml`、安装说明与平台安装器位于 `adapters/codex/`；它只声明 Core API 1 与 CLI `>=0.1.0,<0.2.0` 依赖，不包含 canonical 模板、schema 或兼容规则。
 - `scripts/package_codex_adapter.py` 可生成固定条目顺序／时间／权限的独立 ZIP 和 SHA-256；平台安装器支持 dry-run、未知目录拒绝、旧 Skill／已识别 Adapter 整目录备份升级和移入可恢复回收目录的卸载。备份与回收目录位于 skills discovery 根之外，避免宿主重复发现旧 `SKILL.md`。
 - Codex Adapter 现在包含确定性 CLI 依赖 preflight：它按 manifest 检查 `project-orrery-cli` distribution、`>=0.1.0,<0.2.0` 版本和 `project-orrery` entrypoint；缺失与不兼容均非零退出，不回退到旧 Skill 实现。
-- 2026-08-21 使用 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21` 完成真实 binary 的无模型 discovery、旧 Skill／旧 Adapter 升级和可恢复卸载探针。隔离 discovery root 能唯一发现 Adapter，backup／trash 未重复发现，卸载后 Adapter 条目消失，目标项目作者 tree 不变；精确矩阵见 [Codex Runtime E2E 安全停止](../validation/2026-08-21-codex-runtime-e2e.md)。
-- 新 Adapter 仍为 `experimental`：真实登录态 `CODEX_HOME` 同时发现 repo Adapter 与既有用户级旧 Skill；官方 `--ignore-user-config` 只跳过 config，不排除用户 Skill。为避免同名污染且不复制凭据，真实模型调用在开始前安全停止，因此显式／隐式调用和模型触发的依赖失败证据仍缺失；manifest 的 verified runtime 与 evidence 继续为空。v0.2.0 旧 Skill 仍是唯一已发布集成。
+- 2026-08-21 使用 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21` 完成真实 binary E2E。首次检查因真实登录态同时发现 repo Adapter 与用户旧 Skill 而安全停止；后续使用 Codex `skills.config` 的 per-run 路径禁用项隔离旧 Skill，不复制凭据或修改用户 Skill 目录。模型可见目录只剩 repo Adapter，并以 `gpt-5.6-terra`／medium 完成显式与隐式路由、兼容 CLI 预检和 validate，以及 CLI distribution 缺失、0.2.0 不兼容时的失败关闭。
+- 同一 E2E 还验证旧 v0.2 Skill 只有显式 `--upgrade` 才迁移、升级前整树备份、可恢复卸载、backup／trash 不重复发现、卸载后 Adapter 为 0 项、项目作者 tree 不变和用户旧 Skill 摘要不变。Adapter 0.1.0 的上述精确 runtime／OS／Core 0.1.0／CLI 0.1.0／模型与审批范围标记 `verified`，但 Adapter 发行支持状态继续为 `experimental`，证据见 [Codex Runtime E2E 完成](../validation/2026-08-21-codex-runtime-e2e-completion.md)。Adapter 与独立 Core／CLI 仍未发布；v0.2.0 旧 Skill 仍是唯一已发布集成。
 - ADR-0009 要求 Authority Meta Model 语义可版本识别，但当前 component／project／release manifest 都没有正式 `authority_model_version` 字段；具体兼容维度、所有者和迁移不在本轮决定中。
 - ADR-0007／ADR-0008 的多人协作协议已经进入权威链，但 `orrery worktree create/status/overlap`、review／cleanup 和 `orrery integrate` 仍只是 Approved Design 中的目标工具面；当前 CLI、Observatory、Skill 和发布资产都没有这些命令或 Personal／Team Mode，也没有升级版本或发布新产物。
 
@@ -50,6 +50,6 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 已知缺口
 
 - v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
-- Phase 1 源码边界和 Phase 2 的仓库内 Codex Adapter／生命周期产物已实现，但 Core／CLI 独立发行物、多组件发布流水线、manifest v2、Harness JSON 合约和 runtime 支持矩阵仍未实现。Codex Adapter 已有真实 runtime discovery／升级／卸载证据，但安全隔离门阻止了模型调用，尚未完成真实 runtime E2E。
+- Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Core／CLI 独立发行物、多组件发布流水线、manifest v2、Harness JSON 合约和跨 runtime 支持矩阵仍未实现。
 - 多 Workstream 自动化尚无正式 schema、CLI、观测台投影、Team 网络面或 CI 门禁。当前仅能依靠 Git 原生命令、独立 worktree 和人工验证执行协议；默认安装没有因 ADR-0008 开始监听网络。
 - Authority Meta Model 仍是文档规范；没有独立发行物、Core API、CLI 命令或支持状态变化，v0.2.0 发布事实不变。
