@@ -16,8 +16,8 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 本地 `main` 已集成 `amm-fixture-v1` versioned conformance fixture：21 个案例冻结四项输入、独立 claim dimensions、lifecycle/relations、全部 fact scopes、evidence 能力边界、AI non-escalation、Snapshot 与 Coordinator 分离，以及 determinism/visibility comparison；专项测试为 9/9 通过。
 - ADR-0010 已决定由平台中立 Core 持有唯一确定性 evaluator；本地 `main` 中的 experimental `project_orrery_core.authority` 已能把 normalized observations 与四项 conformance 输入解释为 claims/relations/scope/evidence 边界，21 个 fixture case 的 shadow expectation 全部满足，额外输出均由 fixture policy 显式分类，专项为 14/14。
 - Candidate CLI 已增加第一处真实 consumer 双轨：`authority_shadow.py` 保留原 validator 的 Accepted ADR／入口／pending／integrated 扫描为生产决定路径，同时把 Accepted ADR observation、精确 authority-input snapshot hash、显式 `Unknown` scope 与 revision-content visibility 送入 Core evaluator；差异只按 `parser-gap` 警告，不改变原退出码或 authority status。
-- Worktree Candidate `codex/m2-1-authority-claims` 已增加内部 `cli-authority-observations-v1` contract：它确定性选择 Seed、编号 ADR、Design、Plan、State、Validation 与 Snapshot，记录相对 source、逐文件 SHA-256、repository snapshot、显式 lifecycle／amend／supersede、per-source Core claims 和 evidence provenance。Validation 的 `Result`／`Outcome` 在没有可复现执行证据时只形成 human／Agent assertion，保持 `validation_evidence=unknown`；Plan／State 继续不产生 implementation claim。该 contract 仍嵌在 warning-only CLI shadow 中，不是 Canonical integration、公共 API 或 production switch。
-- Worktree Candidate `codex/m2-2-authority-observatory-projection` 基于 M2.1 `db81691` 增加
+- 本地 Canonical baseline 已集成 M2.1 的内部 `cli-authority-observations-v1` contract：它确定性选择 Seed、编号 ADR、Design、Plan、State、Validation 与 Snapshot，记录相对 source、逐文件 SHA-256、repository snapshot、显式 lifecycle／amend／supersede、per-source Core claims 和 evidence provenance。Validation 的 `Result`／`Outcome` 在没有可复现执行证据时只形成 human／Agent assertion，保持 `validation_evidence=unknown`；Plan／State 继续不产生 implementation claim。该 contract 仍嵌在 warning-only CLI shadow 中，不是公共 API 或 production switch。
+- 本地 Canonical baseline 已集成基于 M2.1 `db81691` 的
   `observatory-authority-projection-v1`：Observatory 包只验证和投影调用方注入的完整 bundle，不 import
   CLI；根 managed integration layer 负责采集，因此现有 CLI→Observatory 依赖不形成环。投影逐项保留
   model／snapshot／scope／visibility、source link／SHA-256、Core claims／relations、evidence provenance、
@@ -26,8 +26,8 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
   `ORRERY_AUTHORITY_PROJECTION_VIEW=1` 时把只读 Candidate 面板注入根 self-host dashboard；
   默认和关闭后的 HTML／stats 保持 legacy。legacy／unsupported model、collector／evaluator／source／
   reconciliation／render failure 都失败关闭为未修改的只读 legacy 页面和无 claim 的 unavailable receipt。
-  原 `build_docsite.py` 与发布模板保持逐字节一致，CLI／Observatory source-path 注入只存在于 Candidate
-  entry。这不是 Canonical integration、release、默认 production switch 或稳定 API。
+  原 `build_docsite.py` 与发布模板保持逐字节一致，CLI／Observatory source-path 注入只存在于 root-only
+  opt-in entry。这不是 release、默认 production switch 或稳定 API。
 - Candidate Observatory 包的未导出 parser shadow adapter 已覆盖 ADR lifecycle 和显式关系：它只把头部 `Amends:`／`Supersedes:` 与 `Status: Superseded by …` 规范化为 Core observations，后者会反转为“新 ADR supersedes 旧 ADR”；`Predecessor`、正文普通引用和 State 引用不进入规范关系。
 - 真实仓库的 6 条 `Amends` 已与 Core relations 一致；合成测试也证明 supersede 会选出 effective decision、amend 会保留 base 与 amendment、缺少 ADR target 的显式关系会失败关闭。旧 build/serve 图谱没有切换，legacy `supersedes` 字段仍只表示 superseded-by target。
 - Candidate Observatory 另有未导出的 role shadow adapter，按受控目录观察 Design／Plan／State／Validation：Design 只识别 Draft／Approved／Deprecated；Plan 只产生 `planned`，State 只产生 `current`，两者都不产生 implementation claim；Validation 只有精确 `Result: Passed/Failed` 或 `Outcome:` 才产生明确结果，文档存在、`Status:` 与自由文本保持 `Unknown`。
@@ -36,7 +36,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Candidate `docsite_insights.py`／`build_docsite.py` 另有独立默认关闭的 `ORRERY_AUTHORITY_SHADOW_VIEW=1` 诊断投影：它只显示 shadow comparison 状态、fact scope、model status、difference／unresolved relation／Validation Unknown 计数，并明确标记 `authority-shadow-diagnostic`、`authoritative=false`、`production-switched=false`。默认与 report-only 路径仍返回 legacy HTML；面板不读取或展示 effective/current/implemented/validated claim payload。
 - Candidate AI 派生视图已消费这一可选 sidecar 的压缩 context：Q&A、briefing、roadmap、milestones 与 radar 的成功／失败 JSON 都附带系统生成的 `derived-ai-view` 非权威 receipt，问答正文有可见说明，streaming response 有 view/status header。没有 report 时保持 `Unknown`／`unavailable`，只有 Candidate shadow 时保持 `shadow-only`；Local-only／Unknown 不得被推为 Canonical、源码事实、effective/current/implemented/validated。该边界阻止 AI 输出在系统中升级权威，不保证模型自然语言本身永不出错。
 - 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 38 个 Validation；现有 Validation 的严格结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
-- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 已有 Accepted ADR 运行时 shadow和只读 model capability report，Observatory 已完成包级 ADR lifecycle/relation/role、runtime bridge、内部 status signal、opt-in managed shadow sidecar／诊断面板与 AI derived-view non-escalation；没有稳定顶层 API、默认启用的 managed Authority projection、consumer production switch、公开 release/installer projection 或发布实现，也不是 Canonical State 的实现声明。
+- 当前 evaluator 与 M2 consumers 是已进入本地 Canonical baseline 的 experimental implementation：CLI 已有完整内部 observation／claim bundle和只读 model capability report，Observatory 已有包级 lifecycle/relation/role、runtime bridge、内部 status signal、opt-in shadow／诊断及 root-only 完整 projection，AI 派生视图继续受 non-escalation 约束；没有稳定顶层 API、默认启用的 managed Authority projection、consumer production switch 或公开 release。
 - Gate B 已由 [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md) 解决。9-case `compatibility.json` 覆盖 field absent、public model 1、known unsupported、unknown newer、数值 gap、离散 model 3 和三类非法值，并冻结普通工具升级不得选择模型、manifest/document schema 不随首版模型变化。
 - Candidate Core 内部 `authority_compatibility.py` 已实现 provider-neutral capability judgment：显式区分 `legacy-unversioned`、`supported`、`unsupported-known`、`unsupported-newer`、`unsupported-unknown` 与 `invalid`；不支持时只保留 read-only browsing，并禁止推导 effective/current/implemented/validated。`eligible` 只表示可进入严格 conformance 评估，不表示验证已经通过。
 - Neutral CLI validator 已消费该 Core judgment，向人类与稳定 JSON 合约只读报告 `authority_model` capability：legacy 在普通验证中警告、在 `--require-integrated` 中失败；unsupported／invalid 始终失败关闭。顺带修复 Authority shadow 警告混入字符串、破坏 JSON issue contract 的缺陷。
@@ -46,7 +46,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Candidate `amm-release-projection-v1` 已冻结 future release 的默认模型 1 + 离散 `[1]` 支持集、project manifest/schema 正交和旧项目不自动选择模型。Core `ReleaseContract` 拒绝缺失配对、默认值不在支持集、重复／非法支持集；project manifest v1 schema 允许但不要求正整数 `authority_model_version`。
 - Core scaffold 只在 manifest 真正不存在／为空且 release 声明有效默认模型时写入该字段；已有 manifest 无论字段存在或缺失都保持原选择。隔离 `--upgrade-tools` 回归证明 legacy 缺字段不会被普通工具升级变成 model 1；当前 source/bundled v0.2.0 release contracts 继续不声明模型，不被本检查点改写。
 - Candidate neutral CLI 0.1.5 `check-update` 已只读消费 future release 的默认值／离散支持集：显式 model 1 target 可直接通过，legacy、invalid 和 unsupported target 返回既有 migration-review 状态与原因；无 target 的 Skill-only 查询不推断项目迁移。v0.2.0 因没有模型声明而保持原更新判断，JSON response schema 未增加字段。
-- M2.3 Worktree Candidate 已把上述投影连成 provider-neutral 本地 release-candidate gate：维护者显式提供候选 SemVer／manifest，Gate 校验模型 1 默认值与离散 `[1]` 支持集，在隔离 staging ZIP 中替换 candidate manifest，并复核 new scaffold、current-source + public-v0.2-manifest legacy 基线、普通 legacy upgrade、invalid／unsupported fail-before-write、receipt-gated migration／restore 与 self-host。它不选择实际下一版本，不改写 v0.2.0 历史输入，也不构成 consumer production switch、公开 installer 支持或 Validation-by-selector。
+- 本地 Canonical baseline 已集成 provider-neutral `orrery-authority-release-candidate-gate-v1`：维护者显式提供候选 SemVer／manifest，Gate 校验模型 1 默认值与离散 `[1]` 支持集，在隔离 staging ZIP 中替换 candidate manifest，并复核 new scaffold、current-source + public-v0.2-manifest legacy 基线、普通 legacy upgrade、invalid／unsupported fail-before-write、receipt-gated migration／restore 与 self-host。它不选择实际下一版本，不改写 v0.2.0 历史输入，也不构成 consumer production switch、公开 installer 支持或 Validation-by-selector。
 - Candidate Observatory runtime bridge 已增加 display-neutral 模型状态信号；supported 可继续 shadow，legacy／unsupported 只返回原 legacy HTML/stats 与只读警告，不运行确定性 Authority shadow。该信号可写入显式 opt-in sidecar，但尚未接入 managed 页面或服务 API。
 
 ## 当前边界
@@ -73,12 +73,12 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `packages/project-orrery-core/src/project_orrery_core/authority.py`（Candidate experimental evaluator）
 - `docs/validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md`
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py`（Candidate CLI shadow adapter）
-- `packages/project-orrery-cli/src/project_orrery_cli/authority_observations.py`（M2.1 Worktree Candidate repository collector／internal contract）
+- `packages/project-orrery-cli/src/project_orrery_cli/authority_observations.py`（M2.1 internal repository collector／contract）
 - `tests/fixtures/authority-meta-model/v1/cli-observation-contract.json`
 - `tests/test_authority_cli_claims.py`
 - `docs/validation/2026-08-21-m2-1-authority-cli-claims.md`
-- `packages/project-orrery-observatory/src/project_orrery_observatory/authority_projection.py`（M2.2 Worktree Candidate；只消费注入 bundle）
-- `scripts/docsite/build_authority_projection.py`（M2.2 root-only managed Candidate entry）
+- `packages/project-orrery-observatory/src/project_orrery_observatory/authority_projection.py`（M2.2 internal projection；只消费注入 bundle）
+- `scripts/docsite/build_authority_projection.py`（M2.2 root-only opt-in entry）
 - `tests/fixtures/authority-meta-model/v1/observatory-projection.json`
 - `tests/test_authority_observatory_projection.py`
 - `docs/validation/2026-08-21-m2-2-observatory-authority-projection.md`
@@ -135,14 +135,13 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 
 - 没有公共 machine-readable domain API、version manifest 或 conformance CLI；当前 parser 与 compatibility contracts 仅是 Candidate 内部测试边界。
 - 仅有区域级盘点；尚未形成逐函数／逐规则的 machine-readable inventory 或 drift 判定。
-- Canonical M1 CLI shadow 仍只比较 `accepted_adr`。M2.1 Worktree Candidate 已能生成完整 repository observations／claims bundle，但尚未集成、未形成稳定公共 report，也没有改变 legacy `entrance_mapped`、`pending_marker`、`integrated` adoption heuristics 或退出码。
-- CLI 尚未解析完整 ADR lifecycle／supersede／amend、Implementation／State／Validation 或 evidence provenance。
+- M2.1 已能生成完整 repository observations／claims bundle，但尚未形成稳定公共 report，也没有改变 legacy `entrance_mapped`、`pending_marker`、`integrated` adoption heuristics 或退出码；Implementation 仍因没有结构化权威输入而保持 Unknown。
 - Observatory lifecycle/relation/role shadow 与 runtime bridge 已有 opt-in managed sidecar 与独立诊断面板接线，但默认关闭；诊断面板只显示 comparison health／scope／计数，不进入 legacy stats，也不消费 claim payload。`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
-- M2.2 Worktree Candidate 已能在独立 opt-in 下显示 Core effective decision 与完整角色 claims，但只位于根
+- M2.2 已能在独立 opt-in 下显示 Core effective decision 与完整角色 claims，但只位于根
   self-host 工具，未进入发布模板、默认 managed 页面、legacy graph/stats 或公共组件契约。
 - Role shadow 目前只解释文档角色与严格头部元数据，不验证 Validation 正文命令是否真正执行，也不从 State 自由文本推导 implementation present/absent。
 - Runtime bridge 可由 Candidate package/test harness 或维护者显式环境开关调用；模板仅投影同一默认关闭的接线，在实际下一 release 与旧项目兼容完成独立验证前不默认启用。当前页面只支持明确标注的 shadow diagnostic，不是 Authority production projection。AI 已有非权威 context／receipt，但其语义仍受可见证据限制，不能替代确定性 evaluator 或人工审阅。
 - Compatibility judgment 已接入 neutral CLI validator 的只读报告、`check-update` 的 future-release migration review 和 Candidate Observatory runtime bridge 的内部 status signal；M2.3 已形成不改写 source release manifest 的本地 candidate package／installer gate，但当前 v0.2.0 release manifest、managed Observatory banner 与公开发布仍未声明模型。self-host 项目已显式选择模型 1，通用迁移已有 receipt-gated dry-run/apply/restore、精确备份与故障恢复证据；实际下一 SemVer 与 M2.2 consumer production evidence 仍是发布阻塞项。
 - 尚无 consumer production switch、公开 release／installer 模型投影或 Canonical runtime release Validation；Harness JSON Adapter v1 也尚未暴露迁移命令。
-- Fixture、Core evaluator 与 M1 shadow／migration 检查点已通过干净 integration 流程进入本地 Canonical Git baseline；尚未 push、发布或切换默认 production consumer。
-- Normalized observation collector/parser contract 尚未稳定；当前覆盖 ADR lifecycle、显式 amend/supersede 和四类文档 role metadata，但 evaluator 仍不读取作者 Markdown 或 Git/Harness 原始输出。
+- Fixture、Core evaluator、M1 与 M2.1／M2.2／M2.3 检查点已通过独立 worktree 与干净 integration 流程进入本地 Canonical Git baseline；尚未 push、发布或切换默认 production consumer。
+- Normalized observation collector/parser contract 尚未稳定为公共 API；当前覆盖全部文档角色、ADR lifecycle、显式 amend/supersede 和来源／证据 provenance，但 evaluator 仍只解释预规范化输入，不直接读取作者 Markdown 或 Git/Harness 原始输出。

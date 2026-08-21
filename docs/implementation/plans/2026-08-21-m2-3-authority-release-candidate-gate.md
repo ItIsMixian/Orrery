@@ -1,10 +1,12 @@
 # 实施计划：M2.3 Authority Model 1 release／installer candidate gate
 
-Status: Worktree Candidate validated; integration pending
+Status: Completed; local gate integrated, actual release still blocked
 
 Date: 2026-08-21
 
 Branch: `codex/m2-3-authority-release-gate`
+
+Integration: `cfd76e4` was integrated through merge commit `bb03040`; no SemVer, tag, public manifest or release was selected.
 
 Baseline: M2.1 validated Candidate `db81691`
 

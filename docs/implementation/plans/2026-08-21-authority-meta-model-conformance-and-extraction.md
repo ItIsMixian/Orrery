@@ -111,9 +111,9 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 1. **Baseline 与 inventory**：冻结上述区域级盘点，补齐现有行为对 fixture 的可追溯映射；不改变运行路径。
 2. **Fixture first**：实现 versioned fixture/golden contract，并以现有 CLI、docsite parser、AI prompt 的输出做差异报告；不选择 owner。
 3. **最小 evaluator / shadow mode**：Gate A 已由 ADR-0010 解决；Core 先实现 normalized observations 到 roles/relations/claim dimensions/scopes/evidence 的确定性解释，并把 fixture comparison 分类为 missing expectation、extra observation 或 expected visibility difference。CLI/docsite 尚不切换生产行为。
-4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。CLI 第一检查点已在 Candidate 中完成：只比较 Accepted ADR，scope 保持 `Unknown`，不切换 legacy status／exit code。Observatory 已完成四个包级检查点：legacy ADR lifecycle、显式 relation/effective-decision、严格 Design／Plan／State／Validation role claims，以及组合真实 legacy `render_site()` 与前述 shadow 的 runtime bridge。第五检查点把 bridge 接到 managed build/serve 的维护者 opt-in sidecar：默认仍是 legacy path，shadow 只写独立 JSON，HTML/stats 和服务启动不切换，失败关闭可独立回滚。第六检查点在独立 `ORRERY_AUTHORITY_SHADOW_VIEW=1` 开关下增加只读诊断面板：`docsite_insights.py` 只投影 comparison health、scope 与计数，明确排除 claims／relations 正文，默认与 report-only HTML 继续不变。`Predecessor`、普通 refs、State 正文 implementation 推导、Validation 命令重放与正式 production switch 留给后续检查点。
+4. **确定性消费者迁移**：M2.1 已在本地 Canonical baseline 提供完整内部 CLI repository observation／claim bundle，保留 legacy status／exit code；M2.2 则通过独立 root-only entry 消费同一 bundle，执行确定性 reconciliation 并投影 effective decisions、全角色 claims、Unknown、source hash 和 evidence provenance。该页面仍需 `ORRERY_AUTHORITY_PROJECTION_VIEW=1` 显式启用，失败或关闭均回到逐字节 legacy；发布模板、默认 managed entry、legacy graph/stats 与稳定公共 API 没有切换。`Predecessor`、普通 refs、State 正文 implementation 推导、Validation 命令重放与正式 production switch 继续留给后续独立检查点。
 5. **AI 派生视图**：Candidate managed Q&A、briefing、roadmap、milestones 与 radar 已消费由 runtime report 压缩出的只读 Authority context；没有 report 时明确保持 `Unknown`／`unavailable`，只有 shadow 时明确标为 `shadow-only`。所有结构化结果和失败结果都附带不可由模型覆盖的 `derived-ai-view` 非权威 receipt，问答正文另有可见提示，streaming endpoint 也投影 view/status header。负向测试覆盖 Local-only／Unknown、伪造 authority receipt、虚构引用和模型越权措辞；这些守卫只阻止输出被系统升级为项目事实，不宣称能保证模型自然语言永不出错，也不构成 production Authority switch。
-6. **兼容、自托管与发布**：ADR-0011 与 9-case legacy/supported/unsupported/invalid fixture 已冻结离散 support contract，Core 内部 capability judgment、CLI 只读报告、Candidate Observatory status signal、self-host 显式模型选择，以及 receipt-gated migration dry-run/apply/restore、精确备份和替换故障注入已经完成。Candidate 又以 `amm-release-projection-v1` 冻结 future release 默认模型 + 离散支持集，并让新项目选择默认值、已有 legacy 项目在普通 scaffold／`--upgrade-tools` 中保持缺字段；已发布 v0.2.0 contract 没有改写。CLI 0.1.5 `check-update` 已在 future release 真正声明该合约时，把 legacy／invalid／unsupported target 保守归类为 migration review，并保持无 target 与 v0.2.0 无声明路径的原行为。后续在不导出稳定 Core API、不切换 managed Observatory 的前提下，先决定并验证实际下一 release projection，再完成 old-project/self-host/release 门。
+6. **兼容、自托管与发布**：ADR-0011、离散 support contract、Core capability judgment、CLI 只读报告、self-host 模型选择、receipt-gated migration／restore 与 `amm-release-projection-v1` 已完成。M2.3 又把这些契约接入本地 provider-neutral release-candidate gate，验证维护者提供的候选 manifest、确定性离线 archive、new／legacy install、invalid／unsupported fail-before-write、显式 migration／restore、self-host 和 secret／generated-artifact 排除；v0.2.0 三份历史输入保持冻结。Gate 只可产生 `candidate_ready`，当前因缺少 managed consumer production evidence 和维护者实际版本选择而保持 `release_ready=false`。
 
 文件长度不是阶段完成条件。每个消费者都必须能在不阻塞其他消费者的情况下回滚自己的切换。
 
@@ -126,10 +126,13 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 - `packages/project-orrery-cli/src/project_orrery_cli/update.py` 与 `tests/test_authority_update_compatibility.py`：只读 future-release update compatibility；沿用 schema v1 的 `status`／`migration_required`／`reasons`，不扩展 Harness JSON schema，不写入 manifest，也不把没有 target 的 Skill-only 查询伪装成项目迁移。
 - `packages/project-orrery-core/src/project_orrery_core/authority_migration.py`、`packages/project-orrery-cli/src/project_orrery_cli/authority_migrate.py`、`authority_restore.py`、`tests/test_authority_model_migration.py` 与 `tests/test_authority_model_restore.py`：纯函数 migration／restore planner、migration materializer 与 CLI dry-run/apply/restore；receipt 分别绑定迁移提议或当前 manifest + 项目内备份，写入前保存逐字节恢复证据并原子替换。restore 只接受迁移备份根下的生成路径，且除模型选择器外的 manifest 字段必须相同；release／installer 不调用这些路径。
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py`、`validate.py`：已有 Accepted ADR warning-only shadow；后续切换或扩大公开输出需要新的验证检查点。
+- `packages/project-orrery-cli/src/project_orrery_cli/authority_observations.py`：M2.1 完整内部 repository observation／claim bundle；不是稳定公共 API，legacy CLI status／exit code 保持。
 - `packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py`：已有未导出的 lifecycle 与显式 relation/effective-decision shadow adapter；保持无公开依赖／API，直到运行时接线边界通过验证。
 - `packages/project-orrery-observatory/src/project_orrery_observatory/authority_role_shadow.py`：已有未导出的 Design／Plan／State／Validation role adapter；只消费受控路径与严格元数据，不从文档存在或自由文本制造 implementation/validation 事实。
 - `packages/project-orrery-observatory/src/project_orrery_observatory/runtime_shadow.py`：已有未导出的 warning-only runtime bridge；真实 legacy render 先完成，Authority 失败只进入独立 report，不改变 HTML/stats。
 - `scripts/docsite/build_docsite.py`、`docsite_insights.py` 与 `serve.py`：已有默认关闭的内部 sidecar 接线；`ORRERY_AUTHORITY_SHADOW_REPORT` 只写 report，不改变 HTML/stats。独立 `ORRERY_AUTHORITY_SHADOW_VIEW=1` 才注入非权威诊断面板，且不把 claim／relation payload 投影为事实。`docsite_qa.py` 与 `serve.py` 已把 report 压缩成非权威 AI context，并给生成结果附加 receipt／提示；正式 Authority 页面 projection 与 production switch 仍是后续门。
+- `packages/project-orrery-observatory/src/project_orrery_observatory/authority_projection.py` 与 `scripts/docsite/build_authority_projection.py`：M2.2 只消费 M2.1 bundle，并通过 root-only 显式 opt-in 投影完整 Authority 页面；默认／发布入口不变。
+- `packaging/authority-release-candidate-policy.json` 与 `scripts/authority_release_candidate_gate.py`：M2.3 本地候选门；不选择实际版本，不修改 public manifest，不创建 tag／Release。
 - `adapters/**` 与 template projection tests：只消费既有确定性契约。
 - `.project-orrery.json`：self-host 已显式选择模型 1；project manifest v1 schema 已允许但不要求正整数模型字段，Core scaffold 已能消费 future release 默认值。当前 release manifest／standalone installer 仍是 v0.2.0 historical path，不选择模型；实际下一 release 的版本、资产与安装验证仍须单独推进。
 
@@ -162,6 +165,6 @@ contract 已版本化、最小 evaluator 经 shadow 验证、迁移消费者有 
 约束可测、Gate B（若触及公开契约）已通过，并完成兼容/self-host/release 验证。
 
 功能 worktree 只同步 `authority-meta-model` State 和对应 Validation/索引，不改写根
-`PROGRESS.md`、`HANDOFF.md`、`DEVLOG.md`。M1 已由唯一整合者在干净 integration worktree 中
-fast-forward 到本地 `main`，并依据实际提交与验证同步 Canonical 入口；这不改变其 experimental／
-unreleased 状态，也不授权后续 consumer production switch。
+`PROGRESS.md`、`HANDOFF.md`、`DEVLOG.md`。M1 与 M2.1／M2.2／M2.3 已由唯一整合者在干净
+integration worktree 中合流并同步本地 Canonical 入口；这不改变其 experimental／unreleased 状态，
+也不授权稳定 API、managed consumer production switch 或公开模型 1 release。

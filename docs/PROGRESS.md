@@ -12,6 +12,8 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 
 2026-08-21 完成 Authority Meta Model M1 的本地 Canonical 集成：ADR-0010 已指定平台中立 Core 为唯一确定性 evaluator owner，ADR-0011 已固定公开模型版本、离散支持集、legacy／unsupported 失败关闭和显式语义迁移边界。`amm-fixture-v1`、experimental Core evaluator、CLI／Observatory shadow、receipt-gated migrate／restore、future release projection、AI non-escalation 与只读诊断投影已经 fast-forward 进入本地 `main`。这些实现仍为 experimental／unreleased，默认生产路径和公开 v0.2.0 资产没有切换。
 
+同日完成 M2.1／M2.2／M2.3 的独立实现与本地 Canonical 集成：CLI 现在能生成完整内部 Authority observation／claim bundle；Observatory 有 root-only、显式 opt-in 且可失败关闭回 legacy 的完整 projection；本地 release-candidate gate 能验证维护者另行提供的模型 1 candidate manifest、离线包、安装／迁移／恢复与安全边界。组合回归中 Authority 163 项为 160 通过／3 项环境跳过，全仓 231 项为 226 通过／5 项环境或可选依赖跳过。这没有选择实际 SemVer、修改 v0.2.0 历史资产、启用默认 projection、建立稳定 API、push 或发布。
+
 ## 已完成
 
 - [x] 通过 ADR-0001 正式采纳 Project Orrery 自托管权威链。
@@ -61,6 +63,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 完成协作产品层讨论与权威链审计：以 ADR-0008 正式修订 ADR-0007 的跨机器输入边界，并收敛 Personal／Team 模式、Workstream、Scope B、权限、审查、清理和指挥台 Approved Design／Plan。
 - [x] 通过 ADR-0009 与 Approved Design 建立 Authority Meta Model 规范层，澄清非线性 Authority Graph、独立 claim dimensions、作用域／证据／派生视图边界和 self-hosting 分层。
 - [x] 完成 M1 Candidate 的 fixture-first 实现与干净集成：ADR-0010／0011、Core evaluator、模型兼容、显式迁移／恢复、CLI／Observatory shadow、AI 非权威 receipt 和诊断投影已进入本地 `main`；完整 196 项测试、Authority 专项 120/120、结构、静态站、本地链接和 diff 检查通过。
+- [x] 完成 M2.1／M2.2／M2.3 分支隔离、交叉审阅与本地集成：完整 CLI claims、root-only opt-in Observatory projection 和 provider-neutral release-candidate gate 已进入本地 Canonical baseline；默认 production 与公开 release 均未切换。
 
 ## 当前结论
 
@@ -81,7 +84,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - 动态 docsite 已没有直接 Provider 路径；默认同用户托管 Broker 只提供统一路由和成本门，只有在独立 OS 身份或等价边界中配置并运行外部 Broker，才能把 Provider Key 隔离出 docsite／Agent 身份。
 - `sivtr` 可作为未来“情境证据来源”的研究对象，但不能替代 State／ADR／实现真值；任何可选 memory evidence Adapter 都需要新的权威／证据分层、隐私生命周期和可复现验证决定，当前不进入发布版或下一 Pilot。
 - 多人／多 Agent 现在有可执行的人工安全工作法和完整的目标 Design，但还不是自动协调系统：独立 worktree 能隔离写入，唯一整合者能对齐权威文档；当前工具不能自动阻止误入主目录、生成 session／finding／review，也没有 Personal 指挥台或 Team telemetry。ADR-0008 允许未来成员主动上报 Local-only 元数据，但未上报内容和语义证据不足处仍是 Unknown。
-- Authority Meta Model 已有进入本地 `main` 的 experimental machine implementation：项目可显式选择模型 1，Core 拥有统一 fixture/evaluator，迁移和 shadow consumers 有验证证据；这仍不等于稳定 domain API、默认 production projection 或发布。AUTH-1 产品核心定位继续 pending，AUTH-4 已由 ADR-0010 解决。
+- Authority Meta Model 已有进入本地 `main` 的 experimental machine implementation：项目可显式选择模型 1，Core 拥有统一 fixture/evaluator，CLI 有完整内部 claims，Observatory 有显式 opt-in projection，迁移／恢复与 release-candidate gate 有验证证据；这仍不等于稳定 domain API、默认 production projection 或发布。AUTH-1 产品核心定位继续 pending，AUTH-4 已由 ADR-0010 解决。
 
 ## 待办
 
@@ -111,7 +114,8 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 完成平台中立 Phase 3 Harness JSON 与跨 OS 门：最终 feature HEAD `02c4a6b` 的 GitHub Actions run 31 在 Windows／Ubuntu 双 PASS，并已 `--ff-only` 集成到本地 main；远端 main 尚未推送。
 - [ ] 按 ADR-0007／ADR-0008 活动 Plan 先实现 Personal foundation Phase 0：版本化 Workstream／session／scope／finding schema、subsystem registry、Git fixture、integration ref 解析和主 worktree 识别；在此之前继续人工创建独立 worktree，且不启动 Team 网络能力。
 - [x] 为 ADR-0009 建立 Authority Meta Model 盘点／conformance／渐进提取 Plan，并完成 fixture、Core owner、兼容契约和 M1 experimental 集成。
-- [ ] 后续按独立检查点补齐完整 CLI claims、正式 Observatory Authority projection 与实际下一 release／installer 验证；在此之前不导出稳定 Core API、不默认切换 production path、不发布模型 1 支持声明。
+- [x] 完成完整内部 CLI claims、root-only opt-in Observatory Authority projection 与本地 release／installer candidate gate；三条检查点均已本地集成并保持可独立回滚。
+- [ ] 下一 Authority 检查点只处理 production consumer 采纳与实际 release 选择：先决定默认 managed projection 是否启用并取得 production evidence，再由维护者选择真实 SemVer／candidate manifest；在此之前不导出稳定 Core API、不发布模型 1 支持声明。
 
 ## Blockers / risks
 
@@ -127,6 +131,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - Marglo 来源仓库包含活跃工作树和潜在用户数据；未来只能从固定提交或显式白名单构造脱敏 fixture，不能直接复制当前工作目录。
 - Broker client token 仍具有受模型白名单和每日预算约束的消费能力；同用户运行 Broker 只能减少重复调用和限制开销，不能宣称 Provider Key 已隔离。
 - 当前多 worktree 规则没有强制执行器；若 Agent 仍在 `D:\coding warehouse\project-orrery` 共享主目录工作，Git 不会替项目区分所有权。恢复分支不可删除，功能 Agent 必须切换到分配的独立目录。
+- M2 本地 gate 的 `candidate_ready` 不等于 `release_ready`：实际下一 SemVer／manifest 尚未由维护者选择，M2.2 也只有 root-only opt-in 证据，没有默认 managed production consumer 证据。
 
 ## 下一里程碑
 
@@ -137,3 +142,5 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 平台适配线路的下一安全里程碑是另行规划 ADR-0004 Phase 4：先选择一个确实可访问、可安全隔离且能留存发现／调用／更新／卸载证据的第二平台，再建立独立 Adapter workstream。Phase 3 的 Harness JSON 不能冒充第二平台 runtime；没有新授权时不选择平台、不发布组件。
 
 多人协作线路的下一安全里程碑是 ADR-0007／ADR-0008 Personal foundation 的最小机器合约和 Git fixture；在任何自动命令完成前，继续使用一个 Workstream 一个独立 worktree、主目录只集成、唯一整合者同步全局 State 的人工协议。Team Mode 必须等 Personal 路径稳定且通过 zero-network 默认验证后再实施。
+
+Authority 线路的下一安全里程碑不是直接发布，而是把 M2.2 的 root-only opt-in projection 与默认 managed consumer 分开审阅：只有 production evidence、回滚证据和维护者实际版本选择同时完成，M2.3 gate 才可从 `candidate_ready` 进入另一次 release review；当前不得 push tag 或重写 v0.2.0 历史资产。

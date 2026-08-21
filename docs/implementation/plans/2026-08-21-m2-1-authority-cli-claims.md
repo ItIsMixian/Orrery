@@ -1,10 +1,12 @@
 # 实施计划：M2.1 完整 CLI Authority observations／claims
 
-Status: Worktree Candidate validated; integration pending
+Status: Completed; locally integrated into the Canonical baseline
 
 Date: 2026-08-21
 
 Branch: `codex/m2-1-authority-claims`
+
+Integration: `db81691` was integrated through the M2 integration branch; see the M2 local Canonical integration Validation.
 
 Governing ADRs: [ADR-0009](../../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../../decisions/0010-core-owned-authority-evaluator.md), [ADR-0011](../../decisions/0011-authority-model-version-and-compatibility.md)
 

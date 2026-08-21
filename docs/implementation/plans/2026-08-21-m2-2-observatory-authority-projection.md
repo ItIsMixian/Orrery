@@ -1,10 +1,12 @@
 # 实施计划：M2.2 Observatory Authority Candidate projection
 
-Status: Worktree Candidate validated locally; integration pending
+Status: Completed; locally integrated, with projection still explicit opt-in
 
 Date: 2026-08-21
 
 Branch: `codex/m2-2-authority-observatory-projection`
+
+Integration: `06ee3eb` was integrated through the M2 integration branch; this completes the checkpoint, not a default production switch.
 
 Baseline: M2.1 Candidate `db81691`
 
