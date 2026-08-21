@@ -40,6 +40,7 @@ Updated: 2026-08-21
 - 2026-08-21 ADR-0009 文档级采纳区分了 role lifecycle 与独立 claim dimensions，并固定 Authority scope、provider-neutral evidence 与 derived-view conformance 边界；尚未建立可执行 fixture 或跨消费者一致性测试。
 - 2026-08-21 Authority Meta Model Candidate fixture checkpoint 新增 `amm-fixture-v1`：21 个 versioned cases 与 2 个 comparison contracts 覆盖 accepted≠implemented≠validated、失败验证、历史/current、supersede/amend、Draft/Approved、Plan/State、六类 fact scope、Snapshot、五类 evidence、AI non-escalation 与 scope≠Coordinator；专项为 9/9 通过。它只验证 golden contract 的结构与不变量，尚未验证任何生产 evaluator 或 consumer conformance。
 - 2026-08-21 ADR-0010 Core shadow evaluator 将 fixture cases 扩展为 normalized observations，新增 deterministic evaluation、all-case expected comparison、显式 extra-output 分类、visibility-sensitive output、unsupported version/scope/evidence/observation fail-closed 和非顶层 API 断言；Authority 专项为 14/14。CLI/docsite 尚未双轨运行，不能据此声称 consumer 已一致。
+- 2026-08-21 CLI 第一处 shadow comparison 新增 6 项专项：保护 legacy integrated heuristic、真实 Accepted ADR 匹配、authority-visible input hash、`parser-gap` 分类，以及 mismatch／evaluator failure 时 warning-only、旧退出码不变。既有产品专项共运行 16 项，其中 14 通过、2 项动态依赖按设计跳过；默认全仓 81 项中 79 通过、2 项按设计跳过，integrated structure、静态站和 250 份 Markdown 本地链接均通过。Observatory 尚未双轨，CLI 也尚未切换生产语义。
 
 ## 验证证据
 
@@ -63,6 +64,7 @@ Updated: 2026-08-21
 - [2026-08-21 ADR-0009 Authority Meta Model 采纳](../validation/2026-08-21-authority-meta-model-adoption.md)
 - [2026-08-21 Authority Meta Model fixture baseline](../validation/2026-08-21-authority-meta-model-fixture-baseline.md)
 - [2026-08-21 Authority Meta Model Core shadow evaluator](../validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md)
+- [2026-08-21 Authority Meta Model CLI shadow comparison](../validation/2026-08-21-authority-meta-model-cli-shadow.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -75,4 +77,4 @@ Updated: 2026-08-21
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 生命周期目前只在临时目录验证；真实 Codex runtime 发现、调用、失败路径、更新与卸载尚无证据，因此不能标记 `verified`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009/0010 已有 Candidate fixture corpus 与 experimental Core evaluator，但仍没有真实 CLI/Observatory parser 的 shadow comparison、公开 `authority_model_version` 兼容矩阵或 runtime conformance 证据。
+- ADR-0009/0010 已有 Candidate fixture corpus、experimental Core evaluator 与 Accepted ADR 的 CLI shadow comparison，但仍没有完整 CLI lifecycle/claim parsing、Observatory shadow、公开 `authority_model_version` 兼容矩阵或 production-switch/release 证据。

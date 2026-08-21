@@ -9,7 +9,9 @@ import sys
 from pathlib import Path
 
 from project_orrery_core import REQUIRED_SCAFFOLD_FILES
+from project_orrery_core.authority import AuthorityEvaluationError
 
+from .authority_shadow import build_authority_shadow, scan_legacy_authority
 from .context import CliContext, repository_context
 
 
@@ -83,18 +85,25 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
     else:
         problems.append("missing required file: .project-orrery.json")
 
-    agents_text = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").is_file() else ""
-    progress_text = (root / "docs" / "PROGRESS.md").read_text(encoding="utf-8") if (root / "docs" / "PROGRESS.md").is_file() else ""
-    accepted_adr = False
-    for adr in (root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md"):
-        if adr.name.startswith("0000-"):
-            continue
-        if re.search(r"(?im)^Status\s*:\s*Accepted\b", adr.read_text(encoding="utf-8")):
-            accepted_adr = True
-            break
-    entrance_mapped = all(token in agents_text for token in ("docs/HANDOFF.md", "docs/PROGRESS.md", "docs/state/"))
-    pending_marker = "migration pending" in progress_text.lower() or "迁移待" in progress_text
-    integrated = accepted_adr and entrance_mapped and not pending_marker
+    legacy_authority = scan_legacy_authority(root)
+    integrated = legacy_authority.integrated
+    try:
+        shadow = build_authority_shadow(root, legacy_authority)
+    except (AuthorityEvaluationError, OSError, ValueError) as exc:
+        warnings.append(
+            f"authority shadow unavailable; legacy CLI remains authoritative: {exc}"
+        )
+    else:
+        differences = shadow["comparison"]["differences"]
+        if differences:
+            summary = ", ".join(
+                f"{item['field']}[{item['category']}] legacy={item['legacy']!r} core={item['core']!r}"
+                for item in differences
+            )
+            warnings.append(
+                "authority shadow mismatch; legacy CLI remains authoritative: "
+                + summary
+            )
     if not integrated:
         warnings.append("authority migration is pending; scaffold presence is not formal adoption")
         if args.require_integrated:

@@ -18,7 +18,7 @@ Observatory、AI 派生视图与未来 Adapter 在相同输入下遵守同一组
 ## 非目标与冻结边界
 
 - 不决定 AUTH-1（产品核心定位）。
-- 不提前决定 AUTH-4（唯一 semantics implementation owner）；fixture 必须先于 owner 选择。
+- Fixture-first 阶段不提前决定 AUTH-4（唯一 semantics implementation owner）；fixture 完成后已由 ADR-0010 选择平台中立 Core。
 - 不修改 manifest、document schema、公开 API、模板或发布契约。
 - 不以文件长度为理由大重构 Observatory，也不预先规定 Python package、parser 或 UI 的归属。
 - 不实现多人协作、Coordinator runtime、AI UI、新作者文档类型，或把 Agent 任务/锁/队列伪装成 fact scope。
@@ -36,7 +36,7 @@ Observatory、AI 派生视图与未来 Adapter 在相同输入下遵守同一组
 | ADR-0009、Approved Design、`docs/core/principles.md` | 定义 Meta Model 与产品 Seed 的边界、invariants、scope/evidence 规则 | `normative-source` | 保持为规范来源；Seed 内容不被提升为通用语义规则 |
 | `AGENTS.md`、authoring 模板与 docs 索引 | 向人类/Agent 投影阅读链、角色和同步义务 | `projection` | 与规范对齐，不成为独立 evaluator |
 | Core `schema.py`、`schema/authority-v1.json`、`manifests.py`、`compatibility.py` | 处理 scaffold、`document_schema`、manifest format 与 toolchain compatibility | `deterministic-evaluator`（仅现有格式兼容） | 不能据此声称已有 authority claim/scope/evidence evaluator |
-| CLI `validate.py` | 正则识别 Accepted ADR，并由 `AGENTS.md`/`PROGRESS.md` 推导 integrated candidate | `deterministic-evaluator` | 先与 fixture 双轨比对，再考虑迁移 |
+| CLI `validate.py` 与 `authority_shadow.py` | 原扫描仍识别 Accepted ADR，并由 `AGENTS.md`/`PROGRESS.md` 推导 integrated candidate；Candidate shadow 只把 Accepted ADR 送入 Core 比较 | `deterministic-evaluator` + shadow adapter | 保持 legacy production path；先扩大可解释差异，再考虑独立切换 |
 | `build_docsite.py` | 解析角色、ADR lifecycle、引用、图与统计，再渲染页面 | `deterministic-evaluator` + `projection` | 先分离语义解析结果与呈现；不要求一次性拆文件 |
 | `docsite_insights.py` | 依据引用、Git recency、代码路径等给出断链/过期/悬置提示 | `heuristic-observation` | 保留启发式性质，不能升级为 authority fact |
 | `docsite_qa.py`、`serve.py` | 选择语料、构造 prompt、输出问答/路线图等 | `derived-ai-view` | 只能消费确定性结果与证据引用，不得创造或升级事实 |
@@ -108,17 +108,17 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 1. **Baseline 与 inventory**：冻结上述区域级盘点，补齐现有行为对 fixture 的可追溯映射；不改变运行路径。
 2. **Fixture first**：实现 versioned fixture/golden contract，并以现有 CLI、docsite parser、AI prompt 的输出做差异报告；不选择 owner。
 3. **最小 evaluator / shadow mode**：Gate A 已由 ADR-0010 解决；Core 先实现 normalized observations 到 roles/relations/claim dimensions/scopes/evidence 的确定性解释，并把 fixture comparison 分类为 missing expectation、extra observation 或 expected visibility difference。CLI/docsite 尚不切换生产行为。
-4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。
+4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。CLI 第一检查点已在 Candidate 中完成：只比较 Accepted ADR，scope 保持 `Unknown`，不切换 legacy status／exit code；完整 lifecycle、relations 和其他 claims 仍待后续 shadow 扩展。
 5. **AI 派生视图**：`docsite_qa.py`/`serve.py` 仅消费已确定的语义、scope、visibility 与引用；对“AI 把 Unknown/Local-only/observed 升级为事实”的响应建立负向测试。
 6. **兼容、自托管与发布**：Gate B 后才设计 manifest 变更、legacy/unknown-version 行为、升级/降级和 release contract；最后在集成分支同步 State、Validation 与全局入口。
 
 文件长度不是阶段完成条件。每个消费者都必须能在不阻塞其他消费者的情况下回滚自己的切换。
 
-## 预计实现路径（尚未授权修改）
+## 实现路径与剩余授权边界
 
 - `tests/fixtures/authority-meta-model/**` 与 `tests/test_authority_meta_model.py`：fixture、golden contract 与 consumer conformance。
 - Gate A 决定后的 Core 或独立 package：最小 evaluator；当前不预设 owner。
-- `packages/project-orrery-cli/src/project_orrery_cli/validate.py`：shadow comparison 后的 CLI 接入。
+- `packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py`、`validate.py`：已有 Accepted ADR warning-only shadow；后续切换或扩大公开输出需要新的验证检查点。
 - `scripts/docsite/build_docsite.py`、`docsite_insights.py`、`docsite_qa.py`、`serve.py`：解析、启发式、投影和 AI 约束的逐步接入。
 - `adapters/**` 与 template projection tests：只消费既有确定性契约。
 - `.project-orrery.json`、release manifest、schema 与 compatibility：仅在 Gate B 和 ADR/amendment 后考虑。
