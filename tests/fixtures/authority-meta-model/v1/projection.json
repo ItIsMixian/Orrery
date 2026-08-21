@@ -1,0 +1,26 @@
+{
+  "fixture_id": "amm-release-projection-v1",
+  "public_authority_model_version": 1,
+  "candidate_release": {
+    "manifest_format": 1,
+    "name": "project-orrery",
+    "version": "0.3.0-candidate",
+    "channel": "candidate",
+    "project_manifest_format": 1,
+    "document_schema": 1,
+    "authority_model_version": 1,
+    "compatibility": {
+      "project_manifest_format": {"minimum": 1, "maximum": 1},
+      "document_schema": {"minimum": 1, "maximum": 1},
+      "authority_model_versions": {"supported": [1]}
+    }
+  },
+  "expected": {
+    "new_project_selects_default": true,
+    "legacy_existing_project_preserves_missing_field": true,
+    "ordinary_tool_upgrade_selects_model": false,
+    "manifest_format_changes": false,
+    "document_schema_changes": false,
+    "published_v0_2_0_is_rewritten": false
+  }
+}

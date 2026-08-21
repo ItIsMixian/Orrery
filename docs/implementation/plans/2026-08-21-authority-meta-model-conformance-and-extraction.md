@@ -113,7 +113,7 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 3. **最小 evaluator / shadow mode**：Gate A 已由 ADR-0010 解决；Core 先实现 normalized observations 到 roles/relations/claim dimensions/scopes/evidence 的确定性解释，并把 fixture comparison 分类为 missing expectation、extra observation 或 expected visibility difference。CLI/docsite 尚不切换生产行为。
 4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。CLI 第一检查点已在 Candidate 中完成：只比较 Accepted ADR，scope 保持 `Unknown`，不切换 legacy status／exit code。Observatory 已完成四个包级检查点：legacy ADR lifecycle、显式 relation/effective-decision、严格 Design／Plan／State／Validation role claims，以及组合真实 legacy `render_site()` 与前述 shadow 的 runtime bridge。第四检查点证明 HTML/stats 原样返回、shadow failure 被隔离，但没有修改 managed build/serve 或发布 projection。`Predecessor`、普通 refs、State 正文 implementation 推导、Validation 命令重放、insights/projection 与正式运行入口留给后续检查点。
 5. **AI 派生视图**：`docsite_qa.py`/`serve.py` 仅消费已确定的语义、scope、visibility 与引用；对“AI 把 Unknown/Local-only/observed 升级为事实”的响应建立负向测试。
-6. **兼容、自托管与发布**：ADR-0011 与 9-case legacy/supported/unsupported/invalid fixture 已冻结离散 support contract，Core 内部 capability judgment、CLI 只读报告、Candidate Observatory status signal、self-host 显式模型选择，以及 receipt-gated migration dry-run/apply/restore、精确备份和替换故障注入已经完成；没有导出稳定 Core API、修改 release 默认值或切换 managed Observatory。后续按 project/release manifest projection → old-project/self-host/release 验证顺序推进。
+6. **兼容、自托管与发布**：ADR-0011 与 9-case legacy/supported/unsupported/invalid fixture 已冻结离散 support contract，Core 内部 capability judgment、CLI 只读报告、Candidate Observatory status signal、self-host 显式模型选择，以及 receipt-gated migration dry-run/apply/restore、精确备份和替换故障注入已经完成。Candidate 又以 `amm-release-projection-v1` 冻结 future release 默认模型 + 离散支持集，并让新项目选择默认值、已有 legacy 项目在普通 scaffold／`--upgrade-tools` 中保持缺字段；已发布 v0.2.0 contract 没有改写。后续在不导出稳定 Core API、不切换 managed Observatory 的前提下，先决定并验证实际下一 release projection，再完成 old-project/self-host/release 门。
 
 文件长度不是阶段完成条件。每个消费者都必须能在不阻塞其他消费者的情况下回滚自己的切换。
 
@@ -122,6 +122,7 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 - `tests/fixtures/authority-meta-model/**` 与 `tests/test_authority_meta_model.py`：fixture、golden contract 与 consumer conformance。
 - `packages/project-orrery-core/src/project_orrery_core/authority.py`：ADR-0010 决定的最小 deterministic evaluator owner；当前实现仍是 experimental、fixture-bound Candidate。
 - `packages/project-orrery-core/src/project_orrery_core/authority_compatibility.py`、`tests/fixtures/authority-meta-model/v1/compatibility.json`、`tests/test_authority_model_compatibility.py`：Gate B capability contract；公开模型 1 映射内部 fixture ID，但不导出顶层 API，也不把 capability 误报为 conformance passed。self-host manifest 已显式选择模型 1，通用 installer/release projection 尚未开始。
+- `packages/project-orrery-core/src/project_orrery_core/manifests.py`、`schema/project-manifest-v1.json`、`tests/fixtures/authority-meta-model/v1/projection.json` 与 `tests/test_authority_model_projection.py`：Candidate release/project projection contract；未来 release declaration 必须同时给出正整数默认值和包含它的离散支持集，新项目才选择默认模型。已有 manifest 的字段存在／缺失都被保留，v0.2.0 source/bundled contracts 保持历史不变。
 - `packages/project-orrery-core/src/project_orrery_core/authority_migration.py`、`packages/project-orrery-cli/src/project_orrery_cli/authority_migrate.py`、`authority_restore.py`、`tests/test_authority_model_migration.py` 与 `tests/test_authority_model_restore.py`：纯函数 migration／restore planner、migration materializer 与 CLI dry-run/apply/restore；receipt 分别绑定迁移提议或当前 manifest + 项目内备份，写入前保存逐字节恢复证据并原子替换。restore 只接受迁移备份根下的生成路径，且除模型选择器外的 manifest 字段必须相同；release／installer 不调用这些路径。
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py`、`validate.py`：已有 Accepted ADR warning-only shadow；后续切换或扩大公开输出需要新的验证检查点。
 - `packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py`：已有未导出的 lifecycle 与显式 relation/effective-decision shadow adapter；保持无公开依赖／API，直到运行时接线边界通过验证。
@@ -129,7 +130,7 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 - `packages/project-orrery-observatory/src/project_orrery_observatory/runtime_shadow.py`：已有未导出的 warning-only runtime bridge；真实 legacy render 先完成，Authority 失败只进入独立 report，不改变 HTML/stats。managed build/serve 接线仍受 Gate B 约束。
 - `scripts/docsite/build_docsite.py`、`docsite_insights.py`、`docsite_qa.py`、`serve.py`：尚未切换；解析、启发式、投影和 AI 约束继续按独立检查点接入。
 - `adapters/**` 与 template projection tests：只消费既有确定性契约。
-- `.project-orrery.json`：self-host 已显式选择模型 1；release manifest、installer 默认值与 schema 投影仍须经过 migration／兼容验证后单独推进。
+- `.project-orrery.json`：self-host 已显式选择模型 1；project manifest v1 schema 已允许但不要求正整数模型字段，Core scaffold 已能消费 future release 默认值。当前 release manifest／standalone installer 仍是 v0.2.0 historical path，不选择模型；实际下一 release 的版本、资产与安装验证仍须单独推进。
 
 ## 验证矩阵
 

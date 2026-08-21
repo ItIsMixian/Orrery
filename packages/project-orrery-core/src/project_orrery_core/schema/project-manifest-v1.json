@@ -18,6 +18,7 @@
     "name": {"const": "project-orrery"},
     "manifest_format": {"const": 1},
     "document_schema": {"type": "integer", "minimum": 1},
+    "authority_model_version": {"type": "integer", "minimum": 1},
     "authority_status": {"enum": ["migration_pending", "integrated"]},
     "toolchain_status": {"enum": ["current", "mixed"]},
     "managed_tools": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},

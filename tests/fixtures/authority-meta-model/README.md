@@ -4,8 +4,10 @@ This directory freezes provider-neutral inputs and expected semantic results bef
 Authority Meta Model implementation owner.
 
 `v1/conformance.json` is a Candidate golden contract, not a public manifest schema and not a runtime API. Its
-`authority_model_version` exists only as one of the four required conformance inputs. Adding that field to a
-project or release manifest remains behind Decision Gate B in the active Implementation Plan.
+internal fixture ID remains distinct from the public integer selected by ADR-0011. `v1/compatibility.json`
+freezes legacy/supported/unsupported capability behavior, while `v1/projection.json` freezes the future-release
+default + discrete support-set contract and the rule that ordinary upgrades preserve an existing missing field.
+These Candidate fixtures do not rewrite the published v0.2.0 release manifest or constitute a new release.
 
 The fixtures deliberately keep coordination runtime data separate from fact scopes and model
 decision/implementation/validation as independent claim dimensions. Consumers may use these fixtures for
