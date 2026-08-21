@@ -231,8 +231,8 @@ class AuthorityReleaseCandidateGateTests(unittest.TestCase):
             self.assertFalse((root / "output").exists())
 
     def test_cli_preserves_candidate_manifest_lexical_path(self) -> None:
-        candidate = Path("C:/reviewed/candidate-link.json")
-        output = Path("C:/reviewed/output")
+        candidate = Path.cwd() / "reviewed" / "candidate-link.json"
+        output = Path.cwd() / "reviewed" / "output"
         original_resolve = Path.resolve
 
         def guarded_resolve(path: Path, *args: object, **kwargs: object) -> Path:
