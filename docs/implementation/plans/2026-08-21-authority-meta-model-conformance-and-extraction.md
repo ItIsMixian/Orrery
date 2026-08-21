@@ -106,8 +106,9 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 Candidate 已形成 [PO-DEC-AUTH-002](../../decisions/proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md)：
 建议项目 manifest 顶层使用正整数模型版本，release 声明默认值与离散支持集，缺失字段保持
 `legacy-unversioned`，unsupported／unknown 只允许只读浏览并对 Authority 结论失败关闭，工具升级
-不得自动执行语义迁移。该提案仍是 Proposed；在维护者接受和集成者分配正式 ADR 前，Gate B 继续
-阻塞任何 manifest/schema/managed-tool 变更。
+不得自动执行语义迁移。维护者已接受 Candidate 实施；提案在集成者分配正式 ADR 前仍保持 Proposed，
+因此首个检查点只建立兼容 fixture 与 Core 内部 capability judgment，继续阻塞 public
+manifest/schema/managed-tool 变更。
 
 ## 渐进阶段
 
@@ -116,7 +117,7 @@ Candidate 已形成 [PO-DEC-AUTH-002](../../decisions/proposals/PO-DEC-AUTH-002-
 3. **最小 evaluator / shadow mode**：Gate A 已由 ADR-0010 解决；Core 先实现 normalized observations 到 roles/relations/claim dimensions/scopes/evidence 的确定性解释，并把 fixture comparison 分类为 missing expectation、extra observation 或 expected visibility difference。CLI/docsite 尚不切换生产行为。
 4. **确定性消费者迁移**：按 CLI → docsite parser → insights/projection 的顺序逐一接入；每个消费者先双轨比对，再独立切换，并可回滚到原逻辑。CLI 第一检查点已在 Candidate 中完成：只比较 Accepted ADR，scope 保持 `Unknown`，不切换 legacy status／exit code。Observatory 已完成四个包级检查点：legacy ADR lifecycle、显式 relation/effective-decision、严格 Design／Plan／State／Validation role claims，以及组合真实 legacy `render_site()` 与前述 shadow 的 runtime bridge。第四检查点证明 HTML/stats 原样返回、shadow failure 被隔离，但没有修改 managed build/serve 或发布 projection。`Predecessor`、普通 refs、State 正文 implementation 推导、Validation 命令重放、insights/projection 与正式运行入口留给后续检查点。
 5. **AI 派生视图**：`docsite_qa.py`/`serve.py` 仅消费已确定的语义、scope、visibility 与引用；对“AI 把 Unknown/Local-only/observed 升级为事实”的响应建立负向测试。
-6. **兼容、自托管与发布**：Gate B 后才设计 manifest 变更、legacy/unknown-version 行为、升级/降级和 release contract；最后在集成分支同步 State、Validation 与全局入口。
+6. **兼容、自托管与发布**：Gate B Candidate 第一检查点已冻结 9-case legacy/supported/unsupported/invalid fixture，并在 Core 内部实现离散 support capability judgment；没有写 manifest、导出公共 API 或切换 consumer。后续仍须先完成正式 ADR 集成，再按 shadow CLI/banner → 显式 migration dry-run → manifest projection → self-host/release 顺序推进。
 
 文件长度不是阶段完成条件。每个消费者都必须能在不阻塞其他消费者的情况下回滚自己的切换。
 
@@ -124,6 +125,7 @@ Candidate 已形成 [PO-DEC-AUTH-002](../../decisions/proposals/PO-DEC-AUTH-002-
 
 - `tests/fixtures/authority-meta-model/**` 与 `tests/test_authority_meta_model.py`：fixture、golden contract 与 consumer conformance。
 - `packages/project-orrery-core/src/project_orrery_core/authority.py`：ADR-0010 决定的最小 deterministic evaluator owner；当前实现仍是 experimental、fixture-bound Candidate。
+- `packages/project-orrery-core/src/project_orrery_core/authority_compatibility.py`、`tests/fixtures/authority-meta-model/v1/compatibility.json`、`tests/test_authority_model_compatibility.py`：Gate B Candidate capability contract；公开模型 1 映射内部 fixture ID，但不导出顶层 API、不写 manifest，也不把 capability 误报为 conformance passed。
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py`、`validate.py`：已有 Accepted ADR warning-only shadow；后续切换或扩大公开输出需要新的验证检查点。
 - `packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py`：已有未导出的 lifecycle 与显式 relation/effective-decision shadow adapter；保持无公开依赖／API，直到运行时接线边界通过验证。
 - `packages/project-orrery-observatory/src/project_orrery_observatory/authority_role_shadow.py`：已有未导出的 Design／Plan／State／Validation role adapter；只消费受控路径与严格元数据，不从文档存在或自由文本制造 implementation/validation 事实。

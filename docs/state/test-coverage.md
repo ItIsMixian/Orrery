@@ -45,6 +45,7 @@ Updated: 2026-08-21
 - 2026-08-21 Observatory relation shadow 将专项扩展为 15 项：覆盖显式 `Amends`／`Supersedes`、`Superseded by` 方向反转、effective decision、amend 保留 base effect、真实仓库 6 条 amendment、非关系引用隔离、缺失目标保持 `Unknown` 与 malformed metadata 失败关闭。Authority 三组专项为 35/35；默认全仓 96 项中 94 通过、2 项按设计跳过，integrated structure、913 KB 静态站和 252 份 Markdown／513 个本地链接均通过。旧 build/serve graph、公开 API 与发布契约仍未切换。
 - 2026-08-21 Observatory role shadow 新增 9 项专项：覆盖 Design Draft／Approved／Deprecated 与 Unknown、Plan/State 不生成 implementation claim、Validation 文档存在／Status／自由文本不等于通过、精确 Passed/Failed、隐藏 executable evidence 回退 Unknown、冲突元数据失败关闭、输入快照与真实仓库 7/12/6/29 角色盘点。Authority 四组专项为 44/44；默认全仓 105 项中 103 通过、2 项按设计跳过。该 adapter 未导出且未接入 build/serve，29 个现有 Validation 结果在严格 collector 中全部保持 Unknown。
 - 2026-08-21 Observatory runtime shadow 新增 5 项专项：真实 legacy `render_site()` 双轨时 HTML/stats 完全相同，ADR/role report 组合、显式 scope 与 evaluator failure 隔离均受保护。Authority 五组专项为 49/49；默认全仓 110 项中 108 通过、2 项按设计跳过，integrated structure、930 KB 静态站和 254 份 Markdown／525 个本地链接均通过。该 bridge 未导出、未接入 managed build/serve，也未修改模板或发布契约。
+- 2026-08-21 Gate B Candidate compatibility 新增 8 项专项与 9-case fixture：保护 public model 1／internal fixture ID 分离、缺失与显式 null 分离、离散 support gap、known/unknown/newer/invalid 分类、downgrade 不兼容、非法 capability 声明失败关闭和非顶层 API 边界。Authority 六组专项为 57/57；全仓 118 项中 116 通过、2 项按设计跳过。该检查点没有修改 project/release manifest、schema、installer、managed docsite 或发布状态。
 
 ## 验证证据
 
@@ -73,6 +74,7 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Meta Model Observatory relation shadow](../validation/2026-08-21-authority-meta-model-observatory-relation-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory role shadow](../validation/2026-08-21-authority-meta-model-observatory-role-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory runtime shadow](../validation/2026-08-21-authority-meta-model-observatory-runtime-shadow.md)
+- [2026-08-21 Authority Model compatibility Candidate](../validation/2026-08-21-authority-model-compatibility-candidate.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -85,4 +87,4 @@ Updated: 2026-08-21
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 生命周期目前只在临时目录验证；真实 Codex runtime 发现、调用、失败路径、更新与卸载尚无证据，因此不能标记 `verified`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009/0010 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow 和 Observatory lifecycle/explicit-relation harness，但仍没有完整 CLI claims、Observatory build/runtime projection、公开 `authority_model_version` 兼容矩阵或 production-switch/release 证据。
+- ADR-0009/0010 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow、Observatory lifecycle/explicit-relation harness 和内部 Gate B capability judgment，但仍没有完整 CLI claims、Observatory production projection、公开 manifest 字段、显式迁移、production-switch 或 release 证据。

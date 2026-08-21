@@ -1,0 +1,149 @@
+{
+  "fixture_format": 1,
+  "fixture_status": "candidate",
+  "public_authority_model_version": 1,
+  "internal_fixture_id": "amm-fixture-v1",
+  "contract": {
+    "project_field": "authority_model_version",
+    "version_type": "positive-integer",
+    "default_supported_versions": [1],
+    "default_known_versions": [1],
+    "unavailable_must_not_infer": [
+      "effective",
+      "current",
+      "implemented",
+      "validated"
+    ],
+    "ordinary_tool_upgrade_may_select_model": false,
+    "manifest_format_changes": false,
+    "document_schema_changes": false
+  },
+  "cases": [
+    {
+      "id": "legacy-field-absent",
+      "manifest": {"name": "project-orrery"},
+      "supported_versions": [1],
+      "known_versions": [1],
+      "expected": {
+        "status": "legacy-unversioned",
+        "selected_version": null,
+        "authority_evaluation_capability": "unavailable",
+        "strict_conformance_eligibility": "ineligible",
+        "read_only_browsing": "available",
+        "required_action": "explicit-semantic-migration"
+      }
+    },
+    {
+      "id": "public-model-1-supported",
+      "manifest": {"authority_model_version": 1},
+      "supported_versions": [1],
+      "known_versions": [1],
+      "expected": {
+        "status": "supported",
+        "selected_version": 1,
+        "authority_evaluation_capability": "available",
+        "strict_conformance_eligibility": "eligible",
+        "read_only_browsing": "available",
+        "required_action": "none"
+      }
+    },
+    {
+      "id": "known-model-not-supported-by-consumer",
+      "manifest": {"authority_model_version": 1},
+      "supported_versions": [2],
+      "known_versions": [1, 2],
+      "expected": {
+        "status": "unsupported-known",
+        "selected_version": 1,
+        "authority_evaluation_capability": "unavailable",
+        "strict_conformance_eligibility": "ineligible",
+        "read_only_browsing": "available",
+        "required_action": "compatible-tool-or-explicit-migration"
+      }
+    },
+    {
+      "id": "unknown-newer-model",
+      "manifest": {"authority_model_version": 4},
+      "supported_versions": [1, 3],
+      "known_versions": [1, 3],
+      "expected": {
+        "status": "unsupported-newer",
+        "selected_version": 4,
+        "authority_evaluation_capability": "unavailable",
+        "strict_conformance_eligibility": "ineligible",
+        "read_only_browsing": "available",
+        "required_action": "compatible-tool-or-explicit-migration"
+      }
+    },
+    {
+      "id": "unknown-gap-is-not-range-supported",
+      "manifest": {"authority_model_version": 2},
+      "supported_versions": [1, 3],
+      "known_versions": [1, 3],
+      "expected": {
+        "status": "unsupported-unknown",
+        "selected_version": 2,
+        "authority_evaluation_capability": "unavailable",
+        "strict_conformance_eligibility": "ineligible",
+        "read_only_browsing": "available",
+        "required_action": "compatible-tool-or-explicit-migration"
+      }
+    },
+    {
+      "id": "discrete-model-3-supported",
+      "manifest": {"authority_model_version": 3},
+      "supported_versions": [1, 3],
+      "known_versions": [1, 3],
+      "expected": {
+        "status": "supported",
+        "selected_version": 3,
+        "authority_evaluation_capability": "available",
+        "strict_conformance_eligibility": "eligible",
+        "read_only_browsing": "available",
+        "required_action": "none"
+      }
+    },
+    {
+      "id": "null-model-is-invalid-not-legacy",
+      "manifest": {"authority_model_version": null},
+      "supported_versions": [1],
+      "known_versions": [1],
+      "expected": {
+        "status": "invalid",
+        "selected_version": null,
+        "authority_evaluation_capability": "unavailable",
+        "strict_conformance_eligibility": "ineligible",
+        "read_only_browsing": "available",
+        "required_action": "repair-invalid-field"
+      }
+    },
+    {
+      "id": "string-model-is-invalid",
+      "manifest": {"authority_model_version": "1"},
+      "supported_versions": [1],
+      "known_versions": [1],
+      "expected": {
+        "status": "invalid",
+        "selected_version": null,
+        "authority_evaluation_capability": "unavailable",
+        "strict_conformance_eligibility": "ineligible",
+        "read_only_browsing": "available",
+        "required_action": "repair-invalid-field"
+      }
+    },
+    {
+      "id": "boolean-model-is-invalid",
+      "manifest": {"authority_model_version": true},
+      "supported_versions": [1],
+      "known_versions": [1],
+      "expected": {
+        "status": "invalid",
+        "selected_version": null,
+        "authority_evaluation_capability": "unavailable",
+        "strict_conformance_eligibility": "ineligible",
+        "read_only_browsing": "available",
+        "required_action": "repair-invalid-field"
+      }
+    }
+  ]
+}

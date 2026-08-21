@@ -8,6 +8,8 @@ Stable proposal ID: `PO-DEC-AUTH-002`
 
 Proposed amendment to: [ADR-0009](../0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../0010-core-owned-authority-evaluator.md)
 
+Maintainer disposition: accepted for Candidate implementation on 2026-08-21; formal ADR numbering and Canonical authority remain deferred to integration.
+
 ## Context
 
 ADR-0009 要求 Authority Meta Model 可被版本识别，ADR-0010 又要求未知模型版本失败关闭，但两者都故意没有决定公开字段、旧项目兼容和迁移方式。Candidate 已用内部标识 `amm-fixture-v1` 冻结 fixture，并在 Core、CLI 与 Observatory shadow 中验证语义；该标识目前不是项目 manifest、release manifest 或公共 API 契约。
@@ -99,7 +101,7 @@ Gate B 因此必须同时定义“选择哪一版语义”和“工具看不懂�
 
 ### 6. 实施与发布门
 
-本 Proposed 决策不授权立即修改 schema、manifest、installer、validator、managed docsite、README 或发布资产。维护者接受后，集成者才可分配正式 ADR 编号并按以下顺序实施：
+本提案在维护者接受前不授权实现。维护者现已授权前两项 Candidate 内部检查点；schema、manifest、installer、validator、managed docsite、README 或发布资产仍须等待正式 ADR 集成后再修改。总体实施顺序为：
 
 1. 为 legacy／supported／unsupported／invalid 组合增加兼容 fixtures；
 2. 在 Core 增加 provider-neutral capability judgment，不先改变消费者输出；
@@ -149,9 +151,9 @@ Authority 语义没有安全的“近似解释”。回退可能把 Unknown、hi
 - 模型迁移将产生额外的 dry-run、备份、State 与 Validation 工作，但避免工具更新静默改变项目事实。
 - v0.2.0 资产及其 checksum 保持历史事实；本提案不回写已发布 manifest。
 
-## Acceptance required
+## Confirmation record（Candidate）
 
-本提案在维护者明确接受前没有约束力。接受时还需确认：
+维护者于 2026-08-21 接受以下六项 Candidate 实施边界；在集成者基于最新 integration ref 分配正式 ADR 编号前，本文件仍保持 Proposed，不能冒充 Canonical 决策：
 
 1. 公开模型版本使用正整数，首版为 `1`；
 2. `.project-orrery.json` 顶层记录项目选择；
@@ -165,4 +167,4 @@ Authority 语义没有安全的“近似解释”。回退可能把 Unknown、hi
 - Approved Design: acceptance 后 amend [Authority Meta Model](../../design/authority-meta-model.md)
 - Implementation Plan: [Authority Meta Model conformance and gradual extraction](../../implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)
 - State Docs: [Authority Meta Model State](../../state/authority-meta-model.md), [release and toolchain](../../state/release-and-toolchain.md)
-- Validation: proposal currently has no runtime implementation evidence; acceptance and implementation require a new Gate B Validation record
+- Validation: [Authority Model compatibility Candidate](../../validation/2026-08-21-authority-model-compatibility-candidate.md)；仅证明内部 fixture／capability judgment，不证明公开契约或发布

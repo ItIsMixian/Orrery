@@ -28,6 +28,6 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-- [PO-DEC-AUTH-002: Authority Model 公开版本与兼容契约](proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md) — Proposed; freezes the Gate B field, legacy/unsupported behavior, version matrix and explicit migration boundary without changing manifests or runtime behavior.
+- [PO-DEC-AUTH-002: Authority Model 公开版本与兼容契约](proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md) — Proposed; maintainer accepted Candidate implementation, while formal ADR allocation and Canonical authority remain deferred to integration. No public manifest or runtime switch has occurred.
 
 Concurrent branches use stable IDs under `docs/decisions/proposals/` until the maintainer accepts a proposal and an integrator allocates the next canonical ADR number.
