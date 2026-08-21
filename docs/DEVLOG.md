@@ -226,3 +226,11 @@
 - 正式分配 ADR-0009，并建立 Authority Meta Model Approved Design／State：规范角色、非线性 Authority Graph、Canonical／Candidate／Worktree／Local-only／Historical／Unknown、provider-neutral evidence 和 derived-view semantic constraints。
 - `docs/core/principles.md` 明确为 Project Orrery Product Seed，不再与通用 Meta Model 职责混写；平台中立 Design 同时保留 AUTH-4 单一 implementation owner 未决定的边界。
 - 本轮没有创建 Implementation Plan、修改产品代码、拆分 Observatory、增加 `authority_model_version` 字段或改变发布状态；这些留到下一次对话。
+
+## 2026-08-21 — Codex Adapter Runtime E2E 集成
+
+- 将 `codex/agent-platform-adapters` 的两个已验证提交以 `--ff-only` 集成到本地 `main`；功能分支和 main 在合流前均 clean，merge base 为 `117acac9825b0ee93f0a98a8a64c8b82d13f56f6`。
+- 使用 Codex 官方 `skills.config` per-run 禁用项隔离真实登录态中的同名旧 Skill；精确 `codex-cli 0.148.0-alpha.21` Windows runtime 实测需要指向旧 `SKILL.md` 文件，模型可见目录才只剩 repo Adapter。
+- `gpt-5.6-terra`／medium 真实 turn 完成显式／隐式 Adapter 路由、CLI 0.1.0 preflight／validate、distribution 缺失和 0.2.0 不兼容失败关闭；旧 v0.2 Skill 显式升级、完整备份、可恢复卸载、重新发现和作者文件保留也有复现证据。
+- manifest 只把精确 Windows／Codex／Adapter／Core／CLI／模型／审批 runtime compatibility 标记为 `verified`；Adapter distribution 与组件顶层继续为 `experimental`／`unreleased`，没有发布、第二平台或 Phase 3 实现。
+- 真实用户旧 Skill／Codex 配置未修改，凭据未读取、复制或输出；repo Adapter 已从隔离 fixture 可恢复卸载。完整矩阵见 `docs/validation/2026-08-21-codex-runtime-e2e-completion.md`。

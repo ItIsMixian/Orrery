@@ -28,10 +28,10 @@ Updated: 2026-08-21
   和 mutation controls，不自动创建或运行 Pilot 010。
 - Marglo／NextStep Seed_2 是首批素材来源；只可提炼模式或从固定提交构造脱敏 fixture，不能在真实工作树运行，也不能复制用户数据、凭据、缓存或未提交改动。
 - 工作树新增未发布的 docsite UI 小优化：动态页 AI 设置入口位于顶栏主题按钮左侧，根观测台与发布模板已同步；桌面／移动端浏览器验证、动态全仓 40/40、集成结构、静态站和 diff 检查通过。没有新增 ADR，也没有提交、推送或发布。
-- ADR-0004 已接受平台中立 Core／CLI／Observatory／Adapter 的单仓库分包边界；Approved Design 与 Active Plan 已建立。Phase 0／1 和 Phase 2 仓库实现检查点已落地，但没有改变 v0.2.0 资产、实现第二平台或产生任何新的 runtime `verified` 证据。
+- ADR-0004 已接受平台中立 Core／CLI／Observatory／Adapter 的单仓库分包边界；Approved Design 与 Active Plan 已建立。Phase 0／1／2 已落地，精确 Windows／Codex runtime 范围已有 `verified` E2E；这没有改变 v0.2.0 资产、发布独立组件或实现第二平台。
 - ADR-0004 Phase 0 已完成：v0.2.0 发布清单和三项 CLI 人类输出由 fixture／回归保护，模板 `AGENTS.md` 使用中立标题；README 将可移植 CLI、`experimental` Codex 和 `target` 其他平台明确分开。
 - ADR-0004 Phase 1 已完成：`packages/*/src` 下建立 Core／CLI／Observatory 0.1.0 源码边界；旧 Skill 路径为薄 wrapper，单独 Skill 使用冻结 v0.2 fallback。12 项产品测试通过，2 个动态依赖测试按设计跳过。
-- ADR-0004 Phase 2 仓库实现检查点已完成：`adapters/codex/` 是不含模板／schema／项目事实的薄 Adapter，`scripts/package_codex_adapter.py` 生成独立 ZIP／checksum，平台安装器的 dry-run、冲突拒绝、旧 Skill 备份迁移、升级与可恢复卸载在临时目录 5/5 通过。真实 Codex E2E 未执行，状态仍为 `experimental`。
+- ADR-0004 Phase 2 已完成：`adapters/codex/` 是不含模板／schema／项目事实的薄 Adapter；真实 `codex-cli 0.148.0-alpha.21` 在 Windows 11 build 26200 上通过唯一发现、显式／隐式调用、CLI 缺失／不兼容失败关闭、旧 Skill／Adapter 升级、完整备份、可恢复卸载、重新发现和环境恢复。只有该 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental` 且未发布。
 - ADR-0003 的 docsite 凭据安全实现已在工作树完成：Provider／Base URL 绑定、显式端点、失败关闭、同源 POST、安全响应头、语料／Provider 缓存签名，以及可选确定性 Broker 的缓存、single-flight、模型与预算门均已同步到根工具和发布模板。它尚未提交、推送或发布。
 - ADR-0006 已在工作树把上述可选 Broker 收敛为唯一 docsite 网关：设置页的 OpenAI／DeepSeek／Custom 只注册上游，默认本机托管自动启动，外部隔离只保存 client token；`set_key.py`、独立 Q&A CLI、仪表盘与测试路径都要求 Broker。动态产品专项 16/16、默认全仓 57 passed + 2 expected skips，尚未提交或发布。
 - 已完成 `Ariestar/sivtr@4fae091` 固定提交的源码观察并写入 Library。当前结论是其 WorkRecord／WorkRef／WorkSet、渐进检索和只读 MCP 可作为情境证据层参考，但不能替代 Orrery 权威链；没有采纳依赖、Adapter、路由策略或新 Pilot。
@@ -63,7 +63,7 @@ Updated: 2026-08-21
 - 不要因 Pilot 009 的成本方向信号直接修改发布 `skills/project-orrery/SKILL.md` 或模板；S 仍是
   experiments 候选且本轮明确不采纳。
 - 不要把工作树中的 Core 源码分包写成“独立组件已发布”或“其他 Agent 平台已兼容”；当前公开发布源和唯一发布集成仍是 `skills/project-orrery/` 下的 Codex Skill。
-- 不要把仓库内 Codex Adapter 的归档／临时目录测试写成真实 runtime 兼容证据；在没有明确授权前，不要安装、升级或卸载维护者真实用户技能目录中的 `project-orrery`。
+- 不要把精确 Windows／Codex runtime 的 `verified` 证据外推到其他 runtime、OS、模型或审批模式，也不要把它写成 Adapter／Core／CLI 已发布。未来真实用户目录操作仍需逐次明确授权。
 - 不要把默认同用户托管 Broker 宣称为进程隔离。它统一路由、缓存和预算门，但只有外部 Broker 确实运行在独立 OS 身份或等价外层边界下时才隔离 Provider Key；client token 仍能在预算内发起调用。
 - 旧共享 keyring 槽不会被启动流程读取或自动迁移；用户重新保存当前 Provider Key 时会写入绑定槽并清理旧槽。若旧 Key 曾进入不受信任进程或测试上下文，轮换仍是 Provider 侧动作，代码无法替代。
 - 不要把 `sivtr` README／Roadmap 或私有 retrieval snapshot 指标写成独立验证事实：其公开仓库没有评估快照，固定提交的完整 Rust 测试在本机因 build-script `os error 5` 未进入测试阶段，且 Agent 入口、架构、Roadmap 与实现存在漂移。任何 transcript 读取还必须先解决缓存副本、保留／删除、脱敏和 Windows daemon token 权限边界。
@@ -84,7 +84,7 @@ Updated: 2026-08-21
    只读 2/3 复核一起解释。
 7. 下一步先按[任务／Oracle v0.2](../experiments/context-routing/designs/real-development-task-oracle-v0.2.zh-CN.md)
    建立无模型 controls。Pilot 010 尚未创建，也没有自动补跑授权。
-8. 平台适配工作先读取 [ADR-0004](decisions/0004-platform-neutral-core-and-adapter-boundaries.md)、[Approved Design](design/platform-neutral-core-and-adapter-architecture.md)、[Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)、[Phase 1 Validation](validation/2026-08-19-platform-neutral-phase-1-core-cli.md)和[Phase 2 仓库实现 Validation](validation/2026-08-19-platform-neutral-phase-2-codex-adapter.md)；下一步须经明确授权后才进行真实 Codex runtime E2E，不先选择第二平台或发布组件。
+8. 平台适配工作先读取 [ADR-0004](decisions/0004-platform-neutral-core-and-adapter-boundaries.md)、[Approved Design](design/platform-neutral-core-and-adapter-architecture.md)、[Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)、[Phase 2 仓库实现 Validation](validation/2026-08-19-platform-neutral-phase-2-codex-adapter.md)和[Runtime E2E 完成记录](validation/2026-08-21-codex-runtime-e2e-completion.md)；下一步是新分支／worktree 中的 Phase 3 Harness JSON，不先选择第二平台或发布组件。
 9. docsite 安全接续先读取 [ADR-0003](decisions/0003-provider-bound-credentials-and-optional-local-broker.md)、[ADR-0006](decisions/0006-broker-only-docsite-provider-gateway.md)、[Broker-first Design](design/broker-first-docsite-provider-gateway.md)和[Validation](validation/2026-08-19-broker-first-docsite-gateway.md)；公开 v0.2.0 尚不包含这些工作树改动。
 10. 若继续研究外部工作记忆层，先读取 [sivtr 观察](library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)；除非用户明确接受新的 ADR／Plan，不安装 sivtr、不扫描真实 transcript、不修改 Scope Router，也不自动创建 Pilot 010。
 11. 多人协作先读取 [ADR-0007](decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)、[Approved Design](design/multi-worktree-collaboration-protocol.md)、[活动 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)和[恢复 Validation](validation/2026-08-20-multi-worktree-recovery-and-manual-adoption.md)。后续任务只在独立 worktree 中继续，根 `PROGRESS`／`HANDOFF` 由整合者同步。

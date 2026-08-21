@@ -4,7 +4,7 @@ Updated: 2026-08-21
 
 ## 当前阶段
 
-Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR-0005 把当前效率目标定义为从任务 Prompt 到首次允许产品写入前的累计 input；Harness 被动派生 Scope Lock，不要求 Agent 输出 Manifest 或回执。Pilot 008 的首对正式运行因 P 读取外部已安装 Skill 和共同 Oracle 假阴性而停止并封存。修正后的 Pilot 009 已完成三项 P/S、共六个 Terra medium run：装置、exact Scope、formal validation 和 R0 全部有效，S/P 聚合写前 input 为 `0.8274`，所有成本门通过；只读任务质量 P/S 均为 2/3，迁移任务共同遗漏 PROGRESS 的未来版本拒绝事实，因此 3/3 质量门失败，S 不采纳。下一步先落实分层任务／Oracle v0.2 的 paraphrase 与 mutation controls，不自动补跑模型。平台适配方向另由 ADR-0004 接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime 验证门；Phase 0、Phase 1 和 Phase 2 的仓库实现检查点已完成，当前工作树已有未发布 Core／CLI／Observatory 源码包、旧 Skill 兼容入口，以及可独立归档和可恢复安装的薄 Codex Adapter，但没有真实 Codex runtime E2E、独立组件发布或第二平台实现。ADR-0003 的凭据加固已由 ADR-0006 收敛为 Broker-only docsite：本机托管为默认，外部隔离只绑定 client token，直接 Provider UI／运行／Q&A CLI 入口均已移除并通过本地验证，但尚未提交或进入公开 v0.2.0。
+Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR-0005 把当前效率目标定义为从任务 Prompt 到首次允许产品写入前的累计 input；Harness 被动派生 Scope Lock，不要求 Agent 输出 Manifest 或回执。Pilot 008 的首对正式运行因 P 读取外部已安装 Skill 和共同 Oracle 假阴性而停止并封存。修正后的 Pilot 009 已完成三项 P/S、共六个 Terra medium run：装置、exact Scope、formal validation 和 R0 全部有效，S/P 聚合写前 input 为 `0.8274`，所有成本门通过；只读任务质量 P/S 均为 2/3，迁移任务共同遗漏 PROGRESS 的未来版本拒绝事实，因此 3/3 质量门失败，S 不采纳。下一步先落实分层任务／Oracle v0.2 的 paraphrase 与 mutation controls，不自动补跑模型。平台适配方向另由 ADR-0004 接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime 验证门；Phase 0、Phase 1 和 Phase 2 已完成，main 现包含未发布 Core／CLI／Observatory 源码包、旧 Skill 兼容入口和薄 Codex Adapter。Adapter 0.1.0 在 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 及已记录模型／审批组合上的 runtime compatibility 已有完整 E2E 并标记 `verified`；Adapter 发行仍为 `experimental`，没有独立组件发布或第二平台实现。ADR-0003 的凭据加固已由 ADR-0006 收敛为 Broker-only docsite：本机托管为默认，外部隔离只绑定 client token，直接 Provider UI／运行／Q&A CLI 入口均已移除并通过本地验证，但尚未提交或进入公开 v0.2.0。
 
 2026-08-20 已把三个 Agent 交错留在共享 `main` 工作目录的成果先封存为不可变恢复提交，再在独立 integration worktree 中按研究、产品和权威状态拆分并合入。ADR-0007 已正式接受一任务一分支／worktree、三层事实作用域与干净集成规则；默认 59 passed + 2 expected skips、动态 61/61、结构／静态站／235 份 Markdown 本地链接验证通过。当前只完成人工采纳与恢复流程，自动 session、重叠检测、主 worktree 守卫和 integration CLI 仍未实现；改动尚未推送或发布。
 
@@ -52,7 +52,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 完成 ADR-0006：默认托管与外部隔离两种模式都以 Broker 为唯一 docsite 调用通道；UI 只注册上游，`set_key.py` 和独立 Q&A CLI 也失败关闭到 Broker。动态产品专项 16/16、默认全仓 57 passed + 2 expected skips，integrated build 与模板投影通过。
 - [x] 完成 ADR-0004 Phase 0：固化 v0.2.0 发布清单与 CLI 人类输出，模板入口改为中立标题，并在 README 将 CLI 可移植路径、`experimental` Codex 与 `target` 其他平台分开表述。
 - [x] 完成 ADR-0004 Phase 1：建立 Core／CLI／Observatory 0.1.0 源码包、canonical 作者模板、schema／兼容模型、managed-tool 清单和旧 Skill wrapper／fallback，并验证新旧入口等价。
-- [x] 完成 ADR-0004 Phase 2 仓库实现检查点：建立独立 Codex Adapter 0.1.0、组件／runtime manifest、确定性 ZIP／checksum 和只管理 Adapter 目录的 dry-run／备份升级／可恢复卸载；临时目录专项 5/5 通过，真实 runtime 验证仍待授权。
+- [x] 完成 ADR-0004 Phase 2：建立独立 Codex Adapter 0.1.0、组件／runtime manifest、确定性 ZIP／checksum 和只管理 Adapter 目录的 dry-run／备份升级／可恢复卸载；真实 Codex runtime 又完成唯一发现、显式／隐式调用、CLI 失败关闭、升级、卸载、重新发现和环境恢复证据门。
 - [x] 完成 `Ariestar/sivtr@4fae091` 外部源码观察，区分其情境工作记忆层与 Orrery 权威事实层；记录 WorkRef／WorkSet 渐进披露、只读 MCP、检索评估、隐私生命周期和文档漂移启发。没有采纳依赖、Adapter、路由策略或新 Pilot。
 - [x] 恢复共享工作目录中的三项并发成果：保留 `a87c5a4` 恢复提交，在独立 integration worktree 中形成研究、产品、Library 和权威状态提交，并将临时协作决策分配为 ADR-0007。
 - [x] 完成 ADR-0007 人工采纳验证：冻结 Pilot 输入逐字节保留，默认／动态全仓、结构、静态站、Markdown 链接与 Git 检查通过。
@@ -74,7 +74,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - Smoke 001 的最终 58,541 input 是无写入边界的整轮累计值，不是 `input-to-scope-lock`；不能用它估算或代替主指标。
 - Smoke 002 的 19,361 input 是单个 ordering-only 兼容性 turn 的精确写前累计值，不是任一正式 P/S 样本，也不能支持路由收益结论；其 `minimum_prewrite_content_reads` 为 0，因此没有独立内容交付证明。
 - 平台中立 Core／CLI／Observatory 源码边界已经实现，但 `implemented` 不等于 `released`：当前没有独立组件发布产物、Harness JSON Adapter、第二平台集成或可声明的第二平台 `verified` 证据。
-- v0.2.0 CLI 仍随 Codex Skill 分发；源码 wrapper 调用新 CLI，独立 Skill 使用冻结 fallback。Codex 因缺少完整真实 runtime E2E 继续保持 `experimental`。
+- v0.2.0 CLI 仍随 Codex Skill 分发；源码 wrapper 调用新 CLI，独立 Skill 使用冻结 fallback。Codex Adapter 发行因独立 CLI／公开安装路径尚未发布而继续为 `experimental`，但 manifest 中已记录的精确 Windows／Codex runtime compatibility 为 `verified`，不得外推到其他版本、OS、模型或审批模式。
 - Codex Adapter 已成为独立的未发布薄产物，但它只声明对 Core API 1 和 CLI `>=0.1.0,<0.2.0` 的依赖；Core／CLI 尚未发布，因此它不是新的完整公共安装路径，也没有改变 v0.2.0 发布事实。
 - 动态 docsite 已没有直接 Provider 路径；默认同用户托管 Broker 只提供统一路由和成本门，只有在独立 OS 身份或等价边界中配置并运行外部 Broker，才能把 Provider Key 隔离出 docsite／Agent 身份。
 - `sivtr` 可作为未来“情境证据来源”的研究对象，但不能替代 State／ADR／实现真值；任何可选 memory evidence Adapter 都需要新的权威／证据分层、隐私生命周期和可复现验证决定，当前不进入发布版或下一 Pilot。
@@ -105,7 +105,7 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 - [x] 采用 `packages/*/src` 布局，Core／CLI／Observatory 初始未发布版本为 0.1.0；旧 Skill wrapper 保留至 0.3.x，最早 0.4.0 移除。
 - [x] 建立 Codex Adapter 独立产物与安装／卸载边界：未知目录拒绝、已识别旧 Skill／Adapter 先备份再升级、卸载移入可恢复回收目录；Adapter 只声明外部 CLI 依赖。
 - [x] 完成 Broker-first docsite gateway：所有 API 入口统一经 Broker 注册，默认托管不强制连接测试，外部模式只接收 client token；根／模板、README 和 Validation 已同步。
-- [ ] 在明确授权后，把独立 CLI 与 Adapter 安装到隔离的真实 Codex 用户技能位置，记录精确 runtime／OS 的发现、调用、失败、更新和卸载 E2E；完成前保持 `experimental`，且不发布组件。
+- [x] 在明确授权后完成真实 Codex runtime E2E：使用 per-run `skills.config` 隔离同名用户旧 Skill，不复制凭据或写用户 Skill／配置；覆盖发现、调用、失败、更新、卸载与恢复，并只把精确 runtime 范围标记为 `verified`。
 - [ ] 按 ADR-0007／ADR-0008 活动 Plan 先实现 Personal foundation Phase 0：版本化 Workstream／session／scope／finding schema、subsystem registry、Git fixture、integration ref 解析和主 worktree 识别；在此之前继续人工创建独立 worktree，且不启动 Team 网络能力。
 - [ ] 下一次对话再为 ADR-0009 设计 Authority Meta Model 的盘点／conformance／渐进提取 Plan；在此之前不决定 API／package owner，不重构 Observatory，不提升 document schema 或 Core API。
 
@@ -130,6 +130,6 @@ Project Orrery v0.2.0 已公开发布，Pilot 007 已封存且 B 不采纳。ADR
 字段契约、分离五层 verdict，并用 paraphrase／contradiction／mutation controls 证明 Oracle。Pilot 009 的
 成本方向信号可以作为继续研究的理由，但 S 在 3/3 质量门和维护者明确接受前不得进入发布 Skill 或模板。
 
-平台适配线路的下一安全里程碑是 ADR-0004 Phase 2 的真实 Codex runtime E2E。仓库内产物和生命周期测试已就绪，但实际安装会改变用户技能目录并可能需要重启／新会话，因此必须先获得明确授权；在此之前保持 `experimental`，也不得宣称第二平台兼容。
+平台适配线路的下一安全里程碑是 ADR-0004 Phase 3：先为 `scaffold --dry-run`、`validate` 和 `check-update` 定义稳定 JSON schema／退出码，再在完全不加载 `SKILL.md`、Codex 配置或 Agent runtime 的新分支／worktree 实现最小 `harness-json` Adapter。该里程碑不选择第二平台，也不改变未发布组件状态。
 
 多人协作线路的下一安全里程碑是 ADR-0007／ADR-0008 Personal foundation 的最小机器合约和 Git fixture；在任何自动命令完成前，继续使用一个 Workstream 一个独立 worktree、主目录只集成、唯一整合者同步全局 State 的人工协议。Team Mode 必须等 Personal 路径稳定且通过 zero-network 默认验证后再实施。
