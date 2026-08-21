@@ -66,6 +66,7 @@ Updated: 2026-08-21
   为 151 项、1 项 Windows symlink privilege skip。首次全仓 219 项暴露 1 项 root/release builder 字节一致性
   失败，随后把 Candidate runtime 移到独立 root-only entry，并由含原失败用例的 19 项 focused rerun 证明修复；
   最终全仓、结构、站点、链接与 diff 见对应 Validation。
+- 2026-08-21 M2.3 release／installer gate Worktree Candidate 新增 12 项门禁专项：覆盖 candidate manifest 配对／版本／secret 失败关闭、v0.2 历史 hash、确定性离线 archive／checksum、new／legacy standalone、invalid／unsupported 与非普通 target 零写入、receipt-gated migration／restore、self-host、环境凭据隔离／timeout，以及 traversal／大小写碰撞／symlink／forbidden／plaintext-secret 二次解包检查。Gate 专项 12 项中 10 通过、2 项因 Windows symlink privilege 跳过；Authority 专项 151 项中 148 通过、3 项跳过；全仓 219 项中 214 通过、5 项按环境或可选依赖跳过。该证据不选择实际 SemVer，不证明 M2.2 consumer production switch、公开发布或稳定 Core API。
 
 ## 验证证据
 
@@ -94,6 +95,7 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Meta Model M1 本地 Canonical 集成](../validation/2026-08-21-authority-meta-model-canonical-integration.md)
 - [2026-08-21 M2.1 complete CLI Authority observations/claims](../validation/2026-08-21-m2-1-authority-cli-claims.md)
 - [2026-08-21 M2.2 Observatory Authority Candidate projection](../validation/2026-08-21-m2-2-observatory-authority-projection.md)
+- [2026-08-21 M2.3 Authority release／installer candidate gate](../validation/2026-08-21-m2-3-authority-release-candidate-gate.md)
 - [2026-08-21 Authority Meta Model Core shadow evaluator](../validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md)
 - [2026-08-21 Authority Meta Model CLI shadow comparison](../validation/2026-08-21-authority-meta-model-cli-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory parser shadow](../validation/2026-08-21-authority-meta-model-observatory-parser-shadow.md)
@@ -122,4 +124,4 @@ Updated: 2026-08-21
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、M2.1 Worktree Candidate 完整 CLI claims、Observatory lifecycle/explicit-relation harness、managed sidecar／shadow diagnostic、AI derived-view guard、内部 Gate B capability judgment、receipt-gated 显式迁移／恢复和 future-release projection contract；M2.1 尚未集成，且仍没有 Observatory production projection、实际下一 release 默认字段、production-switch 或 release 证据。
+- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、M2.1 Worktree Candidate 完整 CLI claims、Observatory lifecycle/explicit-relation harness、managed sidecar／shadow diagnostic、AI derived-view guard、内部 Gate B capability judgment、receipt-gated 显式迁移／恢复、future-release projection contract 与 M2.3 本地 candidate gate；M2.1 尚未集成，且仍没有 Observatory production projection、维护者选择的实际下一 release manifest、production-switch 或公开 release 证据。

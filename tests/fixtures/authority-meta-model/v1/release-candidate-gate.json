@@ -1,0 +1,17 @@
+{
+  "fixture_id": "amm-release-candidate-gate-v1",
+  "gate_contract": "orrery-authority-release-candidate-gate-v1",
+  "synthetic_candidate_version": "0.2.1",
+  "authority_model_version": 1,
+  "supported_authority_model_versions": [1],
+  "expected": {
+    "new_scaffold_selects_default": true,
+    "legacy_ordinary_upgrade_preserves_missing": true,
+    "unsupported_and_invalid_fail_closed": true,
+    "migration_requires_receipt": true,
+    "restore_is_exact": true,
+    "historical_v0_2_0_inputs_unchanged": true,
+    "candidate_ready_can_be_true": true,
+    "release_ready_without_external_blockers": false
+  }
+}
