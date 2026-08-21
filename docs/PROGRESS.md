@@ -4,17 +4,17 @@ Updated: 2026-08-21
 
 ## 当前阶段
 
-Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成平台中立 Core／CLI／Observatory、Codex 与 Harness JSON Adapter、Broker-only docsite、多人协作设计，以及 Authority Meta Model M1／M2。这些后续能力仍是本地 Canonical、`experimental`／`unreleased` 实现，没有形成新的公开 Release。
+Project Orrery v0.2.0 是当前公开版本；源代码 `main` 已在其后集成平台中立 Core／CLI／Observatory、Codex 与 Harness JSON Adapter、Broker-only docsite、多人协作设计，以及 Authority Meta Model M1／M2，并已通过 Windows／Ubuntu CI 同步至公开 `origin/main`。这些后续能力仍是 Canonical source、`experimental`／`unreleased` 实现，没有形成新的公开 Release。
 
 当前工作集中在五条相互独立的线路。详细历史进入 [DEVLOG](DEVLOG.md)，可复现证据进入 [Validation](validation/README.md)，这里仅保留当前控制面。
 
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
-| Authority Meta Model | 模型 1、Core evaluator、完整内部 CLI claims、root-only opt-in Observatory projection 与本地 release-candidate gate 已进入本地 Canonical baseline；默认 production consumer 和公开 release 未切换 | 审阅 managed consumer 的 production switch 与回滚证据，再由维护者选择真实 SemVer／candidate manifest |
+| Authority Meta Model | 模型 1、Core evaluator、完整内部 CLI claims、root-only opt-in Observatory projection 与本地 release-candidate gate 已进入 Canonical source baseline；默认 production consumer 和公开 release 未切换 | 审阅 managed consumer 的 production switch 与回滚证据，再由维护者选择真实 SemVer／candidate manifest |
 | 多 Workstream 协作 | ADR-0007／0008 与 Approved Design 已接受；当前只有人工独立 worktree、唯一整合者和三层事实作用域 | 实现 Personal foundation Phase 0 的 machine contract；继续禁止在共享主目录并发开发 |
 | Context routing 研究 | Pilot 009 的 P/S 装置与 Scope 证据有效，但质量门失败，没有策略获准进入发布 Skill | 不调用模型地完成 task／Oracle v0.2 的分层 verdict、结构化 State、paraphrase 与 mutation controls |
-| 平台与 Adapter | Phase 0–3 已本地集成；Codex 精确 runtime 范围有 verified 证据，Harness JSON 有 Windows／Ubuntu CI；组件仍未独立发布 | 另行规划 Phase 4，并在明确授权后才选择第二个真实 Agent／Harness 平台 |
-| 文档治理 | ADR-0012、Approved Design 与 self-host Phase 0 已进入本地 Canonical，建立当前／历史边界、事件同步和 soft review 规则；尚无 audit runtime | 先冻结只读 finding contract／fixture；不增加自动改写 |
+| 平台与 Adapter | Phase 0–3 已进入 `main`；Codex 精确 runtime 范围有 verified 证据，Harness JSON 有 Windows／Ubuntu CI；组件仍未独立发布 | 另行规划 Phase 4，并在明确授权后才选择第二个真实 Agent／Harness 平台 |
+| 文档治理 | ADR-0012、Approved Design 与 self-host Phase 0 已进入 Canonical source，建立当前／历史边界、事件同步和 soft review 规则；尚无 audit runtime | 先冻结只读 finding contract／fixture；不增加自动改写 |
 
 ## 当前结论
 
@@ -46,6 +46,7 @@ Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成�
 
 ## 最近完成
 
+- [main 验收与跨平台 CI](validation/2026-08-21-main-acceptance-and-cross-platform-ci.md)：本地 231 项动态回归、integrated build、Authority 投影回滚、链接与发布边界通过；首次 Ubuntu 发现的 Windows 路径夹具已修正，最终 Windows／Ubuntu 双 PASS，未创建新 Release。
 - [Authority M2 本地 Canonical 集成](validation/2026-08-21-authority-meta-model-m2-local-canonical-integration.md)：M2.1／M2.2／M2.3 已通过独立 worktree 与干净集成，默认 production 和公开 release 保持不变。
 - [Authority M1 本地 Canonical 集成](validation/2026-08-21-authority-meta-model-canonical-integration.md)：fixture、Core owner、兼容、迁移／恢复、shadow 与 AI non-escalation 已进入本地 baseline。
 - [平台中立 Phase 3](validation/2026-08-21-platform-neutral-phase-3-harness-json.md)：Harness JSON 合约通过 Windows／Ubuntu CI，但仍为未发布参考 Adapter。

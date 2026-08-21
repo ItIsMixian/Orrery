@@ -6,6 +6,7 @@ Updated: 2026-08-21
 
 - 根文档系统已依据 ADR-0001 完成自托管集成；`.project-orrery.json` 应保持 `authority_status: integrated`。
 - Project Orrery v0.2.0 已公开发布：`main`、tag、Release、zip、checksum 和远端 manifest 均已核验。
+- 2026-08-21 的本地 Canonical 集成已在 `main@42aebae` 同步至公开 `origin/main`；本地动态 231 项与远端 GitHub Actions `32492830151` 的 Windows／Ubuntu 矩阵通过。该同步没有创建 tag、Release 或新的公开支持声明。
 - 自托管、实验、installer 缓存排除和 CI 完整历史修复已进入 Git 历史。
 - 上下文路由证据集中在 `experiments/context-routing/`；大型原始输出位于 `D:\coding warehouse\project-orrery-benchmark`。
 - Pilot 004 的 H1 未达到 token 采纳门，不能加入发布版 Skill。
@@ -27,21 +28,21 @@ Updated: 2026-08-21
 - 任务／Oracle v0.2 已作为研究候选成文：下一步先构造分层 verdict、公开结构化 State 字段、paraphrase
   和 mutation controls，不自动创建或运行 Pilot 010。
 - Marglo／NextStep Seed_2 是首批素材来源；只可提炼模式或从固定提交构造脱敏 fixture，不能在真实工作树运行，也不能复制用户数据、凭据、缓存或未提交改动。
-- 工作树新增未发布的 docsite UI 小优化：动态页 AI 设置入口位于顶栏主题按钮左侧，根观测台与发布模板已同步；桌面／移动端浏览器验证、动态全仓 40/40、集成结构、静态站和 diff 检查通过。没有新增 ADR，也没有提交、推送或发布。
+- 未发布的 docsite UI 小优化已随 `1cad1ac` 进入 `origin/main`：动态页 AI 设置入口位于顶栏主题按钮左侧，根观测台与发布模板已同步；桌面／移动端浏览器验证、动态全仓 40/40、集成结构、静态站和 diff 检查通过。没有新增 ADR 或 Release。
 - ADR-0004 已接受平台中立 Core／CLI／Observatory／Adapter 的单仓库分包边界；Approved Design 与 Active Plan 已建立。Phase 0／1／2 已落地，精确 Windows／Codex runtime 范围已有 `verified` E2E；这没有改变 v0.2.0 资产、发布独立组件或实现第二平台。
 - ADR-0004 Phase 0 已完成：v0.2.0 发布清单和三项 CLI 人类输出由 fixture／回归保护，模板 `AGENTS.md` 使用中立标题；README 将可移植 CLI、`experimental` Codex 和 `target` 其他平台明确分开。
 - ADR-0004 Phase 1 已完成：`packages/*/src` 下建立 Core／CLI／Observatory 0.1.0 源码边界；旧 Skill 路径为薄 wrapper，单独 Skill 使用冻结 v0.2 fallback。12 项产品测试通过，2 个动态依赖测试按设计跳过。
 - ADR-0004 Phase 2 已完成：`adapters/codex/` 是不含模板／schema／项目事实的薄 Adapter；真实 `codex-cli 0.148.0-alpha.21` 在 Windows 11 build 26200 上通过唯一发现、显式／隐式调用、CLI 缺失／不兼容失败关闭、旧 Skill／Adapter 升级、完整备份、可恢复卸载、重新发现和环境恢复。只有该 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental` 且未发布。
-- ADR-0004 Phase 3 已完成并本地集成：CLI 0.1.1 的 opt-in JSON 合约、稳定退出码与 `adapters/harness-json/` 0.1.0 已通过隔离生命周期测试。首轮 CI 暴露并修复 Unix CLI 命令夹具；run 30 与最终 HEAD `02c4a6b` 的 run 31 均在 Windows／Ubuntu 双 PASS。Harness 仍为 `experimental`／`unreleased`，不证明模型读取或第三方 Agent runtime 兼容。远端 feature `codex/harness-json-phase3` 已推送；本地 main 已 `--ff-only` 到该 HEAD，但远端 main 尚未推送。
-- ADR-0003 的 docsite 凭据安全实现已在工作树完成：Provider／Base URL 绑定、显式端点、失败关闭、同源 POST、安全响应头、语料／Provider 缓存签名，以及可选确定性 Broker 的缓存、single-flight、模型与预算门均已同步到根工具和发布模板。它尚未提交、推送或发布。
-- ADR-0006 已在工作树把上述可选 Broker 收敛为唯一 docsite 网关：设置页的 OpenAI／DeepSeek／Custom 只注册上游，默认本机托管自动启动，外部隔离只保存 client token；`set_key.py`、独立 Q&A CLI、仪表盘与测试路径都要求 Broker。动态产品专项 16/16、默认全仓 57 passed + 2 expected skips，尚未提交或发布。
+- ADR-0004 Phase 3 已完成并进入 `origin/main`：CLI 0.1.1 的 opt-in JSON 合约、稳定退出码与 `adapters/harness-json/` 0.1.0 已通过隔离生命周期测试。首轮 CI 暴露并修复 Unix CLI 命令夹具；run 30 与最终 HEAD `02c4a6b` 的 run 31 均在 Windows／Ubuntu 双 PASS。Harness 仍为 `experimental`／`unreleased`，不证明模型读取或第三方 Agent runtime 兼容。
+- ADR-0003 的 docsite 凭据安全实现已随 `1cad1ac` 进入 `origin/main`：Provider／Base URL 绑定、显式端点、失败关闭、同源 POST、安全响应头、语料／Provider 缓存签名，以及可选确定性 Broker 的缓存、single-flight、模型与预算门均已同步到根工具和发布模板。它仍未形成新 Release。
+- ADR-0006 已在 `origin/main` 把上述可选 Broker 收敛为唯一 docsite 网关：设置页的 OpenAI／DeepSeek／Custom 只注册上游，默认本机托管自动启动，外部隔离只保存 client token；`set_key.py`、独立 Q&A CLI、仪表盘与测试路径都要求 Broker。动态产品专项 16/16、默认全仓 57 passed + 2 expected skips；支持状态仍是未发布。
 - 已完成 `Ariestar/sivtr@4fae091` 固定提交的源码观察并写入 Library。当前结论是其 WorkRecord／WorkRef／WorkSet、渐进检索和只读 MCP 可作为情境证据层参考，但不能替代 Orrery 权威链；没有采纳依赖、Adapter、路由策略或新 Pilot。
 - 三个 Agent 在同一 `main@96eee5a` 工作目录留下的交错改动已先封存到 `codex/recovery-shared-main-20260820@a87c5a4`，再在 `D:\coding warehouse\project-orrery-integration-20260820` 拆分为研究、产品、Library 和权威状态提交。恢复分支不可改写或删除。
 - ADR-0007 已接受 Workstream 隔离、Canonical／Candidate／Worktree 作用域和干净集成规则；ADR-0008 又接受 default Personal Mode、opt-in Team Mode、Local-only telemetry 与中央只读／本机执行边界。两者都不证明自动化已经实现。完整动态回归仍为 61/61，默认 59 passed + 2 expected skips；本轮新增协作 Design 只做文档级验证，没有新 Release。
 - 自动 session、overlap、主 worktree 守卫、`orrery integrate` 与观测台 scope banner 尚未实现。三个后续 Agent 必须各自进入新分配的 worktree，不能继续复用原共享目录。
 - 已分配目录：context-routing 使用 `D:\coding warehouse\project-orrery-agent-context-routing`，platform／adapters 使用 `D:\coding warehouse\project-orrery-agent-platform-adapters`，docsite／broker 使用 `D:\coding warehouse\project-orrery-agent-docsite`。三者都是 clean linked worktree；尚未创建 session，开始新任务时再声明 expected writes 与 validation。
 - 协作 Design 已完成产品层收敛：Agent-first／Orrery-first 混合入口、subsystem mapping、Scope B、finding／ack、双维度状态、风险审查包、人工集成、保守清理和 Personal／Team 渐进指挥台均已进入 Approved Design。下一步只做 Personal foundation Phase 0，不直接实现 Team 网络层。
-- ADR-0009／0010／0011 与活动 Plan 已把 Authority Meta Model 推进到本地 `main` 的 experimental M2 baseline：M1 的 fixture／Core／兼容／迁移基础上，M2.1 完整内部 CLI claims、M2.2 root-only opt-in Observatory projection 和 M2.3 release-candidate gate 均已通过独立 worktree 验证与干净集成。AUTH-4 已解决为平台中立 Core；AUTH-1 仍 pending。当前仍无稳定公共 domain API、默认 production projection、维护者选定的下一 SemVer／manifest 或公开模型 1 release。
+- ADR-0009／0010／0011 与活动 Plan 已把 Authority Meta Model 推进到 `origin/main` 的 experimental M2 source baseline：M1 的 fixture／Core／兼容／迁移基础上，M2.1 完整内部 CLI claims、M2.2 root-only opt-in Observatory projection 和 M2.3 release-candidate gate 均已通过独立 worktree验证、干净集成与双平台 CI。AUTH-4 已解决为平台中立 Core；AUTH-1 仍 pending。当前仍无稳定公共 domain API、默认 production projection、维护者选定的下一 SemVer／manifest 或公开模型 1 release。
 
 ## 风险与常见陷阱
 

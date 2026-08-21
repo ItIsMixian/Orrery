@@ -68,6 +68,7 @@ Updated: 2026-08-21
   最终全仓、结构、站点、链接与 diff 见对应 Validation。
 - 2026-08-21 M2.3 release／installer gate Worktree Candidate 新增 12 项门禁专项：覆盖 candidate manifest 配对／版本／secret 失败关闭、v0.2 历史 hash、确定性离线 archive／checksum、new／legacy standalone、invalid／unsupported 与非普通 target 零写入、receipt-gated migration／restore、self-host、环境凭据隔离／timeout，以及 traversal／大小写碰撞／symlink／forbidden／plaintext-secret 二次解包检查。Gate 专项 12 项中 10 通过、2 项因 Windows symlink privilege 跳过；Authority 专项 151 项中 148 通过、3 项跳过；全仓 219 项中 214 通过、5 项按环境或可选依赖跳过。该证据不选择实际 SemVer，不证明 M2.2 consumer production switch、公开发布或稳定 Core API。
 - 2026-08-21 M2 本地 Canonical integration 把 M2.1／M2.2／M2.3 合并后的 Authority 专项扩展到 163 项，160 通过、3 项 Windows symlink privilege 跳过；全仓扩展到 231 项，226 通过、5 项按环境或可选依赖跳过。结构、默认 legacy build、显式 projection、链接与 diff 见 integration Validation；该证据不证明 managed production switch 或 release。
+- 2026-08-21 `main` 推送验收先在本机启用动态依赖执行 231 项并全部通过，3 项 Windows symlink privilege 跳过；integrated build、默认／显式 Authority projection 精确回滚、282 份 Markdown／686 个本地链接／0 缺失和发布排除边界通过。首次远端 run `32492265629` 的 Ubuntu job 发现 release-gate 测试硬编码 Windows 绝对路径；`42aebae` 改用平台原生绝对词法路径后，Windows focused 为 10 passed + 2 privilege skips、Ubuntu WSL focused 12/12，最终 GitHub Actions `32492830151` 在 Windows／Ubuntu 双 PASS。该证据只验收公开 source `main`，不构成 Release。
 
 ## 验证证据
 

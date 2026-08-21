@@ -284,3 +284,11 @@
 - `docs/state/project-structure.md` 仍保留 Phase 3 候选早期的“尚未经过 Windows／Ubuntu CI”描述，与平台 Plan、Release State、Test Coverage State 和既有 Phase 3 Validation 冲突。
 - 依据同一候选提交 Windows／Ubuntu 双 PASS 的既有证据，将当前事实修正为“CI 已完成，但仍为 `experimental`／`unreleased`，不证明第三方 Agent runtime 兼容”。
 - 本轮只修复 State 漂移并追加历史记录，没有修改实现、测试、Adapter、组件版本、PROGRESS、HANDOFF 或发布状态。
+
+## 2026-08-21 — main 验收、跨平台夹具修正与公开同步
+
+- 对相对公开 `origin/main@117acac` 的 38 个本地提交执行动态全仓 231 项、integrated build、Authority 显式投影／默认回滚、Markdown 链接、发布排除与 diff 验收；本地检查全部通过。
+- 首次推送 `95fa4e3` 后，GitHub Actions `32492265629` 的 Windows job 通过，Ubuntu job 发现 `test_cli_preserves_candidate_manifest_lexical_path` 把 `C:/...` 错当作所有平台的绝对路径。
+- 在独立 `codex/fix-release-gate-posix-lexical-path` worktree 中把夹具改为平台原生绝对词法路径；产品安全门未改动，symlink identity 不得提前 resolve 的约束保持不变。
+- 修正后 Windows focused 10 passed + 2 privilege skips、Ubuntu WSL focused 12/12；提交 `42aebae` 快进进入 `main`。最终 GitHub Actions `32492830151` 在 Windows／Ubuntu 双 PASS。
+- `main` 已同步至公开 GitHub；v0.2.0 仍是当前公开 Release，没有 tag、Release、实际 SemVer／manifest 选择、稳定 API 或 managed Authority production switch。
