@@ -1,0 +1,25 @@
+{
+  "fixture_format": 1,
+  "projection_schema": "observatory-authority-projection-v1",
+  "source_contract": "cli-authority-observations-v1",
+  "expected_roles": [
+    "seed",
+    "adr",
+    "design",
+    "plan",
+    "state",
+    "validation",
+    "snapshot"
+  ],
+  "expected_effective_decisions": [
+    "ADR-0002",
+    "ADR-0003"
+  ],
+  "required_conformance_inputs": [
+    "authority_model_version",
+    "repository_snapshot",
+    "fact_scope",
+    "evidence_visibility"
+  ],
+  "rollback_environment": "ORRERY_AUTHORITY_PROJECTION_VIEW"
+}

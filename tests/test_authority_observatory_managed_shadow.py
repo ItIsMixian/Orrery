@@ -162,7 +162,7 @@ class AuthorityObservatoryManagedShadowTests(unittest.TestCase):
         self.assertEqual(insight["validation_unknown_count"], 2)
         self.assertNotIn("effective", str(insight))
 
-    def test_root_and_template_projection_include_shadow_diagnostics(self) -> None:
+    def test_m1_shadow_builder_stays_byte_equivalent_and_m2_2_is_root_only(self) -> None:
         template_root = (
             REPOSITORY_ROOT
             / "skills"
@@ -180,10 +180,16 @@ class AuthorityObservatoryManagedShadowTests(unittest.TestCase):
         template_build = (template_root / "build_docsite.py").read_text(
             encoding="utf-8"
         )
-        self.assertEqual(
-            root_build,
-            template_build.replace("{{PROJECT_TITLE_PY}}", "Project Orrery"),
+        normalized_template = template_build.replace(
+            "{{PROJECT_TITLE_PY}}", "Project Orrery"
         )
+        self.assertEqual(root_build, normalized_template)
+        self.assertIn("ORRERY_AUTHORITY_SHADOW_VIEW", root_build)
+        candidate_entry = (
+            REPOSITORY_ROOT / "scripts" / "docsite" / "build_authority_projection.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("ORRERY_AUTHORITY_PROJECTION_VIEW", candidate_entry)
+        self.assertNotIn("ORRERY_AUTHORITY_PROJECTION_VIEW", normalized_template)
 
 
 if __name__ == "__main__":

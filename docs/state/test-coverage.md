@@ -60,6 +60,12 @@ Updated: 2026-08-21
 - 2026-08-21 Authority shadow diagnostic 将 managed-entrypoint 专项从 3 项扩展到 6 项：新增显式 view-only 面板、bounded insights projection、根／模板一致性；默认与 report-only HTML 继续等于 legacy，面板标明非权威／未切换，effective claims 不进入 insights。全仓 196 项中 194 通过、2 项动态依赖按设计跳过；269 份 Markdown／584 个本地链接无缺失，integrated scaffold 与 1096 KB 静态站通过。
 - 2026-08-21 M1 本地 Canonical integration 在 Candidate 与 `main@2989582` 同 merge base、两处 worktree clean 的前提下审阅 20 个提交并 `--ff-only` 合入；合并后全仓仍为 196 项中 194 通过、2 项按设计跳过，Authority 定向 120/120，integrated scaffold、1107 KB 静态站、270 份 Markdown／590 个本地链接／0 缺失和 `git diff --check` 通过。该证据只证明本地 Canonical baseline，不证明 push、发布或 production switch。
 - 2026-08-21 M2.1 CLI claims Worktree Candidate 新增 versioned internal observation contract、完整 role/source hash、显式 decision graph、assertion／validation evidence 分离和 symlink／metadata／missing-target 失败关闭。Authority 专项为 139 项通过、1 项 Windows symlink privilege skip；最终全仓、站点与链接结果见对应 Validation。本证据不证明 Canonical integration、公共 API、Observatory production projection 或 release。
+- 2026-08-21 M2.2 Observatory projection Worktree Candidate 新增 12 项专项，覆盖独立包导入、完整 M2.1
+  reconciliation、effective decision／role/source 投影、determinism、默认无变化／关闭回滚、legacy model、
+  collector／visibility／snapshot drift 失败关闭、source provenance 防篡改和 HTML escaping。Authority 专项当前
+  为 151 项、1 项 Windows symlink privilege skip。首次全仓 219 项暴露 1 项 root/release builder 字节一致性
+  失败，随后把 Candidate runtime 移到独立 root-only entry，并由含原失败用例的 19 项 focused rerun 证明修复；
+  最终全仓、结构、站点、链接与 diff 见对应 Validation。
 
 ## 验证证据
 
@@ -87,6 +93,7 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Meta Model fixture baseline](../validation/2026-08-21-authority-meta-model-fixture-baseline.md)
 - [2026-08-21 Authority Meta Model M1 本地 Canonical 集成](../validation/2026-08-21-authority-meta-model-canonical-integration.md)
 - [2026-08-21 M2.1 complete CLI Authority observations/claims](../validation/2026-08-21-m2-1-authority-cli-claims.md)
+- [2026-08-21 M2.2 Observatory Authority Candidate projection](../validation/2026-08-21-m2-2-observatory-authority-projection.md)
 - [2026-08-21 Authority Meta Model Core shadow evaluator](../validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md)
 - [2026-08-21 Authority Meta Model CLI shadow comparison](../validation/2026-08-21-authority-meta-model-cli-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory parser shadow](../validation/2026-08-21-authority-meta-model-observatory-parser-shadow.md)

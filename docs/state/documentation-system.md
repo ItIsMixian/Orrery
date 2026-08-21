@@ -17,6 +17,11 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 未发布 Codex Adapter 只把 Codex 调用路由到目标仓库根 `AGENTS.md` 和平台中立 CLI；它不携带 State、ADR、Validation、canonical 模板或项目摘要，因此没有形成第二套文档事实。
 - AI 问答、项目简报、路线综合、里程碑和趋势雷达保持可选，且没有事实权威。Candidate 动态观测台已给这些输出附加不可由模型覆盖的 `derived-ai-view` 非权威 receipt；问答另有可见提示。Authority report 缺失时保留 `Unknown`，Candidate shadow 也只作为 `shadow-only` context，不会被 AI 输出升级成 State、ADR、批准或 Validation。
 - Authority 诊断页面与 sidecar 分开 opt-in：`ORRERY_AUTHORITY_SHADOW_REPORT` 只生成可丢弃 report，`ORRERY_AUTHORITY_SHADOW_VIEW=1` 才显示只读诊断面板。面板显式标注非权威／未切换，只展示 comparison health、scope 和计数，不展示或创造项目 claims。
+- M2.2 Worktree Candidate 通过 root-only `build_authority_projection.py` 增加第三个独立开关
+  `ORRERY_AUTHORITY_PROJECTION_VIEW=1`：它把与 M2.1 bundle 精确 reconciliation 的 Core effective decision、
+  role claims、Unknown、scope／visibility 和 source link 投影到 dashboard。开关缺省关闭，关闭即回到逐字节
+  legacy 输出；失败不产生部分页面。原 `build_docsite.py` 与发布模板逐字节一致，Candidate package-path
+  injection 不进入 legacy module；发布 Skill 模板未同步，留给 M2.3／发布门。
 - 动态观测台把 AI 服务设置入口放在顶栏、主题切换按钮左侧；静态 HTML 不注入设置入口，仍保持只读。
 - 动态观测台的问答、仪表盘、趋势雷达、连接测试与独立 Q&A CLI 都只构造 Broker Provider；OpenAI、DeepSeek 和 Custom 只是上游注册项。项目 `ai-config.json` 的有效 Provider 恒为 `broker`。
 - 默认本机托管 Broker 使用专用 Provider 凭据 namespace、client token、缓存、single-flight、模型白名单和预算门；一次“保存并启用”不强制额外测试请求。
@@ -35,6 +40,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `docs/decisions/0001-project-orrery-self-hosting.md`
 - `docs/design/self-hosting-documentation-system.md`
 - `scripts/docsite/build_docsite.py`
+- `scripts/docsite/build_authority_projection.py`（root-only M2.2 Worktree Candidate）
 - `scripts/docsite/serve.py`
 - `scripts/docsite/_llm.py`
 - `scripts/docsite/llm_broker.py`
@@ -49,3 +55,4 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 尚未建立自动检查 State 与实现链接是否过期的机制。
 - 观测台尚未显示 branch、HEAD、integration OID、merge base、dirty、Workstream 生命周期或事实作用域；worktree 私有 session、自动重叠报告、审查包、清理建议和 Team Mode 也未实现。因此当前作用域纪律依赖入口规则、独立目录和集成者审阅。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
+- M2.2 已有 root-only、显式 opt-in 的完整 Candidate Authority projection，但没有改变上述默认／发布边界。
