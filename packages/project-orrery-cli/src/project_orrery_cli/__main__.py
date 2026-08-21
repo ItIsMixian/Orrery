@@ -3,19 +3,23 @@ from __future__ import annotations
 
 import sys
 
-from . import scaffold, update, validate
+from . import authority_migrate, scaffold, update, validate
 
 
 def main(argv: list[str] | None = None) -> int:
     arguments = list(sys.argv[1:] if argv is None else argv)
     if not arguments or arguments[0] in {"-h", "--help"}:
-        print("usage: project-orrery {scaffold|validate|check-update} [options]")
+        print(
+            "usage: project-orrery "
+            "{scaffold|validate|check-update|migrate-authority-model} [options]"
+        )
         return 0
     command = arguments.pop(0)
     commands = {
         "scaffold": scaffold.main,
         "validate": validate.main,
         "check-update": update.main,
+        "migrate-authority-model": authority_migrate.main,
     }
     selected = commands.get(command)
     if selected is None:
