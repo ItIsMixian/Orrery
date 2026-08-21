@@ -58,6 +58,7 @@ Updated: 2026-08-21
 - 2026-08-21 managed Observatory shadow 新增 3 项专项：默认 build runtime 精确等于 legacy path，显式 sidecar 在 Candidate scope 下保持 HTML/stats 字节一致，非法 Coordinator-like scope 对 evaluator 失败关闭而不影响页面。与既有 runtime shadow、产品投影组合 26 项中 24 通过、2 项动态依赖按设计跳过；全仓 187 项中 185 通过、2 项动态依赖按设计跳过。
 - 2026-08-21 Authority AI derived-view 新增 6 项专项：覆盖无 report 的 Unknown、Local-only shadow 不升级、预构造 context／模型回执伪造、虚构引用过滤、成功／失败输出 receipt、根／模板投影与 managed serve context/header 接线。专项 6/6；全仓 193 项中 191 通过、2 项动态依赖按设计跳过；最终 268 份 Markdown／582 个本地链接无缺失，integrated scaffold 与 1088 KB 静态站通过。此证据证明系统不会把 AI 结果升级为项目权威，不证明模型自然语言绝对正确。
 - 2026-08-21 Authority shadow diagnostic 将 managed-entrypoint 专项从 3 项扩展到 6 项：新增显式 view-only 面板、bounded insights projection、根／模板一致性；默认与 report-only HTML 继续等于 legacy，面板标明非权威／未切换，effective claims 不进入 insights。全仓 196 项中 194 通过、2 项动态依赖按设计跳过；269 份 Markdown／584 个本地链接无缺失，integrated scaffold 与 1096 KB 静态站通过。
+- 2026-08-21 M1 本地 Canonical integration 在 Candidate 与 `main@2989582` 同 merge base、两处 worktree clean 的前提下审阅 20 个提交并 `--ff-only` 合入；合并后全仓仍为 196 项中 194 通过、2 项按设计跳过，Authority 定向 120/120，integrated scaffold、1107 KB 静态站、270 份 Markdown／590 个本地链接／0 缺失和 `git diff --check` 通过。该证据只证明本地 Canonical baseline，不证明 push、发布或 production switch。
 
 ## 验证证据
 
@@ -83,6 +84,7 @@ Updated: 2026-08-21
 - [2026-08-20 ADR-0008 协作 Design 集成](../validation/2026-08-20-adr-0008-collaboration-design-integration.md)
 - [2026-08-21 ADR-0009 Authority Meta Model 采纳](../validation/2026-08-21-authority-meta-model-adoption.md)
 - [2026-08-21 Authority Meta Model fixture baseline](../validation/2026-08-21-authority-meta-model-fixture-baseline.md)
+- [2026-08-21 Authority Meta Model M1 本地 Canonical 集成](../validation/2026-08-21-authority-meta-model-canonical-integration.md)
 - [2026-08-21 Authority Meta Model Core shadow evaluator](../validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md)
 - [2026-08-21 Authority Meta Model CLI shadow comparison](../validation/2026-08-21-authority-meta-model-cli-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory parser shadow](../validation/2026-08-21-authority-meta-model-observatory-parser-shadow.md)

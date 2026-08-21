@@ -242,3 +242,11 @@
 - 新增未发布 Harness JSON Adapter 0.1.0：白名单 request schema、response schema、subprocess timeout／protocol failure 分类，以及 Codex／Agent／Provider 环境变量清理；Adapter 不包含或加载 `SKILL.md`。
 - Windows 隔离测试覆盖确定性 dry-run、临时实际安装、mixed toolchain、备份升级预演、schema 失败关闭、offline no-cache、非法请求和作者文件保留；默认全仓 66 passed + 2 expected skips，动态 68/68。
 - 当前只形成 Windows candidate；该提交尚未运行 Windows／Ubuntu CI，仍为 `experimental`／`unreleased`，没有模型调用、第二平台、push、tag 或 Release。
+
+## 2026-08-21 — Authority Meta Model M1 本地 Canonical 集成
+
+- 从 `main@2989582` 审阅 `codex/authority-meta-model-fixtures` 的 20 个提交；Candidate 与 main merge base 一致，功能 worktree 和主 worktree 均 clean，随后以 `--ff-only` 集成到本地 main。
+- ADR-0010 指定平台中立 Core 为唯一确定性 evaluator owner；ADR-0011 固定项目模型选择、release 默认值 + 离散支持集、legacy／unsupported 失败关闭和显式语义迁移边界。AUTH-1 仍未决定。
+- 集成 `amm-fixture-v1`、experimental Core evaluator、CLI／Observatory shadow、模型 capability、receipt-gated migrate／restore、future release projection、AI non-escalation receipt 和默认关闭的诊断面板；默认 legacy 页面、退出码和公开 v0.2.0 资产不切换。
+- 合并前完整发现 196 项测试并全部成功，Authority 专项 120/120；integrated structure、1096 KB 静态站、269 份 Markdown／586 个本地链接／0 缺失和 `git diff --check` 通过。迁移／恢复安全审阅确认写入仅限项目 manifest、项目内备份和原子替换，拒绝外部路径及 symlink 逃逸。
+- 本轮只完成本地 Canonical 集成，没有 push、tag、Release、稳定 API、standalone installer 模型声明或 production consumer switch。

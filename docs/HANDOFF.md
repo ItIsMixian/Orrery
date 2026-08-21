@@ -41,7 +41,7 @@ Updated: 2026-08-21
 - 自动 session、overlap、主 worktree 守卫、`orrery integrate` 与观测台 scope banner 尚未实现。三个后续 Agent 必须各自进入新分配的 worktree，不能继续复用原共享目录。
 - 已分配目录：context-routing 使用 `D:\coding warehouse\project-orrery-agent-context-routing`，platform／adapters 使用 `D:\coding warehouse\project-orrery-agent-platform-adapters`，docsite／broker 使用 `D:\coding warehouse\project-orrery-agent-docsite`。三者都是 clean linked worktree；尚未创建 session，开始新任务时再声明 expected writes 与 validation。
 - 协作 Design 已完成产品层收敛：Agent-first／Orrery-first 混合入口、subsystem mapping、Scope B、finding／ack、双维度状态、风险审查包、人工集成、保守清理和 Personal／Team 渐进指挥台均已进入 Approved Design。下一步只做 Personal foundation Phase 0，不直接实现 Team 网络层。
-- ADR-0009 已接受 Authority Meta Model 规范层并建立独立 State／Approved Design。它定义 role lifecycle、独立 claim dimensions、Authority scopes、provider-neutral evidence、derived-view constraints 和 conformance 输入；当前没有机器实现或 Plan，AUTH-1／AUTH-4 仍 pending。
+- ADR-0009／0010／0011 与活动 Plan 已把 Authority Meta Model 从规范推进到本地 `main` 的 experimental M1 baseline：21-case fixture、Core evaluator、模型兼容、显式 migrate／restore、CLI／Observatory shadow、AI non-escalation 和只读诊断均已集成。AUTH-4 已解决为平台中立 Core；AUTH-1 仍 pending。当前仍无稳定公共 domain API、默认 production projection 或公开 release／installer 模型声明。
 
 ## 风险与常见陷阱
 
@@ -70,7 +70,7 @@ Updated: 2026-08-21
 - 不要把 `sivtr` README／Roadmap 或私有 retrieval snapshot 指标写成独立验证事实：其公开仓库没有评估快照，固定提交的完整 Rust 测试在本机因 build-script `os error 5` 未进入测试阶段，且 Agent 入口、架构、Roadmap 与实现存在漂移。任何 transcript 读取还必须先解决缓存副本、保留／删除、脱敏和 Windows daemon token 权限边界。
 - 不要为了通过 `git diff --check` 删除冻结 Pilot fixture 的 EOF 空行；Pilot 008／009 对这些文件做逐字节 SHA-256 校验。2026-08-20 首次集成回归已实际捕获该问题，正确修复是从恢复提交还原原始字节，不是更新冻结哈希。
 - 不要把 ADR-0007／ADR-0008 Accepted 或人工 worktree 验证写成自动协调已实现。当前产品没有 Team Node；未来已上报的未 push 元数据只能显示 Local-only，未上报内容和证据不足的语义关系继续为 Unknown。
-- 不要把 ADR-0009 Accepted 写成 Meta Model 已经存在于 Core。当前只是规范落地；没有 parser／domain API、语义版本字段或 conformance fixture，也没有授权拆分 `build_docsite.py`／`serve.py`／`docsite_qa.py`。
+- 不要把 M1 进入本地 `main` 写成已经发布或生产切换。Core evaluator、兼容、迁移、CLI／Observatory shadow 与 AI guard 均为 experimental；公开 v0.2.0、standalone installer 和默认 managed Observatory 仍未声明或启用模型 1。也不要因这些检查点大拆 `build_docsite.py`／`serve.py`／`docsite_qa.py`。
 
 ## 安全接续点
 
@@ -90,4 +90,4 @@ Updated: 2026-08-21
 10. 若继续研究外部工作记忆层，先读取 [sivtr 观察](library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)；除非用户明确接受新的 ADR／Plan，不安装 sivtr、不扫描真实 transcript、不修改 Scope Router，也不自动创建 Pilot 010。
 11. 多人协作先读取 [ADR-0007](decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)、[Approved Design](design/multi-worktree-collaboration-protocol.md)、[活动 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)和[恢复 Validation](validation/2026-08-20-multi-worktree-recovery-and-manual-adoption.md)。后续任务只在独立 worktree 中继续，根 `PROGRESS`／`HANDOFF` 由整合者同步。
 12. Team／telemetry 相关工作还必须读取 [ADR-0008](decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)与[Design 收敛 Validation](validation/2026-08-20-multi-worktree-collaboration-design-consolidation.md)；默认 Personal Mode 不得监听网络，Team extension 不得先于 Personal foundation。
-13. Authority semantics 工作必须读取 [ADR-0009](decisions/0009-authority-meta-model-and-semantic-conformance.md)、[Approved Design](design/authority-meta-model.md)和[State](state/authority-meta-model.md)；下一次对话先做重复语义盘点与 conformance 设计，不直接进入重构。
+13. Authority semantics 工作必须读取 [ADR-0009](decisions/0009-authority-meta-model-and-semantic-conformance.md)、[ADR-0010](decisions/0010-core-owned-authority-evaluator.md)、[ADR-0011](decisions/0011-authority-model-version-and-compatibility.md)、[活动 Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)和[State](state/authority-meta-model.md)。下一步只从完整 CLI claims、正式 Observatory projection 或实际下一 release 门中选择一个独立 workstream，不在同一分支同时切换所有 consumer。

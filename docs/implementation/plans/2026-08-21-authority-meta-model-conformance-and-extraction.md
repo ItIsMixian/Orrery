@@ -1,6 +1,6 @@
 # 实施计划：Authority Meta Model 一致性基线与渐进提取
 
-Status: Active Candidate Plan
+Status: Active
 Date: 2026-08-21
 Governing ADR: [ADR-0009](../../decisions/0009-authority-meta-model-and-semantic-conformance.md)
 Approved Design: [Authority Meta Model](../../design/authority-meta-model.md)
@@ -161,6 +161,7 @@ python -X utf8 -m unittest tests.test_project_orrery -v
 contract 已版本化、最小 evaluator 经 shadow 验证、迁移消费者有 conformance/rollback evidence、AI
 约束可测、Gate B（若触及公开契约）已通过，并完成兼容/self-host/release 验证。
 
-本 Candidate worktree 只同步 `authority-meta-model` State 和对应 Validation/索引，不改写根
-`PROGRESS.md`、`HANDOFF.md`、`DEVLOG.md`。唯一整合者在干净 integration worktree 合并后，才可
-依据实际提交与验证更新这些 Canonical 入口。
+功能 worktree 只同步 `authority-meta-model` State 和对应 Validation/索引，不改写根
+`PROGRESS.md`、`HANDOFF.md`、`DEVLOG.md`。M1 已由唯一整合者在干净 integration worktree 中
+fast-forward 到本地 `main`，并依据实际提交与验证同步 Canonical 入口；这不改变其 experimental／
+unreleased 状态，也不授权后续 consumer production switch。
