@@ -100,7 +100,7 @@ ADR-0013 已选择两个独立平台范围；任何一项完成都不能自动�
 - [x] 经单独授权启动最少 headless turn；显式 `/project-orrery` 已在真实 session 形成
   `skill-catalog`／`skill-invocation`，隐式候选形成 catalog，但两者因无 API Key 在模型请求处失败。
 - [x] 经单独授权后，以最少 headless turn 验证显式／隐式调用和 CLI 缺失／不兼容失败路径；普通 wheel
-  CLI 另暴露 source-assets 定位失败，成功 validate 精确绑定 editable source CLI。
+  的 source-assets 定位失败随后已修复，并以非 editable wheel 真实复验通过。
 - [ ] 只有完整 runtime 证据门通过后，才把精确范围标为 `verified`。
 
 Stage A 只允许隔离目录、无真实 API Key、无模型调用；Stage B 写真实用户目录、使用真实登录态或发起
@@ -126,6 +126,11 @@ distribution 缺失 exit 3、0.2.0 不兼容 exit 4，以及模型调用后的 r
 CLI 0.1.1 的 preflight 虽通过，`validate` 却在 target 检查前因找不到 source repository Observatory assets
 崩溃；因此 verified 清单仍未完成。见
 [DeepSeek Harness Stage B Runtime](../../validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md)。
+
+后续 wheel 修复让 Observatory build 从固定 component manifest 将九个 managed assets 嵌入 wheel，CLI
+context 优先使用 `site-packages` assets、source checkout 才回退 monorepo。全新 wheel venv 的 scaffold／
+validate 与真实 DeepSeek 显式 Adapter route 均 exit 0；原 wheel blocker 已关闭。证据见
+[CLI Wheel Observatory Assets](../../validation/2026-08-22-cli-wheel-observatory-assets.md)。
 
 验收证据：两个平台各自的 manifest、专项测试和独立 Validation。
 

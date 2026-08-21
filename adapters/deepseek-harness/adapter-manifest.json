@@ -56,6 +56,7 @@
           "model_observed_cli_incompatible",
           "editable_source_cli_routing",
           "wheel_cli_source_context_failure",
+          "wheel_cli_routing_after_asset_fix",
           "recoverable_uninstall_after_model_calls"
         ]
       }
@@ -64,9 +65,10 @@
     "evidence": [
       "docs/validation/2026-08-21-deepseek-harness-adapter-stage-a.md",
       "docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md",
-      "docs/validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md"
+      "docs/validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md",
+      "docs/validation/2026-08-22-cli-wheel-observatory-assets.md"
     ],
-    "note": "DeepSeek Harness rc.8 completed explicit and implicit real-model Adapter routing plus model-observed dependency failures. Compatibility remains experimental because a normal wheel install of compatible CLI 0.1.1 cannot locate source-owned Observatory assets; the successful route used the unreleased editable source tree."
+    "note": "DeepSeek Harness rc.8 completed explicit and implicit real-model routing, model-observed dependency failures, and a post-fix normal-wheel CLI route. Distribution status remains experimental and unreleased pending integration of this Candidate evidence."
   },
   "distribution": {
     "package_name": "project-orrery-deepseek-harness-adapter",

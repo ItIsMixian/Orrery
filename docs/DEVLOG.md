@@ -314,3 +314,10 @@
 - 旧平台分支的 Phase 4 `ADR-0010` 与主线 Authority ADR 编号冲突，整合时分配为 ADR-0013，并保留 0010–0012 的既有含义。
 - 全局 State／PROGRESS／HANDOFF 由唯一整合者合并：W1 只提升到本地 Canonical Phase 0，Adapter 仍是未发布 experimental source；没有推送、tag、Release 或支持状态提升。
 - 联合专项首次暴露 Authority amendment 期望未包含 ADR-0013；补齐冻结关系后 31/31 通过，最终全仓与结构验收见[整合 Validation](validation/2026-08-22-w1-and-second-platform-adapters-integration.md)。
+
+## 2026-08-22 — CLI Wheel Observatory Assets 修复
+
+- Observatory wheel 构建现在依据版本化 `component.json` 的固定白名单嵌入九个 managed tools；CLI 优先使用安装包内 assets，只有 source／editable checkout 才回退 monorepo。
+- 新增隔离 wheel 回归，在全新 venv 中完成 Core／Observatory／CLI wheel 安装、scaffold 与 validate；普通非 editable wheel 不再依赖源码仓库。
+- 同一普通 wheel 又通过真实 DeepSeek Harness 显式 Adapter turn，preflight／validate 均 exit 0；作者 fixture、credential 与 GUI profile 保持不变，隔离插件最终卸载并恢复 0 项 discovery。
+- 功能分支证据与修复见 [CLI Wheel Validation](validation/2026-08-22-cli-wheel-observatory-assets.md)；是否写入最终 `verified` compatibility entry 由干净整合与联合回归决定。

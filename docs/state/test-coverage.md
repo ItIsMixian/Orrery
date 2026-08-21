@@ -29,6 +29,7 @@ Updated: 2026-08-22
 - Phase 4 新增 `tests/test_claude_code_adapter.py` 与 `tests/test_deepseek_harness_adapter.py`，保护 manifest／组件版本投影、薄 Adapter 内容、确定性 ZIP／npm-compatible TGZ、checksum、隔离生命周期与 CLI 缺失／不兼容失败关闭；真实 runtime 证据与单元测试证据分开记录。
 - 2026-08-22 DeepSeek Stage B 使用真实 `deepseek-official`／`deepseek-v4-flash` 完成 6 个模型 turn：显式 editable route、隐式 `skill` route、CLI distribution 缺失、不兼容以及普通 wheel source-assets 失败；生命周期 probe 为 0→1→0，作者 fixture 424/424 字节一致。
 - W1／第二平台干净整合首次全仓 247 项中仅 ADR-0013 amendment 冻结期望未同步而失败；补入 `ADR-0013 amends ADR-0004` 后联合专项 31/31、最终全仓 242 PASS + 5 expected skips。integrated structure、隔离静态站、295 份 Markdown／765 个本地链接和 diff 检查通过。
+- CLI wheel 专项在临时 monorepo 构建 Core／Observatory／CLI wheel，断言九个 managed assets 被嵌入，并在无源码仓库的新 venv 中完成 scaffold／validate；普通 wheel 还通过真实 DeepSeek Harness 显式 Adapter turn。功能分支结果为专项 1/1、定向组合 18 passed + 2 expected skips、默认全仓 73 passed + 2 expected skips。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
@@ -125,6 +126,7 @@ Updated: 2026-08-22
 - [2026-08-21 DeepSeek Harness Adapter Stage B 凭据边界](../validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md)
 - [2026-08-22 DeepSeek Harness Adapter Stage B Runtime](../validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md)
 - [2026-08-22 W1 与第二平台 Adapter 本地集成](../validation/2026-08-22-w1-and-second-platform-adapters-integration.md)
+- [2026-08-22 CLI Wheel Observatory Assets](../validation/2026-08-22-cli-wheel-observatory-assets.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -139,4 +141,4 @@ Updated: 2026-08-22
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的 Phase 0 Candidate 已有 schema、解析和合成 fixture 测试；Phase 1–4 的主 worktree 写入守卫、私有 session、实际重叠／review／cleanup、Personal 指挥台与 Team Mode 网络测试仍未实现。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。
-- Claude Code 仍被认证阻断。DeepSeek Harness 已证明真实显式／隐式模型调用和模型侧 CLI 失败关闭，但普通 wheel CLI 的 Observatory assets 定位失败阻止完整兼容门；两个平台的 `verified` runtime evidence 仍都为空。
+- Claude Code 仍被认证阻断。DeepSeek Harness 已证明真实显式／隐式模型调用、模型侧 CLI 失败关闭和修复后的普通 wheel 路由；是否写入 `verified` runtime evidence 仍由当前整合门决定。

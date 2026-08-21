@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from project_orrery_core import ReleaseContract, authority_template_root, default_release_contract
+from project_orrery_observatory import observatory_asset_root
 
 
 @dataclass(frozen=True)
@@ -14,18 +15,11 @@ class CliContext:
     observatory_root: Path
 
 
-def _repository_root() -> Path:
-    for parent in Path(__file__).resolve().parents:
-        if (parent / "packages" / "component-versions.json").is_file() and (parent / "scripts" / "docsite").is_dir():
-            return parent
-    raise RuntimeError("cannot locate Project Orrery source repository for Observatory assets")
-
-
 def repository_context() -> CliContext:
     return CliContext(
         release=default_release_contract(),
         authority_root=authority_template_root(),
-        observatory_root=_repository_root(),
+        observatory_root=observatory_asset_root(),
     )
 
 

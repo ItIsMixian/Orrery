@@ -18,6 +18,21 @@ MANAGED_TOOLS = tuple(Path(value) for value in read_component_manifest()["manage
 TEMPLATE_PROJECTION = read_component_manifest().get("template_projection", {})
 
 
+def _complete_asset_root(root: Path) -> bool:
+    return all((root / relative).is_file() for relative in MANAGED_TOOLS)
+
+
+def observatory_asset_root() -> Path:
+    """Return packaged wheel assets, or the canonical root in a source checkout."""
+    packaged = Path(__file__).resolve().parent / "assets"
+    if _complete_asset_root(packaged):
+        return packaged
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "packages" / "component-versions.json").is_file() and _complete_asset_root(parent):
+            return parent
+    raise RuntimeError("cannot locate packaged or source Observatory managed assets")
+
+
 def iter_observatory_assets(source_root: Path) -> Iterator[tuple[Path, Path]]:
     """Resolve managed assets from a repository root or compatibility template root."""
     for relative in MANAGED_TOOLS:
