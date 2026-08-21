@@ -26,7 +26,7 @@ Updated: 2026-08-21
 - 平台中立 Phase 2 的 `tests/test_codex_adapter.py` 现有六项回归：薄 Adapter 内容与精确 runtime evidence 投影、确定性独立归档／checksum／解压安装、dry-run／升级备份／可恢复卸载、未知目录拒绝／旧 Skill 备份迁移和版本错配失败，以及 CLI distribution／entrypoint 缺失与版本范围的失败关闭。
 - 2026-08-21 真实 `codex-cli 0.148.0-alpha.21` E2E 在 Windows 11 build 26200 上验证：唯一 repo Adapter 发现、显式／隐式模型调用、CLI 0.1.0 路由、distribution 缺失和 0.2.0 不兼容失败关闭、完整 v0.2 Skill 只经显式升级迁移、升级前完整备份、可恢复卸载、backup／trash 不重复发现、作者 tree 不变及卸载后 Adapter 消失。真实登录态中的旧用户 Skill 通过 per-run `skills.config` 禁用，没有复制凭据或写入用户 Skill 目录。
 - Phase 3 新增 `tests/test_harness_json_adapter.py` 六项回归，保护 manifest／schema／组件版本投影、确定性 scaffold dry-run、临时安装与 validate、作者入口保留、mixed toolchain 和升级备份预演、schema 不兼容、离线无缓存更新、非法参数拒绝，以及不加载 `SKILL.md`／Codex 配置／Agent runtime 的隔离声明。
-- Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。现有 CI 已配置 Windows／Ubuntu 矩阵，但该未 push 候选提交尚无跨 OS CI 运行证据。
+- Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过，CI run 29 的 Ubuntu 也通过。run 29 Windows 的 68 项中 67 项完成，剩余动态 reader 本机 HTTP 测试 10 秒超时；首轮同一 Windows 测试已通过。取得同一后续提交的双 OS PASS 前，Phase 3 跨平台门仍未通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 002 使用同版本哈希一致的完整 CLI runtime，真实验证 usage 更新位于首次产品 `fileChange` 之前；独立 analyzer 判定 ordering 测量有效。原始根按 `decision_supporting` 封存且 manifest 39/39 有效。该 smoke 允许 0 次写前代理读取，不提供正式 P/S 或内容交付证据。
@@ -76,6 +76,6 @@ Updated: 2026-08-21
 - 外部原始数据已有 manifest 与保留策略，但仍依赖本机存储，且尚无自动脱敏导出器或异地备份。
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
-- Harness JSON 只有 Windows 本地候选证据；在该提交实际通过 Windows／Ubuntu CI 前，不能把 Phase 3 写成跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容。
+- Harness JSON 已有 Windows 本地、Ubuntu WSL 与 Ubuntu CI 候选证据；在同一提交实际通过 Windows／Ubuntu CI 前，不能把 Phase 3 写成跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
 - ADR-0009 的 conformance matrix 仍是 Approved Design 目标，没有 machine-readable Meta Model、fixture corpus、AI non-escalation test 或语义版本兼容测试。

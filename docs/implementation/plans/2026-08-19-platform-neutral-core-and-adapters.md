@@ -65,9 +65,10 @@ Phase 2 已完成。仓库 Adapter、独立归档器、CLI 失败关闭和临时
 
 Phase 3 仓库实现检查点已在候选分支完成：CLI 0.1.1 为三个命令提供 opt-in response envelope，
 JSON 模式使用稳定退出码 0／2／3／4／5／6／7；`adapters/harness-json/` 0.1.0 只接受白名单请求，
-清理 Agent／Provider 环境变量，并直接启动 Python CLI subprocess。Windows 本地专项与全仓回归已通过，
-但分支尚未 push，现有 Windows／Ubuntu CI 矩阵尚未对该提交运行。因此该检查点继续是
-`experimental`／`unreleased` candidate，跨 OS 验收完成前不启动 Phase 4。证据见
+清理 Agent／Provider 环境变量，并直接启动 Python CLI subprocess。分支已 push；首轮 CI 暴露并修复
+了 Linux 命令夹具错误，第二轮 Ubuntu 通过，但 Windows 被变更面外的本机 HTTP 测试偶发超时阻断。
+因此该检查点继续是 `experimental`／`unreleased` candidate，取得同一后续提交的 Windows／Ubuntu
+双 PASS 前不启动 Phase 4。证据见
 [Phase 3 Harness JSON](../../validation/2026-08-21-platform-neutral-phase-3-harness-json.md)。
 
 验收证据：机器可读 fixture、JSON schema 测试、跨 Windows／Ubuntu CLI CI。

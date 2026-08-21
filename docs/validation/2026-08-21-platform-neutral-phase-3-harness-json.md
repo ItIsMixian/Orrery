@@ -2,8 +2,8 @@
 
 Date: 2026-08-21
 Scope: ADR-0004 Implementation Plan Phase 3 的统一 CLI JSON 合约、稳定退出码与不依赖 Codex 的最小 Harness Adapter；不含第二平台、模型调用、组件发布、多人协作或 Authority Meta Model
-Result: PASS（Windows 仓库实现检查点）— 跨 Windows／Ubuntu CI 尚未对该未 push 提交运行，因此 Phase 3 仍是 `experimental`／`unreleased` candidate
-Source: branch `codex/harness-json-phase3`，baseline `main@14af26a879eb2f6e4242031719f675c50e5cb27a`
+Result: PARTIAL — Harness／CLI 实现与 Ubuntu CI 已通过；Windows 的第二轮矩阵被一个无关本机 HTTP 测试的 10 秒超时阻断，完整双 OS 门仍未通过，因此 Phase 3 继续是 `experimental`／`unreleased` candidate
+Source: branch `codex/harness-json-phase3`，baseline `main@14af26a879eb2f6e4242031719f675c50e5cb27a`，实现提交 `da8c541`，Unix 夹具修复 `c30acab`
 
 ## 权威链
 
@@ -26,6 +26,9 @@ Source: branch `codex/harness-json-phase3`，baseline `main@14af26a879eb2f6e4242
 | Harness Adapter | `project-orrery-harness-json-adapter` 0.1.0，API 1，`experimental`／未发布 |
 | Transport | 直接 Python subprocess，stdin/file request 与 stdout response JSON |
 | Agent runtime | 未加载、未调用 |
+
+GitHub Actions 使用 Python 3.11：首轮 Windows 为 3.11.9，Ubuntu 为 3.11.16。运行链接与结论见下方
+验证命令表；这些 CI 运行没有加载 Codex 或其他 Agent runtime。
 
 Codex Adapter 的历史 `verified` 证据继续精确绑定 CLI 0.1.0；本次 CLI 0.1.1 没有回写或外推该
 runtime 证据。
@@ -85,13 +88,17 @@ Harness request 只能使用 schema 白名单参数，不能注入任意 CLI arg
 | 隔离 docsite build | PASS — 61 docs；输出位于 ignored `dist/validation/phase3-harness-json/` |
 | Markdown 本地链接扫描 | PASS — 247 files，497 local links，0 missing |
 | `git diff --check` | PASS |
+| [CI run 28](https://github.com/yw9299-stack/project-orrery/actions/runs/32441062099) on `da8c541` | PARTIAL — Windows PASS；Ubuntu 在 Codex CLI 依赖测试中把 Linux 命令夹具误写为 `.exe`，明确失败 |
+| Windows／Ubuntu 原生夹具专项 | PASS — `c30acab` 在 Windows 与 Ubuntu WSL 分别通过相同 `test_cli_dependency_check_fails_closed_and_accepts_declared_version` |
+| [CI run 29](https://github.com/yw9299-stack/project-orrery/actions/runs/32441186823) on `c30acab` | PARTIAL — Ubuntu PASS；Windows 的 68 项中 67 项完成，`test_graphical_ai_settings_api_is_local_and_never_echoes_keys` 等待本机 HTTP 响应 10 秒后超时。首轮同一 Windows 测试已 PASS；该错误不在 Phase 3 变更面，但完整门仍按失败处理 |
 
 隔离 build 没有修改 `docs/_site/index.html`。
 
 ## 边界与待完成项
 
-- 现有 `.github/workflows/validate.yml` 会在 Windows／Ubuntu 运行完整测试，但本分支尚未 push，因而
-  当前没有该提交的双 OS CI run。跨 OS 验收门仍未通过。
+- 分支已 push，现有 `.github/workflows/validate.yml` 已运行两轮 Windows／Ubuntu 完整矩阵。首轮
+  暴露并修复了真实 Unix 测试夹具问题；第二轮 Ubuntu 已通过，Windows 被变更面外的本机 HTTP
+  测试偶发超时阻断。必须取得同一后续提交的 Windows／Ubuntu 双 PASS，跨 OS 验收门才通过。
 - Harness 证明请求／subprocess／CLI response 的机器合约，不证明模型读取、理解或第三方 Agent
   平台发现／调用。
 - 未生成 wheel、多组件 release、tag 或公开 Adapter 包；顶层组件状态继续为 `unreleased`。
