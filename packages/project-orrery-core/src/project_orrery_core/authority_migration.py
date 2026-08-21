@@ -129,3 +129,37 @@ def plan_authority_model_migration(
         "preserved_dimensions": dimensions,
         "required_action": required_action,
     }
+
+
+def materialize_authority_model_migration(
+    manifest: Mapping[str, Any], plan: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Return proposed manifest content for one allowed plan without mutating input."""
+
+    if not isinstance(manifest, Mapping) or not isinstance(plan, Mapping):
+        raise AuthorityModelMigrationPlanError("manifest and plan must be objects")
+    if not plan.get("allowed"):
+        raise AuthorityModelMigrationPlanError("cannot materialize a blocked plan")
+
+    proposed = dict(manifest)
+    for change in plan.get("changes", ()):
+        if not isinstance(change, Mapping):
+            raise AuthorityModelMigrationPlanError("plan change must be an object")
+        after = change.get("after")
+        if (
+            change.get("path") != ".project-orrery.json"
+            or change.get("operation") != "set"
+            or change.get("field") != AUTHORITY_MODEL_FIELD
+            or not isinstance(after, Mapping)
+            or after.get("present") is not True
+        ):
+            raise AuthorityModelMigrationPlanError(
+                "plan contains an unsupported manifest operation"
+            )
+        value = after.get("value")
+        if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+            raise AuthorityModelMigrationPlanError(
+                "plan contains an invalid Authority Model version"
+            )
+        proposed[AUTHORITY_MODEL_FIELD] = value
+    return proposed

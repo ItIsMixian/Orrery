@@ -51,6 +51,7 @@ Updated: 2026-08-21
 - 2026-08-21 Gate B Candidate compatibility 新增 8 项专项与 9-case fixture：保护 public model 1／internal fixture ID 分离、缺失与显式 null 分离、离散 support gap、known/unknown/newer/invalid 分类、downgrade 不兼容、非法 capability 声明失败关闭和非顶层 API 边界。Authority 六组专项为 57/57；全仓 118 项中 116 通过、2 项按设计跳过。该检查点没有修改 project/release manifest、schema、installer、managed docsite 或发布状态。
 - 2026-08-21 ADR-0011 integration 新增 4 项 CLI capability 回归与 2 项 Observatory status 回归，并更新新增 ADR 的 explicit-amendment golden：supported 只报告 eligible、legacy relaxed/strict 分流、unknown/invalid 失败关闭、JSON warning 结构、read-only shadow suppression 和 legacy render 不变均被覆盖。Authority 专项现为 63/63；全仓 131 项中 129 通过、2 项按设计跳过。self-host manifest 已显式选择模型 1；release manifest、installer、schema、managed docsite 与发布状态未变。
 - 2026-08-21 Authority migration dry-run 新增 13 项回归：保护 legacy→model 1 的单字段计划、no-op、非法／unsupported source、unsupported target、正交 manifest/schema 版本失败关闭、离散支持集不产生隐式路径、非顶层 Core API、CLI 同字节 snapshot hash、统一 CLI 路由、`--dry-run` 强制要求、非法 target、缺失 manifest 和全路径零写入。全仓 144 项中 142 通过、2 项动态依赖按设计跳过；262 份 Markdown／572 个本地链接无缺失。Harness JSON Adapter 仍只暴露原三条白名单命令；apply、release projection 与发布状态未变。
+- 2026-08-21 Authority migration apply 把专项扩展到 20 项：新增纯 materializer、receipt 必填、receipt 分别绑定源／目标／提议、stale manifest 拒绝、精确备份、原子替换、no-op 不写入，以及注入 replace failure 后原文件不变／备份保留／临时文件清理。全仓 151 项中 149 通过、2 项动态依赖按设计跳过；263 份 Markdown／574 个本地链接无缺失。Harness JSON Adapter、release projection 与发布状态仍未改变，restore command 尚未实现。
 
 ## 验证证据
 
@@ -84,6 +85,7 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Meta Model Observatory runtime shadow](../validation/2026-08-21-authority-meta-model-observatory-runtime-shadow.md)
 - [2026-08-21 Authority Model compatibility Candidate](../validation/2026-08-21-authority-model-compatibility-candidate.md)
 - [2026-08-21 Authority Model migration dry-run](../validation/2026-08-21-authority-model-migration-dry-run.md)
+- [2026-08-21 Authority Model migration apply](../validation/2026-08-21-authority-model-migration-apply.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -97,4 +99,4 @@ Updated: 2026-08-21
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow、Observatory lifecycle/explicit-relation harness、内部 Gate B capability judgment 和显式迁移 dry-run，但仍没有 migration apply、完整 CLI claims、Observatory production projection、release 默认字段、production-switch 或 release 证据。
+- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow、Observatory lifecycle/explicit-relation harness、内部 Gate B capability judgment 和 receipt-gated 显式迁移，但仍没有 restore command、完整 CLI claims、Observatory production projection、release 默认字段、production-switch 或 release 证据。

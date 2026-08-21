@@ -25,7 +25,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Gate B 已由 [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md) 解决。9-case `compatibility.json` 覆盖 field absent、public model 1、known unsupported、unknown newer、数值 gap、离散 model 3 和三类非法值，并冻结普通工具升级不得选择模型、manifest/document schema 不随首版模型变化。
 - Candidate Core 内部 `authority_compatibility.py` 已实现 provider-neutral capability judgment：显式区分 `legacy-unversioned`、`supported`、`unsupported-known`、`unsupported-newer`、`unsupported-unknown` 与 `invalid`；不支持时只保留 read-only browsing，并禁止推导 effective/current/implemented/validated。`eligible` 只表示可进入严格 conformance 评估，不表示验证已经通过。
 - Neutral CLI validator 已消费该 Core judgment，向人类与稳定 JSON 合约只读报告 `authority_model` capability：legacy 在普通验证中警告、在 `--require-integrated` 中失败；unsupported／invalid 始终失败关闭。顺带修复 Authority shadow 警告混入字符串、破坏 JSON issue contract 的缺陷。
-- Candidate Core 内部只读 migration planner 与 neutral CLI 0.1.2 `migrate-authority-model --dry-run` 已实现。它对 legacy→model 1 报告唯一 manifest 字段写入、备份范围与保持不变的 manifest/document schema，对已选择 model 1 返回 no-op，对 invalid／unsupported／没有显式跨版本路径的请求失败关闭；CLI 报告所用 manifest hash 与规划输入来自同一字节快照，并且当前没有任何 apply 代码路径。
+- Candidate Core 内部 migration planner/materializer 与 neutral CLI 0.1.3 `migrate-authority-model` 已实现。dry-run 对 legacy→model 1 报告唯一 manifest 字段写入、备份范围与保持不变的 manifest/document schema；apply receipt 同时绑定源 manifest hash、目标模型与提议 manifest hash，过期／换目标会在备份前失败。真正 apply 先逐字节备份，再通过同目录临时文件原子替换；已选择 model 1 返回 no-op，invalid／unsupported／正交版本不兼容／没有显式跨版本路径的请求失败关闭。
 - Candidate Observatory runtime bridge 已增加 display-neutral 模型状态信号；supported 可继续 shadow，legacy／unsupported 只返回原 legacy HTML/stats 与只读警告，不运行确定性 Authority shadow。该信号尚未接入 managed `build_docsite.py`／`serve.py` 页面。
 
 ## 当前边界
@@ -76,6 +76,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_migrate.py`（Candidate dry-run-only CLI）
 - `tests/test_authority_model_migration.py`
 - `docs/validation/2026-08-21-authority-model-migration-dry-run.md`
+- `docs/validation/2026-08-21-authority-model-migration-apply.md`
 
 ## 已知缺口
 
@@ -86,7 +87,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Observatory lifecycle/relation/role shadow 与 runtime bridge 尚未接入 managed `build_docsite.py`／`serve.py`；`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
 - Role shadow 目前只解释文档角色与严格头部元数据，不验证 Validation 正文命令是否真正执行，也不从 State 自由文本推导 implementation present/absent。
 - Runtime bridge 当前只能由 Candidate package/test harness 显式调用；在 managed tool、旧项目和发布兼容完成独立验证前，不进入 scaffold／upgrade projection。
-- Compatibility judgment 已接入 neutral CLI validator 的只读报告和 Candidate Observatory runtime bridge 的内部 status signal；尚未接入 release manifest、installer、CLI update checker 或 managed Observatory banner。self-host 项目已显式选择模型 1，通用迁移目前只有 dry-run，没有 apply／恢复。
-- 尚无 consumer production switch、公开 release／installer 模型投影、migration apply 或 Canonical runtime release Validation；Harness JSON Adapter v1 也尚未暴露新的迁移预演命令。
+- Compatibility judgment 已接入 neutral CLI validator 的只读报告和 Candidate Observatory runtime bridge 的内部 status signal；尚未接入 release manifest、installer、CLI update checker 或 managed Observatory banner。self-host 项目已显式选择模型 1，通用迁移已有 dry-run/apply 和精确备份，但没有 restore command。
+- 尚无 consumer production switch、公开 release／installer 模型投影或 Canonical runtime release Validation；Harness JSON Adapter v1 也尚未暴露迁移命令。
 - Fixture 与 Core evaluator 目前只在 Candidate worktree 中；尚未经干净 integration worktree 合并为 Canonical baseline。
 - Normalized observation collector/parser contract 尚未稳定；当前覆盖 ADR lifecycle、显式 amend/supersede 和四类文档 role metadata，但 evaluator 仍不读取作者 Markdown 或 Git/Harness 原始输出。
