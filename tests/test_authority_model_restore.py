@@ -199,7 +199,7 @@ class AuthorityModelRestoreCliTests(unittest.TestCase):
 
             self.assertEqual(code, 0)
             data = payload["data"]
-            self.assertEqual(payload["versions"]["cli"], "0.1.4")
+            self.assertEqual(payload["versions"]["cli"], "0.1.5")
             self.assertEqual(data["backup_path"], relative)
             self.assertEqual(
                 data["backup_sha256"], hashlib.sha256(backup.read_bytes()).hexdigest()

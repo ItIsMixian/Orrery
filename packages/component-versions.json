@@ -9,7 +9,7 @@
     },
     "cli": {
       "distribution": "project-orrery-cli",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "core_api": 1,
       "json_schema_version": 1
     },

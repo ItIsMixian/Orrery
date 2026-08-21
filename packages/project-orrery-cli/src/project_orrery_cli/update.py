@@ -11,12 +11,17 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Mapping
 
+from project_orrery_core.authority_compatibility import (
+    AUTHORITY_MODEL_FIELD,
+    judge_project_authority_model,
+)
 from project_orrery_core.compatibility import (
     compatibility_with_environment,
     direct_upgrade_supported,
     parse_version,
     target_dimensions,
 )
+from project_orrery_core.manifests import ReleaseContract
 
 from .context import CliContext, repository_context
 from .protocol import JsonExitCode, emit, issue, response
@@ -142,6 +147,7 @@ def evaluate(
         result["reasons"] = [warning or "latest release could not be determined"]
         return result
 
+    latest_contract = ReleaseContract(latest)
     latest_version = str(latest["version"])
     result["latest_version"] = latest_version
     distribution = latest.get("distribution", {})
@@ -156,6 +162,11 @@ def evaluate(
         return result
     if latest_tuple == current_tuple:
         compatible, reasons = compatibility_with_environment(latest, target)
+        authority_compatible, authority_reasons = authority_compatibility_with_target(
+            latest_contract, target
+        )
+        compatible = compatible and authority_compatible
+        reasons.extend(authority_reasons)
         result["status"] = "up_to_date" if compatible else "current_incompatible"
         result["migration_required"] = not compatible
         result["reasons"] = reasons
@@ -163,6 +174,11 @@ def evaluate(
 
     result["update_available"] = True
     compatible, reasons = compatibility_with_environment(latest, target)
+    authority_compatible, authority_reasons = authority_compatibility_with_target(
+        latest_contract, target
+    )
+    compatible = compatible and authority_compatible
+    reasons.extend(authority_reasons)
     direct = direct_upgrade_supported(local_version, latest.get("compatibility", {}).get("direct_upgrade_from"))
     if compatible and direct:
         result["status"] = "update_available_compatible"
@@ -173,6 +189,43 @@ def evaluate(
             reasons.insert(0, f"{local_version} is outside the release's direct-upgrade range")
     result["reasons"] = reasons
     return result
+
+
+def authority_compatibility_with_target(
+    release: ReleaseContract,
+    target: Mapping[str, Any] | None,
+) -> tuple[bool, list[str]]:
+    """Judge a declared release model without selecting or migrating a project.
+
+    Historical releases that do not declare an Authority Model preserve the
+    pre-model update-check behavior. A future declaring release fails closed
+    for legacy, invalid, or unsupported project selectors and reports the
+    explicit maintenance action through the existing ``reasons`` contract.
+    """
+
+    supported = release.supported_authority_model_versions
+    if target is None or release.authority_model_version is None:
+        return True, []
+
+    capability = judge_project_authority_model(
+        target,
+        supported_versions=supported,
+        known_versions=supported,
+    )
+    if capability["status"] == "supported":
+        return True, []
+
+    label = (
+        repr(target[AUTHORITY_MODEL_FIELD])
+        if AUTHORITY_MODEL_FIELD in target
+        else "missing"
+    )
+    reason = (
+        f"project authority model {label} is {capability['status']}; "
+        f"release supports {list(supported)!r} and requires "
+        f"{capability['required_action']}"
+    )
+    return False, [reason]
 
 
 def print_human(result: Mapping[str, Any]) -> None:
