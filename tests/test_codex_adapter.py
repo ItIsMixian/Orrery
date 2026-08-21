@@ -290,7 +290,9 @@ class CodexAdapterTests(unittest.TestCase):
             self.assertEqual(missing_entrypoint.returncode, 3)
             self.assertIn("code=cli_entrypoint_missing", missing_entrypoint.stderr)
 
-            shutil.copy2(sys.executable, executable_root / "project-orrery.exe")
+            entrypoint_name = "project-orrery.exe" if os.name == "nt" else "project-orrery"
+            entrypoint_path = executable_root / entrypoint_name
+            shutil.copy2(sys.executable, entrypoint_path)
             metadata.write_text(
                 "Metadata-Version: 2.1\nName: project-orrery-cli\nVersion: 0.2.0\n",
                 encoding="utf-8",
@@ -307,7 +309,7 @@ class CodexAdapterTests(unittest.TestCase):
             compatible = run_python(ADAPTER_DEPENDENCY_CHECK, env=base_env)
             self.assertEqual(compatible.returncode, 0, compatible.stdout + compatible.stderr)
             self.assertIn("version=0.1.0", compatible.stdout)
-            self.assertIn("project-orrery.exe", compatible.stdout.lower())
+            self.assertIn(entrypoint_name, compatible.stdout.lower())
 
 
 if __name__ == "__main__":
