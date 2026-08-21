@@ -5,6 +5,7 @@
   "installed_skill_version": "0.2.0",
   "toolchain_version": "0.2.0",
   "document_schema": 1,
+  "authority_model_version": 1,
   "update_channel": "stable",
   "latest_manifest_url": "https://raw.githubusercontent.com/yw9299-stack/project-orrery/main/skills/project-orrery/release-manifest.json",
   "title": "Project Orrery",

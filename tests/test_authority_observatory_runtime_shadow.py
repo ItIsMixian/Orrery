@@ -8,9 +8,7 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 CORE_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-core" / "src"
-OBSERVATORY_SOURCE = (
-    REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src"
-)
+OBSERVATORY_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src"
 DOCSITE_SOURCE = REPOSITORY_ROOT / "scripts" / "docsite"
 for source in (CORE_SOURCE, OBSERVATORY_SOURCE, DOCSITE_SOURCE):
     sys.path.insert(0, str(source))
@@ -20,6 +18,9 @@ import project_orrery_observatory  # noqa: E402
 from project_orrery_core.authority import (  # noqa: E402
     AUTHORITY_MODEL_VERSION,
     evaluate_authority,
+)
+from project_orrery_core.authority_compatibility import (  # noqa: E402
+    judge_project_authority_model,
 )
 from project_orrery_observatory.runtime_shadow import (  # noqa: E402
     render_with_authority_shadow,
@@ -40,6 +41,10 @@ class AuthorityObservatoryRuntimeShadowTests(unittest.TestCase):
         )
 
     def render_shadow(self, **kwargs: object) -> tuple[str, dict, dict]:
+        kwargs.setdefault(
+            "authority_model_capability",
+            judge_project_authority_model({"authority_model_version": 1}),
+        )
         return render_with_authority_shadow(
             self.docs_dir,
             self.agents_file,
@@ -68,7 +73,9 @@ class AuthorityObservatoryRuntimeShadowTests(unittest.TestCase):
         self.assertEqual(report["production"]["stats"], self.legacy_stats)
         self.assertFalse(report["production_behavior_switched"])
 
-    def test_real_repository_runtime_shadow_combines_adr_and_role_contracts(self) -> None:
+    def test_real_repository_runtime_shadow_combines_adr_and_role_contracts(
+        self,
+    ) -> None:
         _, _, report = self.render_shadow()
         self.assertEqual(report["shadow"]["status"], "match")
         self.assertEqual(report["shadow"]["fact_scope"], "unknown")
@@ -95,6 +102,9 @@ class AuthorityObservatoryRuntimeShadowTests(unittest.TestCase):
             legacy_adr_parser=build_docsite.parse_adrs,
             evaluator=broken_evaluator,
             authority_model_version=AUTHORITY_MODEL_VERSION,
+            authority_model_capability=judge_project_authority_model(
+                {"authority_model_version": 1}
+            ),
         )
         self.assertEqual(page, self.legacy_page)
         self.assertEqual(stats, self.legacy_stats)
@@ -114,6 +124,33 @@ class AuthorityObservatoryRuntimeShadowTests(unittest.TestCase):
         self.assertEqual(
             report["shadow"]["roles"]["conformance_input"]["fact_scope"],
             "candidate",
+        )
+
+    def test_supported_model_projects_status_without_changing_render(self) -> None:
+        capability = judge_project_authority_model({"authority_model_version": 1})
+        page, stats, report = self.render_shadow(authority_model_capability=capability)
+        self.assertEqual(page, self.legacy_page)
+        self.assertEqual(stats, self.legacy_stats)
+        self.assertEqual(report["authority_model"]["code"], "authority-model-supported")
+        self.assertFalse(report["authority_model"]["read_only"])
+        self.assertEqual(report["shadow"]["status"], "match")
+
+    def test_legacy_model_fails_closed_while_legacy_render_remains_readable(
+        self,
+    ) -> None:
+        capability = judge_project_authority_model({})
+        page, stats, report = self.render_shadow(authority_model_capability=capability)
+        self.assertEqual(page, self.legacy_page)
+        self.assertEqual(stats, self.legacy_stats)
+        self.assertEqual(
+            report["authority_model"]["code"],
+            "authority-model-legacy-unversioned",
+        )
+        self.assertTrue(report["authority_model"]["read_only"])
+        self.assertEqual(report["shadow"]["status"], "unavailable")
+        self.assertEqual(
+            report["shadow"]["error"]["type"],
+            "AuthorityModelUnavailableError",
         )
 
 

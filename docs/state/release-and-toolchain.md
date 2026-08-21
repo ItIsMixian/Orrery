@@ -2,7 +2,7 @@
 
 Updated: 2026-08-21
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md)
 
 ## 当前事实
 
@@ -27,7 +27,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - 同一 E2E 还验证旧 v0.2 Skill 只有显式 `--upgrade` 才迁移、升级前整树备份、可恢复卸载、backup／trash 不重复发现、卸载后 Adapter 为 0 项、项目作者 tree 不变和用户旧 Skill 摘要不变。Adapter 0.1.0 的上述精确 runtime／OS／Core 0.1.0／CLI 0.1.0／模型与审批范围标记 `verified`，但 Adapter 发行支持状态继续为 `experimental`，证据见 [Codex Runtime E2E 完成](../validation/2026-08-21-codex-runtime-e2e-completion.md)。Adapter 与独立 Core／CLI 仍未发布；v0.2.0 旧 Skill 仍是唯一已发布集成。
 - Phase 3 候选分支把未发布 CLI 从 0.1.0 提升到 0.1.1：`scaffold`、`validate` 和 `check-update` 保留原人类输出，并新增 schema v1 opt-in JSON envelope。JSON 模式稳定区分成功、非法请求、操作失败、验证失败、兼容失败、离线更新不可用和超时；Codex Adapter 的已验证历史仍精确绑定 CLI 0.1.0，不能因当前源码版本变化而改写。
 - 未发布 `adapters/harness-json/` 0.1.0 是 subprocess JSON 参考 Adapter：只接受固定参数白名单，不加载 `SKILL.md`、Codex 配置／登录态或 Agent runtime，并清理常见 Agent／Provider 环境变量。它在 Windows 候选工作树通过 dry-run、临时安装、validate、mixed toolchain、schema 不兼容、离线更新和作者文件保留；首轮 CI 暴露的 Unix 命令夹具错误已在 `c30acab` 修复。第三轮 CI `32441505867` 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨 OS 验收完成。支持状态仍为 `experimental`／`unreleased`，不构成第三方平台兼容声明。
-- ADR-0009 要求 Authority Meta Model 语义可版本识别，但当前 component／project／release manifest 都没有正式 `authority_model_version` 字段；具体兼容维度、所有者和迁移不在本轮决定中。
+- ADR-0011 已定义 Authority Model 的公开正整数版本与离散支持集。self-host project manifest 已显式选择模型 1，neutral CLI 0.1.1 候选源码可只读报告兼容能力；component/release manifest、installer、新 scaffold 和 v0.2.0 发布资产仍未投影默认值或支持集，普通工具升级也不会补写字段。
 - ADR-0007／ADR-0008 的多人协作协议已经进入权威链，但 `orrery worktree create/status/overlap`、review／cleanup 和 `orrery integrate` 仍只是 Approved Design 中的目标工具面；当前 CLI、Observatory、Skill 和发布资产都没有这些命令或 Personal／Team Mode，也没有升级版本或发布新产物。
 
 ## 实现证据
@@ -58,4 +58,4 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
 - Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Phase 3 Harness JSON 已通过同一提交的 Windows／Ubuntu CI，但这只验收平台中立 CLI／Harness 合约。Core／CLI 独立发行物、多组件发布流水线、manifest v2 和跨 runtime 支持矩阵仍未实现。
 - 多 Workstream 自动化尚无正式 schema、CLI、观测台投影、Team 网络面或 CI 门禁。当前仅能依靠 Git 原生命令、独立 worktree 和人工验证执行协议；默认安装没有因 ADR-0008 开始监听网络。
-- Authority Meta Model 仍是文档规范；没有独立发行物、Core API、CLI 命令或支持状态变化，v0.2.0 发布事实不变。
+- Authority Meta Model 已有 fixture-bound Core evaluator、内部兼容判断与 neutral CLI `validate` capability report，但没有稳定顶层 Core API、独立发行物、自动语义迁移、managed Observatory banner 或发布支持状态变化；v0.2.0 发布事实不变。

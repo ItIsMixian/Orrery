@@ -15,6 +15,7 @@ from typing import Any
 
 from .authority_role_shadow import build_observatory_role_shadow
 from .authority_shadow import build_observatory_authority_shadow
+from .authority_model_status import project_authority_model_status
 
 
 AuthorityEvaluator = Callable[
@@ -22,6 +23,10 @@ AuthorityEvaluator = Callable[
 ]
 LegacyRenderer = Callable[[Path, Path, Path, str], tuple[str, Mapping[str, Any]]]
 LegacyAdrParser = Callable[[Path], Sequence[Mapping[str, Any]]]
+
+
+class AuthorityModelUnavailableError(RuntimeError):
+    """Internal fail-closed signal that remains isolated from legacy render."""
 
 
 def _overall_status(adr_status: str, role_status: str) -> str:
@@ -43,6 +48,7 @@ def render_with_authority_shadow(
     evaluator: AuthorityEvaluator,
     authority_model_version: str,
     fact_scope: str = "unknown",
+    authority_model_capability: Mapping[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any], dict[str, Any]]:
     """Return the untouched legacy output plus a warning-only shadow report.
 
@@ -57,8 +63,13 @@ def render_with_authority_shadow(
         "html_sha256": hashlib.sha256(page.encode("utf-8")).hexdigest(),
         "stats": dict(stats),
     }
+    model_status = project_authority_model_status(authority_model_capability)
 
     try:
+        if model_status["read_only"]:
+            raise AuthorityModelUnavailableError(
+                "deterministic Authority shadow disabled by fail-closed model capability"
+            )
         adrs = legacy_adr_parser(docs_dir / "decisions")
         adr_report = build_observatory_authority_shadow(
             adrs,
@@ -102,6 +113,7 @@ def render_with_authority_shadow(
         "production_authority": "legacy-observatory-renderer",
         "production_behavior_switched": False,
         "production": production,
+        "authority_model": model_status,
         "shadow": shadow,
     }
     return page, stats, report

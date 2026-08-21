@@ -2,7 +2,7 @@
 
 Status: Approved
 
-Governing ADRs: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../decisions/0010-core-owned-authority-evaluator.md)
+Governing ADRs: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../decisions/0010-core-owned-authority-evaluator.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md)
 
 Updated: 2026-08-21
 
@@ -138,12 +138,16 @@ must be independently rollbackable.
 
 ## Meta Model version 与 document schema
 
-Authority Meta Model 必须可版本识别，但具体字段与兼容策略留给后续 Design／Plan。
+Authority Meta Model 必须可版本识别。ADR-0011 将公开版本与内部 fixture 标识分离：项目在 `.project-orrery.json` 顶层用正整数 `authority_model_version` 选择语义模型，首版为 `1`；内部 conformance corpus 继续使用 `amm-fixture-v1`，不得把内部 ID 写入项目 manifest。
 
 - `document_schema` 描述作者文档格式、字段和结构兼容性；
 - `authority_model_version` 描述角色含义、claim／scope／evidence 解释规则。
 
 格式可以不变而语义规则升级，语义规则也可以保持不变而文件格式迁移；二者不能用一个版本号替代。
+
+消费者必须声明拥有 evaluator 与 conformance evidence 的离散模型支持集，不能用最小／最大区间填补未验证的版本。字段缺失表示 `legacy-unversioned`；未知、更新、已知但不受支持或非法版本均对确定性 Authority claim 失败关闭。原始 Markdown 仍可只读浏览，但 effective/current/implemented/validated 等结论保持 unavailable／Unknown。
+
+普通安装、工具升级和 `--upgrade-tools` 不得选择或改写语义模型。语义迁移是单独的维护者决定，必须先提供只读 capability report 和 dry-run，再经备份、显式 apply、State 与 Validation 形成证据。模型 1 首次采用保持 `manifest_format = 1` 与 `document_schema = 1`；若将字段改成结构必填或改变公共 API，另行评审相应版本。
 
 ## Conformance fixture 最小覆盖
 

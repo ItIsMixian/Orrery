@@ -9,9 +9,7 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 CORE_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-core" / "src"
-OBSERVATORY_SOURCE = (
-    REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src"
-)
+OBSERVATORY_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src"
 DOCSITE_SOURCE = REPOSITORY_ROOT / "scripts" / "docsite"
 for source in (CORE_SOURCE, OBSERVATORY_SOURCE, DOCSITE_SOURCE):
     sys.path.insert(0, str(source))
@@ -60,7 +58,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
         return adrs, report
 
     def test_internal_shadow_adapter_is_not_a_top_level_observatory_api(self) -> None:
-        self.assertFalse(hasattr(project_orrery_observatory, "build_observatory_authority_shadow"))
+        self.assertFalse(
+            hasattr(project_orrery_observatory, "build_observatory_authority_shadow")
+        )
 
     def test_status_normalizer_covers_legacy_lifecycle_classes(self) -> None:
         cases = {
@@ -78,7 +78,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
                 self.assertEqual(normalize_decision_status(raw), expected)
 
     def test_real_legacy_parser_dual_run_matches_all_lifecycle_classes(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             for number, status in enumerate(
                 (
@@ -99,7 +101,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
             self.assertEqual(report["comparison"]["status"], "match")
             self.assertEqual(report["comparison"]["checked"], 7)
             self.assertEqual(report["comparison"]["differences"], [])
-            self.assertEqual(report["production_authority"], "legacy-observatory-parser")
+            self.assertEqual(
+                report["production_authority"], "legacy-observatory-parser"
+            )
             self.assertFalse(report["production_behavior_switched"])
             self.assertEqual(report["conformance_input"]["fact_scope"], "unknown")
 
@@ -111,7 +115,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
         self.assertEqual(report["comparison"]["status"], "match")
 
     def test_explicit_supersedes_yields_effective_decision(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Accepted")
             write_adr(
@@ -127,10 +133,14 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
                 contract["core_relations"],
                 {"ADR-0002": {"supersedes": ["ADR-0001"]}},
             )
-            self.assertEqual(contract["effective_claims"], {"effective_decision": "ADR-0002"})
+            self.assertEqual(
+                contract["effective_claims"], {"effective_decision": "ADR-0002"}
+            )
 
     def test_status_superseded_by_is_inverted_to_normative_direction(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Superseded by ADR-0002")
             write_adr(decisions_dir, 2, "Accepted")
@@ -141,11 +151,17 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
                 contract["core_relations"],
                 {"ADR-0002": {"supersedes": ["ADR-0001"]}},
             )
-            self.assertEqual(contract["legacy_superseded_by"], {"ADR-0001": ["ADR-0002"]})
-            self.assertEqual(contract["effective_claims"], {"effective_decision": "ADR-0002"})
+            self.assertEqual(
+                contract["legacy_superseded_by"], {"ADR-0001": ["ADR-0002"]}
+            )
+            self.assertEqual(
+                contract["effective_claims"], {"effective_decision": "ADR-0002"}
+            )
 
     def test_amends_preserves_base_and_amendment_as_effective(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Accepted")
             write_adr(
@@ -165,7 +181,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
             )
 
     def test_predecessor_and_body_refs_do_not_become_normative_relations(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Accepted")
             write_adr(
@@ -183,15 +201,21 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
             self.assertNotIn("amends", normalized["observations"][1])
 
     def test_malformed_explicit_relation_fails_closed(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
-            write_adr(decisions_dir, 1, "Accepted", metadata=("Amends: earlier choice",))
+            write_adr(
+                decisions_dir, 1, "Accepted", metadata=("Amends: earlier choice",)
+            )
             adrs = build_docsite.parse_adrs(decisions_dir)
             with self.assertRaises(AuthorityRelationParseError):
                 collect_decision_observations(adrs, decisions_dir)
 
     def test_missing_relation_target_remains_unknown(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Superseded by ADR-9999")
             _, report = self.build_shadow(decisions_dir)
@@ -226,11 +250,14 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
                 "ADR-0008": {"amends": ["ADR-0007"]},
                 "ADR-0009": {"amends": ["ADR-0001"]},
                 "ADR-0010": {"amends": ["ADR-0009"]},
+                "ADR-0011": {"amends": ["ADR-0009"]},
             },
         )
 
     def test_forged_legacy_difference_is_classified_without_switching(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Accepted")
             adrs = build_docsite.parse_adrs(decisions_dir)
@@ -258,7 +285,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
             self.assertFalse(report["production_behavior_switched"])
 
     def test_snapshot_changes_when_visible_adr_bytes_change(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Accepted")
             before = authority_input_snapshot(decisions_dir)
@@ -268,7 +297,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
             self.assertNotEqual(before, after)
 
     def test_snapshot_ignores_files_the_legacy_parser_does_not_read(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Accepted")
             before = authority_input_snapshot(decisions_dir)
@@ -282,7 +313,9 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
             self.assertEqual(before, authority_input_snapshot(decisions_dir))
 
     def test_graph_and_reference_fields_stay_legacy_only(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-observatory-shadow-") as temporary:
+        with tempfile.TemporaryDirectory(
+            prefix="orrery-observatory-shadow-"
+        ) as temporary:
             decisions_dir = Path(temporary) / "docs" / "decisions"
             write_adr(decisions_dir, 1, "Accepted")
             _, report = self.build_shadow(decisions_dir)

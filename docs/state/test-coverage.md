@@ -49,6 +49,7 @@ Updated: 2026-08-21
 - 2026-08-21 Observatory role shadow 新增 9 项专项：覆盖 Design Draft／Approved／Deprecated 与 Unknown、Plan/State 不生成 implementation claim、Validation 文档存在／Status／自由文本不等于通过、精确 Passed/Failed、隐藏 executable evidence 回退 Unknown、冲突元数据失败关闭、输入快照与真实仓库 7/12/6/29 角色盘点。Authority 四组专项为 44/44；默认全仓 105 项中 103 通过、2 项按设计跳过。该 adapter 未导出且未接入 build/serve，29 个现有 Validation 结果在严格 collector 中全部保持 Unknown。
 - 2026-08-21 Observatory runtime shadow 新增 5 项专项：真实 legacy `render_site()` 双轨时 HTML/stats 完全相同，ADR/role report 组合、显式 scope 与 evaluator failure 隔离均受保护。Authority 五组专项为 49/49；默认全仓 110 项中 108 通过、2 项按设计跳过，integrated structure、930 KB 静态站和 254 份 Markdown／525 个本地链接均通过。该 bridge 未导出、未接入 managed build/serve，也未修改模板或发布契约。
 - 2026-08-21 Gate B Candidate compatibility 新增 8 项专项与 9-case fixture：保护 public model 1／internal fixture ID 分离、缺失与显式 null 分离、离散 support gap、known/unknown/newer/invalid 分类、downgrade 不兼容、非法 capability 声明失败关闭和非顶层 API 边界。Authority 六组专项为 57/57；全仓 118 项中 116 通过、2 项按设计跳过。该检查点没有修改 project/release manifest、schema、installer、managed docsite 或发布状态。
+- 2026-08-21 ADR-0011 integration 新增 4 项 CLI capability 回归与 2 项 Observatory status 回归，并更新新增 ADR 的 explicit-amendment golden：supported 只报告 eligible、legacy relaxed/strict 分流、unknown/invalid 失败关闭、JSON warning 结构、read-only shadow suppression 和 legacy render 不变均被覆盖。Authority 专项现为 63/63；全仓 131 项中 129 通过、2 项按设计跳过。self-host manifest 已显式选择模型 1；release manifest、installer、schema、managed docsite 与发布状态未变。
 
 ## 验证证据
 

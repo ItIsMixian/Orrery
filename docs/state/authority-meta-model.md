@@ -2,7 +2,7 @@
 
 Updated: 2026-08-21
 
-Governing ADRs: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../decisions/0010-core-owned-authority-evaluator.md)
+Governing ADRs: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../decisions/0010-core-owned-authority-evaluator.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md)
 
 Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-model.md)
 
@@ -12,7 +12,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Meta Model 已规范角色、非线性 Authority Graph、独立 claim dimensions、Authority scopes、provider-neutral evidence categories、derived-view constraints 和 conformance 输入边界。
 - `docs/core/principles.md` 仍是 Project Orrery Product Seed，不是通用 machine-readable Meta Model。
 - 当前语义仍分布在 ADR、Design、模板、Python 工具、Viewer 和 Agent 指令中；Candidate 已有内部 lifecycle/relation collectors 与 Core evaluator，但尚无公共 parser／domain API 或稳定 Meta Model API。
-- 当前 project／release manifest 没有正式 `authority_model_version` 字段；ADR-0009 只要求语义必须可版本识别，具体 schema 与迁移尚未设计。
+- ADR-0011 已正式定义 project 顶层可选正整数 `authority_model_version`、release 默认值与离散支持集、legacy／unknown 失败关闭和显式语义迁移边界。self-host `.project-orrery.json` 已经维护者授权显式选择模型 `1`；当前公开 release manifest、installer 与新 scaffold 尚未投影该字段，旧项目继续是 `legacy-unversioned`。
 - Candidate 分支已建立 `amm-fixture-v1` versioned conformance fixture：21 个案例冻结四项输入、独立 claim dimensions、lifecycle/relations、全部 fact scopes、evidence 能力边界、AI non-escalation、Snapshot 与 Coordinator 分离，以及 determinism/visibility comparison；专项测试为 9/9 通过。
 - ADR-0010 已决定由平台中立 Core 持有唯一确定性 evaluator；Candidate 分支中的 `project_orrery_core.authority` 已能把 normalized observations 与四项 conformance 输入解释为 claims/relations/scope/evidence 边界，21 个 fixture case 的 shadow expectation 全部满足，额外输出均由 fixture policy 显式分类，专项为 14/14。
 - Candidate CLI 已增加第一处真实 consumer 双轨：`authority_shadow.py` 保留原 validator 的 Accepted ADR／入口／pending／integrated 扫描为生产决定路径，同时把 Accepted ADR observation、精确 authority-input snapshot hash、显式 `Unknown` scope 与 revision-content visibility 送入 Core evaluator；差异只按 `parser-gap` 警告，不改变原退出码或 authority status。
@@ -20,19 +20,20 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 真实仓库的 6 条 `Amends` 已与 Core relations 一致；合成测试也证明 supersede 会选出 effective decision、amend 会保留 base 与 amendment、缺少 ADR target 的显式关系会失败关闭。旧 build/serve 图谱没有切换，legacy `supersedes` 字段仍只表示 superseded-by target。
 - Candidate Observatory 另有未导出的 role shadow adapter，按受控目录观察 Design／Plan／State／Validation：Design 只识别 Draft／Approved／Deprecated；Plan 只产生 `planned`，State 只产生 `current`，两者都不产生 implementation claim；Validation 只有精确 `Result: Passed/Failed` 或 `Outcome:` 才产生明确结果，文档存在、`Status:` 与自由文本保持 `Unknown`。
 - Candidate Observatory 现有未导出的 runtime bridge：它先调用真实 legacy `render_site()`，再对同一 docs snapshot 运行 ADR 与 role shadow，返回独立 report；专项证明 HTML 字节、legacy stats 与失败路径均不被 experimental evaluator 改写。
-- 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 31 个 Validation；现有 Validation 的严格结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
-- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 只完成 Accepted ADR 运行时 shadow，Observatory 只完成包级 ADR lifecycle/relation/role 与 runtime bridge harness；没有稳定顶层 API、managed build/serve 接线、consumer production switch、公开 schema/manifest 字段或发布实现，也不是 Canonical State 的实现声明。
-- Gate B 已有 Candidate 提案 [PO-DEC-AUTH-002](../decisions/proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md)：建议在项目 manifest 顶层用正整数选择模型、release 声明默认值与离散支持集、缺失字段保持 `legacy-unversioned`，并把工具升级与显式语义迁移分离。该提案仍是 Proposed，不构成 Canonical 兼容契约；维护者接受的 Candidate 实施授权单独记录如下。
-- 维护者已接受 PO-DEC-AUTH-002 的 Candidate 实施边界；正式 ADR 编号与 Canonical authority 仍留给集成者。Candidate 已增加 9-case `compatibility.json`，覆盖 field absent、public model 1、known unsupported、unknown newer、数值 gap、离散 model 3 和三类非法值，并冻结普通工具升级不得选择模型、manifest/document schema 不随首版模型变化。
+- 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 36 个 Validation；现有 Validation 的严格结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
+- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 已有 Accepted ADR 运行时 shadow和只读 model capability report，Observatory 只完成包级 ADR lifecycle/relation/role、runtime bridge 与内部 status signal；没有稳定顶层 API、managed build/serve 接线、consumer production switch、公开 release/installer projection 或发布实现，也不是 Canonical State 的实现声明。
+- Gate B 已由 [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md) 解决。9-case `compatibility.json` 覆盖 field absent、public model 1、known unsupported、unknown newer、数值 gap、离散 model 3 和三类非法值，并冻结普通工具升级不得选择模型、manifest/document schema 不随首版模型变化。
 - Candidate Core 内部 `authority_compatibility.py` 已实现 provider-neutral capability judgment：显式区分 `legacy-unversioned`、`supported`、`unsupported-known`、`unsupported-newer`、`unsupported-unknown` 与 `invalid`；不支持时只保留 read-only browsing，并禁止推导 effective/current/implemented/validated。`eligible` 只表示可进入严格 conformance 评估，不表示验证已经通过。
+- Neutral CLI validator 已消费该 Core judgment，向人类与稳定 JSON 合约只读报告 `authority_model` capability：legacy 在普通验证中警告、在 `--require-integrated` 中失败；unsupported／invalid 始终失败关闭。顺带修复 Authority shadow 警告混入字符串、破坏 JSON issue contract 的缺陷。
+- Candidate Observatory runtime bridge 已增加 display-neutral 模型状态信号；supported 可继续 shadow，legacy／unsupported 只返回原 legacy HTML/stats 与只读警告，不运行确定性 Authority shadow。该信号尚未接入 managed `build_docsite.py`／`serve.py` 页面。
 
 ## 当前边界
 
 - Accepted ADR-0009 与 Approved Design 不等于 Authority Meta Model 已经代码化。
 - AI Q&A、观测台和其他派生视图继续没有事实权威。
 - AUTH-1 产品核心定位仍未决定；AUTH-4 单一 deterministic evaluator owner 已由 ADR-0010 决定为平台中立 Core。
-- Decision Gate A 已由 ADR-0010 解决；Decision Gate B 已获维护者接受用于 Candidate 实施，但在集成者分配正式 ADR 并完成兼容集成前仍不是 Canonical 决策／发布契约。
-- 在 Gate B 通过前，不得提升 Core／document schema 版本、新增公开契约字段，或把 experimental module 宣称为稳定 API。
+- Decision Gate A 已由 ADR-0010 解决；Decision Gate B 已由 ADR-0011 解决。
+- Gate B 通过不等于发布实现完成：不得在缺少 manifest projection、显式 migration dry-run、旧项目与发布验证时改变 installer／release 默认值，也不得把 experimental module 宣称为稳定 API。
 
 ## 实现证据
 
@@ -42,6 +43,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `docs/decisions/0001-project-orrery-self-hosting.md`
 - `docs/decisions/0004-platform-neutral-core-and-adapter-boundaries.md`
 - `docs/decisions/0010-core-owned-authority-evaluator.md`
+- `docs/decisions/0011-authority-model-version-and-compatibility.md`
 - `docs/implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md`（Candidate Plan；仅记录拟议路径与区域级盘点）
 - `tests/fixtures/authority-meta-model/v1/conformance.json`（Candidate golden contract）
 - `tests/test_authority_meta_model.py`
@@ -62,11 +64,13 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `tests/test_authority_observatory_runtime_shadow.py`
 - `docs/validation/2026-08-21-authority-meta-model-observatory-role-shadow.md`
 - `docs/validation/2026-08-21-authority-meta-model-observatory-runtime-shadow.md`
-- `docs/decisions/proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md`（Candidate Gate B proposal；非有效 ADR）
 - `tests/fixtures/authority-meta-model/v1/compatibility.json`（Candidate compatibility golden contract）
 - `packages/project-orrery-core/src/project_orrery_core/authority_compatibility.py`（Candidate internal capability judgment）
 - `tests/test_authority_model_compatibility.py`
+- `tests/test_authority_cli_compatibility.py`
+- `packages/project-orrery-observatory/src/project_orrery_observatory/authority_model_status.py`（未导出的 status projection）
 - `docs/validation/2026-08-21-authority-model-compatibility-candidate.md`
+- `docs/validation/2026-08-21-adr-0011-authority-model-compatibility-integration.md`
 
 ## 已知缺口
 
@@ -76,8 +80,8 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - CLI 尚未解析完整 ADR lifecycle／supersede／amend、Implementation／State／Validation 或 evidence provenance。
 - Observatory lifecycle/relation/role shadow 与 runtime bridge 尚未接入 managed `build_docsite.py`／`serve.py`；`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
 - Role shadow 目前只解释文档角色与严格头部元数据，不验证 Validation 正文命令是否真正执行，也不从 State 自由文本推导 implementation present/absent。
-- Runtime bridge 当前只能由 Candidate package/test harness 显式调用；在 Gate B 决定 managed tool、旧项目与发布兼容前，不进入 scaffold／upgrade projection。
-- Compatibility judgment 尚未接入 project/release manifest、installer、validator、CLI update checker 或 Observatory banner；当前 `.project-orrery.json` 仍为 fieldless legacy 项目，未执行 self-hosting 语义迁移。
-- 尚无 consumer production switch、公开语义版本字段、发布计划或 Canonical runtime Validation。
+- Runtime bridge 当前只能由 Candidate package/test harness 显式调用；在 managed tool、旧项目和发布兼容完成独立验证前，不进入 scaffold／upgrade projection。
+- Compatibility judgment 已接入 neutral CLI validator 的只读报告和 Candidate Observatory runtime bridge 的内部 status signal；尚未接入 release manifest、installer、CLI update checker 或 managed Observatory banner。self-host 项目已显式选择模型 1，但还没有通用 migration dry-run/apply。
+- 尚无 consumer production switch、公开 release／installer 模型投影、通用 migration plan 或 Canonical runtime release Validation。
 - Fixture 与 Core evaluator 目前只在 Candidate worktree 中；尚未经干净 integration worktree 合并为 Canonical baseline。
 - Normalized observation collector/parser contract 尚未稳定；当前覆盖 ADR lifecycle、显式 amend/supersede 和四类文档 role metadata，但 evaluator 仍不读取作者 Markdown 或 Git/Harness 原始输出。

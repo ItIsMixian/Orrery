@@ -1,14 +1,14 @@
-# PO-DEC-AUTH-002: Authority Model 公开版本与兼容契约
+# ADR-0011: Authority Model 公开版本与兼容契约
 
-Status: Proposed
+Status: Accepted
 
 Date: 2026-08-21
 
-Stable proposal ID: `PO-DEC-AUTH-002`
+Origin: integrated from provisional decision `PO-DEC-AUTH-002`; accepted by the maintainer on 2026-08-21
 
-Proposed amendment to: [ADR-0009](../0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../0010-core-owned-authority-evaluator.md)
+Amends: [ADR-0009](0009-authority-meta-model-and-semantic-conformance.md)
 
-Maintainer disposition: accepted for Candidate implementation on 2026-08-21; formal ADR numbering and Canonical authority remain deferred to integration.
+Clarifies: [ADR-0010](0010-core-owned-authority-evaluator.md)
 
 ## Context
 
@@ -25,7 +25,7 @@ ADR-0009 要求 Authority Meta Model 可被版本识别，ADR-0010 又要求未�
 
 Gate B 因此必须同时定义“选择哪一版语义”和“工具看不懂时还能安全做什么”，并保持安装、工具升级、语义迁移与发布四个动作相互独立。
 
-## Proposed decision
+## Decision
 
 ### 1. 项目显式选择 Authority Model
 
@@ -86,7 +86,7 @@ Gate B 因此必须同时定义“选择哪一版语义”和“工具看不懂�
 - 降级工具前必须验证目标工具仍支持项目所选模型；不支持时拒绝 Authority 操作，不得通过重写字段制造兼容。
 - 任何语义迁移都保留旧 Snapshot／Validation 所使用的模型版本；历史证据不能被新 evaluator 静默重算后冒充原结论。
 
-本提案只冻结行为，不提前规定迁移命令名称、UI 或 Python API。实现必须先提供只读 capability report 与 dry-run，再提供显式 apply 路径。
+本 ADR 只冻结行为，不提前规定迁移命令名称、UI 或 Python API。实现必须先提供只读 capability report 与 dry-run，再提供显式 apply 路径。
 
 ### 5. 版本矩阵保持正交
 
@@ -151,9 +151,9 @@ Authority 语义没有安全的“近似解释”。回退可能把 Unknown、hi
 - 模型迁移将产生额外的 dry-run、备份、State 与 Validation 工作，但避免工具更新静默改变项目事实。
 - v0.2.0 资产及其 checksum 保持历史事实；本提案不回写已发布 manifest。
 
-## Confirmation record（Candidate）
+## Confirmation record
 
-维护者于 2026-08-21 接受以下六项 Candidate 实施边界；在集成者基于最新 integration ref 分配正式 ADR 编号前，本文件仍保持 Proposed，不能冒充 Canonical 决策：
+维护者于 2026-08-21 接受以下六项实施边界；集成者随后基于最新 `main` 分配 ADR-0011，使其成为后续 Design、Plan 与实现的 Canonical 约束：
 
 1. 公开模型版本使用正整数，首版为 `1`；
 2. `.project-orrery.json` 顶层记录项目选择；
@@ -164,7 +164,7 @@ Authority 语义没有安全的“近似解释”。回退可能把 Unknown、hi
 
 ## Implementation and validation mapping
 
-- Approved Design: acceptance 后 amend [Authority Meta Model](../../design/authority-meta-model.md)
-- Implementation Plan: [Authority Meta Model conformance and gradual extraction](../../implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)
-- State Docs: [Authority Meta Model State](../../state/authority-meta-model.md), [release and toolchain](../../state/release-and-toolchain.md)
-- Validation: [Authority Model compatibility Candidate](../../validation/2026-08-21-authority-model-compatibility-candidate.md)；仅证明内部 fixture／capability judgment，不证明公开契约或发布
+- Approved Design: [Authority Meta Model](../design/authority-meta-model.md)
+- Implementation Plan: [Authority Meta Model conformance and gradual extraction](../implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)
+- State Docs: [Authority Meta Model State](../state/authority-meta-model.md), [release and toolchain](../state/release-and-toolchain.md)
+- Validation: [Authority Model compatibility Candidate](../validation/2026-08-21-authority-model-compatibility-candidate.md)（内部 fixture／capability judgment）与 [ADR-0011 integration](../validation/2026-08-21-adr-0011-authority-model-compatibility-integration.md)（formal integration、CLI report 与 Observatory signal）；两者均不证明发布
