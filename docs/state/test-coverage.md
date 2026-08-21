@@ -43,6 +43,7 @@ Updated: 2026-08-21
 - 2026-08-21 CLI 第一处 shadow comparison 新增 6 项专项：保护 legacy integrated heuristic、真实 Accepted ADR 匹配、authority-visible input hash、`parser-gap` 分类，以及 mismatch／evaluator failure 时 warning-only、旧退出码不变。既有产品专项共运行 16 项，其中 14 通过、2 项动态依赖按设计跳过；默认全仓 81 项中 79 通过、2 项按设计跳过，integrated structure、静态站和 250 份 Markdown 本地链接均通过。Observatory 尚未双轨，CLI 也尚未切换生产语义。
 - 2026-08-21 Observatory parser shadow 新增 8 项专项：保护未导出内部 adapter、七类 legacy lifecycle、真实 `parse_adrs` 双轨、当前仓库 ADR、精确输入 hash／过滤、`parser-gap` 与 graph/reference legacy-only 边界。Authority 三组专项合计 28/28；默认全仓 89 项中 87 通过、2 项按设计跳过，integrated structure、905 KB 静态站和 251 份 Markdown 本地链接均通过。该 harness 未接入 build/serve，不能表述为 Observatory 生产迁移。
 - 2026-08-21 Observatory relation shadow 将专项扩展为 15 项：覆盖显式 `Amends`／`Supersedes`、`Superseded by` 方向反转、effective decision、amend 保留 base effect、真实仓库 6 条 amendment、非关系引用隔离、缺失目标保持 `Unknown` 与 malformed metadata 失败关闭。Authority 三组专项为 35/35；默认全仓 96 项中 94 通过、2 项按设计跳过，integrated structure、913 KB 静态站和 252 份 Markdown／513 个本地链接均通过。旧 build/serve graph、公开 API 与发布契约仍未切换。
+- 2026-08-21 Observatory role shadow 新增 9 项专项：覆盖 Design Draft／Approved／Deprecated 与 Unknown、Plan/State 不生成 implementation claim、Validation 文档存在／Status／自由文本不等于通过、精确 Passed/Failed、隐藏 executable evidence 回退 Unknown、冲突元数据失败关闭、输入快照与真实仓库 7/12/6/29 角色盘点。Authority 四组专项为 44/44；默认全仓 105 项中 103 通过、2 项按设计跳过。该 adapter 未导出且未接入 build/serve，29 个现有 Validation 结果在严格 collector 中全部保持 Unknown。
 
 ## 验证证据
 
@@ -69,6 +70,7 @@ Updated: 2026-08-21
 - [2026-08-21 Authority Meta Model CLI shadow comparison](../validation/2026-08-21-authority-meta-model-cli-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory parser shadow](../validation/2026-08-21-authority-meta-model-observatory-parser-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory relation shadow](../validation/2026-08-21-authority-meta-model-observatory-relation-shadow.md)
+- [2026-08-21 Authority Meta Model Observatory role shadow](../validation/2026-08-21-authority-meta-model-observatory-role-shadow.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`

@@ -18,7 +18,9 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Candidate CLI 已增加第一处真实 consumer 双轨：`authority_shadow.py` 保留原 validator 的 Accepted ADR／入口／pending／integrated 扫描为生产决定路径，同时把 Accepted ADR observation、精确 authority-input snapshot hash、显式 `Unknown` scope 与 revision-content visibility 送入 Core evaluator；差异只按 `parser-gap` 警告，不改变原退出码或 authority status。
 - Candidate Observatory 包的未导出 parser shadow adapter 已覆盖 ADR lifecycle 和显式关系：它只把头部 `Amends:`／`Supersedes:` 与 `Status: Superseded by …` 规范化为 Core observations，后者会反转为“新 ADR supersedes 旧 ADR”；`Predecessor`、正文普通引用和 State 引用不进入规范关系。
 - 真实仓库的 6 条 `Amends` 已与 Core relations 一致；合成测试也证明 supersede 会选出 effective decision、amend 会保留 base 与 amendment、缺少 ADR target 的显式关系会失败关闭。旧 build/serve 图谱没有切换，legacy `supersedes` 字段仍只表示 superseded-by target。
-- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 只完成 Accepted ADR 运行时 shadow，Observatory 只完成包级 ADR lifecycle/relation shadow harness；没有稳定顶层 API、docsite build/serve 接线、consumer production switch、公开 schema/manifest 字段或发布实现，也不是 Canonical State 的实现声明。
+- Candidate Observatory 另有未导出的 role shadow adapter，按受控目录观察 Design／Plan／State／Validation：Design 只识别 Draft／Approved／Deprecated；Plan 只产生 `planned`，State 只产生 `current`，两者都不产生 implementation claim；Validation 只有精确 `Result: Passed/Failed` 或 `Outcome:` 才产生明确结果，文档存在、`Status:` 与自由文本保持 `Unknown`。
+- 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 29 个 Validation；现有 29 个 Validation 的结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
+- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 只完成 Accepted ADR 运行时 shadow，Observatory 只完成包级 ADR lifecycle/relation/role shadow harness；没有稳定顶层 API、docsite build/serve 接线、consumer production switch、公开 schema/manifest 字段或发布实现，也不是 Canonical State 的实现声明。
 
 ## 当前边界
 
@@ -50,6 +52,9 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `tests/test_authority_observatory_shadow.py`
 - `docs/validation/2026-08-21-authority-meta-model-observatory-parser-shadow.md`
 - `docs/validation/2026-08-21-authority-meta-model-observatory-relation-shadow.md`
+- `packages/project-orrery-observatory/src/project_orrery_observatory/authority_role_shadow.py`（Candidate、未导出的 role adapter）
+- `tests/test_authority_observatory_roles_shadow.py`
+- `docs/validation/2026-08-21-authority-meta-model-observatory-role-shadow.md`
 
 ## 已知缺口
 
@@ -57,7 +62,8 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 仅有区域级盘点；尚未形成逐函数／逐规则的 machine-readable inventory 或 drift 判定。
 - CLI shadow 当前只比较 `accepted_adr`；`entrance_mapped`、`pending_marker` 与 `integrated` 仍被明确标为 legacy adoption heuristics，尚未进入 Meta Model evaluator。
 - CLI 尚未解析完整 ADR lifecycle／supersede／amend、Implementation／State／Validation 或 evidence provenance。
-- Observatory lifecycle/relation shadow 尚未接入 `build_docsite.py`／`serve.py`；`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 结果。
+- Observatory lifecycle/relation/role shadow 尚未接入 `build_docsite.py`／`serve.py`；`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
+- Role shadow 目前只解释文档角色与严格头部元数据，不验证 Validation 正文命令是否真正执行，也不从 State 自由文本推导 implementation present/absent。
 - 尚无 consumer production switch、公开语义版本字段、发布计划或 Canonical runtime Validation。
 - Fixture 与 Core evaluator 目前只在 Candidate worktree 中；尚未经干净 integration worktree 合并为 Canonical baseline。
-- Normalized observation collector/parser contract 尚未稳定；当前只覆盖 ADR lifecycle 与显式 amend/supersede，evaluator 仍不读取作者 Markdown 或 Git/Harness 原始输出。
+- Normalized observation collector/parser contract 尚未稳定；当前覆盖 ADR lifecycle、显式 amend/supersede 和四类文档 role metadata，但 evaluator 仍不读取作者 Markdown 或 Git/Harness 原始输出。
