@@ -1,0 +1,344 @@
+{
+  "fixture_format": 1,
+  "fixture_status": "candidate",
+  "authority_model_version": "amm-fixture-v1",
+  "normative_sources": [
+    "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md",
+    "docs/design/authority-meta-model.md"
+  ],
+  "contract": {
+    "required_input_dimensions": [
+      "authority_model_version",
+      "repository_snapshot",
+      "fact_scope",
+      "evidence_visibility"
+    ],
+    "claim_dimensions": [
+      "decision_status",
+      "implementation_claim",
+      "validation_evidence"
+    ],
+    "authority_roles": [
+      "seed",
+      "decision",
+      "approved_design",
+      "implementation_plan",
+      "implementation",
+      "state",
+      "validation",
+      "snapshot"
+    ],
+    "fact_scopes": [
+      "canonical",
+      "candidate",
+      "worktree",
+      "local-only",
+      "historical",
+      "unknown"
+    ],
+    "evidence_categories": [
+      "revision-content",
+      "reproducible-executable-validation",
+      "tool-runtime-trace",
+      "human-or-agent-assertion",
+      "derived-ai-summary"
+    ]
+  },
+  "cases": [
+    {
+      "id": "accepted-not-implemented-not-validated",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://accepted-only@r1",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["ADR-0100 status is Accepted"],
+      "expected": {
+        "claims": {
+          "decision_status": "accepted",
+          "implementation_claim": "unknown",
+          "validation_evidence": "absent"
+        },
+        "must_not_infer": ["implemented", "validated"]
+      }
+    },
+    {
+      "id": "implementation-present-validation-failed",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://failed-validation@r2",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content", "reproducible-executable-validation"]
+      },
+      "source_facts": ["implementation exists in r2", "validation run V2 failed"],
+      "expected": {
+        "claims": {
+          "decision_status": "accepted",
+          "implementation_claim": "present",
+          "validation_evidence": "failed"
+        },
+        "must_not_infer": ["implementation-absent", "validated"]
+      }
+    },
+    {
+      "id": "historical-implementation-removed-current",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://removed-current@r4",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["implementation existed in r3", "current r4 removes it"],
+      "expected": {
+        "claims": {
+          "historical_implementation_claim": "present",
+          "implementation_claim": "absent"
+        },
+        "must_not_infer": ["historical-is-current"]
+      }
+    },
+    {
+      "id": "supersede-effective-decision",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://supersede@r5",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["ADR-0101 Accepted", "ADR-0102 Accepted and supersedes ADR-0101"],
+      "expected": {
+        "claims": {"effective_decision": "ADR-0102"},
+        "relations": {"ADR-0102": {"supersedes": ["ADR-0101"]}},
+        "must_not_infer": ["ADR-0101-is-current-effective"]
+      }
+    },
+    {
+      "id": "amend-preserves-base-effect",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://amend@r6",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["ADR-0103 Accepted", "ADR-0104 Accepted and amends ADR-0103"],
+      "expected": {
+        "claims": {"effective_decisions": ["ADR-0103", "ADR-0104"]},
+        "relations": {"ADR-0104": {"amends": ["ADR-0103"]}},
+        "must_not_infer": ["amend-equals-supersede"]
+      }
+    },
+    {
+      "id": "draft-not-approved",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://draft-design@r7",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["Design D1 lifecycle is Draft"],
+      "expected": {
+        "claims": {"design_lifecycle": "draft"},
+        "must_not_infer": ["approved-design", "implemented"]
+      }
+    },
+    {
+      "id": "plan-not-current-state",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://plan-state@r8",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["Plan P1 intends feature F", "State S1 says feature F is absent"],
+      "expected": {
+        "claims": {"planned": true, "current": false},
+        "must_not_infer": ["planned-is-current", "implemented"]
+      }
+    },
+    {
+      "id": "scope-canonical",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://scope@main-r9",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["claim is integrated at canonical ref"],
+      "expected": {"claims": {"scope": "canonical", "authority_level": "authoritative"}, "must_not_infer": []}
+    },
+    {
+      "id": "scope-candidate",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://scope@candidate-r10",
+        "fact_scope": "candidate",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["claim exists at candidate branch HEAD"],
+      "expected": {"claims": {"scope": "candidate", "authority_level": "candidate"}, "must_not_infer": ["canonical"]}
+    },
+    {
+      "id": "scope-worktree",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://scope@candidate-r10+dirty",
+        "fact_scope": "worktree",
+        "evidence_visibility": ["revision-content", "tool-runtime-trace"]
+      },
+      "source_facts": ["uncommitted worktree metadata reports a change"],
+      "expected": {"claims": {"scope": "worktree", "authority_level": "worktree"}, "must_not_infer": ["committed", "canonical"]}
+    },
+    {
+      "id": "scope-local-only",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://remote-device@reported",
+        "fact_scope": "local-only",
+        "evidence_visibility": ["human-or-agent-assertion"]
+      },
+      "source_facts": ["member device reports a dirty path count"],
+      "expected": {"claims": {"scope": "local-only", "authority_level": "reported"}, "must_not_infer": ["source-code-content", "canonical"]}
+    },
+    {
+      "id": "scope-historical",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://scope@old-r3",
+        "fact_scope": "historical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["claim was true at old revision r3"],
+      "expected": {"claims": {"scope": "historical", "authority_level": "historical"}, "must_not_infer": ["current"]}
+    },
+    {
+      "id": "scope-unknown",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://scope@unresolved",
+        "fact_scope": "unknown",
+        "evidence_visibility": []
+      },
+      "source_facts": ["scope cannot be established from visible evidence"],
+      "expected": {"claims": {"scope": "unknown", "authority_level": "unknown"}, "must_not_infer": ["canonical", "candidate", "worktree"]}
+    },
+    {
+      "id": "snapshot-not-live-state",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://snapshot@2026-08-01",
+        "fact_scope": "historical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["Snapshot N1 records an evaluation on 2026-08-01"],
+      "expected": {"claims": {"role": "snapshot", "live_state": false}, "must_not_infer": ["current-state"]}
+    },
+    {
+      "id": "evidence-capability-boundaries",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://evidence@r11",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content", "reproducible-executable-validation", "tool-runtime-trace", "human-or-agent-assertion", "derived-ai-summary"]
+      },
+      "source_facts": ["all evidence categories are visible"],
+      "expected": {
+        "claims": {
+          "revision-content": "supports-bytes-at-revision",
+          "reproducible-executable-validation": "supports-tested-behavior",
+          "tool-runtime-trace": "supports-observed-tool-event",
+          "human-or-agent-assertion": "assertion-only",
+          "derived-ai-summary": "derived-interpretation-only"
+        },
+        "must_not_infer": ["assertion-is-independent-validation", "summary-is-primary-evidence"]
+      }
+    },
+    {
+      "id": "derived-ai-non-escalation",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://ai-view@r12",
+        "fact_scope": "unknown",
+        "evidence_visibility": ["derived-ai-summary"]
+      },
+      "source_facts": ["AI summary says feature F is complete"],
+      "expected": {"claims": {"authority_level": "derived", "implementation_claim": "unknown"}, "must_not_infer": ["approved", "implemented", "validated"]}
+    },
+    {
+      "id": "scope-not-coordinator-runtime",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://coordinator@candidate-r13",
+        "fact_scope": "candidate",
+        "evidence_visibility": ["tool-runtime-trace"]
+      },
+      "source_facts": ["candidate claim is assigned to Agent A", "Coordinator lock L1 is held"],
+      "expected": {
+        "claims": {"scope": "candidate"},
+        "coordinator_runtime": {"owner": "Agent A", "lock": "L1"},
+        "must_not_infer": ["owner-is-scope", "lock-confers-authority"]
+      }
+    },
+    {
+      "id": "deterministic-input-a",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://deterministic@r14",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["ADR-0200 is Accepted"],
+      "expected": {"claims": {"decision_status": "accepted"}, "must_not_infer": ["implemented"]}
+    },
+    {
+      "id": "deterministic-input-b",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://deterministic@r14",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["ADR-0200 is Accepted"],
+      "expected": {"claims": {"decision_status": "accepted"}, "must_not_infer": ["implemented"]}
+    },
+    {
+      "id": "visibility-with-validation",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://visibility@r15",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content", "reproducible-executable-validation"]
+      },
+      "source_facts": ["implementation exists", "passing validation V15 is visible"],
+      "expected": {"claims": {"implementation_claim": "present", "validation_evidence": "passed"}, "must_not_infer": []}
+    },
+    {
+      "id": "visibility-without-validation",
+      "input": {
+        "authority_model_version": "amm-fixture-v1",
+        "repository_snapshot": "fixture://visibility@r15",
+        "fact_scope": "canonical",
+        "evidence_visibility": ["revision-content"]
+      },
+      "source_facts": ["implementation exists", "validation evidence is not visible"],
+      "expected": {"claims": {"implementation_claim": "present", "validation_evidence": "unknown"}, "must_not_infer": ["validated"]}
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "same-input-same-output",
+      "left_case": "deterministic-input-a",
+      "right_case": "deterministic-input-b",
+      "relation": "equal",
+      "allowed_input_differences": []
+    },
+    {
+      "id": "visibility-difference-is-explicit",
+      "left_case": "visibility-with-validation",
+      "right_case": "visibility-without-validation",
+      "relation": "different",
+      "allowed_input_differences": ["evidence_visibility"],
+      "difference_reason": "validation evidence is visible only to the left case"
+    }
+  ]
+}
