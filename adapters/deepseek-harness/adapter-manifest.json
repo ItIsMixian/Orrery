@@ -50,16 +50,23 @@
           "headless_skill_catalog",
           "explicit_user_skill_injection",
           "credential_failure_before_model_response",
-          "no_model_calls"
+          "real_model_explicit_call",
+          "real_model_implicit_skill_tool",
+          "model_observed_cli_missing",
+          "model_observed_cli_incompatible",
+          "editable_source_cli_routing",
+          "wheel_cli_source_context_failure",
+          "recoverable_uninstall_after_model_calls"
         ]
       }
     ],
     "verified": [],
     "evidence": [
       "docs/validation/2026-08-21-deepseek-harness-adapter-stage-a.md",
-      "docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md"
+      "docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md",
+      "docs/validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md"
     ],
-    "note": "DeepSeek Harness is a developer preview. Headless runtime discovery and explicit user Skill injection passed, but missing credentials prevented a model response and CLI routing."
+    "note": "DeepSeek Harness rc.8 completed explicit and implicit real-model Adapter routing plus model-observed dependency failures. Compatibility remains experimental because a normal wheel install of compatible CLI 0.1.1 cannot locate source-owned Observatory assets; the successful route used the unreleased editable source tree."
   },
   "distribution": {
     "package_name": "project-orrery-deepseek-harness-adapter",

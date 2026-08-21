@@ -95,8 +95,8 @@
           "scope": "isolated_no_model_stage_a",
           "validated_on": "2026-08-21",
           "validation": "docs/validation/2026-08-21-deepseek-harness-adapter-stage-a.md",
-          "stage_b_status": "explicit_skill_injection_passed_model_credential_blocked",
-          "stage_b_validation": "docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md"
+          "stage_b_status": "real_model_routing_passed_wheel_cli_blocked",
+          "stage_b_validation": "docs/validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md"
         }
       ]
     },

@@ -60,11 +60,11 @@ class DeepSeekHarnessAdapterTests(unittest.TestCase):
         )
         self.assertEqual(
             component["runtime_evidence"][0]["stage_b_validation"],
-            manifest["runtime_compatibility"]["evidence"][1],
+            manifest["runtime_compatibility"]["evidence"][-1],
         )
         self.assertEqual(
             component["runtime_evidence"][0]["stage_b_status"],
-            "explicit_skill_injection_passed_model_credential_blocked",
+            "real_model_routing_passed_wheel_cli_blocked",
         )
         self.assertEqual(package["dsh"]["bundle"]["patch"], "./cordis.patch.yml")
         self.assertEqual(package["peerDependencies"]["@deepseek-ai/dsh-skill"], "0.1.0-rc.8")

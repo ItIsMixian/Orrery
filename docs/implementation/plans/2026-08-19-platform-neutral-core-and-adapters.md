@@ -99,7 +99,8 @@ ADR-0013 已选择两个独立平台范围；任何一项完成都不能自动�
   bundle composition、真实无模型 Skill discovery、更新、移除和作者文件保留。
 - [x] 经单独授权启动最少 headless turn；显式 `/project-orrery` 已在真实 session 形成
   `skill-catalog`／`skill-invocation`，隐式候选形成 catalog，但两者因无 API Key 在模型请求处失败。
-- [ ] 经单独授权后，以最少 headless turn 验证显式／适用时的隐式调用和失败路径。
+- [x] 经单独授权后，以最少 headless turn 验证显式／隐式调用和 CLI 缺失／不兼容失败路径；普通 wheel
+  CLI 另暴露 source-assets 定位失败，成功 validate 精确绑定 editable source CLI。
 - [ ] 只有完整 runtime 证据门通过后，才把精确范围标为 `verified`。
 
 Stage A 只允许隔离目录、无真实 API Key、无模型调用；Stage B 写真实用户目录、使用真实登录态或发起
@@ -118,6 +119,13 @@ slash command，但本机 `loggedIn=false`；DeepSeek Harness 的真实 headless
 路由，故上方真实调用项仍未完成。证据见
 [Claude Code Stage B 认证阻塞](../../validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md)与
 [DeepSeek Harness Stage B 凭据阻塞](../../validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md)。
+
+2026-08-22 在用户配置真实 DeepSeek credential 后，DSH rc.8／`deepseek-official`／
+`deepseek-v4-flash` 已完成显式 Skill 注入、隐式 `skill` tool load、editable CLI preflight／validate、CLI
+distribution 缺失 exit 3、0.2.0 不兼容 exit 4，以及模型调用后的 remove／restore／final remove。普通 wheel
+CLI 0.1.1 的 preflight 虽通过，`validate` 却在 target 检查前因找不到 source repository Observatory assets
+崩溃；因此 verified 清单仍未完成。见
+[DeepSeek Harness Stage B Runtime](../../validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md)。
 
 验收证据：两个平台各自的 manifest、专项测试和独立 Validation。
 

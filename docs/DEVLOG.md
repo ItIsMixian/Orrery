@@ -300,3 +300,10 @@
 - 合成 Git fixture 实际建立 clean main、两个 linked worktree、独立 clone、文件级 untracked 和未 push commit。首次实现后测试暴露 CLI fixture 缺 Observatory source path 及 Git untracked 目录折叠，均收紧 fixture 后修复。
 - 最终专项 10/10、受影响组合 67 passed + 2 expected skips、全仓 236 passed + 5 existing skips；integrated structure、隔离静态站、284 份 Markdown／696 个本地链接和 diff 检查通过。证据见 [Phase 0 Validation](validation/2026-08-22-personal-collaboration-phase-0.md)。
 - 本轮没有实现持久 session、主目录写入守卫、Scope/path collector、finding 计算、review／integration／cleanup、Observatory 或 Team 网络层；根 PROGRESS／HANDOFF 留给唯一整合者同步。
+
+## 2026-08-22 — DeepSeek Harness Adapter 真实模型 Stage B
+
+- 使用用户明确授权且已配置的真实 DeepSeek credential；Key 仅进入隔离 headless 子进程内存，未复制到测试根或 Git，真实 GUI profile／settings／launcher 和运行进程保持不变。
+- `@deepseek-ai/dsh 0.1.0-rc.8`、`deepseek-official`／`deepseek-v4-flash` 完成显式 `/project-orrery`、隐式 `skill({name: project-orrery})`、CLI distribution 缺失 exit 3 和 0.2.0 不兼容 exit 4；失败路径均无 fallback。
+- editable source CLI 0.1.1 的 preflight／validate 通过；普通 wheel CLI 同版本在 `validate` 前因无法定位 source-owned Observatory assets 失败，证明 version preflight 不能替代可执行兼容证据。
+- 六个模型 turn 后，隔离 Adapter remove／restore／final remove 的 runtime discovery 为 0→1→0，424 个作者 fixture 文件逐字节一致。由于 wheel blocker，支持状态继续为 `experimental`／`unreleased`，`verified` 不提升。
