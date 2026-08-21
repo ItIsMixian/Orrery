@@ -2,7 +2,7 @@
 
 Date: 2026-08-21
 Scope: ADR-0004 Implementation Plan Phase 3 的统一 CLI JSON 合约、稳定退出码与不依赖 Codex 的最小 Harness Adapter；不含第二平台、模型调用、组件发布、多人协作或 Authority Meta Model
-Result: PARTIAL — Harness／CLI 实现与 Ubuntu CI 已通过；Windows 的第二轮矩阵被一个无关本机 HTTP 测试的 10 秒超时阻断，完整双 OS 门仍未通过，因此 Phase 3 继续是 `experimental`／`unreleased` candidate
+Result: PASS — Harness／CLI 实现及同一提交的 Windows／Ubuntu 完整 CI 已通过；Phase 3 跨 OS 验收完成。Harness Adapter 发行状态仍是 `experimental`／`unreleased`，不代表第三方 Agent runtime 兼容
 Source: branch `codex/harness-json-phase3`，baseline `main@14af26a879eb2f6e4242031719f675c50e5cb27a`，实现提交 `da8c541`，Unix 夹具修复 `c30acab`
 
 ## 权威链
@@ -91,14 +91,17 @@ Harness request 只能使用 schema 白名单参数，不能注入任意 CLI arg
 | [CI run 28](https://github.com/yw9299-stack/project-orrery/actions/runs/32441062099) on `da8c541` | PARTIAL — Windows PASS；Ubuntu 在 Codex CLI 依赖测试中把 Linux 命令夹具误写为 `.exe`，明确失败 |
 | Windows／Ubuntu 原生夹具专项 | PASS — `c30acab` 在 Windows 与 Ubuntu WSL 分别通过相同 `test_cli_dependency_check_fails_closed_and_accepts_declared_version` |
 | [CI run 29](https://github.com/yw9299-stack/project-orrery/actions/runs/32441186823) on `c30acab` | PARTIAL — Ubuntu PASS；Windows 的 68 项中 67 项完成，`test_graphical_ai_settings_api_is_local_and_never_echoes_keys` 等待本机 HTTP 响应 10 秒后超时。首轮同一 Windows 测试已 PASS；该错误不在 Phase 3 变更面，但完整门仍按失败处理 |
+| [CI run 30](https://github.com/yw9299-stack/project-orrery/actions/runs/32441505867) on `4a006fe` | PASS — `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)` 均完成并成功；同一候选提交的跨 OS 门通过 |
 
 隔离 build 没有修改 `docs/_site/index.html`。
 
 ## 边界与待完成项
 
-- 分支已 push，现有 `.github/workflows/validate.yml` 已运行两轮 Windows／Ubuntu 完整矩阵。首轮
+- 分支已 push，现有 `.github/workflows/validate.yml` 已运行三轮 Windows／Ubuntu 完整矩阵。首轮
   暴露并修复了真实 Unix 测试夹具问题；第二轮 Ubuntu 已通过，Windows 被变更面外的本机 HTTP
-  测试偶发超时阻断。必须取得同一后续提交的 Windows／Ubuntu 双 PASS，跨 OS 验收门才通过。
+  测试偶发超时阻断；第三轮在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，跨 OS 验收门通过。
+- Phase 3 的实现与跨 OS 验收已完成，但 Harness Adapter 继续是 `experimental`／`unreleased`；这里的
+  PASS 只覆盖 Core／CLI／subprocess JSON 合约，不提升到 runtime-verified 或 released。
 - Harness 证明请求／subprocess／CLI response 的机器合约，不证明模型读取、理解或第三方 Agent
   平台发现／调用。
 - 未生成 wheel、多组件 release、tag 或公开 Adapter 包；顶层组件状态继续为 `unreleased`。
