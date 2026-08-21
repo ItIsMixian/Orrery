@@ -6,11 +6,13 @@ import datetime as dt
 import hashlib
 import json
 import shutil
+import stat
 import sys
 from pathlib import Path
 from typing import Iterable
 
 from project_orrery_core import build_project_manifest, iter_authority_assets, rendered_bytes, rendered_content
+from project_orrery_core.authority_compatibility import judge_project_authority_model
 from project_orrery_observatory import MANAGED_TOOLS, iter_observatory_assets, projected_bytes
 
 from .context import CliContext, repository_context
@@ -85,17 +87,65 @@ def _failure(args: argparse.Namespace, code: str, human_message: str, json_messa
     return 2
 
 
+def _is_reparse_point(path: Path) -> bool:
+    try:
+        attributes = getattr(path.lstat(), "st_file_attributes", 0)
+    except OSError:
+        return False
+    return bool(attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0))
+
+
 def run(args: argparse.Namespace, context: CliContext) -> int:
     target = args.target.expanduser().resolve()
     today = dt.date.today().isoformat()
     stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     manifest_path = target / ".project-orrery.json"
     existing_manifest: dict = {}
+    manifest_read_error: str | None = None
+    supported_models = context.release.supported_authority_model_versions
+    if supported_models:
+        if manifest_path.is_symlink() or _is_reparse_point(manifest_path):
+            return _failure(
+                args,
+                "project_manifest_symlink",
+                "candidate Authority releases do not read or write through a project manifest symlink or reparse point",
+            )
+        if manifest_path.exists() and not manifest_path.is_file():
+            return _failure(
+                args,
+                "project_manifest_not_regular",
+                "candidate Authority releases require the existing project manifest to be a regular file",
+            )
     if manifest_path.is_file():
         try:
-            existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            pass
+            loaded_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if not isinstance(loaded_manifest, dict):
+                raise ValueError("project manifest must be a JSON object")
+            existing_manifest = loaded_manifest
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            manifest_read_error = str(exc)
+
+    if supported_models:
+        if manifest_read_error is not None:
+            return _failure(
+                args,
+                "project_manifest_invalid",
+                f"candidate Authority release cannot safely read the existing project manifest: {manifest_read_error}",
+            )
+        if existing_manifest:
+            capability = judge_project_authority_model(
+                existing_manifest,
+                supported_versions=supported_models,
+                known_versions=supported_models,
+            )
+            if capability["status"] not in {"legacy-unversioned", "supported"}:
+                return _failure(
+                    args,
+                    "authority_model_incompatible",
+                    "candidate Authority release refuses to modify a project with "
+                    f"Authority Model status {capability['status']}; "
+                    f"required action: {capability['required_action']}",
+                )
     title = args.title or existing_manifest.get("title") or target.name
     replacements = {
         "PROJECT_TITLE": title,

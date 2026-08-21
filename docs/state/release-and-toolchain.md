@@ -29,6 +29,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - 未发布 `adapters/harness-json/` 0.1.0 是 subprocess JSON 参考 Adapter：只接受固定参数白名单，不加载 `SKILL.md`、Codex 配置／登录态或 Agent runtime，并清理常见 Agent／Provider 环境变量。它在 Windows 候选工作树通过 dry-run、临时安装、validate、mixed toolchain、schema 不兼容、离线更新和作者文件保留；首轮 CI 暴露的 Unix 命令夹具错误已在 `c30acab` 修复。第三轮 CI `32441505867` 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨 OS 验收完成。支持状态仍为 `experimental`／`unreleased`，不构成第三方平台兼容声明。
 - ADR-0011 已定义 Authority Model 的公开正整数版本与离散支持集。self-host project manifest 已显式选择模型 1，neutral CLI 0.1.5 候选源码可报告兼容能力，通过 review receipt、精确备份与原子替换显式采用 model 1，可从项目内匹配备份执行带撤销备份的恢复，并在 future release 声明模型时只读判断更新是否需要 migration review；实际 component/release manifest、standalone installer、当前 v0.2 scaffold 和发布资产仍未投影默认值或支持集，普通工具升级也不会补写字段。
 - Candidate Core 已能验证 future release 的 `authority_model_version` 与 `compatibility.authority_model_versions.supported` 必须成对、默认值必须位于离散支持集；只有新项目会从这种 future contract 选择默认模型。已有 legacy manifest 在普通 scaffold／`--upgrade-tools` 下继续缺字段。当前 `skills/project-orrery/release-manifest.json` 和 bundled bridge 仍精确代表 v0.2.0、没有模型声明；因此 standalone v0.2 fallback、公开 zip/checksum 与发布事实均未改变。
+- M2.3 Worktree Candidate 新增本地 `orrery-authority-release-candidate-gate-v1`：候选 manifest 由维护者在仓库外显式提供，Gate 对 Authority Model `default=1`／`supported=[1]`、确定性离线 ZIP／checksum、standalone new／legacy、invalid／unsupported target、显式 migration／restore、self-host、secret／generated artifact 排除执行失败关闭验证。候选 manifest 只注入 staging archive，三份冻结 v0.2.0 历史输入保持不变；输出 receipt 始终区分 `candidate_ready` 与 `release_ready=false`。
+- Candidate 安装器在 release 真正声明 Authority support 时，会在任何读取／复制前拒绝 symlink、Windows reparse、目录或其他非普通 `.project-orrery.json`，并对 invalid／unsupported selector 零写入失败；public v0.2 manifest 未声明 support，因此冻结兼容行为不变。Gate 子进程只继承显式环境白名单并有 120 秒超时，解包阶段独立复核 traversal、大小写碰撞、symlink、禁用路径／文件和 plaintext credential pattern。
 - Candidate managed Observatory source/template 已投影同一默认关闭的 Authority shadow sidecar 接线；它只在显式环境开关下运行，且 package／manifest／scope／写入失败不改变 legacy HTML 或 stats。该 Candidate 工具变化没有改写 v0.2.0 release manifest、归档、checksum、installer 默认值或公开支持状态。
 - 同一 source/template 投影现已让 AI 派生视图消费压缩后的 shadow context，并在 JSON／正文／stream headers 标注非权威边界；缺省无 report 时失败关闭为 `Unknown`／`unavailable`。这仍是未发布 managed-tool 行为，不改变组件版本、v0.2.0 资产或公开支持声明。
 - Candidate source/template 还投影了单独的 shadow diagnostic view 开关；report-only 与默认构建保持原 HTML，只有显式 view opt-in 才注入不含 claim payload 的诊断面板。该变化同样没有修改组件版本、release manifest、归档、installer 或 v0.2.0 事实。
@@ -64,10 +66,15 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `tests/fixtures/authority-meta-model/v1/projection.json`
 - `tests/test_authority_model_projection.py`
 - `tests/test_authority_update_compatibility.py`
+- `packaging/authority-release-candidate-policy.json`
+- `scripts/authority_release_candidate_gate.py`
+- `tests/fixtures/authority-meta-model/v1/release-candidate-gate.json`
+- `tests/test_authority_release_candidate_gate.py`
+- `docs/validation/2026-08-21-m2-3-authority-release-candidate-gate.md`
 
 ## 已知缺口
 
 - v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
 - Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Phase 3 Harness JSON 已通过同一提交的 Windows／Ubuntu CI，但这只验收平台中立 CLI／Harness 合约。Core／CLI 独立发行物、多组件发布流水线、manifest v2 和跨 runtime 支持矩阵仍未实现。
 - 多 Workstream 自动化尚无正式 schema、CLI、观测台投影、Team 网络面或 CI 门禁。当前仅能依靠 Git 原生命令、独立 worktree 和人工验证执行协议；默认安装没有因 ADR-0008 开始监听网络。
-- Authority Meta Model 已有 fixture-bound Core evaluator、内部兼容判断、neutral CLI `validate` capability report、receipt-gated migration apply/restore、future-release projection contract 和 `check-update` migration review，但没有实际下一 release manifest、稳定顶层 Core API、独立发行物、Harness Adapter 迁移命令、managed Observatory banner 或发布支持状态变化；v0.2.0 发布事实不变。
+- Authority Meta Model 已有 fixture-bound Core evaluator、内部兼容判断、neutral CLI `validate` capability report、receipt-gated migration apply/restore、future-release projection contract、`check-update` migration review 与本地 release-candidate gate，但没有维护者选定的实际下一 SemVer／source manifest、M2.2 consumer production evidence、稳定顶层 Core API、独立发行物、Harness Adapter 迁移命令、managed Observatory banner 或发布支持状态变化；v0.2.0 发布事实不变。

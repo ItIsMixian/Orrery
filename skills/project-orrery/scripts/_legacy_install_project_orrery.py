@@ -7,6 +7,7 @@ import datetime as dt
 import hashlib
 import json
 import shutil
+import stat
 import sys
 from pathlib import Path
 
@@ -31,6 +32,65 @@ MANAGED_TOOLS = {
 }
 EXCLUDED_TEMPLATE_PARTS = {"__pycache__", ".DS_Store"}
 EXCLUDED_TEMPLATE_SUFFIXES = {".pyc", ".pyo"}
+
+
+def authority_release_capability() -> tuple[int | None, tuple[int, ...]]:
+    """Validate an optional Authority Model declaration in this release.
+
+    The public v0.2.0 manifest declares neither value and therefore keeps the
+    frozen fallback behavior. A future declaring release must provide the
+    default and discrete support set as one fail-closed pair.
+    """
+
+    default_present = "authority_model_version" in RELEASE
+    default = RELEASE.get("authority_model_version")
+    compatibility = RELEASE.get("compatibility")
+    if not isinstance(compatibility, dict):
+        raise ValueError("release compatibility must be an object")
+    rule = compatibility.get("authority_model_versions")
+    support_present = rule is not None
+    if not default_present and not support_present:
+        return None, ()
+    if not default_present or not isinstance(rule, dict):
+        raise ValueError(
+            "Authority Model support requires a paired release default and support set"
+        )
+    supported = rule.get("supported")
+    if (
+        isinstance(default, bool)
+        or not isinstance(default, int)
+        or default <= 0
+        or not isinstance(supported, list)
+        or any(
+            isinstance(value, bool) or not isinstance(value, int) or value <= 0
+            for value in supported
+        )
+        or len(set(supported)) != len(supported)
+        or default not in supported
+    ):
+        raise ValueError("invalid Authority Model release declaration")
+    return default, tuple(sorted(supported))
+
+
+def project_authority_status(
+    manifest: dict, supported: tuple[int, ...]
+) -> tuple[str, str]:
+    if "authority_model_version" not in manifest:
+        return "legacy-unversioned", "explicit-semantic-migration"
+    value = manifest["authority_model_version"]
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        return "invalid", "repair-invalid-field"
+    if value in supported:
+        return "supported", "none"
+    return "unsupported", "compatible-tool-or-explicit-migration"
+
+
+def is_reparse_point(path: Path) -> bool:
+    try:
+        attributes = getattr(path.lstat(), "st_file_attributes", 0)
+    except OSError:
+        return False
+    return bool(attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0))
 
 
 def is_template_asset(path: Path) -> bool:
@@ -69,16 +129,59 @@ def backup_file(target_root: Path, relative: Path, stamp: str, dry_run: bool) ->
 
 def main() -> int:
     args = parse_args()
+    try:
+        authority_default, supported_authority_models = authority_release_capability()
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
     target = args.target.expanduser().resolve()
     today = dt.date.today().isoformat()
     stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     manifest_path = target / ".project-orrery.json"
     existing_manifest: dict = {}
+    manifest_read_error: str | None = None
+    if authority_default is not None:
+        if manifest_path.is_symlink() or is_reparse_point(manifest_path):
+            print(
+                "ERROR: candidate Authority releases do not read or write through "
+                "a project manifest symlink or reparse point",
+                file=sys.stderr,
+            )
+            return 2
+        if manifest_path.exists() and not manifest_path.is_file():
+            print(
+                "ERROR: candidate Authority releases require the existing project "
+                "manifest to be a regular file",
+                file=sys.stderr,
+            )
+            return 2
     if manifest_path.is_file():
         try:
-            existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            pass
+            loaded_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if not isinstance(loaded_manifest, dict):
+                raise ValueError("project manifest must be a JSON object")
+            existing_manifest = loaded_manifest
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            manifest_read_error = str(exc)
+    if authority_default is not None:
+        if manifest_read_error is not None:
+            print(
+                "ERROR: candidate Authority release cannot safely read the existing "
+                f"project manifest: {manifest_read_error}",
+                file=sys.stderr,
+            )
+            return 2
+        if existing_manifest:
+            status, action = project_authority_status(
+                existing_manifest, supported_authority_models
+            )
+            if status not in {"legacy-unversioned", "supported"}:
+                print(
+                    "ERROR: candidate Authority release refuses to modify a project "
+                    f"with Authority Model status {status}; required action: {action}",
+                    file=sys.stderr,
+                )
+                return 2
     title = args.title or existing_manifest.get("title") or target.name
     replacements = {
         "PROJECT_TITLE": title,
@@ -154,6 +257,8 @@ def main() -> int:
         "managed_tools": sorted(p.as_posix() for p in MANAGED_TOOLS),
         "expected_tool_hashes": expected_hashes,
     })
+    if not existing_manifest and authority_default is not None:
+        manifest["authority_model_version"] = authority_default
     manifest_text = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
     old_manifest_text = manifest_path.read_text(encoding="utf-8") if manifest_path.is_file() else ""
     manifest_action = "KEEP" if old_manifest_text == manifest_text else ("UPDATE" if manifest_path.exists() else "WRITE")

@@ -1,0 +1,31 @@
+{
+  "contract": "orrery-authority-release-candidate-gate-v1",
+  "authority_model": {
+    "default": 1,
+    "supported": [1]
+  },
+  "historical_inputs": {
+    "skills/project-orrery/release-manifest.json": "440ae329306245315bd0287b8730d0ba3b5dc601bbf18628a68e3f64fd04d327",
+    "packages/project-orrery-core/src/project_orrery_core/data/release-v0.2.0.json": "1c88d416319fac455db9b19cd1bda280636f484dfec8072ef7971df3d40cf3e0",
+    "tests/fixtures/platform_neutral_phase0_baseline.json": "202b42960ff11a91c4ba0b7a0a11f4025f617af2192588dd2306e588d37dc167"
+  },
+  "forbidden_archive_parts": [
+    ".git",
+    ".project-orrery-backup",
+    "__pycache__",
+    "docs/_site",
+    "project-orrery-benchmark"
+  ],
+  "forbidden_archive_names": [
+    ".doccache.json",
+    ".env",
+    ".port",
+    "ai-config.json",
+    "credentials.json",
+    "keyring.json"
+  ],
+  "release_blockers": [
+    "maintainer-version-selection",
+    "m2.2-consumer-production-evidence"
+  ]
+}
