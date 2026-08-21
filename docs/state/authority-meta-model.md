@@ -16,6 +16,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 本地 `main` 已集成 `amm-fixture-v1` versioned conformance fixture：21 个案例冻结四项输入、独立 claim dimensions、lifecycle/relations、全部 fact scopes、evidence 能力边界、AI non-escalation、Snapshot 与 Coordinator 分离，以及 determinism/visibility comparison；专项测试为 9/9 通过。
 - ADR-0010 已决定由平台中立 Core 持有唯一确定性 evaluator；本地 `main` 中的 experimental `project_orrery_core.authority` 已能把 normalized observations 与四项 conformance 输入解释为 claims/relations/scope/evidence 边界，21 个 fixture case 的 shadow expectation 全部满足，额外输出均由 fixture policy 显式分类，专项为 14/14。
 - Candidate CLI 已增加第一处真实 consumer 双轨：`authority_shadow.py` 保留原 validator 的 Accepted ADR／入口／pending／integrated 扫描为生产决定路径，同时把 Accepted ADR observation、精确 authority-input snapshot hash、显式 `Unknown` scope 与 revision-content visibility 送入 Core evaluator；差异只按 `parser-gap` 警告，不改变原退出码或 authority status。
+- Worktree Candidate `codex/m2-1-authority-claims` 已增加内部 `cli-authority-observations-v1` contract：它确定性选择 Seed、编号 ADR、Design、Plan、State、Validation 与 Snapshot，记录相对 source、逐文件 SHA-256、repository snapshot、显式 lifecycle／amend／supersede、per-source Core claims 和 evidence provenance。Validation 的 `Result`／`Outcome` 在没有可复现执行证据时只形成 human／Agent assertion，保持 `validation_evidence=unknown`；Plan／State 继续不产生 implementation claim。该 contract 仍嵌在 warning-only CLI shadow 中，不是 Canonical integration、公共 API 或 production switch。
 - Candidate Observatory 包的未导出 parser shadow adapter 已覆盖 ADR lifecycle 和显式关系：它只把头部 `Amends:`／`Supersedes:` 与 `Status: Superseded by …` 规范化为 Core observations，后者会反转为“新 ADR supersedes 旧 ADR”；`Predecessor`、正文普通引用和 State 引用不进入规范关系。
 - 真实仓库的 6 条 `Amends` 已与 Core relations 一致；合成测试也证明 supersede 会选出 effective decision、amend 会保留 base 与 amendment、缺少 ADR target 的显式关系会失败关闭。旧 build/serve 图谱没有切换，legacy `supersedes` 字段仍只表示 superseded-by target。
 - Candidate Observatory 另有未导出的 role shadow adapter，按受控目录观察 Design／Plan／State／Validation：Design 只识别 Draft／Approved／Deprecated；Plan 只产生 `planned`，State 只产生 `current`，两者都不产生 implementation claim；Validation 只有精确 `Result: Passed/Failed` 或 `Outcome:` 才产生明确结果，文档存在、`Status:` 与自由文本保持 `Unknown`。
@@ -60,6 +61,10 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `packages/project-orrery-core/src/project_orrery_core/authority.py`（Candidate experimental evaluator）
 - `docs/validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md`
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py`（Candidate CLI shadow adapter）
+- `packages/project-orrery-cli/src/project_orrery_cli/authority_observations.py`（M2.1 Worktree Candidate repository collector／internal contract）
+- `tests/fixtures/authority-meta-model/v1/cli-observation-contract.json`
+- `tests/test_authority_cli_claims.py`
+- `docs/validation/2026-08-21-m2-1-authority-cli-claims.md`
 - `packages/project-orrery-cli/src/project_orrery_cli/validate.py`（legacy production path + warning-only comparison）
 - `tests/test_authority_cli_shadow.py`
 - `docs/validation/2026-08-21-authority-meta-model-cli-shadow.md`
@@ -108,7 +113,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 
 - 没有公共 machine-readable domain API、version manifest 或 conformance CLI；当前 parser 与 compatibility contracts 仅是 Candidate 内部测试边界。
 - 仅有区域级盘点；尚未形成逐函数／逐规则的 machine-readable inventory 或 drift 判定。
-- CLI shadow 当前只比较 `accepted_adr`；`entrance_mapped`、`pending_marker` 与 `integrated` 仍被明确标为 legacy adoption heuristics，尚未进入 Meta Model evaluator。
+- Canonical M1 CLI shadow 仍只比较 `accepted_adr`。M2.1 Worktree Candidate 已能生成完整 repository observations／claims bundle，但尚未集成、未形成稳定公共 report，也没有改变 legacy `entrance_mapped`、`pending_marker`、`integrated` adoption heuristics 或退出码。
 - CLI 尚未解析完整 ADR lifecycle／supersede／amend、Implementation／State／Validation 或 evidence provenance。
 - Observatory lifecycle/relation/role shadow 与 runtime bridge 已有 opt-in managed sidecar 与独立诊断面板接线，但默认关闭；诊断面板只显示 comparison health／scope／计数，不进入 legacy stats，也不消费 claim payload。`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
 - Role shadow 目前只解释文档角色与严格头部元数据，不验证 Validation 正文命令是否真正执行，也不从 State 自由文本推导 implementation present/absent。

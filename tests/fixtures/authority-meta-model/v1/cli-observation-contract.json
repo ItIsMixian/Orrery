@@ -1,0 +1,72 @@
+{
+  "fixture_format": 1,
+  "contract_version": "cli-authority-observations-v1",
+  "authority_model_version": "amm-fixture-v1",
+  "documents": [
+    {
+      "path": "docs/core/principles.md",
+      "content": "# Seed\n\nA durable project principle.\n"
+    },
+    {
+      "path": "docs/decisions/0001-base.md",
+      "content": "# ADR-0001: Base\n\nStatus: Accepted\n\n## Decision\n\nBase decision.\n"
+    },
+    {
+      "path": "docs/decisions/0002-replacement.md",
+      "content": "# ADR-0002: Replacement\n\nStatus: Accepted\n\nSupersedes: [ADR-0001](0001-base.md)\n\n## Decision\n\nReplacement.\n"
+    },
+    {
+      "path": "docs/decisions/0003-amendment.md",
+      "content": "# ADR-0003: Amendment\n\nStatus: Accepted\n\nAmends: [ADR-0002](0002-replacement.md)\n\n## Decision\n\nAmendment.\n"
+    },
+    {
+      "path": "docs/design/example.md",
+      "content": "# Design\n\nStatus: Approved\n\n## Scope\n\nExample.\n"
+    },
+    {
+      "path": "docs/implementation/plans/example.md",
+      "content": "# Plan\n\nStatus: Active\n\n## Tasks\n\nExample.\n"
+    },
+    {
+      "path": "docs/state/example.md",
+      "content": "# State\n\n## Current facts\n\nExample.\n"
+    },
+    {
+      "path": "docs/validation/example.md",
+      "content": "# Validation\n\nResult: Passed\n\n## Procedure\n\nReported by an author.\n"
+    },
+    {
+      "path": "docs/snapshots/2026-08-21.md",
+      "content": "# Snapshot\n\nDate: 2026-08-21\n\n## Assessment\n\nExample.\n"
+    }
+  ],
+  "expected": {
+    "roles": [
+      "adr",
+      "design",
+      "plan",
+      "seed",
+      "snapshot",
+      "state",
+      "validation"
+    ],
+    "relations": {
+      "ADR-0002": {
+        "supersedes": [
+          "ADR-0001"
+        ]
+      },
+      "ADR-0003": {
+        "amends": [
+          "ADR-0002"
+        ]
+      }
+    },
+    "effective_decisions": [
+      "ADR-0002",
+      "ADR-0003"
+    ],
+    "validation_assertion": "passed",
+    "validation_evidence": "unknown"
+  }
+}

@@ -59,6 +59,7 @@ Updated: 2026-08-21
 - 2026-08-21 Authority AI derived-view 新增 6 项专项：覆盖无 report 的 Unknown、Local-only shadow 不升级、预构造 context／模型回执伪造、虚构引用过滤、成功／失败输出 receipt、根／模板投影与 managed serve context/header 接线。专项 6/6；全仓 193 项中 191 通过、2 项动态依赖按设计跳过；最终 268 份 Markdown／582 个本地链接无缺失，integrated scaffold 与 1088 KB 静态站通过。此证据证明系统不会把 AI 结果升级为项目权威，不证明模型自然语言绝对正确。
 - 2026-08-21 Authority shadow diagnostic 将 managed-entrypoint 专项从 3 项扩展到 6 项：新增显式 view-only 面板、bounded insights projection、根／模板一致性；默认与 report-only HTML 继续等于 legacy，面板标明非权威／未切换，effective claims 不进入 insights。全仓 196 项中 194 通过、2 项动态依赖按设计跳过；269 份 Markdown／584 个本地链接无缺失，integrated scaffold 与 1096 KB 静态站通过。
 - 2026-08-21 M1 本地 Canonical integration 在 Candidate 与 `main@2989582` 同 merge base、两处 worktree clean 的前提下审阅 20 个提交并 `--ff-only` 合入；合并后全仓仍为 196 项中 194 通过、2 项按设计跳过，Authority 定向 120/120，integrated scaffold、1107 KB 静态站、270 份 Markdown／590 个本地链接／0 缺失和 `git diff --check` 通过。该证据只证明本地 Canonical baseline，不证明 push、发布或 production switch。
+- 2026-08-21 M2.1 CLI claims Worktree Candidate 新增 versioned internal observation contract、完整 role/source hash、显式 decision graph、assertion／validation evidence 分离和 symlink／metadata／missing-target 失败关闭。Authority 专项为 139 项通过、1 项 Windows symlink privilege skip；最终全仓、站点与链接结果见对应 Validation。本证据不证明 Canonical integration、公共 API、Observatory production projection 或 release。
 
 ## 验证证据
 
@@ -85,6 +86,7 @@ Updated: 2026-08-21
 - [2026-08-21 ADR-0009 Authority Meta Model 采纳](../validation/2026-08-21-authority-meta-model-adoption.md)
 - [2026-08-21 Authority Meta Model fixture baseline](../validation/2026-08-21-authority-meta-model-fixture-baseline.md)
 - [2026-08-21 Authority Meta Model M1 本地 Canonical 集成](../validation/2026-08-21-authority-meta-model-canonical-integration.md)
+- [2026-08-21 M2.1 complete CLI Authority observations/claims](../validation/2026-08-21-m2-1-authority-cli-claims.md)
 - [2026-08-21 Authority Meta Model Core shadow evaluator](../validation/2026-08-21-authority-meta-model-core-shadow-evaluator.md)
 - [2026-08-21 Authority Meta Model CLI shadow comparison](../validation/2026-08-21-authority-meta-model-cli-shadow.md)
 - [2026-08-21 Authority Meta Model Observatory parser shadow](../validation/2026-08-21-authority-meta-model-observatory-parser-shadow.md)
@@ -113,4 +115,4 @@ Updated: 2026-08-21
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
-- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、Accepted ADR 的 CLI shadow、Observatory lifecycle/explicit-relation harness、managed sidecar／shadow diagnostic、AI derived-view guard、内部 Gate B capability judgment、receipt-gated 显式迁移／恢复和 future-release projection contract，但仍没有完整 CLI claims、Observatory production projection、实际下一 release 默认字段、production-switch 或 release 证据。
+- ADR-0009/0010/0011 已有 Candidate fixture corpus、experimental Core evaluator、M2.1 Worktree Candidate 完整 CLI claims、Observatory lifecycle/explicit-relation harness、managed sidecar／shadow diagnostic、AI derived-view guard、内部 Gate B capability judgment、receipt-gated 显式迁移／恢复和 future-release projection contract；M2.1 尚未集成，且仍没有 Observatory production projection、实际下一 release 默认字段、production-switch 或 release 证据。

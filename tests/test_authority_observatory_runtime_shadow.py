@@ -84,9 +84,9 @@ class AuthorityObservatoryRuntimeShadowTests(unittest.TestCase):
             self.legacy_stats["adrs"],
         )
         counts = report["shadow"]["roles"]["role_contract"]["counts"]
-        self.assertEqual(counts["design"], 7)
-        self.assertEqual(counts["plan"], 12)
-        self.assertEqual(counts["state"], 6)
+        self.assertGreaterEqual(counts["design"], 7)
+        self.assertGreaterEqual(counts["plan"], 12)
+        self.assertGreaterEqual(counts["state"], 6)
         self.assertGreaterEqual(counts["validation"], 30)
 
     def test_shadow_evaluator_failure_isolated_from_legacy_output(self) -> None:

@@ -113,7 +113,9 @@ def evaluate_authority(
                 hidden_validation = True
             continue
 
-        if kind == "decision":
+        if kind == "seed":
+            claims["seed_present"] = bool(observation.get("present"))
+        elif kind == "decision":
             decisions.append(observation)
             if not observation.get("id"):
                 claims["decision_status"] = observation.get("status", "unknown")
@@ -122,7 +124,16 @@ def evaluate_authority(
             key = "historical_implementation_claim" if time == "historical" else "implementation_claim"
             claims[key] = observation.get("state", "unknown")
         elif kind == "validation":
-            claims["validation_evidence"] = observation.get("result", "unknown")
+            result = observation.get("result", "unknown")
+            if (
+                result in {"passed", "failed"}
+                and evidence_category != "reproducible-executable-validation"
+            ):
+                claims["validation_assertion"] = result
+                claims["validation_evidence"] = "unknown"
+                prohibit("validated", "assertion-is-independent-validation")
+            else:
+                claims["validation_evidence"] = result
         elif kind == "design":
             claims["design_lifecycle"] = observation.get("lifecycle", "unknown")
         elif kind == "plan":

@@ -15,6 +15,8 @@ from typing import Any
 
 from project_orrery_core.authority import AUTHORITY_MODEL_VERSION, evaluate_authority
 
+from .authority_observations import build_cli_authority_contract
+
 
 @dataclass(frozen=True)
 class LegacyAuthorityFacts:
@@ -108,6 +110,7 @@ def build_authority_shadow(
         }
     ]
     core = evaluate_authority(conformance_input, observations)
+    candidate_contract = build_cli_authority_contract(root, fact_scope=fact_scope)
     core_accepted = core["claims"].get("decision_status") == "accepted"
     differences: list[dict[str, Any]] = []
     if current.accepted_adr != core_accepted:
@@ -126,6 +129,7 @@ def build_authority_shadow(
         "production_behavior_switched": False,
         "legacy": asdict(current),
         "core": core,
+        "candidate_contract": candidate_contract,
         "comparison": {
             "status": "match" if not differences else "mismatch",
             "differences": differences,

@@ -14,6 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-21 M2.1 complete CLI Authority observations/claims](plans/2026-08-21-m2-1-authority-cli-claims.md) — Worktree Candidate validated; expands the CLI shadow to deterministic lifecycle, relation, role and evidence-provenance claims without starting the Observatory production projection or release switch. Integration remains pending.
 - [2026-08-21 Authority Meta Model conformance and gradual extraction](plans/2026-08-21-authority-meta-model-conformance-and-extraction.md) — active Candidate Plan under ADR-0009/0010/0011; fixture、Core shadow、consumer shadow、compatibility、receipt-gated migration/restore、future-release projection 与只读 update compatibility 已形成检查点，实际下一 release 和 production switch 仍待后续验证。
 - [2026-08-19 multi-worktree collaboration protocol](plans/2026-08-19-multi-worktree-collaboration-protocol.md) — active under ADR-0007 and ADR-0008; Personal foundation precedes review/cleanup and opt-in Team Mode.
 - [2026-08-18 self-hosting completion](plans/2026-08-18-self-hosting-completion.md) — completed migration plan; see its linked State and Validation records for current facts.
