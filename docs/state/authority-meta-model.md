@@ -14,13 +14,14 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 当前语义仍分布在 ADR、Design、模板、Python 工具、Viewer 和 Agent 指令中；尚无独立 parser／domain object、公共 Meta Model API 或可声明的单一 implementation owner。
 - 当前 project／release manifest 没有正式 `authority_model_version` 字段；ADR-0009 只要求语义必须可版本识别，具体 schema 与迁移尚未设计。
 - 现有测试覆盖若干 authority invariants，但尚未形成跨 CLI／Viewer／AI／Coordinator 的统一 conformance fixture 套件。
+- 当前 Candidate 分支已形成一份区域级重复语义盘点与渐进提取计划；它不是 fixture、evaluator、consumer migration 或发布实现，也不是 Canonical State 的实现声明。
 
 ## 当前边界
 
 - Accepted ADR-0009 与 Approved Design 不等于 Authority Meta Model 已经代码化。
 - AI Q&A、观测台和其他派生视图继续没有事实权威。
 - AUTH-1 产品核心定位与 AUTH-4 单一 semantics owner 仍未决定。
-- 未建立 Implementation Plan；下一次规划前不得以“落地 Meta Model”为名重构 Observatory 或提升 Core／document schema 版本。
+- 已建立 Candidate Implementation Plan；在 Decision Gate A／B 通过前，不得以“落地 Meta Model”为名重构 Observatory、提升 Core／document schema 版本，或新增公开契约字段。
 
 ## 实现证据
 
@@ -29,10 +30,11 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `docs/core/principles.md`
 - `docs/decisions/0001-project-orrery-self-hosting.md`
 - `docs/decisions/0004-platform-neutral-core-and-adapter-boundaries.md`
+- `docs/implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md`（Candidate Plan；仅记录拟议路径与区域级盘点）
 
 ## 已知缺口
 
 - 没有机器可读 domain model、version manifest、parser contract 或 conformance CLI。
-- 没有盘点各消费者中重复／漂移的 authority 判断。
-- 没有 conformance fixture、迁移策略、发布计划或 runtime Validation。
+- 仅有区域级盘点；尚未形成逐函数／逐规则的 machine-readable inventory 或 drift 判定。
+- 没有 conformance fixture、evaluator、迁移实现、发布计划或 runtime Validation。
 - 没有决定 Meta Model 最终由哪个包拥有。
