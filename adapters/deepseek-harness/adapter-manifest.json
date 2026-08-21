@@ -25,7 +25,7 @@
   },
   "runtime_compatibility": {
     "runtime": "DeepSeek Harness",
-    "status": "experimental",
+    "status": "verified",
     "tested": [
       {
         "runtime_version": "@deepseek-ai/dsh 0.1.0-rc.8",
@@ -61,14 +61,40 @@
         ]
       }
     ],
-    "verified": [],
+    "verified": [
+      {
+        "runtime_version": "@deepseek-ai/dsh 0.1.0-rc.8",
+        "os": "Windows 11 Pro x64 10.0.26200 (build 26200)",
+        "adapter_version": "0.1.0",
+        "core_version": "0.1.0",
+        "core_api": 1,
+        "cli_version": "0.1.1",
+        "cli_requirement": ">=0.1.1,<0.2.0",
+        "node_version": "22.17.0",
+        "pnpm_version": "11.19.0",
+        "provider": "deepseek-official",
+        "model": "deepseek-v4-flash",
+        "validated_on": "2026-08-22",
+        "scope": [
+          "profile_bundle_composition",
+          "real_skill_registry_discovery",
+          "explicit_invocation",
+          "implicit_invocation",
+          "dependency_failure_closed",
+          "normal_wheel_cli_routing",
+          "recoverable_uninstall",
+          "post_remove_discovery",
+          "author_files_preserved"
+        ]
+      }
+    ],
     "evidence": [
       "docs/validation/2026-08-21-deepseek-harness-adapter-stage-a.md",
       "docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md",
       "docs/validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md",
       "docs/validation/2026-08-22-cli-wheel-observatory-assets.md"
     ],
-    "note": "DeepSeek Harness rc.8 completed explicit and implicit real-model routing, model-observed dependency failures, and a post-fix normal-wheel CLI route. Distribution status remains experimental and unreleased pending integration of this Candidate evidence."
+    "note": "Verified only for the exact DeepSeek Harness rc.8, Windows, Adapter, Core 0.1.0, CLI 0.1.1 wheel, deepseek-official/deepseek-v4-flash, lifecycle, and failure-closure scope recorded above. The Adapter distribution remains experimental and unreleased."
   },
   "distribution": {
     "package_name": "project-orrery-deepseek-harness-adapter",

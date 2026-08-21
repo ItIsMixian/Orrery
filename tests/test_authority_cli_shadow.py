@@ -12,7 +12,10 @@ from unittest import mock
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 CORE_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-core" / "src"
 CLI_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-cli" / "src"
-for source in (CORE_SOURCE, CLI_SOURCE):
+OBSERVATORY_SOURCE = (
+    REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src"
+)
+for source in (CORE_SOURCE, CLI_SOURCE, OBSERVATORY_SOURCE):
     sys.path.insert(0, str(source))
 
 from project_orrery_cli.authority_shadow import (  # noqa: E402

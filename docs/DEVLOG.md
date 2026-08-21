@@ -321,3 +321,10 @@
 - 新增隔离 wheel 回归，在全新 venv 中完成 Core／Observatory／CLI wheel 安装、scaffold 与 validate；普通非 editable wheel 不再依赖源码仓库。
 - 同一普通 wheel 又通过真实 DeepSeek Harness 显式 Adapter turn，preflight／validate 均 exit 0；作者 fixture、credential 与 GUI profile 保持不变，隔离插件最终卸载并恢复 0 项 discovery。
 - 功能分支证据与修复见 [CLI Wheel Validation](validation/2026-08-22-cli-wheel-observatory-assets.md)；是否写入最终 `verified` compatibility entry 由干净整合与联合回归决定。
+
+## 2026-08-22 — DeepSeek Wheel Runtime Canonical 集成验收
+
+- 从 `main@56d44fb` 建立独立 integration worktree，只重放 P1 在旧 Stage B 检查点后的 `77811f9`；功能代码无冲突，四份共享文档按当前 W1／Authority 事实增量合并。
+- 联合回归首次捕获两组 Authority CLI 测试缺少新声明的 Observatory source 依赖；显式补齐测试 path 后相关 10/10 通过，没有删除测试或增加 skip。
+- 默认全仓 243 PASS + 5 expected skips，动态全仓 245 PASS + 3 Windows symlink privilege skips；结构、隔离静态站、297 份 Markdown／779 个本地链接、secret scan 与 diff 检查通过。
+- 只有 rc.8／Windows build 26200／Adapter 0.1.0／Core 0.1.0／CLI 0.1.1 wheel／指定 DeepSeek provider-model 与记录范围进入 `verified`；Adapter 发行仍为 `experimental`／`unreleased`，没有 tag 或 Release。

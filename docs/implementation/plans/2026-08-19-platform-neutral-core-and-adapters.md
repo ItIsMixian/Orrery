@@ -89,7 +89,7 @@ ADR-0013 已选择两个独立平台范围；任何一项完成都不能自动�
 - [x] 经单独授权启动最少显式／隐式候选 turn；真实 runtime init 均发现 Plugin／Skill，但本机无登录态，
   在模型请求前以 `authentication_failed` 停止，0 token／0 cost。
 - [ ] 经单独授权后，以最少真实 turn 验证显式／隐式调用和失败路径。
-- [ ] 只有完整 runtime 证据门通过后，才把精确范围标为 `verified`。
+- [x] 完整 runtime 证据门通过后，只把精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围标为 `verified`；Adapter 发行仍为 `experimental`／`unreleased`。
 
 ### Phase 4B：DeepSeek Harness Profile Plugin Adapter
 
@@ -131,6 +131,8 @@ CLI 0.1.1 的 preflight 虽通过，`validate` 却在 target 检查前因找不�
 context 优先使用 `site-packages` assets、source checkout 才回退 monorepo。全新 wheel venv 的 scaffold／
 validate 与真实 DeepSeek 显式 Adapter route 均 exit 0；原 wheel blocker 已关闭。证据见
 [CLI Wheel Observatory Assets](../../validation/2026-08-22-cli-wheel-observatory-assets.md)。
+干净整合与联合回归完成后，只有上述精确范围进入 `runtime_compatibility.verified`；当前源码 CLI 0.1.6、
+其他 DSH／OS／Provider／模型与未来发行物均不继承该结论。
 
 验收证据：两个平台各自的 manifest、专项测试和独立 Validation。
 

@@ -1,9 +1,9 @@
 # Project Orrery DeepSeek Harness Adapter
 
 Status: `experimental` and unreleased. DeepSeek Harness is currently a developer
-preview. Real explicit and implicit model routing, dependency failures, and a
-normal-wheel CLI route have passed on rc.8. The exact evidence remains a
-Candidate until it is integrated into the current main compatibility manifest.
+preview. Runtime compatibility is `verified` only for the exact rc.8, Windows,
+Adapter, Core, CLI 0.1.1, provider/model, lifecycle, and failure-closure scope
+recorded in the manifest. The Adapter distribution itself remains unreleased.
 
 This directory is a native DeepSeek Harness profile Plugin Bundle. Its Cordis
 plugin registers one immutable packaged `project-orrery` Skill with `ctx.skills`.

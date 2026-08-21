@@ -46,7 +46,6 @@ class DeepSeekHarnessAdapterTests(unittest.TestCase):
         self.assertEqual(manifest["adapter"]["version"], package["version"])
         self.assertEqual(manifest["adapter"]["version"], component["version"])
         self.assertEqual(manifest["adapter"]["support_status"], "experimental")
-        self.assertEqual(manifest["runtime_compatibility"]["verified"], [])
         self.assertEqual(len(manifest["runtime_compatibility"]["tested"]), 1)
         self.assertEqual(
             manifest["runtime_compatibility"]["tested"][0]["runtime_version"],
@@ -64,8 +63,13 @@ class DeepSeekHarnessAdapterTests(unittest.TestCase):
         )
         self.assertEqual(
             component["runtime_evidence"][0]["stage_b_status"],
-            "real_model_wheel_routing_passed_pending_integration",
+            "verified_exact_runtime_scope",
         )
+        verified = manifest["runtime_compatibility"]["verified"]
+        self.assertEqual(manifest["runtime_compatibility"]["status"], "verified")
+        self.assertEqual(len(verified), 1)
+        self.assertEqual(verified[0]["cli_version"], "0.1.1")
+        self.assertEqual(verified[0]["model"], "deepseek-v4-flash")
         self.assertEqual(package["dsh"]["bundle"]["patch"], "./cordis.patch.yml")
         self.assertEqual(package["peerDependencies"]["@deepseek-ai/dsh-skill"], "0.1.0-rc.8")
 
