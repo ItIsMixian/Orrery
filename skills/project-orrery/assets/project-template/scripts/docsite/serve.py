@@ -359,7 +359,7 @@ def inject_qa(html: str) -> str:
 # --- build once at startup --------------------------------------------------
 
 print("building reader…", flush=True)
-_page, _stats = bd.render_site(
+_page, _stats, _authority_shadow_report = bd._render_site_for_runtime(
     DOCS,
     AGENTS,
     _ROOT,
@@ -367,6 +367,12 @@ _page, _stats = bd.render_site(
 )
 HTML = inject_qa(_page).encode("utf-8")
 print("  pages: %(adrs)d ADR / %(states)d state / %(snaps)d snap / %(documents)d classified docs" % _stats, flush=True)
+if _authority_shadow_report is not None:
+    print(
+        "  authority shadow: %s"
+        % _authority_shadow_report.get("shadow", {}).get("status", "unavailable"),
+        flush=True,
+    )
 
 print("building corpus…", flush=True)
 CORPUS = docsite_qa.build_corpus(DOCS, AGENTS)

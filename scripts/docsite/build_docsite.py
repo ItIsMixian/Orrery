@@ -22,7 +22,9 @@ import argparse
 import base64
 import html as htmllib
 import json
+import os
 import re
+import tempfile
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -1474,6 +1476,108 @@ def render_site(docs_dir: Path, agents_file: Path, root: Path, title="Project Or
     return page, stats
 
 
+def _write_authority_shadow_report(path: Path, report: dict) -> None:
+    """Atomically write disposable shadow telemetry selected by the operator."""
+
+    path = path.expanduser()
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_name = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            delete=False,
+            dir=path.parent,
+            prefix=path.name + ".",
+            suffix=".tmp",
+        ) as temporary:
+            json.dump(report, temporary, ensure_ascii=False, indent=2, sort_keys=True)
+            temporary.write("\n")
+            temporary_name = temporary.name
+        os.replace(temporary_name, path)
+        temporary_name = None
+    finally:
+        if temporary_name:
+            Path(temporary_name).unlink(missing_ok=True)
+
+
+def _render_site_for_runtime(
+    docs_dir: Path,
+    agents_file: Path,
+    root: Path,
+    title: str,
+):
+    """Optionally dual-run the internal Authority evaluator without switching output.
+
+    ``ORRERY_AUTHORITY_SHADOW_REPORT`` is an experimental maintainer switch.  When
+    absent, this is exactly the legacy render path.  When present, supported source
+    checkouts can emit a JSON sidecar while the returned HTML/statistics remain the
+    legacy renderer's bytes.  Missing packages, invalid manifests, evaluator errors,
+    and report-write failures never become production rendering decisions.
+    """
+
+    report_target = os.environ.get("ORRERY_AUTHORITY_SHADOW_REPORT", "").strip()
+    if not report_target:
+        page, stats = render_site(docs_dir, agents_file, root, title)
+        return page, stats, None
+
+    fact_scope = os.environ.get("ORRERY_AUTHORITY_FACT_SCOPE", "unknown").strip() or "unknown"
+    try:
+        from project_orrery_core.authority import evaluate_authority
+        from project_orrery_core.authority_compatibility import (
+            AUTHORITY_MODEL_FIXTURE_IDS,
+            judge_project_authority_model,
+        )
+        from project_orrery_observatory.runtime_shadow import (
+            render_with_authority_shadow,
+        )
+
+        manifest_path = root / ".project-orrery.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        capability = judge_project_authority_model(manifest)
+        selected_version = capability.get("selected_version")
+        fixture_version = AUTHORITY_MODEL_FIXTURE_IDS.get(selected_version, "unavailable")
+        page, stats, report = render_with_authority_shadow(
+            docs_dir,
+            agents_file,
+            root,
+            title,
+            legacy_renderer=render_site,
+            legacy_adr_parser=parse_adrs,
+            evaluator=evaluate_authority,
+            authority_model_version=fixture_version,
+            fact_scope=fact_scope,
+            authority_model_capability=capability,
+        )
+    except Exception as error:  # the experimental path must fail closed
+        page, stats = render_site(docs_dir, agents_file, root, title)
+        report = {
+            "mode": "shadow",
+            "report_schema": "authority-shadow-report-v1",
+            "production_authority": "legacy-observatory-renderer",
+            "production_behavior_switched": False,
+            "shadow": {
+                "status": "unavailable",
+                "fact_scope": fact_scope,
+                "error": {"type": type(error).__name__, "message": str(error)},
+            },
+        }
+    else:
+        report = dict(report)
+        report["report_schema"] = "authority-shadow-report-v1"
+
+    try:
+        _write_authority_shadow_report(Path(report_target), report)
+    except Exception as error:
+        print(
+            "WARNING: authority shadow report was not written: %s: %s"
+            % (type(error).__name__, error)
+        )
+    return page, stats, report
+
+
 def main():
     here = Path(__file__).resolve()
     root = here.parents[2]
@@ -1484,7 +1588,9 @@ def main():
     ap.add_argument("--title", default="Project Orrery · Documentation")
     args = ap.parse_args()
 
-    page, stats = render_site(Path(args.docs), Path(args.agents), root, args.title)
+    page, stats, authority_report = _render_site_for_runtime(
+        Path(args.docs), Path(args.agents), root, args.title
+    )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(page, encoding="utf-8")
@@ -1495,6 +1601,9 @@ def main():
           % stats)
     if stats["dups"]:
         print("  note : duplicate ADR numbers: %s" % ", ".join(stats["dups"]))
+    if authority_report is not None:
+        shadow = authority_report.get("shadow", {})
+        print("  authority shadow : %s" % shadow.get("status", "unavailable"))
 
 
 if __name__ == "__main__":

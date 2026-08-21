@@ -20,8 +20,9 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 真实仓库的 6 条 `Amends` 已与 Core relations 一致；合成测试也证明 supersede 会选出 effective decision、amend 会保留 base 与 amendment、缺少 ADR target 的显式关系会失败关闭。旧 build/serve 图谱没有切换，legacy `supersedes` 字段仍只表示 superseded-by target。
 - Candidate Observatory 另有未导出的 role shadow adapter，按受控目录观察 Design／Plan／State／Validation：Design 只识别 Draft／Approved／Deprecated；Plan 只产生 `planned`，State 只产生 `current`，两者都不产生 implementation claim；Validation 只有精确 `Result: Passed/Failed` 或 `Outcome:` 才产生明确结果，文档存在、`Status:` 与自由文本保持 `Unknown`。
 - Candidate Observatory 现有未导出的 runtime bridge：它先调用真实 legacy `render_site()`，再对同一 docs snapshot 运行 ADR 与 role shadow，返回独立 report；专项证明 HTML 字节、legacy stats 与失败路径均不被 experimental evaluator 改写。
+- Candidate managed `build_docsite.py` 与 `serve.py` 已增加默认关闭的内部运行时接线：只有维护者显式设置 `ORRERY_AUTHORITY_SHADOW_REPORT` 才会调用该 bridge 并原子写入 disposable JSON sidecar；缺省运行继续精确走 legacy renderer，非法 scope、缺失 package、manifest／evaluator 或 sidecar 写入失败都不切换 HTML、stats 或服务启动权威。
 - 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 36 个 Validation；现有 Validation 的严格结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
-- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 已有 Accepted ADR 运行时 shadow和只读 model capability report，Observatory 只完成包级 ADR lifecycle/relation/role、runtime bridge 与内部 status signal；没有稳定顶层 API、managed build/serve 接线、consumer production switch、公开 release/installer projection 或发布实现，也不是 Canonical State 的实现声明。
+- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 已有 Accepted ADR 运行时 shadow和只读 model capability report，Observatory 已完成包级 ADR lifecycle/relation/role、runtime bridge、内部 status signal 与 opt-in managed shadow sidecar；没有稳定顶层 API、默认启用的 managed projection、consumer production switch、公开 release/installer projection 或发布实现，也不是 Canonical State 的实现声明。
 - Gate B 已由 [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md) 解决。9-case `compatibility.json` 覆盖 field absent、public model 1、known unsupported、unknown newer、数值 gap、离散 model 3 和三类非法值，并冻结普通工具升级不得选择模型、manifest/document schema 不随首版模型变化。
 - Candidate Core 内部 `authority_compatibility.py` 已实现 provider-neutral capability judgment：显式区分 `legacy-unversioned`、`supported`、`unsupported-known`、`unsupported-newer`、`unsupported-unknown` 与 `invalid`；不支持时只保留 read-only browsing，并禁止推导 effective/current/implemented/validated。`eligible` 只表示可进入严格 conformance 评估，不表示验证已经通过。
 - Neutral CLI validator 已消费该 Core judgment，向人类与稳定 JSON 合约只读报告 `authority_model` capability：legacy 在普通验证中警告、在 `--require-integrated` 中失败；unsupported／invalid 始终失败关闭。顺带修复 Authority shadow 警告混入字符串、破坏 JSON issue contract 的缺陷。
@@ -31,7 +32,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Candidate `amm-release-projection-v1` 已冻结 future release 的默认模型 1 + 离散 `[1]` 支持集、project manifest/schema 正交和旧项目不自动选择模型。Core `ReleaseContract` 拒绝缺失配对、默认值不在支持集、重复／非法支持集；project manifest v1 schema 允许但不要求正整数 `authority_model_version`。
 - Core scaffold 只在 manifest 真正不存在／为空且 release 声明有效默认模型时写入该字段；已有 manifest 无论字段存在或缺失都保持原选择。隔离 `--upgrade-tools` 回归证明 legacy 缺字段不会被普通工具升级变成 model 1；当前 source/bundled v0.2.0 release contracts 继续不声明模型，不被本检查点改写。
 - Candidate neutral CLI 0.1.5 `check-update` 已只读消费 future release 的默认值／离散支持集：显式 model 1 target 可直接通过，legacy、invalid 和 unsupported target 返回既有 migration-review 状态与原因；无 target 的 Skill-only 查询不推断项目迁移。v0.2.0 因没有模型声明而保持原更新判断，JSON response schema 未增加字段。
-- Candidate Observatory runtime bridge 已增加 display-neutral 模型状态信号；supported 可继续 shadow，legacy／unsupported 只返回原 legacy HTML/stats 与只读警告，不运行确定性 Authority shadow。该信号尚未接入 managed `build_docsite.py`／`serve.py` 页面。
+- Candidate Observatory runtime bridge 已增加 display-neutral 模型状态信号；supported 可继续 shadow，legacy／unsupported 只返回原 legacy HTML/stats 与只读警告，不运行确定性 Authority shadow。该信号可写入显式 opt-in sidecar，但尚未接入 managed 页面或服务 API。
 
 ## 当前边界
 
@@ -93,6 +94,8 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `packages/project-orrery-cli/src/project_orrery_cli/update.py`
 - `tests/test_authority_update_compatibility.py`
 - `docs/validation/2026-08-21-authority-model-update-compatibility.md`
+- `tests/test_authority_observatory_managed_shadow.py`
+- `docs/validation/2026-08-21-authority-model-managed-observatory-shadow.md`
 
 ## 已知缺口
 
@@ -100,9 +103,9 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 仅有区域级盘点；尚未形成逐函数／逐规则的 machine-readable inventory 或 drift 判定。
 - CLI shadow 当前只比较 `accepted_adr`；`entrance_mapped`、`pending_marker` 与 `integrated` 仍被明确标为 legacy adoption heuristics，尚未进入 Meta Model evaluator。
 - CLI 尚未解析完整 ADR lifecycle／supersede／amend、Implementation／State／Validation 或 evidence provenance。
-- Observatory lifecycle/relation/role shadow 与 runtime bridge 尚未接入 managed `build_docsite.py`／`serve.py`；`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
+- Observatory lifecycle/relation/role shadow 与 runtime bridge 已有 opt-in managed sidecar 接线，但默认关闭且完全不进入 HTML／stats；`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
 - Role shadow 目前只解释文档角色与严格头部元数据，不验证 Validation 正文命令是否真正执行，也不从 State 自由文本推导 implementation present/absent。
-- Runtime bridge 当前只能由 Candidate package/test harness 显式调用；在 managed tool、旧项目和发布兼容完成独立验证前，不进入 scaffold／upgrade projection。
+- Runtime bridge 可由 Candidate package/test harness 或维护者显式环境开关调用；模板仅投影同一默认关闭的接线，在实际下一 release 与旧项目兼容完成独立验证前不默认启用，也不进入页面 authority projection。
 - Compatibility judgment 已接入 neutral CLI validator 的只读报告、`check-update` 的 future-release migration review 和 Candidate Observatory runtime bridge 的内部 status signal；future release/project projection contract 已进入 Core 与 fixture，但当前 v0.2.0 release manifest、standalone installer 和 managed Observatory banner 仍未声明模型。self-host 项目已显式选择模型 1，通用迁移已有 receipt-gated dry-run/apply/restore、精确备份与故障恢复证据；尚无实际下一 release 投影。
 - 尚无 consumer production switch、公开 release／installer 模型投影或 Canonical runtime release Validation；Harness JSON Adapter v1 也尚未暴露迁移命令。
 - Fixture 与 Core evaluator 目前只在 Candidate worktree 中；尚未经干净 integration worktree 合并为 Canonical baseline。

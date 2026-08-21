@@ -55,6 +55,7 @@ Updated: 2026-08-21
 - 2026-08-21 Authority restore 新增 17 项专项：覆盖 pure restore planner、非顶层 Core API、统一 CLI 路由、当前／备份 receipt 绑定、绝对路径／穿越／文件 symlink 拒绝、生成目录形状、无关字段与非法／unsupported／正交版本失败关闭、精确恢复与撤销备份、current／backup 过期、no-op 以及 replace failure。定向 migration/restore/compatibility 共 49/49；全仓 168 项中 166 通过、2 项动态依赖按设计跳过。Harness JSON Adapter、release projection 与发布状态仍未改变。
 - 2026-08-21 Authority release/project projection 新增 8 项专项：冻结 future release 默认值 + 离散支持集、配对／类型／重复校验、optional project schema、新项目默认选择、已有 legacy／explicit 选择保持、真实 `--upgrade-tools` 不迁移，以及 source/bundled v0.2.0 历史 contract 不改写。投影 + compatibility + migration/restore + 产品组合 69 项中 67 通过、2 项动态依赖按设计跳过；全仓 176 项中 174 通过、2 项动态依赖按设计跳过。实际下一 release、standalone installer projection 与发布状态仍未改变。
 - 2026-08-21 Authority update compatibility 新增 8 项专项：future release 的 supported／legacy／invalid／unsupported target、无 target Skill-only 查询、malformed release 失败关闭、v0.2.0 历史行为和既有 JSON schema v1 均受保护。与 projection、compatibility 和产品组合 40 项中 38 通过、2 项动态依赖按设计跳过；全仓 184 项中 182 通过、2 项动态依赖按设计跳过。266 份 Markdown／580 个本地链接无缺失；没有实际下一 release 或 target 写入。
+- 2026-08-21 managed Observatory shadow 新增 3 项专项：默认 build runtime 精确等于 legacy path，显式 sidecar 在 Candidate scope 下保持 HTML/stats 字节一致，非法 Coordinator-like scope 对 evaluator 失败关闭而不影响页面。与既有 runtime shadow、产品投影组合 26 项中 24 通过、2 项动态依赖按设计跳过；全仓 187 项中 185 通过、2 项动态依赖按设计跳过。
 
 ## 验证证据
 
