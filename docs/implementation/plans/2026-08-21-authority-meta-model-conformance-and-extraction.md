@@ -103,6 +103,12 @@ implementation is experimental/fixture-bound and does not cross Gate B. AUTH-1 r
 旧项目策略、未知版本、升级/降级、`document_schema`/manifest/toolchain 的版本矩阵，以及自托管和
 发布兼容性。任何跨模块/发布契约变化都需要 ADR 或 amendment。
 
+Candidate 已形成 [PO-DEC-AUTH-002](../../decisions/proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md)：
+建议项目 manifest 顶层使用正整数模型版本，release 声明默认值与离散支持集，缺失字段保持
+`legacy-unversioned`，unsupported／unknown 只允许只读浏览并对 Authority 结论失败关闭，工具升级
+不得自动执行语义迁移。该提案仍是 Proposed；在维护者接受和集成者分配正式 ADR 前，Gate B 继续
+阻塞任何 manifest/schema/managed-tool 变更。
+
 ## 渐进阶段
 
 1. **Baseline 与 inventory**：冻结上述区域级盘点，补齐现有行为对 fixture 的可追溯映射；不改变运行路径。

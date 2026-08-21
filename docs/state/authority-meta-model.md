@@ -22,13 +22,14 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Candidate Observatory 现有未导出的 runtime bridge：它先调用真实 legacy `render_site()`，再对同一 docs snapshot 运行 ADR 与 role shadow，返回独立 report；专项证明 HTML 字节、legacy stats 与失败路径均不被 experimental evaluator 改写。
 - 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 31 个 Validation；现有 Validation 的严格结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
 - 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 只完成 Accepted ADR 运行时 shadow，Observatory 只完成包级 ADR lifecycle/relation/role 与 runtime bridge harness；没有稳定顶层 API、managed build/serve 接线、consumer production switch、公开 schema/manifest 字段或发布实现，也不是 Canonical State 的实现声明。
+- Gate B 已有 Candidate 提案 [PO-DEC-AUTH-002](../decisions/proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md)：建议在项目 manifest 顶层用正整数选择模型、release 声明默认值与离散支持集、缺失字段保持 `legacy-unversioned`，并把工具升级与显式语义迁移分离。该提案仍是 Proposed，不构成有效兼容契约或实现授权。
 
 ## 当前边界
 
 - Accepted ADR-0009 与 Approved Design 不等于 Authority Meta Model 已经代码化。
 - AI Q&A、观测台和其他派生视图继续没有事实权威。
 - AUTH-1 产品核心定位仍未决定；AUTH-4 单一 deterministic evaluator owner 已由 ADR-0010 决定为平台中立 Core。
-- Decision Gate A 已由 ADR-0010 解决；Decision Gate B 仍未决定公开版本字段与兼容契约。
+- Decision Gate A 已由 ADR-0010 解决；Decision Gate B 已形成 Proposed 候选，但在维护者明确接受并由集成者分配正式 ADR 前仍未决定。
 - 在 Gate B 通过前，不得提升 Core／document schema 版本、新增公开契约字段，或把 experimental module 宣称为稳定 API。
 
 ## 实现证据
@@ -59,6 +60,7 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `tests/test_authority_observatory_runtime_shadow.py`
 - `docs/validation/2026-08-21-authority-meta-model-observatory-role-shadow.md`
 - `docs/validation/2026-08-21-authority-meta-model-observatory-runtime-shadow.md`
+- `docs/decisions/proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md`（Candidate Gate B proposal；非有效 ADR）
 
 ## 已知缺口
 

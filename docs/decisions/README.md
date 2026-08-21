@@ -28,4 +28,6 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-No active provisional decision proposals. Concurrent branches should use stable IDs under `docs/decisions/proposals/` until an integrator allocates the next canonical ADR number.
+- [PO-DEC-AUTH-002: Authority Model 公开版本与兼容契约](proposals/PO-DEC-AUTH-002-authority-model-version-and-compatibility.md) — Proposed; freezes the Gate B field, legacy/unsupported behavior, version matrix and explicit migration boundary without changing manifests or runtime behavior.
+
+Concurrent branches use stable IDs under `docs/decisions/proposals/` until the maintainer accepts a proposal and an integrator allocates the next canonical ADR number.
