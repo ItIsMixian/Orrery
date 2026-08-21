@@ -26,6 +26,7 @@ Updated: 2026-08-22
 - 平台中立 Phase 2 的 `tests/test_codex_adapter.py` 现有六项回归：薄 Adapter 内容与精确 runtime evidence 投影、确定性独立归档／checksum／解压安装、dry-run／升级备份／可恢复卸载、未知目录拒绝／旧 Skill 备份迁移和版本错配失败，以及 CLI distribution／entrypoint 缺失与版本范围的失败关闭。
 - 2026-08-21 真实 `codex-cli 0.148.0-alpha.21` E2E 在 Windows 11 build 26200 上验证：唯一 repo Adapter 发现、显式／隐式模型调用、CLI 0.1.0 路由、distribution 缺失和 0.2.0 不兼容失败关闭、完整 v0.2 Skill 只经显式升级迁移、升级前完整备份、可恢复卸载、backup／trash 不重复发现、作者 tree 不变及卸载后 Adapter 消失。真实登录态中的旧用户 Skill 通过 per-run `skills.config` 禁用，没有复制凭据或写入用户 Skill 目录。
 - Phase 3 新增 `tests/test_harness_json_adapter.py` 六项回归，保护 manifest／schema／组件版本投影、确定性 scaffold dry-run、临时安装与 validate、作者入口保留、mixed toolchain 和升级备份预演、schema 不兼容、离线无缓存更新、非法参数拒绝，以及不加载 `SKILL.md`／Codex 配置／Agent runtime 的隔离声明。
+- Phase 4 新增 `tests/test_claude_code_adapter.py` 与 `tests/test_deepseek_harness_adapter.py`，保护 manifest／组件版本投影、薄 Adapter 内容、确定性 ZIP／npm-compatible TGZ、checksum、隔离生命周期与 CLI 缺失／不兼容失败关闭；真实 runtime 证据与单元测试证据分开记录。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
@@ -116,6 +117,10 @@ Updated: 2026-08-22
 - [2026-08-21 Authority AI derived-view constraints](../validation/2026-08-21-authority-ai-derived-view-constraints.md)
 - [2026-08-21 Authority shadow diagnostic projection](../validation/2026-08-21-authority-shadow-diagnostic-projection.md)
 - [2026-08-22 Personal collaboration Phase 0](../validation/2026-08-22-personal-collaboration-phase-0.md)
+- [2026-08-21 Claude Code Adapter Stage A](../validation/2026-08-21-claude-code-adapter-stage-a.md)
+- [2026-08-21 DeepSeek Harness Adapter Stage A](../validation/2026-08-21-deepseek-harness-adapter-stage-a.md)
+- [2026-08-21 Claude Code Adapter Stage B 认证阻塞](../validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md)
+- [2026-08-21 DeepSeek Harness Adapter Stage B 凭据边界](../validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -130,3 +135,4 @@ Updated: 2026-08-22
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的 Phase 0 Candidate 已有 schema、解析和合成 fixture 测试；Phase 1–4 的主 worktree 写入守卫、私有 session、实际重叠／review／cleanup、Personal 指挥台与 Team Mode 网络测试仍未实现。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。
+- Claude Code／DeepSeek Harness 的仓库与 runtime 测试不能互相替代：Claude 尚未完成成功模型响应；DeepSeek 的成功与失败边界必须按对应 Validation 的精确运行记录解释，二者均未形成公开发行兼容承诺。

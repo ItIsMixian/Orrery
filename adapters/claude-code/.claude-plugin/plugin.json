@@ -1,0 +1,15 @@
+{
+  "name": "project-orrery",
+  "description": "Route Project Orrery documentation-system work through the platform-neutral Project Orrery CLI.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Project Orrery"
+  },
+  "repository": "https://github.com/yw9299-stack/project-orrery",
+  "license": "MIT",
+  "keywords": [
+    "project-orrery",
+    "documentation",
+    "authority"
+  ]
+}

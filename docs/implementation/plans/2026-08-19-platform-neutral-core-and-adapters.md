@@ -2,7 +2,7 @@
 
 Status: Active
 Date: 2026-08-19
-Governing ADR: [ADR-0004](../../decisions/0004-platform-neutral-core-and-adapter-boundaries.md)
+Governing ADRs: [ADR-0004](../../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0013](../../decisions/0013-claude-code-and-deepseek-harness-adapters.md)
 Approved Design: [平台中立 Core 与 Adapter 架构](../../design/platform-neutral-core-and-adapter-architecture.md)
 
 ## 范围边界
@@ -76,16 +76,52 @@ JSON 模式使用稳定退出码 0／2／3／4／5／6／7；`adapters/harness-j
 
 回滚边界：JSON 保持 opt-in；既有人类输出和旧入口继续可用。
 
-## Phase 4：第二平台真实适配
+## Phase 4：Claude Code 与 DeepSeek Harness 真实适配
 
-- [ ] 根据可访问的真实 runtime、安装边界和自动化能力另行选择一个平台。
-- [ ] 先以 `experimental` 发布最薄 Adapter，不复制模板和项目事实。
-- [ ] 完成真实 runtime、OS、发现、权限、调用、更新和卸载矩阵。
-- [ ] 满足 ADR-0004 的完整证据门后再改为 `verified`。
+ADR-0013 已选择两个独立平台范围；任何一项完成都不能自动提升另一项。
 
-验收证据：平台专属 Validation 和 manifest 支持条目。
+### Phase 4A：Claude Code Plugin Adapter
 
-回滚边界：Adapter 可独立下架；Core／CLI 和其他 Adapter 不受影响。
+- [x] 依据官方 Plugin／Skill／CLI 文档确认发现、隔离 home、marketplace 和生命周期边界。
+- [x] 建立 `adapters/claude-code/` 薄 Plugin、manifest、CLI 失败关闭和确定性归档。
+- [x] 使用本机精确 Claude Code runtime 在隔离 `CLAUDE_CONFIG_DIR` 中完成无模型 validate、发现、安装、
+  更新、卸载和作者文件保留。
+- [x] 经单独授权启动最少显式／隐式候选 turn；真实 runtime init 均发现 Plugin／Skill，但本机无登录态，
+  在模型请求前以 `authentication_failed` 停止，0 token／0 cost。
+- [ ] 经单独授权后，以最少真实 turn 验证显式／隐式调用和失败路径。
+- [ ] 只有完整 runtime 证据门通过后，才把精确范围标为 `verified`。
+
+### Phase 4B：DeepSeek Harness Profile Plugin Adapter
+
+- [x] 依据官方架构、CLI、Skill registry 和 Plugin Bundle 文档确认扩展面与 profile 生命周期。
+- [x] 建立 `adapters/deepseek-harness/` Bundle、packaged Skill、manifest、CLI 失败关闭和确定性 npm 产物。
+- [x] 在 D 盘隔离 `DSH_HOME`／profile 中安装精确 developer-preview runtime，不读取或复制真实凭据；完成
+  bundle composition、真实无模型 Skill discovery、更新、移除和作者文件保留。
+- [x] 经单独授权启动最少 headless turn；显式 `/project-orrery` 已在真实 session 形成
+  `skill-catalog`／`skill-invocation`，隐式候选形成 catalog，但两者因无 API Key 在模型请求处失败。
+- [ ] 经单独授权后，以最少 headless turn 验证显式／适用时的隐式调用和失败路径。
+- [ ] 只有完整 runtime 证据门通过后，才把精确范围标为 `verified`。
+
+Stage A 只允许隔离目录、无真实 API Key、无模型调用；Stage B 写真实用户目录、使用真实登录态或发起
+模型 turn 前必须在当前对话取得明确确认。
+
+Phase 4A／4B 的 Stage A 已完成。Claude Code 2.1.87 通过官方 manifest validate、隔离
+0.0.9→0.1.0 update、卸载后空安装列表与可恢复 cache；DeepSeek Harness 0.1.0-rc.8 在隔离
+`DSH_HOME`／`DSH_AGENTS_HOME` 中通过真实 `ctx.skills` 唯一发现、body load、升级和移除后 0 项。
+两者均为 0 模型调用，故 `verified` 数组保持为空。证据见
+[Claude Code Stage A](../../validation/2026-08-21-claude-code-adapter-stage-a.md)与
+[DeepSeek Harness Stage A](../../validation/2026-08-21-deepseek-harness-adapter-stage-a.md)。
+
+Stage B 已获明确授权并执行安全的最少候选 turn。Claude Code 的真实 init 发现 inline Plugin、Skill 与
+slash command，但本机 `loggedIn=false`；DeepSeek Harness 的真实 headless session 已形成 catalog 和
+显式 Skill 注入，但本机没有 `DEEPSEEK_API_KEY`。两平台都在首个成功模型响应前失败，CLI 也未被模型
+路由，故上方真实调用项仍未完成。证据见
+[Claude Code Stage B 认证阻塞](../../validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md)与
+[DeepSeek Harness Stage B 凭据阻塞](../../validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md)。
+
+验收证据：两个平台各自的 manifest、专项测试和独立 Validation。
+
+回滚边界：任一 Adapter 可独立下架；Core／CLI 和其他 Adapter 不受影响。
 
 ## 预计实现目标
 
@@ -93,6 +129,8 @@ JSON 模式使用稳定退出码 0／2／3／4／5／6／7；`adapters/harness-j
 - `packages/project-orrery-cli/**`
 - `packages/project-orrery-observatory/**`
 - `adapters/codex/**`
+- `adapters/claude-code/**`
+- `adapters/deepseek-harness/**`
 - `adapters/harness-json/**`
 - `skills/project-orrery/**` 兼容 wrapper 与迁移入口
 - `scripts/package_release.py`, `.github/workflows/**`

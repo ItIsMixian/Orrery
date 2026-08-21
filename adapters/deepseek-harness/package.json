@@ -1,0 +1,33 @@
+{
+  "name": "project-orrery-deepseek-harness-adapter",
+  "description": "Thin DeepSeek Harness packaged Skill adapter for Project Orrery",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "README.md",
+    "SKILL.md",
+    "adapter-manifest.json",
+    "cordis.patch.yml",
+    "index.js",
+    "scripts/check_cli_dependency.py"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yw9299-stack/project-orrery.git",
+    "directory": "adapters/deepseek-harness"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-skill": "0.1.0-rc.8"
+  }
+}

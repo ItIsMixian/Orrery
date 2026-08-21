@@ -1,0 +1,76 @@
+{
+  "manifest_format": 1,
+  "adapter": {
+    "id": "project-orrery-claude-code",
+    "name": "Project Orrery Claude Code Adapter",
+    "platform": "claude-code",
+    "version": "0.1.0",
+    "api_version": 1,
+    "support_status": "experimental"
+  },
+  "requires": {
+    "core_api": 1,
+    "cli": {
+      "distribution": "project-orrery-cli",
+      "minimum": "0.1.1",
+      "maximum_exclusive": "0.2.0",
+      "entrypoint": "project-orrery"
+    },
+    "runtime": {
+      "name": "Claude Code",
+      "minimum": "2.1.87"
+    }
+  },
+  "runtime_compatibility": {
+    "runtime": "Claude Code",
+    "status": "experimental",
+    "tested": [
+      {
+        "runtime_version": "2.1.87",
+        "os": "Windows 11 Pro x64 10.0.26200 (build 26200)",
+        "adapter_version": "0.1.0",
+        "core_version": "0.1.0",
+        "core_api": 1,
+        "cli_version": "0.1.1",
+        "cli_requirement": ">=0.1.1,<0.2.0",
+        "validated_on": "2026-08-21",
+        "scope": [
+          "official_manifest_validation",
+          "isolated_install",
+          "isolated_upgrade",
+          "isolated_uninstall",
+          "post_uninstall_list",
+          "dependency_failure_closed",
+          "author_files_preserved",
+          "runtime_init_plugin_and_skill_discovery",
+          "authentication_failure_before_inference",
+          "no_model_calls"
+        ]
+      }
+    ],
+    "verified": [],
+    "evidence": [
+      "docs/validation/2026-08-21-claude-code-adapter-stage-a.md",
+      "docs/validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md"
+    ],
+    "note": "Runtime init discovers the Plugin and Skill, but authentication failed before inference; model-call and CLI-routing compatibility remain unverified."
+  },
+  "distribution": {
+    "install_directory": "project-orrery",
+    "files": [
+      ".claude-plugin/marketplace.json",
+      ".claude-plugin/plugin.json",
+      "README.md",
+      "adapter-manifest.json",
+      "scripts/check_cli_dependency.py",
+      "skills/project-orrery/SKILL.md"
+    ]
+  },
+  "lifecycle": {
+    "session_discovery": "claude --plugin-dir <adapter-directory>",
+    "persistent_install": "claude plugin install project-orrery@project-orrery --scope <scope>",
+    "persistent_update": "claude plugin update project-orrery@project-orrery --scope <scope>",
+    "persistent_uninstall": "claude plugin uninstall project-orrery@project-orrery --scope <scope> --keep-data",
+    "target_project_mutation": "none"
+  }
+}

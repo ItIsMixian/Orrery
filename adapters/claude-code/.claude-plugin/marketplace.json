@@ -1,0 +1,17 @@
+{
+  "name": "project-orrery",
+  "owner": {
+    "name": "Project Orrery"
+  },
+  "metadata": {
+    "description": "Official Project Orrery platform adapters for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "project-orrery",
+      "description": "Thin Claude Code adapter for the Project Orrery CLI.",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}

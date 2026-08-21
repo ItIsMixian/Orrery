@@ -62,14 +62,16 @@ The evidence and open questions behind the next context-routing experiments are 
 
 ## Available integrations
 
-Project Orrery's core workflow can be operated directly from the command line. The current source tree now has internal Core, CLI, and Observatory package boundaries plus an independently packageable Codex Adapter, but all of those new components are unreleased. In v0.2.0, the supported scripts are still distributed inside the legacy Codex Skill, and there is not yet a separately packaged Core/CLI distribution. Packaged integrations add platform-specific installation and invocation without changing the underlying authority model.
+Project Orrery's core workflow can be operated directly from the command line. The current source tree now has internal Core, CLI, and Observatory package boundaries plus independently packageable Codex, Claude Code, DeepSeek Harness, and JSON Harness Adapters, but all of those new components are unreleased. In v0.2.0, the supported scripts are still distributed inside the legacy Codex Skill, and there is not yet a separately packaged Core/CLI distribution. Packaged integrations add platform-specific installation and invocation without changing the underlying authority model.
 
 | Surface | What exists today | Support status |
 | --- | --- | --- |
 | Core / CLI | The installer, validator, and update checker can be invoked directly without a Codex runtime; unreleased source packages now own the shared contracts. CLI 0.1.1 adds an opt-in JSON response envelope while preserving human output. | Portable source and command path; not yet separately published. |
 | Codex | A packaged legacy [Codex Skill](skills/project-orrery/) is available in v0.2.0; the worktree also contains an unreleased thin [Codex Adapter](adapters/codex/) and lifecycle installer. | Adapter distribution: `experimental` and unreleased. Runtime scope: `verified` only for Adapter 0.1.0 on Codex Desktop 26.818.2441.0 / `codex-cli 0.148.0-alpha.21`, Windows 11 build 26200, Core/CLI 0.1.0, and the recorded model/approval scope. See the [runtime Validation](docs/validation/2026-08-21-codex-runtime-e2e-completion.md). |
-| Harness JSON | The worktree contains an unreleased [subprocess JSON reference Adapter](adapters/harness-json/) for scaffold, validate, and update automation without an Agent runtime. | `experimental`: Windows candidate tests pass; this commit still needs the configured Windows/Ubuntu CI matrix. It is not a third-party platform claim. |
-| Other Agent platforms | No packaged Adapter has been published. | `target`: compatibility is not claimed until a real integration and runtime validation exist. |
+| Claude Code | The worktree contains an unreleased native [Claude Code Plugin Adapter](adapters/claude-code/) with a thin Skill and isolated marketplace lifecycle. | `experimental`: Claude Code 2.1.87 passed Stage A lifecycle checks, and a real Stage B init discovered the Plugin/Skill. No supported login was available, so model invocation and CLI routing remain unverified. See [Stage B Validation](docs/validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md). |
+| DeepSeek Harness | The worktree contains an unreleased [profile Plugin Bundle Adapter](adapters/deepseek-harness/) that registers a packaged Skill. | `experimental`: `@deepseek-ai/dsh 0.1.0-rc.8` passed Stage A lifecycle checks; real headless Stage B persisted the catalog and explicit Skill injection, then stopped because no API Key was available. Model handling and CLI routing remain unverified. See [Stage B Validation](docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md). |
+| Harness JSON | The worktree contains an unreleased [subprocess JSON reference Adapter](adapters/harness-json/) for scaffold, validate, and update automation without an Agent runtime. | `experimental`: the same commit passed Windows/Ubuntu CI; this proves only the CLI/Harness contract, not a third-party platform runtime. |
+| Other Agent platforms | No other packaged Adapter has been implemented or published. | `target`: compatibility is not claimed until a real integration and runtime validation exist. |
 
 ## Quick start
 
@@ -215,8 +217,12 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | Authority architecture and migration contract |
 | [`packages/`](packages/) | Unreleased platform-neutral Core, CLI, and Observatory source packages |
 | [`adapters/codex/`](adapters/codex/) | Unreleased thin Codex Adapter, manifest, metadata, and lifecycle installer |
+| [`adapters/claude-code/`](adapters/claude-code/) | Unreleased native Claude Code Plugin Adapter and local marketplace metadata |
+| [`adapters/deepseek-harness/`](adapters/deepseek-harness/) | Unreleased DeepSeek Harness profile Bundle and packaged Skill provider |
 | [`adapters/harness-json/`](adapters/harness-json/) | Unreleased subprocess JSON contract and reference Harness Adapter |
 | [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | Versioned Codex Adapter archive and checksum builder |
+| [`scripts/package_claude_code_adapter.py`](scripts/package_claude_code_adapter.py) | Deterministic Claude Code Plugin archive and checksum builder |
+| [`scripts/package_deepseek_harness_adapter.py`](scripts/package_deepseek_harness_adapter.py) | Deterministic npm-compatible DeepSeek Adapter tarball builder |
 | [`docs/`](docs/) | Project Orrery's own self-hosted authority chain, current State, validation, and history |
 | [`docs/library/`](docs/library/) | Non-authoritative research, literature reviews, experiments, and design hypotheses |
 | [`experiments/context-routing/`](experiments/context-routing/) | Pre-ADR benchmark corpus, run schema, and validation tooling for context-routing research |

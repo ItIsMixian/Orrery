@@ -2,7 +2,7 @@
 
 Updated: 2026-08-22
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md)
 
 ## 当前事实
 
@@ -27,6 +27,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - 同一 E2E 还验证旧 v0.2 Skill 只有显式 `--upgrade` 才迁移、升级前整树备份、可恢复卸载、backup／trash 不重复发现、卸载后 Adapter 为 0 项、项目作者 tree 不变和用户旧 Skill 摘要不变。Adapter 0.1.0 的上述精确 runtime／OS／Core 0.1.0／CLI 0.1.0／模型与审批范围标记 `verified`，但 Adapter 发行支持状态继续为 `experimental`，证据见 [Codex Runtime E2E 完成](../validation/2026-08-21-codex-runtime-e2e-completion.md)。Adapter 与独立 Core／CLI 仍未发布；v0.2.0 旧 Skill 仍是唯一已发布集成。
 - Phase 3 候选分支先把未发布 CLI 从 0.1.0 提升到 0.1.1：`scaffold`、`validate` 和 `check-update` 保留原人类输出，并新增 schema v1 opt-in JSON envelope。Authority migration 检查点把候选 CLI 依次推进到 0.1.2 dry-run、0.1.3 receipt-gated apply、0.1.4 scoped restore 和 0.1.5 future-release update compatibility；W1 Phase 0 又以 0.1.6 增加只读 `collaboration-contract` 人类／JSON 入口。既有 JSON 退出码与 update data schema 不变，Codex Adapter 的已验证历史仍精确绑定 CLI 0.1.0，不能因当前源码版本变化而改写。
 - 未发布 `adapters/harness-json/` 0.1.0 是 subprocess JSON 参考 Adapter：只接受固定参数白名单，不加载 `SKILL.md`、Codex 配置／登录态或 Agent runtime，并清理常见 Agent／Provider 环境变量。它在 Windows 候选工作树通过 dry-run、临时安装、validate、mixed toolchain、schema 不兼容、离线更新和作者文件保留；首轮 CI 暴露的 Unix 命令夹具错误已在 `c30acab` 修复。第三轮 CI `32441505867` 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨 OS 验收完成，源码已进入公开 `origin/main`。支持状态仍为 `experimental`／`unreleased`，不构成第三方平台兼容声明。
+- ADR-0013 的 Claude Code 与 DeepSeek Harness Adapter 0.1.0 已进入源码候选：各自有独立 manifest、确定性归档、CLI 依赖预检和隔离生命周期测试，支持状态均为 `experimental`／`unreleased`。Claude Code 2.1.87 只证明 Plugin／Skill 发现及认证前失败关闭；DeepSeek Harness rc.8 已证明 profile composition、catalog 与显式 Skill 注入，后续模型调用证据由单独 Validation 精确限定。
 - ADR-0011 已定义 Authority Model 的公开正整数版本与离散支持集。self-host project manifest 已显式选择模型 1，neutral CLI 0.1.6 Candidate 保留 0.1.5 的兼容报告、receipt-gated migration／restore 和只读 update 判断；实际 release manifest、standalone installer、当前 v0.2 scaffold 和发布资产仍未投影默认值或支持集，普通工具升级也不会补写字段。
 - Candidate Core 已能验证 future release 的 `authority_model_version` 与 `compatibility.authority_model_versions.supported` 必须成对、默认值必须位于离散支持集；只有新项目会从这种 future contract 选择默认模型。已有 legacy manifest 在普通 scaffold／`--upgrade-tools` 下继续缺字段。当前 `skills/project-orrery/release-manifest.json` 和 bundled bridge 仍精确代表 v0.2.0、没有模型声明；因此 standalone v0.2 fallback、公开 zip/checksum 与发布事实均未改变。
 - Canonical source baseline 已集成 `orrery-authority-release-candidate-gate-v1` 并进入公开 `origin/main`：候选 manifest 由维护者在仓库外显式提供，Gate 对 Authority Model `default=1`／`supported=[1]`、确定性离线 ZIP／checksum、standalone new／legacy、invalid／unsupported target、显式 migration／restore、self-host、secret／generated artifact 排除执行失败关闭验证。候选 manifest 只注入 staging archive，三份冻结 v0.2.0 历史输入保持不变；输出 receipt 始终区分 `candidate_ready` 与 `release_ready=false`。源码同步不等于 gate、模型 1 或下一版本已发布。
@@ -57,6 +58,12 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `adapters/harness-json/adapter-manifest.json`
 - `adapters/harness-json/schemas/`
 - `adapters/harness-json/run_harness.py`
+- `adapters/claude-code/`
+- `scripts/package_claude_code_adapter.py`
+- `tests/test_claude_code_adapter.py`
+- `adapters/deepseek-harness/`
+- `scripts/package_deepseek_harness_adapter.py`
+- `tests/test_deepseek_harness_adapter.py`
 - `tests/test_harness_json_adapter.py`
 - `packages/project-orrery-core/src/project_orrery_core/authority_migration.py`
 - `packages/project-orrery-cli/src/project_orrery_cli/authority_migrate.py`
@@ -81,4 +88,5 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
 - Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Phase 3 Harness JSON 已通过同一提交的 Windows／Ubuntu CI，但这只验收平台中立 CLI／Harness 合约。Core／CLI 独立发行物、多组件发布流水线、manifest v2 和跨 runtime 支持矩阵仍未实现。
 - 多 Workstream Phase 0 目前只是未发布 Candidate schema 与只读 CLI；尚无持久 session、写入守卫、Scope/path collector、finding 计算、观测台投影、Team 网络面或 CI 跨平台证据。默认安装和公开 Skill 没有因 ADR-0008 开始监听网络。
+- Claude Code／DeepSeek Harness 尚无公开分发与跨版本支持承诺；任何 runtime 兼容声明只在各自 manifest 与 Validation 的精确版本、OS、认证和调用范围内成立。
 - Authority Meta Model 已有 fixture-bound Core evaluator、内部兼容判断、neutral CLI `validate` capability report、receipt-gated migration apply/restore、future-release projection contract、`check-update` migration review 与本地 release-candidate gate，但没有维护者选定的实际下一 SemVer／source manifest、M2.2 consumer production evidence、稳定顶层 Core API、独立发行物、Harness Adapter 迁移命令、managed Observatory banner 或发布支持状态变化；v0.2.0 发布事实不变。

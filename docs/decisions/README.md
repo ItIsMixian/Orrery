@@ -24,6 +24,7 @@ Use `0000-template.md` as the starting point.
 - [ADR-0010: Core-owned deterministic Authority evaluator](0010-core-owned-authority-evaluator.md) — Accepted; resolves AUTH-4 by assigning deterministic semantics to platform-neutral Core while keeping parsing, projections, AI and Coordinator runtime outside the evaluator and preserving Gate B.
 - [ADR-0011: Authority Model public version and compatibility contract](0011-authority-model-version-and-compatibility.md) — Accepted; resolves Gate B with a positive-integer project selector, discrete consumer support sets, fail-closed legacy/unknown behavior and explicit semantic migration separate from ordinary tool upgrades.
 - [ADR-0012: Documentation governance and information lifecycle](0012-document-governance-and-information-lifecycle.md) — Accepted; separates current control surfaces from history, adopts event-driven synchronization and soft review budgets, and limits future tooling to non-authoritative read-only findings.
+- [ADR-0013: Claude Code and DeepSeek Harness Adapters](0013-claude-code-and-deepseek-harness-adapters.md) — Accepted; selects two independent Phase 4 platform Adapter ranges and requires isolated lifecycle evidence before separately authorized model-call validation.
 - [Adoption proposal](0000-orrery-adoption-proposal.md) — Superseded by ADR-0001; retained as migration history.
 
 An accepted ADR constrains later Approved Design and implementation work. It does not prove that code or documents already implement the decision; current State and Validation provide that evidence.

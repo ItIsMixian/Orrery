@@ -1,0 +1,82 @@
+{
+  "manifest_format": 1,
+  "adapter": {
+    "id": "project-orrery-deepseek-harness",
+    "name": "Project Orrery DeepSeek Harness Adapter",
+    "platform": "deepseek-harness",
+    "distribution": "project-orrery-deepseek-harness-adapter",
+    "version": "0.1.0",
+    "api_version": 1,
+    "support_status": "experimental"
+  },
+  "requires": {
+    "core_api": 1,
+    "cli": {
+      "distribution": "project-orrery-cli",
+      "minimum": "0.1.1",
+      "maximum_exclusive": "0.2.0",
+      "entrypoint": "project-orrery"
+    },
+    "runtime": {
+      "distribution": "@deepseek-ai/dsh",
+      "minimum": "0.1.0-rc.8",
+      "maximum_exclusive": "0.2.0"
+    }
+  },
+  "runtime_compatibility": {
+    "runtime": "DeepSeek Harness",
+    "status": "experimental",
+    "tested": [
+      {
+        "runtime_version": "@deepseek-ai/dsh 0.1.0-rc.8",
+        "os": "Windows 11 Pro x64 10.0.26200 (build 26200)",
+        "adapter_version": "0.1.0",
+        "core_version": "0.1.0",
+        "core_api": 1,
+        "cli_version": "0.1.1",
+        "cli_requirement": ">=0.1.1,<0.2.0",
+        "node_version": "22.17.0",
+        "pnpm_version": "11.19.0",
+        "validated_on": "2026-08-21",
+        "scope": [
+          "profile_bundle_composition",
+          "real_skill_registry_discovery",
+          "isolated_install",
+          "isolated_upgrade",
+          "isolated_remove",
+          "post_remove_discovery",
+          "dependency_failure_closed",
+          "author_files_preserved",
+          "headless_skill_catalog",
+          "explicit_user_skill_injection",
+          "credential_failure_before_model_response",
+          "no_model_calls"
+        ]
+      }
+    ],
+    "verified": [],
+    "evidence": [
+      "docs/validation/2026-08-21-deepseek-harness-adapter-stage-a.md",
+      "docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md"
+    ],
+    "note": "DeepSeek Harness is a developer preview. Headless runtime discovery and explicit user Skill injection passed, but missing credentials prevented a model response and CLI routing."
+  },
+  "distribution": {
+    "package_name": "project-orrery-deepseek-harness-adapter",
+    "files": [
+      "README.md",
+      "SKILL.md",
+      "adapter-manifest.json",
+      "cordis.patch.yml",
+      "index.js",
+      "package.json",
+      "scripts/check_cli_dependency.py"
+    ]
+  },
+  "lifecycle": {
+    "install": "dsh plugin --profile <profile> add <package-path-or-spec>",
+    "update": "dsh plugin --profile <profile> update project-orrery-deepseek-harness-adapter",
+    "uninstall": "dsh plugin --profile <profile> remove project-orrery-deepseek-harness-adapter",
+    "target_project_mutation": "none"
+  }
+}

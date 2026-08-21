@@ -1,8 +1,8 @@
 # 平台中立 Core 与 Agent／Harness Adapter 架构
 
 Status: Approved
-Governing ADR: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md)
-Updated: 2026-08-19
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md)
+Updated: 2026-08-21
 
 ## 目标与当前基线
 
@@ -40,6 +40,8 @@ packages/
   project-orrery-observatory/
 adapters/
   codex/
+  claude-code/
+  deepseek-harness/
   harness-json/
 packaging/
 docs/
@@ -65,6 +67,19 @@ docs/
 
 薄入口不得复制项目当前状态、活动计划、ADR 内容或验证结论。既有同名作者文件默认不覆盖；
 平台安装器必须先预演并由用户确认合并方式。
+
+## Phase 4 平台映射
+
+ADR-0013 将下一批真实平台固定为两个互相独立的 Adapter：
+
+| 平台 | 官方扩展面 | 隔离 discovery／生命周期边界 | 分发前提 |
+|---|---|---|---|
+| Claude Code | Plugin 中的 `skills/project-orrery/SKILL.md` | 临时 `--plugin-dir`；持久测试使用独立 `CLAUDE_CONFIG_DIR` 与本地 marketplace | Claude marketplace 条目或等价受信分发源 |
+| DeepSeek Harness | profile Plugin Bundle 注册 packaged Skill | 独立 `DSH_HOME`、专用 profile 与 `dsh plugin` | 可安装 npm／本地 package，且 runtime 版本满足 manifest |
+
+Claude Plugin 使用宿主原生 install／update／uninstall；DeepSeek Bundle 使用 pnpm-backed
+`dsh plugin add/update/remove`。Adapter 自身的备份、缓存和 profile 状态必须留在隔离宿主根，不能进入
+目标项目或被当作作者文档。两者在真实模型调用前都必须先证明 CLI 依赖缺失／不兼容时失败关闭。
 
 ## CLI 与 Harness 合约
 
@@ -136,7 +151,7 @@ CLI、dry-run、错误路径、更新／卸载，以及未覆盖作者文档。�
 
 ## 非目标
 
-- 本设计不选择第二个 Agent 平台。
+- 除 ADR-0013 已选择的 Claude Code 与 DeepSeek Harness 外，本设计不选择其他 Agent 平台。
 - 不实现或推广 Pilot 001–008 的上下文路由候选。
 - 不解决多人／多 worktree 状态合并。
 - 不改变 docsite 凭据、Broker 或 Provider 安全设计。

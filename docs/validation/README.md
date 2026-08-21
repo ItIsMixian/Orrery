@@ -14,6 +14,10 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 ## Records
 
 - [2026-08-22 Personal collaboration Phase 0](2026-08-22-personal-collaboration-phase-0.md) — versioned Core contracts, synthetic Git topology, integration/main-worktree rules, subsystem/member/mode boundaries, zero-network default and Candidate-only verification.
+- [2026-08-21 Claude Code Adapter Stage A](2026-08-21-claude-code-adapter-stage-a.md) — native Plugin validation, isolated update/uninstall, deterministic package and CLI dependency failure-closed checks without a model turn.
+- [2026-08-21 DeepSeek Harness Adapter Stage A](2026-08-21-deepseek-harness-adapter-stage-a.md) — profile Bundle composition, real Skill registry discovery, isolated lifecycle and author-tree preservation without a model turn.
+- [2026-08-21 Claude Code Adapter Stage B auth blocked](2026-08-21-claude-code-adapter-stage-b-auth-blocked.md) — runtime init discovered the Plugin and Skill, then stopped before inference because authentication was unavailable.
+- [2026-08-21 DeepSeek Harness Adapter Stage B credential boundary](2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md) — headless catalog and explicit Skill injection evidence, with model-call and CLI-routing claims limited to the recorded credential boundary.
 - [2026-08-21 documentation governance adoption](2026-08-21-document-governance-adoption.md) — records the ADR／Design／Plan governance chain, current-versus-history lifecycle and non-authoritative tooling boundary without claiming an audit CLI or release implementation.
 - [2026-08-21 main acceptance and cross-platform CI](2026-08-21-main-acceptance-and-cross-platform-ci.md) — records the local 231-test acceptance, generated-artifact and link boundaries, the first Ubuntu fixture failure, portable correction and final Windows／Ubuntu green run without claiming a release.
 - [2026-08-18 self-hosting baseline](2026-08-18-self-hosting-baseline.md) — structure, manifest, static reader, test suite, and link/source coverage for the initial self-hosted repository.

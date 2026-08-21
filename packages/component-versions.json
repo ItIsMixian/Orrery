@@ -46,6 +46,60 @@
         }
       ]
     },
+    "claude-code": {
+      "distribution": "project-orrery-claude-code-adapter",
+      "version": "0.1.0",
+      "adapter_api_version": 1,
+      "support_status": "experimental",
+      "core_api": 1,
+      "cli": {
+        "minimum": "0.1.1",
+        "maximum_exclusive": "0.2.0"
+      },
+      "runtime_evidence": [
+        {
+          "runtime": "Claude Code",
+          "runtime_version": "2.1.87",
+          "os": "Windows 11 Pro x64 10.0.26200 (build 26200)",
+          "adapter_version": "0.1.0",
+          "core_version": "0.1.0",
+          "cli_version": "0.1.1",
+          "status": "experimental",
+          "scope": "isolated_no_model_stage_a",
+          "validated_on": "2026-08-21",
+          "validation": "docs/validation/2026-08-21-claude-code-adapter-stage-a.md",
+          "stage_b_status": "authentication_blocked_before_inference",
+          "stage_b_validation": "docs/validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md"
+        }
+      ]
+    },
+    "deepseek-harness": {
+      "distribution": "project-orrery-deepseek-harness-adapter",
+      "version": "0.1.0",
+      "adapter_api_version": 1,
+      "support_status": "experimental",
+      "core_api": 1,
+      "cli": {
+        "minimum": "0.1.1",
+        "maximum_exclusive": "0.2.0"
+      },
+      "runtime_evidence": [
+        {
+          "runtime": "DeepSeek Harness",
+          "runtime_version": "@deepseek-ai/dsh 0.1.0-rc.8",
+          "os": "Windows 11 Pro x64 10.0.26200 (build 26200)",
+          "adapter_version": "0.1.0",
+          "core_version": "0.1.0",
+          "cli_version": "0.1.1",
+          "status": "experimental",
+          "scope": "isolated_no_model_stage_a",
+          "validated_on": "2026-08-21",
+          "validation": "docs/validation/2026-08-21-deepseek-harness-adapter-stage-a.md",
+          "stage_b_status": "explicit_skill_injection_passed_model_credential_blocked",
+          "stage_b_validation": "docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md"
+        }
+      ]
+    },
     "harness-json": {
       "distribution": "project-orrery-harness-json-adapter",
       "version": "0.1.0",

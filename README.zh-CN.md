@@ -62,14 +62,16 @@ Project Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模�
 
 ## 可用集成
 
-Project Orrery 的核心工作流可以直接通过命令行运行。当前源码树已经建立内部 Core、CLI 与 Observatory 包边界，以及可独立打包的 Codex Adapter，但这些新组件都尚未发布；在 v0.2.0 中，受支持脚本仍随旧 Codex Skill 分发，Core／CLI 尚未作为独立 Core/CLI 包发布。平台集成只负责补充特定平台的安装和调用方式，不改变底层权威模型。
+Project Orrery 的核心工作流可以直接通过命令行运行。当前源码树已经建立内部 Core、CLI 与 Observatory 包边界，以及可独立打包的 Codex、Claude Code、DeepSeek Harness 和 JSON Harness Adapter，但这些新组件都尚未发布；在 v0.2.0 中，受支持脚本仍随旧 Codex Skill 分发，Core／CLI 尚未作为独立 Core/CLI 包发布。平台集成只负责补充特定平台的安装和调用方式，不改变底层权威模型。
 
 | 能力面 | 当前已有内容 | 支持状态 |
 | --- | --- | --- |
 | Core / CLI | installer、validator 和 update checker 可在没有 Codex runtime 的情况下直接调用；未发布源码包现已持有共享契约。CLI 0.1.1 在保留人类输出的同时新增 opt-in JSON response envelope。 | 可移植源码与命令路径；尚未独立发布。 |
 | Codex | v0.2.0 已提供打包好的旧 [Codex Skill](skills/project-orrery/)；工作树另有未发布的薄 [Codex Adapter](adapters/codex/) 与生命周期安装器。 | Adapter 发行状态仍为 `experimental` 且未发布；仅 Adapter 0.1.0 + Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21` + Windows 11 build 26200 + Core／CLI 0.1.0 及已记录模型／审批 runtime 范围为 `verified`。见 [runtime Validation](docs/validation/2026-08-21-codex-runtime-e2e-completion.md)。 |
-| Harness JSON | 工作树包含未发布的 [subprocess JSON 参考 Adapter](adapters/harness-json/)，可在没有 Agent runtime 时自动执行 scaffold、validate 和 update。 | `experimental`：Windows 候选测试通过，该提交仍待现有 Windows／Ubuntu CI 矩阵验证；不构成第三方平台声明。 |
-| 其他 Agent 平台 | 尚未发布平台 Adapter。 | `target`：在完成真实集成与 runtime 验证前，不宣称兼容。 |
+| Claude Code | 工作树包含未发布的原生 [Claude Code Plugin Adapter](adapters/claude-code/)，提供薄 Skill 与隔离 marketplace 生命周期。 | `experimental`：Claude Code 2.1.87 已通过 Stage A 生命周期检查，真实 Stage B init 也发现 Plugin／Skill；但本机没有可用登录态，模型调用与 CLI 路由仍未验证。见 [Stage B Validation](docs/validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md)。 |
+| DeepSeek Harness | 工作树包含未发布的 [profile Plugin Bundle Adapter](adapters/deepseek-harness/)，由插件注册 packaged Skill。 | `experimental`：`@deepseek-ai/dsh 0.1.0-rc.8` 已通过 Stage A；真实 headless Stage B 持久化目录与显式 Skill 注入后因没有 API Key 停止，模型处理和 CLI 路由仍未验证。见 [Stage B Validation](docs/validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md)。 |
+| Harness JSON | 工作树包含未发布的 [subprocess JSON 参考 Adapter](adapters/harness-json/)，可在没有 Agent runtime 时自动执行 scaffold、validate 和 update。 | `experimental`：同一提交的 Windows／Ubuntu CI 已通过；只证明 CLI／Harness 合约，不构成第三方平台 runtime 声明。 |
+| 其他 Agent 平台 | 尚未实现或发布其他平台 Adapter。 | `target`：在完成真实集成与 runtime 验证前，不宣称兼容。 |
 
 ## 快速开始
 
@@ -214,8 +216,12 @@ Project Orrery 对既有项目采取保守策略。
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | 权威架构与迁移契约 |
 | [`packages/`](packages/) | 未发布的平台中立 Core、CLI 与 Observatory 源码包 |
 | [`adapters/codex/`](adapters/codex/) | 未发布的薄 Codex Adapter、manifest、元数据与生命周期安装器 |
+| [`adapters/claude-code/`](adapters/claude-code/) | 未发布的原生 Claude Code Plugin Adapter 与本地 marketplace 元数据 |
+| [`adapters/deepseek-harness/`](adapters/deepseek-harness/) | 未发布的 DeepSeek Harness profile Bundle 与 packaged Skill provider |
 | [`adapters/harness-json/`](adapters/harness-json/) | 未发布的 subprocess JSON 合约与参考 Harness Adapter |
 | [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | 版本化 Codex Adapter 归档与 checksum 构建器 |
+| [`scripts/package_claude_code_adapter.py`](scripts/package_claude_code_adapter.py) | 确定性 Claude Code Plugin 归档与 checksum 构建器 |
+| [`scripts/package_deepseek_harness_adapter.py`](scripts/package_deepseek_harness_adapter.py) | 确定性 npm-compatible DeepSeek Adapter tarball 构建器 |
 | [`docs/`](docs/) | Project Orrery 自身的自托管权威链、当前 State、验证与历史 |
 | [`docs/library/`](docs/library/) | 非权威研究、文献综述、实验方案与设计假设 |
 | [`experiments/context-routing/`](experiments/context-routing/) | 用于上下文路由研究的 ADR 前置基准语料、运行结构与验证工具 |
