@@ -258,3 +258,12 @@
 - 本地 Canonical baseline 现包含完整内部 CLI Authority bundle、root-only opt-in Observatory projection 和 provider-neutral release-candidate gate；legacy CLI、默认文档站、公开 v0.2.0 历史资产和发布状态不变。
 - 合并后 Authority 163 项中 160 通过、3 项环境跳过；全仓 231 项中 226 通过、5 项环境／可选依赖跳过。结构、默认与显式 projection、release gate、277 份 Markdown／639 个本地链接／0 缺失和 diff 由独立 M2 integration Validation 记录。
 - 本轮没有 push、tag、Release、实际 SemVer／manifest 选择、稳定 API 或 managed consumer production switch；M2.3 `release_ready` 继续为 false。
+
+## 2026-08-21 — 当前状态入口职责压缩
+
+- 审计发现根 PROGRESS 已累计早期 Pilot、平台阶段和实现史，Authority State 也保存了逐检查点实现与 Validation 文件目录；两者虽然内容大多正确，但不再适合作为 Agent／维护者的快速当前入口。
+- 将 PROGRESS 从 146 行压缩为 55 行，只保留四条当前线路、当前结论、活动计划、阻塞、最近完成与下一里程碑；完整历史继续由本 DEVLOG、Validation 和 Git 记录承担。
+- 将 Authority State 从 147 行压缩为 60 行，以规范事实和 Core／CLI／Observatory／migration／release gate 分层能力表替代逐检查点叙述，并把实现／验证证据收敛为少量权威入口。
+- Documentation System State 明确 PROGRESS／HANDOFF 是集成入口而不是历史总账。本轮没有改变 ADR、Design、Plan、代码、发布契约或公开支持状态。
+- 首次把本 Validation 写成精确 `Result: Passed` 时，完整回归捕获 strict role collector 会将其升级为结构化 Validation success；改用非权威 `Status:` 表述后，相关 32 项专项和最终全仓回归通过，没有削弱 collector 或测试。
+- 全仓 231 项中 226 通过、5 项按既有环境／可选依赖跳过；integrated build、默认／显式 Authority projection 回滚、278 份 Markdown／655 个本地链接与 diff 检查通过。
