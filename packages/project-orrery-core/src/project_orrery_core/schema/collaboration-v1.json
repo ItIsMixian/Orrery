@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-orrery-collaboration-v1",
+  "title": "Project Orrery provider-neutral collaboration contracts v1",
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_type": {"type": "string"}
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/worktree_identity"},
+    {"$ref": "#/$defs/workstream_session"},
+    {"$ref": "#/$defs/scope"},
+    {"$ref": "#/$defs/overlap_finding"},
+    {"$ref": "#/$defs/integration_report"},
+    {"$ref": "#/$defs/subsystem_registry"},
+    {"$ref": "#/$defs/member"},
+    {"$ref": "#/$defs/project_mode"}
+  ],
+  "$defs": {
+    "worktree_identity": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "worktree_id", "worktree_path", "git_dir",
+        "git_common_dir", "branch", "head", "dirty", "is_primary", "primary_worktree_path",
+        "primary_worktree_source", "integration_ref", "integration_oid", "fact_scope",
+        "member_id", "host_id", "visibility", "observability"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "worktree-identity"},
+        "worktree_id": {"type": "string", "minLength": 1},
+        "worktree_path": {"type": "string", "minLength": 1},
+        "git_dir": {"type": "string", "minLength": 1},
+        "git_common_dir": {"type": "string", "minLength": 1},
+        "branch": {"type": ["string", "null"]},
+        "head": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "dirty": {"type": "boolean"},
+        "is_primary": {"type": "boolean"},
+        "primary_worktree_path": {"type": "string", "minLength": 1},
+        "primary_worktree_source": {"enum": ["git-main-worktree", "maintainer-override"]},
+        "integration_ref": {"type": "string", "pattern": "^refs/heads/"},
+        "integration_oid": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "fact_scope": {"enum": ["canonical", "candidate", "worktree"]},
+        "member_id": {"type": "string", "minLength": 1},
+        "host_id": {"type": "string", "minLength": 1},
+        "visibility": {"enum": ["canonical", "candidate", "worktree-local", "local-only", "unknown"]},
+        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]}
+      },
+      "additionalProperties": false
+    },
+    "workstream_session": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "project_mode", "workstream_id", "worktree_id",
+        "member_id", "host_id", "active_host_id", "branch", "head", "integration_ref",
+        "integration_oid", "merge_base", "lifecycle_phase", "runtime_condition", "scope_revision",
+        "primary_subsystem_id", "affected_subsystem_ids", "expected_writes", "governing_docs",
+        "validation_surfaces", "visibility", "observability", "captured_at"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-session"},
+        "project_mode": {"enum": ["personal", "team"]},
+        "workstream_id": {"type": "string", "minLength": 1},
+        "worktree_id": {"type": "string", "minLength": 1},
+        "member_id": {"type": "string", "minLength": 1},
+        "host_id": {"type": "string", "minLength": 1},
+        "active_host_id": {"type": "string", "minLength": 1},
+        "platform_session": {
+          "type": ["object", "null"],
+          "properties": {
+            "adapter": {"type": "string", "minLength": 1},
+            "session_id": {"type": "string", "minLength": 1}
+          },
+          "required": ["adapter", "session_id"],
+          "additionalProperties": false
+        },
+        "branch": {"type": ["string", "null"]},
+        "head": {"type": "string"},
+        "integration_ref": {"type": "string"},
+        "integration_oid": {"type": "string"},
+        "merge_base": {"type": "string"},
+        "lifecycle_phase": {"enum": ["created", "investigating", "implementing", "validating", "review-ready", "integrated", "closed"]},
+        "runtime_condition": {"enum": ["active", "waiting-for-user", "paused", "blocked-by-conflict", "failed", "offline", "stale-unknown"]},
+        "scope_revision": {"type": "integer", "minimum": 1},
+        "primary_subsystem_id": {"type": "string", "minLength": 1},
+        "affected_subsystem_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "expected_writes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "governing_docs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "validation_surfaces": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
+        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
+        "captured_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "workstream_id", "revision", "scope_kind",
+        "primary_subsystem_id", "affected_subsystem_ids", "expected_writes", "governing_docs",
+        "validation_surfaces", "member_id", "host_id", "visibility", "observability"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "scope"},
+        "workstream_id": {"type": "string", "minLength": 1},
+        "revision": {"type": "integer", "minimum": 1},
+        "scope_kind": {"enum": ["mapped", "unmapped", "project-wide"]},
+        "primary_subsystem_id": {"type": "string", "minLength": 1},
+        "affected_subsystem_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "expected_writes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "governing_docs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "validation_surfaces": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "member_id": {"type": "string", "minLength": 1},
+        "host_id": {"type": "string", "minLength": 1},
+        "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
+        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]}
+      },
+      "additionalProperties": false
+    },
+    "overlap_finding": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "finding_id", "kind", "disposition", "severity",
+        "workstream_ids", "path_evidence", "authority_surfaces", "validation_surfaces",
+        "required_member_ids", "acknowledgements", "member_id", "host_id", "visibility", "observability", "created_at"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "overlap-finding"},
+        "finding_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["direct", "authority", "semantic", "unknown"]},
+        "disposition": {"enum": ["open", "acknowledged", "resolved", "stale"]},
+        "severity": {"enum": ["l1", "l2", "l3"]},
+        "workstream_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+        "path_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "authority_surfaces": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "validation_surfaces": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "required_member_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "acknowledgements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["member_id", "reason", "scope_revision", "acknowledged_at"],
+            "properties": {
+              "member_id": {"type": "string", "minLength": 1},
+              "reason": {"type": "string", "minLength": 1},
+              "scope_revision": {"type": "integer", "minimum": 1},
+              "acknowledged_at": {"type": "string", "format": "date-time"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "member_id": {"type": "string", "minLength": 1},
+        "host_id": {"type": "string", "minLength": 1},
+        "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
+        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
+        "created_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "integration_report": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "report_id", "candidate_head", "target_ref", "target_oid",
+        "merge_base", "scope_revision", "finding_ids", "validations", "state_alignment", "result",
+        "member_id", "host_id", "visibility", "observability", "generated_at"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "integration-report"},
+        "report_id": {"type": "string", "minLength": 1},
+        "candidate_head": {"type": "string"},
+        "target_ref": {"type": "string"},
+        "target_oid": {"type": "string"},
+        "merge_base": {"type": "string"},
+        "scope_revision": {"type": "integer", "minimum": 1},
+        "finding_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "validations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["command", "result", "evidence_ref", "completed_at"],
+            "properties": {
+              "command": {"type": "string", "minLength": 1},
+              "result": {"enum": ["passed", "failed", "skipped", "unknown"]},
+              "evidence_ref": {"type": "string", "minLength": 1},
+              "completed_at": {"type": "string", "format": "date-time"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "state_alignment": {"enum": ["passed", "failed", "unknown"]},
+        "result": {"enum": ["ready-for-human-integration", "blocked", "failed", "stale"]},
+        "member_id": {"type": "string", "minLength": 1},
+        "host_id": {"type": "string", "minLength": 1},
+        "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
+        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
+        "generated_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "subsystem_registry": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "source", "reserved_scope_ids", "entries"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "subsystem-registry"},
+        "source": {"const": "AGENTS.md"},
+        "reserved_scope_ids": {"type": "array", "items": {"enum": ["unmapped", "project-wide"]}, "uniqueItems": true},
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["subsystem_id", "display_name", "state_docs", "authority_docs"],
+            "properties": {
+              "subsystem_id": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+              "display_name": {"type": "string", "minLength": 1},
+              "state_docs": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+              "authority_docs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "capability_audit": {
+      "type": "object",
+      "required": ["actor_id", "action", "capability", "before", "after", "credential_epoch", "occurred_at"],
+      "properties": {
+        "actor_id": {"type": "string", "minLength": 1},
+        "action": {"enum": ["grant", "revoke", "remove-member"]},
+        "capability": {"type": ["string", "null"]},
+        "before": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "after": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "credential_epoch": {"type": "integer", "minimum": 1},
+        "occurred_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "member": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "member_id", "member_kind", "base_role", "status",
+        "capabilities", "credential_epoch", "credential_state", "audit"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "member"},
+        "member_id": {"type": "string", "minLength": 1},
+        "member_kind": {"const": "human"},
+        "base_role": {"const": "member"},
+        "status": {"enum": ["active", "removed"]},
+        "capabilities": {"type": "array", "items": {"enum": ["reviewer", "integrator", "admin"]}, "uniqueItems": true},
+        "credential_epoch": {"type": "integer", "minimum": 1},
+        "credential_state": {"enum": ["active", "revoked"]},
+        "audit": {"type": "array", "items": {"$ref": "#/$defs/capability_audit"}}
+      },
+      "additionalProperties": false
+    },
+    "project_mode": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "project_mode", "runtime_status", "member_identity",
+        "active_network_features", "network_boundaries"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "project-mode"},
+        "project_mode": {"enum": ["personal", "team"]},
+        "runtime_status": {"enum": ["personal-local-only", "contract-only"]},
+        "member_identity": {"enum": ["implicit-local", "explicit-member-required"]},
+        "active_network_features": {"type": "array", "maxItems": 0},
+        "network_boundaries": {
+          "type": "object",
+          "required": ["listener", "discovery", "coordinator", "member_authentication", "team_sync", "heartbeat"],
+          "properties": {
+            "listener": {"const": false},
+            "discovery": {"const": false},
+            "coordinator": {"const": false},
+            "member_authentication": {"const": false},
+            "team_sync": {"const": false},
+            "heartbeat": {"const": false}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

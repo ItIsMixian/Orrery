@@ -36,11 +36,15 @@
 
 ## project structure
 
+**ID**: `project-structure`
+
 **What**: 管理发布 Skill、根文档、实验控制面、自托管观测台和外部原始运行之间的边界。
 **Truth**: 当前仓库树、`.project-orrery.json`、`docs/PROGRESS.md`。
 **Dig**: [项目结构 State](docs/state/project-structure.md) | [ADR-0001](docs/decisions/0001-project-orrery-self-hosting.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)。
 
 ## documentation system
+
+**ID**: `documentation-system`
 
 **What**: 管理权威链、人类／Agent 阅读入口、作者文档生命周期、同步义务和观测台投影。
 **Truth**: `AGENTS.md`, `docs/`, 根 `scripts/docsite/`。
@@ -48,11 +52,15 @@
 
 ## authority semantics
 
+**ID**: `authority-meta-model`
+
 **What**: 定义 Orrery 解释项目权威体系的 Meta Model：authority roles、各对象 lifecycle、独立 claim dimensions、fact scopes、evidence categories、derived-view constraints 和 conformance 输入边界。
 **Truth**: [Authority Meta Model State](docs/state/authority-meta-model.md)；本地 Canonical baseline 已有 versioned fixture、experimental Core evaluator、完整内部 CLI claim bundle、root-only opt-in Observatory projection 和本地 release-candidate gate；仍无稳定公共 domain API、默认 production switch 或公开模型 1 release。
 **Dig**: [ADR-0009](docs/decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0010](docs/decisions/0010-core-owned-authority-evaluator.md) | [ADR-0011](docs/decisions/0011-authority-model-version-and-compatibility.md) | [Approved Design](docs/design/authority-meta-model.md) | [来源讨论](docs/library/2026-08-20-authority-semantics-and-product-complexity-discussion.zh-CN.md)。
 
 ## released skill and compatibility
+
+**ID**: `release-and-toolchain`
 
 **What**: 平台中立 Core／CLI／Observatory、Codex Skill 兼容入口和发布兼容契约。
 **Truth**: `packages/`, `adapters/codex/`, `skills/project-orrery/`, `scripts/package_release.py`, `scripts/package_codex_adapter.py`, `.github/workflows/`。
@@ -60,17 +68,23 @@
 
 ## multi-worktree collaboration
 
+**ID**: `multi-worktree-collaboration`
+
 **What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅和干净集成。
 **Truth**: Git branch／HEAD／worktree 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；当前只实现人工隔离与集成流程，自动 session、overlap 与 integration 命令尚未实现。
 **Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
 
 ## context-routing research
 
+**ID**: `context-routing-research`
+
 **What**: 测量 Agent 文档负担、上下文路由、访问证据与 Harness 验收。
 **Truth**: `experiments/context-routing/` 与仓库外封存输出；当前没有任何实验策略进入发布版 Skill。
 **Dig**: [研究 State](docs/state/context-routing-research.md) | [研究综述](docs/library/2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md) | [ADR-0002](docs/decisions/0002-real-development-benchmark-portfolio.md) | [ADR-0005](docs/decisions/0005-prewrite-scope-acquisition-input.md)。
 
 ## test coverage
+
+**ID**: `test-coverage`
 
 **What**: 保护安装、升级、发布、文档站、凭据边界和实验 Harness。
 **Truth**: `tests/`, `.github/workflows/`, `docs/validation/`。

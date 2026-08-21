@@ -19,6 +19,15 @@
     "manifest_format": {"const": 1},
     "document_schema": {"type": "integer", "minimum": 1},
     "authority_model_version": {"type": "integer", "minimum": 1},
+    "collaboration": {
+      "type": "object",
+      "properties": {
+        "integration_ref": {"type": "string", "pattern": "^refs/heads/[^/](?:.*[^/])?$"},
+        "primary_worktree": {"type": "string", "minLength": 1},
+        "project_mode": {"enum": ["personal", "team"]}
+      },
+      "additionalProperties": false
+    },
     "authority_status": {"enum": ["migration_pending", "integrated"]},
     "toolchain_status": {"enum": ["current", "mixed"]},
     "managed_tools": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
