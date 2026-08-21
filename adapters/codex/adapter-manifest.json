@@ -31,6 +31,7 @@
       "SKILL.md",
       "adapter-manifest.json",
       "agents/openai.yaml",
+      "scripts/check_cli_dependency.py",
       "scripts/install_adapter.py"
     ]
   },

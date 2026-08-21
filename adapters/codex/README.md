@@ -14,6 +14,11 @@ range and command name are declared in `adapter-manifest.json`. The Phase 1 CLI
 is currently source-only, so this adapter is not yet a complete public install
 path.
 
+Before routing a task, the Adapter runs `scripts/check_cli_dependency.py` with
+the same Python environment that supplies `project-orrery`. Missing package
+metadata, a missing entrypoint, and versions outside the declared range fail
+with a nonzero exit instead of falling back to legacy copied behavior.
+
 ## Preview and install
 
 Codex discovers user skills from `$HOME/.agents/skills`. Preview an install
@@ -38,5 +43,6 @@ python adapters/codex/scripts/install_adapter.py --destination-root <skills-dire
 
 Uninstall is recoverable: the adapter directory is moved under a timestamped
 trash directory next to the discovery root rather than deleted. Keeping backup
-Skills outside that root prevents duplicate discovery. The installer manages only the Codex
-adapter directory. It never scaffolds or upgrades a target project.
+Skills outside that root prevents duplicate discovery. The installer manages
+only the Codex adapter directory. It never scaffolds or upgrades a target
+project.

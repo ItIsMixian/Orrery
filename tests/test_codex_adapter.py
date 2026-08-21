@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -14,11 +16,16 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 ADAPTER_ROOT = REPOSITORY_ROOT / "adapters" / "codex"
 ADAPTER_MANIFEST = ADAPTER_ROOT / "adapter-manifest.json"
 ADAPTER_INSTALLER = ADAPTER_ROOT / "scripts" / "install_adapter.py"
+ADAPTER_DEPENDENCY_CHECK = ADAPTER_ROOT / "scripts" / "check_cli_dependency.py"
 ADAPTER_PACKAGER = REPOSITORY_ROOT / "scripts" / "package_codex_adapter.py"
 COMPONENT_VERSIONS = REPOSITORY_ROOT / "packages" / "component-versions.json"
 
 
-def run_python(script: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
+def run_python(
+    script: Path,
+    *arguments: str,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, "-X", "utf8", str(script), *arguments],
         cwd=REPOSITORY_ROOT,
@@ -27,6 +34,7 @@ def run_python(script: Path, *arguments: str) -> subprocess.CompletedProcess[str
         encoding="utf-8",
         errors="replace",
         check=False,
+        env=env,
     )
 
 
@@ -60,6 +68,7 @@ class CodexAdapterTests(unittest.TestCase):
         skill = (ADAPTER_ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertTrue(skill.startswith("---\nname: project-orrery\ndescription:"))
         self.assertIn("project-orrery scaffold", skill)
+        self.assertIn("scripts/check_cli_dependency.py", skill)
         self.assertIn("root `AGENTS.md`", skill)
         self.assertIn("does not contain", skill)
         self.assertNotIn("docs/state/", skill)
@@ -240,6 +249,51 @@ class CodexAdapterTests(unittest.TestCase):
             self.assertEqual(result.returncode, 2)
             self.assertIn("does not match", result.stderr)
             self.assertEqual(list(Path(temporary).iterdir()), [])
+
+    def test_cli_dependency_check_fails_closed_and_accepts_declared_version(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-adapter-dependency-") as temporary:
+            root = Path(temporary)
+            executable_root = root / "bin"
+            metadata_root = root / "metadata"
+            executable_root.mkdir()
+            metadata_root.mkdir()
+
+            base_env = os.environ.copy()
+            base_env["PATH"] = str(executable_root)
+            base_env["PYTHONPATH"] = str(metadata_root)
+            missing_distribution = run_python(ADAPTER_DEPENDENCY_CHECK, env=base_env)
+            self.assertEqual(missing_distribution.returncode, 3)
+            self.assertIn("code=cli_distribution_missing", missing_distribution.stderr)
+
+            dist_info = metadata_root / "project_orrery_cli-0.2.0.dist-info"
+            dist_info.mkdir()
+            metadata = dist_info / "METADATA"
+            metadata.write_text(
+                "Metadata-Version: 2.1\nName: project-orrery-cli\nVersion: 0.1.0\n",
+                encoding="utf-8",
+            )
+            missing_entrypoint = run_python(ADAPTER_DEPENDENCY_CHECK, env=base_env)
+            self.assertEqual(missing_entrypoint.returncode, 3)
+            self.assertIn("code=cli_entrypoint_missing", missing_entrypoint.stderr)
+
+            shutil.copy2(sys.executable, executable_root / "project-orrery.exe")
+            metadata.write_text(
+                "Metadata-Version: 2.1\nName: project-orrery-cli\nVersion: 0.2.0\n",
+                encoding="utf-8",
+            )
+            incompatible = run_python(ADAPTER_DEPENDENCY_CHECK, env=base_env)
+            self.assertEqual(incompatible.returncode, 4)
+            self.assertIn("code=cli_version_incompatible", incompatible.stderr)
+            self.assertIn("installed=0.2.0", incompatible.stderr)
+
+            metadata.write_text(
+                "Metadata-Version: 2.1\nName: project-orrery-cli\nVersion: 0.1.0\n",
+                encoding="utf-8",
+            )
+            compatible = run_python(ADAPTER_DEPENDENCY_CHECK, env=base_env)
+            self.assertEqual(compatible.returncode, 0, compatible.stdout + compatible.stderr)
+            self.assertIn("version=0.1.0", compatible.stdout)
+            self.assertIn("project-orrery.exe", compatible.stdout.lower())
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-20
+Updated: 2026-08-21
 
 ## 当前事实
 
@@ -23,7 +23,8 @@ Updated: 2026-08-20
 - 2026-08-19 Pilot 008 准备快照：上下文专项 13/13；文件稳定后的默认全仓 44 项中 42 通过、2 项动态依赖按设计跳过。较早的动态检查点为 41/42，唯一失败来自当时并行未完成的 docsite Broker HTTP 400 断言；新增并行测试后未重跑动态模式。benchmark、integrated static build、169 份 Markdown 本地链接与 diff 检查通过。
 - 平台中立 Phase 0 新增 v0.2.0 发布清单 fixture 和两项回归，保护既有归档路径、managed tools、manifest 必需字段、人类 CLI 输出、模板入口与公开支持状态；`tests.test_project_orrery` 为 9 passed + 2 个动态依赖按设计跳过，未运行 context-routing 或任何 Pilot。
 - 平台中立 Phase 1 新增三项回归：组件版本／模板投影一致性、新 CLI 与旧路径逐文件等价及作者文件保留、解压 Skill 的独立 fallback。产品专项为 12 passed + 2 个动态依赖按设计跳过；未运行 context-routing 或任何 Pilot。
-- 平台中立 Phase 2 新增 `tests/test_codex_adapter.py` 五项回归：薄 Adapter 内容与空 runtime 声明、确定性独立归档／checksum／解压安装、dry-run／升级备份／可恢复卸载、未知目录拒绝／旧 Skill 备份迁移和版本错配失败。Adapter 专项 5/5 通过；与当前既有产品专项合计 18 passed + 2 个动态依赖按设计跳过，未运行 context-routing 或任何 Pilot。
+- 平台中立 Phase 2 的 `tests/test_codex_adapter.py` 现有六项回归：薄 Adapter 内容与空 runtime 声明、确定性独立归档／checksum／解压安装、dry-run／升级备份／可恢复卸载、未知目录拒绝／旧 Skill 备份迁移和版本错配失败，以及 CLI distribution／entrypoint 缺失与版本范围的失败关闭。Adapter 专项 6/6 通过；与当前既有产品专项合计 20 passed + 2 个动态依赖按设计跳过，未运行 context-routing 或任何 Pilot。
+- 2026-08-21 真实 `codex-cli 0.148.0-alpha.21` 无模型探针验证 repo Adapter 发现、完整 v0.2 Skill 只经显式升级迁移、升级前完整备份、可恢复卸载、backup／trash 不重复发现、作者 tree 不变和卸载后 Adapter 消失。真实登录态同时发现用户旧 Skill 与 repo Adapter；依据官方 discovery 与 CLI flag 边界，在模型 turn 前安全停止，模型调用为 0。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 002 使用同版本哈希一致的完整 CLI runtime，真实验证 usage 更新位于首次产品 `fileChange` 之前；独立 analyzer 判定 ordering 测量有效。原始根按 `decision_supporting` 封存且 manifest 39/39 有效。该 smoke 允许 0 次写前代理读取，不提供正式 P/S 或内容交付证据。
@@ -54,6 +55,7 @@ Updated: 2026-08-20
 - [2026-08-19 平台中立 Phase 0 发布基线](../validation/2026-08-19-platform-neutral-phase-0-baseline.md)
 - [2026-08-19 平台中立 Phase 1 Core／CLI 抽取](../validation/2026-08-19-platform-neutral-phase-1-core-cli.md)
 - [2026-08-19 平台中立 Phase 2 Codex Adapter 仓库实现](../validation/2026-08-19-platform-neutral-phase-2-codex-adapter.md)
+- [2026-08-21 Codex Runtime E2E 安全停止](../validation/2026-08-21-codex-runtime-e2e.md)
 - [2026-08-19 Broker-first docsite gateway](../validation/2026-08-19-broker-first-docsite-gateway.md)
 - [2026-08-20 多 worktree 恢复与人工采纳](../validation/2026-08-20-multi-worktree-recovery-and-manual-adoption.md)
 - [2026-08-20 多 Workstream 协作 Design 收敛](../validation/2026-08-20-multi-worktree-collaboration-design-consolidation.md)
@@ -69,6 +71,6 @@ Updated: 2026-08-20
 - 当前端到端强度止于代理+完整 CLI JSONL 的事后交叉证明；没有可工作的实时 Hook 阻断。
 - 外部原始数据已有 manifest 与保留策略，但仍依赖本机存储，且尚无自动脱敏导出器或异地备份。
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
-- Codex Adapter 生命周期目前只在临时目录验证；真实 Codex runtime 发现、调用、失败路径、更新与卸载尚无证据，因此不能标记 `verified`。
+- Codex Adapter 已有真实 runtime 的无模型发现、升级和卸载证据，CLI preflight 也覆盖缺失与不兼容；但真实显式／隐式调用和模型触发失败路径因同名用户 Skill 污染而未运行，因此仍不能标记 `verified`。
 - ADR-0007／ADR-0008 的 Phase 0–4 自动化矩阵尚未实现；目前没有机器可执行的主 worktree 写入守卫、私有 session、重叠／review／cleanup、Personal 指挥台或 Team Mode 网络测试。
 - ADR-0009 的 conformance matrix 仍是 Approved Design 目标，没有 machine-readable Meta Model、fixture corpus、AI non-escalation test 或语义版本兼容测试。

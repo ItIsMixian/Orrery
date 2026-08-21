@@ -43,8 +43,11 @@ Pilot 008、不处理多人／多 worktree 协作、不修改 docsite 凭据／B
 - [ ] 只有上述证据完成后，才把对应范围标为 `verified`。
 
 仓库实现检查点：`adapters/codex/`、独立归档器和临时目录生命周期测试已经完成；Adapter
-仍是未发布 `experimental`，且独立 CLI 发行物和真实 Codex runtime 验证尚未完成。本检查点
-不等于 Phase 2 全部完成。
+仍是未发布 `experimental`，且独立 CLI 发行物尚未完成。2026-08-21 的真实 runtime 检查点已验证
+无模型 discovery、升级、卸载和重新发现，但真实登录态同时加载 repo Adapter 与用户旧 Skill；安全
+隔离门阻止了模型调用，因此显式／隐式调用和模型触发依赖失败仍未完成。证据见
+[Codex Runtime E2E 安全停止](../../validation/2026-08-21-codex-runtime-e2e.md)。本检查点不等于 Phase 2
+全部完成，也不满足 `verified` 门禁。
 
 验收证据：Codex Adapter 独立归档、checksum、实际 runtime Validation 和旧 Skill 升级路径。
 

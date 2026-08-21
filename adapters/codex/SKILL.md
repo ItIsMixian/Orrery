@@ -13,9 +13,10 @@ Project Orrery templates, schema, compatibility rules, or project facts.
 
 1. Read the target repository's root `AGENTS.md` and follow its local reading
    order and safety boundaries before touching project files.
-2. Confirm the `project-orrery` CLI is available. If it is missing or outside
-   the manifest's compatible range, report the dependency gap instead of
-   falling back to copied templates or inferred rules.
+2. Before invoking the CLI, run this Adapter's
+   `scripts/check_cli_dependency.py` with the Python interpreter that resolves
+   `project-orrery`. If the check exits nonzero, report its dependency error
+   instead of falling back to copied templates or inferred rules.
 3. Use the CLI command that matches the request:
    - `project-orrery scaffold --target <repo> --title <title> --dry-run`
    - `project-orrery validate --target <repo>`
@@ -33,4 +34,3 @@ Observatory files and has reviewed the planned backups.
 After implementation or validation work, update the authority layers required
 by the target repository's own `AGENTS.md`. Do not create a parallel state
 summary in Codex-specific files.
-
