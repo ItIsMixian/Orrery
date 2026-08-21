@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import sys
 
-from . import authority_migrate, scaffold, update, validate
+from . import authority_migrate, authority_restore, scaffold, update, validate
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -11,7 +11,8 @@ def main(argv: list[str] | None = None) -> int:
     if not arguments or arguments[0] in {"-h", "--help"}:
         print(
             "usage: project-orrery "
-            "{scaffold|validate|check-update|migrate-authority-model} [options]"
+            "{scaffold|validate|check-update|migrate-authority-model|"
+            "restore-authority-model} [options]"
         )
         return 0
     command = arguments.pop(0)
@@ -20,6 +21,7 @@ def main(argv: list[str] | None = None) -> int:
         "validate": validate.main,
         "check-update": update.main,
         "migrate-authority-model": authority_migrate.main,
+        "restore-authority-model": authority_restore.main,
     }
     selected = commands.get(command)
     if selected is None:

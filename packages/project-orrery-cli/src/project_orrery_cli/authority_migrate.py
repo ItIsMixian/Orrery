@@ -106,11 +106,15 @@ def _backup_and_replace(
     manifest_path: Path,
     before: bytes,
     after: bytes,
+    *,
+    backup_kind: str = "authority-model",
 ) -> Path:
+    if backup_kind not in {"authority-model", "authority-model-restore"}:
+        raise ValueError("unsupported Authority Model backup category")
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     backup_relative = (
         Path(".project-orrery-backup")
-        / "authority-model"
+        / backup_kind
         / f"{stamp}-{hashlib.sha256(before).hexdigest()[:12]}"
         / ".project-orrery.json"
     )
