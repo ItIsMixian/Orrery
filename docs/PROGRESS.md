@@ -6,7 +6,7 @@ Updated: 2026-08-21
 
 Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成平台中立 Core／CLI／Observatory、Codex 与 Harness JSON Adapter、Broker-only docsite、多人协作设计，以及 Authority Meta Model M1／M2。这些后续能力仍是本地 Canonical、`experimental`／`unreleased` 实现，没有形成新的公开 Release。
 
-当前工作集中在四条相互独立的线路。详细历史进入 [DEVLOG](DEVLOG.md)，可复现证据进入 [Validation](validation/README.md)，这里仅保留当前控制面。
+当前工作集中在五条相互独立的线路。详细历史进入 [DEVLOG](DEVLOG.md)，可复现证据进入 [Validation](validation/README.md)，这里仅保留当前控制面。
 
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
@@ -14,6 +14,7 @@ Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成�
 | 多 Workstream 协作 | ADR-0007／0008 与 Approved Design 已接受；当前只有人工独立 worktree、唯一整合者和三层事实作用域 | 实现 Personal foundation Phase 0 的 machine contract；继续禁止在共享主目录并发开发 |
 | Context routing 研究 | Pilot 009 的 P/S 装置与 Scope 证据有效，但质量门失败，没有策略获准进入发布 Skill | 不调用模型地完成 task／Oracle v0.2 的分层 verdict、结构化 State、paraphrase 与 mutation controls |
 | 平台与 Adapter | Phase 0–3 已本地集成；Codex 精确 runtime 范围有 verified 证据，Harness JSON 有 Windows／Ubuntu CI；组件仍未独立发布 | 另行规划 Phase 4，并在明确授权后才选择第二个真实 Agent／Harness 平台 |
+| 文档治理 | ADR-0012 与 Approved Design 已接受；self-host Phase 0 已建立当前／历史边界、事件同步和 soft review 规则，尚无 audit runtime | 集成本 Candidate 后，先冻结只读 finding contract／fixture；不增加自动改写 |
 
 ## 当前结论
 
@@ -23,6 +24,7 @@ Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成�
 - 多 Agent 目前具有可执行的人工安全工作法，但没有自动 session、主 worktree 守卫、重叠检测、review／integration CLI、Personal 指挥台或 Team telemetry。
 - Context-routing 的 H1、H2、B 和 S 均未通过各自采纳门；发布 Skill 不强制 Agent 生成 Context Manifest、Selected Evidence 或访问回执。
 - Broker-only docsite 已统一模型调用入口，但同一 OS 用户下的本机托管只提供路由、缓存和预算门，不构成 Provider Key 的进程隔离。
+- 文档治理与 Authority Meta Model 分层：治理 finding 只是非权威观察，长度／密度只触发人工审查，不能单独使文档失效或自动改写作者内容。
 
 ## 活动计划与待办
 
@@ -30,7 +32,8 @@ Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成�
 - [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：先实现 Personal foundation Phase 0 的版本化 Workstream／session／scope／finding schema、subsystem registry、Git fixture、integration ref 与主 worktree 识别。
 - [ ] [Context-routing 研究 State](state/context-routing-research.md)：完成 task／Oracle v0.2 的静态控制包，再决定是否申请新的 Terra medium 模型样本。
 - [ ] 平台 Phase 4：等待单独计划和授权；Harness JSON 不冒充第二平台 runtime。
-- [ ] 跨平台 byte-for-byte archive 一致性和 benchmark R1 自动脱敏导出继续延期，不阻塞上述三个近期检查点。
+- [ ] [文档治理 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)：Phase 0 文档规范完成后，下一步只设计 provider-neutral finding contract 与合成 fixture；HANDOFF 专项压缩须另行人工复核。
+- [ ] 跨平台 byte-for-byte archive 一致性和 benchmark R1 自动脱敏导出继续延期，不阻塞上述近期检查点。
 
 ## Blockers / risks
 
@@ -47,9 +50,11 @@ Project Orrery v0.2.0 是当前公开版本；本地 `main` 已在其后集成�
 - [Authority M1 本地 Canonical 集成](validation/2026-08-21-authority-meta-model-canonical-integration.md)：fixture、Core owner、兼容、迁移／恢复、shadow 与 AI non-escalation 已进入本地 baseline。
 - [平台中立 Phase 3](validation/2026-08-21-platform-neutral-phase-3-harness-json.md)：Harness JSON 合约通过 Windows／Ubuntu CI，但仍为未发布参考 Adapter。
 - [ADR-0008 协作 Design 集成](validation/2026-08-20-adr-0008-collaboration-design-integration.md)：Personal-first、Team opt-in 与 Local-only telemetry 边界已形成权威设计，尚无 runtime 实现。
+- [当前状态入口压缩](validation/2026-08-21-current-state-entry-compaction.md)：PROGRESS 与 Authority State 已恢复为当前控制入口，并触发 ADR-0012 的长期治理设计。
 
 ## 下一里程碑
 
 1. **Authority：** 明确 managed production consumer 的启用／回滚门，再由维护者选择实际 SemVer 和 candidate manifest。
 2. **协作：** 完成 zero-network Personal foundation 的最小机器合约与 Git fixture；Team Mode 继续冻结。
 3. **研究：** 在不调用模型的情况下证明新 Oracle 对 paraphrase、contradiction 与 mutation controls 的稳健性。
+4. **文档治理：** 完成 Phase 1 只读 finding contract／fixture 设计；不实现自动修复或公开模板迁移。

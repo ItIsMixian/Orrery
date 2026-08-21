@@ -18,7 +18,7 @@
 - State Docs 只写当前事实；ADR 保存决定与原因；Plan 只写准备怎样做。
 - `accepted` 不等于 `implemented`；工作树实现不等于已提交，已提交不等于已发布。
 - `docs/library/`、`docs/backlog.md` 和 `experiments/` 没有决策权。实验通过质量门并经用户接受后才可形成 ADR。
-- 每次完成实现或验证，同步 State、PROGRESS、DEVLOG；停止点或风险变化时同步 HANDOFF。
+- 每次完成实现或验证，同步 State、Validation、DEVLOG；由唯一整合者按当前线路同步 PROGRESS，停止点或风险变化时同步 HANDOFF。当前入口只保留当前控制信息，历史通过链接进入 DEVLOG／Validation。
 - `docs/_site/index.html` 是生成物，禁止手工编辑。
 
 ## 硬边界
@@ -42,9 +42,9 @@
 
 ## documentation system
 
-**What**: 管理权威链、人类／Agent 阅读入口、同步义务和观测台投影。
+**What**: 管理权威链、人类／Agent 阅读入口、作者文档生命周期、同步义务和观测台投影。
 **Truth**: `AGENTS.md`, `docs/`, 根 `scripts/docsite/`。
-**Dig**: [文档系统 State](docs/state/documentation-system.md) | [Approved Design](docs/design/self-hosting-documentation-system.md)。
+**Dig**: [文档系统 State](docs/state/documentation-system.md) | [自托管 Design](docs/design/self-hosting-documentation-system.md) | [治理 ADR-0012](docs/decisions/0012-document-governance-and-information-lifecycle.md) | [治理 Design](docs/design/document-governance-and-information-lifecycle.md) | [活动 Plan](docs/implementation/plans/2026-08-21-document-governance-and-audit.md)。
 
 ## authority semantics
 

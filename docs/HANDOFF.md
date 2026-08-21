@@ -71,6 +71,7 @@ Updated: 2026-08-21
 - 不要为了通过 `git diff --check` 删除冻结 Pilot fixture 的 EOF 空行；Pilot 008／009 对这些文件做逐字节 SHA-256 校验。2026-08-20 首次集成回归已实际捕获该问题，正确修复是从恢复提交还原原始字节，不是更新冻结哈希。
 - 不要把 ADR-0007／ADR-0008 Accepted 或人工 worktree 验证写成自动协调已实现。当前产品没有 Team Node；未来已上报的未 push 元数据只能显示 Local-only，未上报内容和证据不足的语义关系继续为 Unknown。
 - 不要把 M2 进入本地 `main` 写成已经发布或生产切换。完整 CLI bundle 仍是内部 contract，M2.2 projection 只由 root-only 开关启用，M2.3 gate 的 `release_ready` 仍为 false；公开 v0.2.0、standalone installer 和默认 managed Observatory 没有被改写。也不要因这些检查点大拆 `build_docsite.py`／`serve.py`／`docsite_qa.py`。
+- 不要把 ADR-0012 Accepted 写成 `docs audit` 已实现。当前只有治理规范、自托管入口和活动 Plan；soft budget／finding／acknowledge／Observatory／模板发布都未实现。HANDOFF 本身是首个专项 review candidate，但压缩前必须人工确认本节安全边界的当前有效性。
 
 ## 安全接续点
 
@@ -91,3 +92,4 @@ Updated: 2026-08-21
 11. 多人协作先读取 [ADR-0007](decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)、[Approved Design](design/multi-worktree-collaboration-protocol.md)、[活动 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)和[恢复 Validation](validation/2026-08-20-multi-worktree-recovery-and-manual-adoption.md)。后续任务只在独立 worktree 中继续，根 `PROGRESS`／`HANDOFF` 由整合者同步。
 12. Team／telemetry 相关工作还必须读取 [ADR-0008](decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)与[Design 收敛 Validation](validation/2026-08-20-multi-worktree-collaboration-design-consolidation.md)；默认 Personal Mode 不得监听网络，Team extension 不得先于 Personal foundation。
 13. Authority semantics 工作必须读取 [ADR-0009](decisions/0009-authority-meta-model-and-semantic-conformance.md)、[ADR-0010](decisions/0010-core-owned-authority-evaluator.md)、[ADR-0011](decisions/0011-authority-model-version-and-compatibility.md)、[活动 Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)、[State](state/authority-meta-model.md)和[M2 integration Validation](validation/2026-08-21-authority-meta-model-m2-local-canonical-integration.md)。下一步先单独审阅 managed production consumer／rollback，再由维护者另行选择实际 SemVer／candidate manifest；不得把两项阻塞在同一未经审阅的发布动作中关闭。
+14. 文档治理工作先读取 [ADR-0012](decisions/0012-document-governance-and-information-lifecycle.md)、[Approved Design](design/document-governance-and-information-lifecycle.md)、[活动 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)和[Documentation State](state/documentation-system.md)。下一步只建立只读 finding contract／fixture；不得自动清理 HANDOFF、把长度 warning 设为权威硬门或修改公开模板。

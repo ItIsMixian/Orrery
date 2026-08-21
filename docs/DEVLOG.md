@@ -267,3 +267,13 @@
 - Documentation System State 明确 PROGRESS／HANDOFF 是集成入口而不是历史总账。本轮没有改变 ADR、Design、Plan、代码、发布契约或公开支持状态。
 - 首次把本 Validation 写成精确 `Result: Passed` 时，完整回归捕获 strict role collector 会将其升级为结构化 Validation success；改用非权威 `Status:` 表述后，相关 32 项专项和最终全仓回归通过，没有削弱 collector 或测试。
 - 全仓 231 项中 226 通过、5 项按既有环境／可选依赖跳过；integrated build、默认／显式 Authority projection 回滚、278 份 Markdown／655 个本地链接与 diff 检查通过。
+
+## 2026-08-21 — 文档治理与信息生命周期采纳
+
+- 维护者确认当前入口还需要长期治理规则；ADR-0012 正式修订 ADR-0001 的维护职责，同时保持 ADR-0009 Authority Meta Model 只定义事实语义，不吞入文档编辑工作流。
+- Approved Design 把 AGENTS、HANDOFF、PROGRESS、State、ADR、Design、Plan、Validation、DEVLOG、Snapshot 和非权威材料分别映射到当前／历史职责、更新事件和保留规则。
+- 治理采用事件驱动同步、链接而非复制证据、按职责拆分和 soft review budget。未来 CLI／Harness／Observatory 只能生成 non-authoritative finding，不得自动改写作者文档或创造事实。
+- 活动 Plan 将只读 contract／fixture、CLI、Observatory 和公开模板／发布拆成后续阶段；本轮只完成自托管规范，没有实现 audit runtime、改动产品代码、切换模板或发布版本。
+- HANDOFF 因包含大量安全接续信息被标为首个专项 review candidate；本轮只增加治理接续入口，没有未经人工复核删除既有风险。
+- 首轮全仓回归正确捕获仓库级 amend 关系冻结集合缺少 ADR-0012；只补充 `ADR-0012 → ADR-0001` 的精确预期，未放宽 Authority evaluator 或测试。
+- 修正后全仓 231 项中 226 通过、5 项按既有环境／可选依赖跳过；integrated build、默认／显式 Authority projection 回滚、282 份 Markdown／686 个本地链接和 diff 检查完成。

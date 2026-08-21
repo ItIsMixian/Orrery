@@ -13,6 +13,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 - [Broker-first docsite Provider gateway](broker-first-docsite-provider-gateway.md) — Broker-only runtime, managed default, external isolation and explicit migration governed by ADR-0006.
 - [Multi-worktree collaboration protocol](multi-worktree-collaboration-protocol.md) — isolation and fact scopes under ADR-0007, amended by ADR-0008 with default Personal Mode, opt-in Team Mode, Local-only telemetry, review, cleanup, and progressive command-center UX.
 - [Authority Meta Model semantics](authority-meta-model.md) — role lifecycles, independent claim dimensions, authority scopes, provider-neutral evidence, derived-view constraints and conformance boundaries governed by ADR-0009; no implementation owner or refactor Plan is selected yet.
+- [Documentation governance and information lifecycle](document-governance-and-information-lifecycle.md) — current/history boundaries, event-driven synchronization, responsibility-based splitting, soft budgets and non-authoritative audit findings governed by ADR-0012.
 
 ## Draft designs
 

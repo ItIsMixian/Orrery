@@ -1,7 +1,7 @@
 # Project Orrery 自托管文档系统
 
 Status: Approved
-Governing ADR: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md)
 
 ## 目标
 
@@ -30,8 +30,10 @@ Governing ADR: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md)
 
 ## 同步规则
 
-1. 产品行为变化：修改实现、State、PROGRESS、DEVLOG 和 Validation。
-2. 研究实验完成：修改实验报告、研究 State、PROGRESS、DEVLOG、HANDOFF；必要时更新 Library 综述。
+作者文档的详细更新、压缩、拆分和保留周期由[文档治理与信息生命周期](document-governance-and-information-lifecycle.md)规定；本节只保留自托管边界。
+
+1. 产品行为变化：修改实现、相关 State、DEVLOG 和 Validation；只有当前控制面变化时，才由整合者同步 PROGRESS。
+2. 研究实验完成：修改实验报告、研究 State、DEVLOG 和 Validation；只有当前线路、停止点或风险变化时，才同步 PROGRESS／HANDOFF；必要时更新 Library 综述。
 3. 长期产品约束变化：新增 ADR，再更新 Approved Design 和 Plan。
 4. 发布：区分工作树已实现、仓库已提交和 GitHub 已发布三个状态。
 5. Snapshots 只提供日期截面，不替代活动 State。

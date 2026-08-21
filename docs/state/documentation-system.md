@@ -1,7 +1,7 @@
 # 文档系统 State
 
 Updated: 2026-08-21
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md)
 
 ## 当前事实
 
@@ -11,6 +11,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - ADR-0009 已把这些职责、各对象 lifecycle、独立 Decision／Implementation／Validation claim dimensions、fact scopes、evidence categories 和 derived-view constraints 正式定义为 Authority Meta Model；`docs/core/principles.md` 明确只是 Project Orrery Product Seed。
 - 文档事实现在显式区分 Canonical（integration ref 已集成）、Candidate（功能分支 HEAD）和 Worktree（本地未提交）三个作用域；分支 State 只能陈述候选事实，不能冒充 canonical 当前状态。
 - 根 `PROGRESS.md` 与 `HANDOFF.md` 是集成视角入口，不是历史总账：PROGRESS 只保留当前线路、未完成事项、阻塞和近期里程碑，完整演化与逐次证据分别进入 DEVLOG／Validation。普通功能分支应让代码、测试和 subsystem State 同行，并在合流时由唯一整合者同步全局入口，避免多个 Agent 持续争写同一份全局状态。
+- ADR-0012 已建立独立于 Authority Meta Model 的 Documentation Governance Policy：它按文档角色规定当前／历史边界、事件驱动同步、责任式拆分、soft review budget 和人工审查闭环。它不是新的作者文档类型，也不授权自动改写。
+- 当前 self-host 文档已采用治理入口：PROGRESS／Authority State 完成首轮职责压缩；HANDOFF 因包含大量安全接续细节，被记录为后续人工 review candidate，尚未做专项压缩。
 - ADR-0008 已接受默认 zero-network Personal Mode、手动开启 Team Mode、Local-only 元数据和中央只读／本机执行边界；这些目前只是有效设计约束，现有观测台还没有 Workstream 指挥台、Team 页签、成员或同步实现。
 - 根观测台由模板 v0.2.0 安装；其输出 `docs/_site/index.html` 为可重建生成物。
 - 未发布 Core 包现持有 canonical 作者文档模板；Skill 下的 project-template 是兼容投影，测试要求作者模板内容一致。Observatory 工具不属于作者事实，并由独立组件清单管理。
@@ -39,6 +41,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `AGENTS.md`
 - `docs/decisions/0001-project-orrery-self-hosting.md`
 - `docs/design/self-hosting-documentation-system.md`
+- `docs/design/document-governance-and-information-lifecycle.md`
+- `docs/implementation/plans/2026-08-21-document-governance-and-audit.md`
 - `scripts/docsite/build_docsite.py`
 - `scripts/docsite/build_authority_projection.py`（root-only M2.2 opt-in projection）
 - `scripts/docsite/serve.py`
@@ -52,7 +56,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 ## 已知缺口
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
-- 尚未建立自动检查 State 与实现链接是否过期的机制。
+- 尚未实现 provider-neutral `docs audit`、finding schema／registry、project soft budget、acknowledge／defer storage 或自动检查 State／实现链接是否过期的机制；当前只有 Accepted ADR、Approved Design、活动 Plan 和人工自托管规则。
 - 观测台尚未显示 branch、HEAD、integration OID、merge base、dirty、Workstream 生命周期或事实作用域；worktree 私有 session、自动重叠报告、审查包、清理建议和 Team Mode 也未实现。因此当前作用域纪律依赖入口规则、独立目录和集成者审阅。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。
