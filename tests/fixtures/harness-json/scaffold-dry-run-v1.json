@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "command": "scaffold",
+  "arguments": {
+    "target": "__TARGET__",
+    "title": "Harness Fixture",
+    "dry_run": true
+  }
+}

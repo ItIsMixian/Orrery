@@ -57,11 +57,18 @@ Phase 2 已完成。仓库 Adapter、独立归档器、CLI 失败关闭和临时
 
 ## Phase 3：不依赖 Codex 的 Harness／CLI 样例
 
-- [ ] 为 scaffold dry-run、validate 和 update checker 建立统一 JSON schema 与稳定退出码。
-- [ ] 实现最小 `harness-json` 参考 Adapter，使用 subprocess 或公共 Python API 调用 CLI。
-- [ ] 测试环境显式排除 `SKILL.md`、Codex 配置和真实 Agent runtime。
-- [ ] 覆盖成功、mixed toolchain、schema 不兼容、离线更新和目标文件保留路径。
-- [ ] 明确测试只证明 Core／CLI／Harness 合约，不证明模型读取或第三方平台兼容。
+- [x] 为 scaffold dry-run、validate 和 update checker 建立统一 JSON schema 与稳定退出码。
+- [x] 实现最小 `harness-json` 参考 Adapter，使用 subprocess 或公共 Python API 调用 CLI。
+- [x] 测试环境显式排除 `SKILL.md`、Codex 配置和真实 Agent runtime。
+- [x] 覆盖成功、mixed toolchain、schema 不兼容、离线更新和目标文件保留路径。
+- [x] 明确测试只证明 Core／CLI／Harness 合约，不证明模型读取或第三方平台兼容。
+
+Phase 3 仓库实现检查点已在候选分支完成：CLI 0.1.1 为三个命令提供 opt-in response envelope，
+JSON 模式使用稳定退出码 0／2／3／4／5／6／7；`adapters/harness-json/` 0.1.0 只接受白名单请求，
+清理 Agent／Provider 环境变量，并直接启动 Python CLI subprocess。Windows 本地专项与全仓回归已通过，
+但分支尚未 push，现有 Windows／Ubuntu CI 矩阵尚未对该提交运行。因此该检查点继续是
+`experimental`／`unreleased` candidate，跨 OS 验收完成前不启动 Phase 4。证据见
+[Phase 3 Harness JSON](../../validation/2026-08-21-platform-neutral-phase-3-harness-json.md)。
 
 验收证据：机器可读 fixture、JSON schema 测试、跨 Windows／Ubuntu CLI CI。
 

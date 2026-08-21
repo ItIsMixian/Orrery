@@ -11,6 +11,7 @@ from pathlib import Path
 from project_orrery_core import REQUIRED_SCAFFOLD_FILES
 
 from .context import CliContext, repository_context
+from .protocol import JsonExitCode, emit, issue, response
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -18,28 +19,37 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--target", type=Path, default=Path.cwd())
     parser.add_argument("--build", action="store_true", help="Build docs/_site/index.html; requires dependencies")
     parser.add_argument("--require-integrated", action="store_true", help="Fail unless the authority chain appears integrated")
+    parser.add_argument("--json", action="store_true", help="Emit the stable machine-readable response contract")
     return parser.parse_args(argv)
 
 
 def run(args: argparse.Namespace, context: CliContext) -> int:
     root = args.target.expanduser().resolve()
-    problems: list[str] = []
-    warnings: list[str] = []
+    problems: list[dict[str, object]] = []
+    warnings: list[dict[str, object]] = []
+    build_completed = False
+
+    def problem(code: str, message: str, **details: object) -> None:
+        problems.append(issue(code, message, **details))
+
+    def warning(code: str, message: str, **details: object) -> None:
+        warnings.append(issue(code, message, **details))
 
     for relative in REQUIRED_SCAFFOLD_FILES:
         if not (root / relative).is_file():
-            problems.append(f"missing required file: {relative}")
+            problem("required_file_missing", f"missing required file: {relative}", path=relative)
 
     for script in sorted((root / "scripts" / "docsite").glob("*.py")):
         try:
             source = script.read_text(encoding="utf-8")
             compile(source, str(script), "exec")
         except (OSError, SyntaxError) as exc:
-            problems.append(f"Python compile failed: {script.name}: {exc}")
+            problem("python_compile_failed", f"Python compile failed: {script.name}: {exc}", path=script.name)
 
     for path in [root / "AGENTS.md", *sorted((root / "docs").rglob("*.md"))]:
         if path.is_file() and re.search(r"\{\{[A-Z0-9_]+\}\}", path.read_text(encoding="utf-8")):
-            problems.append(f"unresolved template token: {path.relative_to(root).as_posix()}")
+            relative = path.relative_to(root).as_posix()
+            problem("unresolved_template_token", f"unresolved template token: {relative}", path=relative)
 
     gitignore = root / ".gitignore"
     safety_entries = (
@@ -52,36 +62,50 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
     ignored = gitignore.read_text(encoding="utf-8") if gitignore.is_file() else ""
     missing_ignores = [entry for entry in safety_entries if entry not in ignored]
     if missing_ignores:
-        warnings.append(".gitignore is missing safety entries: " + ", ".join(missing_ignores))
+        warning(
+            "gitignore_safety_entries_missing",
+            ".gitignore is missing safety entries: " + ", ".join(missing_ignores),
+            entries=missing_ignores,
+        )
 
     manifest_path = root / ".project-orrery.json"
     if manifest_path.is_file():
         try:
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             if manifest.get("toolchain_status") == "mixed":
-                warnings.append("viewer toolchain is marked partial/mixed")
+                warning("toolchain_mixed", "viewer toolchain is marked partial/mixed")
             legacy_manifest = manifest.get("name") == "project-orrery" and "manifest_format" not in manifest
             manifest_format = 1 if legacy_manifest else manifest.get("manifest_format")
             schema = manifest.get("document_schema", 1 if legacy_manifest else None)
             if legacy_manifest:
-                warnings.append("legacy v0.1 project manifest detected; rerun the current installer to record version dimensions")
+                warning(
+                    "legacy_project_manifest",
+                    "legacy v0.1 project manifest detected; rerun the current installer to record version dimensions",
+                )
             if manifest_format != context.release.project_manifest_format:
-                problems.append(
+                problem(
+                    "project_manifest_format_unsupported",
                     "unsupported .project-orrery.json format: "
-                    f"{manifest_format!r}; expected {context.release.project_manifest_format}"
+                    f"{manifest_format!r}; expected {context.release.project_manifest_format}",
+                    actual=manifest_format,
+                    expected=context.release.project_manifest_format,
                 )
             schema_rule = context.release.compatibility["document_schema"]
             if not isinstance(schema, int) or not schema_rule["minimum"] <= schema <= schema_rule["maximum"]:
-                problems.append(
+                problem(
+                    "document_schema_unsupported",
                     f"unsupported document schema: {schema!r}; supported range is "
-                    f"{schema_rule['minimum']}..{schema_rule['maximum']}"
+                    f"{schema_rule['minimum']}..{schema_rule['maximum']}",
+                    actual=schema,
+                    minimum=schema_rule["minimum"],
+                    maximum=schema_rule["maximum"],
                 )
             if manifest.get("toolchain_status") == "current" and not manifest.get("toolchain_version"):
-                warnings.append("current viewer toolchain has no recorded toolchain_version")
+                warning("toolchain_version_missing", "current viewer toolchain has no recorded toolchain_version")
         except json.JSONDecodeError:
-            warnings.append(".project-orrery.json is not valid JSON")
+            warning("project_manifest_invalid_json", ".project-orrery.json is not valid JSON")
     else:
-        problems.append("missing required file: .project-orrery.json")
+        problem("project_manifest_missing", "missing required file: .project-orrery.json", path=".project-orrery.json")
 
     agents_text = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").is_file() else ""
     progress_text = (root / "docs" / "PROGRESS.md").read_text(encoding="utf-8") if (root / "docs" / "PROGRESS.md").is_file() else ""
@@ -96,9 +120,12 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
     pending_marker = "migration pending" in progress_text.lower() or "迁移待" in progress_text
     integrated = accepted_adr and entrance_mapped and not pending_marker
     if not integrated:
-        warnings.append("authority migration is pending; scaffold presence is not formal adoption")
+        warning("authority_migration_pending", "authority migration is pending; scaffold presence is not formal adoption")
         if args.require_integrated:
-            problems.append("authority chain is not integrated: add an accepted project ADR and update AGENTS/PROGRESS")
+            problem(
+                "authority_not_integrated",
+                "authority chain is not integrated: add an accepted project ADR and update AGENTS/PROGRESS",
+            )
 
     if args.build and not problems:
         result = subprocess.run(
@@ -110,23 +137,65 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
             errors="replace",
         )
         if result.returncode:
-            problems.append("static build failed:\n" + (result.stdout + result.stderr).strip())
+            problem("static_build_failed", "static build failed:\n" + (result.stdout + result.stderr).strip())
         elif not (root / "docs" / "_site" / "index.html").is_file():
-            problems.append("static build reported success but docs/_site/index.html is missing")
+            problem(
+                "static_build_output_missing",
+                "static build reported success but docs/_site/index.html is missing",
+            )
+        else:
+            build_completed = True
 
     if problems:
+        if args.json:
+            exit_code = JsonExitCode.VALIDATION_FAILED
+            emit(
+                response(
+                    "validate",
+                    status="error",
+                    exit_code=exit_code,
+                    data={
+                        "target": str(root),
+                        "valid": False,
+                        "integrated": integrated,
+                        "build_requested": bool(args.build),
+                        "build_completed": build_completed,
+                    },
+                    warnings=warnings,
+                    errors=problems,
+                )
+            )
+            return int(exit_code)
         print("Project Orrery validation FAILED")
-        for problem in problems:
-            print(f"- {problem}")
-        for warning in warnings:
-            print(f"WARNING: {warning}")
+        for item in problems:
+            print(f"- {item['message']}")
+        for item in warnings:
+            print(f"WARNING: {item['message']}")
         return 1
 
     suffix = " + static build" if args.build else ""
-    print(f"Project Orrery scaffold structure valid{suffix}: {root}")
-    print("Authority status: integrated candidate" if integrated else "Authority status: migration pending")
-    for warning in warnings:
-        print(f"WARNING: {warning}")
+    if args.json:
+        emit(
+            response(
+                "validate",
+                status="warning" if warnings else "ok",
+                exit_code=JsonExitCode.OK,
+                data={
+                    "target": str(root),
+                    "valid": True,
+                    "integrated": integrated,
+                    "authority_status": "integrated_candidate" if integrated else "migration_pending",
+                    "build_requested": bool(args.build),
+                    "build_completed": build_completed,
+                },
+                warnings=warnings,
+            )
+        )
+    else:
+        print(f"Project Orrery scaffold structure valid{suffix}: {root}")
+        print("Authority status: integrated candidate" if integrated else "Authority status: migration pending")
+        for item in warnings:
+            print(f"WARNING: {item['message']}")
     return 0
 
 

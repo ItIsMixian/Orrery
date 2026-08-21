@@ -25,6 +25,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Codex Adapter 现在包含确定性 CLI 依赖 preflight：它按 manifest 检查 `project-orrery-cli` distribution、`>=0.1.0,<0.2.0` 版本和 `project-orrery` entrypoint；缺失与不兼容均非零退出，不回退到旧 Skill 实现。
 - 2026-08-21 使用 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21` 完成真实 binary E2E。首次检查因真实登录态同时发现 repo Adapter 与用户旧 Skill 而安全停止；后续使用 Codex `skills.config` 的 per-run 路径禁用项隔离旧 Skill，不复制凭据或修改用户 Skill 目录。模型可见目录只剩 repo Adapter，并以 `gpt-5.6-terra`／medium 完成显式与隐式路由、兼容 CLI 预检和 validate，以及 CLI distribution 缺失、0.2.0 不兼容时的失败关闭。
 - 同一 E2E 还验证旧 v0.2 Skill 只有显式 `--upgrade` 才迁移、升级前整树备份、可恢复卸载、backup／trash 不重复发现、卸载后 Adapter 为 0 项、项目作者 tree 不变和用户旧 Skill 摘要不变。Adapter 0.1.0 的上述精确 runtime／OS／Core 0.1.0／CLI 0.1.0／模型与审批范围标记 `verified`，但 Adapter 发行支持状态继续为 `experimental`，证据见 [Codex Runtime E2E 完成](../validation/2026-08-21-codex-runtime-e2e-completion.md)。Adapter 与独立 Core／CLI 仍未发布；v0.2.0 旧 Skill 仍是唯一已发布集成。
+- Phase 3 候选分支把未发布 CLI 从 0.1.0 提升到 0.1.1：`scaffold`、`validate` 和 `check-update` 保留原人类输出，并新增 schema v1 opt-in JSON envelope。JSON 模式稳定区分成功、非法请求、操作失败、验证失败、兼容失败、离线更新不可用和超时；Codex Adapter 的已验证历史仍精确绑定 CLI 0.1.0，不能因当前源码版本变化而改写。
+- 未发布 `adapters/harness-json/` 0.1.0 是 subprocess JSON 参考 Adapter：只接受固定参数白名单，不加载 `SKILL.md`、Codex 配置／登录态或 Agent runtime，并清理常见 Agent／Provider 环境变量。它在 Windows 候选工作树通过 dry-run、临时安装、validate、mixed toolchain、schema 不兼容、离线更新和作者文件保留；支持状态为 `experimental`，不构成第三方平台兼容声明。
 - ADR-0009 要求 Authority Meta Model 语义可版本识别，但当前 component／project／release manifest 都没有正式 `authority_model_version` 字段；具体兼容维度、所有者和迁移不在本轮决定中。
 - ADR-0007／ADR-0008 的多人协作协议已经进入权威链，但 `orrery worktree create/status/overlap`、review／cleanup 和 `orrery integrate` 仍只是 Approved Design 中的目标工具面；当前 CLI、Observatory、Skill 和发布资产都没有这些命令或 Personal／Team Mode，也没有升级版本或发布新产物。
 
@@ -46,10 +48,14 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `adapters/codex/scripts/install_adapter.py`
 - `scripts/package_codex_adapter.py`
 - `tests/test_codex_adapter.py`
+- `adapters/harness-json/adapter-manifest.json`
+- `adapters/harness-json/schemas/`
+- `adapters/harness-json/run_harness.py`
+- `tests/test_harness_json_adapter.py`
 
 ## 已知缺口
 
 - v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
-- Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Core／CLI 独立发行物、多组件发布流水线、manifest v2、Harness JSON 合约和跨 runtime 支持矩阵仍未实现。
+- Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Phase 3 Harness JSON 已有 Windows 候选实现与本地证据，但该提交尚无 Windows／Ubuntu CI 结果。Core／CLI 独立发行物、多组件发布流水线、manifest v2 和跨 runtime 支持矩阵仍未实现。
 - 多 Workstream 自动化尚无正式 schema、CLI、观测台投影、Team 网络面或 CI 门禁。当前仅能依靠 Git 原生命令、独立 worktree 和人工验证执行协议；默认安装没有因 ADR-0008 开始监听网络。
 - Authority Meta Model 仍是文档规范；没有独立发行物、Core API、CLI 命令或支持状态变化，v0.2.0 发布事实不变。

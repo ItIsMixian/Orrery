@@ -9,8 +9,9 @@
     },
     "cli": {
       "distribution": "project-orrery-cli",
-      "version": "0.1.0",
-      "core_api": 1
+      "version": "0.1.1",
+      "core_api": 1,
+      "json_schema_version": 1
     },
     "observatory": {
       "distribution": "project-orrery-observatory",
@@ -44,6 +45,20 @@
           "validation": "docs/validation/2026-08-21-codex-runtime-e2e-completion.md"
         }
       ]
+    },
+    "harness-json": {
+      "distribution": "project-orrery-harness-json-adapter",
+      "version": "0.1.0",
+      "adapter_api_version": 1,
+      "support_status": "experimental",
+      "core_api": 1,
+      "cli": {
+        "minimum": "0.1.1",
+        "maximum_exclusive": "0.2.0"
+      },
+      "request_schema_version": 1,
+      "response_schema_version": 1,
+      "runtime_evidence": []
     }
   },
   "legacy_compatibility": {

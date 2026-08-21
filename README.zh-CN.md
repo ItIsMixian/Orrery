@@ -66,9 +66,10 @@ Project Orrery 的核心工作流可以直接通过命令行运行。当前源�
 
 | 能力面 | 当前已有内容 | 支持状态 |
 | --- | --- | --- |
-| Core / CLI | installer、validator 和 update checker 可在没有 Codex runtime 的情况下直接调用；未发布源码包现已持有共享契约。 | 可移植源码与命令路径；尚未独立发布。 |
+| Core / CLI | installer、validator 和 update checker 可在没有 Codex runtime 的情况下直接调用；未发布源码包现已持有共享契约。CLI 0.1.1 在保留人类输出的同时新增 opt-in JSON response envelope。 | 可移植源码与命令路径；尚未独立发布。 |
 | Codex | v0.2.0 已提供打包好的旧 [Codex Skill](skills/project-orrery/)；工作树另有未发布的薄 [Codex Adapter](adapters/codex/) 与生命周期安装器。 | Adapter 发行状态仍为 `experimental` 且未发布；仅 Adapter 0.1.0 + Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21` + Windows 11 build 26200 + Core／CLI 0.1.0 及已记录模型／审批 runtime 范围为 `verified`。见 [runtime Validation](docs/validation/2026-08-21-codex-runtime-e2e-completion.md)。 |
-| 其他 Agent 与 Harness 平台 | 尚未发布平台 Adapter。 | `target`：在完成真实集成与 runtime 验证前，不宣称兼容。 |
+| Harness JSON | 工作树包含未发布的 [subprocess JSON 参考 Adapter](adapters/harness-json/)，可在没有 Agent runtime 时自动执行 scaffold、validate 和 update。 | `experimental`：Windows 候选测试通过，该提交仍待现有 Windows／Ubuntu CI 矩阵验证；不构成第三方平台声明。 |
+| 其他 Agent 平台 | 尚未发布平台 Adapter。 | `target`：在完成真实集成与 runtime 验证前，不宣称兼容。 |
 
 ## 快速开始
 
@@ -85,6 +86,8 @@ python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
 检查所有 `CREATE`、`SKIP`、`UPGRADE` 和 mixed-toolchain 警告，再去掉 `--dry-run` 正式安装。
 
 你可以直接运行这些命令，也可以让所使用的 Agent 或 Harness 执行同一套可审计流程。
+开发自动化可使用未发布的 `adapters/harness-json/` 参考实现：它接收版本化请求并返回稳定 JSON
+分类与退出码，不加载 Agent Skill 或 runtime，也不属于 v0.2.0 发布资产。
 
 ### 2. 可选：安装 Codex 集成
 
@@ -211,6 +214,7 @@ Project Orrery 对既有项目采取保守策略。
 | [`skills/project-orrery/references/`](skills/project-orrery/references/) | 权威架构与迁移契约 |
 | [`packages/`](packages/) | 未发布的平台中立 Core、CLI 与 Observatory 源码包 |
 | [`adapters/codex/`](adapters/codex/) | 未发布的薄 Codex Adapter、manifest、元数据与生命周期安装器 |
+| [`adapters/harness-json/`](adapters/harness-json/) | 未发布的 subprocess JSON 合约与参考 Harness Adapter |
 | [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | 版本化 Codex Adapter 归档与 checksum 构建器 |
 | [`docs/`](docs/) | Project Orrery 自身的自托管权威链、当前 State、验证与历史 |
 | [`docs/library/`](docs/library/) | 非权威研究、文献综述、实验方案与设计假设 |
