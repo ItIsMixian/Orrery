@@ -64,14 +64,14 @@
 
 **What**: 平台中立 Core／CLI／Observatory、Codex Skill 兼容入口和发布兼容契约。
 **Truth**: `packages/`, `adapters/codex/`, `skills/project-orrery/`, `scripts/package_release.py`, `scripts/package_codex_adapter.py`, `.github/workflows/`。
-**Dig**: [发布与工具链 State](docs/state/release-and-toolchain.md) | [ADR-0004](docs/decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [Approved Design](docs/design/platform-neutral-core-and-adapter-architecture.md)。
+**Dig**: [发布与工具链 State](docs/state/release-and-toolchain.md) | [ADR-0004](docs/decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0013](docs/decisions/0013-claude-code-and-deepseek-harness-adapters.md) | [Approved Design](docs/design/platform-neutral-core-and-adapter-architecture.md)。
 
 ## multi-worktree collaboration
 
 **ID**: `multi-worktree-collaboration`
 
 **What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅和干净集成。
-**Truth**: Git branch／HEAD／worktree 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；当前只实现人工隔离与集成流程，自动 session、overlap 与 integration 命令尚未实现。
+**Truth**: Git branch／HEAD／worktree 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；Phase 0 已有版本化协作 contract、Git fixture 与只读 CLI 检查，持久 session、写入守卫、overlap 与 integration 命令尚未实现。
 **Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
 
 ## context-routing research

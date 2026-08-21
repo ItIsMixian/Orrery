@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - ADR-0004 已接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime 证据门；Phase 1 已在工作树建立 Core／CLI／Observatory 源码包，但 Codex Skill 仍是当前唯一发布集成，也没有第二平台兼容实现。
 - ADR-0004 Phase 0 已完成：v0.2.0 的 36 个发布路径、8 个 managed tools、checksum、CLI 入口与 manifest 必需字段已进入机器可读基线；installer／validator／update checker 的人类输出有回归断言，模板 `AGENTS.md` 标题已中立化。
 - 公开 README 当前把可直接运行但仍随 Skill 分发的 Core／CLI 路径、整体仍为 `experimental`／未发布但精确 runtime 范围为 `verified` 的 Codex Adapter，以及 `target` 其他平台分开表述；这不构成独立 Core／CLI 包发布，也不得把验证范围外推到其他 runtime 或 OS。
-- 三个未发布组件初始版本均为 `0.1.0`；本分支 W1 Phase 0 Candidate 将 Core 提升到 0.1.1、CLI 提升到 0.1.6，Observatory 保持 0.1.0，Core API 仍为 1。旧 `skills/project-orrery/scripts/` 路径是薄 wrapper，并保留可独立运行的冻结 v0.2 fallback；保留承诺覆盖 `0.3.x`，最早 `0.4.0` 才可移除。
+- 三个未发布组件初始版本均为 `0.1.0`；本地 Canonical W1 Phase 0 将 Core 提升到 0.1.1、CLI 提升到 0.1.6，Observatory 保持 0.1.0，Core API 仍为 1。旧 `skills/project-orrery/scripts/` 路径是薄 wrapper，并保留可独立运行的冻结 v0.2 fallback；保留承诺覆盖 `0.3.x`，最早 `0.4.0` 才可移除。
 - Observatory 的 9 个当前 managed tools 由独立 component manifest 清点；根观测台与 Skill 模板之间的标题差异通过显式模板投影表达，不复制项目事实。
 - 工作树新增未发布的 Codex Adapter 0.1.0：独立 manifest、`SKILL.md`、`agents/openai.yaml`、安装说明与平台安装器位于 `adapters/codex/`；它只声明 Core API 1 与 CLI `>=0.1.0,<0.2.0` 依赖，不包含 canonical 模板、schema 或兼容规则。
 - `scripts/package_codex_adapter.py` 可生成固定条目顺序／时间／权限的独立 ZIP 和 SHA-256；平台安装器支持 dry-run、未知目录拒绝、旧 Skill／已识别 Adapter 整目录备份升级和移入可恢复回收目录的卸载。备份与回收目录位于 skills discovery 根之外，避免宿主重复发现旧 `SKILL.md`。
@@ -36,7 +36,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Candidate managed Observatory source/template 已投影同一默认关闭的 Authority shadow sidecar 接线；它只在显式环境开关下运行，且 package／manifest／scope／写入失败不改变 legacy HTML 或 stats。该 Candidate 工具变化没有改写 v0.2.0 release manifest、归档、checksum、installer 默认值或公开支持状态。
 - 同一 source/template 投影现已让 AI 派生视图消费压缩后的 shadow context，并在 JSON／正文／stream headers 标注非权威边界；缺省无 report 时失败关闭为 `Unknown`／`unavailable`。这仍是未发布 managed-tool 行为，不改变组件版本、v0.2.0 资产或公开支持声明。
 - Candidate source/template 还投影了单独的 shadow diagnostic view 开关；report-only 与默认构建保持原 HTML，只有显式 view opt-in 才注入不含 claim payload 的诊断面板。该变化同样没有修改组件版本、release manifest、归档、installer 或 v0.2.0 事实。
-- ADR-0007／ADR-0008 的 Phase 0 Candidate 已提供 versioned Core schema、dependency-free validation、只读 Git/config/subsystem/member/mode 解析和 `collaboration-contract` CLI；默认 Personal contract 明确所有网络能力关闭。`orrery worktree create/status/overlap`、session 写入、review／cleanup、`orrery integrate`、Observatory 与 Team runtime 仍只是后续目标，Skill／公开 v0.2.0 资产没有变化。
+- ADR-0007／ADR-0008 的 Phase 0 已进入本地 Canonical source，提供 versioned Core schema、dependency-free validation、只读 Git/config/subsystem/member/mode 解析和 `collaboration-contract` CLI；默认 Personal contract 明确所有网络能力关闭。`orrery worktree create/status/overlap`、session 写入、review／cleanup、`orrery integrate`、Observatory 与 Team runtime 仍只是后续目标，Skill／公开 v0.2.0 资产没有变化。
 
 ## 实现证据
 
@@ -88,6 +88,6 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 - v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
 - Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Phase 3 Harness JSON 已通过同一提交的 Windows／Ubuntu CI，但这只验收平台中立 CLI／Harness 合约。Core／CLI 独立发行物、多组件发布流水线、manifest v2 和跨 runtime 支持矩阵仍未实现。
-- 多 Workstream Phase 0 目前只是未发布 Candidate schema 与只读 CLI；尚无持久 session、写入守卫、Scope/path collector、finding 计算、观测台投影、Team 网络面或 CI 跨平台证据。默认安装和公开 Skill 没有因 ADR-0008 开始监听网络。
+- 多 Workstream Phase 0 已进入本地 Canonical source，但仍是未发布 schema 与只读 CLI；尚无持久 session、写入守卫、Scope/path collector、finding 计算、观测台投影、Team 网络面或 CI 跨平台证据。默认安装和公开 Skill 没有因 ADR-0008 开始监听网络。
 - Claude Code 尚未完成成功认证与模型调用；DeepSeek Harness 已有真实显式／隐式模型调用与模型侧 CLI 失败关闭，但普通 wheel CLI 的 source-assets 定位失败阻止完整兼容门。两者均无公开分发或跨版本支持承诺，任何 runtime 声明只在对应 Validation 的精确范围内成立。
 - Authority Meta Model 已有 fixture-bound Core evaluator、内部兼容判断、neutral CLI `validate` capability report、receipt-gated migration apply/restore、future-release projection contract、`check-update` migration review 与本地 release-candidate gate，但没有维护者选定的实际下一 SemVer／source manifest、M2.2 consumer production evidence、稳定顶层 Core API、独立发行物、Harness Adapter 迁移命令、managed Observatory banner 或发布支持状态变化；v0.2.0 发布事实不变。

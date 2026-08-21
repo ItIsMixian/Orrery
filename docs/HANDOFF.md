@@ -1,6 +1,6 @@
 # 跨会话交接
 
-Updated: 2026-08-21
+Updated: 2026-08-22
 
 ## 当前情况
 
@@ -39,10 +39,12 @@ Updated: 2026-08-21
 - 已完成 `Ariestar/sivtr@4fae091` 固定提交的源码观察并写入 Library。当前结论是其 WorkRecord／WorkRef／WorkSet、渐进检索和只读 MCP 可作为情境证据层参考，但不能替代 Orrery 权威链；没有采纳依赖、Adapter、路由策略或新 Pilot。
 - 三个 Agent 在同一 `main@96eee5a` 工作目录留下的交错改动已先封存到 `codex/recovery-shared-main-20260820@a87c5a4`，再在 `D:\coding warehouse\project-orrery-integration-20260820` 拆分为研究、产品、Library 和权威状态提交。恢复分支不可改写或删除。
 - ADR-0007 已接受 Workstream 隔离、Canonical／Candidate／Worktree 作用域和干净集成规则；ADR-0008 又接受 default Personal Mode、opt-in Team Mode、Local-only telemetry 与中央只读／本机执行边界。两者都不证明自动化已经实现。完整动态回归仍为 61/61，默认 59 passed + 2 expected skips；本轮新增协作 Design 只做文档级验证，没有新 Release。
-- 自动 session、overlap、主 worktree 守卫、`orrery integrate` 与观测台 scope banner 尚未实现。三个后续 Agent 必须各自进入新分配的 worktree，不能继续复用原共享目录。
+- 协作 Phase 0 的版本化 schema、Git fixture、integration ref／主 worktree 解析、subsystem registry 与只读 `collaboration-contract` 已进入本地 Canonical source。持久 session、overlap、主 worktree 守卫、`orrery integrate` 与观测台 scope banner 尚未实现；后续 Agent 仍必须各自进入独立 worktree。
 - 已分配目录：context-routing 使用 `D:\coding warehouse\project-orrery-agent-context-routing`，platform／adapters 使用 `D:\coding warehouse\project-orrery-agent-platform-adapters`，docsite／broker 使用 `D:\coding warehouse\project-orrery-agent-docsite`。三者都是 clean linked worktree；尚未创建 session，开始新任务时再声明 expected writes 与 validation。
-- 协作 Design 已完成产品层收敛：Agent-first／Orrery-first 混合入口、subsystem mapping、Scope B、finding／ack、双维度状态、风险审查包、人工集成、保守清理和 Personal／Team 渐进指挥台均已进入 Approved Design。下一步只做 Personal foundation Phase 0，不直接实现 Team 网络层。
+- 协作 Design 已完成产品层收敛：Agent-first／Orrery-first 混合入口、subsystem mapping、Scope B、finding／ack、双维度状态、风险审查包、人工集成、保守清理和 Personal／Team 渐进指挥台均已进入 Approved Design。Phase 0 已进入本地 Canonical source；下一步只做 Personal Phase 1 的 worktree identity 与私有 session，不直接实现 Team 网络层。
 - ADR-0009／0010／0011 与活动 Plan 已把 Authority Meta Model 推进到 `origin/main` 的 experimental M2 source baseline：M1 的 fixture／Core／兼容／迁移基础上，M2.1 完整内部 CLI claims、M2.2 root-only opt-in Observatory projection 和 M2.3 release-candidate gate 均已通过独立 worktree验证、干净集成与双平台 CI。AUTH-4 已解决为平台中立 Core；AUTH-1 仍 pending。当前仍无稳定公共 domain API、默认 production projection、维护者选定的下一 SemVer／manifest 或公开模型 1 release。
+- ADR-0013 已将 Claude Code 与 DeepSeek Harness 选为相互独立的 Phase 4 Adapter。源码候选均为 0.1.0、`experimental`／`unreleased`；Claude Code 2.1.87 只证明 Plugin／Skill 发现后认证前失败关闭，DeepSeek Harness rc.8 已证明真实显式／隐式模型路由与失败关闭，但普通 wheel CLI 的 Observatory assets 定位缺陷仍阻止 `verified`。
+- W1 和第二平台 Adapter 原本分别位于 `codex/w1-personal-core-contract` 与 `codex/claude-deepseek-adapters`。2026-08-22 在独立整合分支按 W1→P3 顺序吸收；旧 P3 分支占用的 ADR-0010 已重编号为 ADR-0013，Authority ADR-0010／0011／0012 保持不变。当前本地 `main` 尚未推送本轮整合，也没有 tag、Release 或公开支持提升。
 
 ## 风险与常见陷阱
 
@@ -87,7 +89,7 @@ Updated: 2026-08-21
    只读 2/3 复核一起解释。
 7. 下一步先按[任务／Oracle v0.2](../experiments/context-routing/designs/real-development-task-oracle-v0.2.zh-CN.md)
    建立无模型 controls。Pilot 010 尚未创建，也没有自动补跑授权。
-8. 平台适配工作先读取 [ADR-0004](decisions/0004-platform-neutral-core-and-adapter-boundaries.md)、[Approved Design](design/platform-neutral-core-and-adapter-architecture.md)、[Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)、[Runtime E2E 完成记录](validation/2026-08-21-codex-runtime-e2e-completion.md)和[Phase 3 Harness JSON](validation/2026-08-21-platform-neutral-phase-3-harness-json.md)。Phase 0–3 已完成；下一步若获授权才为 Phase 4 选择第二平台，不能把 Harness CI 外推为 runtime 证据或组件发布。
+8. 平台适配工作先读取 [ADR-0004](decisions/0004-platform-neutral-core-and-adapter-boundaries.md)、[ADR-0013](decisions/0013-claude-code-and-deepseek-harness-adapters.md)、[Approved Design](design/platform-neutral-core-and-adapter-architecture.md)、[Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)和[DeepSeek Runtime Validation](validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md)。Phase 4 源码候选已进入本地 Canonical source；下一步先修复普通 wheel CLI 的 Observatory assets 定位，再补跑精确兼容门，不能把 editable 成功外推为 `verified` 或组件发布。
 9. docsite 安全接续先读取 [ADR-0003](decisions/0003-provider-bound-credentials-and-optional-local-broker.md)、[ADR-0006](decisions/0006-broker-only-docsite-provider-gateway.md)、[Broker-first Design](design/broker-first-docsite-provider-gateway.md)和[Validation](validation/2026-08-19-broker-first-docsite-gateway.md)；公开 v0.2.0 尚不包含这些工作树改动。
 10. 若继续研究外部工作记忆层，先读取 [sivtr 观察](library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)；除非用户明确接受新的 ADR／Plan，不安装 sivtr、不扫描真实 transcript、不修改 Scope Router，也不自动创建 Pilot 010。
 11. 多人协作先读取 [ADR-0007](decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)、[Approved Design](design/multi-worktree-collaboration-protocol.md)、[活动 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)和[恢复 Validation](validation/2026-08-20-multi-worktree-recovery-and-manual-adoption.md)。后续任务只在独立 worktree 中继续，根 `PROGRESS`／`HANDOFF` 由整合者同步。

@@ -307,3 +307,10 @@
 - `@deepseek-ai/dsh 0.1.0-rc.8`、`deepseek-official`／`deepseek-v4-flash` 完成显式 `/project-orrery`、隐式 `skill({name: project-orrery})`、CLI distribution 缺失 exit 3 和 0.2.0 不兼容 exit 4；失败路径均无 fallback。
 - editable source CLI 0.1.1 的 preflight／validate 通过；普通 wheel CLI 同版本在 `validate` 前因无法定位 source-owned Observatory assets 失败，证明 version preflight 不能替代可执行兼容证据。
 - 六个模型 turn 后，隔离 Adapter remove／restore／final remove 的 runtime discovery 为 0→1→0，424 个作者 fixture 文件逐字节一致。由于 wheel blocker，支持状态继续为 `experimental`／`unreleased`，`verified` 不提升。
+
+## 2026-08-22 — W1 与第二平台 Adapter 干净整合
+
+- 从 clean `main@8df974f` 建立独立 integration worktree，先 no-ff 合入 W1，再重放 Claude／DeepSeek 两个逻辑提交；两个来源没有共享工作目录，原分支与 worktree 均保留。
+- 旧平台分支的 Phase 4 `ADR-0010` 与主线 Authority ADR 编号冲突，整合时分配为 ADR-0013，并保留 0010–0012 的既有含义。
+- 全局 State／PROGRESS／HANDOFF 由唯一整合者合并：W1 只提升到本地 Canonical Phase 0，Adapter 仍是未发布 experimental source；没有推送、tag、Release 或支持状态提升。
+- 联合专项首次暴露 Authority amendment 期望未包含 ADR-0013；补齐冻结关系后 31/31 通过，最终全仓与结构验收见[整合 Validation](validation/2026-08-22-w1-and-second-platform-adapters-integration.md)。

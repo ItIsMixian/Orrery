@@ -28,6 +28,7 @@ Updated: 2026-08-22
 - Phase 3 新增 `tests/test_harness_json_adapter.py` 六项回归，保护 manifest／schema／组件版本投影、确定性 scaffold dry-run、临时安装与 validate、作者入口保留、mixed toolchain 和升级备份预演、schema 不兼容、离线无缓存更新、非法参数拒绝，以及不加载 `SKILL.md`／Codex 配置／Agent runtime 的隔离声明。
 - Phase 4 新增 `tests/test_claude_code_adapter.py` 与 `tests/test_deepseek_harness_adapter.py`，保护 manifest／组件版本投影、薄 Adapter 内容、确定性 ZIP／npm-compatible TGZ、checksum、隔离生命周期与 CLI 缺失／不兼容失败关闭；真实 runtime 证据与单元测试证据分开记录。
 - 2026-08-22 DeepSeek Stage B 使用真实 `deepseek-official`／`deepseek-v4-flash` 完成 6 个模型 turn：显式 editable route、隐式 `skill` route、CLI distribution 缺失、不兼容以及普通 wheel source-assets 失败；生命周期 probe 为 0→1→0，作者 fixture 424/424 字节一致。
+- W1／第二平台干净整合首次全仓 247 项中仅 ADR-0013 amendment 冻结期望未同步而失败；补入 `ADR-0013 amends ADR-0004` 后联合专项 31/31、最终全仓 242 PASS + 5 expected skips。integrated structure、隔离静态站、295 份 Markdown／765 个本地链接和 diff 检查通过。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
@@ -123,6 +124,7 @@ Updated: 2026-08-22
 - [2026-08-21 Claude Code Adapter Stage B 认证阻塞](../validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md)
 - [2026-08-21 DeepSeek Harness Adapter Stage B 凭据边界](../validation/2026-08-21-deepseek-harness-adapter-stage-b-credential-blocked.md)
 - [2026-08-22 DeepSeek Harness Adapter Stage B Runtime](../validation/2026-08-22-deepseek-harness-adapter-stage-b-runtime.md)
+- [2026-08-22 W1 与第二平台 Adapter 本地集成](../validation/2026-08-22-w1-and-second-platform-adapters-integration.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`

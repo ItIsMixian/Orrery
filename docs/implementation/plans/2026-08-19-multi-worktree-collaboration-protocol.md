@@ -61,9 +61,9 @@ Approved Design: [多人／多 worktree 协作协议](../../design/multi-worktre
 - [x] 为 Member 基础身份和 Reviewer／Integrator／Admin capability 定义可组合权限 schema、bootstrap maintainer、授予／撤销审计与本地凭据失效规则。
 - [x] 定义 `personal`／`team` project mode；默认 personal 使用隐式本地成员和全部本地 capability，且证明没有网络监听、发现、Coordinator、成员认证或团队同步依赖启动。
 
-Candidate checkpoint（2026-08-22）：上述 Phase 0 项已在独立分支提交 `4ae4f0a` 实现并通过
-[专项 Validation](../../validation/2026-08-22-personal-collaboration-phase-0.md)。这仍是 Candidate，
-尚未进入 integration ref、发布包或 Team 网络层；Phase 1–5 的未勾选项不因 schema 存在而视为实现。
+Canonical checkpoint（2026-08-22）：上述 Phase 0 项由独立分支提交 `4ae4f0a` 实现，通过
+[专项 Validation](../../validation/2026-08-22-personal-collaboration-phase-0.md)后经干净整合进入本地
+`main`。它仍未进入发布包或 Team 网络层；Phase 1–5 的未勾选项不因 schema 存在而视为实现。
 
 ### Phase 1 — 身份与 session
 

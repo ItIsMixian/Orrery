@@ -17,7 +17,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 原始运行由仓库内 `experiments/context-routing/harness/raw-evidence-retention-policy.json` 与 `seal_raw_evidence.py` 管理 manifest、校验和、分类和到期状态；工具不自动删除。
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - Codex Adapter 0.1.0 的发行支持状态仍为 `experimental`／未发布；其 runtime manifest 只对 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`。
-- 本分支 Candidate 已在平台中立 Core 0.1.1 冻结 `project-orrery-collaboration-v1`：worktree identity、Workstream session、Scope、overlap finding、integration report、subsystem registry、Member capability 和 project mode 共用一套 schema；CLI 0.1.6 新增只读 `collaboration-contract` 检查，不实现 Phase 1 的 session 写入或 worktree 创建。
+- 本地 Canonical source 已在平台中立 Core 0.1.1 冻结 `project-orrery-collaboration-v1`：worktree identity、Workstream session、Scope、overlap finding、integration report、subsystem registry、Member capability 和 project mode 共用一套 schema；CLI 0.1.6 新增只读 `collaboration-contract` 检查，不实现 Phase 1 的 session 写入或 worktree 创建。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 已形成 0.1.0、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。Claude Code 已证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 已证明 profile Bundle、Skill catalog 与显式 Skill 注入，成功模型调用和 CLI 路由仍须按各自证据范围判断。
 
 ## 当前边界
@@ -67,5 +67,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- Phase 0 只建立 Candidate contract、只读 Git identity/config 解析、subsystem registry 和合成 fixture；私有 session 持久化、主目录写入守卫、实际 Scope/path 采集、自动 overlap finding、integration/review/cleanup 命令、Observatory 投影与 Team 网络层仍未实现，不能宣称多 Agent 协调闭环已经完成。
+- Phase 0 只建立本地 Canonical contract、只读 Git identity/config 解析、subsystem registry 和合成 fixture；私有 session 持久化、主目录写入守卫、实际 Scope/path 采集、自动 overlap finding、integration/review/cleanup 命令、Observatory 投影与 Team 网络层仍未实现，不能宣称多 Agent 协调闭环已经完成。
 - Claude Code／DeepSeek Harness Adapter 尚未公开发布；Claude 仍缺成功认证后的模型调用与 CLI 路由证据，DeepSeek 的证据范围以对应 runtime Validation 为准，不得外推到其他版本、OS 或隐式选择场景。
