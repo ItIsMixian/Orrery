@@ -21,9 +21,10 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - Candidate Observatory 另有未导出的 role shadow adapter，按受控目录观察 Design／Plan／State／Validation：Design 只识别 Draft／Approved／Deprecated；Plan 只产生 `planned`，State 只产生 `current`，两者都不产生 implementation claim；Validation 只有精确 `Result: Passed/Failed` 或 `Outcome:` 才产生明确结果，文档存在、`Status:` 与自由文本保持 `Unknown`。
 - Candidate Observatory 现有未导出的 runtime bridge：它先调用真实 legacy `render_site()`，再对同一 docs snapshot 运行 ADR 与 role shadow，返回独立 report；专项证明 HTML 字节、legacy stats 与失败路径均不被 experimental evaluator 改写。
 - Candidate managed `build_docsite.py` 与 `serve.py` 已增加默认关闭的内部运行时接线：只有维护者显式设置 `ORRERY_AUTHORITY_SHADOW_REPORT` 才会调用该 bridge 并原子写入 disposable JSON sidecar；缺省运行继续精确走 legacy renderer，非法 scope、缺失 package、manifest／evaluator 或 sidecar 写入失败都不切换 HTML、stats 或服务启动权威。
+- Candidate `docsite_insights.py`／`build_docsite.py` 另有独立默认关闭的 `ORRERY_AUTHORITY_SHADOW_VIEW=1` 诊断投影：它只显示 shadow comparison 状态、fact scope、model status、difference／unresolved relation／Validation Unknown 计数，并明确标记 `authority-shadow-diagnostic`、`authoritative=false`、`production-switched=false`。默认与 report-only 路径仍返回 legacy HTML；面板不读取或展示 effective/current/implemented/validated claim payload。
 - Candidate AI 派生视图已消费这一可选 sidecar 的压缩 context：Q&A、briefing、roadmap、milestones 与 radar 的成功／失败 JSON 都附带系统生成的 `derived-ai-view` 非权威 receipt，问答正文有可见说明，streaming response 有 view/status header。没有 report 时保持 `Unknown`／`unavailable`，只有 Candidate shadow 时保持 `shadow-only`；Local-only／Unknown 不得被推为 Canonical、源码事实、effective/current/implemented/validated。该边界阻止 AI 输出在系统中升级权威，不保证模型自然语言本身永不出错。
-- 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 37 个 Validation；现有 Validation 的严格结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
-- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 已有 Accepted ADR 运行时 shadow和只读 model capability report，Observatory 已完成包级 ADR lifecycle/relation/role、runtime bridge、内部 status signal、opt-in managed shadow sidecar 与 AI derived-view non-escalation；没有稳定顶层 API、默认启用的 managed Authority projection、consumer production switch、公开 release/installer projection 或发布实现，也不是 Canonical State 的实现声明。
+- 当前仓库 shadow 输入包含 7 个 Design、12 个 Plan、6 个 State 和 38 个 Validation；现有 Validation 的严格结果全部保持 `Unknown`，因此不会因旧自然语言记录误报验证通过。该结果只表示严格 collector 的 Candidate 输出，不否定各 Validation 正文中的人工证据。
+- 当前 evaluator 是 experimental、fixture-bound 的 Candidate implementation：CLI 已有 Accepted ADR 运行时 shadow和只读 model capability report，Observatory 已完成包级 ADR lifecycle/relation/role、runtime bridge、内部 status signal、opt-in managed shadow sidecar／诊断面板与 AI derived-view non-escalation；没有稳定顶层 API、默认启用的 managed Authority projection、consumer production switch、公开 release/installer projection 或发布实现，也不是 Canonical State 的实现声明。
 - Gate B 已由 [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md) 解决。9-case `compatibility.json` 覆盖 field absent、public model 1、known unsupported、unknown newer、数值 gap、离散 model 3 和三类非法值，并冻结普通工具升级不得选择模型、manifest/document schema 不随首版模型变化。
 - Candidate Core 内部 `authority_compatibility.py` 已实现 provider-neutral capability judgment：显式区分 `legacy-unversioned`、`supported`、`unsupported-known`、`unsupported-newer`、`unsupported-unknown` 与 `invalid`；不支持时只保留 read-only browsing，并禁止推导 effective/current/implemented/validated。`eligible` 只表示可进入严格 conformance 评估，不表示验证已经通过。
 - Neutral CLI validator 已消费该 Core judgment，向人类与稳定 JSON 合约只读报告 `authority_model` capability：legacy 在普通验证中警告、在 `--require-integrated` 中失败；unsupported／invalid 始终失败关闭。顺带修复 Authority shadow 警告混入字符串、破坏 JSON issue contract 的缺陷。
@@ -100,6 +101,8 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - `scripts/docsite/docsite_qa.py` 与 `scripts/docsite/serve.py`（Candidate AI derived-view guard／receipt）
 - `tests/test_authority_ai_derived_view.py`
 - `docs/validation/2026-08-21-authority-ai-derived-view-constraints.md`
+- `scripts/docsite/docsite_insights.py` 与 `scripts/docsite/build_docsite.py`（Candidate shadow diagnostic projection）
+- `docs/validation/2026-08-21-authority-shadow-diagnostic-projection.md`
 
 ## 已知缺口
 
@@ -107,9 +110,9 @@ Approved Design: [Authority Meta Model 语义设计](../design/authority-meta-mo
 - 仅有区域级盘点；尚未形成逐函数／逐规则的 machine-readable inventory 或 drift 判定。
 - CLI shadow 当前只比较 `accepted_adr`；`entrance_mapped`、`pending_marker` 与 `integrated` 仍被明确标为 legacy adoption heuristics，尚未进入 Meta Model evaluator。
 - CLI 尚未解析完整 ADR lifecycle／supersede／amend、Implementation／State／Validation 或 evidence provenance。
-- Observatory lifecycle/relation/role shadow 与 runtime bridge 已有 opt-in managed sidecar 接线，但默认关闭且完全不进入 HTML／stats；`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
+- Observatory lifecycle/relation/role shadow 与 runtime bridge 已有 opt-in managed sidecar 与独立诊断面板接线，但默认关闭；诊断面板只显示 comparison health／scope／计数，不进入 legacy stats，也不消费 claim payload。`predecessors`、普通 ADR refs 与 State refs 仍明确属于 legacy graph/reference heuristics，页面 graph 尚未消费 Core effective-decision 或 role claim 结果。
 - Role shadow 目前只解释文档角色与严格头部元数据，不验证 Validation 正文命令是否真正执行，也不从 State 自由文本推导 implementation present/absent。
-- Runtime bridge 可由 Candidate package/test harness 或维护者显式环境开关调用；模板仅投影同一默认关闭的接线，在实际下一 release 与旧项目兼容完成独立验证前不默认启用，也不进入页面 authority projection。AI 已有非权威 context／receipt，但其语义仍受可见证据限制，不能替代确定性 evaluator 或人工审阅。
+- Runtime bridge 可由 Candidate package/test harness 或维护者显式环境开关调用；模板仅投影同一默认关闭的接线，在实际下一 release 与旧项目兼容完成独立验证前不默认启用。当前页面只支持明确标注的 shadow diagnostic，不是 Authority production projection。AI 已有非权威 context／receipt，但其语义仍受可见证据限制，不能替代确定性 evaluator 或人工审阅。
 - Compatibility judgment 已接入 neutral CLI validator 的只读报告、`check-update` 的 future-release migration review 和 Candidate Observatory runtime bridge 的内部 status signal；future release/project projection contract 已进入 Core 与 fixture，但当前 v0.2.0 release manifest、standalone installer 和 managed Observatory banner 仍未声明模型。self-host 项目已显式选择模型 1，通用迁移已有 receipt-gated dry-run/apply/restore、精确备份与故障恢复证据；尚无实际下一 release 投影。
 - 尚无 consumer production switch、公开 release／installer 模型投影或 Canonical runtime release Validation；Harness JSON Adapter v1 也尚未暴露迁移命令。
 - Fixture 与 Core evaluator 目前只在 Candidate worktree 中；尚未经干净 integration worktree 合并为 Canonical baseline。

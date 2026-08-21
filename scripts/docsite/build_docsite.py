@@ -1503,6 +1503,73 @@ def _write_authority_shadow_report(path: Path, report: dict) -> None:
             Path(temporary_name).unlink(missing_ok=True)
 
 
+def _authority_shadow_view_enabled() -> bool:
+    return os.environ.get("ORRERY_AUTHORITY_SHADOW_VIEW", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _build_authority_shadow_diagnostic_panel(report: dict) -> str:
+    insight = di.compute_authority_shadow_insights(report)
+    labels = {
+        "match": "一致",
+        "mismatch": "有差异",
+        "unknown": "Unknown",
+        "unavailable": "不可用",
+    }
+    status = str(insight["status"])
+    notices = "".join(
+        "<li>%s</li>" % esc(notice) for notice in insight["notices"]
+    )
+    metrics = (
+        '<span style="margin-right:14px">差异 <b>%d</b></span>'
+        '<span style="margin-right:14px">未解析关系 <b>%d</b></span>'
+        '<span>Validation Unknown <b>%d</b></span>'
+        % (
+            insight["difference_count"],
+            insight["unresolved_relation_count"],
+            insight["validation_unknown_count"],
+        )
+    )
+    return (
+        '<section id="authority-shadow-diagnostic" '
+        'data-view-type="authority-shadow-diagnostic" '
+        'data-authoritative="false" data-production-switched="false" '
+        'style="margin:0 0 16px;padding:14px 16px;border:1px dashed #b083f0;'
+        'border-radius:12px;background:rgba(176,131,240,.08)">'
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'
+        '<b>🧭 Authority Shadow · 非权威诊断</b>'
+        '<span class="chip">%s</span><span class="chip">scope: %s</span>'
+        '<span class="chip">model: %s</span></div>'
+        '<div style="margin-top:9px;font-size:13px">%s</div>'
+        '<ul style="margin:9px 0 0;padding-left:20px;font-size:13px;line-height:1.65">%s</ul>'
+        '<div style="margin-top:8px;font-size:12px;opacity:.8">'
+        '仅显示 Candidate shadow 的比较健康度；不创建或改变 State、ADR、Implementation、Validation。</div>'
+        '</section>'
+        % (
+            esc(labels.get(status, status)),
+            esc(insight["fact_scope"]),
+            esc(insight["authority_model_status"]),
+            metrics,
+            notices,
+        )
+    )
+
+
+def _inject_authority_shadow_diagnostic(page: str, report: dict) -> str:
+    marker = (
+        '<article class="page wide on" id="dashboard" '
+        'data-kind="dashboard" data-title="总览">'
+    )
+    if marker not in page:
+        raise ValueError("dashboard projection marker not found")
+    panel = _build_authority_shadow_diagnostic_panel(report)
+    return page.replace(marker, marker + panel, 1)
+
+
 def _render_site_for_runtime(
     docs_dir: Path,
     agents_file: Path,
@@ -1519,7 +1586,8 @@ def _render_site_for_runtime(
     """
 
     report_target = os.environ.get("ORRERY_AUTHORITY_SHADOW_REPORT", "").strip()
-    if not report_target:
+    view_enabled = _authority_shadow_view_enabled()
+    if not report_target and not view_enabled:
         page, stats = render_site(docs_dir, agents_file, root, title)
         return page, stats, None
 
@@ -1568,13 +1636,32 @@ def _render_site_for_runtime(
         report = dict(report)
         report["report_schema"] = "authority-shadow-report-v1"
 
-    try:
-        _write_authority_shadow_report(Path(report_target), report)
-    except Exception as error:
-        print(
-            "WARNING: authority shadow report was not written: %s: %s"
-            % (type(error).__name__, error)
-        )
+    if view_enabled:
+        try:
+            page = _inject_authority_shadow_diagnostic(page, report)
+        except Exception as error:
+            report["derived_view"] = {
+                "status": "unavailable",
+                "authoritative": False,
+                "production_behavior_switched": False,
+                "error": {"type": type(error).__name__, "message": str(error)},
+            }
+        else:
+            report["derived_view"] = {
+                "status": "rendered",
+                "view_type": "authority-shadow-diagnostic",
+                "authoritative": False,
+                "production_behavior_switched": False,
+            }
+
+    if report_target:
+        try:
+            _write_authority_shadow_report(Path(report_target), report)
+        except Exception as error:
+            print(
+                "WARNING: authority shadow report was not written: %s: %s"
+                % (type(error).__name__, error)
+            )
     return page, stats, report
 
 

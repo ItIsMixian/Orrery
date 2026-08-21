@@ -145,3 +145,108 @@ def compute_insights(adrs, state_docs, subs, resolver, docs_dir: Path,
 
     return {"items": items, "recent": recent, "have_git": have_git,
             "counts": {s: sum(1 for it in items if it["sev"] == s) for s in ("high", "med", "low")}}
+
+
+def compute_authority_shadow_insights(report):
+    """Return a bounded diagnostic projection of an Authority shadow report.
+
+    The result deliberately excludes claims, relations and effective-decision
+    payloads.  It can describe comparison health, visible scope and unresolved
+    inputs, but it cannot become a project fact or a production switch.
+    """
+
+    result = {
+        "view_type": "authority-shadow-diagnostic",
+        "authoritative": False,
+        "creates_project_facts": False,
+        "production_behavior_switched": False,
+        "status": "unavailable",
+        "fact_scope": "unknown",
+        "authority_model_status": "unavailable",
+        "difference_count": 0,
+        "unresolved_relation_count": 0,
+        "validation_unknown_count": 0,
+        "notices": [],
+    }
+    if not isinstance(report, dict):
+        result["notices"].append("没有可见的 Authority shadow report。")
+        return result
+    if report.get("production_behavior_switched") is not False:
+        result["notices"].append(
+            "该 report 不满足 Candidate shadow-only 边界，诊断投影已失败关闭。"
+        )
+        return result
+
+    model = report.get("authority_model", {})
+    shadow = report.get("shadow", {})
+    if not isinstance(model, dict):
+        model = {}
+    if not isinstance(shadow, dict):
+        shadow = {}
+    model_status = str(model.get("status") or "unavailable")
+    scope = str(shadow.get("fact_scope") or "unknown")
+    if scope not in (
+        "canonical",
+        "candidate",
+        "worktree",
+        "local-only",
+        "historical",
+        "unknown",
+    ):
+        scope = "unknown"
+    status = str(shadow.get("status") or "unavailable")
+    if status not in ("match", "mismatch", "unknown", "unavailable"):
+        status = "unavailable"
+
+    adr = shadow.get("adr", {})
+    roles = shadow.get("roles", {})
+    comparison = adr.get("comparison", {}) if isinstance(adr, dict) else {}
+    role_contract = roles.get("role_contract", {}) if isinstance(roles, dict) else {}
+    relation_contract = (
+        comparison.get("relation_contract", {})
+        if isinstance(comparison, dict)
+        else {}
+    )
+    differences = (
+        comparison.get("differences", []) if isinstance(comparison, dict) else []
+    )
+    unresolved = (
+        relation_contract.get("unresolved_targets", [])
+        if isinstance(relation_contract, dict)
+        else []
+    )
+    validation_unknown = (
+        role_contract.get("validation_unknown", [])
+        if isinstance(role_contract, dict)
+        else []
+    )
+
+    result.update(
+        {
+            "status": status,
+            "fact_scope": scope,
+            "authority_model_status": model_status,
+            "difference_count": len(differences) if isinstance(differences, list) else 0,
+            "unresolved_relation_count": len(unresolved) if isinstance(unresolved, list) else 0,
+            "validation_unknown_count": (
+                len(validation_unknown) if isinstance(validation_unknown, list) else 0
+            ),
+        }
+    )
+    if status == "match":
+        result["notices"].append(
+            "可见输入的 shadow comparison 一致；这不等于实现或验证通过。"
+        )
+    elif status == "mismatch":
+        result["notices"].append("检测到 legacy 与 Candidate evaluator 的差异。")
+    elif status == "unknown":
+        result["notices"].append("可见证据不足，结论保持 Unknown。")
+    else:
+        error = shadow.get("error", {})
+        error_type = error.get("type") if isinstance(error, dict) else None
+        result["notices"].append(
+            "Authority shadow 不可用%s。"
+            % (("（%s）" % error_type) if error_type else "")
+        )
+    result["notices"].append("事实作用域：%s。" % scope)
+    return result
