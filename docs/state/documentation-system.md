@@ -31,6 +31,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 手动刷新、设置与问答写操作都要求同源 POST；旧查询参数 GET 不再触发模型调用。
 - Canonical W1 Phase 0 已为 `AGENTS.md` 的七个 subsystem 区块增加显式稳定 ID。Core registry parser 只读取这些 ID 与已有 `docs/state/*.md` 链接；重复／保留 ID 或缺失 State Doc 失败关闭，并且不会因路径推断创建新 State。该 registry 是权威入口的机器投影，不是新的作者事实源。
 - W1.1 Candidate 把 Workstream session 保存为 Git 私有、可重建运行元数据，并由只读 CLI 从 Git 机械派生 branch／OID／dirty／scope 摘要与 stale 原因；它不进入作者文档，不要求 Agent 固定生成 Manifest／Receipt，也不会把 session 升级为 State、Plan 或 Validation。
+- W1.2 Candidate 创建 linked worktree 时由 Core／CLI 机械记录固定 integration OID、branch、worktree 路径与 Git-private session，并由 guard 机械返回 allow／block reason；Agent 不需要生成创建回执。该 JSON 是 Candidate 执行证据，不会自动改写 State／Plan／Validation 或根进度入口。
 
 ## 同步状态
 
@@ -62,6 +63,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - 尚未实现 provider-neutral `docs audit`、finding schema／registry、project soft budget、acknowledge／defer storage 或自动检查 State／实现链接是否过期的机制；当前只有 Accepted ADR、Approved Design、活动 Plan 和人工自托管规则。
-- W1.1 Candidate CLI 已能报告 branch、HEAD、integration OID、merge base、ahead／behind、dirty fingerprint／计数、主 worktree、fact scope 和私有 session freshness；观测台尚未消费该合约，也没有自动重叠报告、审查包、清理建议或 Team Mode runtime。因此当前协作执行仍依赖入口规则、独立目录和集成者审阅。
+- W1.2 Candidate CLI 已能报告既有 W1.1 status/session，并可创建固定 integration OID 的 linked worktree、初始化私有 session、执行 primary-write preflight；Adapter 尚未强制接线，观测台也未消费该合约，仍没有自动重叠报告、审查包、清理建议或 Team Mode runtime。因此当前协作执行仍依赖入口规则、显式 guard、独立目录和集成者审阅。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

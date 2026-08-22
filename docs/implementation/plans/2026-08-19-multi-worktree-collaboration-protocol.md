@@ -67,14 +67,15 @@ Canonical checkpoint（2026-08-22）：上述 Phase 0 项由独立分支提交 `
 
 ### Phase 1 — 身份与 session
 
-- [ ] 实现 `orrery worktree create` 的平台中立核心。
+- [x] 实现 `orrery worktree create` 的平台中立核心。
 - [x] 实现 `orrery worktree status --json` 的平台中立只读核心与稳定 JSON envelope。
 - [x] 把 session 写入 `git rev-parse --git-path orrery/worktree.json`，不写入作者工作树。
 - [x] 当 branch、HEAD、integration OID 或 dirty fingerprint 改变时将陈旧 session 标出；重建只通过显式 session write 完成。
 - [x] 验证 linked worktree 和独立 clone 都能产生一致的作用域字段。
 - [x] 为 CLI 输出定义结构化、可按需展开的状态摘要；证明 Agent 无需生成或固定读取可机械派生的 Manifest／Receipt。
+- [x] 提供平台中立的 primary-worktree product-write preflight guard：clean 主 worktree 与 dirty 主 worktree 均失败关闭，dirty 情况只进入人工恢复边界，不自动迁移。
 - [ ] 为 lifecycle phase、runtime condition、evidence freshness、closure reason 定义互不混淆的 schema 与合法转换；阶段回退和 Review Ready 撤销必须可解释。
-- [ ] 定义 Adapter 的 launch／attach／rebind／message capability matrix，并覆盖 Orrery-first、Agent-first 自动 attach、首次写入守卫、无法 rebind 时新会话降级和 dirty 主 worktree 拒绝自动迁移。
+- [ ] 定义 Adapter 的 launch／attach／rebind／message capability matrix，并覆盖 Orrery-first、Agent-first 自动 attach、Adapter 对 guard 的强制调用、无法 rebind 时新会话降级和 dirty 主 worktree 恢复流程。
 
 Candidate checkpoint W1.1（2026-08-22）：实现提交 `6c5570d` 在独立分支
 `codex/w1-1-personal-phase-1a` 完成上述五项最小 Phase 1A 闭环。Core 0.1.2 生成 branch／HEAD、
@@ -83,6 +84,15 @@ integration ref／OID、merge base、ahead／behind、dirty fingerprint 与计�
 独立 clone、stale reason、zero-network 和作者工作树不变均由
 [专项 Validation](../../validation/2026-08-22-w1-1-personal-phase-1a.md)覆盖。该 Candidate 未实现
 worktree create、主目录写入守卫、完整 lifecycle／attach／rebind、Scope/Finding、Observatory 或 Team runtime。
+
+Candidate checkpoint W1.2（2026-08-22）：在 W1.1 之上，提交 `ebf9b75` 于 stacked 分支
+`codex/w1-2-personal-phase-1b` 完成最小 Phase 1B。Core 0.1.3／CLI 0.1.8 的
+`worktree create` 从配置的本地 integration ref 固定精确 OID，建立新 branch + linked worktree，
+初始化 Git-private session；path／branch 碰撞、session 初始化失败或 integration 漂移均失败关闭并在
+本操作拥有的 clean 新对象上回滚。`worktree guard` 提供稳定 JSON product-write preflight：隔离 worktree
+放行，clean／dirty primary worktree 阻断，dirty 不自动迁移。证据见
+[专项 Validation](../../validation/2026-08-22-w1-2-personal-phase-1b.md)。完整 Adapter 强制接线、
+attach／rebind、lifecycle、Scope/Finding、Observatory 与 Team runtime 仍未实现。
 
 ### Phase 2 — 范围采集与重叠检测
 

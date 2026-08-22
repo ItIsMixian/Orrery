@@ -342,3 +342,11 @@
 - session 绑定 worktree ID、branch、HEAD、integration ref／OID 与 dirty fingerprint；status 以稳定原因码报告 stale，不自动重写。linked worktree 与独立 clone 均验证私有路径、scope 字段和作者工作树不变。
 - 专项 13/13、默认全仓 246 PASS + 5 existing skips、动态全仓 248 PASS + 3 Windows symlink privilege skips；integrated structure、隔离静态站、本地 Markdown links、secret scan 与 diff 检查通过。证据见 [W1.1 Validation](validation/2026-08-22-w1-1-personal-phase-1a.md)。
 - 本轮没有实现 worktree create、主目录写入守卫、完整 lifecycle／attach／rebind、Scope/Finding、review／integration／cleanup、Observatory、Team Mode、push、tag 或 Release；根 PROGRESS／HANDOFF 留给唯一整合者同步。
+
+## 2026-08-22 — W1.2 Personal Phase 1B Candidate
+
+- 在 W1.1 Candidate 之上建立 stacked `codex/w1-2-personal-phase-1b`；实现提交 `ebf9b75` 将 Core／CLI 提升到 0.1.3／0.1.8，没有重写既有 W1／W1.1 历史，也没有占用 W2。
+- `worktree create` 固定配置的本地 integration OID，创建 branch + linked worktree 并初始化 Git-private `created` session；branch／path 碰撞预先拒绝，session failure／integration drift 回滚本操作创建的 clean 对象。dirty primary 的作者改动原样保留，新 worktree clean。
+- `worktree guard` 作为平台中立只读 preflight：隔离 worktree allow；clean／dirty primary 均 block，dirty 只给人工恢复边界，不自动迁移。当前 Adapter 尚未强制调用，因此不宣称全局写入拦截。
+- 专项 18/18、默认全仓 251 PASS + 5 existing skips、动态全仓 253 PASS + 3 Windows symlink privilege skips；其余结构／站点／链接／secret／diff 证据见 [W1.2 Validation](validation/2026-08-22-w1-2-personal-phase-1b.md)。
+- 本轮没有实现 lifecycle transitions、launch／attach／rebind／message、Scope/Finding、review／integration／cleanup、Observatory、Team Mode、push、merge、tag 或 Release；根 PROGRESS／HANDOFF 留给唯一整合者同步。
