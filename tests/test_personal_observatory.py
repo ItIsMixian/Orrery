@@ -267,7 +267,13 @@ class PersonalObservatoryTests(unittest.TestCase):
                 opened.append(resolved)
                 return original(path)
 
-            with mock.patch.object(collaboration, "inspect_worktree_status", guarded):
+            with mock.patch.object(
+                collaboration, "inspect_worktree_status", guarded
+            ), mock.patch.object(
+                personal_observatory,
+                "_collect_w3_projection",
+                side_effect=AssertionError("automatic W3 provider crossed exclusion boundary"),
+            ) as w3_provider:
                 projection = build_personal_observatory_projection(
                     fixture.worktree_a,
                     excluded_branches=("codex/fixture-b",),
@@ -281,6 +287,16 @@ class PersonalObservatoryTests(unittest.TestCase):
         self.assertEqual(excluded[0]["branch"], "codex/fixture-b")
         self.assertEqual(excluded[0]["evidence_freshness"], "unknown")
         self.assertEqual(excluded[0]["display_group"], "unavailable")
+        w3_provider.assert_not_called()
+        self.assertIsNone(projection["w3_evidence"])
+        self.assertEqual(projection["w3_provider_error"]["type"], "IsolationBoundary")
+        self.assertEqual(
+            projection["w3_provider_error"]["message"],
+            "excluded-worktree-isolation-boundary",
+        )
+        self.assertTrue(
+            all(slot["status"] == "unavailable" for slot in projection["w3"].values())
+        )
 
     def test_absent_session_and_remote_boundary_stay_unknown(self):
         with CollaborationGitFixture() as fixture:

@@ -669,12 +669,23 @@ def build_personal_observatory_projection(
     w3_evidence: dict[str, Any] | None = None
     w3_error: dict[str, str] | None = None
     if w3_projection is None:
-        try:
-            w3_evidence = _collect_w3_projection(root, cards)
-            w3_slots = _w3_summary(w3_evidence)
-        except Exception as error:
+        excluded_isolation_boundary = bool(excluded) or any(
+            card.get("unavailable_reason") == "excluded-worktree-contract-not-integrated"
+            for card in cards
+        )
+        if excluded_isolation_boundary:
             w3_slots = _w3_slots(None)
-            w3_error = {"type": type(error).__name__, "message": str(error)}
+            w3_error = {
+                "type": "IsolationBoundary",
+                "message": "excluded-worktree-isolation-boundary",
+            }
+        else:
+            try:
+                w3_evidence = _collect_w3_projection(root, cards)
+                w3_slots = _w3_summary(w3_evidence)
+            except Exception as error:
+                w3_slots = _w3_slots(None)
+                w3_error = {"type": type(error).__name__, "message": str(error)}
     elif "provider_schema_version" in w3_projection:
         try:
             _require_schema(
