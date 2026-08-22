@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-22 Candidate-first main promotion gate](2026-08-22-candidate-first-main-promotion-gate.md) — server-enforced exact-SHA Windows/Ubuntu checks before direct main promotion, without requiring a PR or changing release state.
 - [2026-08-22 W1／D1／C1 Canonical integration](2026-08-22-w1-d1-c1-canonical-integration.md) — ordered clean integration, additive State reconciliation, C1 LF fixture stabilization, 273-test combined regression and explicit boundary before W2/D2/C2 or release.
 - [2026-08-22 C1 Context-routing Oracle v0.2 static controls](2026-08-22-c1-context-routing-oracle-v0.2-static-controls.md) — model-free layered verdict, checksummed public-State fixture, paraphrase/contradiction/mutation controls and static readiness to request—but not run—Pilot 010; C1 is a development task ID, not an evidence layer.
 - [2026-08-22 D1 documentation governance Phase 1 finding contract](2026-08-22-d1-document-governance-finding-contract.md) — freezes the internal provider-neutral v1 schema, rule registry, 11 positive/negative fixture pairs, review lifecycle and non-escalation boundaries without an audit CLI, enabled hard gate, automatic rewrite or release change.

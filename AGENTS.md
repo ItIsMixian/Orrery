@@ -31,6 +31,7 @@
 - 修改发布契约、文档架构或跨模块安全边界时必须新增 ADR，不得只改 README。
 - 并发 Workstream 必须各自使用独立分支和 linked worktree／clone；主 worktree 只用于集成。不得让两个 Agent 共享同一工作目录或把 Candidate／Worktree State 表述为 canonical。
 - 普通功能分支不持续改写根 `docs/PROGRESS.md` 与 `docs/HANDOFF.md`；受影响的 subsystem State、实现和验证在分支同行，由唯一整合者在干净 integration worktree 中同步全局入口。
+- 推广到 `main` 前，必须先把 exact Candidate SHA 推到非 main 分支，并取得 GitHub `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)` 双 PASS；main 保护规则必须拒绝未经这两个检查的 SHA。该规则不强制 PR，但禁止先推 main 再等待验证。
 - 协作功能默认必须保持 zero-network Personal Mode；Team Mode 只能由用户按项目显式开启。中央视图只读且只能发送请求，任何执行必须由成员本机确认。
 - Team Mode 不得同步完整 Prompt／回答／transcript、源码正文、未 push diff 或成员执行凭据；Local-only telemetry 必须标注来源，证据不足的语义关系保持 Unknown。
 

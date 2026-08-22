@@ -119,6 +119,8 @@ brief，不伪装原地迁移。证据见 [专项 Validation](../../validation/2
 
 ### Phase 3 — 推测性集成与人工审查
 
+Self-host operational checkpoint（2026-08-22）：Project Orrery 的 GitHub `main` 使用 Candidate-first promotion。唯一整合者先把 exact integration SHA 推到非 main 分支，等待 Windows／Ubuntu 两个稳定 check context 通过，再把同一 SHA 快进 main。main branch protection 对管理员同样生效，但不要求 PR。该仓库级保护不等于 `orrery integrate`、review package 或通用 CI Adapter 已实现，不能勾选本阶段其他条目。
+
 - [ ] 实现 `orrery integrate --target <ref> --dry-run`，只在新建干净 integration worktree 中运行。
 - [ ] 固定 target OID，计算 merge base 与 ahead／behind，并拒绝目标在运行期间静默漂移。
 - [ ] 尝试 merge／rebase，运行 Workstream 声明的验证、受影响子系统验证与文档一致性检查。

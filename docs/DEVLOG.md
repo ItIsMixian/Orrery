@@ -381,3 +381,9 @@
 - 修复后联合专项 35/35、默认全仓 268 PASS + 5 existing skips、动态全仓 270 PASS + 3 Windows privilege skips。
 - W1 Phase 1、D1 contract/fixture 与 C1 static controls 进入 Canonical source；W2/D2/C2、Pilot 010、发布和模型运行均未自动启动，远端 CI 尚待推送。
 - 首次远端矩阵 `32564000587` 为 Ubuntu PASS／Windows FAIL；Windows 失败来自测试对 `RUNNER~1` 与 Git 长路径做字面比较。产品 containment 逻辑未改，测试改用 realpath/normcase 后 collaboration 22/22，最终 `32564334514` Windows／Ubuntu 双 PASS。
+
+## 2026-08-22 — Candidate-first main promotion gate 候选
+
+- 多次“先推 main、再由远端发现平台差异”说明本地全仓无法替代 GitHub runner；问题是推广顺序，不只是缺少更多测试。
+- self-host 流程改为先推 Candidate exact SHA 并等待 Windows／Ubuntu 双 PASS，再快进 main；服务端 required checks 对管理员生效，但不强制 PR。
+- 本记录先随 Candidate branch 运行自身矩阵，保护规则和 main 推广结果由同一 Validation 在外部状态完成后补全。
