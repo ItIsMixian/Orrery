@@ -35,9 +35,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `worktree overlap` 与 `scope inspect` 保持只读；`scope refresh` 和 `finding acknowledge` 只在本机更新私有 session。L2 确认记录成员、理由、时间与 Scope Revision，Agent／中央来源被拒绝；缺失对端保持 Unknown／Unavailable。
 - W3 Candidate 延续同一事实模型：review package、decision 与 closure record 只保存在 Git-private 管理区，是可审计的协调证据而非作者 State／ADR／Validation。package 先保存原始日志链接和结构化事实，再附可选的 `derived-non-authoritative` AI 摘要；摘要不能覆盖失败证据、满足人类 reviewer 计数或创造 Authority。
 - W3 workspace inventory／cleanup bundle 仍是本地派生协调视图：Git metadata、private session／closure、项目允许根和显式候选是来源，Legacy unmanaged／Unknown 不因目录名、前缀或年龄升级成 Orrery 所有或可删事实。closure v2 与其 Git-private action-log 引用保留原路径、OID、review／Validation、分类、操作者及调用者自述动作；receipt 不能证明工具执行了删除，也不进入作者文档。
-- W3 Candidate 的 State alignment 只检查受影响实现与既有 subsystem State 是否同行，ADR alignment 检查临时 ID、正式编号冲突和引用；工具不会自动改写或编号作者文档。功能分支只同步受影响 subsystem State、Plan、Validation 与 DEVLOG，根 PROGRESS／HANDOFF 仍由唯一整合者处理。
-- W4 Worktree Candidate 的 Personal Observatory 只投影上述 W1/W2 机器数据，不解析作者文档来重新判断 Git／Scope／finding／Authority。它作为总览仪表盘的 sibling page 由侧栏单独进入，总览本身不承载 Personal 内容。页面按人的阅读顺序呈现“项目现在怎么样／先看这些／谁在推进什么／影响到哪里”：首屏使用确定性本机计数与一句当前焦点，不把 OID、fact scope 或 finding 枚举当作主叙事；无法回答的趋势与交付资格明确显示 Unknown／Unavailable。活动区只显示存在 session 且 phase 尚未 `integrated`／`closed` 的 Workstream；无 session、已结束或不可用的本机 worktree，以及 W3 slots、Git、路径、ack、integration OID 与 merge base，统一下沉到默认折叠的技术证据。
-- W3 尚未进入 main，因此 W4 只提供三个无业务判定的可选展示槽；缺省分别显示 `Unavailable / W3 not integrated`。远端、无 session、明确排除或不可访问 worktree 保持 Unknown／Unavailable；“无本机 finding”也同时提示 remote/unreported Unknown，不能表达为全局零冲突。
+- W3 的 State alignment 只检查受影响实现与既有 subsystem State 是否同行，ADR alignment 检查临时 ID、正式编号冲突和引用；工具不会自动改写或编号作者文档。功能分支只同步受影响 subsystem State、Plan、Validation 与 DEVLOG，根 PROGRESS／HANDOFF 仍由唯一整合者处理。
+- W4 Worktree Candidate 的 Personal Observatory 不解析作者文档来重新判断 Git／Scope／finding／Authority，也不重写 W3 review／integration／cleanup 规则。它作为总览仪表盘的 sibling page 由侧栏单独进入，总览本身不承载 Personal 内容。页面按人的阅读顺序呈现“项目现在怎么样／先看这些／谁在推进什么／影响到哪里”：首屏使用确定性本机计数与一句当前焦点，不把 OID、fact scope 或 finding 枚举当作主叙事；待审、阻断与可清理候选来自 W3 Core，raw package hash、OID、path、七类 inventory、closure／receipt 则下沉到默认折叠的技术证据。
+- W4 通过 Workstream session 的 `review_package_id` 调用 W3 freshness／eligibility，而不是扫描目录猜审查队列；bounded inventory 只消费 W3 的 Git metadata／private session／closure／允许根／显式候选来源。四类 cleanup action 在页面只显示资格、授权与 `performed=false`，没有表单或执行入口。provider 缺失、失败、schema 不兼容或存在显式 excluded-worktree 隔离边界时，W1/W2 页面继续可用，W3 区域明确显示 Unavailable／Unknown；隔离边界下自动 W3 provider 不运行。远端、无 session 或不可访问证据也不表达为全局零冲突。
 
 ## 同步状态
 
@@ -74,7 +74,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
-- W3 source 已在 W2 合约上实现证据优先审查包、推测性 integration、人工 decision、closure、bounded workspace inventory 与清理资格报告；它没有自动作者文档更新、main 合流或清理执行，Canonical 状态由包含本段的 ref 决定。观测台尚未在 Canonical 中消费该合约，Team Mode runtime 仍未实现。
-- W4 Worktree Candidate 已由观测台只读消费 W1/W2 合约，但尚未 Canonical integration／发布；该历史 W4A checkpoint 尚未消费 W3，后续 W4B commit 负责正式接线。Team Mode runtime 仍未实现。
+- W3 已在 W2 合约上实现证据优先审查包、推测性 integration、人工 decision、closure、bounded workspace inventory 与清理资格报告；它没有自动作者文档更新、main 合流或清理执行。W4 Worktree Candidate 已只读投影这些 Canonical W3 证据，但尚未 Canonical integration／发布；Team Mode runtime 仍未实现。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

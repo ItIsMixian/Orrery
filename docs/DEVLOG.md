@@ -434,3 +434,12 @@
 - 浏览器在 1440×1000 与 390×844 实测：四区、W3 fallback、三维状态、details 展开和空状态有效；窄屏最终 `scrollWidth=375 < 390`，主题按钮保留且搜索框折叠。完整回归、结构、站点、链接与安全证据见 [W4 Validation](validation/2026-08-22-w4-personal-observatory.md)。根 PROGRESS／HANDOFF 按普通功能分支规则保持不动。
 - 用户审阅后，Personal Observatory 从总览内嵌面板改为侧栏独立 sibling page；总览 DOM 保持原内容。原先“31 个活动 Workstream”实际混入全部 `git worktree list` 结果，现按 Canonical session／phase 数据分为 2 个未 integrated／closed 的活动 Workstream、28 个无 session 的 worktree 与 1 个隔离 unavailable worktree。活动主行只显示身份、三维状态、Scope／working tree／finding 摘要，29 个非活动项默认折叠，Git OID、路径、finding 与 acknowledgement 留在 details。
 - 第二轮用户审阅指出页面仍按机器 schema 而非人的问题组织。页面随后改为编辑式项目简报：首屏用一句确定性当前焦点和“未结束／推进／暂停阻塞／直接重叠”四个信号回答项目现状，关注区把 Direct、暂停、stale、W3 unavailable 与 Unknown 分开解释，Workstream 改成可扫描状态行，subsystem 说明影响范围；W3 slots、Git、OID、路径和 inventory 统一进入底部技术证据。趋势因没有历史快照保持 Unknown，不由 UI 生成项目事实。
+
+## 2026-08-23 — W4B Canonical W3 read-only projection
+
+- 先把已验证 W4A 冻结为本地 `335f10a`，再把 Canonical `main@7932a9c` 精确合入为 `9ab8522`；语义冲突同时保留 W3 Canonical 与 W4A Candidate 事实，根 PROGRESS／HANDOFF 只继承 main 内容且相对 main 无 W4 diff。没有读取旧 W3 worktree。
+- W4B 实现提交 `2b9b556` 将 Observatory 推进到 0.1.2。Personal provider 从 session-bound `review_package_id` 调用 W3 Core package freshness 与 integration eligibility，投影 risk、human approval、blockers、target／candidate／Scope binding；七类 workspace inventory、protection、Unknown、estimated size 与 cleanup candidate 也直接来自 W3 Core。
+- 只有 Core `recommended_action=evaluate-cleanup-eligibility` 的条目继续调用 cleanup gate；remove worktree、delete local branch、delete remote branch、remove ordinary directory 四个动作分别显示且自动投影要求 `authorized=false`、`performed=false`、`implies_actions=[]`。closure 与 caller-attested action receipt 只作为 Git-private evidence，页面明确不推断删除已发生。
+- provider 缺失、失败或 schema 不兼容时只把 W3 区域降为 Unavailable／Unknown，W1/W2 的 W4A 页面继续工作。界面仍按人的项目问题组织，raw OID／hash／path 下沉技术证据；没有执行按钮、Team Mode、LAN、telemetry、请求、外部网络、merge 或 cleanup。
+- 隔离修复后的 Fast focused 为 12/12 PASS（99.481 s），包含真实 W3 Core review package→W4 consumer；组件版本一致性 1/1 PASS。实现代理误启动的 collaboration 组合运行在约十分钟后停止并记录为 interrupted，没有重跑或算作通过；默认／动态全仓与 exact-SHA 双平台矩阵留给中央联合 Candidate。
+- 首次 W4B diagnostic build 暴露 W1/W2 exclusion 尚未阻止新 W3 provider 间接读取被排除 worktree；该产物立即判废并覆盖。修复提交 `e5a198e` 在显式 exclusion 下完全跳过自动 W3 provider，回退 `IsolationBoundary / Unavailable`；回归测试断言 provider 未被调用。修复后的真实隔离页、稳定 W3 代表页与 provider fallback 页均完成桌面／390×844 浏览器验证，无表单、产品动作按钮、外链或横向溢出。

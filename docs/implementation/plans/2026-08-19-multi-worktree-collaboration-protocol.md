@@ -161,11 +161,11 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 
 ### Phase 4 — 观测台与平台适配边界
 
-- [ ] 在本地观测台页首显示当前 scope、branch、HEAD、integration OID、merge base、ahead／behind、dirty 和 untracked 数量。
-- [ ] 展示其他本机可见 worktree 的重叠告警，并把远端不可见状态显示为 Unknown。
+- [x] 在本地观测台页首显示当前 scope、branch、HEAD、integration OID、merge base、ahead／behind、dirty 和 untracked 数量。
+- [x] 展示其他本机可见 worktree 的重叠告警，并把远端不可见状态显示为 Unknown。
 - [ ] 单人视图直接展示 Workstream／Agent；多人视图先按 Member 汇总再下钻到各自 Workstream，Host 只作为定位元数据。
 - [ ] 默认只显示 Personal Mode 本地多 Agent 体验；用户按项目明确开启 Team Mode 后才加载成员、中央视图、局域网 Host／加入和同步设置。
-- [ ] 在同一 Observatory 中为 Personal 指挥台建立独立页面，总览仪表盘只保留侧栏入口；Personal 页先回答项目当前焦点、需关注事项、谁在推进与影响范围，审查队列、Scope／路径／日志／finding／review／cleanup 作为技术证据按需展开。
+- [x] 在同一 Observatory 中为 Personal 指挥台建立独立页面，总览仪表盘只保留侧栏入口；Personal 页先回答项目当前焦点、需关注事项、谁在推进与影响范围，审查队列、Scope／路径／日志／finding／review／cleanup 作为技术证据按需展开。
 - [ ] Team Mode 只增加 Team 页签、Member 聚合、同步／请求／capability 视图；My Workstreams 保留本地执行动作，Team／他人卡片只能查看和发送请求。
 - [ ] 把只读展示层与执行层分开；执行动作必须经过成员权限和平台 Adapter capability 检查。
 - [ ] 中央指挥台允许所有已认证项目成员查看全员状态，但只能发送请求；成员本地指挥台必须对远程请求做明确确认后才执行。
@@ -176,9 +176,9 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 - [ ] 实现单 active Host 与手工 Host 切换；Host 离线不影响本地工作，新的 Host 按单调 revision 重新聚合在线成员状态。首版不做自动 leader election。
 - [ ] 默认只在 Workstream／Scope、Agent 阶段、Git、验证或 finding 变化时经 debounce 后同步；提供立即同步，presence heartbeat 默认关闭并允许成员启用／调频／关闭。
 - [ ] 对断连、突然掉线、Sharing off 和长期未更新分别投影 Offline、Stale／Unknown、Unavailable，不把最后快照当成实时事实。
-- [ ] 分开展示 Workstream 生命周期、运行状况和证据新鲜度；不能把 Agent 自报的“完成”直接映射为 Review Ready、Integrated 或 Closed。
-- [ ] 保持核心 Git 数据模型与 Codex、Claude Code、CI 或代码托管平台适配器分离。
-- [ ] 所有状态投影只读，不回写 State、ADR 或 Plan。
+- [x] 分开展示 Workstream 生命周期、运行状况和证据新鲜度；不能把 Agent 自报的“完成”直接映射为 Review Ready、Integrated 或 Closed。
+- [x] 保持核心 Git 数据模型与 Codex、Claude Code、CI 或代码托管平台适配器分离。
+- [x] 所有状态投影只读，不回写 State、ADR 或 Plan。
 
 Candidate checkpoint W4 Personal Observatory（2026-08-22）：独立分支
 `codex/w4-personal-observatory` 在 `main@ef488715dee369cbce81806f3040b4c0417d3eb8` 上实现
@@ -195,6 +195,21 @@ fallback 为 `Unavailable / W3 not integrated`，没有 review／integration／c
 Team runtime、LAN／Coordinator／同步或作者文档写回。该 checkpoint 不勾选任何 Team、W3 execution、
 platform launch/rebind/message、Canonical integration 或 release 条目；证据见
 [W4 Validation](../../validation/2026-08-22-w4-personal-observatory.md)。
+
+Candidate checkpoint W4B（2026-08-23）：先将 W4A 冻结为本地提交 `335f10a`，再把
+Canonical `main@7932a9c01efb2e5125da1962873e67383982d98c` 精确合入并保留 W4A 历史；W4B
+实现提交 `2b9b556` 将 Observatory 推进到 0.1.2。Personal provider 从 Workstream session 的
+`review_package_id` 调用 W3 Core freshness／integration eligibility，直接消费 risk、human approval、
+target／candidate／Scope binding 与 blockers；workspace inventory 的七类分类、protection、Unknown、
+estimated size 和 `recommended_action` 均来自 W3 Core。只有 Core 标记为
+`evaluate-cleanup-eligibility` 的条目继续调用 cleanup gate，四个 action 分别保持
+`authorized=false`、`performed=false`、`implies_actions=[]`；closure/action receipt 仅作为 Git-private、
+caller-attested evidence 显示，不推断目录或 branch 已删除。provider 缺失、失败或 schema 不兼容时，
+W1/W2 的 W4A 页面继续可用，W3 区域退回 Unavailable／Unknown。页面仍无执行按钮、Team runtime、
+LAN／telemetry／请求或外部网络依赖；W5 全部条目保持未启动。证据继续记录在
+[W4 Validation](../../validation/2026-08-22-w4-personal-observatory.md)。
+显式 `excluded_branches` 同时是 W1/W2 collector 与自动 W3 provider 的读取边界；修复提交 `e5a198e`
+在该边界下不运行 provider，并用 `IsolationBoundary / Unavailable` 保留诚实降级。
 
 ### Phase 5 — 自托管迁移与发布
 
