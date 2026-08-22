@@ -2,7 +2,7 @@
 
 Date: 2026-08-22
 Scope: 在独立 integration worktree 中按 W1→D1→C1 顺序吸收 Personal Phase 1、文档治理 finding contract 与 Oracle v0.2 静态 controls；同步当前 State，但不启动 W2/D2/C2、Pilot 010、tag 或 Release
-Status: Local PASS；首次远端 Ubuntu PASS／Windows FAIL，路径断言修复后的矩阵待重跑
+Result: PASS — 本地联合验收通过；首次远端 Ubuntu PASS／Windows FAIL，路径断言修复后 Windows／Ubuntu 双 PASS
 
 ## 输入与整合顺序
 
@@ -43,3 +43,5 @@ Status: Local PASS；首次远端 Ubuntu PASS／Windows FAIL，路径断言修�
 `main@7e194b5` 的 GitHub Actions [32564000587](https://github.com/yw9299-stack/project-orrery/actions/runs/32564000587) 为 Ubuntu PASS／Windows FAIL。Windows runner 的 `TEMP` 使用 `RUNNER~1`，Git 返回同一 session 的长路径；测试对两种等价路径做 `Path` 字面相等比较，导致 independent clone 子案例提前退出，随后又产生派生的 session-list IndexError。
 
 产品的 Git-private containment 检查和返回路径均正确。修复只把测试断言收敛为 `abspath + realpath + normcase`，不放宽 session 必须位于当前 worktree Git dir 的安全边界。单项复跑 1/1、完整 collaboration 专项 22/22 PASS；新的远端矩阵通过前不宣称跨平台验收完成。
+
+修复提交 `481f452` 进入 `origin/main` 后，GitHub Actions [32564334514](https://github.com/yw9299-stack/project-orrery/actions/runs/32564334514) 完成：Ubuntu PASS（48s），Windows PASS（4m20s）。因此 W1／D1／C1 Canonical source 的本轮跨平台门关闭；这仍不构成 tag、Release、Adapter 0.1.1 runtime verification 或 Pilot 010 授权。

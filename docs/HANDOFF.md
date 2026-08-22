@@ -45,7 +45,7 @@ Updated: 2026-08-22
 - ADR-0009／0010／0011 与活动 Plan 已把 Authority Meta Model 推进到 `origin/main` 的 experimental M2 source baseline：M1 的 fixture／Core／兼容／迁移基础上，M2.1 完整内部 CLI claims、M2.2 root-only opt-in Observatory projection 和 M2.3 release-candidate gate 均已通过独立 worktree验证、干净集成与双平台 CI。AUTH-4 已解决为平台中立 Core；AUTH-1 仍 pending。当前仍无稳定公共 domain API、默认 production projection、维护者选定的下一 SemVer／manifest 或公开模型 1 release。
 - ADR-0013 已将 Claude Code 与 DeepSeek Harness 选为相互独立的 Phase 4 Adapter。源码候选均为 0.1.0、`experimental`／`unreleased`；Claude Code 2.1.87 只证明 Plugin／Skill 发现后认证前失败关闭。DeepSeek Harness 只有 rc.8／Windows build 26200／Adapter 0.1.0／Core 0.1.0／CLI 0.1.1 wheel／`deepseek-official`／`deepseek-v4-flash` 与 manifest 所列生命周期范围为 `verified`。
 - W1 和第二平台 Adapter 已经独立 worktree、干净整合、普通 wheel 复验和双平台 CI 进入 `origin/main`；旧 P3 分支占用的 ADR-0010 已重编号为 ADR-0013，Authority ADR-0010／0011／0012 保持不变。当前没有 tag、Release 或 Adapter 独立发行。
-- W1.1／W1.2／W1.3、D1 与 C1 已在独立 integration worktree 按 W1→D1→C1 顺序吸收；本地联合 273 项默认／动态回归通过，C1 fixture 行尾已显式冻结为 LF。该整合尚待本轮远端 CI，不创建 Pilot 010、tag 或 Release。
+- W1.1／W1.2／W1.3、D1 与 C1 已按 W1→D1→C1 顺序进入 `origin/main`；本地联合 273 项回归通过，C1 fixture 行尾冻结为 LF。首次远端 `32564000587` 为 Ubuntu PASS／Windows FAIL；修复 session-path 短／长路径断言后，`32564334514` Windows／Ubuntu 双 PASS。没有创建 Pilot 010、tag 或 Release。
 
 ## 风险与常见陷阱
 
