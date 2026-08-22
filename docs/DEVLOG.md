@@ -397,3 +397,9 @@
 - Direct／Authority／Semantic／Unknown 与 Open／Acknowledged／Resolved／Stale 绑定 Scope／baseline fingerprint；L2 只接受本机 Member 理由确认，跨成员保存 `n/m`，单方确认只解锁本地工作。Direct／L3、凭据／release／schema 独占面和未本机确认 L2 已接入 Adapter route 并失败关闭。
 - collaboration 专项扩展到 27/27；实现提交后的默认全仓 278 项中 273 PASS + 5 existing skips。完整动态、结构、隔离站点、链接、secret／forbidden 与 diff 结果见 [W2 Validation](validation/2026-08-22-w2-scope-finding.md)。
 - W2 只把 Acknowledged L2 与处置历史保存为未来 W3 审查包输入，不生成审查包；review／integration／cleanup、Observatory、Coordinator／LAN／Team transport、自动合流和自动修复均未实现。
+
+## 2026-08-22 — W2 本地 Canonical 集成
+
+- 从受保护 `main@6e1f9cb` 建立独立 integration worktree，重放 W2 两个提交；实现无冲突，共享 DEVLOG／State／Validation 索引与 promotion-gate 事实增量合并。
+- collaboration 27/27、默认全仓 273 PASS + 5 existing skips；结构、站点、链接与安全门完成后，exact SHA 将先推 Candidate 分支接受 Windows／Ubuntu required checks。
+- W2 进入 Canonical source 后下一任务为 W3；W3/W4/W5 均未自动启动，公开 v0.2.0 与发布状态不变。

@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
-- 本分支的 Canonical base 为 Core 0.1.4／CLI 0.1.9；W2 Candidate 已推进到 Core 0.1.5／CLI 0.1.10，在原 Phase 0／1 contract、Git-private session、registry 与 route/guard 上增加 Scope/path observation、overlap finding、Scope Expansion B 和本机 acknowledgement。Observatory 保持 0.1.0，Core API 仍为 1；Candidate 尚未集成或发布。
+- Canonical source 当前为 Core 0.1.5／CLI 0.1.10：在 W1 contract、Git-private session、registry 与 route/guard 上增加 Scope/path observation、overlap finding、Scope Expansion B 和本机 acknowledgement。Observatory 保持 0.1.0，Core API 仍为 1；组件仍未发布。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
 ## 当前边界
@@ -39,8 +39,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - lifecycle phase、runtime condition、evidence freshness 与 closure reason 独立保存；Git／review evidence 漂移会撤销有效 Review Ready，进入 Review Ready／Integrated 仍须等待 W3 可执行门。
 - Adapter capability contract 分离 launch／attach／rebind／message。Codex、Claude、DeepSeek 当前只声明 caller-provided attach，Harness JSON 全关闭；Adapter Skill 要求先走 route/guard，但不能拦截绕过 Adapter 的任意宿主写入，也不证明 platform runtime launch／rebind 支持。
 - 根 `AGENTS.md` 的七个 subsystem 入口已有显式稳定 ID；Core registry 只投影这些入口链接的既有 State Docs，缺失 State 时失败关闭，`unmapped` 与 `project-wide` 只是 Scope 保留表达，不自动创建作者文档。
-- W2 Candidate 从 merge base→HEAD、staged、unstaged、untracked 与 session expected writes 生成同一 `scope-observation`，每条路径保留来源；registry 另从 `AGENTS.md` 的 Truth 路径与既有 authority links 派生 subsystem mapping。无法映射的路径保持 `Unmapped`，共享 subsystem 只进入 Semantic 优先列表，不单凭同模块宣称冲突。
-- W2 Candidate 的 Direct／Authority／Semantic／Unknown finding 与 Open／Acknowledged／Resolved／Stale 生命周期均存放于 Git-private session。fingerprint 绑定 Scope revision、HEAD、integration OID、路径、验证面和对端；变更使 acknowledgement 失效。跨成员 L2 保存 required members 与逐成员确认，单方确认只解锁本地开发，整体 `n/m` 未完成时继续阻止 Review Ready。
+- W2 从 merge base→HEAD、staged、unstaged、untracked 与 session expected writes 生成同一 `scope-observation`，每条路径保留来源；registry 从 `AGENTS.md` Truth 路径与 authority links 派生 subsystem mapping。无法映射的路径保持 `Unmapped`，共享 subsystem 只提高 Semantic 优先级。
+- Direct／Authority／Semantic／Unknown finding 与 Open／Acknowledged／Resolved／Stale 生命周期存放于 Git-private session。fingerprint 绑定 Scope revision、HEAD、integration OID、路径、验证面和对端；跨成员 L2 保存 required members 与逐成员确认，整体 `n/m` 未完成时阻止 Review Ready。
 - Personal Mode 的 W2 collector、overlap、scope refresh 与 acknowledgement 都只执行本地 Git／文件系统操作；没有新增 listener、discovery、Coordinator、heartbeat 或 Team transport。凭据、release、schema migration 的默认独占路径可由项目配置收紧／替换，Direct／L3 以及未本机确认的 L2 已接入 Adapter route 并失败关闭。
 
 ## 实现证据
@@ -77,5 +77,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W2 Candidate 已实现实际 Scope/path 采集、自动 overlap finding 与本机门禁，但当前平台仍未声明 launch／rebind／message，也没有宿主级任意写入拦截。review／integration／cleanup、closure archive、Observatory 投影与 Team 网络层仍未实现，不能宣称完整多 Agent 协调或 review／integration 闭环。
-- Claude Code／DeepSeek Harness Adapter 尚未公开发布；Claude 仍缺成功认证后的模型调用与 CLI 路由证据。DeepSeek 的精确 manifest 范围已验证，但不得外推到当前 Candidate Adapter 0.1.1／CLI 0.1.10、其他版本、OS、Provider、模型或未来发行物。
+- W2 已实现实际 Scope/path 采集、自动 overlap finding 与本机门禁，但当前平台仍未声明 launch／rebind／message，也没有宿主级任意写入拦截。review／integration／cleanup、closure archive、Observatory 投影与 Team 网络层仍未实现。
+- Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.10、其他版本、OS、Provider、模型或未来发行物。
