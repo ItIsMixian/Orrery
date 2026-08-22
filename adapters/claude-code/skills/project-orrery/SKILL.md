@@ -17,13 +17,20 @@ Project Orrery templates, schema, compatibility rules, or project facts.
    `python -X utf8 "${CLAUDE_PLUGIN_ROOT}/scripts/check_cli_dependency.py"`.
    If the check exits nonzero, report its structured dependency error instead
    of falling back to copied templates or inferred rules.
-3. Use the CLI command that matches the request:
+3. Before the first product write, run `project-orrery worktree route --target
+   <repo> --adapter-manifest "${CLAUDE_PLUGIN_ROOT}/adapter-manifest.json"
+   --platform-session-id <current-session-id> --json`. If the runtime does not
+   expose its session ID, stop with the returned continuation brief. When the
+   route requires attach, run the corresponding `worktree session attach`
+   command and rerun the route. Continue only when the route returns `allow`;
+   never bypass dirty-primary recovery or silently rebind an existing session.
+4. Use the CLI command that matches the request:
    - `project-orrery scaffold --target <repo> --title <title> --dry-run`
    - `project-orrery validate --target <repo>`
    - `project-orrery check-update --target <repo>`
-4. Keep Plugin installation separate from target-project scaffolding,
+5. Keep Plugin installation separate from target-project scaffolding,
    Observatory tool upgrades, and authored-document migration.
-5. Never claim that an accepted decision is implemented, that an installed
+6. Never claim that an accepted decision is implemented, that an installed
    scaffold is integrated, or that Agent self-report proves files were read.
 
 For established repositories, inspect existing documentation roles and review

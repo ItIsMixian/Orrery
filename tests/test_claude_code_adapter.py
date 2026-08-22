@@ -44,7 +44,7 @@ class ClaudeCodeAdapterTests(unittest.TestCase):
         component = components["adapters"]["claude-code"]
 
         self.assertEqual(manifest["adapter"]["id"], "project-orrery-claude-code")
-        self.assertEqual(manifest["adapter"]["version"], "0.1.0")
+        self.assertEqual(manifest["adapter"]["version"], "0.1.1")
         self.assertEqual(manifest["adapter"]["version"], plugin["version"])
         self.assertEqual(manifest["adapter"]["version"], marketplace["plugins"][0]["version"])
         self.assertEqual(manifest["adapter"]["version"], component["version"])

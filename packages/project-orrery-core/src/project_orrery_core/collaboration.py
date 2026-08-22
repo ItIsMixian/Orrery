@@ -21,6 +21,7 @@ COLLABORATION_CONTRACT_ID = "project-orrery-collaboration-v1"
 WORKTREE_STATUS_SCHEMA_VERSION = 1
 WORKTREE_CREATE_SCHEMA_VERSION = 1
 PRIMARY_WRITE_GUARD_SCHEMA_VERSION = 1
+SESSION_ROUTE_SCHEMA_VERSION = 1
 DEFAULT_INTEGRATION_REF = "refs/heads/main"
 INTEGRATION_REF_CONFIG_KEY = "collaboration.integration_ref"
 PRIMARY_WORKTREE_CONFIG_KEY = "collaboration.primary_worktree"
@@ -39,6 +40,23 @@ _SESSION_STALE_FIELDS = (
     ("integration_oid", "integration-oid-changed"),
     ("dirty_fingerprint", "dirty-fingerprint-changed"),
 )
+LIFECYCLE_PHASES = (
+    "created", "investigating", "implementing", "validating", "review-ready", "integrated", "closed"
+)
+RUNTIME_CONDITIONS = (
+    "active", "waiting-for-user", "paused", "blocked-by-conflict", "failed", "offline", "stale-unknown"
+)
+EVIDENCE_FRESHNESS = ("unknown", "current", "stale")
+CLOSURE_REASONS = ("integrated", "abandoned", "superseded", "duplicate")
+_LIFECYCLE_TRANSITIONS = {
+    "created": {"investigating", "implementing", "closed"},
+    "investigating": {"implementing", "closed"},
+    "implementing": {"investigating", "validating", "closed"},
+    "validating": {"implementing", "review-ready", "closed"},
+    "review-ready": {"implementing", "validating", "integrated", "closed"},
+    "integrated": {"closed"},
+    "closed": set(),
+}
 
 
 def _schema_type_matches(value: Any, expected: str) -> bool:
@@ -488,6 +506,30 @@ def _read_workstream_session(path: Path) -> dict[str, Any] | None:
     return session
 
 
+def _session_lifecycle_projection(
+    session: Mapping[str, Any] | None, stale_reasons: Sequence[str]
+) -> dict[str, Any] | None:
+    if session is None:
+        return None
+    declared_phase = str(session["lifecycle_phase"])
+    declared_freshness = str(session.get("evidence_freshness", "unknown"))
+    reasons = list(stale_reasons)
+    if declared_phase == "review-ready" and declared_freshness != "current":
+        reasons.append("review-evidence-not-current")
+    reasons = list(dict.fromkeys(reasons))
+    review_ready_revoked = declared_phase == "review-ready" and bool(reasons)
+    return {
+        "declared_phase": declared_phase,
+        "effective_phase": "validating" if review_ready_revoked else declared_phase,
+        "runtime_condition": session["runtime_condition"],
+        "evidence_freshness": "stale" if stale_reasons else declared_freshness,
+        "closure_reason": session.get("closure_reason"),
+        "lifecycle_revision": session.get("lifecycle_revision", 1),
+        "review_ready_revoked": review_ready_revoked,
+        "revocation_reasons": reasons if review_ready_revoked else [],
+    }
+
+
 def inspect_worktree_status(project_root: Path) -> dict[str, Any]:
     """Return a stable read-only status projection for one worktree or clone."""
     root = Path(project_root).expanduser().absolute()
@@ -509,6 +551,7 @@ def inspect_worktree_status(project_root: Path) -> dict[str, Any]:
             "exists": session is not None,
             "state": "absent" if session is None else ("stale" if stale_reasons else "current"),
             "stale_reasons": stale_reasons,
+            "lifecycle": _session_lifecycle_projection(session, stale_reasons),
             "record": session,
         },
         "writes_performed": False,
@@ -556,6 +599,11 @@ def build_workstream_session(
     scope_revision: int = 1,
     lifecycle_phase: str = "implementing",
     runtime_condition: str = "active",
+    evidence_freshness: str = "unknown",
+    closure_reason: str | None = None,
+    lifecycle_revision: int = 1,
+    last_transition: Mapping[str, Any] | None = None,
+    platform_session: Mapping[str, str] | None = None,
     member_id: str = "local-owner",
     host_id: str = "local-host",
     captured_at: str | None = None,
@@ -587,7 +635,7 @@ def build_workstream_session(
         "member_id": member_id,
         "host_id": host_id,
         "active_host_id": host_id,
-        "platform_session": None,
+        "platform_session": dict(platform_session) if platform_session is not None else None,
         "branch": identity["branch"],
         "head": identity["head"],
         "integration_ref": identity["integration_ref"],
@@ -596,6 +644,10 @@ def build_workstream_session(
         "dirty_fingerprint": identity["dirty_fingerprint"],
         "lifecycle_phase": lifecycle_phase,
         "runtime_condition": runtime_condition,
+        "evidence_freshness": evidence_freshness,
+        "closure_reason": closure_reason,
+        "lifecycle_revision": lifecycle_revision,
+        "last_transition": dict(last_transition) if last_transition is not None else None,
         "scope_revision": scope_revision,
         "primary_subsystem_id": scope["primary_subsystem_id"],
         "affected_subsystem_ids": scope["affected_subsystem_ids"],
@@ -607,13 +659,24 @@ def build_workstream_session(
         "captured_at": timestamp,
     }
     validate_collaboration_contract(session)
+    _validate_lifecycle_semantics(session)
     return session
 
 
-def write_workstream_session(project_root: Path, **session_fields: Any) -> dict[str, Any]:
-    """Atomically persist one reconstructable session under the private Git path."""
-    root = Path(project_root).expanduser().absolute()
-    session = build_workstream_session(root, **session_fields)
+def _validate_lifecycle_semantics(session: Mapping[str, Any]) -> None:
+    phase = session["lifecycle_phase"]
+    closure_reason = session.get("closure_reason")
+    if phase == "closed" and closure_reason is None:
+        raise ValueError("closed Workstream session requires a closure reason")
+    if phase != "closed" and closure_reason is not None:
+        raise ValueError("closure reason is only valid for a closed Workstream session")
+    if closure_reason == "integrated" and phase != "closed":
+        raise ValueError("integrated closure reason requires a closed Workstream session")
+
+
+def _write_private_session(root: Path, session: Mapping[str, Any]) -> dict[str, Any]:
+    validate_collaboration_contract(session)
+    _validate_lifecycle_semantics(session)
     path = worktree_session_path(root)
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -636,9 +699,263 @@ def write_workstream_session(project_root: Path, **session_fields: Any) -> dict[
     return {
         "session_path": str(path),
         "storage": "git-private-worktree",
-        "session": session,
+        "session": dict(session),
         "writes_performed": True,
     }
+
+
+def write_workstream_session(project_root: Path, **session_fields: Any) -> dict[str, Any]:
+    """Atomically persist one reconstructable session under the private Git path."""
+    root = Path(project_root).expanduser().absolute()
+    session = build_workstream_session(root, **session_fields)
+    return _write_private_session(root, session)
+
+
+def transition_workstream_session(
+    project_root: Path,
+    *,
+    reason: str,
+    lifecycle_phase: str | None = None,
+    runtime_condition: str | None = None,
+    evidence_freshness: str | None = None,
+    closure_reason: str | None = None,
+    occurred_at: str | None = None,
+) -> dict[str, Any]:
+    """Apply one legal lifecycle transition to a current private session."""
+    if not reason.strip():
+        raise ValueError("lifecycle transition reason must not be empty")
+    root = Path(project_root).expanduser().absolute()
+    status = inspect_worktree_status(root)
+    if status["session"]["state"] != "current":
+        raise ValueError("lifecycle transition requires a current Workstream session")
+    session = dict(status["session"]["record"])
+    old_phase = str(session["lifecycle_phase"])
+    new_phase = lifecycle_phase or old_phase
+    if new_phase not in LIFECYCLE_PHASES:
+        raise ValueError("unknown Workstream lifecycle phase")
+    if new_phase != old_phase and new_phase not in _LIFECYCLE_TRANSITIONS[old_phase]:
+        raise ValueError(f"illegal Workstream lifecycle transition: {old_phase} -> {new_phase}")
+    if new_phase == "review-ready" and old_phase != "review-ready":
+        raise ValueError("review-ready transition requires the future executable review gate")
+    if new_phase == "integrated" and old_phase != "integrated":
+        raise ValueError("integrated transition requires the future integration command")
+    new_runtime = runtime_condition or str(session["runtime_condition"])
+    if new_runtime not in RUNTIME_CONDITIONS:
+        raise ValueError("unknown Workstream runtime condition")
+    new_freshness = evidence_freshness or str(session.get("evidence_freshness", "unknown"))
+    if new_freshness not in EVIDENCE_FRESHNESS:
+        raise ValueError("unknown Workstream evidence freshness")
+    if old_phase == "review-ready" and new_phase == "review-ready" and (
+        new_freshness != "current" or new_runtime != "active"
+    ):
+        new_phase = "validating"
+    if new_phase == "closed":
+        if closure_reason not in CLOSURE_REASONS:
+            raise ValueError("closing a Workstream requires an explicit closure reason")
+        if closure_reason == "integrated" and old_phase != "integrated":
+            raise ValueError("integrated closure is only legal after the integrated phase")
+        if old_phase == "integrated" and closure_reason != "integrated":
+            raise ValueError("an integrated Workstream must close with reason integrated")
+    elif closure_reason is not None:
+        raise ValueError("closure reason is only valid when closing a Workstream")
+    timestamp = occurred_at or dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
+    session.update(
+        {
+            "lifecycle_phase": new_phase,
+            "runtime_condition": new_runtime,
+            "evidence_freshness": new_freshness,
+            "closure_reason": closure_reason if new_phase == "closed" else None,
+            "lifecycle_revision": int(session.get("lifecycle_revision", 1)) + 1,
+            "last_transition": {
+                "from_phase": old_phase,
+                "to_phase": new_phase,
+                "reason": reason.strip(),
+                "occurred_at": timestamp,
+            },
+        }
+    )
+    return _write_private_session(root, session)
+
+
+def load_adapter_capabilities(manifest_path: Path) -> dict[str, Any]:
+    """Load the provider-neutral capability declaration embedded in an Adapter manifest."""
+    path = Path(manifest_path).expanduser().absolute()
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot read Adapter manifest {path}: {exc}") from exc
+    if not isinstance(manifest, Mapping):
+        raise ValueError("Adapter manifest must contain a JSON object")
+    value = manifest.get("workstream_capabilities")
+    if not isinstance(value, Mapping):
+        raise ValueError("Adapter manifest does not declare workstream_capabilities")
+    capabilities = dict(value)
+    validate_collaboration_contract(capabilities)
+    if capabilities.get("contract_type") != "adapter-capabilities":
+        raise ValueError("Adapter capability declaration has the wrong contract type")
+    if capabilities["rebind"] and not capabilities["attach"]:
+        raise ValueError("Adapter rebind capability requires attach capability")
+    if capabilities["session_identity_source"] == "unavailable" and (
+        capabilities["attach"] or capabilities["rebind"]
+    ):
+        raise ValueError("Adapter without a session identity source cannot attach or rebind")
+    return capabilities
+
+
+def _continuation_brief(
+    identity: Mapping[str, Any], session: Mapping[str, Any] | None, action: str
+) -> dict[str, Any]:
+    """Return only reconstructable routing facts; never include prompts or source content."""
+    return {
+        "action": action,
+        "worktree_path": identity["worktree_path"],
+        "branch": identity["branch"],
+        "head": identity["head"],
+        "integration_ref": identity["integration_ref"],
+        "integration_oid": identity["integration_oid"],
+        "workstream_id": session.get("workstream_id") if session else None,
+    }
+
+
+def plan_adapter_session_route(
+    project_root: Path,
+    *,
+    adapter_manifest: Path,
+    platform_session_id: str | None = None,
+) -> dict[str, Any]:
+    """Plan an Orrery-first or Agent-first local session route without writing."""
+    root = Path(project_root).expanduser().absolute()
+    capabilities = load_adapter_capabilities(adapter_manifest)
+    status = inspect_worktree_status(root)
+    identity = status["identity"]
+    session_record = status["session"]["record"]
+    decision = "block"
+    reason: str
+    next_action: str
+    if identity["is_primary"]:
+        reason = (
+            "primary-worktree-dirty-recovery-required"
+            if identity["dirty"]
+            else "primary-worktree-write-prohibited"
+        )
+        next_action = (
+            "review-and-selectively-transfer-existing-changes"
+            if identity["dirty"]
+            else "create-or-open-isolated-workstream"
+        )
+    elif status["session"]["state"] == "absent":
+        reason = "workstream-session-required"
+        next_action = "register-private-workstream-session"
+    elif status["session"]["state"] == "stale":
+        reason = "stale-workstream-session"
+        next_action = "explicitly-recreate-or-refresh-session"
+    else:
+        assert isinstance(session_record, Mapping)
+        attached = session_record.get("platform_session")
+        same_session = (
+            isinstance(attached, Mapping)
+            and attached.get("adapter") == capabilities["adapter_id"]
+            and attached.get("session_id") == platform_session_id
+        )
+        if platform_session_id and same_session:
+            decision = "allow"
+            reason = "platform-session-attached"
+            next_action = "continue-in-current-worktree"
+        elif not platform_session_id:
+            reason = "platform-session-id-required"
+            next_action = (
+                "supply-platform-session-id"
+                if capabilities["session_identity_source"] != "unavailable"
+                else "manual-open-with-continuation-brief"
+            )
+        elif attached is None and capabilities["attach"]:
+            reason = "platform-session-attach-required"
+            next_action = "attach-platform-session"
+        elif isinstance(attached, Mapping) and capabilities["rebind"]:
+            reason = "platform-session-rebind-required"
+            next_action = "explicitly-rebind-platform-session"
+        elif isinstance(attached, Mapping):
+            reason = "adapter-rebind-unavailable"
+            next_action = "create-new-workstream-and-open-new-platform-session"
+        elif capabilities["launch"]:
+            reason = "platform-session-launch-required"
+            next_action = "launch-platform-session-in-current-worktree"
+        else:
+            reason = "adapter-attach-unavailable"
+            next_action = "manual-open-with-continuation-brief"
+    return {
+        "route_schema_version": SESSION_ROUTE_SCHEMA_VERSION,
+        "decision": decision,
+        "allowed": decision == "allow",
+        "reason": reason,
+        "next_action": next_action,
+        "capabilities": capabilities,
+        "status": status,
+        "continuation_brief": _continuation_brief(identity, session_record, next_action),
+        "writes_performed": False,
+        "network_performed": False,
+    }
+
+
+def attach_platform_session(
+    project_root: Path,
+    *,
+    adapter_manifest: Path,
+    platform_session_id: str,
+    rebind: bool = False,
+) -> dict[str, Any]:
+    """Attach a runtime session to a current Workstream using Git-private storage only."""
+    if not platform_session_id.strip():
+        raise ValueError("platform session ID must not be empty")
+    root = Path(project_root).expanduser().absolute()
+    capabilities = load_adapter_capabilities(adapter_manifest)
+    if not capabilities["attach"]:
+        raise ValueError("Adapter does not support platform-session attach")
+    status = inspect_worktree_status(root)
+    if status["identity"]["is_primary"]:
+        raise ValueError("platform-session attach is prohibited in the primary worktree")
+    if status["session"]["state"] != "current":
+        raise ValueError("platform-session attach requires a current Workstream session")
+    session = dict(status["session"]["record"])
+    if session["lifecycle_phase"] in {"integrated", "closed"}:
+        raise ValueError("platform-session attach is not legal for a finished Workstream")
+    requested = {
+        "adapter": capabilities["adapter_id"],
+        "session_id": platform_session_id.strip(),
+    }
+    existing = session.get("platform_session")
+    if existing == requested:
+        return {
+            "session_path": status["session"]["path"],
+            "storage": "git-private-worktree",
+            "session": session,
+            "writes_performed": False,
+        }
+    if existing is not None:
+        if not rebind:
+            raise ValueError("Workstream is already attached; explicit --rebind is required")
+        if not capabilities["rebind"]:
+            raise ValueError("Adapter does not support platform-session rebind")
+    old_phase = str(session["lifecycle_phase"])
+    new_phase = "investigating" if old_phase == "created" else old_phase
+    timestamp = dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
+    session.update(
+        {
+            "platform_session": requested,
+            "lifecycle_phase": new_phase,
+            "runtime_condition": "active",
+            "evidence_freshness": str(session.get("evidence_freshness", "unknown")),
+            "closure_reason": None,
+            "lifecycle_revision": int(session.get("lifecycle_revision", 1)) + 1,
+            "last_transition": {
+                "from_phase": old_phase,
+                "to_phase": new_phase,
+                "reason": "platform-session-rebound" if existing is not None else "platform-session-attached",
+                "occurred_at": timestamp,
+            },
+        }
+    )
+    return _write_private_session(root, session)
 
 
 def _default_worktree_path(source_root: Path, workstream_id: str) -> Path:

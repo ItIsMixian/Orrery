@@ -10,7 +10,7 @@
     {
       "name": "project-orrery",
       "description": "Thin Claude Code adapter for the Project Orrery CLI.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./"
     }
   ]

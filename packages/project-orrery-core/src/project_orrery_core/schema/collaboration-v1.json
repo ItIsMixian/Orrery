@@ -13,6 +13,7 @@
     {"$ref": "#/$defs/overlap_finding"},
     {"$ref": "#/$defs/integration_report"},
     {"$ref": "#/$defs/subsystem_registry"},
+    {"$ref": "#/$defs/adapter_capabilities"},
     {"$ref": "#/$defs/member"},
     {"$ref": "#/$defs/project_mode"}
   ],
@@ -91,6 +92,20 @@
         "dirty_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "lifecycle_phase": {"enum": ["created", "investigating", "implementing", "validating", "review-ready", "integrated", "closed"]},
         "runtime_condition": {"enum": ["active", "waiting-for-user", "paused", "blocked-by-conflict", "failed", "offline", "stale-unknown"]},
+        "evidence_freshness": {"enum": ["unknown", "current", "stale"]},
+        "closure_reason": {"type": ["string", "null"], "enum": ["integrated", "abandoned", "superseded", "duplicate", null]},
+        "lifecycle_revision": {"type": "integer", "minimum": 1},
+        "last_transition": {
+          "type": ["object", "null"],
+          "properties": {
+            "from_phase": {"enum": ["created", "investigating", "implementing", "validating", "review-ready", "integrated", "closed"]},
+            "to_phase": {"enum": ["created", "investigating", "implementing", "validating", "review-ready", "integrated", "closed"]},
+            "reason": {"type": "string", "minLength": 1},
+            "occurred_at": {"type": "string", "format": "date-time"}
+          },
+          "required": ["from_phase", "to_phase", "reason", "occurred_at"],
+          "additionalProperties": false
+        },
         "scope_revision": {"type": "integer", "minimum": 1},
         "primary_subsystem_id": {"type": "string", "minLength": 1},
         "affected_subsystem_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
@@ -246,6 +261,29 @@
         "after": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "credential_epoch": {"type": "integer", "minimum": 1},
         "occurred_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "adapter_capabilities": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "adapter_id", "platform", "launch", "attach",
+        "rebind", "message", "session_identity_source", "requires_product_write_guard",
+        "visibility", "observability"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "adapter-capabilities"},
+        "adapter_id": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "launch": {"type": "boolean"},
+        "attach": {"type": "boolean"},
+        "rebind": {"type": "boolean"},
+        "message": {"type": "boolean"},
+        "session_identity_source": {"enum": ["adapter-provided", "caller-provided", "unavailable"]},
+        "requires_product_write_guard": {"const": true},
+        "visibility": {"const": "local-only"},
+        "observability": {"const": "local"}
       },
       "additionalProperties": false
     },

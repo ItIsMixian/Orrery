@@ -4,7 +4,7 @@
     "id": "project-orrery-codex",
     "name": "Project Orrery Codex Adapter",
     "platform": "codex",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "api_version": 1,
     "support_status": "experimental"
   },
@@ -16,6 +16,20 @@
       "maximum_exclusive": "0.2.0",
       "entrypoint": "project-orrery"
     }
+  },
+  "workstream_capabilities": {
+    "schema_version": 1,
+    "contract_type": "adapter-capabilities",
+    "adapter_id": "project-orrery-codex",
+    "platform": "codex",
+    "launch": false,
+    "attach": true,
+    "rebind": false,
+    "message": false,
+    "session_identity_source": "caller-provided",
+    "requires_product_write_guard": true,
+    "visibility": "local-only",
+    "observability": "local"
   },
   "runtime_compatibility": {
     "runtime": "Codex",

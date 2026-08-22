@@ -54,7 +54,8 @@ class CodexAdapterTests(unittest.TestCase):
         verified = runtime["verified"][0]
         self.assertEqual(verified["runtime_version"], "codex-cli 0.148.0-alpha.21")
         self.assertEqual(verified["os"], "Windows 11 Pro x64 10.0.26200 (build 26200)")
-        self.assertEqual(verified["adapter_version"], manifest["adapter"]["version"])
+        self.assertEqual(verified["adapter_version"], "0.1.0")
+        self.assertNotEqual(verified["adapter_version"], manifest["adapter"]["version"])
         self.assertEqual(verified["core_api"], manifest["requires"]["core_api"])
         self.assertEqual(verified["cli_requirement"], ">=0.1.0,<0.2.0")
         self.assertIn("implicit_invocation", verified["scope"])

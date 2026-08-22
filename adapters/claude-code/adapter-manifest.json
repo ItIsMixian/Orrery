@@ -4,7 +4,7 @@
     "id": "project-orrery-claude-code",
     "name": "Project Orrery Claude Code Adapter",
     "platform": "claude-code",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "api_version": 1,
     "support_status": "experimental"
   },
@@ -20,6 +20,20 @@
       "name": "Claude Code",
       "minimum": "2.1.87"
     }
+  },
+  "workstream_capabilities": {
+    "schema_version": 1,
+    "contract_type": "adapter-capabilities",
+    "adapter_id": "project-orrery-claude-code",
+    "platform": "claude-code",
+    "launch": false,
+    "attach": true,
+    "rebind": false,
+    "message": false,
+    "session_identity_source": "caller-provided",
+    "requires_product_write_guard": true,
+    "visibility": "local-only",
+    "observability": "local"
   },
   "runtime_compatibility": {
     "runtime": "Claude Code",

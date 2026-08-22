@@ -3,7 +3,7 @@
   "adapter": {
     "name": "Project Orrery Harness JSON Adapter",
     "distribution": "project-orrery-harness-json-adapter",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "adapter_api_version": 1,
     "support_status": "experimental"
   },
@@ -14,6 +14,20 @@
       "minimum": "0.1.1",
       "maximum_exclusive": "0.2.0"
     }
+  },
+  "workstream_capabilities": {
+    "schema_version": 1,
+    "contract_type": "adapter-capabilities",
+    "adapter_id": "project-orrery-harness-json",
+    "platform": "harness-json",
+    "launch": false,
+    "attach": false,
+    "rebind": false,
+    "message": false,
+    "session_identity_source": "unavailable",
+    "requires_product_write_guard": true,
+    "visibility": "local-only",
+    "observability": "local"
   },
   "protocol": {
     "transport": "subprocess-json",

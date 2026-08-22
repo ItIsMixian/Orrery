@@ -26,6 +26,7 @@ from project_orrery_core.collaboration import (  # noqa: E402
     DEFAULT_INTEGRATION_REF,
     RESERVED_SUBSYSTEM_IDS,
     CollaborationConfig,
+    attach_platform_session,
     apply_capability_change,
     bootstrap_maintainer,
     build_project_mode_contract,
@@ -35,9 +36,12 @@ from project_orrery_core.collaboration import (  # noqa: E402
     inspect_primary_write_guard,
     inspect_worktree_status,
     inspect_worktree_identity,
+    load_adapter_capabilities,
     load_subsystem_registry,
     remove_member,
+    plan_adapter_session_route,
     resolve_integration_oid,
+    transition_workstream_session,
     validate_collaboration_contract,
     worktree_session_path,
     write_workstream_session,
@@ -54,6 +58,7 @@ class CollaborationContractTests(unittest.TestCase):
             set(payload["$defs"]),
             {
                 "capability_audit",
+                "adapter_capabilities",
                 "integration_report",
                 "member",
                 "overlap_finding",
@@ -495,8 +500,8 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(status.returncode, 0, status.stdout + status.stderr)
             status_payload = json.loads(status.stdout)
             self.assertEqual(status_payload["command"], "worktree-status")
-            self.assertEqual(status_payload["versions"]["core"], "0.1.3")
-            self.assertEqual(status_payload["versions"]["cli"], "0.1.8")
+            self.assertEqual(status_payload["versions"]["core"], "0.1.4")
+            self.assertEqual(status_payload["versions"]["cli"], "0.1.9")
             self.assertEqual(status_payload["data"]["session"]["state"], "absent")
             self.assertFalse(status_payload["data"]["writes_performed"])
 
@@ -783,8 +788,8 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(created.returncode, 0, created.stdout + created.stderr)
             payload = json.loads(created.stdout)
             self.assertEqual(payload["command"], "worktree-create")
-            self.assertEqual(payload["versions"]["core"], "0.1.3")
-            self.assertEqual(payload["versions"]["cli"], "0.1.8")
+            self.assertEqual(payload["versions"]["core"], "0.1.4")
+            self.assertEqual(payload["versions"]["cli"], "0.1.9")
             self.assertEqual(payload["data"]["status"]["session"]["state"], "current")
 
             allowed = subprocess.run(
@@ -799,6 +804,240 @@ class CollaborationContractTests(unittest.TestCase):
             )
             self.assertEqual(allowed.returncode, 0, allowed.stdout + allowed.stderr)
             self.assertTrue(json.loads(allowed.stdout)["data"]["allowed"])
+
+    def test_lifecycle_transitions_are_legal_separate_and_fail_closed_at_future_gates(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W1.3-lifecycle",
+                primary_subsystem_id="project-structure",
+                lifecycle_phase="created",
+            )
+            transitioned = transition_workstream_session(
+                fixture.worktree_b,
+                lifecycle_phase="investigating",
+                runtime_condition="waiting-for-user",
+                evidence_freshness="stale",
+                reason="need maintainer input",
+                occurred_at="2026-08-22T00:00:00Z",
+            )["session"]
+            self.assertEqual(transitioned["lifecycle_phase"], "investigating")
+            self.assertEqual(transitioned["runtime_condition"], "waiting-for-user")
+            self.assertEqual(transitioned["evidence_freshness"], "stale")
+            self.assertEqual(transitioned["lifecycle_revision"], 2)
+            self.assertEqual(transitioned["last_transition"]["from_phase"], "created")
+
+            with self.assertRaisesRegex(ValueError, "illegal Workstream lifecycle transition"):
+                transition_workstream_session(
+                    fixture.worktree_b,
+                    lifecycle_phase="validating",
+                    reason="skip implementation",
+                )
+            transition_workstream_session(
+                fixture.worktree_b, lifecycle_phase="implementing", reason="resume implementation"
+            )
+            transition_workstream_session(
+                fixture.worktree_b, lifecycle_phase="validating", reason="run validation"
+            )
+            with self.assertRaisesRegex(ValueError, "future executable review gate"):
+                transition_workstream_session(
+                    fixture.worktree_b,
+                    lifecycle_phase="review-ready",
+                    evidence_freshness="current",
+                    reason="self reported",
+                )
+            with self.assertRaisesRegex(ValueError, "explicit closure reason"):
+                transition_workstream_session(
+                    fixture.worktree_b, lifecycle_phase="closed", reason="stop"
+                )
+            closed = transition_workstream_session(
+                fixture.worktree_b,
+                lifecycle_phase="closed",
+                closure_reason="abandoned",
+                reason="maintainer stopped the workstream",
+            )["session"]
+            self.assertEqual(closed["closure_reason"], "abandoned")
+            with self.assertRaisesRegex(ValueError, "not legal for a finished Workstream"):
+                attach_platform_session(
+                    fixture.worktree_b,
+                    adapter_manifest=REPOSITORY_ROOT
+                    / "adapters"
+                    / "codex"
+                    / "adapter-manifest.json",
+                    platform_session_id="too-late",
+                )
+
+    def test_stale_git_binding_revokes_effective_review_ready_without_mutating_session(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W1.3-review-revocation",
+                primary_subsystem_id="project-structure",
+                lifecycle_phase="review-ready",
+                evidence_freshness="current",
+            )
+            current = inspect_worktree_status(fixture.worktree_b)
+            self.assertEqual(current["session"]["lifecycle"]["effective_phase"], "review-ready")
+            (fixture.worktree_b / "dirty.txt").write_text("dirty\n", encoding="utf-8")
+            stale = inspect_worktree_status(fixture.worktree_b)
+            self.assertEqual(stale["session"]["state"], "stale")
+            self.assertEqual(stale["session"]["lifecycle"]["effective_phase"], "validating")
+            self.assertTrue(stale["session"]["lifecycle"]["review_ready_revoked"])
+            self.assertEqual(stale["session"]["record"]["lifecycle_phase"], "review-ready")
+
+    def test_adapter_route_attach_and_no_rebind_fallback_are_private_and_zero_network(self) -> None:
+        manifest = REPOSITORY_ROOT / "adapters" / "codex" / "adapter-manifest.json"
+        harness_manifest = REPOSITORY_ROOT / "adapters" / "harness-json" / "adapter-manifest.json"
+        capabilities = load_adapter_capabilities(manifest)
+        self.assertTrue(capabilities["attach"])
+        self.assertFalse(capabilities["rebind"])
+        self.assertFalse(load_adapter_capabilities(harness_manifest)["attach"])
+        for adapter in ("claude-code", "deepseek-harness"):
+            declared = load_adapter_capabilities(
+                REPOSITORY_ROOT / "adapters" / adapter / "adapter-manifest.json"
+            )
+            self.assertTrue(declared["attach"])
+            self.assertFalse(declared["launch"])
+            self.assertFalse(declared["rebind"])
+            self.assertFalse(declared["message"])
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W1.3-route",
+                primary_subsystem_id="project-structure",
+                lifecycle_phase="created",
+            )
+            planned = plan_adapter_session_route(
+                fixture.worktree_b,
+                adapter_manifest=manifest,
+                platform_session_id="session-1",
+            )
+            self.assertFalse(planned["allowed"])
+            self.assertEqual(planned["reason"], "platform-session-attach-required")
+            self.assertFalse(planned["writes_performed"])
+            self.assertFalse(planned["network_performed"])
+            attached = attach_platform_session(
+                fixture.worktree_b,
+                adapter_manifest=manifest,
+                platform_session_id="session-1",
+            )
+            self.assertEqual(attached["session"]["lifecycle_phase"], "investigating")
+            self.assertEqual(attached["session"]["platform_session"]["session_id"], "session-1")
+            allowed = plan_adapter_session_route(
+                fixture.worktree_b,
+                adapter_manifest=manifest,
+                platform_session_id="session-1",
+            )
+            self.assertTrue(allowed["allowed"])
+            self.assertEqual(allowed["reason"], "platform-session-attached")
+            fallback = plan_adapter_session_route(
+                fixture.worktree_b,
+                adapter_manifest=manifest,
+                platform_session_id="session-2",
+            )
+            self.assertEqual(fallback["reason"], "adapter-rebind-unavailable")
+            self.assertEqual(
+                fallback["next_action"], "create-new-workstream-and-open-new-platform-session"
+            )
+            with self.assertRaisesRegex(ValueError, "does not support platform-session rebind"):
+                attach_platform_session(
+                    fixture.worktree_b,
+                    adapter_manifest=manifest,
+                    platform_session_id="session-2",
+                    rebind=True,
+                )
+            primary = plan_adapter_session_route(
+                fixture.repository,
+                adapter_manifest=manifest,
+                platform_session_id="session-primary",
+            )
+            self.assertEqual(primary["reason"], "primary-worktree-write-prohibited")
+
+    def test_lifecycle_and_adapter_cli_commands_have_stable_json_and_fail_closed_routes(self) -> None:
+        manifest = REPOSITORY_ROOT / "adapters" / "codex" / "adapter-manifest.json"
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W1.3-cli",
+                primary_subsystem_id="project-structure",
+                lifecycle_phase="created",
+            )
+            environment = {
+                **fixture.environment,
+                "PYTHONPATH": os.pathsep.join(
+                    (str(CLI_SOURCE), str(CORE_SOURCE), str(OBSERVATORY_SOURCE))
+                ),
+            }
+            base = [sys.executable, "-X", "utf8", "-m", "project_orrery_cli", "worktree"]
+
+            def run(*arguments: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [*base, *arguments, "--json"],
+                    cwd=REPOSITORY_ROOT,
+                    env=environment,
+                    text=True,
+                    capture_output=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    check=False,
+                )
+
+            route = run(
+                "route",
+                "--target",
+                str(fixture.worktree_b),
+                "--adapter-manifest",
+                str(manifest),
+                "--platform-session-id",
+                "cli-session",
+            )
+            self.assertEqual(route.returncode, 5, route.stdout + route.stderr)
+            route_payload = json.loads(route.stdout)
+            self.assertEqual(route_payload["command"], "worktree-session-route")
+            self.assertEqual(route_payload["data"]["reason"], "platform-session-attach-required")
+            self.assertFalse(route_payload["data"]["writes_performed"])
+
+            attach = run(
+                "session",
+                "attach",
+                "--target",
+                str(fixture.worktree_b),
+                "--adapter-manifest",
+                str(manifest),
+                "--platform-session-id",
+                "cli-session",
+            )
+            self.assertEqual(attach.returncode, 0, attach.stdout + attach.stderr)
+            attach_payload = json.loads(attach.stdout)
+            self.assertEqual(attach_payload["command"], "worktree-session-attach")
+            self.assertTrue(attach_payload["data"]["writes_performed"])
+
+            allowed = run(
+                "route",
+                "--target",
+                str(fixture.worktree_b),
+                "--adapter-manifest",
+                str(manifest),
+                "--platform-session-id",
+                "cli-session",
+            )
+            self.assertEqual(allowed.returncode, 0, allowed.stdout + allowed.stderr)
+            self.assertTrue(json.loads(allowed.stdout)["data"]["allowed"])
+
+            transition = run(
+                "session",
+                "transition",
+                "--target",
+                str(fixture.worktree_b),
+                "--phase",
+                "implementing",
+                "--reason",
+                "begin CLI implementation",
+            )
+            self.assertEqual(transition.returncode, 0, transition.stdout + transition.stderr)
+            transition_payload = json.loads(transition.stdout)
+            self.assertEqual(transition_payload["command"], "worktree-session-transition")
+            self.assertEqual(transition_payload["data"]["session"]["lifecycle_phase"], "implementing")
 
 
 if __name__ == "__main__":

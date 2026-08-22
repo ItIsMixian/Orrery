@@ -6,9 +6,12 @@ import sys
 from pathlib import Path
 
 from project_orrery_core.collaboration import (
+    attach_platform_session,
     create_worktree,
     inspect_primary_write_guard,
     inspect_worktree_status,
+    plan_adapter_session_route,
+    transition_workstream_session,
     write_workstream_session,
 )
 
@@ -28,6 +31,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     guard = actions.add_parser("guard", help="check the primary-worktree product-write boundary")
     _add_common_target(guard)
+
+    route = actions.add_parser("route", help="plan an Adapter session route without writing")
+    _add_common_target(route)
+    route.add_argument("--adapter-manifest", required=True, type=Path)
+    route.add_argument("--platform-session-id")
 
     create = actions.add_parser("create", help="create an isolated linked Workstream worktree")
     _add_common_target(create)
@@ -52,6 +60,20 @@ def build_parser() -> argparse.ArgumentParser:
     write.add_argument("--governing-doc", action="append", default=[])
     write.add_argument("--validation-surface", action="append", default=[])
     write.add_argument("--scope-revision", type=int, default=1)
+
+    transition = session_actions.add_parser("transition", help="apply one legal lifecycle transition")
+    _add_common_target(transition)
+    transition.add_argument("--reason", required=True)
+    transition.add_argument("--phase")
+    transition.add_argument("--runtime-condition")
+    transition.add_argument("--evidence-freshness")
+    transition.add_argument("--closure-reason")
+
+    attach = session_actions.add_parser("attach", help="attach a platform session privately")
+    _add_common_target(attach)
+    attach.add_argument("--adapter-manifest", required=True, type=Path)
+    attach.add_argument("--platform-session-id", required=True)
+    attach.add_argument("--rebind", action="store_true")
     return parser
 
 
@@ -123,6 +145,34 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Recovery: {data['recovery']}")
         return int(exit_code)
 
+    if arguments.action == "route":
+        command = "worktree-session-route"
+        try:
+            data = plan_adapter_session_route(
+                arguments.target,
+                adapter_manifest=arguments.adapter_manifest,
+                platform_session_id=arguments.platform_session_id,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        exit_code = JsonExitCode.OK if data["allowed"] else JsonExitCode.COMPATIBILITY_FAILED
+        if arguments.json_output:
+            warnings = [] if data["allowed"] else [issue(data["reason"], data["next_action"])]
+            emit(
+                response(
+                    command,
+                    status="ok" if data["allowed"] else "warning",
+                    exit_code=exit_code,
+                    data=data,
+                    warnings=warnings,
+                )
+            )
+        else:
+            print(f"Decision: {data['decision']}")
+            print(f"Reason: {data['reason']}")
+            print(f"Next action: {data['next_action']}")
+        return int(exit_code)
+
     if arguments.action == "create":
         command = "worktree-create"
         try:
@@ -150,6 +200,44 @@ def main(argv: list[str] | None = None) -> int:
                 f"{data['source']['integration_oid']}"
             )
             print(f"Session: {data['session_path']}")
+        return int(JsonExitCode.OK)
+
+    if arguments.session_action == "transition":
+        command = "worktree-session-transition"
+        try:
+            data = transition_workstream_session(
+                arguments.target,
+                reason=arguments.reason,
+                lifecycle_phase=arguments.phase,
+                runtime_condition=arguments.runtime_condition,
+                evidence_freshness=arguments.evidence_freshness,
+                closure_reason=arguments.closure_reason,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        if arguments.json_output:
+            emit(response(command, status="ok", exit_code=JsonExitCode.OK, data=data))
+        else:
+            print(f"Lifecycle phase: {data['session']['lifecycle_phase']}")
+            print(f"Lifecycle revision: {data['session']['lifecycle_revision']}")
+        return int(JsonExitCode.OK)
+
+    if arguments.session_action == "attach":
+        command = "worktree-session-attach"
+        try:
+            data = attach_platform_session(
+                arguments.target,
+                adapter_manifest=arguments.adapter_manifest,
+                platform_session_id=arguments.platform_session_id,
+                rebind=arguments.rebind,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        if arguments.json_output:
+            emit(response(command, status="ok", exit_code=JsonExitCode.OK, data=data))
+        else:
+            attached = data["session"]["platform_session"]
+            print(f"Platform session: {attached['adapter']}:{attached['session_id']}")
         return int(JsonExitCode.OK)
 
     command = "worktree-session-write"

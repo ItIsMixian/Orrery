@@ -5,7 +5,7 @@
     "name": "Project Orrery DeepSeek Harness Adapter",
     "platform": "deepseek-harness",
     "distribution": "project-orrery-deepseek-harness-adapter",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "api_version": 1,
     "support_status": "experimental"
   },
@@ -22,6 +22,20 @@
       "minimum": "0.1.0-rc.8",
       "maximum_exclusive": "0.2.0"
     }
+  },
+  "workstream_capabilities": {
+    "schema_version": 1,
+    "contract_type": "adapter-capabilities",
+    "adapter_id": "project-orrery-deepseek-harness",
+    "platform": "deepseek-harness",
+    "launch": false,
+    "attach": true,
+    "rebind": false,
+    "message": false,
+    "session_identity_source": "caller-provided",
+    "requires_product_write_guard": true,
+    "visibility": "local-only",
+    "observability": "local"
   },
   "runtime_compatibility": {
     "runtime": "DeepSeek Harness",
