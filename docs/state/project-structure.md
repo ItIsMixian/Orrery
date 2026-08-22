@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
-- Canonical source 当前仍为 Core 0.1.5／CLI 0.1.10；本 W3 Candidate worktree 将未发布源码推进到 Core 0.1.7／CLI 0.1.12，在既有 W1/W2 contract、Git-private session、Scope、finding、acknowledgement 与 route gate 上增加证据优先 review package、推测性 integration dry-run、人工 decision、integration eligibility、Git-private closure，以及 bounded workspace inventory／cleanup eligibility。Observatory 保持 0.1.0，Core API 仍为 1；Candidate 尚未提交、集成、推送或发布。
+- 当前 source 将未发布 Core／CLI 推进到 0.1.7／0.1.12：在 W1/W2 contract、Git-private session、Scope、finding、acknowledgement 与 route gate 上增加证据优先 review package、推测性 integration dry-run、人工 decision、integration eligibility、Git-private closure，以及 bounded workspace inventory／cleanup eligibility。Observatory 保持 0.1.0，Core API 仍为 1；只有当包含本段的 exact SHA 位于 `main` 时 W3 才是 Canonical，公开 v0.2.0 仍未改变。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
 ## 当前边界
@@ -85,5 +85,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W3 Candidate 已实现本地 review／integration dry-run／closure／cleanup eligibility 闭环，但尚未进入 Canonical、没有当前 SHA 的远端 Windows／Ubuntu promotion evidence，也没有真实 main 更新或清理执行。当前平台仍未声明 launch／rebind／message，也没有宿主级任意写入拦截；Observatory 投影与 Team 网络层仍未实现。
+- W3 source 已实现本地 review／integration dry-run／closure／workspace inventory／cleanup eligibility 闭环；它不执行真实 main 更新或清理。Canonical 与远端 promotion 状态由包含本段的 ref 和 exact-SHA checks 决定。当前平台仍未声明 launch／rebind／message，也没有宿主级任意写入拦截；Observatory 投影与 Team 网络层仍未进入 Canonical。
 - Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.12、其他版本、OS、Provider、模型或未来发行物。
