@@ -79,6 +79,7 @@ Updated: 2026-08-22
 - 2026-08-21 M2 本地 Canonical integration 把 M2.1／M2.2／M2.3 合并后的 Authority 专项扩展到 163 项，160 通过、3 项 Windows symlink privilege 跳过；全仓扩展到 231 项，226 通过、5 项按环境或可选依赖跳过。结构、默认 legacy build、显式 projection、链接与 diff 见 integration Validation；该证据不证明 managed production switch 或 release。
 - 2026-08-21 `main` 推送验收先在本机启用动态依赖执行 231 项并全部通过，3 项 Windows symlink privilege 跳过；integrated build、默认／显式 Authority projection 精确回滚、282 份 Markdown／686 个本地链接／0 缺失和发布排除边界通过。首次远端 run `32492265629` 的 Ubuntu job 发现 release-gate 测试硬编码 Windows 绝对路径；`42aebae` 改用平台原生绝对词法路径后，Windows focused 为 10 passed + 2 privilege skips、Ubuntu WSL focused 12/12，最终 GitHub Actions `32492830151` 在 Windows／Ubuntu 双 PASS。该证据只验收公开 source `main`，不构成 Release。
 - 2026-08-22 W1 Personal Core／CLI Phase 0 Candidate 新增 10 项专项，使用运行时合成 Git fixture 覆盖 clean main、两个 linked worktree、独立 clone、文件级 untracked 和未 push commit；同时覆盖 schema bundle、integration ref/OID、主 worktree 覆盖、subsystem registry、Scope 特殊表达、Member capability/credential epoch、Personal zero-network 与只读 CLI。专项 10/10，受影响组合 67 passed + 2 expected skips；最终全仓 241 项中 236 通过、5 项按既有 symlink privilege／动态依赖门跳过。
+- 2026-08-22 D1 文档治理 Phase 1 Candidate 新增 11 项专项，保护 v1 finding schema／规则 registry、11 组正负 synthetic corpus、source hash／line range、status／acknowledge／defer／resolve、soft budget 默认 exit 0、结构门未启用、Authority／作者文档零影响、零网络与确定性零写入。最终全仓、结构、隔离站点与链接结果见对应 Validation。
 
 ## 验证证据
 
@@ -135,6 +136,7 @@ Updated: 2026-08-22
 - [2026-08-22 CLI Wheel Observatory Assets](../validation/2026-08-22-cli-wheel-observatory-assets.md)
 - [2026-08-22 DeepSeek Wheel Runtime Canonical 集成](../validation/2026-08-22-deepseek-wheel-runtime-canonical-integration.md)
 - [2026-08-22 DeepSeek Wheel／W1 Windows CI 修复](../validation/2026-08-22-deepseek-w1-windows-ci-fix.md)
+- [2026-08-22 D1 文档治理 Phase 1 finding contract](../validation/2026-08-22-d1-document-governance-finding-contract.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`

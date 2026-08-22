@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-orrery-documentation-governance-finding-v1",
+  "title": "Project Orrery documentation governance finding v1",
+  "description": "Provider-neutral, read-only, non-authoritative documentation review observation.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "finding_id",
+    "rule_id",
+    "category",
+    "severity",
+    "authority",
+    "source",
+    "observed",
+    "source_evidence",
+    "suggested_destination",
+    "uncertainty",
+    "review",
+    "must_not_infer",
+    "generated_at",
+    "producer"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_id": {"const": "documentation-governance-finding-v1"},
+    "finding_id": {"type": "string", "pattern": "^DGF-[A-Z0-9-]+-[0-9a-f]{12}$"},
+    "rule_id": {"type": "string", "pattern": "^DG-[A-Z0-9-]+-[0-9]{3}$"},
+    "category": {
+      "enum": [
+        "role-boundary",
+        "current-history",
+        "evidence-duplication",
+        "staleness",
+        "link-integrity",
+        "metadata",
+        "growth",
+        "ownership"
+      ]
+    },
+    "severity": {"enum": ["info", "warning", "review-required"]},
+    "authority": {"const": "non-authoritative-observation"},
+    "source": {
+      "type": "object",
+      "required": ["document", "document_role", "fact_scope", "repository_snapshot"],
+      "properties": {
+        "document": {"type": "string", "minLength": 1},
+        "document_role": {
+          "enum": [
+            "agents",
+            "handoff",
+            "progress",
+            "state",
+            "adr",
+            "approved-design",
+            "plan",
+            "validation",
+            "devlog",
+            "snapshot",
+            "library",
+            "backlog",
+            "experiment",
+            "other"
+          ]
+        },
+        "fact_scope": {
+          "enum": ["canonical", "candidate", "worktree", "local-only", "historical", "unknown"]
+        },
+        "repository_snapshot": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "observed": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["metric", "value", "comparator", "threshold", "unit"],
+        "properties": {
+          "metric": {"type": "string", "minLength": 1},
+          "value": {"type": "number"},
+          "comparator": {"enum": ["gt", "gte", "eq", "neq"]},
+          "threshold": {"type": "number"},
+          "unit": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "source_evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["kind", "path", "line_start", "line_end", "sha256", "detail"],
+        "properties": {
+          "kind": {"enum": ["line-range", "link-target", "duplicate-range", "document-metadata"]},
+          "path": {"type": "string", "minLength": 1},
+          "line_start": {"type": "integer", "minimum": 1},
+          "line_end": {"type": "integer", "minimum": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "detail": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "suggested_destination": {"type": ["string", "null"]},
+    "uncertainty": {
+      "type": "object",
+      "required": ["status", "reason"],
+      "properties": {
+        "status": {"enum": ["known", "unknown"]},
+        "reason": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "trigger",
+        "review_class",
+        "status",
+        "acknowledgement",
+        "program_gate",
+        "authority_effect",
+        "author_document_effect"
+      ],
+      "properties": {
+        "trigger": {"const": "human-review"},
+        "review_class": {"enum": ["soft-budget", "content-review", "structural-integrity"]},
+        "status": {"enum": ["open", "acknowledged", "deferred", "resolved"]},
+        "acknowledgement": {
+          "type": ["object", "null"],
+          "required": ["disposition", "actor", "reason", "recorded_at", "review_after"],
+          "properties": {
+            "disposition": {"enum": ["acknowledge", "defer", "resolve"]},
+            "actor": {"type": "string", "minLength": 1},
+            "reason": {"type": "string", "minLength": 1},
+            "recorded_at": {"type": "string", "format": "date-time"},
+            "review_after": {"type": ["string", "null"], "format": "date-time"}
+          },
+          "additionalProperties": false
+        },
+        "program_gate": {"enum": ["advisory", "eligible-not-enabled"]},
+        "authority_effect": {"const": "none"},
+        "author_document_effect": {"const": "none"}
+      },
+      "additionalProperties": false
+    },
+    "must_not_infer": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "authority-change",
+          "document-invalid",
+          "automatic-author-document-write",
+          "validation-success",
+          "automatic-finding-closure"
+        ]
+      }
+    },
+    "generated_at": {"type": "string", "format": "date-time"},
+    "producer": {
+      "type": "object",
+      "required": ["name", "version", "network_access"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "network_access": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -358,3 +358,11 @@
 - 四个 Adapter Candidate 提升到 0.1.1 并声明 launch／attach／rebind／message matrix；Codex、Claude Code、DeepSeek Harness 当前只支持 caller-provided attach，Harness JSON 全关闭。三个 Agent Adapter Skill 强制先走只读 route；attach 只写 Git 私有 session，no-rebind 返回新 Workstream／新会话 continuation brief，dirty primary 不自动迁移。
 - 专项 22/22、默认全仓 255 PASS + 5 existing skips、动态全仓 257 PASS + 3 Windows symlink privilege skips；既有真实 Adapter runtime evidence 继续精确绑定 0.1.0，没有提升 0.1.1 支持状态。其余结构／站点／链接／secret／diff 证据见 [W1.3 Validation](validation/2026-08-22-w1-3-personal-phase-1c.md)。
 - W2 Scope/Finding、review／integration／cleanup、closure archive、Observatory、Team Mode、实际 platform launch／rebind／message、宿主级任意写入拦截、push、merge、tag 和 Release 均未实现；根 PROGRESS／HANDOFF 留给唯一整合者同步。
+
+## 2026-08-22 — D1 文档治理 Phase 1 finding contract
+
+- 在独立 `codex/document-governance-finding-contract` worktree 中冻结 Core 内部 `documentation-governance-finding-v1` schema、11 条规则 registry 与 dependency-free validator；没有增加 scanner、CLI、Observatory 或公开 API。
+- finding 显式携带 source／scope／evidence、category／severity、uncertainty、人工 review status／ack 和五项 `must_not_infer`；schema 拒绝 patch、Authority、Validation 写入字段，Authority／作者文档 effect 恒为 `none`。
+- 11 组正负合成 fixture 覆盖 soft budget、入口密度、重复事实、当前／历史、断链、State／Plan／Validation 职责、失活 Plan、metadata 和功能分支全局入口 ownership；golden evidence 绑定文件 SHA-256 与行区间。
+- 所有 D1 规则默认 exit 0；soft budget 仅 advisory，断链只标记为未来 `eligible-not-enabled`。真实项目配置位置／阈值、ack storage 和任何硬门仍待 Phase 2 之后另行决定。
+- 专项 11/11 已通过；完整仓库、integrated structure、隔离静态站、Markdown links 与 diff 结果进入对应 Validation。根 PROGRESS／HANDOFF 按普通功能分支规则保持不动。

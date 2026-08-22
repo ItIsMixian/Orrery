@@ -6,6 +6,8 @@ Date: 2026-08-21
 
 Branch: `codex/document-governance-policy`
 
+D1 Candidate branch: `codex/document-governance-finding-contract`
+
 Governing ADRs: [ADR-0001](../../decisions/0001-project-orrery-self-hosting.md), [ADR-0009](../../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0012](../../decisions/0012-document-governance-and-information-lifecycle.md)
 
 Approved Design: [文档治理与信息生命周期](../../design/document-governance-and-information-lifecycle.md)
@@ -25,11 +27,11 @@ Approved Design: [文档治理与信息生命周期](../../design/document-gover
 
 ## Phase 1：只读 contract 与 fixture
 
-- [ ] 在平台中立 Core 定义 `documentation-governance-finding-v1` schema 和规则 registry；不读取正文之外的敏感数据。
-- [ ] 建立合成 fixture，覆盖 PROGRESS 完成史堆积、State 计划／历史混入、失活 Plan、断链、结构化字段误用、证据重复、soft budget 和并发全局入口所有权。
-- [ ] 明确 `info`／`warning`／`review-required` 与程序退出码的正交关系；长度 warning 默认退出 0。
-- [ ] 定义 project-level advisory 配置和默认缺省行为；不把固定字数写入 Authority Model。
-- [ ] 以负向测试证明 finding 不会变成 ADR／State／Validation，也不会触发文件写入。
+- [x] D1 在平台中立 Core 定义内部 `documentation-governance-finding-v1` schema 和规则 registry；不读取正文之外的敏感数据，也不导出稳定公共 API。
+- [x] D1 建立 11 组正负合成 fixture，覆盖 PROGRESS 完成史堆积、State／Plan／Validation 职责混入、失活 Plan、断链、结构化字段误用、证据重复、soft budget 和并发全局入口所有权。
+- [x] D1 明确 `info`／`warning`／`review-required` 与程序退出码正交：Phase 1 所有规则默认 exit 0；断链仅为后续硬门候选但当前未启用。
+- [x] D1 冻结 project-level advisory 配置语义：阈值是项目本地 soft data，缺省未配置时禁用；真实配置位置和初始阈值继续留待真实 corpus 测量。
+- [x] D1 以负向测试证明 finding 不能携带 patch／Authority／Validation 写入字段，不会触发作者文件写入、自动关闭或 Authority／文档有效性变化。
 
 ## Phase 2：平台中立 CLI 审计
 
@@ -72,7 +74,7 @@ Approved Design: [文档治理与信息生命周期](../../design/document-gover
 
 ## 当前未决选择
 
-- 初始项目级 soft budget 默认值和配置位置；必须先测量真实 corpus，不能凭偏好写死。
+- 初始项目级 soft budget 值和配置位置；D1 已固定“缺省禁用／项目本地／非 Authority”，具体位置和值必须先测量真实 corpus，不能凭偏好写死。
 - Finding acknowledge／defer 的持久化位置和 lifecycle；不能与作者事实混存。
 - 哪些结构违规可进入 CI review gate；长度和风格类 finding 已明确不能单独成为硬门。
 - HANDOFF 首次专项压缩的人工保留清单；当前文件是首个 review candidate，但本 Plan 不授权自动清理。
@@ -81,4 +83,5 @@ Approved Design: [文档治理与信息生命周期](../../design/document-gover
 
 - State: [文档系统 State](../../state/documentation-system.md)，后续实现时再同步 Test Coverage／Release State。
 - Phase 0 Validation: [2026-08-21 文档治理采纳](../../validation/2026-08-21-document-governance-adoption.md)
-- Phase 1–4 必须分别新增 Validation，不得用本 Plan 的 checklist 代替实现证据。
+- D1／Phase 1 Validation: [2026-08-22 finding contract 与合成 fixture](../../validation/2026-08-22-d1-document-governance-finding-contract.md)
+- Phase 2–4 必须分别新增 Validation，不得用本 Plan 的 checklist 代替实现证据。

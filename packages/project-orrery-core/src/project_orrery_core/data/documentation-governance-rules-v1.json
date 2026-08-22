@@ -1,0 +1,152 @@
+{
+  "registry_id": "documentation-governance-rules-v1",
+  "registry_version": 1,
+  "finding_contract_id": "documentation-governance-finding-v1",
+  "status": "candidate",
+  "execution_constraints": {
+    "network_access": false,
+    "author_document_writes": false,
+    "authority_mutation": false,
+    "automatic_finding_closure": false
+  },
+  "advisory_configuration": {
+    "location": "unselected",
+    "default_when_absent": "disabled",
+    "thresholds_are_authority": false,
+    "thresholds_are_project_local": true
+  },
+  "rules": [
+    {
+      "rule_id": "DG-ENTRANCE-SOFT-BUDGET-001",
+      "category": "growth",
+      "severity": "warning",
+      "document_roles": ["agents", "handoff", "progress"],
+      "review_class": "soft-budget",
+      "threshold_key": "entrance_non_empty_lines",
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-ENTRANCE-LINK-DENSITY-001",
+      "category": "growth",
+      "severity": "warning",
+      "document_roles": ["agents", "handoff", "progress"],
+      "review_class": "soft-budget",
+      "threshold_key": "entrance_link_density_percent",
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-DUPLICATE-CURRENT-FACT-001",
+      "category": "evidence-duplication",
+      "severity": "warning",
+      "document_roles": ["agents", "handoff", "progress", "state"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-CURRENT-HISTORY-RETENTION-001",
+      "category": "current-history",
+      "severity": "warning",
+      "document_roles": ["handoff", "progress", "state"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-BROKEN-AUTHORITY-LINK-001",
+      "category": "link-integrity",
+      "severity": "review-required",
+      "document_roles": ["agents", "handoff", "progress", "state", "adr", "approved-design", "plan", "validation"],
+      "review_class": "structural-integrity",
+      "threshold_key": null,
+      "program_gate": "eligible-not-enabled",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-STATE-ROLE-BOUNDARY-001",
+      "category": "role-boundary",
+      "severity": "review-required",
+      "document_roles": ["state"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-PLAN-ROLE-BOUNDARY-001",
+      "category": "role-boundary",
+      "severity": "review-required",
+      "document_roles": ["plan"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-VALIDATION-ROLE-BOUNDARY-001",
+      "category": "role-boundary",
+      "severity": "review-required",
+      "document_roles": ["validation"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-INACTIVE-PLAN-001",
+      "category": "staleness",
+      "severity": "warning",
+      "document_roles": ["plan"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-STRUCTURED-METADATA-MISUSE-001",
+      "category": "metadata",
+      "severity": "review-required",
+      "document_roles": ["state", "plan", "validation"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    },
+    {
+      "rule_id": "DG-GLOBAL-ENTRY-OWNERSHIP-001",
+      "category": "ownership",
+      "severity": "review-required",
+      "document_roles": ["other"],
+      "review_class": "content-review",
+      "threshold_key": null,
+      "program_gate": "advisory",
+      "default_exit_code": 0,
+      "authority_effect": "none",
+      "author_document_effect": "none"
+    }
+  ]
+}

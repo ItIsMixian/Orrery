@@ -62,7 +62,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 ## 已知缺口
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
-- 尚未实现 provider-neutral `docs audit`、finding schema／registry、project soft budget、acknowledge／defer storage 或自动检查 State／实现链接是否过期的机制；当前只有 Accepted ADR、Approved Design、活动 Plan 和人工自托管规则。
+- D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
 - W1.2 Candidate CLI 已能报告既有 W1.1 status/session，并可创建固定 integration OID 的 linked worktree、初始化私有 session、执行 primary-write preflight；Adapter 尚未强制接线，观测台也未消费该合约，仍没有自动重叠报告、审查包、清理建议或 Team Mode runtime。因此当前协作执行仍依赖入口规则、显式 guard、独立目录和集成者审阅。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

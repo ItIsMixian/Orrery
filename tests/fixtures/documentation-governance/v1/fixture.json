@@ -1,0 +1,822 @@
+{
+  "fixture_format": 1,
+  "fixture_status": "candidate",
+  "finding_contract_id": "documentation-governance-finding-v1",
+  "rule_registry_id": "documentation-governance-rules-v1",
+  "repository_snapshot": "fixture://documentation-governance-v1@frozen",
+  "normative_sources": [
+    "docs/decisions/0012-document-governance-and-information-lifecycle.md",
+    "docs/design/document-governance-and-information-lifecycle.md",
+    "docs/implementation/plans/2026-08-21-document-governance-and-audit.md",
+    "docs/state/documentation-system.md"
+  ],
+  "execution_constraints": {
+    "network_access": false,
+    "author_document_writes": false,
+    "authority_mutation": false,
+    "automatic_finding_closure": false,
+    "deterministic": true
+  },
+  "advisory_config": {
+    "scope": "synthetic-fixture-only",
+    "entrance_non_empty_lines": 12,
+    "entrance_link_density_percent": 50
+  },
+  "review_lifecycle_examples": [
+    {
+      "status": "open",
+      "acknowledgement": null
+    },
+    {
+      "status": "acknowledged",
+      "acknowledgement": {
+        "disposition": "acknowledge",
+        "actor": "fixture-maintainer",
+        "reason": "Reviewed; the current wording is intentionally retained.",
+        "recorded_at": "2026-08-22T01:00:00Z",
+        "review_after": null
+      }
+    },
+    {
+      "status": "deferred",
+      "acknowledgement": {
+        "disposition": "defer",
+        "actor": "fixture-integrator",
+        "reason": "Revisit after the next documentation milestone.",
+        "recorded_at": "2026-08-22T02:00:00Z",
+        "review_after": "2026-09-01T00:00:00Z"
+      }
+    },
+    {
+      "status": "resolved",
+      "acknowledgement": {
+        "disposition": "resolve",
+        "actor": "fixture-maintainer",
+        "reason": "The author document was manually reviewed outside the finding contract.",
+        "recorded_at": "2026-08-22T03:00:00Z",
+        "review_after": null
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "entrance-soft-budget-positive",
+      "polarity": "positive",
+      "coverage": ["overlong-entry", "soft-review-budget"],
+      "document": "corpus/entrance-soft-budget-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-ENTRANCE-SOFT-BUDGET-969de4a36c2d",
+          "rule_id": "DG-ENTRANCE-SOFT-BUDGET-001",
+          "category": "growth",
+          "severity": "warning",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/entrance-soft-budget-positive.md",
+            "document_role": "progress",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "non_empty_lines",
+              "value": 15,
+              "comparator": "gt",
+              "threshold": 12,
+              "unit": "lines"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "document-metadata",
+              "path": "corpus/entrance-soft-budget-positive.md",
+              "line_start": 1,
+              "line_end": 23,
+              "sha256": "969de4a36c2d7c87956d8c644893ddb7dc24e5b9d99dcee23ed1514f231604a5",
+              "detail": "15 non-empty lines exceed the fixture-only advisory threshold of 12."
+            }
+          ],
+          "suggested_destination": "docs/DEVLOG.md",
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "soft-budget",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "entrance-soft-budget-negative",
+      "polarity": "negative",
+      "coverage": ["overlong-entry", "soft-review-budget"],
+      "document": "corpus/entrance-soft-budget-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "entrance-density-positive",
+      "polarity": "positive",
+      "coverage": ["high-density-entry", "soft-review-budget"],
+      "document": "corpus/entrance-density-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-ENTRANCE-LINK-DENSITY-04b224dcef3f",
+          "rule_id": "DG-ENTRANCE-LINK-DENSITY-001",
+          "category": "growth",
+          "severity": "warning",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/entrance-density-positive.md",
+            "document_role": "agents",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "link_density_percent",
+              "value": 86,
+              "comparator": "gt",
+              "threshold": 50,
+              "unit": "percent"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "document-metadata",
+              "path": "corpus/entrance-density-positive.md",
+              "line_start": 1,
+              "line_end": 8,
+              "sha256": "04b224dcef3f8e58fe6b8ef1ea17a236d48eed45a009fbd91c31e4d3cd7fd935",
+              "detail": "6 of 7 non-empty lines contain links; the rounded density is 86 percent."
+            }
+          ],
+          "suggested_destination": null,
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "soft-budget",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "entrance-density-negative",
+      "polarity": "negative",
+      "coverage": ["high-density-entry", "soft-review-budget"],
+      "document": "corpus/entrance-density-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "duplicate-fact-positive",
+      "polarity": "positive",
+      "coverage": ["duplicate-fact"],
+      "document": "corpus/duplicate-fact-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-DUPLICATE-CURRENT-FACT-18304e73028b",
+          "rule_id": "DG-DUPLICATE-CURRENT-FACT-001",
+          "category": "evidence-duplication",
+          "severity": "warning",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/duplicate-fact-positive.md",
+            "document_role": "progress",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "duplicate_claim_occurrences",
+              "value": 2,
+              "comparator": "gt",
+              "threshold": 1,
+              "unit": "occurrences"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "duplicate-range",
+              "path": "corpus/duplicate-fact-positive.md",
+              "line_start": 3,
+              "line_end": 6,
+              "sha256": "18304e73028b8536337093abd468a97dee02de55523f4a092e5c1c28330035e6",
+              "detail": "The same synthetic current-fact sentence occurs on lines 3 and 6."
+            }
+          ],
+          "suggested_destination": null,
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "duplicate-fact-negative",
+      "polarity": "negative",
+      "coverage": ["duplicate-fact"],
+      "document": "corpus/duplicate-fact-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "current-history-positive",
+      "polarity": "positive",
+      "coverage": ["historical-content-in-current-entry"],
+      "document": "corpus/current-history-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-CURRENT-HISTORY-RETENTION-be32b3c2bfdb",
+          "rule_id": "DG-CURRENT-HISTORY-RETENTION-001",
+          "category": "current-history",
+          "severity": "warning",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/current-history-positive.md",
+            "document_role": "handoff",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "resolved_history_lines",
+              "value": 2,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "lines"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "line-range",
+              "path": "corpus/current-history-positive.md",
+              "line_start": 7,
+              "line_end": 10,
+              "sha256": "be32b3c2bfdb23b621a9ecffa59ff3b3454064699553a238d4932628eaec852f",
+              "detail": "A current HANDOFF fixture contains an explicitly resolved-history section."
+            }
+          ],
+          "suggested_destination": "docs/DEVLOG.md",
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "current-history-negative",
+      "polarity": "negative",
+      "coverage": ["historical-content-in-current-entry"],
+      "document": "corpus/current-history-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "broken-link-positive",
+      "polarity": "positive",
+      "coverage": ["broken-link", "hard-gate-boundary"],
+      "document": "corpus/broken-link-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-BROKEN-AUTHORITY-LINK-61579eb1830f",
+          "rule_id": "DG-BROKEN-AUTHORITY-LINK-001",
+          "category": "link-integrity",
+          "severity": "review-required",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/broken-link-positive.md",
+            "document_role": "state",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "missing_link_targets",
+              "value": 1,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "links"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "link-target",
+              "path": "corpus/broken-link-positive.md",
+              "line_start": 3,
+              "line_end": 3,
+              "sha256": "61579eb1830f76a802b62bae2ca2a217146ba3e3d0661a7fb2f5de55854bba76",
+              "detail": "The synthetic target ../validation/missing-validation.md does not exist."
+            }
+          ],
+          "suggested_destination": null,
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "structural-integrity",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "eligible-not-enabled",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "broken-link-negative",
+      "polarity": "negative",
+      "coverage": ["broken-link", "hard-gate-boundary"],
+      "document": "corpus/broken-link-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "state-role-positive",
+      "polarity": "positive",
+      "coverage": ["state-plan-responsibility-mix"],
+      "document": "corpus/state-role-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-STATE-ROLE-BOUNDARY-95ba3809f87f",
+          "rule_id": "DG-STATE-ROLE-BOUNDARY-001",
+          "category": "role-boundary",
+          "severity": "review-required",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/state-role-positive.md",
+            "document_role": "state",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "future_checklist_items",
+              "value": 2,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "items"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "line-range",
+              "path": "corpus/state-role-positive.md",
+              "line_start": 7,
+              "line_end": 10,
+              "sha256": "95ba3809f87f712cd1191690c71aea361d6938726f2fd1270b5f913c61f03fce",
+              "detail": "A State fixture contains a planned-work checklist."
+            }
+          ],
+          "suggested_destination": "docs/implementation/plans/",
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "state-role-negative",
+      "polarity": "negative",
+      "coverage": ["state-plan-responsibility-mix"],
+      "document": "corpus/state-role-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "plan-role-positive",
+      "polarity": "positive",
+      "coverage": ["plan-state-validation-responsibility-mix"],
+      "document": "corpus/plan-role-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-PLAN-ROLE-BOUNDARY-5e802e9369af",
+          "rule_id": "DG-PLAN-ROLE-BOUNDARY-001",
+          "category": "role-boundary",
+          "severity": "review-required",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/plan-role-positive.md",
+            "document_role": "plan",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "implementation_or_release_claims",
+              "value": 1,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "claims"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "line-range",
+              "path": "corpus/plan-role-positive.md",
+              "line_start": 3,
+              "line_end": 5,
+              "sha256": "5e802e9369af667f68765728cf55abd6b1cd7a9cbb7b59ef5bf47bb64c75d95c",
+              "detail": "A Plan fixture claims verified and released implementation state."
+            }
+          ],
+          "suggested_destination": "docs/state/ and docs/validation/",
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "plan-role-negative",
+      "polarity": "negative",
+      "coverage": ["plan-state-validation-responsibility-mix"],
+      "document": "corpus/plan-role-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "validation-role-positive",
+      "polarity": "positive",
+      "coverage": ["validation-plan-responsibility-mix"],
+      "document": "corpus/validation-role-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-VALIDATION-ROLE-BOUNDARY-a5914ac234b5",
+          "rule_id": "DG-VALIDATION-ROLE-BOUNDARY-001",
+          "category": "role-boundary",
+          "severity": "review-required",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/validation-role-positive.md",
+            "document_role": "validation",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "prospective_only_claims",
+              "value": 2,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "claims"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "line-range",
+              "path": "corpus/validation-role-positive.md",
+              "line_start": 3,
+              "line_end": 7,
+              "sha256": "a5914ac234b510ee6d1601cbcd4d635db6b8c5a1ebfb885f375f6f0dee17e75a",
+              "detail": "A Validation fixture contains only future commands and expected results."
+            }
+          ],
+          "suggested_destination": "docs/implementation/plans/",
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "validation-role-negative",
+      "polarity": "negative",
+      "coverage": ["validation-plan-responsibility-mix"],
+      "document": "corpus/validation-role-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "inactive-plan-positive",
+      "polarity": "positive",
+      "coverage": ["inactive-plan"],
+      "document": "corpus/inactive-plan-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-INACTIVE-PLAN-291d399c9e5e",
+          "rule_id": "DG-INACTIVE-PLAN-001",
+          "category": "staleness",
+          "severity": "warning",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/inactive-plan-positive.md",
+            "document_role": "plan",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "active_plan_with_no_open_items",
+              "value": 1,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "plans"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "line-range",
+              "path": "corpus/inactive-plan-positive.md",
+              "line_start": 3,
+              "line_end": 10,
+              "sha256": "291d399c9e5ef21592a813eb65431f2be90240c2405e74d472aae5c8bcefdc49",
+              "detail": "An Active Plan fixture has only completed checklist items and a completion date."
+            }
+          ],
+          "suggested_destination": null,
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "inactive-plan-negative",
+      "polarity": "negative",
+      "coverage": ["inactive-plan"],
+      "document": "corpus/inactive-plan-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "metadata-misuse-positive",
+      "polarity": "positive",
+      "coverage": ["structured-metadata-misuse"],
+      "document": "corpus/metadata-misuse-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-STRUCTURED-METADATA-MISUSE-4f27487cd17b",
+          "rule_id": "DG-STRUCTURED-METADATA-MISUSE-001",
+          "category": "metadata",
+          "severity": "review-required",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/metadata-misuse-positive.md",
+            "document_role": "validation",
+            "fact_scope": "candidate",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "structured_success_without_evidence_sections",
+              "value": 1,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "claims"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "line-range",
+              "path": "corpus/metadata-misuse-positive.md",
+              "line_start": 3,
+              "line_end": 5,
+              "sha256": "4f27487cd17b52a52605f7bf817193085e7d70b5fe2014868f4ea4c60daed014",
+              "detail": "A structured Passed claim is present without command, environment, or observed output."
+            }
+          ],
+          "suggested_destination": null,
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "metadata-misuse-negative",
+      "polarity": "negative",
+      "coverage": ["structured-metadata-misuse"],
+      "document": "corpus/metadata-misuse-negative.md",
+      "expected_findings": []
+    },
+    {
+      "id": "global-entry-ownership-positive",
+      "polarity": "positive",
+      "coverage": ["concurrent-global-entry-ownership"],
+      "document": "corpus/global-entry-ownership-positive.md",
+      "expected_findings": [
+        {
+          "schema_version": 1,
+          "contract_id": "documentation-governance-finding-v1",
+          "finding_id": "DGF-GLOBAL-ENTRY-OWNERSHIP-ca95cf05145b",
+          "rule_id": "DG-GLOBAL-ENTRY-OWNERSHIP-001",
+          "category": "ownership",
+          "severity": "review-required",
+          "authority": "non-authoritative-observation",
+          "source": {
+            "document": "corpus/global-entry-ownership-positive.md",
+            "document_role": "other",
+            "fact_scope": "worktree",
+            "repository_snapshot": "fixture://documentation-governance-v1@frozen"
+          },
+          "observed": [
+            {
+              "metric": "feature_branch_global_entry_writes",
+              "value": 2,
+              "comparator": "gt",
+              "threshold": 0,
+              "unit": "paths"
+            }
+          ],
+          "source_evidence": [
+            {
+              "kind": "line-range",
+              "path": "corpus/global-entry-ownership-positive.md",
+              "line_start": 3,
+              "line_end": 8,
+              "sha256": "ca95cf05145ba1aa81c564571da18c15f9e492969af510882f0483c021c3bc23",
+              "detail": "A feature-worktree scope fixture lists both root integration entries as expected writes."
+            }
+          ],
+          "suggested_destination": "integrator review",
+          "uncertainty": {"status": "known", "reason": null},
+          "review": {
+            "trigger": "human-review",
+            "review_class": "content-review",
+            "status": "open",
+            "acknowledgement": null,
+            "program_gate": "advisory",
+            "authority_effect": "none",
+            "author_document_effect": "none"
+          },
+          "must_not_infer": [
+            "authority-change",
+            "document-invalid",
+            "automatic-author-document-write",
+            "validation-success",
+            "automatic-finding-closure"
+          ],
+          "generated_at": "2026-08-22T00:00:00Z",
+          "producer": {"name": "synthetic-fixture", "version": "1", "network_access": false}
+        }
+      ]
+    },
+    {
+      "id": "global-entry-ownership-negative",
+      "polarity": "negative",
+      "coverage": ["concurrent-global-entry-ownership"],
+      "document": "corpus/global-entry-ownership-negative.md",
+      "expected_findings": []
+    }
+  ]
+}
