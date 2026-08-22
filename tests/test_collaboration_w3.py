@@ -51,6 +51,13 @@ PASS_COMMAND = 'python -c "import sys; sys.exit(0)"'
 FAIL_COMMAND = 'python -c "import sys; sys.exit(7)"'
 
 
+def _same_path(left: str | os.PathLike[str], right: str | os.PathLike[str]) -> bool:
+    """Compare Windows short/long aliases as one filesystem identity."""
+    return os.path.normcase(os.path.realpath(os.path.abspath(left))) == os.path.normcase(
+        os.path.realpath(os.path.abspath(right))
+    )
+
+
 class CollaborationW3Tests(unittest.TestCase):
     def _prepare_session(
         self,
@@ -436,7 +443,11 @@ class CollaborationW3Tests(unittest.TestCase):
             )
             closure_path.resolve().relative_to(common.resolve())
             self.assertFalse(closure["author_worktree_files_changed"])
-            self.assertEqual(closure["closure_record"]["original_workspace_path"], str(fixture.worktree_b))
+            self.assertTrue(
+                _same_path(
+                    closure["closure_record"]["original_workspace_path"], fixture.worktree_b
+                )
+            )
             self.assertEqual(closure["closure_record"]["final_head"], package["binding"]["candidate_head"])
             self.assertEqual(closure["closure_record"]["actual_cleanup_actions"], [])
             eligible = compute_cleanup_eligibility(
@@ -500,7 +511,9 @@ class CollaborationW3Tests(unittest.TestCase):
             )
             active_inventory = inventory_workspaces(fixture.worktree_b)
             active = next(
-                item for item in active_inventory["entries"] if Path(item["path"]) == fixture.worktree_b
+                item
+                for item in active_inventory["entries"]
+                if _same_path(item["path"], fixture.worktree_b)
             )
             self.assertEqual(active["classification"], "registered-active")
             self.assertIn("active-or-pending-workstream", active["protections"])
