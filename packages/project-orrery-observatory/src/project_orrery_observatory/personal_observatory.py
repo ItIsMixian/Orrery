@@ -1,9 +1,9 @@
 """Read-only Personal Observatory projection over canonical collaboration data.
 
-The collector deliberately delegates Git identity, Scope, finding, and lifecycle
-semantics to ``project_orrery_core.collaboration``.  This module only aggregates
-those machine contracts for presentation; it does not mutate Workstream sessions
-or infer the future W3 review/integration/cleanup decisions.
+The collector deliberately delegates Git identity, Scope, finding, lifecycle,
+review, integration, inventory, and cleanup semantics to ``project_orrery_core``.
+This module only aggregates those machine contracts for presentation; it does
+not mutate Workstream sessions or infer W3 decisions.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from __future__ import annotations
 import html
 import json
 import os
+import stat
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,11 @@ from typing import Any, Mapping, Sequence
 
 PROJECTION_SCHEMA = "project-orrery-personal-observatory-v1"
 W3_SLOT_KEYS = ("review_queue", "integration_eligibility", "cleanup_eligibility")
+W3_PROJECTION_SCHEMA_VERSION = 1
+
+
+class _W3ProviderIncompatible(ValueError):
+    pass
 
 
 def _now(value: str | None = None) -> str:
@@ -43,7 +49,7 @@ def _w3_slots(projection: Mapping[str, Any] | None) -> dict[str, dict[str, str]]
             key: {
                 "status": "unavailable",
                 "label": "Unavailable",
-                "detail": "W3 not integrated",
+                "detail": "W3 provider unavailable or incompatible · Unknown",
                 "source": "optional-w3-slot",
             }
             for key in W3_SLOT_KEYS
@@ -66,6 +72,311 @@ def _w3_slots(projection: Mapping[str, Any] | None) -> dict[str, dict[str, str]]
             "source": str(value.get("source", "w3-display-provider")),
         }
     return slots
+
+
+def _require_schema(bundle: Mapping[str, Any], key: str, expected: int) -> None:
+    if bundle.get(key) != expected:
+        raise _W3ProviderIncompatible(f"unsupported W3 {key}: {bundle.get(key)!r}")
+
+
+def _read_contained_json(path: Path, boundary: Path, description: str) -> dict[str, Any]:
+    try:
+        resolved_boundary = boundary.resolve(strict=True)
+        resolved = path.resolve(strict=True)
+        resolved.relative_to(resolved_boundary)
+        metadata = path.lstat()
+    except (OSError, ValueError) as error:
+        raise ValueError(f"cannot safely inspect {description}: {error}") from error
+    if not stat.S_ISREG(metadata.st_mode):
+        raise ValueError(f"{description} must be a regular file inside its W3 bundle")
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"cannot read {description}: {error}") from error
+    if not isinstance(value, dict):
+        raise ValueError(f"{description} must contain a JSON object")
+    return value
+
+
+def _load_closure_receipt_bundles(
+    inventory_entries: Sequence[Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Follow W3 closure paths/log refs without importing Core-private helpers."""
+
+    from project_orrery_core.collaboration import validate_collaboration_contract
+
+    closures: list[dict[str, Any]] = []
+    receipts: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for entry in inventory_entries:
+        summary = entry.get("closure", {})
+        closure_id = str(summary.get("closure_id") or "")
+        record_path = summary.get("record_path")
+        if not closure_id or closure_id in seen:
+            continue
+        if not isinstance(record_path, str) or not record_path:
+            raise ValueError("W3 closure summary is missing its stable record_path")
+        seen.add(closure_id)
+        closure_path = Path(record_path)
+        if closure_path.name != f"{closure_id}.json":
+            raise ValueError("W3 closure record_path does not match its closure ID")
+        closure = _read_contained_json(
+            closure_path, closure_path.parent, "closure record"
+        )
+        validate_collaboration_contract(closure)
+        if closure.get("contract_type") != "closure-record" or closure.get(
+            "closure_id"
+        ) != closure_id:
+            raise ValueError("W3 closure record does not match its inventory summary")
+        if summary.get("review_package_id") != closure.get("review_package_id"):
+            raise ValueError("W3 closure review-package binding does not match inventory")
+        expected_log_ref = f"git-private:orrery/closures/actions/{closure_id}/"
+        if closure.get("cleanup_action_log_ref") != expected_log_ref:
+            raise ValueError("W3 closure cleanup_action_log_ref is incompatible")
+        closures.append({**closure, "record_path": str(closure_path)})
+
+        actions_root = closure_path.parent / "actions"
+        directory = actions_root / closure_id
+        if not directory.is_dir():
+            continue
+        try:
+            directory.resolve(strict=True).relative_to(actions_root.resolve(strict=True))
+            directory_metadata = directory.lstat()
+        except (OSError, ValueError) as error:
+            raise ValueError(f"W3 cleanup action log escaped containment: {error}") from error
+        if not stat.S_ISDIR(directory_metadata.st_mode):
+            raise ValueError("W3 cleanup action log must be a regular directory")
+        for path in sorted(directory.glob("cleanup-action-*.json")):
+            receipt = _read_contained_json(path, directory, "cleanup action receipt")
+            _require_schema(receipt, "receipt_schema_version", 1)
+            if receipt.get("closure_id") != closure_id:
+                raise ValueError("W3 cleanup receipt closure binding does not match")
+            receipts.append(
+                {
+                    "receipt_id": receipt.get("receipt_id"),
+                    "closure_id": receipt.get("closure_id"),
+                    "action": receipt.get("action"),
+                    "actor_id": receipt.get("actor_id"),
+                    "authorization_id": receipt.get("authorization_id"),
+                    "evidence_refs": list(receipt.get("evidence_refs", [])),
+                    "occurred_at": receipt.get("occurred_at"),
+                    "verification": receipt.get("verification"),
+                    "caller_attested_performed": receipt.get("performed") is True,
+                    "deletion_inferred": False,
+                    "receipt_path": str(path),
+                }
+            )
+    return closures, receipts
+
+
+def _collect_w3_projection(
+    project_root: Path, workstreams: Sequence[Mapping[str, Any]]
+) -> dict[str, Any]:
+    """Collect display evidence by invoking W3 Core policy and loaders only."""
+
+    from project_orrery_core.review import (
+        compute_integration_eligibility,
+        inspect_review_package_freshness,
+        load_review_package,
+    )
+    from project_orrery_core.workspace_cleanup import (
+        CLEANUP_ACTIONS,
+        WORKSPACE_CLASSIFICATIONS,
+        compute_workspace_cleanup_eligibility,
+        inventory_workspaces,
+    )
+
+    inventory = inventory_workspaces(project_root)
+    _require_schema(inventory, "inventory_schema_version", 1)
+    package_refs = {
+        str(card["review_package_id"]): {
+            "path": str(card.get("worktree_path")),
+            "session_content_hash": card.get("review_package_content_hash"),
+        }
+        for card in workstreams
+        if card.get("review_package_id")
+    }
+    closures_by_package = {
+        str(entry["closure"]["review_package_id"]): dict(entry["closure"])
+        for entry in inventory["entries"]
+        if entry.get("closure", {}).get("review_package_id")
+    }
+    review_queue: list[dict[str, Any]] = []
+    for package_id, reference in sorted(package_refs.items()):
+        source_root = Path(reference["path"])
+        package = load_review_package(source_root, package_id)
+        _require_schema(package, "review_schema_version", 1)
+        freshness = inspect_review_package_freshness(source_root, package_id)
+        eligibility = compute_integration_eligibility(source_root, package_id)
+        _require_schema(eligibility, "eligibility_schema_version", 1)
+        policy = eligibility["review_policy"]
+        closure = closures_by_package.get(package_id)
+        review_queue.append(
+            {
+                "queue_status": "closed" if closure else "pending",
+                "package_id": package_id,
+                "package_content_hash": package["content_hash"],
+                "session_content_hash": reference["session_content_hash"],
+                "package_path": package.get("_git_private_path"),
+                "workstream_id": package["workstream_id"],
+                "generated_at": package["generated_at"],
+                "freshness": "current" if freshness["fresh"] else "stale",
+                "stale_reasons": list(freshness["stale_reasons"]),
+                "risk": dict(package["risk"]),
+                "human_approval": {
+                    "count": policy["human_approval_count"],
+                    "required": policy["required_human_reviewers"],
+                    "capability": policy["required_approval_capability"],
+                    "non_author_required": policy["non_author_reviewer_required"],
+                    "non_author_count": policy["non_author_approval_count"],
+                    "latest_decisions": list(policy["latest_decisions"]),
+                },
+                "integration": {
+                    "eligible": eligibility["eligible"],
+                    "reasons": list(eligibility["reasons"]),
+                    "recommended_action": eligibility["recommended_action"],
+                    "integration_ref_updated": eligibility["integration_ref_updated"],
+                    "writes_performed": eligibility["writes_performed"],
+                },
+                "binding": dict(eligibility["binding"]),
+                "evidence_refs": list(package["evidence"].get("evidence_refs", [])),
+                "closure": closure,
+            }
+        )
+
+    classification_counts = {key: 0 for key in WORKSPACE_CLASSIFICATIONS}
+    inventory_entries: list[dict[str, Any]] = []
+    cleanup: list[dict[str, Any]] = []
+    for entry in inventory["entries"]:
+        classification_counts[entry["classification"]] += 1
+        closure = dict(entry["closure"])
+        inventory_entries.append(
+            {
+                "workspace_id": entry["workspace_id"],
+                "path": entry["path"],
+                "resolved_path": entry["resolved_path"],
+                "sources": list(entry["sources"]),
+                "classification": entry["classification"],
+                "classification_label": entry["classification_label"],
+                "classification_source": entry["classification_source"],
+                "protections": list(entry["protections"]),
+                "unknown": list(entry["unknown"]),
+                "estimated_reclaim_bytes": entry["estimated_reclaim_bytes"],
+                "recommended_action": entry["recommended_action"],
+                "closure": closure,
+            }
+        )
+        if entry["recommended_action"] != "evaluate-cleanup-eligibility":
+            continue
+        package_id = closure.get("review_package_id")
+        try:
+            gate = compute_workspace_cleanup_eligibility(
+                project_root,
+                workspace_path=entry["path"],
+                package=package_id,
+            )
+            _require_schema(gate, "cleanup_schema_version", 2)
+        except _W3ProviderIncompatible:
+            raise
+        except ValueError as error:
+            cleanup.append(
+                {
+                    "workspace_id": entry["workspace_id"],
+                    "path": entry["path"],
+                    "status": "unknown",
+                    "eligible": None,
+                    "reasons": [f"provider-unavailable:{type(error).__name__}"],
+                    "unknown": [str(error)],
+                    "estimated_reclaim_bytes": entry["estimated_reclaim_bytes"],
+                    "closure_record": closure.get("record_path"),
+                    "actions": {
+                        action: {
+                            "eligible": None,
+                            "authorized": False,
+                            "performed": False,
+                            "implies_actions": [],
+                            "reasons": ["cleanup-provider-unavailable"],
+                        }
+                        for action in CLEANUP_ACTIONS
+                    },
+                }
+            )
+        else:
+            if set(gate["actions"]) != set(CLEANUP_ACTIONS):
+                raise ValueError("W3 cleanup candidate did not provide four independent actions")
+            if any(
+                details.get("authorized") is not False
+                or details.get("performed") is not False
+                or details.get("implies_actions") != []
+                for details in gate["actions"].values()
+            ):
+                raise ValueError("W3 read-only cleanup actions must remain independent and unperformed")
+            cleanup.append(
+                {
+                    "workspace_id": gate["workspace"]["workspace_id"],
+                    "path": gate["workspace"]["path"],
+                    "status": "eligible" if gate["eligible"] else "blocked",
+                    "eligible": gate["eligible"],
+                    "reasons": list(gate["reasons"]),
+                    "unknown": list(gate["unknown"]),
+                    "estimated_reclaim_bytes": gate["estimated_reclaim_bytes"],
+                    "closure_record": gate["closure_record"],
+                    "actions": {key: dict(value) for key, value in gate["actions"].items()},
+                }
+            )
+
+    closures, receipts = _load_closure_receipt_bundles(inventory_entries)
+    return {
+        "provider_schema_version": W3_PROJECTION_SCHEMA_VERSION,
+        "status": "ready",
+        "review_queue": review_queue,
+        "inventory": {
+            "inventory_schema_version": inventory["inventory_schema_version"],
+            "inventory_id": inventory["inventory_id"],
+            "content_hash": inventory["content_hash"],
+            "classification_counts": classification_counts,
+            "classification_labels": dict(WORKSPACE_CLASSIFICATIONS),
+            "entries": inventory_entries,
+            "source_contract": dict(inventory["source_contract"]),
+        },
+        "cleanup": cleanup,
+        "closures": closures,
+        "action_receipts": receipts,
+        "writes_performed": False,
+        "network_performed": False,
+        "policy_owner": "project-orrery-core-w3",
+    }
+
+
+def _w3_summary(bundle: Mapping[str, Any]) -> dict[str, dict[str, str]]:
+    _require_schema(bundle, "provider_schema_version", W3_PROJECTION_SCHEMA_VERSION)
+    packages = list(bundle.get("review_queue", []))
+    pending = [item for item in packages if item.get("queue_status") == "pending"]
+    stale = sum(item.get("freshness") != "current" for item in pending)
+    eligible = sum(item.get("integration", {}).get("eligible") is True for item in pending)
+    blockers = sum(len(item.get("integration", {}).get("reasons", [])) for item in pending)
+    cleanup = list(bundle.get("cleanup", []))
+    cleanup_eligible = sum(item.get("eligible") is True for item in cleanup)
+    return {
+        "review_queue": {
+            "status": "empty" if not pending else "attention" if stale else "ready",
+            "label": "No review packages" if not packages else f"{len(pending)} pending / {len(packages)} total",
+            "detail": f"{stale} stale · human decisions remain authoritative",
+            "source": "project-orrery-core-w3",
+        },
+        "integration_eligibility": {
+            "status": "empty" if not pending else "ready" if eligible else "blocked",
+            "label": "Unavailable · no review package" if not pending else f"{eligible} eligible",
+            "detail": f"{blockers} Core-reported blockers · integration ref updated false",
+            "source": "project-orrery-core-w3",
+        },
+        "cleanup_eligibility": {
+            "status": "ready" if cleanup_eligible else "blocked" if cleanup else "empty",
+            "label": f"{cleanup_eligible} eligible / {len(cleanup)} inventoried",
+            "detail": "4 actions remain independent · authorized false · performed false",
+            "source": "project-orrery-core-w3",
+        },
+    }
 
 
 def _unavailable_worktree(record: Mapping[str, Any], reason: str) -> dict[str, Any]:
@@ -277,6 +588,14 @@ def build_personal_observatory_projection(
                 "platform_session": (
                     session.get("platform_session") if isinstance(session, Mapping) else None
                 ),
+                "review_package_id": (
+                    session.get("review_package_id") if isinstance(session, Mapping) else None
+                ),
+                "review_package_content_hash": (
+                    session.get("review_package_content_hash")
+                    if isinstance(session, Mapping)
+                    else None
+                ),
                 "finding_counts": dict(finding_counts),
                 "findings": relevant_findings,
                 "availability": "available",
@@ -347,6 +666,28 @@ def build_personal_observatory_projection(
             }
         )
 
+    w3_evidence: dict[str, Any] | None = None
+    w3_error: dict[str, str] | None = None
+    if w3_projection is None:
+        try:
+            w3_evidence = _collect_w3_projection(root, cards)
+            w3_slots = _w3_summary(w3_evidence)
+        except Exception as error:
+            w3_slots = _w3_slots(None)
+            w3_error = {"type": type(error).__name__, "message": str(error)}
+    elif "provider_schema_version" in w3_projection:
+        try:
+            _require_schema(
+                w3_projection, "provider_schema_version", W3_PROJECTION_SCHEMA_VERSION
+            )
+            w3_evidence = dict(w3_projection)
+            w3_slots = _w3_summary(w3_evidence)
+        except Exception as error:
+            w3_slots = _w3_slots(None)
+            w3_error = {"type": type(error).__name__, "message": str(error)}
+    else:
+        w3_slots = _w3_slots(w3_projection)
+
     return {
         "projection_schema": PROJECTION_SCHEMA,
         "mode": "personal",
@@ -370,12 +711,19 @@ def build_personal_observatory_projection(
             "label": "Unknown",
             "detail": "Personal Mode has no Team runtime or remote telemetry",
         },
-        "w3": _w3_slots(w3_projection),
+        "w3": w3_slots,
+        "w3_evidence": w3_evidence,
+        "w3_provider_error": w3_error,
         "source_contracts": [
             "worktree-status-v1",
             "scope-observation-v1",
             "overlap-report-v1",
             "collaboration-v1",
+            *(
+                ["review-package-v1", "workspace-inventory-v1", "workspace-cleanup-v2"]
+                if w3_evidence
+                else []
+            ),
         ],
     }
 
@@ -398,6 +746,8 @@ def unavailable_personal_observatory_projection(error: Exception) -> dict[str, A
         "attention": [],
         "remote_observability": {"status": "unknown", "label": "Unknown"},
         "w3": _w3_slots(None),
+        "w3_evidence": None,
+        "w3_provider_error": {"type": type(error).__name__, "message": str(error)},
     }
 
 
@@ -594,6 +944,128 @@ def _worktree_inventory_row(card: Mapping[str, Any]) -> str:
     )
 
 
+def _size_label(value: object) -> str:
+    if not isinstance(value, int):
+        return "Unknown"
+    units = ("B", "KB", "MB", "GB")
+    amount = float(value)
+    unit = units[0]
+    for unit in units:
+        if amount < 1024 or unit == units[-1]:
+            break
+        amount /= 1024
+    return f"{amount:.1f} {unit}"
+
+
+def _w3_evidence_html(bundle: Mapping[str, Any] | None) -> str:
+    if not bundle:
+        return '<div class="po-empty" data-state="w3-unavailable">W4A fallback · W3 evidence Unavailable / Unknown</div>'
+    reviews = "".join(
+        '<details class="po-evidence-record"><summary><b>%s</b><span>%s · %s · approval %s/%s</span></summary>'
+        '<div class="po-record-grid"><div><small>Risk</small><b>%s</b></div><div><small>Integration</small><b>%s</b></div>'
+        '<div><small>Package hash</small><code>%s</code></div><div><small>Target OID</small><code>%s</code></div>'
+        '<div><small>Candidate HEAD</small><code>%s</code></div><div><small>Scope hash</small><code>%s</code></div>'
+        '<div class="po-record-wide"><small>Blockers / stale reasons</small><code>%s</code></div>'
+        '<div class="po-record-wide"><small>Git-private package</small><code>%s</code></div></div></details>'
+        % (
+            _esc(item.get("workstream_id", "Unknown")),
+            _esc(item.get("queue_status", "unknown")),
+            _esc(item.get("freshness", "unknown")),
+            _esc(item.get("human_approval", {}).get("count", 0)),
+            _esc(item.get("human_approval", {}).get("required", "Unknown")),
+            _esc(item.get("risk", {}).get("level", item.get("risk", {}).get("risk_level", "Unknown"))),
+            _esc("eligible" if item.get("integration", {}).get("eligible") else "blocked"),
+            _esc(item.get("package_content_hash", "Unknown")),
+            _esc(item.get("binding", {}).get("target_oid", "Unknown")),
+            _esc(item.get("binding", {}).get("candidate_head", "Unknown")),
+            _esc(item.get("binding", {}).get("scope_fingerprint", "Unknown")),
+            _esc(" · ".join([*item.get("integration", {}).get("reasons", []), *item.get("stale_reasons", [])]) or "None reported"),
+            _esc(item.get("package_path", "Unknown")),
+        )
+        for item in bundle.get("review_queue", [])
+    ) or '<div class="po-empty" data-state="no-review-package">No review packages in bound Workstream sessions</div>'
+    inventory = bundle.get("inventory", {})
+    classes = "".join(
+        '<div><span>%s</span><b>%s</b></div>'
+        % (_esc(inventory.get("classification_labels", {}).get(key, key)), _esc(count))
+        for key, count in inventory.get("classification_counts", {}).items()
+    )
+    entries = "".join(
+        '<div class="po-w3-inventory-row"><div><b>%s</b><code>%s</code></div><span>%s</span><span>%s</span><span>%s</span></div>'
+        % (
+            _esc(item.get("classification_label", "Unknown")),
+            _esc(item.get("path", "Unknown")),
+            _esc("protected: " + (", ".join(item.get("protections", [])) or "none")),
+            _esc("Unknown: " + (", ".join(item.get("unknown", [])) or "none")),
+            _esc(_size_label(item.get("estimated_reclaim_bytes"))),
+        )
+        for item in inventory.get("entries", [])
+    ) or '<div class="po-empty">No bounded workspace entries</div>'
+    cleanup = "".join(
+        '<details class="po-evidence-record"><summary><b>%s</b><span>%s · %s</span></summary>'
+        '<div class="po-actions">%s</div><p class="po-record-note">%s</p></details>'
+        % (
+            _esc(item.get("path", "Unknown")),
+            _esc(item.get("status", "unknown")),
+            _esc(_size_label(item.get("estimated_reclaim_bytes"))),
+            "".join(
+                '<div><b>%s</b><span>eligible %s · authorized %s · performed %s</span><small>implies %s</small></div>'
+                % (
+                    _esc(action),
+                    _esc(details.get("eligible", "Unknown")),
+                    _esc(details.get("authorized", False)),
+                    _esc(details.get("performed", False)),
+                    _esc(details.get("implies_actions", [])),
+                )
+                for action, details in item.get("actions", {}).items()
+            ),
+            _esc(" · ".join([*item.get("reasons", []), *item.get("unknown", [])]) or "No Core blocker reported"),
+        )
+        for item in bundle.get("cleanup", [])
+    ) or '<div class="po-empty">Cleanup eligibility Unavailable / Unknown</div>'
+    closures = "".join(
+        '<div class="po-receipt"><b>%s · %s</b><span>closure evidence only</span>'
+        '<code>%s</code><small>%s · %s</small></div>'
+        % (
+            _esc(item.get("closure_id", "Unknown")),
+            _esc(item.get("closure_reason", "Unknown")),
+            _esc(item.get("final_oid", "Unknown")),
+            _esc(item.get("review_package_id", "Unknown")),
+            _esc(item.get("record_path", "Unknown")),
+        )
+        for item in bundle.get("closures", [])
+    ) or '<div class="po-empty">No Git-private closure records in bounded inventory</div>'
+    receipts = "".join(
+        '<div class="po-receipt"><b>%s · %s</b><span>caller-attested=%s · deletion inferred=false</span>'
+        '<code>%s</code><small>%s</small></div>'
+        % (
+            _esc(item.get("action", "Unknown")),
+            _esc(item.get("receipt_id", "Unknown")),
+            _esc(item.get("caller_attested_performed", False)),
+            _esc(item.get("authorization_id", "Unknown")),
+            _esc(item.get("receipt_path", "Unknown")),
+        )
+        for item in bundle.get("action_receipts", [])
+    ) or '<div class="po-empty">No caller-attested cleanup action receipts</div>'
+    return (
+        '<section><h4>Review packages · evidence first</h4>%s</section>'
+        '<section><h4>Bounded workspace inventory · all seven classes</h4>'
+        '<div class="po-class-counts">%s</div><code class="po-hashline">%s · %s</code><div class="po-w3-inventory">%s</div></section>'
+        '<section><h4>Cleanup eligibility · independent actions</h4>%s</section>'
+        '<section><h4>Closure / action receipts</h4><p class="po-record-note">Closure records establish traceability. Action receipts are caller-attested evidence; neither proves a path or branch was deleted.</p>%s%s</section>'
+        % (
+            reviews,
+            classes,
+            _esc(inventory.get("inventory_id", "Unknown")),
+            _esc(inventory.get("content_hash", "Unknown")),
+            entries,
+            cleanup,
+            closures,
+            receipts,
+        )
+    )
+
+
 PERSONAL_OBSERVATORY_CSS = r"""
 .po-shell{--po-cyan:#63d6cf;--po-amber:#f2ba5e;--po-red:#ff786b;--po-dim:#758097;
  margin:0 0 24px;border:1px solid var(--line);border-radius:16px;overflow:hidden;
@@ -683,6 +1155,19 @@ PERSONAL_OBSERVATORY_CSS = r"""
  align-items:center;padding:15px 24px;cursor:pointer;list-style:none}.po-vault>summary::-webkit-details-marker{display:none}.po-vault>summary div{display:flex;flex-direction:column}
 .po-vault>summary b{font-size:13px}.po-vault>summary span{color:var(--mut);font-size:10.5px}.po-vault-body{padding:0 24px 20px;border-top:1px solid var(--line)}
 .po-vault-body h4{font-size:11px;margin:16px 0 7px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.po-evidence-record{border-top:1px solid var(--line);padding:9px 0}.po-evidence-record>summary{display:flex;justify-content:space-between;
+ gap:12px;cursor:pointer;font-size:11px}.po-evidence-record>summary span,.po-record-note{color:var(--mut);font-size:10.5px}
+.po-record-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.po-record-grid>div{display:flex;flex-direction:column;min-width:0}
+.po-record-grid small{color:var(--mut);font-size:9px}.po-record-grid code{overflow:hidden;text-overflow:ellipsis}.po-record-wide{grid-column:1/-1}
+.po-class-counts{display:grid;grid-template-columns:repeat(7,minmax(90px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.po-class-counts>div{display:flex;flex-direction:column;padding:8px;background:var(--bg)}.po-class-counts span{color:var(--mut);font-size:9px}.po-class-counts b{font-size:15px}
+.po-hashline{display:block;margin:9px 0;overflow:hidden;text-overflow:ellipsis}.po-w3-inventory{border-top:1px solid var(--line)}
+.po-w3-inventory-row{display:grid;grid-template-columns:minmax(220px,1.35fr) 1fr 1fr 80px;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:10px}
+.po-w3-inventory-row>div{display:flex;flex-direction:column;min-width:0}.po-w3-inventory-row code{overflow:hidden;text-overflow:ellipsis}.po-w3-inventory-row>span{color:var(--mut)}
+.po-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin-top:9px;background:var(--line);border:1px solid var(--line)}
+.po-actions>div{display:flex;flex-direction:column;gap:3px;padding:8px;background:var(--bg)}.po-actions b{font-size:10px}.po-actions span,.po-actions small{color:var(--mut);font-size:9px}
+.po-receipt{display:grid;grid-template-columns:minmax(160px,1fr) minmax(180px,1fr);gap:5px 12px;padding:8px 0;border-top:1px solid var(--line);font-size:10px}
+.po-receipt code,.po-receipt small{overflow:hidden;text-overflow:ellipsis}.po-receipt span,.po-receipt small{color:var(--mut)}
 @media(max-width:900px){.po-project-grid{grid-template-columns:1fr 1fr}
  .po-attention-grid{grid-template-columns:1fr}.po-subsystems{grid-template-columns:1fr 1fr}.po-brief-grid{grid-template-columns:1fr}
  .po-proof{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}.po-workstream>.po-work-summary{grid-template-columns:minmax(190px,1.2fr) repeat(3,minmax(110px,.8fr))}.po-open-label{display:none}}
@@ -702,7 +1187,8 @@ PERSONAL_OBSERVATORY_CSS = r"""
  .po-signals b{font-size:21px}.po-proof>div{align-items:start}.po-workstream>.po-work-summary{grid-template-columns:1fr 1fr;padding:13px}
  .po-work-name{grid-column:1/-1;border-bottom:1px solid var(--line);padding-bottom:10px}.po-work-signal{grid-column:1/-1}
  .po-work-detail{padding:0 13px 13px}.po-subsystems{grid-template-columns:1fr}.po-subsystem{align-items:start;flex-direction:column;gap:5px}.po-subsystem code{max-width:100%}
- .po-vault>summary{padding:14px 18px}.po-vault-body{padding:0 18px 18px}}
+ .po-vault>summary{padding:14px 18px}.po-vault-body{padding:0 18px 18px}.po-record-grid{grid-template-columns:1fr}
+ .po-record-wide{grid-column:auto}.po-class-counts{grid-template-columns:1fr 1fr}.po-w3-inventory-row,.po-actions,.po-receipt{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.po-shell *{scroll-behavior:auto!important;transition:none!important}}
 """
 
@@ -725,15 +1211,20 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         "cleanup_eligibility": "Cleanup eligibility",
     }
     w3_rows = "".join(
-        '<div class="po-w3-row" data-w3-slot="%s"><b>%s</b><span class="po-scope unknown">%s</span>'
+        '<div class="po-w3-row" data-w3-slot="%s"><b>%s</b><span class="po-scope %s">%s</span>'
         '<small>%s</small></div>'
         % (
             _esc(key),
             _esc(w3_labels[key]),
+            _esc(_status_class(projection["w3"][key]["status"])),
             _esc(projection["w3"][key]["label"]),
             _esc(projection["w3"][key]["detail"]),
         )
         for key in W3_SLOT_KEYS
+    )
+    w3_evidence = projection.get("w3_evidence")
+    w3_evidence_html = _w3_evidence_html(
+        w3_evidence if isinstance(w3_evidence, Mapping) else None
     )
     active_cards = [
         card for card in projection["workstreams"]
@@ -838,11 +1329,46 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             "%d 个未结束 Workstream 的证据已过期" % stale_count,
             "页面仍展示最后一次本机观测，但不能把它当作当前事实。",
         ))
+    if isinstance(w3_evidence, Mapping):
+        pending_reviews = [
+            item for item in w3_evidence.get("review_queue", [])
+            if item.get("queue_status") == "pending"
+        ]
+        approval_needed = sum(
+            item.get("human_approval", {}).get("count", 0)
+            < item.get("human_approval", {}).get("required", 1)
+            for item in pending_reviews
+        )
+        eligible_reviews = sum(
+            item.get("integration", {}).get("eligible") is True
+            for item in pending_reviews
+        )
+        cleanup_ready = sum(
+            item.get("eligible") is True for item in w3_evidence.get("cleanup", [])
+        )
+        if approval_needed:
+            priorities.append((
+                "warning",
+                "%d 个审查包仍需人工批准" % approval_needed,
+                "风险等级、所需 capability 与非作者要求均来自 W3 Core。",
+            ))
+        if eligible_reviews:
+            priorities.append((
+                "warning",
+                "%d 个候选满足当前集成资格" % eligible_reviews,
+                "这只表示 W3 Core gate 通过；integration ref 仍未更新。",
+            ))
+        if cleanup_ready:
+            priorities.append((
+                "warning",
+                "%d 个 workspace 满足清理资格" % cleanup_ready,
+                "四类动作仍需分别授权，当前全部 performed=false。",
+            ))
     if all(slot.get("status") == "unavailable" for slot in projection["w3"].values()):
         priorities.append((
             "unknown",
             "当前不能判断审查、集成和清理资格",
-            "W3 contract 尚未进入 main；页面不会自行补造这些结论。",
+            "W3 provider 缺失、失败或 schema 不受支持；已保持 W4A fallback。",
         ))
     if unknown_count:
         priorities.append((
@@ -873,7 +1399,7 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         '<div><b>%d</b><span>未结束 Workstream</span></div><div><b>%d</b><span>正在推进</span></div>'
         '<div><b>%d</b><span>暂停／阻塞</span></div><div class="%s"><b>%d</b><span>确定直接重叠</span></div>'
         '</div><aside class="po-proof"><div><small>本机范围</small><b>%d worktrees</b></div>'
-        '<div><small>趋势</small><b>Unknown · 无历史快照</b></div><div><small>交付资格</small><b>Unavailable · W3 未集成</b></div>'
+        '<div><small>趋势</small><b>Unknown · 无历史快照</b></div><div><small>交付资格</small><b>%s</b></div>'
         '<div><small>采集时间</small><code>%s</code></div></aside></div></section>'
         '<section class="po-zone" data-zone="attention"><div class="po-zone-head"><h3>先看这些</h3>'
         '<span>确定事实优先；Unknown 单独保留</span></div><ol class="po-priorities">%s</ol></section>'
@@ -883,7 +1409,7 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         '<section class="po-zone" data-zone="subsystems"><div class="po-zone-head"><h3>影响到哪里</h3>'
         '<span>来自 Workstream 声明的 primary + affected subsystem</span></div><div class="po-subsystems">%s</div></section>'
         '<details class="po-vault"><summary><div><b>技术证据</b><span>Git、W3 display slots 与本机 worktree inventory</span></div>'
-        '<span>按需展开</span></summary><div class="po-vault-body"><section><h4>W3 display slots</h4><div class="po-w3">%s</div></section>%s</div></details>'
+        '<span>按需展开</span></summary><div class="po-vault-body"><section><h4>W3 status</h4><div class="po-w3">%s</div></section>%s%s</div></details>'
         '<div class="po-foot"><span>captured %s</span><span>%s · writes false · network false · Team false</span></div>'
         '</section></article>'
         % (
@@ -894,11 +1420,13 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             "critical" if direct_count else "",
             direct_count,
             len(projection["workstreams"]),
+            _esc(projection["w3"]["integration_eligibility"]["label"]),
             _esc(projection["captured_at"]),
             priority_html,
             workstreams,
             subsystems,
             w3_rows,
+            w3_evidence_html,
             inventory,
             _esc(projection["captured_at"]),
             _esc(projection["projection_schema"]),

@@ -8,7 +8,7 @@ from .inventory import (
     read_component_manifest,
 )
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "MANAGED_TOOLS",

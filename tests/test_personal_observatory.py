@@ -20,7 +20,14 @@ for source in (
         sys.path.insert(0, str(source))
 
 import build_docsite
-from project_orrery_core.collaboration import write_workstream_session
+import project_orrery_observatory.personal_observatory as personal_observatory
+import project_orrery_core.workspace_cleanup as workspace_cleanup
+from project_orrery_core.collaboration import (
+    refresh_workstream_scope,
+    transition_workstream_session,
+    write_workstream_session,
+)
+from project_orrery_core.review import generate_review_package
 from project_orrery_observatory.personal_observatory import (
     PERSONAL_OBSERVATORY_CSS,
     build_personal_observatory_projection,
@@ -29,6 +36,9 @@ from project_orrery_observatory.personal_observatory import (
     unavailable_personal_observatory_projection,
 )
 from tests.fixtures.collaboration.git_fixture import CollaborationGitFixture
+
+
+PASS_COMMAND = 'python -c "import sys; sys.exit(0)"'
 
 
 def _load_builder_module():
@@ -75,6 +85,111 @@ def _ready_projection(**overrides):
                 "cleanup_eligibility",
             )
         },
+    }
+    base.update(overrides)
+    return base
+
+
+def _w3_bundle(**overrides):
+    actions = {
+        action: {
+            "eligible": action == "remove-worktree",
+            "authorized": False,
+            "performed": False,
+            "implies_actions": [],
+            "reasons": [] if action == "remove-worktree" else ["fixture-blocker"],
+        }
+        for action in (
+            "remove-worktree",
+            "delete-local-branch",
+            "delete-remote-branch",
+            "remove-directory",
+        )
+    }
+    base = {
+        "provider_schema_version": 1,
+        "status": "ready",
+        "review_queue": [
+            {
+                "queue_status": "pending",
+                "package_id": "review-" + "a" * 24,
+                "package_content_hash": "b" * 64,
+                "package_path": "C:/git/private/review.json",
+                "workstream_id": "W4B-review",
+                "generated_at": "2026-08-23T00:00:00Z",
+                "freshness": "current",
+                "stale_reasons": [],
+                "risk": {"level": "elevated"},
+                "human_approval": {"count": 0, "required": 1},
+                "integration": {
+                    "eligible": False,
+                    "reasons": ["required-human-reviewer-count-not-met"],
+                },
+                "binding": {
+                    "target_oid": "c" * 40,
+                    "candidate_head": "d" * 40,
+                    "scope_fingerprint": "e" * 64,
+                },
+            }
+        ],
+        "inventory": {
+            "inventory_schema_version": 1,
+            "inventory_id": "inventory-fixture",
+            "content_hash": "f" * 64,
+            "classification_counts": {
+                "registered-active": 1,
+                "review-integration-pending": 0,
+                "integrated-closed": 0,
+                "legacy-unmanaged": 0,
+                "generated-disposable": 0,
+                "evidence-retained": 0,
+                "unknown": 0,
+            },
+            "classification_labels": {
+                "registered-active": "Registered active",
+                "review-integration-pending": "Review/Integration pending",
+                "integrated-closed": "Integrated/Closed",
+                "legacy-unmanaged": "Legacy unmanaged",
+                "generated-disposable": "Generated disposable",
+                "evidence-retained": "Evidence/retained",
+                "unknown": "Unknown",
+            },
+            "entries": [
+                {
+                    "workspace_id": "workspace-fixture",
+                    "path": "C:/workspace/private",
+                    "classification_label": "Registered active",
+                    "protections": ["active-or-pending-workstream"],
+                    "unknown": ["remote-state-not-observed"],
+                    "estimated_reclaim_bytes": 4096,
+                }
+            ],
+        },
+        "cleanup": [
+            {
+                "workspace_id": "workspace-fixture",
+                "path": "C:/workspace/private",
+                "status": "blocked",
+                "eligible": False,
+                "reasons": ["workstream-is-active"],
+                "unknown": [],
+                "estimated_reclaim_bytes": 4096,
+                "actions": actions,
+            }
+        ],
+        "closures": [],
+        "action_receipts": [
+            {
+                "receipt_id": "cleanup-action-" + "1" * 24,
+                "action": "remove-worktree",
+                "caller_attested_performed": True,
+                "deletion_inferred": False,
+                "authorization_id": "cleanup-authorization-fixture",
+                "receipt_path": "C:/git/private/receipt.json",
+            }
+        ],
+        "writes_performed": False,
+        "network_performed": False,
     }
     base.update(overrides)
     return base
@@ -182,15 +297,171 @@ class PersonalObservatoryTests(unittest.TestCase):
         )
         self.assertNotIn("safe", str(projection).lower())
 
-    def test_w3_slots_fail_closed_without_a_contract(self):
-        with CollaborationGitFixture() as fixture:
+    def test_no_review_packages_still_projects_bounded_w3_inventory(self):
+        original_cleanup = workspace_cleanup.compute_workspace_cleanup_eligibility
+        with CollaborationGitFixture() as fixture, mock.patch.object(
+            workspace_cleanup,
+            "compute_workspace_cleanup_eligibility",
+            wraps=original_cleanup,
+        ) as cleanup_provider:
             projection = build_personal_observatory_projection(
                 fixture.worktree_a, include_local_worktrees=False
             )
-        for slot in projection["w3"].values():
-            self.assertEqual(slot["status"], "unavailable")
-            self.assertEqual(slot["label"], "Unavailable")
-            self.assertEqual(slot["detail"], "W3 not integrated")
+        self.assertEqual(projection["w3"]["review_queue"]["status"], "empty")
+        self.assertEqual(projection["w3"]["review_queue"]["label"], "No review packages")
+        self.assertEqual(projection["w3_evidence"]["review_queue"], [])
+        counts = projection["w3_evidence"]["inventory"]["classification_counts"]
+        self.assertEqual(len(counts), 7)
+        self.assertEqual(
+            set(counts),
+            {
+                "registered-active",
+                "review-integration-pending",
+                "integrated-closed",
+                "legacy-unmanaged",
+                "generated-disposable",
+                "evidence-retained",
+                "unknown",
+            },
+        )
+        self.assertFalse(projection["w3_evidence"]["writes_performed"])
+        self.assertFalse(projection["w3_evidence"]["network_performed"])
+        cleanup_candidates = [
+            item for item in projection["w3_evidence"]["inventory"]["entries"]
+            if item["recommended_action"] == "evaluate-cleanup-eligibility"
+        ]
+        self.assertEqual(cleanup_provider.call_count, len(cleanup_candidates))
+        self.assertEqual(len(projection["w3_evidence"]["cleanup"]), len(cleanup_candidates))
+
+    def test_w3_provider_consumes_real_core_review_bundle_without_writes(self):
+        with CollaborationGitFixture() as fixture:
+            (fixture.worktree_b / "README.md").write_text(
+                "# fixture\nW4 consumes canonical W3 evidence.\n", encoding="utf-8"
+            )
+            fixture.git(fixture.worktree_b, "add", "README.md")
+            fixture.git(fixture.worktree_b, "commit", "-m", "candidate for W4 projection")
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W4-real-W3-provider",
+                primary_subsystem_id="project-structure",
+                expected_writes=("README.md",),
+                validation_surfaces=(PASS_COMMAND,),
+                lifecycle_phase="implementing",
+            )
+            refreshed = refresh_workstream_scope(
+                fixture.worktree_b,
+                include_local_worktrees=False,
+                occurred_at="2026-08-23T00:00:00Z",
+            )
+            self.assertTrue(refreshed["expansion"]["allowed"], refreshed)
+            transition_workstream_session(
+                fixture.worktree_b,
+                lifecycle_phase="validating",
+                evidence_freshness="current",
+                reason="fixture validation inputs ready",
+                occurred_at="2026-08-23T00:01:00Z",
+            )
+            with mock.patch.object(
+                socket, "socket", side_effect=AssertionError("network is forbidden")
+            ), mock.patch.object(
+                socket,
+                "create_connection",
+                side_effect=AssertionError("network is forbidden"),
+            ):
+                generated = generate_review_package(fixture.worktree_b)
+                before = fixture.git(
+                    fixture.worktree_b, "status", "--porcelain=v1"
+                ).stdout
+                projection = build_personal_observatory_projection(
+                    fixture.worktree_b, include_local_worktrees=False
+                )
+                after = fixture.git(
+                    fixture.worktree_b, "status", "--porcelain=v1"
+                ).stdout
+
+        self.assertEqual(before, after)
+        package = generated["review_package"]
+        review = projection["w3_evidence"]["review_queue"][0]
+        self.assertEqual(review["package_id"], package["package_id"])
+        self.assertEqual(review["freshness"], "current")
+        self.assertEqual(review["risk"], package["risk"])
+        self.assertEqual(review["human_approval"]["count"], 0)
+        self.assertEqual(review["human_approval"]["required"], 1)
+        self.assertFalse(review["integration"]["eligible"])
+        self.assertIn(
+            "required-human-reviewer-count-not-met", review["integration"]["reasons"]
+        )
+        self.assertEqual(review["binding"], package["binding"])
+        self.assertFalse(review["integration"]["integration_ref_updated"])
+        self.assertFalse(review["integration"]["writes_performed"])
+        self.assertFalse(projection["w3_evidence"]["network_performed"])
+
+    def test_w3_provider_failure_and_old_schema_keep_w4a_fallback(self):
+        with CollaborationGitFixture() as fixture, mock.patch.object(
+            personal_observatory,
+            "_collect_w3_projection",
+            side_effect=ValueError("provider failed"),
+        ):
+            failed = build_personal_observatory_projection(
+                fixture.worktree_a, include_local_worktrees=False
+            )
+        self.assertIsNone(failed["w3_evidence"])
+        self.assertEqual(failed["w3_provider_error"]["type"], "ValueError")
+        self.assertTrue(all(
+            slot["detail"] == "W3 provider unavailable or incompatible · Unknown"
+            for slot in failed["w3"].values()
+        ))
+
+        with CollaborationGitFixture() as fixture:
+            old = build_personal_observatory_projection(
+                fixture.worktree_a,
+                include_local_worktrees=False,
+                w3_projection={"provider_schema_version": 0},
+            )
+        self.assertIsNone(old["w3_evidence"])
+        self.assertIn("unsupported W3", old["w3_provider_error"]["message"])
+        self.assertEqual(old["w3"]["integration_eligibility"]["label"], "Unavailable")
+
+        source = (
+            ROOT
+            / "packages"
+            / "project-orrery-observatory"
+            / "src"
+            / "project_orrery_observatory"
+            / "personal_observatory.py"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("from project_orrery_core.review import _private_area", source)
+        self.assertNotIn("from project_orrery_core.review import _read_regular_json", source)
+        legacy_slots = _ready_projection()["w3"]
+        self.assertEqual(personal_observatory._w3_slots(legacy_slots), legacy_slots)
+
+    def test_w3_projection_keeps_policy_actions_and_receipts_separate(self):
+        bundle = _w3_bundle()
+        with CollaborationGitFixture() as fixture:
+            projection = build_personal_observatory_projection(
+                fixture.worktree_a,
+                include_local_worktrees=False,
+                w3_projection=bundle,
+            )
+        self.assertEqual(projection["w3"]["review_queue"]["status"], "ready")
+        self.assertEqual(projection["w3"]["integration_eligibility"]["status"], "blocked")
+        actions = projection["w3_evidence"]["cleanup"][0]["actions"]
+        self.assertEqual(len(actions), 4)
+        self.assertTrue(all(not item["authorized"] for item in actions.values()))
+        self.assertTrue(all(not item["performed"] for item in actions.values()))
+        receipt = projection["w3_evidence"]["action_receipts"][0]
+        self.assertTrue(receipt["caller_attested_performed"])
+        self.assertFalse(receipt["deletion_inferred"])
+        panel = render_personal_observatory_panel(projection)
+        self.assertIn("required-human-reviewer-count-not-met", panel)
+        self.assertIn("all seven classes", panel)
+        self.assertIn("active-or-pending-workstream", panel)
+        self.assertIn("remote-state-not-observed", panel)
+        self.assertIn("4.0 KB", panel)
+        self.assertIn("authorized False · performed False", panel)
+        self.assertIn("deletion inferred=false", panel)
+        self.assertIn("c" * 40, panel)
+        self.assertIn("f" * 64, panel)
 
     def test_renderer_has_four_zones_progressive_detail_and_no_actions(self):
         projection = _ready_projection()
