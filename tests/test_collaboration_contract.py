@@ -50,6 +50,12 @@ from tests.fixtures.collaboration.git_fixture import CollaborationGitFixture  # 
 
 
 class CollaborationContractTests(unittest.TestCase):
+    def assertSameFilesystemPath(self, left: Path, right: Path) -> None:  # noqa: N802
+        self.assertEqual(
+            os.path.normcase(os.path.realpath(os.path.abspath(left))),
+            os.path.normcase(os.path.realpath(os.path.abspath(right))),
+        )
+
     def test_schema_bundle_freezes_all_phase_zero_contracts(self) -> None:
         payload = json.loads(SCHEMA.read_text(encoding="utf-8"))
         self.assertEqual(payload["$id"], COLLABORATION_CONTRACT_ID)
@@ -382,7 +388,7 @@ class CollaborationContractTests(unittest.TestCase):
                     expected = Path(expected_text)
                     if not expected.is_absolute():
                         expected = root / expected
-                    self.assertEqual(worktree_session_path(root), expected.absolute())
+                    self.assertSameFilesystemPath(worktree_session_path(root), expected)
                     self.assertFalse(expected.exists())
 
                     written = write_workstream_session(
@@ -393,7 +399,7 @@ class CollaborationContractTests(unittest.TestCase):
                         captured_at="2026-08-22T00:00:00Z",
                     )
                     self.assertTrue(written["writes_performed"])
-                    self.assertEqual(Path(written["session_path"]), expected.absolute())
+                    self.assertSameFilesystemPath(Path(written["session_path"]), expected)
                     self.assertTrue(expected.is_file())
                     refreshed = inspect_worktree_status(root)
                     self.assertEqual(refreshed["session"]["state"], "current")

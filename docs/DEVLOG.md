@@ -380,3 +380,4 @@
 - 首轮联合专项捕获 C1 fixture 从 C 盘重放到 D 盘后的 CRLF hash mismatch；新增 fixture-source 专属 LF 属性，保持原 manifest hash，Pilot 004–009 冻结目录不变。
 - 修复后联合专项 35/35、默认全仓 268 PASS + 5 existing skips、动态全仓 270 PASS + 3 Windows privilege skips。
 - W1 Phase 1、D1 contract/fixture 与 C1 static controls 进入 Canonical source；W2/D2/C2、Pilot 010、发布和模型运行均未自动启动，远端 CI 尚待推送。
+- 首次远端矩阵 `32564000587` 为 Ubuntu PASS／Windows FAIL；Windows 失败来自测试对 `RUNNER~1` 与 Git 长路径做字面比较。产品 containment 逻辑未改，测试改用 realpath/normcase 后 collaboration 22/22 通过，等待新矩阵。

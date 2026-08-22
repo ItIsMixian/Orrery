@@ -2,7 +2,7 @@
 
 Date: 2026-08-22
 Scope: 在独立 integration worktree 中按 W1→D1→C1 顺序吸收 Personal Phase 1、文档治理 finding contract 与 Oracle v0.2 静态 controls；同步当前 State，但不启动 W2/D2/C2、Pilot 010、tag 或 Release
-Status: Local PASS；远端 Windows／Ubuntu CI 尚待推送
+Status: Local PASS；首次远端 Ubuntu PASS／Windows FAIL，路径断言修复后的矩阵待重跑
 
 ## 输入与整合顺序
 
@@ -37,3 +37,9 @@ Status: Local PASS；远端 Windows／Ubuntu CI 尚待推送
 - W1 Personal Phase 1、D1 contract/fixture 与 C1 static controls 进入 Canonical source，不等于相应能力已发布。
 - W2 Scope/Finding、D2 scanner/CLI、C2 Pilot 010 design 都未自动启动；Pilot 010 未创建且无模型运行授权。
 - Adapter 0.1.1／CLI 0.1.9 没有继承旧 Adapter 0.1.0 runtime evidence；公开 v0.2.0、tag、Release 和用户级 Skill 均不变。
+
+## 首次远端矩阵
+
+`main@7e194b5` 的 GitHub Actions [32564000587](https://github.com/yw9299-stack/project-orrery/actions/runs/32564000587) 为 Ubuntu PASS／Windows FAIL。Windows runner 的 `TEMP` 使用 `RUNNER~1`，Git 返回同一 session 的长路径；测试对两种等价路径做 `Path` 字面相等比较，导致 independent clone 子案例提前退出，随后又产生派生的 session-list IndexError。
+
+产品的 Git-private containment 检查和返回路径均正确。修复只把测试断言收敛为 `abspath + realpath + normcase`，不放宽 session 必须位于当前 worktree Git dir 的安全边界。单项复跑 1/1、完整 collaboration 专项 22/22 PASS；新的远端矩阵通过前不宣称跨平台验收完成。
