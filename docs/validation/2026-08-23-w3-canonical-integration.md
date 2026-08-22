@@ -2,7 +2,7 @@
 
 Date: 2026-08-23
 Scope: 在 W2 Canonical base 上吸收 W3 review／integration／closure／workspace inventory／cleanup eligibility，并同步全局入口；不包含 W4、真实 merge／delete、tag 或 Release
-Status: Candidate validation in progress；只有当包含本记录的 exact SHA 位于 `main` 时 W3 才是 Canonical
+Status: Local PASS；Candidate-first Windows／Ubuntu exact-SHA checks pending；只有当包含本记录的 exact SHA 位于 `main` 时 W3 才是 Canonical
 
 ## 输入
 
@@ -20,4 +20,10 @@ Status: Candidate validation in progress；只有当包含本记录的 exact SHA
 
 ## 验证
 
-最终 exact-SHA 的 W3 focused、动态全仓、integrated structure、隔离 docsite、Markdown link、安全／forbidden artifact、diff 与 Windows／Ubuntu Candidate-first 结果在本次集成完成后记录或由 GitHub exact-SHA checks 承载。
+- W3 Candidate focused：13/13 PASS；W1/W2 + W3 + 邻接迁移／恢复／Codex Adapter checkpoint：83/83 PASS；
+- 本地 integration candidate `c758827` 动态全仓：291 项，288 PASS + 3 个既有 Windows symlink privilege skips，746.154s；
+- integrated structure：PASS；Authority status `integrated candidate`，模型 1 可严格评估；
+- 隔离 docsite：`D:\coding warehouse\project-orrery-validation-w3-integration\index.html`，1,471 KB，115 docs；
+- Markdown：337 files／862 local links；1 个 D1 positive fixture 预期 missing，0 unexpected missing；
+- high-confidence private-key／token、forbidden tracked artifact 与 `git diff --check`：PASS；
+- 最终文档提交不改变 W3 代码；包含本记录的 exact SHA 仍须先在非 main 分支取得 Windows／Ubuntu required checks，才可推广远端 main。

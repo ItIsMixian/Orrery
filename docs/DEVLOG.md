@@ -411,3 +411,9 @@
 - 推测性 merge／rebase 只在工具新建的干净临时 integration worktree 中运行；package 精确绑定 target OID、candidate HEAD、Scope revision/fingerprint、finding set、schema version/byte hash、validation set 与内容 hash。输入漂移、冲突、验证／State／ADR 失败、缺少足够非作者人审都会失败关闭；AI 摘要明确非权威且不计 reviewer。
 - 2026-08-23 在同一 W3 范围内补充 cleanup contract：inventory 只从 Git metadata、private session/closure、项目允许根和显式候选取数，分类七类；历史无 session/closure 目录必须显式采纳，保留策略与 Unknown 失败关闭。remove worktree、local branch、remote branch、ordinary directory 是四个互不隐含的授权，工具全部不执行；closure v2 引用 Git-private caller-attested action log。没有把本机截图、历史 clone、临时输出或仓库外 benchmark 声称为已审计可删。
 - 实现不 fetch、不更新 main、不 push、不建 PR/tag/release、不删除用户 branch/worktree/ordinary directory，也不实现 W4 Observatory、W5 Team Mode、平台 launch/rebind/message 或任何网络 transport。W3 focused 13/13；按更新后的验证策略，当前增量只以专项/checkpoint 交付，全仓动态、docsite、全链接与 exact-SHA 双平台矩阵由中央在 W3+W4 干净联合 Candidate 上统一执行。证据见 [W3 Validation](validation/2026-08-22-w3-review-integration-cleanup.md)。
+
+## 2026-08-23 — W3 Canonical integration candidate
+
+- 冻结 W3 实现 `e807f4c` 与 Candidate 文档 `1aa3f32`，在 W2 base `ef48871` 上按原顺序吸收；没有包含 W4、分级验证文档分支、用户级 Skill、历史目录或仓库外 benchmark。
+- 本地 integration candidate `c758827` 运行唯一一套动态全仓：291 项中 288 PASS + 3 个既有 Windows symlink privilege skips；integrated structure、1,471 KB 隔离站点、337 份 Markdown／862 个本地链接／0 unexpected missing、secret／forbidden 与 diff 门通过。
+- W3 仍不执行真实 main update 或清理动作；Promotion 必须先把包含最终集成记录的 exact SHA 推到非 main branch，并取得 Windows／Ubuntu required checks。公开 v0.2.0、W4/W5 和 Release 均不改变。
