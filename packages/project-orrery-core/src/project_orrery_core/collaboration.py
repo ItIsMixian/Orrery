@@ -1,11 +1,14 @@
-"""Provider-neutral Phase 0 collaboration contracts and local Git inspection."""
+"""Provider-neutral collaboration contracts and local Git inspection."""
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import json
 import os
 import re
+import stat
 import subprocess
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -15,6 +18,7 @@ from .schema import COLLABORATION_SCHEMA
 
 COLLABORATION_SCHEMA_VERSION = 1
 COLLABORATION_CONTRACT_ID = "project-orrery-collaboration-v1"
+WORKTREE_STATUS_SCHEMA_VERSION = 1
 DEFAULT_INTEGRATION_REF = "refs/heads/main"
 INTEGRATION_REF_CONFIG_KEY = "collaboration.integration_ref"
 PRIMARY_WORKTREE_CONFIG_KEY = "collaboration.primary_worktree"
@@ -24,6 +28,15 @@ CAPABILITIES = ("reviewer", "integrator", "admin")
 _COLLABORATION_CONFIG_FIELDS = {"integration_ref", "primary_worktree", "project_mode"}
 _SUBSYSTEM_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 _OID = re.compile(r"^[0-9a-f]{40}(?:[0-9a-f]{24})?$")
+_DIRTY_FINGERPRINT_DOMAIN = b"project-orrery-dirty-fingerprint-v1\0"
+_SESSION_STALE_FIELDS = (
+    ("worktree_id", "worktree-id-changed"),
+    ("branch", "branch-changed"),
+    ("head", "head-changed"),
+    ("integration_ref", "integration-ref-changed"),
+    ("integration_oid", "integration-oid-changed"),
+    ("dirty_fingerprint", "dirty-fingerprint-changed"),
+)
 
 
 def _schema_type_matches(value: Any, expected: str) -> bool:
@@ -221,6 +234,71 @@ def _absolute_git_path(root: Path, value: str) -> Path:
     return Path(os.path.abspath(os.fspath(path)))
 
 
+def _status_snapshot(repository: Path) -> dict[str, Any]:
+    raw = _run_git(
+        repository,
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all",
+        binary=True,
+    )
+    assert isinstance(raw, bytes)
+    staged_count = 0
+    unstaged_count = 0
+    untracked_count = 0
+    entry_count = 0
+    records = raw.split(b"\0")
+    index = 0
+    while index < len(records):
+        record = records[index]
+        index += 1
+        if not record:
+            continue
+        if len(record) < 3:
+            raise ValueError("Git returned an invalid porcelain status record")
+        code = record[:2]
+        entry_count += 1
+        if code == b"??":
+            untracked_count += 1
+            continue
+        if code == b"!!":
+            continue
+        if code[:1] != b" ":
+            staged_count += 1
+        if code[1:2] != b" ":
+            unstaged_count += 1
+        if code[:1] in {b"R", b"C"} or code[1:2] in {b"R", b"C"}:
+            # Porcelain v1 -z emits the original path as the following NUL field.
+            index += 1
+    return {
+        "dirty": bool(raw),
+        "dirty_fingerprint": hashlib.sha256(_DIRTY_FINGERPRINT_DOMAIN + raw).hexdigest(),
+        "dirty_entry_count": entry_count,
+        "staged_count": staged_count,
+        "unstaged_count": unstaged_count,
+        "untracked_count": untracked_count,
+    }
+
+
+def _merge_base(repository: Path, head: str, integration_oid: str) -> str:
+    value = str(_run_git(repository, "merge-base", head, integration_oid)).strip().lower()
+    if not _OID.fullmatch(value):
+        raise ValueError("HEAD and integration ref do not have a valid merge base")
+    return value
+
+
+def _ahead_behind(repository: Path, head: str, integration_oid: str) -> tuple[int, int]:
+    value = str(
+        _run_git(repository, "rev-list", "--left-right", "--count", f"{integration_oid}...{head}")
+    ).strip()
+    parts = value.split()
+    if len(parts) != 2 or any(not part.isdigit() for part in parts):
+        raise ValueError("Git returned invalid ahead/behind counts")
+    behind, ahead = (int(part) for part in parts)
+    return ahead, behind
+
+
 def _worktree_records(repository: Path) -> list[dict[str, Any]]:
     raw = _run_git(repository, "worktree", "list", "--porcelain", "-z", binary=True)
     assert isinstance(raw, bytes)
@@ -294,8 +372,11 @@ def inspect_worktree_identity(
     if branch_result.returncode not in {0, 1}:
         raise ValueError("Git inspection failed for symbolic-ref HEAD")
     branch = branch_result.stdout.strip() if branch_result.returncode == 0 else None
-    dirty = bool(_run_git(root, "status", "--porcelain=v1", "-z", binary=True))
+    status = _status_snapshot(root)
+    dirty = bool(status["dirty"])
     integration_oid = resolve_integration_oid(root, config.integration_ref)
+    merge_base = _merge_base(root, head, integration_oid)
+    ahead, behind = _ahead_behind(root, head, integration_oid)
     is_primary = _normalized_path(root) == _normalized_path(Path(str(primary["worktree"])))
     if dirty:
         fact_scope = "worktree"
@@ -314,11 +395,19 @@ def inspect_worktree_identity(
         "branch": branch,
         "head": head,
         "dirty": dirty,
+        "dirty_fingerprint": status["dirty_fingerprint"],
+        "dirty_entry_count": status["dirty_entry_count"],
+        "staged_count": status["staged_count"],
+        "unstaged_count": status["unstaged_count"],
+        "untracked_count": status["untracked_count"],
         "is_primary": is_primary,
         "primary_worktree_path": str(Path(str(primary["worktree"])).absolute()),
         "primary_worktree_source": primary_source,
         "integration_ref": config.integration_ref,
         "integration_oid": integration_oid,
+        "merge_base": merge_base,
+        "ahead": ahead,
+        "behind": behind,
         "fact_scope": fact_scope,
         "member_id": member_id,
         "host_id": host_id,
@@ -327,6 +416,168 @@ def inspect_worktree_identity(
     }
     validate_collaboration_contract(contract)
     return contract
+
+
+def worktree_session_path(repository: Path) -> Path:
+    """Resolve the per-worktree private session path selected by Git."""
+    root_text = str(_run_git(repository, "rev-parse", "--show-toplevel")).strip()
+    root = Path(os.path.abspath(root_text))
+    value = str(_run_git(root, "rev-parse", "--git-path", "orrery/worktree.json")).strip()
+    path = _absolute_git_path(root, value)
+    git_dir = _absolute_git_path(
+        root, str(_run_git(root, "rev-parse", "--absolute-git-dir")).strip()
+    )
+    try:
+        path.resolve(strict=False).relative_to(git_dir.resolve(strict=True))
+    except (OSError, ValueError) as exc:
+        raise ValueError("Git private session path is outside the current worktree Git directory") from exc
+    return path
+
+
+def _read_workstream_session(path: Path) -> dict[str, Any] | None:
+    try:
+        metadata = path.lstat()
+    except FileNotFoundError:
+        return None
+    except OSError as exc:
+        raise ValueError(f"cannot inspect private Workstream session: {exc}") from exc
+    if not stat.S_ISREG(metadata.st_mode):
+        raise ValueError("private Workstream session must be a regular file")
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot read private Workstream session: {exc}") from exc
+    if not isinstance(value, Mapping):
+        raise ValueError("private Workstream session must contain a JSON object")
+    session = dict(value)
+    validate_collaboration_contract(session)
+    if session.get("contract_type") != "workstream-session":
+        raise ValueError("private Workstream session has the wrong contract type")
+    return session
+
+
+def inspect_worktree_status(project_root: Path) -> dict[str, Any]:
+    """Return a stable read-only status projection for one worktree or clone."""
+    root = Path(project_root).expanduser().absolute()
+    config = load_collaboration_config(root)
+    identity = inspect_worktree_identity(root, config)
+    session_path = worktree_session_path(root)
+    session = _read_workstream_session(session_path)
+    stale_reasons = (
+        [reason for field, reason in _SESSION_STALE_FIELDS if session.get(field) != identity.get(field)]
+        if session is not None
+        else []
+    )
+    return {
+        "status_schema_version": WORKTREE_STATUS_SCHEMA_VERSION,
+        "identity": identity,
+        "session": {
+            "path": str(session_path),
+            "storage": "git-private-worktree",
+            "exists": session is not None,
+            "state": "absent" if session is None else ("stale" if stale_reasons else "current"),
+            "stale_reasons": stale_reasons,
+            "record": session,
+        },
+        "writes_performed": False,
+    }
+
+
+def build_workstream_session(
+    project_root: Path,
+    *,
+    workstream_id: str,
+    primary_subsystem_id: str,
+    affected_subsystem_ids: Sequence[str] = (),
+    expected_writes: Sequence[str] = (),
+    governing_docs: Sequence[str] = (),
+    validation_surfaces: Sequence[str] = (),
+    scope_revision: int = 1,
+    lifecycle_phase: str = "implementing",
+    runtime_condition: str = "active",
+    member_id: str = "local-owner",
+    host_id: str = "local-host",
+    captured_at: str | None = None,
+) -> dict[str, Any]:
+    """Build a session bound to current Git facts without writing it."""
+    root = Path(project_root).expanduser().absolute()
+    config = load_collaboration_config(root)
+    identity = inspect_worktree_identity(root, config, member_id=member_id, host_id=host_id)
+    registry = load_subsystem_registry(root)
+    scope = build_scope_contract(
+        workstream_id=workstream_id,
+        revision=scope_revision,
+        primary_subsystem_id=primary_subsystem_id,
+        affected_subsystem_ids=affected_subsystem_ids,
+        registry=registry,
+        expected_writes=expected_writes,
+        governing_docs=governing_docs,
+        validation_surfaces=validation_surfaces,
+        member_id=member_id,
+        host_id=host_id,
+    )
+    timestamp = captured_at or dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
+    session = {
+        "schema_version": COLLABORATION_SCHEMA_VERSION,
+        "contract_type": "workstream-session",
+        "project_mode": config.project_mode,
+        "workstream_id": workstream_id,
+        "worktree_id": identity["worktree_id"],
+        "member_id": member_id,
+        "host_id": host_id,
+        "active_host_id": host_id,
+        "platform_session": None,
+        "branch": identity["branch"],
+        "head": identity["head"],
+        "integration_ref": identity["integration_ref"],
+        "integration_oid": identity["integration_oid"],
+        "merge_base": identity["merge_base"],
+        "dirty_fingerprint": identity["dirty_fingerprint"],
+        "lifecycle_phase": lifecycle_phase,
+        "runtime_condition": runtime_condition,
+        "scope_revision": scope_revision,
+        "primary_subsystem_id": scope["primary_subsystem_id"],
+        "affected_subsystem_ids": scope["affected_subsystem_ids"],
+        "expected_writes": scope["expected_writes"],
+        "governing_docs": scope["governing_docs"],
+        "validation_surfaces": scope["validation_surfaces"],
+        "visibility": "worktree-local",
+        "observability": "local",
+        "captured_at": timestamp,
+    }
+    validate_collaboration_contract(session)
+    return session
+
+
+def write_workstream_session(project_root: Path, **session_fields: Any) -> dict[str, Any]:
+    """Atomically persist one reconstructable session under the private Git path."""
+    root = Path(project_root).expanduser().absolute()
+    session = build_workstream_session(root, **session_fields)
+    path = worktree_session_path(root)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if path.exists() and not stat.S_ISREG(path.lstat().st_mode):
+            raise OSError("existing private Workstream session is not a regular file")
+        descriptor, temporary_name = tempfile.mkstemp(prefix="worktree.", suffix=".tmp", dir=path.parent)
+        temporary = Path(temporary_name)
+        try:
+            with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as stream:
+                json.dump(session, stream, ensure_ascii=False, indent=2, sort_keys=True)
+                stream.write("\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.chmod(temporary, 0o600)
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
+    except OSError as exc:
+        raise ValueError(f"cannot write private Workstream session: {exc}") from exc
+    return {
+        "session_path": str(path),
+        "storage": "git-private-worktree",
+        "session": session,
+        "writes_performed": True,
+    }
 
 
 def load_subsystem_registry(project_root: Path) -> dict[str, Any]:

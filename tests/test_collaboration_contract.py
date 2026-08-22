@@ -31,11 +31,14 @@ from project_orrery_core.collaboration import (  # noqa: E402
     build_project_mode_contract,
     build_scope_contract,
     credential_is_current,
+    inspect_worktree_status,
     inspect_worktree_identity,
     load_subsystem_registry,
     remove_member,
     resolve_integration_oid,
     validate_collaboration_contract,
+    worktree_session_path,
+    write_workstream_session,
 )
 from tests.fixtures.collaboration.git_fixture import CollaborationGitFixture  # noqa: E402
 
@@ -346,6 +349,199 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(payload["data"]["mode"]["active_network_features"], [])
             self.assertNotIn("prompt", json.dumps(payload).lower())
             self.assertEqual(fixture.git(fixture.repository, "status", "--porcelain").stdout, before)
+
+    def test_worktree_status_is_read_only_and_private_sessions_cover_linked_and_clone(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            sessions = []
+            for root in (fixture.worktree_b, fixture.clone):
+                with self.subTest(root=root.name):
+                    before = fixture.git(root, "status", "--porcelain", "--untracked-files=all").stdout
+                    with mock.patch.object(
+                        socket, "socket", side_effect=AssertionError("network socket opened")
+                    ), mock.patch.object(
+                        socket, "create_connection", side_effect=AssertionError("network connection opened")
+                    ):
+                        status = inspect_worktree_status(root)
+                    self.assertEqual(
+                        set(status),
+                        {"status_schema_version", "identity", "session", "writes_performed"},
+                    )
+                    self.assertEqual(status["status_schema_version"], 1)
+                    self.assertFalse(status["writes_performed"])
+                    self.assertEqual(status["session"]["state"], "absent")
+                    expected_text = fixture.git(
+                        root, "rev-parse", "--git-path", "orrery/worktree.json"
+                    ).stdout.strip()
+                    expected = Path(expected_text)
+                    if not expected.is_absolute():
+                        expected = root / expected
+                    self.assertEqual(worktree_session_path(root), expected.absolute())
+                    self.assertFalse(expected.exists())
+
+                    written = write_workstream_session(
+                        root,
+                        workstream_id=f"W1-{root.name}",
+                        primary_subsystem_id="project-structure",
+                        expected_writes=["packages/project-orrery-core/"],
+                        captured_at="2026-08-22T00:00:00Z",
+                    )
+                    self.assertTrue(written["writes_performed"])
+                    self.assertEqual(Path(written["session_path"]), expected.absolute())
+                    self.assertTrue(expected.is_file())
+                    refreshed = inspect_worktree_status(root)
+                    self.assertEqual(refreshed["session"]["state"], "current")
+                    self.assertEqual(refreshed["session"]["stale_reasons"], [])
+                    self.assertEqual(
+                        refreshed["identity"]["dirty_fingerprint"],
+                        refreshed["session"]["record"]["dirty_fingerprint"],
+                    )
+                    self.assertEqual(
+                        fixture.git(root, "status", "--porcelain", "--untracked-files=all").stdout,
+                        before,
+                    )
+                    sessions.append(refreshed["session"]["record"])
+            for field in (
+                "project_mode",
+                "integration_ref",
+                "primary_subsystem_id",
+                "affected_subsystem_ids",
+                "expected_writes",
+                "governing_docs",
+                "validation_surfaces",
+                "visibility",
+                "observability",
+            ):
+                self.assertEqual(sessions[0][field], sessions[1][field])
+            self.assertNotEqual(sessions[0]["worktree_id"], sessions[1]["worktree_id"])
+
+    def test_session_staleness_tracks_branch_head_integration_and_dirty_fingerprint(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            root = fixture.worktree_b
+            write_workstream_session(
+                root,
+                workstream_id="W1-stale",
+                primary_subsystem_id="project-structure",
+                captured_at="2026-08-22T00:00:00Z",
+            )
+
+            dirty_path = root / "dirty.txt"
+            dirty_path.write_text("dirty\n", encoding="utf-8")
+            dirty_status = inspect_worktree_status(root)
+            self.assertEqual(dirty_status["session"]["state"], "stale")
+            self.assertEqual(
+                dirty_status["session"]["stale_reasons"], ["dirty-fingerprint-changed"]
+            )
+            dirty_path.unlink()
+            self.assertEqual(inspect_worktree_status(root)["session"]["state"], "current")
+
+            fixture.git(root, "branch", "-m", "codex/fixture-renamed")
+            branch_status = inspect_worktree_status(root)
+            self.assertEqual(branch_status["session"]["stale_reasons"], ["branch-changed"])
+
+        with CollaborationGitFixture() as fixture:
+            root = fixture.worktree_b
+            write_workstream_session(
+                root,
+                workstream_id="W1-head",
+                primary_subsystem_id="project-structure",
+                captured_at="2026-08-22T00:00:00Z",
+            )
+            changed = root / "head.txt"
+            changed.write_text("head\n", encoding="utf-8")
+            fixture.git(root, "add", "head.txt")
+            fixture.git(root, "commit", "-m", "advance candidate head")
+            self.assertEqual(
+                inspect_worktree_status(root)["session"]["stale_reasons"], ["head-changed"]
+            )
+
+        with CollaborationGitFixture() as fixture:
+            root = fixture.worktree_b
+            write_workstream_session(
+                root,
+                workstream_id="W1-integration",
+                primary_subsystem_id="project-structure",
+                captured_at="2026-08-22T00:00:00Z",
+            )
+            integrated = fixture.repository / "integration.txt"
+            integrated.write_text("integration\n", encoding="utf-8")
+            fixture.git(fixture.repository, "add", "integration.txt")
+            fixture.git(fixture.repository, "commit", "-m", "advance integration")
+            status = inspect_worktree_status(root)
+            self.assertEqual(status["session"]["stale_reasons"], ["integration-oid-changed"])
+            self.assertEqual(status["identity"]["behind"], 1)
+
+    def test_worktree_cli_has_stable_json_and_explicit_private_write(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            environment = {
+                **fixture.environment,
+                "PYTHONPATH": os.pathsep.join(
+                    (str(CLI_SOURCE), str(CORE_SOURCE), str(OBSERVATORY_SOURCE))
+                ),
+            }
+            before = fixture.git(fixture.worktree_b, "status", "--porcelain").stdout
+            base_command = [sys.executable, "-X", "utf8", "-m", "project_orrery_cli", "worktree"]
+            status = subprocess.run(
+                [*base_command, "status", "--target", str(fixture.worktree_b), "--json"],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(status.returncode, 0, status.stdout + status.stderr)
+            status_payload = json.loads(status.stdout)
+            self.assertEqual(status_payload["command"], "worktree-status")
+            self.assertEqual(status_payload["versions"]["core"], "0.1.2")
+            self.assertEqual(status_payload["versions"]["cli"], "0.1.7")
+            self.assertEqual(status_payload["data"]["session"]["state"], "absent")
+            self.assertFalse(status_payload["data"]["writes_performed"])
+
+            write = subprocess.run(
+                [
+                    *base_command,
+                    "session",
+                    "write",
+                    "--target",
+                    str(fixture.worktree_b),
+                    "--workstream-id",
+                    "W1-cli",
+                    "--primary-subsystem-id",
+                    "project-structure",
+                    "--expected-write",
+                    "packages/",
+                    "--json",
+                ],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(write.returncode, 0, write.stdout + write.stderr)
+            write_payload = json.loads(write.stdout)
+            self.assertEqual(write_payload["command"], "worktree-session-write")
+            self.assertTrue(write_payload["data"]["writes_performed"])
+            self.assertTrue(Path(write_payload["data"]["session_path"]).is_file())
+            self.assertEqual(
+                fixture.git(fixture.worktree_b, "status", "--porcelain").stdout, before
+            )
+
+            refreshed = subprocess.run(
+                [*base_command, "status", "--target", str(fixture.worktree_b), "--json"],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(refreshed.returncode, 0, refreshed.stdout + refreshed.stderr)
+            self.assertEqual(json.loads(refreshed.stdout)["data"]["session"]["state"], "current")
 
 
 if __name__ == "__main__":
