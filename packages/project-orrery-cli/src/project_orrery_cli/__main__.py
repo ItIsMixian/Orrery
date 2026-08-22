@@ -3,7 +3,17 @@ from __future__ import annotations
 
 import sys
 
-from . import authority_migrate, authority_restore, collaboration_contract, scaffold, update, validate, worktree
+from . import (
+    authority_migrate,
+    authority_restore,
+    collaboration_contract,
+    integration,
+    review,
+    scaffold,
+    update,
+    validate,
+    worktree,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -12,7 +22,7 @@ def main(argv: list[str] | None = None) -> int:
         print(
             "usage: project-orrery "
             "{scaffold|validate|check-update|migrate-authority-model|"
-            "restore-authority-model|collaboration-contract|worktree} [options]"
+            "restore-authority-model|collaboration-contract|worktree|integrate|review} [options]"
         )
         return 0
     command = arguments.pop(0)
@@ -24,6 +34,8 @@ def main(argv: list[str] | None = None) -> int:
         "restore-authority-model": authority_restore.main,
         "collaboration-contract": collaboration_contract.main,
         "worktree": worktree.main,
+        "integrate": integration.main,
+        "review": review.main,
     }
     selected = commands.get(command)
     if selected is None:

@@ -15,7 +15,10 @@
     {"$ref": "#/$defs/subsystem_registry"},
     {"$ref": "#/$defs/adapter_capabilities"},
     {"$ref": "#/$defs/member"},
-    {"$ref": "#/$defs/project_mode"}
+    {"$ref": "#/$defs/project_mode"},
+    {"$ref": "#/$defs/review_package"},
+    {"$ref": "#/$defs/review_decision"},
+    {"$ref": "#/$defs/closure_record"}
     ,{"$ref": "#/$defs/scope_observation"}
   ],
   "$defs": {
@@ -132,6 +135,8 @@
           },
           "additionalProperties": false
         }
+        ,"review_package_id": {"type": "string", "minLength": 1}
+        ,"review_package_content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       },
       "additionalProperties": false
     },
@@ -327,7 +332,200 @@
         "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
         "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
         "generated_at": {"type": "string", "format": "date-time"}
+        ,"strategy": {"enum": ["merge", "rebase"]}
+        ,"integration_worktree_clean": {"type": "boolean"}
+        ,"merge_result": {"enum": ["passed", "conflicted", "failed"]}
+        ,"conflict_paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        ,"target_drifted": {"type": "boolean"}
+        ,"author_worktree_unchanged": {"type": "boolean"}
+        ,"validation_set_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
       },
+      "additionalProperties": false
+    },
+    "review_binding": {
+      "type": "object",
+      "required": [
+        "candidate_head", "target_ref", "target_oid", "merge_base", "scope_revision",
+        "scope_fingerprint", "finding_set_hash", "collaboration_schema_id",
+        "collaboration_schema_version", "collaboration_schema_hash", "validation_set_hash"
+      ],
+      "properties": {
+        "candidate_head": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "target_ref": {"type": "string", "pattern": "^refs/heads/"},
+        "target_oid": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "merge_base": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "scope_revision": {"type": "integer", "minimum": 1},
+        "scope_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "finding_set_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "collaboration_schema_id": {"const": "project-orrery-collaboration-v1"},
+        "collaboration_schema_version": {"const": 1},
+        "collaboration_schema_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "validation_set_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "review_risk": {
+      "type": "object",
+      "required": [
+        "level", "reasons", "required_human_reviewers", "required_approval_capability",
+        "non_author_reviewer_required", "ai_counts_as_human_reviewer"
+      ],
+      "properties": {
+        "level": {"enum": ["normal", "elevated", "high"]},
+        "reasons": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "required_human_reviewers": {"type": "integer", "minimum": 1},
+        "required_approval_capability": {"enum": ["reviewer", "integrator"]},
+        "non_author_reviewer_required": {"type": "boolean"},
+        "ai_counts_as_human_reviewer": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "review_package": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "review_schema_version", "package_id",
+        "content_hash", "hash_excludes", "binding", "workstream_id", "author_member_id",
+        "author_host_id", "risk", "evidence", "ai_summary", "presentation_order",
+        "invalidation_conditions", "validation_fresh_until", "visibility", "observability", "generated_at"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "review-package"},
+        "review_schema_version": {"const": 1},
+        "package_id": {"type": "string", "pattern": "^review-[0-9a-f]{24}$"},
+        "content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "hash_excludes": {
+          "type": "array", "items": {"enum": ["package_id", "content_hash"]},
+          "minItems": 2, "maxItems": 2, "uniqueItems": true
+        },
+        "binding": {"$ref": "#/$defs/review_binding"},
+        "workstream_id": {"type": "string", "minLength": 1},
+        "author_member_id": {"type": "string", "minLength": 1},
+        "author_host_id": {"type": "string", "minLength": 1},
+        "risk": {"$ref": "#/$defs/review_risk"},
+        "evidence": {
+          "type": "object",
+          "required": [
+            "scope", "findings", "finding_history", "changed_paths", "diff_stat",
+            "validations", "state_alignment", "adr_alignment", "speculative_integration",
+            "evidence_refs", "unknown_boundaries"
+          ],
+          "properties": {
+            "scope": {"$ref": "#/$defs/scope_observation"},
+            "findings": {"type": "array", "items": {"$ref": "#/$defs/overlap_finding"}},
+            "finding_history": {"type": "array", "items": {"$ref": "#/$defs/overlap_finding"}},
+            "changed_paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "diff_stat": {"type": "string"},
+            "validations": {"type": "array", "items": {"type": "object"}},
+            "state_alignment": {"type": "object"},
+            "adr_alignment": {"type": "object"},
+            "speculative_integration": {"$ref": "#/$defs/integration_report"},
+            "evidence_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "unknown_boundaries": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+          },
+          "additionalProperties": false
+        },
+        "ai_summary": {
+          "type": "object",
+          "required": ["status", "authority", "text", "generated_at"],
+          "properties": {
+            "status": {"enum": ["unavailable", "provided"]},
+            "authority": {"const": "derived-non-authoritative"},
+            "text": {"type": "string"},
+            "generated_at": {"type": "string", "format": "date-time"}
+          },
+          "additionalProperties": false
+        },
+        "presentation_order": {
+          "type": "array", "items": {"enum": ["evidence", "ai_summary"]},
+          "minItems": 2, "maxItems": 2, "uniqueItems": true
+        },
+        "invalidation_conditions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "validation_fresh_until": {"type": "string", "format": "date-time"},
+        "visibility": {"const": "worktree-local"},
+        "observability": {"const": "local"},
+        "generated_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "review_decision": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "decision_schema_version", "decision_id",
+        "package_id", "package_content_hash", "action", "actor_id", "actor_kind",
+        "actor_is_author", "actor_capabilities", "reason", "evidence_refs", "decided_at",
+        "invalidation_conditions", "visibility", "observability"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "review-decision"},
+        "decision_schema_version": {"const": 1},
+        "decision_id": {"type": "string", "pattern": "^decision-[0-9a-f]{24}$"},
+        "package_id": {"type": "string", "pattern": "^review-[0-9a-f]{24}$"},
+        "package_content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "action": {"enum": ["approve", "request-changes", "hold", "reject"]},
+        "actor_id": {"type": "string", "minLength": 1},
+        "actor_kind": {"const": "human"},
+        "actor_is_author": {"type": "boolean"},
+        "actor_capabilities": {"type": "array", "items": {"enum": ["reviewer", "integrator", "admin"]}, "uniqueItems": true},
+        "reason": {"type": "string", "minLength": 1},
+        "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+        "decided_at": {"type": "string", "format": "date-time"},
+        "invalidation_conditions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "visibility": {"const": "local-only"},
+        "observability": {"const": "local"}
+      },
+      "additionalProperties": false
+    },
+    "closure_record": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "closure_schema_version", "closure_id",
+        "workstream_id", "candidate_head", "target_ref", "review_target_oid", "final_oid",
+        "review_package_id", "review_package_content_hash", "decision_ids", "validation_refs",
+        "closure_reason", "actor_id", "closed_at", "storage", "visibility", "observability"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "closure-record"},
+        "closure_schema_version": {"enum": [1, 2]},
+        "closure_id": {"type": "string", "pattern": "^closure-[0-9a-f]{24}$"},
+        "workstream_id": {"type": "string", "minLength": 1},
+        "original_workspace_path": {"type": "string", "minLength": 1},
+        "workspace_classification": {"enum": ["integrated-closed"]},
+        "workspace_classification_label": {"const": "Integrated/Closed"},
+        "candidate_head": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "final_head": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "target_ref": {"type": "string", "pattern": "^refs/heads/"},
+        "review_target_oid": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "final_oid": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "integration_oid": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "review_package_id": {"type": "string", "pattern": "^review-[0-9a-f]{24}$"},
+        "review_package_content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "decision_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+        "validation_refs": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+        "closure_reason": {"const": "integrated"},
+        "actor_id": {"type": "string", "minLength": 1},
+        "cleanup_operator_id": {"type": "string", "minLength": 1},
+        "cleanup_action_log_ref": {"type": "string", "pattern": "^git-private:orrery/closures/actions/closure-[0-9a-f]{24}/$"},
+        "actual_cleanup_actions": {"type": "array", "items": {"enum": ["remove-worktree", "delete-local-branch", "delete-remote-branch", "remove-directory"]}, "uniqueItems": true},
+        "closed_at": {"type": "string", "format": "date-time"},
+        "storage": {"const": "git-private-common"},
+        "visibility": {"const": "local-only"},
+        "observability": {"const": "local"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"closure_schema_version": {"const": 2}}},
+          "then": {
+            "required": [
+              "original_workspace_path", "workspace_classification",
+              "workspace_classification_label", "final_head", "integration_oid",
+              "cleanup_operator_id", "cleanup_action_log_ref", "actual_cleanup_actions"
+            ]
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "subsystem_registry": {
