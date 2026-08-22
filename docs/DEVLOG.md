@@ -443,3 +443,11 @@
 - provider 缺失、失败或 schema 不兼容时只把 W3 区域降为 Unavailable／Unknown，W1/W2 的 W4A 页面继续工作。界面仍按人的项目问题组织，raw OID／hash／path 下沉技术证据；没有执行按钮、Team Mode、LAN、telemetry、请求、外部网络、merge 或 cleanup。
 - 隔离修复后的 Fast focused 为 12/12 PASS（99.481 s），包含真实 W3 Core review package→W4 consumer；组件版本一致性 1/1 PASS。实现代理误启动的 collaboration 组合运行在约十分钟后停止并记录为 interrupted，没有重跑或算作通过；默认／动态全仓与 exact-SHA 双平台矩阵留给中央联合 Candidate。
 - 首次 W4B diagnostic build 暴露 W1/W2 exclusion 尚未阻止新 W3 provider 间接读取被排除 worktree；该产物立即判废并覆盖。修复提交 `e5a198e` 在显式 exclusion 下完全跳过自动 W3 provider，回退 `IsolationBoundary / Unavailable`；回归测试断言 provider 未被调用。修复后的真实隔离页、稳定 W3 代表页与 provider fallback 页均完成桌面／390×844 浏览器验证，无表单、产品动作按钮、外链或横向溢出。
+
+## 2026-08-23 — W5A opt-in Team Mode foundation Candidate
+
+- 从 `main@7932a9c01efb2e5125da1962873e67383982d98c` 建立独立 `codex/w5-team-foundation` worktree；实现提交 `ac0f4eb` 将 Core／CLI 推进到 0.1.8／0.1.13，没有修改 W4 Observatory／docsite、用户级 Skill、PROGRESS／HANDOFF、tag 或 Release。
+- 复用 W1–W3 Member／Host／Workstream／Scope／finding／review contract，新增 Git-private Team config／credential／Coordinator／outbox／inbox、64 KiB exact-field metadata envelope、Member → Workstream 只读 projection、monotonic revision、手工 active Host switch、heartbeat／TTL 与 request-only 本机确认。
+- Personal 默认保持零监听；Team enable 本身不打开网络，显式 serve 默认只绑定 loopback，LAN bind 要求本机开关。disable 停止已登记 runtime 并保留本地 Git／Workstream／Validation／文档。
+- 手工 invite／join 已实现项目 fingerprint、指定成员、Host-local Admin 确认和非成员拒绝；自动发现、跨 Coordinator 迁移／选主、云 relay、多设备迁移、完整 credential re-issue UX 与 W5 UI 留给后续。
+- focused 13/13 PASS；adjacent checkpoint 的 24 个实际产品用例全部通过。首次 checkpoint 误写两个 unittest class 名，只产生 loader selection error，已用正确 class 名 2/2 补跑；没有把该命令错误重分类为产品通过或失败。完整证据见 [W5A Validation](validation/2026-08-23-w5a-team-mode-foundation.md)。

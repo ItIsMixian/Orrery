@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
-- Canonical `main@7932a9c` 的未发布 Core／CLI 为 0.1.7／0.1.12：在 W1/W2 contract、Git-private session、Scope、finding、acknowledgement 与 route gate 上增加证据优先 review package、推测性 integration dry-run、人工 decision、integration eligibility、Git-private closure，以及 bounded workspace inventory／cleanup eligibility。当前 W4 Worktree Candidate 将 Observatory 源码推进到 0.1.2；该版本尚未进入 canonical main。Core API 仍为 1，所有组件仍未发布，公开 v0.2.0 也未改变。
+- 联合 Candidate 将未发布 Core／CLI 推进到 0.1.8／0.1.13、Observatory 推进到 0.1.2：W1–W3 提供 Personal Scope/review/cleanup contract，W4 提供只读 Personal 指挥台，W5A 增加 Git-private Team 配置与身份、严格 metadata envelope、event outbox、Member → Workstream 只读聚合、request-only 本机确认和显式启动的 loopback／LAN Coordinator foundation。Core API 仍为 1；公开 v0.2.0 与 Canonical main 尚未改变。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
 ## 当前边界
@@ -31,7 +31,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `adapters/claude-code/` 使用原生 Plugin discovery；`adapters/deepseek-harness/` 使用 profile Cordis Plugin Bundle。两者有独立 manifest、打包器、生命周期和 runtime evidence，不共享对第三方平台兼容性的推断。
 - `docs/_site/`、缓存、凭据和 benchmark 原始输出不是作者文档或发布资产。
 - 自托管、实验和测试资产已进入 `main`；v0.2.0 tag／Release 指向发布提交 `20fc95b`，后续当前事实由 main 上的发布后文档继续维护。
-- linked worktree 共享 Git 对象库和普通 refs，但拥有独立 HEAD、索引与工作目录。未提交文件仍只属于所在 Worktree scope。当前没有 ADR-0008 所设计的 Team Node／Coordinator，因此跨机器未 push 工作在实际产品中仍不可观察；未来 opt-in Team Mode 只能增加标注为 Local-only 的元数据，不会成为代码证据。
+- linked worktree 共享 Git 对象库和普通 refs，但拥有独立 HEAD、索引与工作目录。未提交文件仍只属于所在 Worktree scope。W5A Candidate 只有用户本机显式 enable 后才能启动 Coordinator；中央只接受标注为 Local-only 的版本化元数据，不接收源码正文或未 push diff，也不把 telemetry 升级为代码证据。未启用、未分享、过期或证据不足继续投影 Unknown／Unavailable。
 - Phase 0 配置固定在 `.project-orrery.json` 的 `collaboration.integration_ref`、`collaboration.primary_worktree` 和 `collaboration.project_mode`；integration ref 缺省为 `refs/heads/main`，只按本地 branch ref 解析精确 commit OID，不 fetch 或回退远端。主 worktree 缺省取 `git worktree list --porcelain` 的 main worktree，维护者覆盖必须是同一仓库已列出的绝对 worktree 路径。
 - worktree 路径比较先收敛现有路径的真实绝对形式，再应用平台大小写规则；这让 Windows runner 的 8.3／长路径别名指向同一已列出 worktree，同时不允许不存在或跨仓库的 override 绕过检查。
 - Phase 1 通过 `git rev-parse --git-path orrery/worktree.json` 定位每个 linked worktree／clone 的 Git 私有 session；原子写入不改变作者工作树。session 绑定 worktree ID、branch、HEAD、integration ref／OID、merge base 和 dirty fingerprint；只读 status 在绑定事实漂移后报告稳定 stale reason，不自动重写。
@@ -82,6 +82,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `packages/project-orrery-observatory/src/project_orrery_observatory/personal_observatory.py`（W4 Worktree Candidate）
 - `scripts/docsite/build_personal_observatory.py`（root-only W4 opt-in entry）
 - `tests/test_personal_observatory.py`
+- `packages/project-orrery-core/src/project_orrery_core/team.py`
+- `packages/project-orrery-core/src/project_orrery_core/schema/team-v1.json`
+- `packages/project-orrery-cli/src/project_orrery_cli/team.py`
+- `tests/test_collaboration_team.py`
 
 ## 已知缺口
 
@@ -91,5 +95,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W3 source 已实现本地 review／integration dry-run／closure／workspace inventory／cleanup eligibility 闭环；它不执行真实 main 更新或清理。W4 Worktree Candidate 已只读投影 W1–W3 Canonical 数据，但尚未进入 Canonical integration 或发布，也不实现 Team 网络层。当前平台仍未声明 launch／rebind／message，也没有宿主级任意写入拦截。
-- Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.12、其他版本、OS、Provider、模型或未来发行物。
+- W3 source 已实现本地 review／integration dry-run／closure／workspace inventory／cleanup eligibility；W4 Candidate 已只读投影 W1–W3；W5A Candidate 又增加可运行的 opt-in Team Core／CLI 与 loopback Coordinator。仍没有自动发现、自动 Coordinator 迁移／选主、云 relay、多设备迁移或 Team UI，且不执行真实 main update、远程 shell／Agent／merge／delete。Canonical 与远端 promotion 状态仍由最终 exact SHA required checks 决定。
+- Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.13、其他版本、OS、Provider、模型或未来发行物。

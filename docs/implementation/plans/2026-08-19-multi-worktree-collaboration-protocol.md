@@ -211,6 +211,18 @@ LAN／telemetry／请求或外部网络依赖；W5 全部条目保持未启动�
 显式 `excluded_branches` 同时是 W1/W2 collector 与自动 W3 provider 的读取边界；修复提交 `e5a198e`
 在该边界下不运行 provider，并用 `IsolationBoundary / Unavailable` 保留诚实降级。
 
+W5A Candidate checkpoint（2026-08-23）：独立 worktree `codex/w5-team-foundation` 从
+`main@7932a9c01efb2e5125da1962873e67383982d98c` 开始，提交 `ac0f4eb` 将 Core／CLI 推进到
+0.1.8／0.1.13。它复用 W1–W3 的 Member／Host／Workstream／Scope／finding／review contract，在
+Git-private 区域增加显式 Team 配置、项目／成员／Host 身份、成员 credential epoch、严格 64 KiB
+metadata envelope、event outbox、单调 revision、手工 active Host 切换、heartbeat／TTL 投影、
+Member → Workstream 只读 bundle、request-only／本机决定 receipt，以及 stdlib loopback Coordinator。
+Personal 默认仍不启动 listener；LAN bind 需要本机双重开关；disable 停止已登记 runtime 并保留本地
+Git／Workstream／Validation／文档。手工 invite／join fallback 可运行，加入必须匹配项目 fingerprint、
+邀请身份并经 Host-local Admin 确认。自动发现、跨 Coordinator 状态迁移／leader election、云 relay、
+多设备迁移、完整成员 credential re-issue UX、Observatory／Team UI 和公开发布留给 W5B／后续 W4 集成。
+本 checkpoint 不修改 Observatory／docsite，也不把 Candidate 写成 Canonical 或 released。
+
 ### Phase 5 — 自托管迁移与发布
 
 - [ ] 先在 Project Orrery 自身的隔离 fixture 和真实 linked worktree 上试用。
