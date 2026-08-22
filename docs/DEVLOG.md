@@ -373,3 +373,10 @@
 - 四层 verdict 分开保留形式有效性、语义质量、结构化 State／未来版本遗漏和 apparatus contamination；checksummed 7 文件 fixture 公开 versioned State 字段、枚举与四项可发现测试。
 - 20 个 self-test cases 覆盖三组英／中 paraphrase、每项事实两组 contradiction、索引改名、关键 behavior/data/scope/State/formal mutations、未知措辞人工复核与外部读取污染；全部只走临时 Git、Python 公共调用链与 SQLite，结果明确为 `model_calls: 0`。
 - 静态结论只允许申请 Pilot 010 设计；任务包、Prompt 等长、嵌套隔离、目标 runtime handshake 和 formal transport 尚未冻结，因此不得运行新样本或采纳 S。
+
+## 2026-08-22 — W1／D1／C1 本地 Canonical 集成
+
+- 从 clean `main@606e2c8` 建立独立 integration worktree，按 W1→D1→C1 顺序吸收；W1 六个 stacked commits fast-forward，D1/C1 只在共享文档追加处冲突并按当前事实增量合并。
+- 首轮联合专项捕获 C1 fixture 从 C 盘重放到 D 盘后的 CRLF hash mismatch；新增 fixture-source 专属 LF 属性，保持原 manifest hash，Pilot 004–009 冻结目录不变。
+- 修复后联合专项 35/35、默认全仓 268 PASS + 5 existing skips、动态全仓 270 PASS + 3 Windows privilege skips。
+- W1 Phase 1、D1 contract/fixture 与 C1 static controls 进入 Canonical source；W2/D2/C2、Pilot 010、发布和模型运行均未自动启动，远端 CI 尚待推送。

@@ -4,3 +4,4 @@
 *.yaml text eol=lf
 *.yml text eol=lf
 *.bat text eol=crlf
+experiments/context-routing/oracles/oracle-v0.2/fixture-source/** text eol=lf
