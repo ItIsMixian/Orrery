@@ -402,4 +402,4 @@ orrery integrate --target <integration-ref> --validate
 23. 集成后默认只建议清理并展示空间，成员本机确认后才删除合格的 clean worktree；branch 延迟提示删除，dirty／独有 commit／未知本地文件和未集成状态禁止自动清理。
 24. Personal 与 Team 使用同一 Observatory 渐进扩展：默认首页只有项目状态、关注项、审查队列、Workstream／subsystem 概览；详情按需展开，Team Mode 仅增加 Team 页签且不提供跨成员直接执行按钮。
 
-ADR-0007 与其 amendment ADR-0008 已在 2026-08-20 的集成工作中正式接受，本 Design 现为 canonical Approved Design。现有实现仍只完成工作目录隔离、恢复与人工集成流程；私有 session、自动重叠检测、审查／清理命令和观测台投影均待实现，不能把设计获批误写为工具已经完成。
+ADR-0007 与其 amendment ADR-0008 已在 2026-08-20 的集成工作中正式接受，本 Design 现为 canonical Approved Design。Canonical W1 已完成 worktree／Git-private session／route 基础；W2 Candidate 已实现 Scope/path、finding 与本机门禁。审查／integration／cleanup、closure archive、观测台投影和 Team runtime 仍待实现，不能把 Design 获批或 Candidate worktree 误写为 canonical／released 完整工具。

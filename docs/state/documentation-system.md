@@ -31,6 +31,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 手动刷新、设置与问答写操作都要求同源 POST；旧查询参数 GET 不再触发模型调用。
 - Canonical W1 Phase 0 已为 `AGENTS.md` 的七个 subsystem 区块增加显式稳定 ID。Core registry parser 只读取这些 ID 与已有 `docs/state/*.md` 链接；重复／保留 ID 或缺失 State Doc 失败关闭，并且不会因路径推断创建新 State。该 registry 是权威入口的机器投影，不是新的作者事实源。
 - W1 Phase 1 把 Workstream session 保存为 Git 私有、可重建运行元数据，并由 CLI 从 Git 机械派生 branch／OID／dirty／scope、stale、lifecycle 与 routing 摘要；create／guard／route／attach 都不会自动改写 State、Plan、Validation 或根进度入口，也不要求 Agent 固定生成 Manifest／Receipt。
+- W2 Candidate 继续只写 Git-private control metadata：`scope-observation` 保留 committed／staged／unstaged／untracked／expected 来源，Authority surface 识别覆盖 Seed、ADR、Design、Plan、State、Validation、AGENTS、PROGRESS、HANDOFF 与 DEVLOG。finding、acknowledgement 和历史处置是可重建协调记录，不成为新的 State／ADR／Validation；普通功能分支仍不持续改写根 PROGRESS／HANDOFF。
+- W2 Candidate 的 `worktree overlap` 与 `scope inspect` 保持只读；`scope refresh` 和 `finding acknowledge` 只在本机更新私有 session。所有 L2 确认记录成员、理由、时间与 Scope Revision，Agent／中央请求来源被拒绝；缺失或不可访问对端产生 Unknown／Unavailable，不投影为“零冲突”。
 
 ## 同步状态
 
@@ -62,6 +64,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
-- W1 Phase 1 CLI 已能创建固定 integration OID 的 linked worktree、维护 Git-private session、执行 primary-write preflight、lifecycle transition、route 与 caller-provided attach；Adapter Skill 只在自身流程中要求这些检查，观测台尚未消费该合约，仍没有自动重叠报告、审查包、清理建议或 Team Mode runtime。
+- W2 Candidate 已在 W1 的 create／status／guard／route／attach 基础上实现自动 Scope/path 与 overlap report，并让 Adapter route 消费本机 L2/L3/finding gate。观测台尚未消费该合约，审查包、integration、清理建议与 Team Mode runtime 仍未实现；Adapter Skill 接线也不等于宿主级任意写入拦截。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

@@ -106,16 +106,26 @@ brief，不伪装原地迁移。证据见 [专项 Validation](../../validation/2
 
 ### Phase 2 — 范围采集与重叠检测
 
-- [ ] 采集 merge base 至 HEAD 的 committed paths。
-- [ ] 采集 staged、unstaged、untracked 与 session expected writes，保留路径来源。
-- [ ] 从 Project Orrery 配置和文档索引识别 State、ADR、Design、Plan、Validation、PROGRESS、HANDOFF 等权威面。
-- [ ] 输出 Direct、Authority、Semantic 和 Unknown findings；不把缺失远端证据解释为安全。
-- [ ] 对凭据、release 和 schema migration 等独占资源提供可配置硬门禁。
-- [ ] 实现 Scope Expansion B 策略：L0／L1 自动 revision，L2 本机确认，L3 本机拒绝；中央服务不能绕过本机门禁。
-- [ ] 从实际／预期路径与 registry 派生 subsystem mapping；未预期跨 subsystem 触发 L2，Unmapped 保持显式，Shared subsystem 进入 Semantic 优先检查但不自动判冲突。
-- [ ] 实现 Open／Acknowledged／Resolved／Stale finding lifecycle；Direct／L3 无豁免入口，Semantic／L2 的本机确认记录成员、理由、时间和 Scope Revision，并在范围／基线变化后失效。
-- [ ] 将所有 Acknowledged L2 finding 和历史处置纳入人工集成审查包；Agent 自报和中央请求都不能直接改变 finding disposition。
-- [ ] 为跨成员 L2 保存 per-member acknowledgement 和必需成员集合；单方确认只解锁其本地工作，整体以 `n/m` 投影，并在全员确认／解决／仲裁前阻止 Review Ready。
+- [x] 采集 merge base 至 HEAD 的 committed paths。
+- [x] 采集 staged、unstaged、untracked 与 session expected writes，保留路径来源。
+- [x] 从 Project Orrery 配置和文档索引识别 State、ADR、Design、Plan、Validation、PROGRESS、HANDOFF 等权威面。
+- [x] 输出 Direct、Authority、Semantic 和 Unknown findings；不把缺失远端证据解释为安全。
+- [x] 对凭据、release 和 schema migration 等独占资源提供可配置硬门禁。
+- [x] 实现 Scope Expansion B 策略：L0／L1 自动 revision，L2 本机确认，L3 本机拒绝；中央服务不能绕过本机门禁。
+- [x] 从实际／预期路径与 registry 派生 subsystem mapping；未预期跨 subsystem 触发 L2，Unmapped 保持显式，Shared subsystem 进入 Semantic 优先检查但不自动判冲突。
+- [x] 实现 Open／Acknowledged／Resolved／Stale finding lifecycle；Direct／L3 无豁免入口，Semantic／L2 的本机确认记录成员、理由、时间和 Scope Revision，并在范围／基线变化后失效。
+- [x] 将所有 Acknowledged L2 finding 和历史处置保存为后续人工集成审查包的强制输入；W2 不提前生成 W3 审查包，Agent 自报和中央请求不能改变 disposition。
+- [x] 为跨成员 L2 保存 per-member acknowledgement 和必需成员集合；单方确认只解锁其本地工作，整体以 `n/m` 投影，并在全员确认／解决／仲裁前阻止 Review Ready。
+
+Candidate checkpoint W2（2026-08-22）：实现提交 `de5152e` 位于独立分支
+`codex/w2-scope-finding`。Core 0.1.5／CLI 0.1.10 在既有 collaboration-v1、Git-private session、
+subsystem registry 与 route/guard 上增加 path source observation、`worktree overlap`、`scope
+inspect/refresh` 和本机 finding acknowledgement。Scope／finding fingerprint 绑定 HEAD、integration OID、
+revision、路径、subsystem 与验证面；变化后旧 acknowledgement 进入 Stale，条件消失后机械 Resolved。
+Direct／L3、独占资源与未确认 L2 已接入 Adapter route，本机成员确认的跨成员 L2 只解锁其本地工作，
+整体仍以 `n/m` 阻断 Review Ready。证据见 [W2 Validation](../../validation/2026-08-22-w2-scope-finding.md)。
+该 Candidate 没有实现 W3 review／integration／cleanup、Observatory、Coordinator／LAN／Team transport、
+自动合流或自动修复，也没有修改用户级 Skill 或公开 v0.2.0。
 
 ### Phase 3 — 推测性集成与人工审查
 

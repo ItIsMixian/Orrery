@@ -388,3 +388,12 @@
 - self-host 流程改为先推 Candidate exact SHA 并等待 Windows／Ubuntu 双 PASS，再快进 main；服务端 required checks 对管理员生效，但不强制 PR。
 - 本记录先随 Candidate branch 运行自身矩阵，保护规则和 main 推广结果由同一 Validation 在外部状态完成后补全。
 - Candidate `e4e4442` 的 `32566445483` Windows／Ubuntu 双 PASS 后，main protection 已以 strict/admin enforcement 启用并接受同一 SHA；workflow 随后排除普通 main push，避免重复矩阵。
+
+## 2026-08-22 — W2 Scope / Finding Candidate
+
+- 从 `origin/main@193b3ba` 在独立 `codex/w2-scope-finding` worktree 实现正式 W2；实现提交为 `de5152e`，没有启动或编号 W3/W4/W5，没有修改用户级 Skill、push、merge、tag 或 Release。
+- Core 0.1.5／CLI 0.1.10 复用 collaboration-v1、Git-private session、subsystem registry 和 W1 route/guard，采集 committed／staged／unstaged／untracked／expected 五类路径来源，并提供 `worktree overlap`、`scope inspect/refresh` 与 `finding acknowledge`。
+- Scope observation 识别 Seed／ADR／Design／Plan／State／Validation／AGENTS／PROGRESS／HANDOFF／DEVLOG，按 registry Truth 路径映射 subsystem；Unmapped／project-wide 保持显式，共享 subsystem 只提高 Semantic 检查优先级，不自动判冲突。
+- Direct／Authority／Semantic／Unknown 与 Open／Acknowledged／Resolved／Stale 绑定 Scope／baseline fingerprint；L2 只接受本机 Member 理由确认，跨成员保存 `n/m`，单方确认只解锁本地工作。Direct／L3、凭据／release／schema 独占面和未本机确认 L2 已接入 Adapter route 并失败关闭。
+- collaboration 专项扩展到 27/27；实现提交后的默认全仓 278 项中 273 PASS + 5 existing skips。完整动态、结构、隔离站点、链接、secret／forbidden 与 diff 结果见 [W2 Validation](validation/2026-08-22-w2-scope-finding.md)。
+- W2 只把 Acknowledged L2 与处置历史保存为未来 W3 审查包输入，不生成审查包；review／integration／cleanup、Observatory、Coordinator／LAN／Team transport、自动合流和自动修复均未实现。
