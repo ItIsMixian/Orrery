@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-22/23 W3 Review / Integration / Cleanup Candidate](2026-08-22-w3-review-integration-cleanup.md) — evidence-first review, clean speculative integration, bounded workspace inventory, seven conservative classifications, independent four-action authorization, Git-private closure/action trace and zero-delete cleanup eligibility; no main mutation, W4/W5 or release.
 - [2026-08-22 W2 Canonical integration](2026-08-22-w2-canonical-integration.md) — latest-main reconciliation, 27/27 collaboration regression, 278-test local suite and Candidate-first boundary before W3 or release.
 - [2026-08-22 W2 Scope / Finding Candidate](2026-08-22-w2-scope-finding.md) — five-source path observation, Authority/subsystem mapping, Direct／Authority／Semantic／Unknown, Scope Expansion B, exclusive-resource route gates, local-only acknowledgement and cross-member `n/m`; no W3, Observatory, Team transport or release.
 - [2026-08-22 Candidate-first main promotion gate](2026-08-22-candidate-first-main-promotion-gate.md) — server-enforced exact-SHA Windows/Ubuntu checks before direct main promotion, without requiring a PR or changing release state.

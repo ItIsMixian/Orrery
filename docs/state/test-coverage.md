@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-22
+Updated: 2026-08-23
 
 ## 当前事实
 
@@ -38,6 +38,7 @@ Updated: 2026-08-22
 - W1.3 将同一专项扩展到 22/22：覆盖 lifecycle 合法／非法转换、phase／runtime／evidence／closure 独立性、Review Ready stale 撤销、未来 review／integration gate 失败关闭、四 Adapter capability contract、只读 route、Git-private attach、caller-provided Agent-first attach、no-rebind 新 Workstream 回退、dirty／clean primary 阻断和稳定 CLI JSON／exit code。默认全仓为 255 PASS + 5 existing skips，动态全仓为 257 PASS + 3 Windows symlink privilege skips；这是 stacked Windows Candidate 本地证据，不构成 W1.3 跨平台 CI、当前 Adapter runtime 验证或发布支持声明。
 - W1／D1／C1 干净整合先暴露 C1 CRLF hash mismatch；专属 `eol=lf` 修复后，联合专项 35/35、默认全仓 268 PASS + 5 skips、动态全仓 270 PASS + 3 privilege skips及其余本地门通过。首次远端 `32564000587` 为 Ubuntu PASS／Windows FAIL：W1 session-path 测试误把 `RUNNER~1` 与等价长路径判为不同；改用 realpath/normcase 后单项 1/1、collaboration 22/22，最终 `32564334514` Windows／Ubuntu 双 PASS。
 - W2 将 collaboration 专项扩展到 27/27：覆盖五类路径来源、四类 finding、registry mapping、独占门、L1/L2/L3、route gate、lifecycle、ack 失效和跨成员 `1/2 → 2/2`。集成树默认全仓 278 项中 273 PASS + 5 existing skips；integrated structure、隔离静态站、335 份 Markdown／855 个链接／0 unexpected missing、secret／forbidden 与 diff 门通过。exact SHA `21a2e1c` 在 GitHub Actions `32570545138` 取得 Windows／Ubuntu 双 PASS 后由受保护 main 接受。
+- W3 Candidate 的 `tests/test_collaboration_w3.py` 已扩展到 13 项：除 review/integration 原有安全面外，还覆盖 bounded inventory、Legacy unmanaged／Unknown 显式采纳、active task、benchmark/evidence retained、recovery retained、path escape/reparse、独有 commit、未知 untracked／ignored、敏感 ignored 不可 allowlist、四动作分离授权、Git-private external-action receipt、stable JSON 和 zero-delete／zero-network。W3 focused 13/13；W1/W2 collaboration + W3 + 邻接 schema migration/restore + Codex adapter checkpoint 为 83/83。默认／动态全仓与 exact-SHA 双平台矩阵留给干净 W3+W4 联合 Candidate 的中央一次性验收，不能把较早全仓结果外推到当前增量；命令与边界见 [W3 Validation](../validation/2026-08-22-w3-review-integration-cleanup.md)。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
@@ -153,6 +154,6 @@ Updated: 2026-08-22
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
-- ADR-0007／ADR-0008 的 Canonical W2 已在 W1 schema/session/create/guard/route 上补齐实际 scope／overlap／ack 测试。当前平台的 launch／rebind／message 均声明不支持；review／integration／cleanup、Personal 指挥台与 Team Mode 网络测试仍未实现。
+- ADR-0007／ADR-0008 的 Canonical W2 已在 W1 schema/session/create/guard/route 上补齐实际 scope／overlap／ack 测试；W3 Candidate 进一步覆盖本地 review／integration dry-run／closure／cleanup eligibility。当前平台的 launch／rebind／message 均声明不支持；W3 尚未 Canonical 或取得当前 SHA 的远端双平台证据，Personal 指挥台与 Team Mode 网络测试仍未实现。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。
 - Claude Code 仍被认证阻断。DeepSeek Harness 已证明真实显式／隐式模型调用、模型侧 CLI 失败关闭和修复后的普通 wheel 路由；只有 manifest 中的精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1／模型与生命周期范围进入 `verified`，其余范围不外推。

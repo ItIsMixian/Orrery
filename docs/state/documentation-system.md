@@ -1,6 +1,6 @@
 # 文档系统 State
 
-Updated: 2026-08-22
+Updated: 2026-08-23
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md)
 
 ## 当前事实
@@ -33,6 +33,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W1 Phase 1 把 Workstream session 保存为 Git 私有、可重建运行元数据，并由 CLI 从 Git 机械派生 branch／OID／dirty／scope、stale、lifecycle 与 routing 摘要；create／guard／route／attach 都不会自动改写 State、Plan、Validation 或根进度入口，也不要求 Agent 固定生成 Manifest／Receipt。
 - W2 只写 Git-private control metadata：`scope-observation` 保留 committed／staged／unstaged／untracked／expected 来源；finding、acknowledgement 和历史处置是可重建协调记录，不成为新的 State／ADR／Validation。
 - `worktree overlap` 与 `scope inspect` 保持只读；`scope refresh` 和 `finding acknowledge` 只在本机更新私有 session。L2 确认记录成员、理由、时间与 Scope Revision，Agent／中央来源被拒绝；缺失对端保持 Unknown／Unavailable。
+- W3 Candidate 延续同一事实模型：review package、decision 与 closure record 只保存在 Git-private 管理区，是可审计的协调证据而非作者 State／ADR／Validation。package 先保存原始日志链接和结构化事实，再附可选的 `derived-non-authoritative` AI 摘要；摘要不能覆盖失败证据、满足人类 reviewer 计数或创造 Authority。
+- W3 workspace inventory／cleanup bundle 仍是本地派生协调视图：Git metadata、private session／closure、项目允许根和显式候选是来源，Legacy unmanaged／Unknown 不因目录名、前缀或年龄升级成 Orrery 所有或可删事实。closure v2 与其 Git-private action-log 引用保留原路径、OID、review／Validation、分类、操作者及调用者自述动作；receipt 不能证明工具执行了删除，也不进入作者文档。
+- W3 Candidate 的 State alignment 只检查受影响实现与既有 subsystem State 是否同行，ADR alignment 检查临时 ID、正式编号冲突和引用；工具不会自动改写或编号作者文档。功能分支只同步受影响 subsystem State、Plan、Validation 与 DEVLOG，根 PROGRESS／HANDOFF 仍由唯一整合者处理。
 
 ## 同步状态
 
@@ -57,13 +60,15 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `adapters/codex/SKILL.md`
 - `adapters/codex/adapter-manifest.json`
 - `packages/project-orrery-core/src/project_orrery_core/collaboration.py`
+- `packages/project-orrery-core/src/project_orrery_core/review.py`
 - `packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json`
 - `tests/test_collaboration_contract.py`
+- `tests/test_collaboration_w3.py`
 
 ## 已知缺口
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
-- W2 已在 W1 基础上实现自动 Scope/path 与 overlap report，并让 Adapter route 消费本机 L2/L3/finding gate。观测台尚未消费该合约，审查包、integration、清理建议与 Team Mode runtime 仍未实现。
+- W3 Candidate 已在 W2 合约上实现证据优先审查包、推测性 integration、人工 decision、closure 与清理资格报告；它尚未进入 Canonical，也没有自动作者文档更新、main 合流或清理执行。观测台尚未消费该合约，Team Mode runtime 仍未实现。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

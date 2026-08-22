@@ -403,3 +403,11 @@
 - 从受保护 `main@6e1f9cb` 建立独立 integration worktree，重放 W2 两个提交；实现无冲突，共享 DEVLOG／State／Validation 索引与 promotion-gate 事实增量合并。
 - collaboration 27/27、默认全仓 273 PASS + 5 existing skips；结构、站点、链接与安全门完成后，exact SHA `21a2e1c` 先推 Candidate 分支，并在 GitHub Actions `32570545138` 取得 Windows／Ubuntu required checks 双 PASS。
 - branch protection 随后允许同一 SHA fast-forward 进入 `origin/main`；没有 PR、tag、Release 或重复 main matrix。W2 进入 Canonical source 后下一任务为 W3，公开 v0.2.0 与发布状态不变。
+
+## 2026-08-22 — W3 Review / Integration / Cleanup Candidate
+
+- 从本地 `main@ef488715` 建立独立 `codex/w3-review-integration-cleanup` worktree；远端 fetch 因本机 `127.0.0.1:7897` proxy 无法连接而未刷新，但开始时本地 `main` 与本地 tracking `origin/main` 指向同一 OID。工作树保持未提交、未推送，根 PROGRESS／HANDOFF 留给唯一整合者。
+- Core 0.1.7／CLI 0.1.12 Candidate 复用 W1/W2 collaboration-v1、Git-private session、Scope、finding、acknowledgement 与 route gate，新增 `integrate --dry-run`、证据优先 review package、Approve／Request Changes／Hold／Reject、integration eligibility、Git-private closure record，以及 bounded workspace inventory/advisory-only cleanup eligibility。
+- 推测性 merge／rebase 只在工具新建的干净临时 integration worktree 中运行；package 精确绑定 target OID、candidate HEAD、Scope revision/fingerprint、finding set、schema version/byte hash、validation set 与内容 hash。输入漂移、冲突、验证／State／ADR 失败、缺少足够非作者人审都会失败关闭；AI 摘要明确非权威且不计 reviewer。
+- 2026-08-23 在同一 W3 范围内补充 cleanup contract：inventory 只从 Git metadata、private session/closure、项目允许根和显式候选取数，分类七类；历史无 session/closure 目录必须显式采纳，保留策略与 Unknown 失败关闭。remove worktree、local branch、remote branch、ordinary directory 是四个互不隐含的授权，工具全部不执行；closure v2 引用 Git-private caller-attested action log。没有把本机截图、历史 clone、临时输出或仓库外 benchmark 声称为已审计可删。
+- 实现不 fetch、不更新 main、不 push、不建 PR/tag/release、不删除用户 branch/worktree/ordinary directory，也不实现 W4 Observatory、W5 Team Mode、平台 launch/rebind/message 或任何网络 transport。W3 focused 13/13；按更新后的验证策略，当前增量只以专项/checkpoint 交付，全仓动态、docsite、全链接与 exact-SHA 双平台矩阵由中央在 W3+W4 干净联合 Candidate 上统一执行。证据见 [W3 Validation](validation/2026-08-22-w3-review-integration-cleanup.md)。

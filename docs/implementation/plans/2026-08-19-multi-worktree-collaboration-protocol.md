@@ -131,16 +131,33 @@ Direct／L3、独占资源与未确认 L2 已接入 Adapter route，本机成员
 
 Self-host operational checkpoint（2026-08-22）：Project Orrery 的 GitHub `main` 使用 Candidate-first promotion。唯一整合者先把 exact integration SHA 推到非 main 分支，等待 Windows／Ubuntu 两个稳定 check context 通过，再把同一 SHA 快进 main。main branch protection 对管理员同样生效，但不要求 PR。该仓库级保护不等于 `orrery integrate`、review package 或通用 CI Adapter 已实现，不能勾选本阶段其他条目。
 
-- [ ] 实现 `orrery integrate --target <ref> --dry-run`，只在新建干净 integration worktree 中运行。
-- [ ] 固定 target OID，计算 merge base 与 ahead／behind，并拒绝目标在运行期间静默漂移。
-- [ ] 尝试 merge／rebase，运行 Workstream 声明的验证、受影响子系统验证与文档一致性检查。
-- [ ] 验证 Candidate State 与推测性合流后的实现一致；失败时保留报告并停止进入人工审查队列。
-- [ ] 检查临时决策 ID，计算正式 ADR 编号候选，并要求集成者确认重命名和引用更新。
-- [ ] 生成包含 diff、重叠、验证、State 对齐和回退点的 AI 辅助审查包；首版由人类执行实际 merge，不自动更新 integration ref。
-- [ ] 实现风险分级审查策略：personal 普通变更可自审，team 普通变更由 Integrator 审查，跨成员 L2／Authority／共享接口和高风险变更要求非作者 Reviewer；AI 不能满足人类审批计数。
-- [ ] 将审查包绑定 candidate HEAD、target OID、Scope Revision 和 schema/hash，按证据／链接在前、AI 派生摘要在后的顺序生成，并拒绝失败证据被摘要隐藏。
-- [ ] 实现 Approve／Request Changes／Hold／Reject 记录与失效规则；新提交、Scope／target／finding 变化或验证过期后旧批准变 Stale，Approve 只进入人工 Integrator 流程。
-- [ ] 实现集成后清理资格报告：canonical ancestry、clean、独有 commit、untracked／ignored、closure record 和预计回收空间；默认只建议，本地成员确认后分别处理 worktree／local branch／remote branch。
+- [x] 实现 `orrery integrate --target <ref> --dry-run`，只在新建干净 integration worktree 中运行。
+- [x] 固定 target OID，计算 merge base 与 ahead／behind，并拒绝目标在运行期间静默漂移。
+- [x] 尝试 merge／rebase，运行 Workstream 声明的验证、受影响子系统验证与文档一致性检查。
+- [x] 验证 Candidate State 与推测性合流后的实现一致；失败时保留报告并停止进入人工审查队列。
+- [x] 检查临时决策 ID，计算正式 ADR 编号候选，并要求集成者确认重命名和引用更新。
+- [x] 生成包含 diff、重叠、验证、State 对齐和回退点的 AI 辅助审查包；首版由人类执行实际 merge，不自动更新 integration ref。
+- [x] 实现风险分级审查策略：personal 普通变更可自审，team 普通变更由 Integrator 审查，跨成员 L2／Authority／共享接口和高风险变更要求非作者 Reviewer；AI 不能满足人类审批计数。
+- [x] 将审查包绑定 candidate HEAD、target OID、Scope Revision 和 schema/hash，按证据／链接在前、AI 派生摘要在后的顺序生成，并拒绝失败证据被摘要隐藏。
+- [x] 实现 Approve／Request Changes／Hold／Reject 记录与失效规则；新提交、Scope／target／finding 变化或验证过期后旧批准变 Stale，Approve 只进入人工 Integrator 流程。
+- [x] 实现集成后 workspace inventory 与清理资格报告：只从 Git worktree metadata、Git-private session／closure、项目允许根和显式用户候选采集；分类 Registered active、Review/Integration pending、Integrated/Closed、Legacy unmanaged、Generated disposable、Evidence/retained 与 Unknown，并验证路径边界、Git identity/common-dir、active 状态、clean、untracked／ignored、独有 commit、canonical ancestry、review／Validation／closure 和 target OID。默认只建议；remove worktree、delete local branch、delete remote branch、remove ordinary directory 使用四份互不隐含的授权且均不执行。
+
+Candidate checkpoint W3（2026-08-22）：独立 worktree `codex/w3-review-integration-cleanup` 从本地
+`main@ef488715` 开始，未提交源码将 Core／CLI 推进到 0.1.7／0.1.12。实现复用 W1/W2 的
+collaboration-v1、session、Scope、finding、acknowledgement 和 route gate；`integrate --dry-run`
+只创建临时干净 integration worktree，review package／decision／closure 只写 Git-private 管理区，
+integration／cleanup 只报告资格。任何 target、candidate、Scope、finding、schema 或 validation
+关键输入漂移都会使结论失效；AI 摘要保持派生且不计人审。该 Candidate 没有更新 main、push、
+删除用户 branch/worktree、创建 W4/W5、实现 Observatory/Team transport 或改变 v0.2.0 发布事实。
+证据见 [W3 Validation](../../validation/2026-08-22-w3-review-integration-cleanup.md)。
+
+W3 cleanup contract 补充（2026-08-23）：同一 Candidate 增加 bounded workspace inventory，既不按
+目录前缀推断 Orrery 所有权，也不递归发现整块磁盘。没有 Orrery session／closure 的历史目录保持
+Legacy unmanaged／Unknown，只有显式 adopt/classify 后才进入后续资格检查；benchmark/raw evidence、
+recovery/immutable、credential/cache 由显式保留策略或 Unknown fail-closed 保护。closure v2 保存原路径、
+final HEAD、integration OID、review／Validation、分类和 Git-private action-log 引用；显式 receipt 只记录
+调用者自述的外部动作，不执行动作。现有截图、历史 clone、临时输出和仓库外 benchmark 未因此被独立
+审计或判定可删；W4 也不在本分支消费该 bundle。
 
 ### Phase 4 — 观测台与平台适配边界
 
