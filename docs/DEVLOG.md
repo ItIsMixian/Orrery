@@ -418,3 +418,9 @@
 - 本地 integration candidate `c758827` 运行唯一一套动态全仓：291 项中 288 PASS + 3 个既有 Windows symlink privilege skips；integrated structure、1,471 KB 隔离站点、337 份 Markdown／862 个本地链接／0 unexpected missing、secret／forbidden 与 diff 门通过。
 - W3 仍不执行真实 main update 或清理动作；Promotion 必须先把包含最终集成记录的 exact SHA 推到非 main branch，并取得 Windows／Ubuntu required checks。公开 v0.2.0、W4/W5 和 Release 均不改变。
 - 首次远端 `32583193534` 为 Ubuntu PASS／Windows FAIL；Windows 失败来自 `RUNNER~1` 与等价长路径的测试字面比较，而非产品 cleanup 放行。测试统一使用与 Core 相同的 filesystem identity 后，两个原失败用例本地 2/2 PASS；保留首次失败并要求新 exact SHA 重跑双平台门。
+
+## 2026-08-22 — 分级验证原则
+
+- 用户接受 `Fast → Checkpoint → Candidate → Promotion` 作为跨阶段验证原则：日常迭代使用受影响专项，完整动态全仓与双平台证据留给冻结后的联合 integration candidate。
+- W3／W4 已通过任务控制消息人工采用该策略；被中断且无明确终态的长测试不计为证据，不再在编辑循环盲目整轮重跑。
+- Candidate-first exact-SHA Windows／Ubuntu 门保持不变。本轮只记录原则、Plan 与当前人工状态；未实现持久 runner、自动影响分析、缓存、跨 SHA 复用或 CI 跳过规则，也未创建 ADR。

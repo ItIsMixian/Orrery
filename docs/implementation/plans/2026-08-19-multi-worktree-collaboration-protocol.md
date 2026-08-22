@@ -204,6 +204,22 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 
 ## Validation 矩阵
 
+### 分级验证执行原则
+
+协作 Workstream 采用 `Fast → Checkpoint → Candidate → Promotion` 四级验证。分级只移动昂贵验证的运行时机，不降低安全关键路径、Candidate-first 或发布门：
+
+| 层级 | 触发时机 | 最低责任 | 可形成的结论 |
+|---|---|---|---|
+| Fast | 实现迭代中 | 受影响模块专项、直接失败路径和最小静态检查 | 只证明当前局部反馈，不证明 Workstream 完成 |
+| Checkpoint | 一个功能阶段准备交付 | 专项、邻接 schema／CLI／Adapter、结构与 diff；按改动补安全／静态站／浏览器检查 | 证明该 Workstream candidate 可交给整合者，不证明可推广 main |
+| Candidate | 干净 integration candidate 冻结后 | 默认全仓；相关时启用动态全仓；结构、隔离 docsite、链接、安全和 forbidden-artifact 门 | 证明该 exact local candidate 具备申请远端推广验证的条件 |
+| Promotion | 推广 main 或 release 前 | exact Candidate SHA 的规定远端环境与 required checks；Project Orrery self-host 当前为 Windows／Ubuntu | 只有全部 required evidence 通过后才可推广同一 SHA |
+
+- 高风险变更可在 Fast／Checkpoint 提前升级测试强度，但不得以较低层结果替代 Candidate／Promotion。
+- 被终止、缺少 `Ran`／`OK` 或无明确退出码的长测试只记录为 `interrupted`，不能算通过；重跑应等待代码冻结或只重跑缺失层级，不在编辑循环盲目重启全仓。
+- 测试证据至少绑定 HEAD、命令、配置和环境范围。当前没有持久 runner、自动影响分析、跨 SHA 缓存或可满足 Promotion 的证据复用机制；这些能力实现并验证前不得写成现状。
+- W3／W4 从 2026-08-22 起人工采用本策略：各自交付 Fast／Checkpoint 证据，唯一整合者在联合 integration candidate 上运行一次 Candidate，并由 Candidate-first workflow 完成 Promotion。
+
 | 场景 | 必须证明 |
 |---|---|
 | 主 worktree dirty，新建 linked worktree | 新 worktree 保持 clean，索引和 `$GIT_DIR` 私有，`$GIT_COMMON_DIR` 共享 |
@@ -257,7 +273,7 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 | Team 渐进启用 | Personal Mode 看不到团队网络／成员负担；开启后同一 Observatory 增加 Team 页签，不出现第二套权威或重复任务数据 |
 | 中央／本地按钮边界 | My Workstreams 可执行本地动作；Team 和其他成员卡片只有查看／请求，视觉与接口都不能误触发远程执行 |
 
-最低验证命令将在实现时固化为仓库脚本；至少包括：
+以下命令属于 Candidate 层最低集合，不要求每个开发迭代重复运行；实现时仍应固化为仓库脚本：
 
 ```text
 python -m unittest discover -s tests -v
