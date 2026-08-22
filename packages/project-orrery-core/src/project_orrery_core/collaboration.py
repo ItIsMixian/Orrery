@@ -208,7 +208,10 @@ def resolve_integration_oid(repository: Path, integration_ref: str) -> str:
 
 
 def _normalized_path(path: Path) -> str:
-    return os.path.normcase(os.path.abspath(os.fspath(path)))
+    # Git can report the long Windows spelling of a worktree even when TEMP or
+    # the caller supplied the equivalent 8.3 path (for example RUNNER~1).
+    # realpath expands those aliases before the case-insensitive comparison.
+    return os.path.normcase(os.path.realpath(os.path.abspath(os.fspath(path))))
 
 
 def _absolute_git_path(root: Path, value: str) -> Path:

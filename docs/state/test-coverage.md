@@ -31,6 +31,7 @@ Updated: 2026-08-22
 - W1／第二平台干净整合首次全仓 247 项中仅 ADR-0013 amendment 冻结期望未同步而失败；补入 `ADR-0013 amends ADR-0004` 后联合专项 31/31、最终全仓 242 PASS + 5 expected skips。integrated structure、隔离静态站、295 份 Markdown／765 个本地链接和 diff 检查通过。
 - CLI wheel 专项在临时 monorepo 构建 Core／Observatory／CLI wheel，断言九个 managed assets 被嵌入，并在无源码仓库的新 venv 中完成 scaffold／validate；普通 wheel 还通过真实 DeepSeek Harness 显式 Adapter turn。功能分支结果为专项 1/1、定向组合 18 passed + 2 expected skips、默认全仓 73 passed + 2 expected skips。
 - DeepSeek wheel 修复进入当前整合基线后，首次默认全仓在收集阶段捕获两组 Authority CLI source-layout 测试未注入已声明的 Observatory 依赖；补齐测试 source path 后，相关 10/10、DeepSeek／wheel 4/4、默认全仓 243 PASS + 5 expected skips，动态全仓 245 PASS + 3 Windows symlink privilege skips。integrated structure、1,361,966-byte 隔离静态站、297 份 Markdown／779 个本地链接、secret scan 与 diff 检查通过。
+- 首次远端 matrix `32500503338` 为 Ubuntu PASS／Windows FAIL：Windows 同时暴露临时目录 8.3／长路径 worktree alias 和缺少 `wheel` 测试依赖。Candidate 修复保留已列出 worktree 硬门、使用 `realpath` 规范化别名，并在 workflow 显式安装 `wheel>=0.41,<1`；本地受影响专项 11/11、动态全仓 245 PASS + 3 privilege skips，远端复验待新提交。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
@@ -129,6 +130,7 @@ Updated: 2026-08-22
 - [2026-08-22 W1 与第二平台 Adapter 本地集成](../validation/2026-08-22-w1-and-second-platform-adapters-integration.md)
 - [2026-08-22 CLI Wheel Observatory Assets](../validation/2026-08-22-cli-wheel-observatory-assets.md)
 - [2026-08-22 DeepSeek Wheel Runtime Canonical 集成](../validation/2026-08-22-deepseek-wheel-runtime-canonical-integration.md)
+- [2026-08-22 DeepSeek Wheel／W1 Windows CI 修复](../validation/2026-08-22-deepseek-w1-windows-ci-fix.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`

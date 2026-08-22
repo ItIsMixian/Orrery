@@ -24,8 +24,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install reader dependencies
-        run: python -m pip install -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+      - name: Install test dependencies
+        run: python -m pip install "wheel>=0.41,<1" -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
 
       - name: Run portable installation tests
         env:

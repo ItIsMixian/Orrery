@@ -328,3 +328,9 @@
 - 联合回归首次捕获两组 Authority CLI 测试缺少新声明的 Observatory source 依赖；显式补齐测试 path 后相关 10/10 通过，没有删除测试或增加 skip。
 - 默认全仓 243 PASS + 5 expected skips，动态全仓 245 PASS + 3 Windows symlink privilege skips；结构、隔离静态站、297 份 Markdown／779 个本地链接、secret scan 与 diff 检查通过。
 - 只有 rc.8／Windows build 26200／Adapter 0.1.0／Core 0.1.0／CLI 0.1.1 wheel／指定 DeepSeek provider-model 与记录范围进入 `verified`；Adapter 发行仍为 `experimental`／`unreleased`，没有 tag 或 Release。
+
+## 2026-08-22 — DeepSeek／W1 首次远端 Windows CI 修复
+
+- `afdbc3b` 推送后的 GitHub Actions `32500503338` 在 Ubuntu 通过、Windows 失败；失败不是模型或 Adapter 行为，而是 Windows `RUNNER~1`／长路径别名比较和 runner 未安装 `wheel` 两项测试基础设施问题。
+- Core 路径规范化改为 realpath + normcase，仍只接受 Git 列出的 worktree；workflow 显式安装 wheel 测试依赖，不把它加入产品运行依赖。
+- 本地受影响专项 11/11、动态全仓 245 PASS + 3 Windows symlink privilege skips；原失败 run 保留，新的远端 matrix 通过前不宣称跨平台修复完成。
