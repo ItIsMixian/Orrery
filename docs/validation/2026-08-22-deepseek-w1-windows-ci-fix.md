@@ -2,7 +2,7 @@
 
 Date: 2026-08-22
 Scope: 修复 DeepSeek wheel Canonical 集成首次 GitHub Actions 暴露的 Windows-only test-environment 与 worktree path alias 问题；不改变协作 contract、DeepSeek verified scope、tag 或 Release
-Status: Candidate local PASS；修复提交的远端 Windows／Ubuntu matrix 尚待运行
+Result: PASS — 本地专项／动态全仓通过，修复提交的 GitHub Actions Windows／Ubuntu matrix 双 PASS
 
 ## 触发证据
 
@@ -24,5 +24,13 @@ Status: Candidate local PASS；修复提交的远端 Windows／Ubuntu matrix 尚
 - `tests.test_collaboration_contract` + `tests.test_cli_wheel_installation`：11/11 PASS；
 - `ORRERY_TEST_BUILD=1` 动态全仓：248 项，245 PASS + 3 Windows symlink privilege skips；
 - integrated structure：PASS；隔离静态站构建到 `D:\coding warehouse\project-orrery-validation-deepseek-w1-ci-fix-20260822\index.html`：PASS；
-- Markdown：298 files／781 local links／0 missing；高置信 token／private-key scan 与 `git diff --check`：PASS；
-- 下一步：提交后再次推送 `main`，要求同一 GitHub Actions Windows／Ubuntu matrix 双 PASS；远端结果完成前本记录不宣称 CI 修复已验收。
+- Markdown：298 files／782 local links／0 missing；高置信 token／private-key scan 与 `git diff --check`：PASS；
+
+## 远端复验
+
+修复提交 `000111d` 进入 `origin/main` 后，GitHub Actions [32554191374](https://github.com/yw9299-stack/project-orrery/actions/runs/32554191374) 完成：
+
+- Windows `smoke-test`：PASS（2m39s）；
+- Ubuntu `smoke-test`：PASS（50s）。
+
+因此两个首轮失败点均已由独立远端环境复验关闭。该结论不创建新 Release，也不扩张 DeepSeek manifest 已记录的精确 runtime 范围。

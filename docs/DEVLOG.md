@@ -333,4 +333,4 @@
 
 - `afdbc3b` 推送后的 GitHub Actions `32500503338` 在 Ubuntu 通过、Windows 失败；失败不是模型或 Adapter 行为，而是 Windows `RUNNER~1`／长路径别名比较和 runner 未安装 `wheel` 两项测试基础设施问题。
 - Core 路径规范化改为 realpath + normcase，仍只接受 Git 列出的 worktree；workflow 显式安装 wheel 测试依赖，不把它加入产品运行依赖。
-- 本地受影响专项 11/11、动态全仓 245 PASS + 3 Windows symlink privilege skips；原失败 run 保留，新的远端 matrix 通过前不宣称跨平台修复完成。
+- 本地受影响专项 11/11、动态全仓 245 PASS + 3 Windows symlink privilege skips；原失败 run 保留。修复提交 `000111d` 的 GitHub Actions `32554191374` 随后取得 Windows／Ubuntu 双 PASS，跨平台修复完成。
