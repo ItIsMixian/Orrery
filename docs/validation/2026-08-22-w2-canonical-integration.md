@@ -2,7 +2,7 @@
 
 Date: 2026-08-22
 Scope: 基于最新受保护 main 吸收 W2 Scope/Finding Candidate，同步 State 并形成 exact integration SHA；不启动 W3/W4/W5，不创建 tag 或 Release
-Status: Local PASS；Candidate-first Windows／Ubuntu CI 尚待推送
+Status: PASS
 
 ## 输入
 
@@ -19,6 +19,14 @@ Status: Local PASS；Candidate-first Windows／Ubuntu CI 尚待推送
 - Markdown：335 files／855 links；D1 positive fixture 1 个预期 missing target，0 unexpected missing；
 - high-confidence secret scan、forbidden tracked artifacts 与 `git diff --check`：PASS；
 - Personal Mode zero-network 与本机 L2/L3 门保持不变。
+
+## Candidate-first 远端门与推广
+
+- exact integration SHA：`21a2e1cb9b90550504261f32432ff0c185e8222c`；
+- Candidate branch：`codex/integrate-w2-20260822`；GitHub Actions run：[`32570545138`](https://github.com/yw9299-stack/project-orrery/actions/runs/32570545138)；
+- `smoke-test (ubuntu-latest)`：PASS（59s）；`smoke-test (windows-latest)`：PASS（5m58s）；
+- 两项 required checks 绑定同一 exact SHA 后，受保护 `main` 以 fast-forward 接受该 SHA；`main` workflow 排除规则没有重复运行矩阵；
+- 未创建 PR、tag 或 GitHub Release，公开 v0.2.0 状态不变。
 
 ## 边界
 

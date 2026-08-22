@@ -401,5 +401,5 @@
 ## 2026-08-22 — W2 本地 Canonical 集成
 
 - 从受保护 `main@6e1f9cb` 建立独立 integration worktree，重放 W2 两个提交；实现无冲突，共享 DEVLOG／State／Validation 索引与 promotion-gate 事实增量合并。
-- collaboration 27/27、默认全仓 273 PASS + 5 existing skips；结构、站点、链接与安全门完成后，exact SHA 将先推 Candidate 分支接受 Windows／Ubuntu required checks。
-- W2 进入 Canonical source 后下一任务为 W3；W3/W4/W5 均未自动启动，公开 v0.2.0 与发布状态不变。
+- collaboration 27/27、默认全仓 273 PASS + 5 existing skips；结构、站点、链接与安全门完成后，exact SHA `21a2e1c` 先推 Candidate 分支，并在 GitHub Actions `32570545138` 取得 Windows／Ubuntu required checks 双 PASS。
+- branch protection 随后允许同一 SHA fast-forward 进入 `origin/main`；没有 PR、tag、Release 或重复 main matrix。W2 进入 Canonical source 后下一任务为 W3，公开 v0.2.0 与发布状态不变。
