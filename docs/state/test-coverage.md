@@ -86,6 +86,7 @@ Updated: 2026-08-23
 - 2026-08-21 `main` 推送验收先在本机启用动态依赖执行 231 项并全部通过，3 项 Windows symlink privilege 跳过；integrated build、默认／显式 Authority projection 精确回滚、282 份 Markdown／686 个本地链接／0 缺失和发布排除边界通过。首次远端 run `32492265629` 的 Ubuntu job 发现 release-gate 测试硬编码 Windows 绝对路径；`42aebae` 改用平台原生绝对词法路径后，Windows focused 为 10 passed + 2 privilege skips、Ubuntu WSL focused 12/12，最终 GitHub Actions `32492830151` 在 Windows／Ubuntu 双 PASS。该证据只验收公开 source `main`，不构成 Release。
 - 2026-08-22 W1 Personal Core／CLI Phase 0 Candidate 新增 10 项专项，使用运行时合成 Git fixture 覆盖 clean main、两个 linked worktree、独立 clone、文件级 untracked 和未 push commit；同时覆盖 schema bundle、integration ref/OID、主 worktree 覆盖、subsystem registry、Scope 特殊表达、Member capability/credential epoch、Personal zero-network 与只读 CLI。专项 10/10，受影响组合 67 passed + 2 expected skips；最终全仓 241 项中 236 通过、5 项按既有 symlink privilege／动态依赖门跳过。
 - 2026-08-22 D1 文档治理 Phase 1 Candidate 新增 11 项专项，保护 v1 finding schema／规则 registry、11 组正负 synthetic corpus、source hash／line range、status／acknowledge／defer／resolve、soft budget 默认 exit 0、结构门未启用、Authority／作者文档零影响、零网络与确定性零写入。最终全仓、结构、隔离站点与链接结果见对应 Validation。
+- 2026-08-22 W4 Personal Observatory Worktree Candidate 新增 9 项专项，保护 W1/W2 Core contract 复用、排除 worktree 不读取、zero-network／read-only、Unknown／Unavailable、W3 三槽 fallback、总览内容不变而 Personal 以独立 sibling page 注入、active session 与 worktree-only／unavailable 分组、面向人的四问题信息架构、lifecycle／runtime／freshness 分离、HTML escaping、legacy 精确回退和窄屏 CSS；受影响组合为 42 PASS + 2 expected dynamic-dependency skips。默认全仓 287 项中 282 PASS + 5 skips，启用 `ORRERY_TEST_BUILD=1` 后 284 PASS + 3 Windows symlink privilege skips；integrated scaffold、legacy 隔离站、Authority + Personal 显式组合站、336 份 Markdown／863 个本地链接（仅 1 个 D1 冻结 synthetic missing target）、secret／forbidden 与 diff 门通过。真实 Chromium 覆盖 1440×1000、390×844、首屏 briefing、独立导航、Workstream／技术证据 details、折叠 inventory 与无 Workstream／无 finding 空状态；这是未提交 Windows Worktree Candidate 证据，不构成 Canonical integration、跨平台 CI 或 Release。
 
 ## 验证证据
 
@@ -144,6 +145,7 @@ Updated: 2026-08-23
 - [2026-08-22 DeepSeek Wheel／W1 Windows CI 修复](../validation/2026-08-22-deepseek-w1-windows-ci-fix.md)
 - [2026-08-22 D1 文档治理 Phase 1 finding contract](../validation/2026-08-22-d1-document-governance-finding-contract.md)
 - [2026-08-22 W2 Scope / Finding Candidate](../validation/2026-08-22-w2-scope-finding.md)
+- [2026-08-22 W4 Personal Observatory Worktree Candidate](../validation/2026-08-22-w4-personal-observatory.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -157,5 +159,6 @@ Updated: 2026-08-23
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的 W1–W3 已覆盖 schema/session/create/guard/route、scope／overlap／ack、review／integration dry-run／closure／workspace inventory／cleanup eligibility。当前平台的 launch／rebind／message 均声明不支持；远端 Canonical 状态由包含集成记录的 exact SHA 双平台证据决定，Personal 指挥台与 Team Mode 网络测试仍未进入 Canonical。
+- W4 已有 root-only opt-in、只读 Personal 指挥台 Worktree Candidate 及本机浏览器证据；该 W4A checkpoint 尚未消费 W3，后续 W4B commit 负责覆盖。当前平台的 launch／rebind／message 均声明不支持，Team Mode 网络测试仍未实现。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。
 - Claude Code 仍被认证阻断。DeepSeek Harness 已证明真实显式／隐式模型调用、模型侧 CLI 失败关闭和修复后的普通 wheel 路由；只有 manifest 中的精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1／模型与生命周期范围进入 `verified`，其余范围不外推。

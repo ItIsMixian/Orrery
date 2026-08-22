@@ -165,7 +165,7 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 - [ ] 展示其他本机可见 worktree 的重叠告警，并把远端不可见状态显示为 Unknown。
 - [ ] 单人视图直接展示 Workstream／Agent；多人视图先按 Member 汇总再下钻到各自 Workstream，Host 只作为定位元数据。
 - [ ] 默认只显示 Personal Mode 本地多 Agent 体验；用户按项目明确开启 Team Mode 后才加载成员、中央视图、局域网 Host／加入和同步设置。
-- [ ] 在同一 Observatory 中实现项目状态、关注项、审查队列、活动 Workstream／subsystem 四区首页；卡片保持摘要，Scope／路径／日志／finding／review／cleanup 只在详情按需展开。
+- [ ] 在同一 Observatory 中为 Personal 指挥台建立独立页面，总览仪表盘只保留侧栏入口；Personal 页先回答项目当前焦点、需关注事项、谁在推进与影响范围，审查队列、Scope／路径／日志／finding／review／cleanup 作为技术证据按需展开。
 - [ ] Team Mode 只增加 Team 页签、Member 聚合、同步／请求／capability 视图；My Workstreams 保留本地执行动作，Team／他人卡片只能查看和发送请求。
 - [ ] 把只读展示层与执行层分开；执行动作必须经过成员权限和平台 Adapter capability 检查。
 - [ ] 中央指挥台允许所有已认证项目成员查看全员状态，但只能发送请求；成员本地指挥台必须对远程请求做明确确认后才执行。
@@ -179,6 +179,22 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 - [ ] 分开展示 Workstream 生命周期、运行状况和证据新鲜度；不能把 Agent 自报的“完成”直接映射为 Review Ready、Integrated 或 Closed。
 - [ ] 保持核心 Git 数据模型与 Codex、Claude Code、CI 或代码托管平台适配器分离。
 - [ ] 所有状态投影只读，不回写 State、ADR 或 Plan。
+
+Candidate checkpoint W4 Personal Observatory（2026-08-22）：独立分支
+`codex/w4-personal-observatory` 在 `main@ef488715dee369cbce81806f3040b4c0417d3eb8` 上实现
+Phase 4 的 Personal-only 只读子集。Observatory 0.1.1 Candidate 直接消费 Core 0.1.5 的
+`worktree-status-v1`、`scope-observation-v1`、`overlap-report-v1` 与 collaboration-v1；root-only
+`build_personal_observatory.py` 通过显式 `ORRERY_PERSONAL_OBSERVATORY_VIEW`／`--enable` 启用，默认
+legacy build／serve、Authority projection、AI Q&A、Skill template 与 v0.2.0 保持不变。Personal 指挥台作为
+总览仪表盘的独立 sibling page 从侧栏进入，以“项目现在怎么样／先看这些／谁在推进什么／影响到哪里”组织四区；
+首屏只投影可证实的当前焦点与本机信号，趋势和交付资格不足时明确显示 Unknown／Unavailable；
+活动区只列存在 session 且尚未 integrated／closed 的 Workstream，其余本机 worktree 默认折叠。branch／HEAD／integration OID／merge base／ahead-behind／
+dirty-untracked、Scope Revision、subsystem、四类 finding、ack `n/m` 及三维状态均由 W1/W2 合约投影，
+详情按需展开。远端、无 session、不可访问或隔离分支保持 Unknown／Unavailable；W3 三个展示槽固定
+fallback 为 `Unavailable / W3 not integrated`，没有 review／integration／cleanup 判定。页面没有执行按钮、
+Team runtime、LAN／Coordinator／同步或作者文档写回。该 checkpoint 不勾选任何 Team、W3 execution、
+platform launch/rebind/message、Canonical integration 或 release 条目；证据见
+[W4 Validation](../../validation/2026-08-22-w4-personal-observatory.md)。
 
 ### Phase 5 — 自托管迁移与发布
 

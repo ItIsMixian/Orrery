@@ -13,7 +13,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 根 `PROGRESS.md` 与 `HANDOFF.md` 是集成视角入口，不是历史总账：PROGRESS 只保留当前线路、未完成事项、阻塞和近期里程碑，完整演化与逐次证据分别进入 DEVLOG／Validation。普通功能分支应让代码、测试和 subsystem State 同行，并在合流时由唯一整合者同步全局入口，避免多个 Agent 持续争写同一份全局状态。
 - ADR-0012 已进入本地 Canonical，并建立独立于 Authority Meta Model 的 Documentation Governance Policy：它按文档角色规定当前／历史边界、事件驱动同步、责任式拆分、soft review budget 和人工审查闭环。它不是新的作者文档类型，也不授权自动改写。
 - 当前 self-host 文档已采用治理入口：PROGRESS／Authority State 完成首轮职责压缩；HANDOFF 因包含大量安全接续细节，被记录为后续人工 review candidate，尚未做专项压缩。
-- ADR-0008 已接受默认 zero-network Personal Mode、手动开启 Team Mode、Local-only 元数据和中央只读／本机执行边界；这些目前只是有效设计约束，现有观测台还没有 Workstream 指挥台、Team 页签、成员或同步实现。
+- ADR-0008 已接受默认 zero-network Personal Mode、手动开启 Team Mode、Local-only 元数据和中央只读／本机执行边界。当前 W4 Worktree Candidate 已建立显式 opt-in 的本机 Workstream 指挥台；Team 页签、成员、同步、Host、发现与请求仍未实现。
 - 根观测台由模板 v0.2.0 安装；其输出 `docs/_site/index.html` 为可重建生成物。
 - 未发布 Core 包现持有 canonical 作者文档模板；Skill 下的 project-template 是兼容投影，测试要求作者模板内容一致。Observatory 工具不属于作者事实，并由独立组件清单管理。
 - 未发布 Codex Adapter 只把 Codex 调用路由到目标仓库根 `AGENTS.md` 和平台中立 CLI；它不携带 State、ADR、Validation、canonical 模板或项目摘要，因此没有形成第二套文档事实。
@@ -36,6 +36,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W3 Candidate 延续同一事实模型：review package、decision 与 closure record 只保存在 Git-private 管理区，是可审计的协调证据而非作者 State／ADR／Validation。package 先保存原始日志链接和结构化事实，再附可选的 `derived-non-authoritative` AI 摘要；摘要不能覆盖失败证据、满足人类 reviewer 计数或创造 Authority。
 - W3 workspace inventory／cleanup bundle 仍是本地派生协调视图：Git metadata、private session／closure、项目允许根和显式候选是来源，Legacy unmanaged／Unknown 不因目录名、前缀或年龄升级成 Orrery 所有或可删事实。closure v2 与其 Git-private action-log 引用保留原路径、OID、review／Validation、分类、操作者及调用者自述动作；receipt 不能证明工具执行了删除，也不进入作者文档。
 - W3 Candidate 的 State alignment 只检查受影响实现与既有 subsystem State 是否同行，ADR alignment 检查临时 ID、正式编号冲突和引用；工具不会自动改写或编号作者文档。功能分支只同步受影响 subsystem State、Plan、Validation 与 DEVLOG，根 PROGRESS／HANDOFF 仍由唯一整合者处理。
+- W4 Worktree Candidate 的 Personal Observatory 只投影上述 W1/W2 机器数据，不解析作者文档来重新判断 Git／Scope／finding／Authority。它作为总览仪表盘的 sibling page 由侧栏单独进入，总览本身不承载 Personal 内容。页面按人的阅读顺序呈现“项目现在怎么样／先看这些／谁在推进什么／影响到哪里”：首屏使用确定性本机计数与一句当前焦点，不把 OID、fact scope 或 finding 枚举当作主叙事；无法回答的趋势与交付资格明确显示 Unknown／Unavailable。活动区只显示存在 session 且 phase 尚未 `integrated`／`closed` 的 Workstream；无 session、已结束或不可用的本机 worktree，以及 W3 slots、Git、路径、ack、integration OID 与 merge base，统一下沉到默认折叠的技术证据。
+- W3 尚未进入 main，因此 W4 只提供三个无业务判定的可选展示槽；缺省分别显示 `Unavailable / W3 not integrated`。远端、无 session、明确排除或不可访问 worktree 保持 Unknown／Unavailable；“无本机 finding”也同时提示 remote/unreported Unknown，不能表达为全局零冲突。
 
 ## 同步状态
 
@@ -64,11 +66,15 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json`
 - `tests/test_collaboration_contract.py`
 - `tests/test_collaboration_w3.py`
+- `packages/project-orrery-observatory/src/project_orrery_observatory/personal_observatory.py`
+- `scripts/docsite/build_personal_observatory.py`
+- `tests/test_personal_observatory.py`
 
 ## 已知缺口
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
 - W3 source 已在 W2 合约上实现证据优先审查包、推测性 integration、人工 decision、closure、bounded workspace inventory 与清理资格报告；它没有自动作者文档更新、main 合流或清理执行，Canonical 状态由包含本段的 ref 决定。观测台尚未在 Canonical 中消费该合约，Team Mode runtime 仍未实现。
+- W4 Worktree Candidate 已由观测台只读消费 W1/W2 合约，但尚未 Canonical integration／发布；该历史 W4A checkpoint 尚未消费 W3，后续 W4B commit 负责正式接线。Team Mode runtime 仍未实现。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

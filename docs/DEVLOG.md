@@ -424,3 +424,13 @@
 - 用户接受 `Fast → Checkpoint → Candidate → Promotion` 作为跨阶段验证原则：日常迭代使用受影响专项，完整动态全仓与双平台证据留给冻结后的联合 integration candidate。
 - W3／W4 已通过任务控制消息人工采用该策略；被中断且无明确终态的长测试不计为证据，不再在编辑循环盲目整轮重跑。
 - Candidate-first exact-SHA Windows／Ubuntu 门保持不变。本轮只记录原则、Plan 与当前人工状态；未实现持久 runner、自动影响分析、缓存、跨 SHA 复用或 CI 跳过规则，也未创建 ADR。
+
+## 2026-08-22 — W4 Personal Observatory Worktree Candidate
+
+- 从最新 `main@ef488715` 建立独立 `codex/w4-personal-observatory` worktree；与并行 W3 保持隔离，只消费已经 Canonical 的 W1/W2 Core／CLI contract。真实构建通过排除槽把 `codex/w3-review-integration-cleanup` 仅登记为 Unavailable，没有打开其工作目录或 Git-private session。
+- Observatory 0.1.1 Candidate 新增只读 Personal projection 与 root-only opt-in builder。投影按本机 worktree 聚合 branch／HEAD／integration／merge base／ahead-behind／dirty-untracked、Scope、subsystem、Direct／Authority／Semantic／Unknown、Scope Revision、ack `n/m`、lifecycle／runtime／freshness；规则均委托 Core 0.1.5，不在 UI 重算。
+- 首页采用项目状态、需要关注、活动 Workstream、subsystem 四区；路径、finding 与 Git 细节使用原生 details 按需展开。W3 review queue／integration eligibility／cleanup eligibility 没有 contract 时稳定显示 `Unavailable / W3 not integrated`；无本机 finding 仍提示 remote/unreported Unknown。
+- 页面无表单或执行按钮，声明 read-only／zero-external-network／Team runtime off；没有 Team Mode、Member、LAN、Coordinator、heartbeat、请求传输、平台 launch/rebind/message、merge、cleanup、acknowledge 或作者事实写回。默认 build／serve、Authority projection、AI Q&A、Skill template、managed assets 和 v0.2.0 发布契约未切换。
+- 浏览器在 1440×1000 与 390×844 实测：四区、W3 fallback、三维状态、details 展开和空状态有效；窄屏最终 `scrollWidth=375 < 390`，主题按钮保留且搜索框折叠。完整回归、结构、站点、链接与安全证据见 [W4 Validation](validation/2026-08-22-w4-personal-observatory.md)。根 PROGRESS／HANDOFF 按普通功能分支规则保持不动。
+- 用户审阅后，Personal Observatory 从总览内嵌面板改为侧栏独立 sibling page；总览 DOM 保持原内容。原先“31 个活动 Workstream”实际混入全部 `git worktree list` 结果，现按 Canonical session／phase 数据分为 2 个未 integrated／closed 的活动 Workstream、28 个无 session 的 worktree 与 1 个隔离 unavailable worktree。活动主行只显示身份、三维状态、Scope／working tree／finding 摘要，29 个非活动项默认折叠，Git OID、路径、finding 与 acknowledgement 留在 details。
+- 第二轮用户审阅指出页面仍按机器 schema 而非人的问题组织。页面随后改为编辑式项目简报：首屏用一句确定性当前焦点和“未结束／推进／暂停阻塞／直接重叠”四个信号回答项目现状，关注区把 Direct、暂停、stale、W3 unavailable 与 Unknown 分开解释，Workstream 改成可扫描状态行，subsystem 说明影响范围；W3 slots、Git、OID、路径和 inventory 统一进入底部技术证据。趋势因没有历史快照保持 Unknown，不由 UI 生成项目事实。
