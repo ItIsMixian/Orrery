@@ -451,3 +451,10 @@
 - Personal 默认保持零监听；Team enable 本身不打开网络，显式 serve 默认只绑定 loopback，LAN bind 要求本机开关。disable 停止已登记 runtime 并保留本地 Git／Workstream／Validation／文档。
 - 手工 invite／join 已实现项目 fingerprint、指定成员、Host-local Admin 确认和非成员拒绝；自动发现、跨 Coordinator 迁移／选主、云 relay、多设备迁移、完整 credential re-issue UX 与 W5 UI 留给后续。
 - focused 13/13 PASS；adjacent checkpoint 的 24 个实际产品用例全部通过。首次 checkpoint 误写两个 unittest class 名，只产生 loader selection error，已用正确 class 名 2/2 补跑；没有把该命令错误重分类为产品通过或失败。完整证据见 [W5A Validation](validation/2026-08-23-w5a-team-mode-foundation.md)。
+
+## 2026-08-23 — W4／W5A non-main integration candidate
+
+- 从 `main@7932a9c` 建立独立 integration worktree，按分级验证原则→W4A/W4B→W5A 顺序吸收；共享 Plan／State／DEVLOG／Validation index 加法合并，代码零冲突，根 PROGRESS／HANDOFF 保持 Canonical main 内容。
+- 联合源码版本为 Core 0.1.8／CLI 0.1.13／Observatory 0.1.2；W4 只读投影 W1–W3，W5A 提供显式 opt-in、metadata-only、request-only Team foundation，公开 v0.2.0 与发布入口不变。
+- W4+W5 focused 26/26、动态全仓 313 PASS + 3 privilege skips；结构、legacy/W4 站点、340 Markdown／874 links／0 unexpected missing、安全、schema 与 diff 门通过。
+- 本轮只准备非 main Candidate；必须先取得 exact-SHA Windows／Ubuntu checks，并由维护者明早确认，才能决定是否合并 main。没有 tag、Release、真实远程执行或目录清理。
