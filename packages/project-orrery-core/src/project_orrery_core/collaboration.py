@@ -19,6 +19,8 @@ from .schema import COLLABORATION_SCHEMA
 COLLABORATION_SCHEMA_VERSION = 1
 COLLABORATION_CONTRACT_ID = "project-orrery-collaboration-v1"
 WORKTREE_STATUS_SCHEMA_VERSION = 1
+WORKTREE_CREATE_SCHEMA_VERSION = 1
+PRIMARY_WRITE_GUARD_SCHEMA_VERSION = 1
 DEFAULT_INTEGRATION_REF = "refs/heads/main"
 INTEGRATION_REF_CONFIG_KEY = "collaboration.integration_ref"
 PRIMARY_WORKTREE_CONFIG_KEY = "collaboration.primary_worktree"
@@ -202,6 +204,36 @@ def _run_git(repository: Path, *arguments: str, binary: bool = False) -> str | b
     if completed.returncode:
         raise ValueError(f"Git inspection failed for {' '.join(arguments)}")
     return completed.stdout
+
+
+def _run_git_mutation(repository: Path, *arguments: str) -> None:
+    """Run one bounded local Git mutation without prompts or network fallback."""
+    completed = subprocess.run(
+        ["git", "-C", str(repository), *arguments],
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+    )
+    if completed.returncode:
+        detail = (completed.stderr or completed.stdout).strip()
+        suffix = f": {detail}" if detail else ""
+        raise ValueError(f"Git operation failed for {' '.join(arguments)}{suffix}")
+
+
+def _git_succeeds(repository: Path, *arguments: str) -> bool:
+    completed = subprocess.run(
+        ["git", "-C", str(repository), *arguments],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+        env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
+    )
+    return completed.returncode == 0
 
 
 def resolve_integration_oid(repository: Path, integration_ref: str) -> str:
@@ -483,6 +515,35 @@ def inspect_worktree_status(project_root: Path) -> dict[str, Any]:
     }
 
 
+def inspect_primary_write_guard(project_root: Path) -> dict[str, Any]:
+    """Fail closed before a product write from the configured primary worktree."""
+    root = Path(project_root).expanduser().absolute()
+    config = load_collaboration_config(root)
+    identity = inspect_worktree_identity(root, config)
+    if not identity["is_primary"]:
+        decision = "allow"
+        reason = "isolated-worktree"
+        recovery = "none"
+    elif identity["dirty"]:
+        decision = "block"
+        reason = "primary-worktree-dirty-recovery-required"
+        recovery = "review-and-selectively-transfer-existing-changes"
+    else:
+        decision = "block"
+        reason = "primary-worktree-write-prohibited"
+        recovery = "create-or-connect-isolated-workstream"
+    return {
+        "guard_schema_version": PRIMARY_WRITE_GUARD_SCHEMA_VERSION,
+        "intent": "product-write",
+        "decision": decision,
+        "allowed": decision == "allow",
+        "reason": reason,
+        "recovery": recovery,
+        "identity": identity,
+        "writes_performed": False,
+    }
+
+
 def build_workstream_session(
     project_root: Path,
     *,
@@ -576,6 +637,152 @@ def write_workstream_session(project_root: Path, **session_fields: Any) -> dict[
         "session_path": str(path),
         "storage": "git-private-worktree",
         "session": session,
+        "writes_performed": True,
+    }
+
+
+def _default_worktree_path(source_root: Path, workstream_id: str) -> Path:
+    slug = re.sub(r"[^a-z0-9]+", "-", workstream_id.lower()).strip("-")
+    if not slug:
+        raise ValueError("workstream ID must contain at least one letter or number")
+    return source_root.parent / f"{source_root.name}-{slug}"
+
+
+def _validate_new_branch(repository: Path, branch: str) -> str:
+    if not branch or branch.startswith("refs/"):
+        raise ValueError("branch must be a short local branch name")
+    completed = subprocess.run(
+        ["git", "-C", str(repository), "check-ref-format", "--branch", branch],
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
+    )
+    if completed.returncode:
+        raise ValueError("branch is not a valid short local branch name")
+    branch_ref = f"refs/heads/{branch}"
+    if _git_succeeds(repository, "show-ref", "--verify", "--quiet", branch_ref):
+        raise ValueError(f"branch already exists: {branch_ref}")
+    return branch_ref
+
+
+def _rollback_created_worktree(repository: Path, path: Path, branch: str) -> list[str]:
+    failures: list[str] = []
+    if os.path.lexists(path):
+        try:
+            _run_git_mutation(repository, "worktree", "remove", str(path))
+        except ValueError as exc:
+            failures.append(str(exc))
+    branch_ref = f"refs/heads/{branch}"
+    if _git_succeeds(repository, "show-ref", "--verify", "--quiet", branch_ref):
+        try:
+            _run_git_mutation(repository, "branch", "-d", "--", branch)
+        except ValueError as exc:
+            failures.append(str(exc))
+    return failures
+
+
+def create_worktree(
+    project_root: Path,
+    *,
+    workstream_id: str,
+    branch: str,
+    primary_subsystem_id: str,
+    path: Path | None = None,
+    integration_ref: str | None = None,
+    affected_subsystem_ids: Sequence[str] = (),
+    expected_writes: Sequence[str] = (),
+    governing_docs: Sequence[str] = (),
+    validation_surfaces: Sequence[str] = (),
+    member_id: str = "local-owner",
+    host_id: str = "local-host",
+) -> dict[str, Any]:
+    """Create one linked worktree at an exact local integration OID and initialize its session."""
+    source_text = str(_run_git(Path(project_root), "rev-parse", "--show-toplevel")).strip()
+    source_root = Path(os.path.abspath(source_text))
+    config = load_collaboration_config(source_root)
+    selected_ref = integration_ref or config.integration_ref
+    if selected_ref != config.integration_ref:
+        raise ValueError(
+            "--from must match collaboration.integration_ref so status and session use one baseline"
+        )
+    source_identity = inspect_worktree_identity(
+        source_root, config, member_id=member_id, host_id=host_id
+    )
+    integration_oid = source_identity["integration_oid"]
+    branch_ref = _validate_new_branch(source_root, branch)
+    target = Path(path).expanduser().absolute() if path is not None else _default_worktree_path(
+        source_root, workstream_id
+    ).absolute()
+    if os.path.lexists(target):
+        raise ValueError(f"worktree path already exists: {target}")
+    if not target.parent.is_dir():
+        raise ValueError(f"worktree parent directory does not exist: {target.parent}")
+    build_scope_contract(
+        workstream_id=workstream_id,
+        revision=1,
+        primary_subsystem_id=primary_subsystem_id,
+        affected_subsystem_ids=affected_subsystem_ids,
+        registry=load_subsystem_registry(source_root),
+        expected_writes=expected_writes,
+        governing_docs=governing_docs,
+        validation_surfaces=validation_surfaces,
+        member_id=member_id,
+        host_id=host_id,
+    )
+
+    created = False
+    try:
+        _run_git_mutation(
+            source_root,
+            "worktree",
+            "add",
+            "-b",
+            branch,
+            str(target),
+            integration_oid,
+        )
+        created = True
+        session_result = write_workstream_session(
+            target,
+            workstream_id=workstream_id,
+            primary_subsystem_id=primary_subsystem_id,
+            affected_subsystem_ids=affected_subsystem_ids,
+            expected_writes=expected_writes,
+            governing_docs=governing_docs,
+            validation_surfaces=validation_surfaces,
+            lifecycle_phase="created",
+            member_id=member_id,
+            host_id=host_id,
+        )
+        if session_result["session"]["integration_oid"] != integration_oid:
+            raise ValueError("integration ref changed while the worktree was being created")
+        status = inspect_worktree_status(target)
+    except (OSError, ValueError) as exc:
+        failures = _rollback_created_worktree(source_root, target, branch) if created else []
+        if failures:
+            raise ValueError(
+                f"worktree creation failed: {exc}; rollback incomplete: {'; '.join(failures)}"
+            ) from exc
+        raise ValueError(f"worktree creation failed and was rolled back: {exc}") from exc
+
+    return {
+        "create_schema_version": WORKTREE_CREATE_SCHEMA_VERSION,
+        "workstream_id": workstream_id,
+        "source": {
+            "worktree_path": source_identity["worktree_path"],
+            "dirty": source_identity["dirty"],
+            "integration_ref": selected_ref,
+            "integration_oid": integration_oid,
+        },
+        "branch": branch_ref,
+        "worktree_path": str(target),
+        "status": status,
+        "session_path": session_result["session_path"],
+        "write_targets": ["local-branch", "linked-worktree", "git-private-worktree-session"],
         "writes_performed": True,
     }
 

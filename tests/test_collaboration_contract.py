@@ -30,7 +30,9 @@ from project_orrery_core.collaboration import (  # noqa: E402
     bootstrap_maintainer,
     build_project_mode_contract,
     build_scope_contract,
+    create_worktree,
     credential_is_current,
+    inspect_primary_write_guard,
     inspect_worktree_status,
     inspect_worktree_identity,
     load_subsystem_registry,
@@ -493,8 +495,8 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(status.returncode, 0, status.stdout + status.stderr)
             status_payload = json.loads(status.stdout)
             self.assertEqual(status_payload["command"], "worktree-status")
-            self.assertEqual(status_payload["versions"]["core"], "0.1.2")
-            self.assertEqual(status_payload["versions"]["cli"], "0.1.7")
+            self.assertEqual(status_payload["versions"]["core"], "0.1.3")
+            self.assertEqual(status_payload["versions"]["cli"], "0.1.8")
             self.assertEqual(status_payload["data"]["session"]["state"], "absent")
             self.assertFalse(status_payload["data"]["writes_performed"])
 
@@ -542,6 +544,261 @@ class CollaborationContractTests(unittest.TestCase):
             )
             self.assertEqual(refreshed.returncode, 0, refreshed.stdout + refreshed.stderr)
             self.assertEqual(json.loads(refreshed.stdout)["data"]["session"]["state"], "current")
+
+    def test_primary_write_guard_blocks_clean_and_dirty_primary_but_allows_isolation(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            with mock.patch.object(
+                socket, "socket", side_effect=AssertionError("network socket opened")
+            ), mock.patch.object(
+                socket, "create_connection", side_effect=AssertionError("network connection opened")
+            ):
+                clean = inspect_primary_write_guard(fixture.repository)
+                isolated = inspect_primary_write_guard(fixture.worktree_b)
+            self.assertFalse(clean["allowed"])
+            self.assertEqual(clean["reason"], "primary-worktree-write-prohibited")
+            self.assertEqual(clean["recovery"], "create-or-connect-isolated-workstream")
+            self.assertTrue(isolated["allowed"])
+            self.assertEqual(isolated["reason"], "isolated-worktree")
+            self.assertFalse(clean["writes_performed"])
+
+            dirty = fixture.repository / "existing-author-change.txt"
+            dirty.write_text("preserve me\n", encoding="utf-8")
+            dirty_guard = inspect_primary_write_guard(fixture.repository)
+            self.assertFalse(dirty_guard["allowed"])
+            self.assertEqual(
+                dirty_guard["reason"], "primary-worktree-dirty-recovery-required"
+            )
+            self.assertEqual(
+                dirty_guard["recovery"], "review-and-selectively-transfer-existing-changes"
+            )
+            self.assertTrue(dirty.is_file())
+
+    def test_create_worktree_pins_integration_and_preserves_dirty_primary(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            dirty = fixture.repository / "existing-author-change.txt"
+            dirty.write_text("preserve me\n", encoding="utf-8")
+            before = fixture.git(
+                fixture.repository, "status", "--porcelain", "--untracked-files=all"
+            ).stdout
+            integration_oid = fixture.git(fixture.repository, "rev-parse", "main").stdout.strip()
+            target = fixture.root / "created-worktree"
+            with mock.patch.object(
+                socket, "socket", side_effect=AssertionError("network socket opened")
+            ), mock.patch.object(
+                socket, "create_connection", side_effect=AssertionError("network connection opened")
+            ):
+                result = create_worktree(
+                    fixture.repository,
+                    workstream_id="W1.2-create",
+                    branch="codex/w1-2-created",
+                    path=target,
+                    primary_subsystem_id="project-structure",
+                    expected_writes=["packages/"],
+                )
+            self.assertTrue(result["writes_performed"])
+            self.assertTrue(result["source"]["dirty"])
+            self.assertEqual(result["source"]["integration_oid"], integration_oid)
+            self.assertEqual(result["branch"], "refs/heads/codex/w1-2-created")
+            self.assertEqual(result["status"]["identity"]["head"], integration_oid)
+            self.assertEqual(result["status"]["identity"]["dirty"], False)
+            self.assertFalse(result["status"]["identity"]["is_primary"])
+            self.assertEqual(result["status"]["session"]["state"], "current")
+            self.assertEqual(
+                result["status"]["session"]["record"]["lifecycle_phase"], "created"
+            )
+            self.assertEqual(
+                fixture.git(fixture.repository, "status", "--porcelain", "--untracked-files=all").stdout,
+                before,
+            )
+            self.assertNotEqual(
+                fixture.git(target, "rev-parse", "--absolute-git-dir").stdout.strip(),
+                fixture.git(fixture.repository, "rev-parse", "--absolute-git-dir").stdout.strip(),
+            )
+            self.assertEqual(
+                Path(
+                    fixture.git(
+                        target, "rev-parse", "--path-format=absolute", "--git-common-dir"
+                    ).stdout.strip()
+                ).resolve(),
+                Path(
+                    fixture.git(
+                        fixture.repository,
+                        "rev-parse",
+                        "--path-format=absolute",
+                        "--git-common-dir",
+                    ).stdout.strip()
+                ).resolve(),
+            )
+
+    def test_create_worktree_collisions_and_session_failure_leave_no_partial_state(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            existing_path = fixture.root / "existing-path"
+            existing_path.mkdir()
+            with self.assertRaisesRegex(ValueError, "path already exists"):
+                create_worktree(
+                    fixture.repository,
+                    workstream_id="W1.2-path",
+                    branch="codex/w1-2-path",
+                    path=existing_path,
+                    primary_subsystem_id="project-structure",
+                )
+            self.assertNotEqual(
+                fixture.git(
+                    fixture.repository,
+                    "show-ref",
+                    "--verify",
+                    "--quiet",
+                    "refs/heads/codex/w1-2-path",
+                    check=False,
+                ).returncode,
+                0,
+            )
+
+            fixture.git(fixture.repository, "branch", "codex/w1-2-existing", "main")
+            with self.assertRaisesRegex(ValueError, "branch already exists"):
+                create_worktree(
+                    fixture.repository,
+                    workstream_id="W1.2-branch",
+                    branch="codex/w1-2-existing",
+                    path=fixture.root / "branch-collision",
+                    primary_subsystem_id="project-structure",
+                )
+
+            rollback_target = fixture.root / "rollback-worktree"
+            with mock.patch(
+                "project_orrery_core.collaboration.write_workstream_session",
+                side_effect=ValueError("injected private session failure"),
+            ), self.assertRaisesRegex(ValueError, "rolled back"):
+                create_worktree(
+                    fixture.repository,
+                    workstream_id="W1.2-rollback",
+                    branch="codex/w1-2-rollback",
+                    path=rollback_target,
+                    primary_subsystem_id="project-structure",
+                )
+            self.assertFalse(rollback_target.exists())
+            self.assertNotIn(
+                str(rollback_target),
+                fixture.git(fixture.repository, "worktree", "list", "--porcelain").stdout,
+            )
+            self.assertNotEqual(
+                fixture.git(
+                    fixture.repository,
+                    "show-ref",
+                    "--verify",
+                    "--quiet",
+                    "refs/heads/codex/w1-2-rollback",
+                    check=False,
+                ).returncode,
+                0,
+            )
+
+    def test_create_worktree_rolls_back_if_integration_ref_drifts(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            target = fixture.root / "drift-worktree"
+            original_write = write_workstream_session
+
+            def advance_integration_then_write(root: Path, **fields: object) -> dict[str, object]:
+                changed = fixture.repository / "integration-drift.txt"
+                changed.write_text("advanced\n", encoding="utf-8")
+                fixture.git(fixture.repository, "add", "integration-drift.txt")
+                fixture.git(fixture.repository, "commit", "-m", "advance integration during create")
+                return original_write(root, **fields)
+
+            with mock.patch(
+                "project_orrery_core.collaboration.write_workstream_session",
+                side_effect=advance_integration_then_write,
+            ), self.assertRaisesRegex(ValueError, "integration ref changed"):
+                create_worktree(
+                    fixture.repository,
+                    workstream_id="W1.2-drift",
+                    branch="codex/w1-2-drift",
+                    path=target,
+                    primary_subsystem_id="project-structure",
+                )
+            self.assertFalse(target.exists())
+            self.assertNotEqual(
+                fixture.git(
+                    fixture.repository,
+                    "show-ref",
+                    "--verify",
+                    "--quiet",
+                    "refs/heads/codex/w1-2-drift",
+                    check=False,
+                ).returncode,
+                0,
+            )
+
+    def test_worktree_create_and_guard_cli_use_stable_json_and_exit_codes(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            environment = {
+                **fixture.environment,
+                "PYTHONPATH": os.pathsep.join(
+                    (str(CLI_SOURCE), str(CORE_SOURCE), str(OBSERVATORY_SOURCE))
+                ),
+            }
+            base = [sys.executable, "-X", "utf8", "-m", "project_orrery_cli", "worktree"]
+            blocked = subprocess.run(
+                [*base, "guard", "--target", str(fixture.repository), "--json"],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(blocked.returncode, 5, blocked.stdout + blocked.stderr)
+            blocked_payload = json.loads(blocked.stdout)
+            self.assertEqual(blocked_payload["command"], "worktree-primary-write-guard")
+            self.assertEqual(blocked_payload["status"], "warning")
+            self.assertFalse(blocked_payload["data"]["allowed"])
+
+            target = fixture.root / "cli-created"
+            created = subprocess.run(
+                [
+                    *base,
+                    "create",
+                    "W1.2-cli",
+                    "--target",
+                    str(fixture.repository),
+                    "--branch",
+                    "codex/w1-2-cli",
+                    "--path",
+                    str(target),
+                    "--from",
+                    "refs/heads/main",
+                    "--primary-subsystem-id",
+                    "project-structure",
+                    "--json",
+                ],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(created.returncode, 0, created.stdout + created.stderr)
+            payload = json.loads(created.stdout)
+            self.assertEqual(payload["command"], "worktree-create")
+            self.assertEqual(payload["versions"]["core"], "0.1.3")
+            self.assertEqual(payload["versions"]["cli"], "0.1.8")
+            self.assertEqual(payload["data"]["status"]["session"]["state"], "current")
+
+            allowed = subprocess.run(
+                [*base, "guard", "--target", str(target), "--json"],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(allowed.returncode, 0, allowed.stdout + allowed.stderr)
+            self.assertTrue(json.loads(allowed.stdout)["data"]["allowed"])
 
 
 if __name__ == "__main__":

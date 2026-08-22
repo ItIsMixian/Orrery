@@ -4,12 +4,12 @@
   "components": {
     "core": {
       "distribution": "project-orrery-core",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "api_version": 1
     },
     "cli": {
       "distribution": "project-orrery-cli",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "core_api": 1,
       "json_schema_version": 1
     },

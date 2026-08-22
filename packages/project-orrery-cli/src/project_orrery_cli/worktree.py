@@ -1,11 +1,16 @@
-"""Read-only worktree status and explicit Git-private session writes."""
+"""Local worktree creation, guards, status, and Git-private sessions."""
 from __future__ import annotations
 
 import argparse
 import sys
 from pathlib import Path
 
-from project_orrery_core.collaboration import inspect_worktree_status, write_workstream_session
+from project_orrery_core.collaboration import (
+    create_worktree,
+    inspect_primary_write_guard,
+    inspect_worktree_status,
+    write_workstream_session,
+)
 
 from .protocol import JsonExitCode, emit, issue, response
 
@@ -20,6 +25,21 @@ def build_parser() -> argparse.ArgumentParser:
     actions = parser.add_subparsers(dest="action", required=True)
     status = actions.add_parser("status", help="inspect current Git and private session status")
     _add_common_target(status)
+
+    guard = actions.add_parser("guard", help="check the primary-worktree product-write boundary")
+    _add_common_target(guard)
+
+    create = actions.add_parser("create", help="create an isolated linked Workstream worktree")
+    _add_common_target(create)
+    create.add_argument("workstream_id")
+    create.add_argument("--branch", required=True)
+    create.add_argument("--path", type=Path)
+    create.add_argument("--from", dest="integration_ref")
+    create.add_argument("--primary-subsystem-id", required=True)
+    create.add_argument("--affected-subsystem-id", action="append", default=[])
+    create.add_argument("--expected-write", action="append", default=[])
+    create.add_argument("--governing-doc", action="append", default=[])
+    create.add_argument("--validation-surface", action="append", default=[])
 
     session = actions.add_parser("session", help="manage the private Workstream session")
     session_actions = session.add_subparsers(dest="session_action", required=True)
@@ -73,6 +93,63 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Session: {session['state']} ({session['path']})")
             if session["stale_reasons"]:
                 print(f"Session stale reasons: {', '.join(session['stale_reasons'])}")
+        return int(JsonExitCode.OK)
+
+    if arguments.action == "guard":
+        command = "worktree-primary-write-guard"
+        try:
+            data = inspect_primary_write_guard(arguments.target)
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        exit_code = JsonExitCode.OK if data["allowed"] else JsonExitCode.COMPATIBILITY_FAILED
+        if arguments.json_output:
+            warnings = (
+                []
+                if data["allowed"]
+                else [issue(data["reason"], "product write blocked by primary-worktree guard")]
+            )
+            emit(
+                response(
+                    command,
+                    status="ok" if data["allowed"] else "warning",
+                    exit_code=exit_code,
+                    data=data,
+                    warnings=warnings,
+                )
+            )
+        else:
+            print(f"Decision: {data['decision']}")
+            print(f"Reason: {data['reason']}")
+            print(f"Recovery: {data['recovery']}")
+        return int(exit_code)
+
+    if arguments.action == "create":
+        command = "worktree-create"
+        try:
+            data = create_worktree(
+                arguments.target,
+                workstream_id=arguments.workstream_id,
+                branch=arguments.branch,
+                path=arguments.path,
+                integration_ref=arguments.integration_ref,
+                primary_subsystem_id=arguments.primary_subsystem_id,
+                affected_subsystem_ids=arguments.affected_subsystem_id,
+                expected_writes=arguments.expected_write,
+                governing_docs=arguments.governing_doc,
+                validation_surfaces=arguments.validation_surface,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        if arguments.json_output:
+            emit(response(command, status="ok", exit_code=JsonExitCode.OK, data=data))
+        else:
+            print(f"Worktree created: {data['worktree_path']}")
+            print(f"Branch: {data['branch']}")
+            print(
+                f"Integration: {data['source']['integration_ref']}@"
+                f"{data['source']['integration_oid']}"
+            )
+            print(f"Session: {data['session_path']}")
         return int(JsonExitCode.OK)
 
     command = "worktree-session-write"
