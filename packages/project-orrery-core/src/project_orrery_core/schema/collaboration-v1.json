@@ -16,6 +16,7 @@
     {"$ref": "#/$defs/adapter_capabilities"},
     {"$ref": "#/$defs/member"},
     {"$ref": "#/$defs/project_mode"}
+    ,{"$ref": "#/$defs/scope_observation"}
   ],
   "$defs": {
     "worktree_identity": {
@@ -115,6 +116,22 @@
         "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
         "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
         "captured_at": {"type": "string", "format": "date-time"}
+        ,"scope_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        ,"scope_observation": {"$ref": "#/$defs/scope_observation"}
+        ,"findings": {"type": "array", "items": {"$ref": "#/$defs/overlap_finding"}}
+        ,"finding_history": {"type": "array", "items": {"$ref": "#/$defs/overlap_finding"}}
+        ,"last_scope_expansion": {
+          "type": "object",
+          "required": ["level", "decision", "reason", "occurred_at"],
+          "properties": {
+            "level": {"enum": ["l0", "l1", "l2", "l3"]},
+            "decision": {"enum": ["recorded", "auto-revised", "confirmed-local", "blocked"]},
+            "reason": {"type": "string", "minLength": 1},
+            "member_id": {"type": "string", "minLength": 1},
+            "occurred_at": {"type": "string", "format": "date-time"}
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },
@@ -171,7 +188,8 @@
               "member_id": {"type": "string", "minLength": 1},
               "reason": {"type": "string", "minLength": 1},
               "scope_revision": {"type": "integer", "minimum": 1},
-              "acknowledged_at": {"type": "string", "format": "date-time"}
+              "acknowledged_at": {"type": "string", "format": "date-time"},
+              "finding_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
             },
             "additionalProperties": false
           }
@@ -181,6 +199,93 @@
         "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
         "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
         "created_at": {"type": "string", "format": "date-time"}
+        ,"finding_key": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        ,"finding_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        ,"finding_revision": {"type": "integer", "minimum": 1}
+        ,"scope_bindings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["workstream_id", "scope_revision", "scope_fingerprint"],
+            "properties": {
+              "workstream_id": {"type": "string", "minLength": 1},
+              "scope_revision": {"type": "integer", "minimum": 1},
+              "scope_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            },
+            "additionalProperties": false
+          }
+        }
+        ,"path_provenance": {"type": "array", "items": {"$ref": "#/$defs/path_evidence"}}
+        ,"exclusive_resource_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        ,"blocking": {"type": "boolean"}
+        ,"acknowledgement_complete": {"type": "boolean"}
+        ,"acknowledgement_progress": {"type": "string", "pattern": "^[0-9]+/[0-9]+$"}
+        ,"review_ready_blocked": {"type": "boolean"}
+        ,"resolution_reason": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "path_evidence": {
+      "type": "object",
+      "required": ["workstream_id", "path", "sources"],
+      "properties": {
+        "workstream_id": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "sources": {
+          "type": "array",
+          "items": {"enum": ["committed", "staged", "unstaged", "untracked", "expected"]},
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "scope_path": {
+      "type": "object",
+      "required": ["path", "is_pattern", "sources", "authority_surfaces", "subsystem_ids", "exclusive_resource_ids"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "is_pattern": {"type": "boolean"},
+        "sources": {
+          "type": "array",
+          "items": {"enum": ["committed", "staged", "unstaged", "untracked", "expected"]},
+          "uniqueItems": true
+        },
+        "authority_surfaces": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "subsystem_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "exclusive_resource_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "scope_observation": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "workstream_id", "worktree_id", "member_id", "host_id",
+        "branch", "head", "integration_ref", "integration_oid", "merge_base", "scope_revision",
+        "declared_subsystem_ids", "derived_subsystem_ids", "path_entries", "governing_docs",
+        "validation_surfaces", "scope_fingerprint", "visibility", "observability", "captured_at"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "scope-observation"},
+        "workstream_id": {"type": "string", "minLength": 1},
+        "worktree_id": {"type": "string", "minLength": 1},
+        "member_id": {"type": "string", "minLength": 1},
+        "host_id": {"type": "string", "minLength": 1},
+        "branch": {"type": ["string", "null"]},
+        "head": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "integration_ref": {"type": "string", "minLength": 1},
+        "integration_oid": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "merge_base": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "scope_revision": {"type": "integer", "minimum": 1},
+        "declared_subsystem_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "derived_subsystem_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "path_entries": {"type": "array", "items": {"$ref": "#/$defs/scope_path"}},
+        "governing_docs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "validation_surfaces": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "scope_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
+        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
+        "captured_at": {"type": "string", "format": "date-time"}
       },
       "additionalProperties": false
     },
@@ -237,12 +342,13 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["subsystem_id", "display_name", "state_docs", "authority_docs"],
+            "required": ["subsystem_id", "display_name", "state_docs", "authority_docs", "path_patterns"],
             "properties": {
               "subsystem_id": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
               "display_name": {"type": "string", "minLength": 1},
               "state_docs": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
-              "authority_docs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+              "authority_docs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "path_patterns": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
             },
             "additionalProperties": false
           }

@@ -2,15 +2,20 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
 from project_orrery_core.collaboration import (
     attach_platform_session,
+    acknowledge_workstream_finding,
+    collect_scope_observation,
     create_worktree,
     inspect_primary_write_guard,
+    inspect_worktree_overlap,
     inspect_worktree_status,
     plan_adapter_session_route,
+    refresh_workstream_scope,
     transition_workstream_session,
     write_workstream_session,
 )
@@ -36,6 +41,31 @@ def build_parser() -> argparse.ArgumentParser:
     _add_common_target(route)
     route.add_argument("--adapter-manifest", required=True, type=Path)
     route.add_argument("--platform-session-id")
+
+    overlap = actions.add_parser("overlap", help="inspect local and supplied peer scope findings")
+    _add_common_target(overlap)
+    overlap.add_argument("--peer-scope", action="append", type=Path, default=[])
+    overlap.add_argument("--no-local-worktrees", action="store_true")
+
+    scope = actions.add_parser("scope", help="inspect or refresh Scope Expansion B")
+    scope_actions = scope.add_subparsers(dest="scope_action", required=True)
+    scope_inspect = scope_actions.add_parser("inspect", help="collect path scope without writing")
+    _add_common_target(scope_inspect)
+    scope_refresh = scope_actions.add_parser("refresh", help="refresh Git-private scope metadata")
+    _add_common_target(scope_refresh)
+    scope_refresh.add_argument("--peer-scope", action="append", type=Path, default=[])
+    scope_refresh.add_argument("--no-local-worktrees", action="store_true")
+    scope_refresh.add_argument("--confirm-l2", action="store_true")
+    scope_refresh.add_argument("--reason")
+
+    finding = actions.add_parser("finding", help="manage derived overlap findings")
+    finding_actions = finding.add_subparsers(dest="finding_action", required=True)
+    acknowledge = finding_actions.add_parser(
+        "acknowledge", help="locally acknowledge one Semantic/Authority/Unknown L2 finding"
+    )
+    _add_common_target(acknowledge)
+    acknowledge.add_argument("finding_id")
+    acknowledge.add_argument("--reason", required=True)
 
     create = actions.add_parser("create", help="create an isolated linked Workstream worktree")
     _add_common_target(create)
@@ -90,6 +120,26 @@ def _failure(command: str, json_output: bool, exc: ValueError) -> int:
     else:
         print(f"ERROR: {exc}", file=sys.stderr)
     return int(JsonExitCode.OPERATION_FAILED)
+
+
+def _load_peer_scopes(paths: list[Path]) -> list[dict[str, object]]:
+    scopes: list[dict[str, object]] = []
+    for path in paths:
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"cannot read peer scope {path}: {exc}") from exc
+        if not isinstance(value, dict):
+            raise ValueError(f"peer scope {path} must contain a JSON object")
+        candidate = value
+        if isinstance(value.get("data"), dict):
+            candidate = value["data"]
+        if isinstance(candidate.get("scope"), dict):
+            candidate = candidate["scope"]
+        elif isinstance(candidate.get("current_scope"), dict):
+            candidate = candidate["current_scope"]
+        scopes.append(candidate)
+    return scopes
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -172,6 +222,104 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Reason: {data['reason']}")
             print(f"Next action: {data['next_action']}")
         return int(exit_code)
+
+    if arguments.action == "overlap":
+        command = "worktree-overlap"
+        try:
+            data = inspect_worktree_overlap(
+                arguments.target,
+                peer_scopes=_load_peer_scopes(arguments.peer_scope),
+                include_local_worktrees=not arguments.no_local_worktrees,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        blocked = data["review_ready_blocked"]
+        exit_code = JsonExitCode.COMPATIBILITY_FAILED if blocked else JsonExitCode.OK
+        if arguments.json_output:
+            emit(
+                response(
+                    command,
+                    status="warning" if blocked else "ok",
+                    exit_code=exit_code,
+                    data=data,
+                    warnings=(
+                        [issue("overlap-findings-block-review-ready", "resolve or acknowledge findings locally")]
+                        if blocked
+                        else []
+                    ),
+                )
+            )
+        else:
+            print(f"Findings: {len(data['findings'])}")
+            print(f"Unknown peers: {len(data['unavailable_peers'])}")
+            print(f"Review Ready blocked: {'yes' if blocked else 'no'}")
+        return int(exit_code)
+
+    if arguments.action == "scope" and arguments.scope_action == "inspect":
+        command = "worktree-scope-inspect"
+        try:
+            data = collect_scope_observation(arguments.target)
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        if arguments.json_output:
+            emit(response(command, status="ok", exit_code=JsonExitCode.OK, data=data))
+        else:
+            print(f"Scope revision: {data['scope_revision']}")
+            print(f"Paths: {len(data['path_entries'])}")
+            print(f"Fingerprint: {data['scope_fingerprint']}")
+        return int(JsonExitCode.OK)
+
+    if arguments.action == "scope" and arguments.scope_action == "refresh":
+        command = "worktree-scope-refresh"
+        try:
+            data = refresh_workstream_scope(
+                arguments.target,
+                peer_scopes=_load_peer_scopes(arguments.peer_scope),
+                include_local_worktrees=not arguments.no_local_worktrees,
+                confirm_l2=arguments.confirm_l2,
+                reason=arguments.reason,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        allowed = data["expansion"]["allowed"]
+        exit_code = JsonExitCode.OK if allowed else JsonExitCode.COMPATIBILITY_FAILED
+        if arguments.json_output:
+            emit(
+                response(
+                    command,
+                    status="ok" if allowed else "warning",
+                    exit_code=exit_code,
+                    data=data,
+                    warnings=(
+                        []
+                        if allowed
+                        else [issue(data["expansion"]["reason"], "scope expansion blocked locally")]
+                    ),
+                )
+            )
+        else:
+            print(f"Expansion: {data['expansion']['level']}")
+            print(f"Allowed: {'yes' if allowed else 'no'}")
+            print(f"Scope revision: {data['scope']['scope_revision']}")
+        return int(exit_code)
+
+    if arguments.action == "finding":
+        command = "worktree-finding-acknowledge"
+        try:
+            data = acknowledge_workstream_finding(
+                arguments.target,
+                finding_id=arguments.finding_id,
+                reason=arguments.reason,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        if arguments.json_output:
+            emit(response(command, status="ok", exit_code=JsonExitCode.OK, data=data))
+        else:
+            finding = data["finding"]
+            print(f"Finding: {finding['finding_id']}")
+            print(f"Acknowledged: {finding['acknowledgement_progress']}")
+        return int(JsonExitCode.OK)
 
     if arguments.action == "create":
         command = "worktree-create"

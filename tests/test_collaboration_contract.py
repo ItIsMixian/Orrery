@@ -27,6 +27,9 @@ from project_orrery_core.collaboration import (  # noqa: E402
     RESERVED_SUBSYSTEM_IDS,
     CollaborationConfig,
     attach_platform_session,
+    acknowledge_overlap_finding,
+    collect_scope_observation,
+    compute_overlap_findings,
     apply_capability_change,
     bootstrap_maintainer,
     build_project_mode_contract,
@@ -34,12 +37,15 @@ from project_orrery_core.collaboration import (  # noqa: E402
     create_worktree,
     credential_is_current,
     inspect_primary_write_guard,
+    inspect_worktree_overlap,
     inspect_worktree_status,
     inspect_worktree_identity,
     load_adapter_capabilities,
     load_subsystem_registry,
     remove_member,
     plan_adapter_session_route,
+    reconcile_overlap_findings,
+    refresh_workstream_scope,
     resolve_integration_oid,
     transition_workstream_session,
     validate_collaboration_contract,
@@ -68,8 +74,11 @@ class CollaborationContractTests(unittest.TestCase):
                 "integration_report",
                 "member",
                 "overlap_finding",
+                "path_evidence",
                 "project_mode",
                 "scope",
+                "scope_observation",
+                "scope_path",
                 "subsystem_registry",
                 "workstream_session",
                 "worktree_identity",
@@ -506,8 +515,8 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(status.returncode, 0, status.stdout + status.stderr)
             status_payload = json.loads(status.stdout)
             self.assertEqual(status_payload["command"], "worktree-status")
-            self.assertEqual(status_payload["versions"]["core"], "0.1.4")
-            self.assertEqual(status_payload["versions"]["cli"], "0.1.9")
+            self.assertEqual(status_payload["versions"]["core"], "0.1.5")
+            self.assertEqual(status_payload["versions"]["cli"], "0.1.10")
             self.assertEqual(status_payload["data"]["session"]["state"], "absent")
             self.assertFalse(status_payload["data"]["writes_performed"])
 
@@ -794,8 +803,8 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(created.returncode, 0, created.stdout + created.stderr)
             payload = json.loads(created.stdout)
             self.assertEqual(payload["command"], "worktree-create")
-            self.assertEqual(payload["versions"]["core"], "0.1.4")
-            self.assertEqual(payload["versions"]["cli"], "0.1.9")
+            self.assertEqual(payload["versions"]["core"], "0.1.5")
+            self.assertEqual(payload["versions"]["cli"], "0.1.10")
             self.assertEqual(payload["data"]["status"]["session"]["state"], "current")
 
             allowed = subprocess.run(
@@ -1044,6 +1053,320 @@ class CollaborationContractTests(unittest.TestCase):
             transition_payload = json.loads(transition.stdout)
             self.assertEqual(transition_payload["command"], "worktree-session-transition")
             self.assertEqual(transition_payload["data"]["session"]["lifecycle_phase"], "implementing")
+
+    def test_w2_collects_all_path_sources_and_derives_authority_subsystems_and_resources(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            root = fixture.worktree_a
+            committed = root / "packages" / "committed.py"
+            committed.parent.mkdir()
+            committed.write_text("committed\n", encoding="utf-8")
+            fixture.git(root, "add", "packages/committed.py")
+            fixture.git(root, "commit", "-m", "candidate committed path")
+            staged = root / "packages" / "staged.py"
+            staged.write_text("staged\n", encoding="utf-8")
+            fixture.git(root, "add", "packages/staged.py")
+            (root / "README.md").write_text("# fixture\nunstaged\n", encoding="utf-8")
+            write_workstream_session(
+                root,
+                workstream_id="W2-collect",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=[
+                    "packages/expected.py",
+                    "packages/",
+                    "docs/state/project-structure.md",
+                    "packages/component-versions.json",
+                    "packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json",
+                ],
+                captured_at="2026-08-22T01:00:00Z",
+            )
+            with mock.patch.object(
+                socket, "socket", side_effect=AssertionError("network socket opened")
+            ), mock.patch.object(
+                socket, "create_connection", side_effect=AssertionError("network connection opened")
+            ):
+                scope = collect_scope_observation(root, captured_at="2026-08-22T01:01:00Z")
+            entries = {entry["path"]: entry for entry in scope["path_entries"]}
+            self.assertIn("committed", entries["packages/committed.py"]["sources"])
+            self.assertIn("staged", entries["packages/staged.py"]["sources"])
+            self.assertIn("unstaged", entries["README.md"]["sources"])
+            self.assertIn("untracked", entries["untracked/same-path.txt"]["sources"])
+            self.assertIn("expected", entries["packages/expected.py"]["sources"])
+            self.assertIn("expected", entries["packages/**"]["sources"])
+            self.assertIn(
+                "release-and-toolchain", entries["packages/expected.py"]["subsystem_ids"]
+            )
+            self.assertIn(
+                "state:docs/state/project-structure.md",
+                entries["docs/state/project-structure.md"]["authority_surfaces"],
+            )
+            self.assertIn(
+                "schema-migration",
+                entries[
+                    "packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json"
+                ]["exclusive_resource_ids"],
+            )
+            self.assertIn(
+                "release", entries["packages/component-versions.json"]["exclusive_resource_ids"]
+            )
+            validate_collaboration_contract(scope)
+
+    def test_w2_direct_authority_semantic_unknown_and_source_provenance(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            for root, workstream in (
+                (fixture.worktree_a, "W2-a"),
+                (fixture.worktree_b, "W2-b"),
+            ):
+                same = root / "overlap" / "same.txt"
+                same.parent.mkdir()
+                same.write_text(workstream, encoding="utf-8")
+                write_workstream_session(
+                    root,
+                    workstream_id=workstream,
+                    primary_subsystem_id="release-and-toolchain",
+                    expected_writes=["docs/state/project-structure.md"],
+                    validation_surfaces=["python -m unittest tests.test_collaboration_contract"],
+                    member_id=f"member-{workstream[-1]}",
+                    captured_at="2026-08-22T02:00:00Z",
+                )
+            left = collect_scope_observation(fixture.worktree_a)
+            right = collect_scope_observation(fixture.worktree_b)
+            report = compute_overlap_findings(
+                [left, right],
+                unavailable_peers=[
+                    {
+                        "workstream_id": "W2-remote",
+                        "member_id": "member-remote",
+                        "reason": "sharing-off",
+                    }
+                ],
+            )
+            kinds = {finding["kind"] for finding in report["findings"]}
+            self.assertEqual(kinds, {"direct", "authority", "semantic", "unknown"})
+            direct = next(
+                finding
+                for finding in report["findings"]
+                if finding["kind"] == "direct"
+                and "overlap/same.txt" in finding["path_evidence"]
+            )
+            self.assertEqual(direct["severity"], "l3")
+            self.assertEqual(
+                {item["workstream_id"] for item in direct["path_provenance"]}, {"W2-a", "W2-b"}
+            )
+            self.assertTrue(all("untracked" in item["sources"] for item in direct["path_provenance"]))
+            unknown = next(item for item in report["findings"] if item["kind"] == "unknown")
+            self.assertEqual(unknown["observability"], "unavailable")
+            self.assertTrue(unknown["review_ready_blocked"])
+            self.assertFalse(report["network_performed"])
+
+    def test_w2_scope_expansion_b_l1_l2_and_l3_are_local_and_fail_closed(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W2-l1",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/new.py"],
+                captured_at="2026-08-22T03:00:00Z",
+            )
+            l1 = refresh_workstream_scope(
+                fixture.worktree_b,
+                include_local_worktrees=False,
+                occurred_at="2026-08-22T03:01:00Z",
+            )
+            self.assertEqual(l1["expansion"]["level"], "l1")
+            self.assertTrue(l1["expansion"]["allowed"])
+            self.assertEqual(l1["session"]["scope_revision"], 2)
+            self.assertFalse(l1["network_performed"])
+
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W2-l2",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["tests/new_test.py"],
+                captured_at="2026-08-22T03:10:00Z",
+            )
+            l2_blocked = refresh_workstream_scope(
+                fixture.worktree_b,
+                include_local_worktrees=False,
+                occurred_at="2026-08-22T03:11:00Z",
+            )
+            self.assertEqual(l2_blocked["expansion"]["level"], "l2")
+            self.assertFalse(l2_blocked["local_work_allowed"])
+            l2_confirmed = refresh_workstream_scope(
+                fixture.worktree_b,
+                include_local_worktrees=False,
+                confirm_l2=True,
+                reason="task explicitly includes the test subsystem",
+                occurred_at="2026-08-22T03:12:00Z",
+            )
+            self.assertTrue(l2_confirmed["local_work_allowed"])
+            self.assertEqual(l2_confirmed["session"]["scope_revision"], 2)
+            self.assertIn("test-coverage", l2_confirmed["session"]["affected_subsystem_ids"])
+            self.assertEqual(
+                l2_confirmed["session"]["last_scope_expansion"]["decision"], "confirmed-local"
+            )
+
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W2-l3",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/component-versions.json"],
+                captured_at="2026-08-22T03:20:00Z",
+            )
+            l3 = refresh_workstream_scope(
+                fixture.worktree_b,
+                include_local_worktrees=False,
+                occurred_at="2026-08-22T03:21:00Z",
+            )
+            self.assertEqual(l3["expansion"]["level"], "l3")
+            self.assertFalse(l3["expansion"]["allowed"])
+            self.assertTrue(l3["review_ready_blocked"] or not l3["local_work_allowed"])
+            route = plan_adapter_session_route(
+                fixture.worktree_b,
+                adapter_manifest=REPOSITORY_ROOT / "adapters" / "codex" / "adapter-manifest.json",
+                platform_session_id="w2-l3-session",
+            )
+            self.assertFalse(route["allowed"])
+            self.assertEqual(route["reason"], "scope-expansion-l3-blocked")
+            with self.assertRaisesRegex(ValueError, "only for an L2"):
+                refresh_workstream_scope(
+                    fixture.worktree_b,
+                    include_local_worktrees=False,
+                    confirm_l2=True,
+                    reason="central request must not bypass L3",
+                )
+
+        custom = CollaborationConfig.from_manifest(
+            {
+                "collaboration": {
+                    "exclusive_resources": [
+                        {"resource_id": "database-lock", "path_patterns": ["db/migrations/**"]}
+                    ]
+                }
+            }
+        )
+        self.assertEqual(custom.exclusive_resources[0]["resource_id"], "database-lock")
+
+    def test_w2_cross_member_ack_progress_stales_on_scope_change_and_resolves_mechanically(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            for root, workstream, member, expected in (
+                (fixture.worktree_a, "W2-member-a", "member-a", "packages/a.py"),
+                (fixture.worktree_b, "W2-member-b", "member-b", "packages/b.py"),
+            ):
+                write_workstream_session(
+                    root,
+                    workstream_id=workstream,
+                    primary_subsystem_id="release-and-toolchain",
+                    expected_writes=[expected],
+                    validation_surfaces=["schema-contract-tests"],
+                    member_id=member,
+                    captured_at="2026-08-22T04:00:00Z",
+                )
+            left = collect_scope_observation(fixture.worktree_a)
+            right = collect_scope_observation(fixture.worktree_b)
+            initial = compute_overlap_findings([left, right])["findings"]
+            semantic = next(item for item in initial if item["kind"] == "semantic")
+            with self.assertRaisesRegex(ValueError, "confirmed by a member locally"):
+                acknowledge_overlap_finding(
+                    semantic,
+                    member_id="member-a",
+                    reason="central request",
+                    scope_revision=1,
+                    source="central-request",
+                )
+            one = acknowledge_overlap_finding(
+                semantic,
+                member_id="member-a",
+                reason="member A accepts local coordination risk",
+                scope_revision=1,
+                acknowledged_at="2026-08-22T04:01:00Z",
+            )
+            self.assertEqual(one["acknowledgement_progress"], "1/2")
+            self.assertFalse(one["acknowledgement_complete"])
+            self.assertTrue(one["review_ready_blocked"])
+            both = acknowledge_overlap_finding(
+                one,
+                member_id="member-b",
+                reason="member B accepts local coordination risk",
+                scope_revision=1,
+                acknowledged_at="2026-08-22T04:02:00Z",
+            )
+            self.assertEqual(both["acknowledgement_progress"], "2/2")
+            self.assertTrue(both["acknowledgement_complete"])
+            self.assertFalse(both["review_ready_blocked"])
+
+            changed_right = dict(right)
+            changed_right["scope_revision"] = 2
+            changed_right["scope_fingerprint"] = "b" * 64
+            changed = compute_overlap_findings([left, changed_right])["findings"]
+            reconciled = reconcile_overlap_findings(changed, [both])
+            self.assertEqual(reconciled["active"][0]["disposition"], "open")
+            self.assertEqual(reconciled["retired"][0]["disposition"], "stale")
+            self.assertEqual(reconciled["retired"][0]["resolution_reason"], "scope-or-baseline-binding-changed")
+
+            resolved = reconcile_overlap_findings([], reconciled["active"])
+            self.assertEqual(resolved["retired"][0]["disposition"], "resolved")
+            self.assertFalse(resolved["retired"][0]["blocking"])
+
+    def test_w2_cli_overlap_and_scope_refresh_use_stable_json_and_zero_network(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            for root, workstream in (
+                (fixture.worktree_a, "W2-cli-a"),
+                (fixture.worktree_b, "W2-cli-b"),
+            ):
+                write_workstream_session(
+                    root,
+                    workstream_id=workstream,
+                    primary_subsystem_id="release-and-toolchain",
+                    expected_writes=["packages/shared.py"],
+                    captured_at="2026-08-22T05:00:00Z",
+                )
+            environment = {
+                **fixture.environment,
+                "PYTHONPATH": os.pathsep.join(
+                    (str(CLI_SOURCE), str(CORE_SOURCE), str(OBSERVATORY_SOURCE))
+                ),
+            }
+            base = [sys.executable, "-X", "utf8", "-m", "project_orrery_cli", "worktree"]
+            overlap = subprocess.run(
+                [*base, "overlap", "--target", str(fixture.worktree_a), "--json"],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(overlap.returncode, 5, overlap.stdout + overlap.stderr)
+            payload = json.loads(overlap.stdout)
+            self.assertEqual(payload["command"], "worktree-overlap")
+            self.assertFalse(payload["data"]["network_performed"])
+            self.assertTrue(payload["data"]["review_ready_blocked"])
+
+            scope = subprocess.run(
+                [
+                    *base,
+                    "scope",
+                    "refresh",
+                    "--target",
+                    str(fixture.worktree_a),
+                    "--json",
+                ],
+                cwd=REPOSITORY_ROOT,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(scope.returncode, 5, scope.stdout + scope.stderr)
+            scope_payload = json.loads(scope.stdout)
+            self.assertEqual(scope_payload["command"], "worktree-scope-refresh")
+            self.assertEqual(scope_payload["data"]["expansion"]["level"], "l3")
+            self.assertFalse(scope_payload["data"]["network_performed"])
 
 
 if __name__ == "__main__":

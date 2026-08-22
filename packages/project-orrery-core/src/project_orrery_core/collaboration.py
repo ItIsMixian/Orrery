@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import fnmatch
 import hashlib
 import json
 import os
@@ -22,16 +23,60 @@ WORKTREE_STATUS_SCHEMA_VERSION = 1
 WORKTREE_CREATE_SCHEMA_VERSION = 1
 PRIMARY_WRITE_GUARD_SCHEMA_VERSION = 1
 SESSION_ROUTE_SCHEMA_VERSION = 1
+SCOPE_OBSERVATION_SCHEMA_VERSION = 1
+OVERLAP_REPORT_SCHEMA_VERSION = 1
+SCOPE_EXPANSION_SCHEMA_VERSION = 1
 DEFAULT_INTEGRATION_REF = "refs/heads/main"
 INTEGRATION_REF_CONFIG_KEY = "collaboration.integration_ref"
 PRIMARY_WORKTREE_CONFIG_KEY = "collaboration.primary_worktree"
 PROJECT_MODE_CONFIG_KEY = "collaboration.project_mode"
+EXCLUSIVE_RESOURCES_CONFIG_KEY = "collaboration.exclusive_resources"
 RESERVED_SUBSYSTEM_IDS = ("unmapped", "project-wide")
 CAPABILITIES = ("reviewer", "integrator", "admin")
-_COLLABORATION_CONFIG_FIELDS = {"integration_ref", "primary_worktree", "project_mode"}
+_COLLABORATION_CONFIG_FIELDS = {
+    "integration_ref", "primary_worktree", "project_mode", "exclusive_resources"
+}
 _SUBSYSTEM_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 _OID = re.compile(r"^[0-9a-f]{40}(?:[0-9a-f]{24})?$")
 _DIRTY_FINGERPRINT_DOMAIN = b"project-orrery-dirty-fingerprint-v1\0"
+_SCOPE_FINGERPRINT_DOMAIN = b"project-orrery-scope-observation-v1\0"
+_FINDING_KEY_DOMAIN = b"project-orrery-overlap-finding-key-v1\0"
+_FINDING_FINGERPRINT_DOMAIN = b"project-orrery-overlap-finding-v1\0"
+_PATH_SOURCES = ("committed", "staged", "unstaged", "untracked", "expected")
+_AUTHORITY_PREFIXES = (
+    ("seed", "docs/core/"),
+    ("adr", "docs/decisions/"),
+    ("design", "docs/design/"),
+    ("plan", "docs/implementation/plans/"),
+    ("state", "docs/state/"),
+    ("validation", "docs/validation/"),
+)
+_AUTHORITY_EXACT = {
+    "AGENTS.md": "agent-index",
+    "docs/PROGRESS.md": "progress",
+    "docs/HANDOFF.md": "handoff",
+    "docs/DEVLOG.md": "devlog",
+}
+DEFAULT_EXCLUSIVE_RESOURCES = (
+    {
+        "resource_id": "credentials",
+        "path_patterns": [
+            "ai-config.json", "**/ai-config.json", ".env", ".env.*", "**/.env", "**/.env.*",
+            "**/credentials.json", "**/keyring/**", "**/*.pem", "**/*.key",
+        ],
+    },
+    {
+        "resource_id": "release",
+        "path_patterns": [
+            "skills/project-orrery/release-manifest.json", "packages/component-versions.json",
+            "scripts/package_release.py", ".github/workflows/release.yml", "packaging/**",
+        ],
+    },
+    {
+        "resource_id": "schema-migration",
+        "path_patterns": ["**/schema/**", "**/migrations/**", "**/*schema*.json"],
+    },
+)
 _SESSION_STALE_FIELDS = (
     ("worktree_id", "worktree-id-changed"),
     ("branch", "branch-changed"),
@@ -57,6 +102,36 @@ _LIFECYCLE_TRANSITIONS = {
     "integrated": {"closed"},
     "closed": set(),
 }
+
+
+def _normalize_scope_path(value: str, *, allow_pattern: bool = False) -> str:
+    """Normalize one repository-relative path or glob without touching the filesystem."""
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("scope paths must be non-empty strings")
+    normalized = value.strip().replace("\\", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    if allow_pattern and normalized.endswith("/"):
+        normalized = f"{normalized}**"
+    if normalized.startswith("/") or re.match(r"^[A-Za-z]:/", normalized):
+        raise ValueError("scope paths must be repository-relative")
+    parts = normalized.split("/")
+    if any(part in {"", ".", ".."} for part in parts):
+        raise ValueError("scope paths must not contain empty, dot, or parent segments")
+    if not allow_pattern and any(character in normalized for character in "*?["):
+        raise ValueError("observed Git paths must not contain glob syntax")
+    return normalized
+
+
+def _utc_timestamp(value: str | None = None) -> str:
+    return value or dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _canonical_json_hash(domain: bytes, payload: Any) -> str:
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
+    return hashlib.sha256(domain + encoded).hexdigest()
 
 
 def _schema_type_matches(value: Any, expected: str) -> bool:
@@ -165,6 +240,10 @@ class CollaborationConfig:
     integration_ref: str = DEFAULT_INTEGRATION_REF
     primary_worktree: Path | None = None
     project_mode: str = "personal"
+    exclusive_resources: tuple[dict[str, Any], ...] = tuple(
+        {"resource_id": item["resource_id"], "path_patterns": list(item["path_patterns"])}
+        for item in DEFAULT_EXCLUSIVE_RESOURCES
+    )
 
     @classmethod
     def from_manifest(cls, manifest: Mapping[str, Any]) -> "CollaborationConfig":
@@ -190,10 +269,39 @@ class CollaborationConfig:
         project_mode = raw.get("project_mode", "personal")
         if project_mode not in {"personal", "team"}:
             raise ValueError("collaboration.project_mode must be personal or team")
+        exclusive_raw = raw.get("exclusive_resources", DEFAULT_EXCLUSIVE_RESOURCES)
+        if not isinstance(exclusive_raw, Sequence) or isinstance(exclusive_raw, (str, bytes)):
+            raise ValueError("collaboration.exclusive_resources must be an array")
+        exclusive_resources: list[dict[str, Any]] = []
+        seen_resources: set[str] = set()
+        for item in exclusive_raw:
+            if not isinstance(item, Mapping) or set(item) != {"resource_id", "path_patterns"}:
+                raise ValueError("each exclusive resource requires only resource_id and path_patterns")
+            resource_id = item.get("resource_id")
+            patterns = item.get("path_patterns")
+            if (
+                not isinstance(resource_id, str)
+                or not _SUBSYSTEM_ID.fullmatch(resource_id)
+                or resource_id in seen_resources
+            ):
+                raise ValueError("exclusive resource IDs must be unique stable IDs")
+            if (
+                not isinstance(patterns, Sequence)
+                or isinstance(patterns, (str, bytes))
+                or not patterns
+                or any(not isinstance(pattern, str) or not pattern.strip() for pattern in patterns)
+            ):
+                raise ValueError("exclusive resource path_patterns must be a non-empty string array")
+            normalized_patterns = [_normalize_scope_path(pattern, allow_pattern=True) for pattern in patterns]
+            exclusive_resources.append(
+                {"resource_id": resource_id, "path_patterns": list(dict.fromkeys(normalized_patterns))}
+            )
+            seen_resources.add(resource_id)
         return cls(
             integration_ref=integration_ref,
             primary_worktree=primary_worktree,
             project_mode=str(project_mode),
+            exclusive_resources=tuple(exclusive_resources),
         )
 
 
@@ -516,6 +624,9 @@ def _session_lifecycle_projection(
     reasons = list(stale_reasons)
     if declared_phase == "review-ready" and declared_freshness != "current":
         reasons.append("review-evidence-not-current")
+    scope_gate = _session_scope_gate(session)
+    if declared_phase == "review-ready" and not scope_gate["allowed"]:
+        reasons.append(scope_gate["reason"])
     reasons = list(dict.fromkeys(reasons))
     review_ready_revoked = declared_phase == "review-ready" and bool(reasons)
     return {
@@ -528,6 +639,34 @@ def _session_lifecycle_projection(
         "review_ready_revoked": review_ready_revoked,
         "revocation_reasons": reasons if review_ready_revoked else [],
     }
+
+
+def _session_scope_gate(session: Mapping[str, Any]) -> dict[str, Any]:
+    expansion = session.get("last_scope_expansion")
+    if isinstance(expansion, Mapping) and expansion.get("decision") == "blocked":
+        level = expansion.get("level")
+        return {
+            "allowed": False,
+            "reason": (
+                "scope-expansion-l3-blocked"
+                if level == "l3"
+                else "scope-expansion-l2-confirmation-required"
+            ),
+        }
+    member_id = session.get("member_id")
+    for finding in session.get("findings", []):
+        if not isinstance(finding, Mapping) or finding.get("disposition") not in {
+            "open", "acknowledged"
+        }:
+            continue
+        if finding.get("kind") == "direct" or finding.get("severity") == "l3":
+            return {"allowed": False, "reason": "direct-or-l3-finding-blocked"}
+        if finding.get("severity") == "l2" and not any(
+            isinstance(ack, Mapping) and ack.get("member_id") == member_id
+            for ack in finding.get("acknowledgements", [])
+        ):
+            return {"allowed": False, "reason": "local-l2-acknowledgement-required"}
+    return {"allowed": True, "reason": "scope-gate-clear"}
 
 
 def inspect_worktree_status(project_root: Path) -> dict[str, Any]:
@@ -857,7 +996,11 @@ def plan_adapter_session_route(
             and attached.get("adapter") == capabilities["adapter_id"]
             and attached.get("session_id") == platform_session_id
         )
-        if platform_session_id and same_session:
+        scope_gate = _session_scope_gate(session_record)
+        if not scope_gate["allowed"]:
+            reason = scope_gate["reason"]
+            next_action = "refresh-scope-and-resolve-local-finding"
+        elif platform_session_id and same_session:
             decision = "allow"
             reason = "platform-session-attached"
             next_action = "continue-in-current-worktree"
@@ -1104,6 +1247,34 @@ def create_worktree(
     }
 
 
+def _registry_path_patterns(body: str, state_docs: Sequence[str], authority_docs: Sequence[str]) -> list[str]:
+    patterns: list[str] = []
+    truth_match = re.search(r"(?m)^\*\*Truth\*\*:\s*(.+)$", body)
+    tokens = re.findall(r"`([^`]+)`", truth_match.group(1)) if truth_match else []
+    for token in tokens:
+        candidate = token.strip().replace("\\", "/")
+        if (
+            not candidate
+            or "://" in candidate
+            or candidate.startswith("$")
+            or not ("/" in candidate or "." in Path(candidate).name or candidate == "AGENTS.md")
+        ):
+            continue
+        if candidate.endswith("/"):
+            candidate = f"{candidate}**"
+        try:
+            patterns.append(_normalize_scope_path(candidate, allow_pattern=True))
+        except ValueError:
+            continue
+    for path in (*state_docs, *authority_docs):
+        if path.startswith("docs/") or path == "AGENTS.md":
+            try:
+                patterns.append(_normalize_scope_path(path, allow_pattern=True))
+            except ValueError:
+                continue
+    return list(dict.fromkeys(patterns))
+
+
 def load_subsystem_registry(project_root: Path) -> dict[str, Any]:
     """Project explicit subsystem IDs from AGENTS.md and existing State Docs."""
     root = Path(project_root)
@@ -1143,6 +1314,7 @@ def load_subsystem_registry(project_root: Path) -> dict[str, Any]:
                 "display_name": heading.group(1).strip(),
                 "state_docs": state_docs,
                 "authority_docs": linked_docs,
+                "path_patterns": _registry_path_patterns(body, state_docs, linked_docs),
             }
         )
         seen.add(subsystem_id)
@@ -1211,6 +1383,839 @@ def build_scope_contract(
     }
     validate_collaboration_contract(contract)
     return contract
+
+
+def _path_matches_pattern(path: str, pattern: str) -> bool:
+    if pattern.endswith("/**"):
+        prefix = pattern[:-3].rstrip("/")
+        return path == prefix or path.startswith(f"{prefix}/")
+    return fnmatch.fnmatchcase(path, pattern)
+
+
+def _path_specs_overlap(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
+    left_path = str(left["path"])
+    right_path = str(right["path"])
+    left_pattern = bool(left.get("is_pattern"))
+    right_pattern = bool(right.get("is_pattern"))
+    if not left_pattern and not right_pattern:
+        return left_path == right_path
+    if left_pattern and not right_pattern:
+        return _path_matches_pattern(right_path, left_path)
+    if right_pattern and not left_pattern:
+        return _path_matches_pattern(left_path, right_path)
+    if left_path == right_path:
+        return True
+    def literal_prefix(value: str) -> str:
+        positions = [value.find(character) for character in "*?[" if character in value]
+        return value[: min(positions) if positions else len(value)].rstrip("/")
+
+    left_prefix = literal_prefix(left_path)
+    right_prefix = literal_prefix(right_path)
+    return bool(left_prefix and right_prefix) and (
+        left_prefix == right_prefix
+        or left_prefix.startswith(f"{right_prefix}/")
+        or right_prefix.startswith(f"{left_prefix}/")
+    )
+
+
+def _authority_surfaces(path: str, *, is_pattern: bool) -> list[str]:
+    surfaces: list[str] = []
+    for exact, kind in _AUTHORITY_EXACT.items():
+        if (not is_pattern and path == exact) or (is_pattern and _path_matches_pattern(exact, path)):
+            surfaces.append(f"{kind}:{exact}")
+    for kind, prefix in _AUTHORITY_PREFIXES:
+        if path.startswith(prefix):
+            surfaces.append(f"{kind}:{path}")
+        elif is_pattern and _path_matches_pattern(f"{prefix}__authority_probe__.md", path):
+            surfaces.append(f"{kind}:{path}")
+    return list(dict.fromkeys(surfaces))
+
+
+def _subsystems_for_path(
+    path: str, *, is_pattern: bool, registry: Mapping[str, Any]
+) -> list[str]:
+    matched: list[str] = []
+    for entry in registry.get("entries", []):
+        if not isinstance(entry, Mapping):
+            continue
+        subsystem_id = entry.get("subsystem_id")
+        if not isinstance(subsystem_id, str):
+            continue
+        for raw_pattern in entry.get("path_patterns", []):
+            if not isinstance(raw_pattern, str):
+                continue
+            registry_spec = {
+                "path": raw_pattern,
+                "is_pattern": any(character in raw_pattern for character in "*?[")
+                or raw_pattern.endswith("/"),
+            }
+            current_spec = {"path": path, "is_pattern": is_pattern}
+            if _path_specs_overlap(current_spec, registry_spec):
+                matched.append(subsystem_id)
+                break
+    return list(dict.fromkeys(matched))
+
+
+def _exclusive_resources_for_path(
+    path: str, *, is_pattern: bool, config: CollaborationConfig
+) -> list[str]:
+    matched: list[str] = []
+    current = {"path": path, "is_pattern": is_pattern}
+    for resource in config.exclusive_resources:
+        for pattern in resource["path_patterns"]:
+            configured = {
+                "path": pattern,
+                "is_pattern": any(character in pattern for character in "*?[")
+                or pattern.endswith("/"),
+            }
+            if _path_specs_overlap(current, configured):
+                matched.append(str(resource["resource_id"]))
+                break
+    return matched
+
+
+def _parse_name_status(raw: bytes) -> list[str]:
+    records = raw.split(b"\0")
+    paths: list[str] = []
+    index = 0
+    while index < len(records):
+        status_raw = records[index]
+        index += 1
+        if not status_raw:
+            continue
+        status = status_raw.decode("ascii", errors="replace")
+        path_count = 2 if status.startswith(("R", "C")) else 1
+        if index + path_count > len(records):
+            raise ValueError("Git returned an invalid name-status record")
+        for _ in range(path_count):
+            encoded = records[index]
+            index += 1
+            if not encoded:
+                raise ValueError("Git returned an empty changed path")
+            decoded = encoded.decode("utf-8", errors="surrogateescape")
+            paths.append(_normalize_scope_path(decoded))
+    return list(dict.fromkeys(paths))
+
+
+def _git_changed_paths(repository: Path, *arguments: str) -> list[str]:
+    raw = _run_git(repository, *arguments, "--name-status", "-z", binary=True)
+    assert isinstance(raw, bytes)
+    return _parse_name_status(raw)
+
+
+def _git_untracked_paths(repository: Path) -> list[str]:
+    raw = _run_git(repository, "ls-files", "--others", "--exclude-standard", "-z", binary=True)
+    assert isinstance(raw, bytes)
+    return [
+        _normalize_scope_path(item.decode("utf-8", errors="surrogateescape"))
+        for item in raw.split(b"\0")
+        if item
+    ]
+
+
+def collect_scope_observation(
+    project_root: Path,
+    *,
+    session: Mapping[str, Any] | None = None,
+    scope_revision: int | None = None,
+    affected_subsystem_ids: Sequence[str] | None = None,
+    captured_at: str | None = None,
+) -> dict[str, Any]:
+    """Collect actual and expected path scope while preserving every Git/session source."""
+    root = Path(project_root).expanduser().absolute()
+    config = load_collaboration_config(root)
+    status = inspect_worktree_status(root)
+    record = dict(session) if session is not None else status["session"]["record"]
+    if not isinstance(record, Mapping):
+        raise ValueError("scope collection requires a private Workstream session")
+    registry = load_subsystem_registry(root)
+    identity = status["identity"]
+    sources: dict[str, set[str]] = {}
+
+    def add_paths(values: Sequence[str], source: str, *, patterns: bool = False) -> None:
+        for value in values:
+            normalized = _normalize_scope_path(value, allow_pattern=patterns)
+            sources.setdefault(normalized, set()).add(source)
+
+    add_paths(
+        _git_changed_paths(root, "diff", f"{identity['merge_base']}..{identity['head']}"),
+        "committed",
+    )
+    add_paths(_git_changed_paths(root, "diff", "--cached"), "staged")
+    add_paths(_git_changed_paths(root, "diff"), "unstaged")
+    add_paths(_git_untracked_paths(root), "untracked")
+    add_paths(list(record.get("expected_writes", [])), "expected", patterns=True)
+
+    entries: list[dict[str, Any]] = []
+    derived_subsystems: list[str] = []
+    for path in sorted(sources):
+        is_pattern = "expected" in sources[path] and any(character in path for character in "*?[")
+        subsystem_ids = _subsystems_for_path(path, is_pattern=is_pattern, registry=registry)
+        derived_subsystems.extend(subsystem_ids)
+        entries.append(
+            {
+                "path": path,
+                "is_pattern": is_pattern,
+                "sources": [source for source in _PATH_SOURCES if source in sources[path]],
+                "authority_surfaces": _authority_surfaces(path, is_pattern=is_pattern),
+                "subsystem_ids": subsystem_ids,
+                "exclusive_resource_ids": _exclusive_resources_for_path(
+                    path, is_pattern=is_pattern, config=config
+                ),
+            }
+        )
+    selected_affected = list(
+        record.get("affected_subsystem_ids", [])
+        if affected_subsystem_ids is None
+        else affected_subsystem_ids
+    )
+    declared = list(
+        dict.fromkeys([str(record["primary_subsystem_id"]), *selected_affected])
+    )
+    observation = {
+        "schema_version": SCOPE_OBSERVATION_SCHEMA_VERSION,
+        "contract_type": "scope-observation",
+        "workstream_id": str(record["workstream_id"]),
+        "worktree_id": identity["worktree_id"],
+        "member_id": str(record["member_id"]),
+        "host_id": str(record["host_id"]),
+        "branch": identity["branch"],
+        "head": identity["head"],
+        "integration_ref": identity["integration_ref"],
+        "integration_oid": identity["integration_oid"],
+        "merge_base": identity["merge_base"],
+        "scope_revision": int(scope_revision or record["scope_revision"]),
+        "declared_subsystem_ids": declared,
+        "derived_subsystem_ids": list(dict.fromkeys(derived_subsystems)),
+        "path_entries": entries,
+        "governing_docs": list(dict.fromkeys(record.get("governing_docs", []))),
+        "validation_surfaces": list(dict.fromkeys(record.get("validation_surfaces", []))),
+        "scope_fingerprint": "0" * 64,
+        "visibility": str(record.get("visibility", "worktree-local")),
+        "observability": str(record.get("observability", "local")),
+        "captured_at": _utc_timestamp(captured_at),
+    }
+    fingerprint_input = dict(observation)
+    fingerprint_input.pop("scope_fingerprint")
+    fingerprint_input.pop("captured_at")
+    observation["scope_fingerprint"] = _canonical_json_hash(
+        _SCOPE_FINGERPRINT_DOMAIN, fingerprint_input
+    )
+    validate_collaboration_contract(observation)
+    return observation
+
+
+def _finding_material(
+    kind: str,
+    left: Mapping[str, Any],
+    right: Mapping[str, Any],
+    *,
+    path_evidence: Sequence[str] = (),
+    authority_surfaces: Sequence[str] = (),
+    validation_surfaces: Sequence[str] = (),
+    exclusive_resource_ids: Sequence[str] = (),
+) -> dict[str, Any]:
+    workstreams = sorted({str(left["workstream_id"]), str(right["workstream_id"])})
+    members = sorted({str(left["member_id"]), str(right["member_id"])})
+    key_input = {
+        "kind": kind,
+        "workstream_ids": workstreams,
+        "path_evidence": sorted(set(path_evidence)),
+        "authority_surfaces": sorted(set(authority_surfaces)),
+        "validation_surfaces": sorted(set(validation_surfaces)),
+        "exclusive_resource_ids": sorted(set(exclusive_resource_ids)),
+    }
+    finding_key = _canonical_json_hash(_FINDING_KEY_DOMAIN, key_input)
+    bindings = sorted(
+        [
+            {
+                "workstream_id": str(scope["workstream_id"]),
+                "scope_revision": int(scope["scope_revision"]),
+                "scope_fingerprint": str(scope["scope_fingerprint"]),
+            }
+            for scope in (left, right)
+        ],
+        key=lambda item: item["workstream_id"],
+    )
+    fingerprint = _canonical_json_hash(
+        _FINDING_FINGERPRINT_DOMAIN, {"finding_key": finding_key, "scope_bindings": bindings}
+    )
+    severity = "l3" if kind == "direct" or exclusive_resource_ids else "l2"
+    return {
+        "schema_version": COLLABORATION_SCHEMA_VERSION,
+        "contract_type": "overlap-finding",
+        "finding_id": f"finding-{finding_key[:20]}",
+        "kind": kind,
+        "disposition": "open",
+        "severity": severity,
+        "workstream_ids": workstreams,
+        "path_evidence": sorted(set(path_evidence)),
+        "authority_surfaces": sorted(set(authority_surfaces)),
+        "validation_surfaces": sorted(set(validation_surfaces)),
+        "required_member_ids": members,
+        "acknowledgements": [],
+        "member_id": str(left["member_id"]),
+        "host_id": str(left["host_id"]),
+        "visibility": "worktree-local",
+        "observability": "local",
+        "created_at": _utc_timestamp(),
+        "finding_key": finding_key,
+        "finding_fingerprint": fingerprint,
+        "finding_revision": 1,
+        "scope_bindings": bindings,
+        "path_provenance": [],
+        "exclusive_resource_ids": sorted(set(exclusive_resource_ids)),
+        "blocking": True,
+        "acknowledgement_complete": False,
+        "acknowledgement_progress": f"0/{len(members)}",
+        "review_ready_blocked": True,
+        "resolution_reason": None,
+    }
+
+
+def _add_path_provenance(
+    finding: dict[str, Any], left: Mapping[str, Any], right: Mapping[str, Any]
+) -> None:
+    finding["path_provenance"] = [
+        {
+            "workstream_id": str(scope["workstream_id"]),
+            "path": str(entry["path"]),
+            "sources": list(entry["sources"]),
+        }
+        for scope, entry in (left, right)
+    ]
+
+
+def compute_overlap_findings(
+    scopes: Sequence[Mapping[str, Any]],
+    *,
+    unavailable_peers: Sequence[Mapping[str, str]] = (),
+) -> dict[str, Any]:
+    """Compute local/metadata findings without network access or semantic overclaiming."""
+    validated_scopes: list[dict[str, Any]] = []
+    for raw in scopes:
+        scope = dict(raw)
+        validate_collaboration_contract(scope)
+        if scope.get("contract_type") != "scope-observation":
+            raise ValueError("overlap inputs must be scope-observation contracts")
+        validated_scopes.append(scope)
+    findings: list[dict[str, Any]] = []
+    semantic_priorities: list[dict[str, Any]] = []
+    for left_index, left in enumerate(validated_scopes):
+        for right in validated_scopes[left_index + 1 :]:
+            if left["workstream_id"] == right["workstream_id"]:
+                continue
+            shared_subsystems = sorted(
+                set(left["derived_subsystem_ids"]) & set(right["derived_subsystem_ids"])
+            )
+            if shared_subsystems:
+                semantic_priorities.append(
+                    {
+                        "workstream_ids": sorted([left["workstream_id"], right["workstream_id"]]),
+                        "shared_subsystem_ids": shared_subsystems,
+                        "finding_created": False,
+                        "reason": "shared-subsystem-priority-is-not-alone-proof-of-conflict",
+                    }
+                )
+            for left_entry in left["path_entries"]:
+                for right_entry in right["path_entries"]:
+                    if not _path_specs_overlap(left_entry, right_entry):
+                        continue
+                    evidence = sorted({left_entry["path"], right_entry["path"]})
+                    direct = _finding_material("direct", left, right, path_evidence=evidence)
+                    _add_path_provenance(direct, (left, left_entry), (right, right_entry))
+                    findings.append(direct)
+                    shared_authority = sorted(
+                        set(left_entry["authority_surfaces"])
+                        & set(right_entry["authority_surfaces"])
+                    )
+                    if shared_authority:
+                        authority = _finding_material(
+                            "authority",
+                            left,
+                            right,
+                            path_evidence=evidence,
+                            authority_surfaces=shared_authority,
+                        )
+                        _add_path_provenance(authority, (left, left_entry), (right, right_entry))
+                        findings.append(authority)
+            shared_validations = sorted(
+                set(left["validation_surfaces"]) & set(right["validation_surfaces"])
+            )
+            if shared_validations:
+                findings.append(
+                    _finding_material(
+                        "semantic", left, right, validation_surfaces=shared_validations
+                    )
+                )
+            left_resources = {
+                resource
+                for entry in left["path_entries"]
+                for resource in entry["exclusive_resource_ids"]
+            }
+            right_resources = {
+                resource
+                for entry in right["path_entries"]
+                for resource in entry["exclusive_resource_ids"]
+            }
+            shared_resources = sorted(left_resources & right_resources)
+            if shared_resources:
+                findings.append(
+                    _finding_material(
+                        "semantic", left, right, exclusive_resource_ids=shared_resources
+                    )
+                )
+    if validated_scopes:
+        local = validated_scopes[0]
+        for peer in unavailable_peers:
+            peer_workstream = peer.get("workstream_id", "unknown-peer")
+            synthetic = {
+                **local,
+                "workstream_id": peer_workstream,
+                "member_id": peer.get("member_id", "unknown-member"),
+                "host_id": peer.get("host_id", "unknown-host"),
+                "scope_fingerprint": "0" * 64,
+                "scope_revision": 1,
+            }
+            unknown = _finding_material("unknown", local, synthetic)
+            unknown.update(
+                {
+                    "visibility": "unknown",
+                    "observability": "unavailable",
+                    "resolution_reason": peer.get("reason", "peer-scope-unavailable"),
+                }
+            )
+            findings.append(unknown)
+    deduplicated: dict[str, dict[str, Any]] = {}
+    for finding in findings:
+        validate_collaboration_contract(finding)
+        deduplicated[finding["finding_id"]] = finding
+    return {
+        "report_schema_version": OVERLAP_REPORT_SCHEMA_VERSION,
+        "scopes": validated_scopes,
+        "findings": [deduplicated[key] for key in sorted(deduplicated)],
+        "semantic_priorities": semantic_priorities,
+        "writes_performed": False,
+        "network_performed": False,
+    }
+
+
+def _with_ack_progress(finding: Mapping[str, Any]) -> dict[str, Any]:
+    value = dict(finding)
+    required = list(value.get("required_member_ids", []))
+    acknowledgements = [dict(item) for item in value.get("acknowledgements", [])]
+    acknowledged = {item["member_id"] for item in acknowledgements}
+    count = len(acknowledged & set(required))
+    complete = bool(required) and count == len(required)
+    value.update(
+        {
+            "acknowledgements": acknowledgements,
+            "acknowledgement_complete": complete,
+            "acknowledgement_progress": f"{count}/{len(required)}",
+            "disposition": "acknowledged" if count else "open",
+            "blocking": not complete,
+            "review_ready_blocked": not complete,
+        }
+    )
+    return value
+
+
+def acknowledge_overlap_finding(
+    finding: Mapping[str, Any],
+    *,
+    member_id: str,
+    reason: str,
+    scope_revision: int,
+    acknowledged_at: str | None = None,
+    source: str = "member-local",
+) -> dict[str, Any]:
+    """Record a local human acknowledgement; Direct/L3 and remote/Agent sources fail closed."""
+    value = dict(finding)
+    validate_collaboration_contract(value)
+    if source != "member-local":
+        raise ValueError("finding acknowledgement must be confirmed by a member locally")
+    if value["kind"] == "direct" or value["severity"] == "l3":
+        raise ValueError("Direct and L3 findings cannot be acknowledged or waived")
+    if value["disposition"] in {"resolved", "stale"}:
+        raise ValueError("resolved or stale findings cannot be acknowledged")
+    if member_id not in value["required_member_ids"]:
+        raise ValueError("acknowledging member is not required by this finding")
+    if not reason.strip():
+        raise ValueError("finding acknowledgement requires a non-empty reason")
+    binding = next(
+        (item for item in value.get("scope_bindings", []) if item["workstream_id"] in value["workstream_ids"]),
+        None,
+    )
+    if binding is not None and scope_revision not in {
+        item["scope_revision"] for item in value["scope_bindings"]
+    }:
+        raise ValueError("finding acknowledgement scope revision does not match the finding")
+    acknowledgements = [
+        dict(item) for item in value.get("acknowledgements", []) if item["member_id"] != member_id
+    ]
+    acknowledgements.append(
+        {
+            "member_id": member_id,
+            "reason": reason.strip(),
+            "scope_revision": scope_revision,
+            "acknowledged_at": _utc_timestamp(acknowledged_at),
+            "finding_fingerprint": value["finding_fingerprint"],
+        }
+    )
+    value["acknowledgements"] = sorted(acknowledgements, key=lambda item: item["member_id"])
+    value = _with_ack_progress(value)
+    validate_collaboration_contract(value)
+    return value
+
+
+def reconcile_overlap_findings(
+    current: Sequence[Mapping[str, Any]], previous: Sequence[Mapping[str, Any]]
+) -> dict[str, list[dict[str, Any]]]:
+    """Carry current acknowledgements, stale changed bindings, and resolve disappeared findings."""
+    previous_by_id = {str(item["finding_id"]): dict(item) for item in previous}
+    active: list[dict[str, Any]] = []
+    retired: list[dict[str, Any]] = []
+    current_ids: set[str] = set()
+    for raw in current:
+        value = dict(raw)
+        current_ids.add(value["finding_id"])
+        old = previous_by_id.get(value["finding_id"])
+        if old is not None and old.get("finding_fingerprint") == value.get("finding_fingerprint"):
+            value["acknowledgements"] = [dict(item) for item in old.get("acknowledgements", [])]
+            value["finding_revision"] = int(old.get("finding_revision", 1))
+            value = _with_ack_progress(value)
+        elif old is not None:
+            stale = dict(old)
+            stale.update(
+                {
+                    "disposition": "stale",
+                    "blocking": False,
+                    "review_ready_blocked": False,
+                    "resolution_reason": "scope-or-baseline-binding-changed",
+                }
+            )
+            retired.append(stale)
+            value["finding_revision"] = int(old.get("finding_revision", 1)) + 1
+        validate_collaboration_contract(value)
+        active.append(value)
+    for finding_id, old in previous_by_id.items():
+        if finding_id in current_ids or old.get("disposition") in {"resolved", "stale"}:
+            continue
+        resolved = dict(old)
+        resolved.update(
+            {
+                "disposition": "resolved",
+                "blocking": False,
+                "review_ready_blocked": False,
+                "resolution_reason": "overlap-condition-no-longer-present",
+            }
+        )
+        validate_collaboration_contract(resolved)
+        retired.append(resolved)
+    return {"active": active, "retired": retired}
+
+
+def evaluate_scope_expansion(
+    observation: Mapping[str, Any],
+    session: Mapping[str, Any],
+    findings: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    active = [item for item in findings if item.get("disposition") in {"open", "acknowledged"}]
+    exclusive = any(entry["exclusive_resource_ids"] for entry in observation["path_entries"])
+    if exclusive or any(
+        item.get("kind") == "direct" or item.get("severity") == "l3" for item in active
+    ):
+        level, allowed, reason = "l3", False, "direct-or-exclusive-resource-hard-gate"
+    else:
+        declared = set(observation["declared_subsystem_ids"])
+        derived = set(observation["derived_subsystem_ids"])
+        authority = any(entry["authority_surfaces"] for entry in observation["path_entries"])
+        l2_findings = [item for item in active if item.get("severity") == "l2"]
+        local_member = session.get("member_id")
+        locally_acknowledged = all(
+            any(ack.get("member_id") == local_member for ack in item.get("acknowledgements", []))
+            for item in l2_findings
+        )
+        if (
+            session.get("scope_fingerprint") == observation["scope_fingerprint"]
+            and locally_acknowledged
+        ):
+            level, allowed, reason = "l0", True, "scope-unchanged"
+        elif derived - declared or authority or l2_findings:
+            level, allowed, reason = "l2", False, "local-member-confirmation-required"
+        elif session.get("scope_fingerprint") != observation["scope_fingerprint"]:
+            level, allowed, reason = "l1", True, "same-subsystem-safe-expansion"
+        else:
+            level, allowed, reason = "l0", True, "scope-unchanged"
+    return {
+        "expansion_schema_version": SCOPE_EXPANSION_SCHEMA_VERSION,
+        "level": level,
+        "allowed": allowed,
+        "reason": reason,
+        "local_confirmation_required": level == "l2",
+        "hard_block": level == "l3",
+        "central_override_allowed": False,
+    }
+
+
+def inspect_worktree_overlap(
+    project_root: Path,
+    *,
+    peer_scopes: Sequence[Mapping[str, Any]] = (),
+    include_local_worktrees: bool = True,
+) -> dict[str, Any]:
+    """Inspect current and explicitly visible peer scope without any network transport."""
+    root = Path(project_root).expanduser().absolute()
+    status = inspect_worktree_status(root)
+    session = status["session"]["record"]
+    if not isinstance(session, Mapping):
+        raise ValueError("overlap inspection requires a private Workstream session")
+    current = collect_scope_observation(root, session=session)
+    scopes = [current]
+    unavailable: list[dict[str, str]] = []
+    if include_local_worktrees:
+        config = load_collaboration_config(root)
+        identity = status["identity"]
+        primary = _normalized_path(Path(identity["primary_worktree_path"]))
+        for record in _worktree_records(root):
+            candidate = Path(str(record["worktree"]))
+            normalized = _normalized_path(candidate)
+            if normalized in {_normalized_path(root), primary}:
+                continue
+            peer_hint = f"local-{hashlib.sha256(normalized.encode('utf-8')).hexdigest()[:16]}"
+            if not candidate.is_dir():
+                unavailable.append(
+                    {"workstream_id": peer_hint, "reason": "local-worktree-unavailable"}
+                )
+                continue
+            try:
+                peer_status = inspect_worktree_status(candidate)
+                peer_session = peer_status["session"]["record"]
+                if not isinstance(peer_session, Mapping):
+                    unavailable.append(
+                        {"workstream_id": peer_hint, "reason": "local-worktree-session-unavailable"}
+                    )
+                    continue
+                scopes.append(collect_scope_observation(candidate, session=peer_session))
+            except ValueError:
+                unavailable.append(
+                    {"workstream_id": peer_hint, "reason": "local-worktree-scope-unavailable"}
+                )
+    for peer in peer_scopes:
+        value = dict(peer)
+        validate_collaboration_contract(value)
+        if value.get("contract_type") != "scope-observation":
+            raise ValueError("peer scope file must contain a scope-observation contract")
+        scopes.append(value)
+    computed = compute_overlap_findings(scopes, unavailable_peers=unavailable)
+    previous = session.get("findings", [])
+    reconciled = reconcile_overlap_findings(computed["findings"], previous)
+    review_ready_blocked = any(
+        finding.get("review_ready_blocked", False) for finding in reconciled["active"]
+    )
+    return {
+        **computed,
+        "current_scope": current,
+        "findings": reconciled["active"],
+        "retired_findings": reconciled["retired"],
+        "unavailable_peers": unavailable,
+        "review_ready_blocked": review_ready_blocked,
+        "writes_performed": False,
+        "network_performed": False,
+    }
+
+
+def _accepted_affected_subsystems(
+    session: Mapping[str, Any], observation: Mapping[str, Any]
+) -> list[str]:
+    primary = str(session["primary_subsystem_id"])
+    affected = list(session.get("affected_subsystem_ids", []))
+    for subsystem_id in observation["derived_subsystem_ids"]:
+        if subsystem_id != primary and subsystem_id not in RESERVED_SUBSYSTEM_IDS:
+            affected.append(subsystem_id)
+    return list(dict.fromkeys(affected))
+
+
+def refresh_workstream_scope(
+    project_root: Path,
+    *,
+    peer_scopes: Sequence[Mapping[str, Any]] = (),
+    include_local_worktrees: bool = True,
+    confirm_l2: bool = False,
+    reason: str | None = None,
+    confirmation_source: str = "member-local",
+    occurred_at: str | None = None,
+) -> dict[str, Any]:
+    """Apply Scope Expansion B to Git-private control metadata only."""
+    root = Path(project_root).expanduser().absolute()
+    status = inspect_worktree_status(root)
+    if status["identity"]["is_primary"]:
+        raise ValueError("scope refresh is prohibited in the primary worktree")
+    raw_session = status["session"]["record"]
+    if not isinstance(raw_session, Mapping):
+        raise ValueError("scope refresh requires a private Workstream session")
+    session = dict(raw_session)
+    overlap = inspect_worktree_overlap(
+        root, peer_scopes=peer_scopes, include_local_worktrees=include_local_worktrees
+    )
+    observation = overlap["current_scope"]
+    decision = evaluate_scope_expansion(observation, session, overlap["findings"])
+    timestamp = _utc_timestamp(occurred_at)
+    if confirm_l2 and decision["level"] != "l2":
+        raise ValueError("--confirm-l2 is valid only for an L2 scope expansion")
+    if confirm_l2 and (confirmation_source != "member-local" or not reason or not reason.strip()):
+        raise ValueError("L2 expansion requires a local member confirmation and reason")
+
+    accepted = decision["level"] in {"l0", "l1"} or (decision["level"] == "l2" and confirm_l2)
+    new_revision = int(session["scope_revision"])
+    affected = list(session.get("affected_subsystem_ids", []))
+    if decision["level"] in {"l1", "l2"} and accepted:
+        new_revision += 1
+        affected = _accepted_affected_subsystems(session, observation)
+        observation = collect_scope_observation(
+            root,
+            session=session,
+            scope_revision=new_revision,
+            affected_subsystem_ids=affected,
+            captured_at=timestamp,
+        )
+        scopes = [observation, *[scope for scope in overlap["scopes"] if scope is not overlap["current_scope"]]]
+        recomputed = compute_overlap_findings(scopes, unavailable_peers=overlap["unavailable_peers"])
+        reconciled = reconcile_overlap_findings(recomputed["findings"], session.get("findings", []))
+        overlap["findings"] = reconciled["active"]
+        overlap["retired_findings"] = reconciled["retired"]
+        overlap["current_scope"] = observation
+
+    if decision["level"] == "l2" and confirm_l2:
+        confirmed: list[dict[str, Any]] = []
+        for finding in overlap["findings"]:
+            if finding["severity"] == "l2" and session["member_id"] in finding["required_member_ids"]:
+                finding = acknowledge_overlap_finding(
+                    finding,
+                    member_id=str(session["member_id"]),
+                    reason=str(reason),
+                    scope_revision=new_revision,
+                    acknowledged_at=timestamp,
+                    source=confirmation_source,
+                )
+            confirmed.append(finding)
+        overlap["findings"] = confirmed
+
+    identity = inspect_worktree_identity(root, load_collaboration_config(root))
+    session.update(
+        {
+            "worktree_id": identity["worktree_id"],
+            "branch": identity["branch"],
+            "head": identity["head"],
+            "integration_ref": identity["integration_ref"],
+            "integration_oid": identity["integration_oid"],
+            "merge_base": identity["merge_base"],
+            "dirty_fingerprint": identity["dirty_fingerprint"],
+            "scope_revision": new_revision,
+            "affected_subsystem_ids": affected,
+            "scope_observation": observation,
+            "findings": overlap["findings"],
+            "finding_history": [
+                *[dict(item) for item in session.get("finding_history", [])],
+                *overlap["retired_findings"],
+            ],
+            "last_scope_expansion": {
+                "level": decision["level"],
+                "decision": (
+                    "blocked"
+                    if not accepted
+                    else "confirmed-local"
+                    if decision["level"] == "l2"
+                    else "auto-revised"
+                    if decision["level"] == "l1"
+                    else "recorded"
+                ),
+                "reason": str(reason).strip() if confirm_l2 else decision["reason"],
+                "member_id": str(session["member_id"]),
+                "occurred_at": timestamp,
+            },
+            "captured_at": timestamp,
+        }
+    )
+    if accepted:
+        session["scope_fingerprint"] = observation["scope_fingerprint"]
+    if accepted and session.get("runtime_condition") == "blocked-by-conflict":
+        session["runtime_condition"] = "active"
+    elif not accepted:
+        session["runtime_condition"] = "blocked-by-conflict"
+    write_result = _write_private_session(root, session)
+    local_acknowledged = all(
+        finding["severity"] != "l2"
+        or any(ack["member_id"] == session["member_id"] for ack in finding["acknowledgements"])
+        for finding in overlap["findings"]
+    )
+    review_ready_blocked = any(
+        finding["severity"] == "l3"
+        or finding["kind"] == "direct"
+        or not finding.get("acknowledgement_complete", False)
+        for finding in overlap["findings"]
+    )
+    return {
+        "expansion": {**decision, "allowed": accepted},
+        "scope": observation,
+        "findings": overlap["findings"],
+        "retired_findings": overlap["retired_findings"],
+        "local_work_allowed": accepted and local_acknowledged,
+        "review_ready_blocked": review_ready_blocked,
+        "session": write_result["session"],
+        "session_path": write_result["session_path"],
+        "writes_performed": True,
+        "network_performed": False,
+    }
+
+
+def acknowledge_workstream_finding(
+    project_root: Path,
+    *,
+    finding_id: str,
+    reason: str,
+    source: str = "member-local",
+    acknowledged_at: str | None = None,
+) -> dict[str, Any]:
+    """Acknowledge one stored L2 finding for the local owning Member."""
+    root = Path(project_root).expanduser().absolute()
+    status = inspect_worktree_status(root)
+    session_record = status["session"]["record"]
+    if not isinstance(session_record, Mapping):
+        raise ValueError("finding acknowledgement requires a private Workstream session")
+    session = dict(session_record)
+    findings = [dict(item) for item in session.get("findings", [])]
+    target_index = next(
+        (index for index, item in enumerate(findings) if item["finding_id"] == finding_id), None
+    )
+    if target_index is None:
+        raise ValueError("finding is not present in the current Workstream session")
+    findings[target_index] = acknowledge_overlap_finding(
+        findings[target_index],
+        member_id=str(session["member_id"]),
+        reason=reason,
+        scope_revision=int(session["scope_revision"]),
+        acknowledged_at=acknowledged_at,
+        source=source,
+    )
+    session["findings"] = findings
+    expansion_blocked = (
+        isinstance(session.get("last_scope_expansion"), Mapping)
+        and session["last_scope_expansion"].get("decision") == "blocked"
+    )
+    if not expansion_blocked and all(
+        finding["severity"] != "l2"
+        or any(ack["member_id"] == session["member_id"] for ack in finding["acknowledgements"])
+        for finding in findings
+    ) and not any(finding["severity"] == "l3" for finding in findings):
+        session["runtime_condition"] = "active"
+    result = _write_private_session(root, session)
+    return {
+        "finding": findings[target_index],
+        "session_path": result["session_path"],
+        "writes_performed": result["writes_performed"],
+        "network_performed": False,
+    }
 
 
 def bootstrap_maintainer(member_id: str = "local-owner") -> dict[str, Any]:
@@ -1359,9 +2364,11 @@ def inspect_collaboration(project_root: Path) -> dict[str, Any]:
             "integration_ref": INTEGRATION_REF_CONFIG_KEY,
             "primary_worktree": PRIMARY_WORKTREE_CONFIG_KEY,
             "project_mode": PROJECT_MODE_CONFIG_KEY,
+            "exclusive_resources": EXCLUSIVE_RESOURCES_CONFIG_KEY,
         },
         "identity": inspect_worktree_identity(root, config),
         "mode": build_project_mode_contract(config),
         "bootstrap_maintainer": bootstrap_maintainer(),
         "subsystems": load_subsystem_registry(root),
+        "exclusive_resources": [dict(item) for item in config.exclusive_resources],
     }

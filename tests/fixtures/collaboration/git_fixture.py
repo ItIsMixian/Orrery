@@ -65,12 +65,30 @@ class CollaborationGitFixture:
         state = self.repository / "docs" / "state" / "project-structure.md"
         state.parent.mkdir(parents=True)
         state.write_text("# Project structure State\n", encoding="utf-8")
+        release_state = self.repository / "docs" / "state" / "release-and-toolchain.md"
+        release_state.write_text("# Release and toolchain State\n", encoding="utf-8")
+        test_state = self.repository / "docs" / "state" / "test-coverage.md"
+        test_state.write_text("# Test coverage State\n", encoding="utf-8")
+        documentation_state = self.repository / "docs" / "state" / "documentation-system.md"
+        documentation_state.write_text("# Documentation system State\n", encoding="utf-8")
         (self.repository / "AGENTS.md").write_text(
             "# Agent index\n\n"
             "## project structure\n\n"
             "**ID**: `project-structure`\n\n"
-            "**Truth**: repository tree.\n\n"
-            "**Dig**: [State](docs/state/project-structure.md).\n",
+            "**Truth**: `.project-orrery.json`.\n\n"
+            "**Dig**: [State](docs/state/project-structure.md).\n\n"
+            "## release and toolchain\n\n"
+            "**ID**: `release-and-toolchain`\n\n"
+            "**Truth**: `packages/`.\n\n"
+            "**Dig**: [State](docs/state/release-and-toolchain.md).\n\n"
+            "## test coverage\n\n"
+            "**ID**: `test-coverage`\n\n"
+            "**Truth**: `tests/`.\n\n"
+            "**Dig**: [State](docs/state/test-coverage.md).\n\n"
+            "## documentation system\n\n"
+            "**ID**: `documentation-system`\n\n"
+            "**Truth**: `AGENTS.md`, `docs/`.\n\n"
+            "**Dig**: [State](docs/state/documentation-system.md).\n",
             encoding="utf-8",
         )
         self.git(self.repository, "add", ".")
