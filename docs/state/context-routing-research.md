@@ -1,6 +1,6 @@
 # 上下文路由研究 State
 
-Updated: 2026-08-19
+Updated: 2026-08-22
 Authority: research state; no routing candidate is accepted product policy
 
 ## 当前事实
@@ -48,8 +48,14 @@ Authority: research state; no routing candidate is accepted product policy
 - Pilot 009 冻结 Oracle 报告 P/S 0/3；只读语义复核确认 feedback 与事实对齐任务只是自然语言词形
   假阴性，P/S 真实质量均为 2/3。迁移任务行为与数据安全通过，但两侧 PROGRESS 都遗漏未来版本写前
   拒绝事实，维持失败。3/3 质量门未通过，S 不采纳。
-- 新的任务／Oracle v0.2 研究候选把 behavior、data safety、scope、structured State 和 narrative
-  consistency 分开报告，并要求 paraphrase／contradiction／mutation controls；尚未形成新 Pilot 或产品规则。
+- 开发任务 C1（不是 R0／R1／R2 evidence layer）的任务／Oracle v0.2 无模型静态控制包已实现：四层 verdict 独立区分形式有效性、语义质量、结构化
+  State／未来版本遗漏和 apparatus contamination；公开 State schema、7 文件 checksummed fixture 与 20 个
+  baseline／paraphrase／contradiction／mutation／manual-review／contamination cases 已通过。
+- 静态包对每项自然语言事实覆盖三种 positive paraphrase 和两种 contradiction，并用公共 API、SQLite
+  终态及 Git 范围检查阻断 guard 删除、索引列交换、未来版本检查后移、helper bypass、State omission 与
+  越界写；索引改名保持 pass，未知措辞进入 `manual_review_required`。
+- Oracle 层已具备申请 Pilot 010 设计的静态条件，但 Pilot 010 尚未创建、未运行；任务级 Prompt 等长、
+  嵌套隔离、完整事件链、Scope pipeline 和目标 runtime 握手仍须在任何模型样本前单独冻结验证。
 - 已完成 `Ariestar/sivtr` 固定提交 `4fae091` 的外部源码观察：其类型化 WorkRecord／WorkRef、WorkSet
   anchors、渐进检索与只读 MCP 适合作为“情境证据层”参考，但不具备 Orrery 的权威事实职责。研究没有
   采纳依赖、Adapter、路由策略或新 Pilot；隐私生命周期、公开检索快照缺失和文档漂移仍是明确边界。
@@ -63,6 +69,8 @@ Authority: research state; no routing candidate is accepted product policy
 - ADR-0002 与 ADR-0005 只约束研究设计，不改变当前发布 Skill，也不重新解释 Pilot 001–007。
 - Pilot 009 的 S 仍只存在于 `experiments/`；成本方向信号不足以越过质量门。R 作为未运行历史候选保留，
   S 不进入发布 Skill 或模板，也不新增产品 ADR。
+- Oracle v0.2 的公开 State schema 只属于研究 fixture，不是发布版 Skill／模板或通用 Authority Model 的
+  新契约；静态 readiness 不构成模型运行授权或 treatment 采纳。
 
 ## 证据
 
@@ -98,6 +106,8 @@ Authority: research state; no routing candidate is accepted product policy
 - [Pilot 009 Validation](../validation/2026-08-19-pilot-009-ps-scope-run.md)
 - [Pilot 009 R2 结果](../../experiments/context-routing/results/2026-08-19-pilot-009-ps-scope-terra-medium.md)
 - [真实开发任务与 Oracle v0.2](../../experiments/context-routing/designs/real-development-task-oracle-v0.2.zh-CN.md)
+- [C1 Oracle v0.2 静态结果](../../experiments/context-routing/results/2026-08-22-c1-oracle-v0.2-static-controls.md)
+- [C1 Oracle v0.2 静态验证](../validation/2026-08-22-c1-context-routing-oracle-v0.2-static-controls.md)
 - [sivtr 统一工作记忆层观察](../library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)
 
 ## 已知边界
@@ -115,3 +125,5 @@ Authority: research state; no routing candidate is accepted product policy
 - Pilot 009 只有三项任务和一个模型/runtime，且写前 input 中 cached token 占比很高；一致的成本下降是
   值得复测的方向信号，不是跨仓库普遍因果结论。自然语言 Oracle 的 lexical false negative 必须在后续
   Pilot 前由 paraphrase controls 阻断。
+- Oracle v0.2 controls 只验证合成 feedback／SQLite／State 模式；未来 Pilot 的每个新任务仍必须拥有自己的
+  positive／negative／mutation／paraphrase controls，不能把这 20 个通用 case 当作任务级 Oracle 已冻结。

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.invalid/context-routing/oracle-v0.2/public-state.schema.json",
+  "title": "Oracle v0.2 public application State facts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "authority", "component", "facts"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "authority": { "const": "state" },
+    "component": { "const": "application" },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feedback", "storage", "validation"],
+      "properties": {
+        "feedback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["auto_expiry_policy"],
+          "properties": {
+            "auto_expiry_policy": {
+              "enum": ["unknown", "bug_present", "fixed_preserves_user_snooze"]
+            }
+          }
+        },
+        "storage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_version", "v2_migration", "future_version_policy"],
+          "properties": {
+            "schema_version": { "type": "integer", "minimum": 1 },
+            "v2_migration": { "enum": ["not_implemented", "implemented"] },
+            "future_version_policy": { "enum": ["unknown", "reject_before_write"] }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["automated_tests"],
+          "properties": {
+            "automated_tests": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    }
+  }
+}

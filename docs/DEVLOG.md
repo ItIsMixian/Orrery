@@ -366,3 +366,10 @@
 - 11 组正负合成 fixture 覆盖 soft budget、入口密度、重复事实、当前／历史、断链、State／Plan／Validation 职责、失活 Plan、metadata 和功能分支全局入口 ownership；golden evidence 绑定文件 SHA-256 与行区间。
 - 所有 D1 规则默认 exit 0；soft budget 仅 advisory，断链只标记为未来 `eligible-not-enabled`。真实项目配置位置／阈值、ack storage 和任何硬门仍待 Phase 2 之后另行决定。
 - 专项 11/11 已通过；完整仓库、integrated structure、隔离静态站、Markdown links 与 diff 结果进入对应 Validation。根 PROGRESS／HANDOFF 按普通功能分支规则保持不动。
+
+## 2026-08-22 — C1 Context-routing Oracle v0.2 无模型静态 Controls
+
+- `C1` 是开发任务编号，不是 R0／R1／R2 evidence layer。在独立 `codex/context-routing-oracle-v0-2-static` worktree 建立研究专用 Oracle 包；未调用任何模型，未创建 Pilot 010，未触碰发布 Skill、冻结 Pilot 004–009 或仓库外 raw evidence。
+- 四层 verdict 分开保留形式有效性、语义质量、结构化 State／未来版本遗漏和 apparatus contamination；checksummed 7 文件 fixture 公开 versioned State 字段、枚举与四项可发现测试。
+- 20 个 self-test cases 覆盖三组英／中 paraphrase、每项事实两组 contradiction、索引改名、关键 behavior/data/scope/State/formal mutations、未知措辞人工复核与外部读取污染；全部只走临时 Git、Python 公共调用链与 SQLite，结果明确为 `model_calls: 0`。
+- 静态结论只允许申请 Pilot 010 设计；任务包、Prompt 等长、嵌套隔离、目标 runtime handshake 和 formal transport 尚未冻结，因此不得运行新样本或采纳 S。

@@ -19,3 +19,6 @@ Each pilot directory is an immutable experiment packet once its first run starts
   Six formal runs completed with valid apparatus and Scope evidence. S used 82.74% of P's aggregate pre-write input,
   but read-only quality was only 2/3 on both sides; the [R2 result](../results/2026-08-19-pilot-009-ps-scope-terra-medium.md)
   does not adopt S.
+
+There is no `pilot-010` packet. The model-free [C1 Oracle v0.2 controls](../results/2026-08-22-c1-oracle-v0.2-static-controls.md)
+are ready for a future design request, but they do not authorize or instantiate another run.

@@ -28,3 +28,6 @@ Pilot 009 completed six valid P/S runs. S met every frozen cost guard, including
 82.74% of P, but corrected task quality was only 2/3 on both sides. S is not adopted. The task/Oracle v0.2
 candidate separates behavioral, safety, scope, structured-State and narrative verdicts and adds paraphrase and
 mutation controls before another Pilot.
+
+The [C1 Oracle v0.2 static controls](../results/2026-08-22-c1-oracle-v0.2-static-controls.md) implement that model-free gate
+with 20 passing cases. They permit a request for Pilot 010 design only; no Pilot 010 packet or model run exists.

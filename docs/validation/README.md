@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-22 C1 Context-routing Oracle v0.2 static controls](2026-08-22-c1-context-routing-oracle-v0.2-static-controls.md) — model-free layered verdict, checksummed public-State fixture, paraphrase/contradiction/mutation controls and static readiness to request—but not run—Pilot 010; C1 is a development task ID, not an evidence layer.
 - [2026-08-22 D1 documentation governance Phase 1 finding contract](2026-08-22-d1-document-governance-finding-contract.md) — freezes the internal provider-neutral v1 schema, rule registry, 11 positive/negative fixture pairs, review lifecycle and non-escalation boundaries without an audit CLI, enabled hard gate, automatic rewrite or release change.
 - [2026-08-22 W1.3 Personal Phase 1C](2026-08-22-w1-3-personal-phase-1c.md) — lifecycle transitions and Review Ready revocation, Adapter capability matrix, read-only route, private attach, no-rebind fallback and zero-network Phase 1 completion; stacked Candidate only.
 - [2026-08-22 W1.1 Personal Phase 1A](2026-08-22-w1-1-personal-phase-1a.md) — read-only worktree status, Git-private Workstream session, stale binding, linked-worktree／clone parity and zero-network Candidate validation.

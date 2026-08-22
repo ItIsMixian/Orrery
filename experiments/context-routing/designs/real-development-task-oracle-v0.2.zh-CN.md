@@ -1,8 +1,10 @@
 # 真实开发任务与 Oracle v0.2
 
-Status: research candidate; not product policy
+Status: research candidate with model-free static controls; not product policy
 Date: 2026-08-19
-Evidence: Pilot 008 apparatus stop and Pilot 009 R2
+Updated: 2026-08-22
+Evidence: Pilot 008 apparatus stop, Pilot 009 R2, and Oracle v0.2 static controls
+Development task: `C1`（开发任务编号，不是 R0／R1／R2 evidence layer）
 
 ## 要解决的问题
 
@@ -72,3 +74,22 @@ baseline 预置 `feedback_auto_expiry_policy: unknown`，Agent 只需更新公�
 新 Pilot 在任何模型样本前必须通过：每任务 baseline negative、positive、mutation、paraphrase controls；
 P/S Prompt 等长；嵌套 Git 隔离；完整事件 validator；Scope analyzer synthetic pipeline；新 runtime 无模型
 握手。缺一项就只报告 apparatus not ready。
+
+## C1 静态控制包（2026-08-22）
+
+[Oracle v0.2 static controls](../oracles/oracle-v0.2/README.md) 已实现本 Design 的无模型部分：
+
+- 顶层分开报告 `formal_validity`、`semantic_quality`、`state_future_version` 与
+  `apparatus_contamination`；装置污染不会抹掉候选质量结果。
+- Fixture 在任务开始前公开 `application.facts.json` 的 State 字段与枚举，并由
+  [`public-state.schema.json`](../oracles/oracle-v0.2/public-state.schema.json)和 checksummed manifest
+  验证；Oracle 不发明隐藏字段。
+- 三组英文／中文 positive paraphrase、每项事实两组 contradiction、未知措辞转人工复核、索引改名、
+  guard 删除、索引列交换、未来版本检查后移、专用 helper 绕开、State 遗漏与越界写 mutation 均由
+  dependency-free self-test 覆盖。
+- 正确性 probe 只走公开 `Feedback` 与 `initialize_database` 调用链，并按 SQLite 列顺序和数据库终态
+  判断，不验收索引名称。
+
+这只满足“可申请下一 Pilot 设计”的 Oracle 静态门，不满足“可运行 Pilot 010”的完整启动门。Pilot 010
+尚未创建；未来任务包仍须独立证明任务级 controls、P/S Prompt 等长、嵌套隔离、完整事件链、Scope
+pipeline 与目标 runtime 无模型握手。

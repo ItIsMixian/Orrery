@@ -13,6 +13,8 @@ This benchmark is the first implementation step proposed by the [task-context an
 - `validate_benchmark.py` validates corpus structure, safe relative paths, Git references, reference diffs, and any captured run records without third-party packages.
 - `runs/` contains local or publishable benchmark evidence with explicit provenance.
 - `results/` contains evaluator comparisons and apparatus findings; a report is not an architecture decision.
+- `oracles/oracle-v0.2/` contains the model-free layered-verdict, public-State fixture, paraphrase, contradiction,
+  mutation and contamination controls required before another Pilot is designed.
 - Pilot-003's runner freezes a Harness-authored `product-changes.json` for every run, including Git-untracked product files, and its checksummed operator-side security oracle tests failure ordering and secret-free persistence independently of Agent-authored tests.
 
 The historical commit diff is a reproducible oracle for expected write paths. `curated_context_paths` are hypotheses about useful reads, not proof that every listed file is necessary or sufficient.
@@ -46,6 +48,10 @@ treatment. All six runs have valid event/proxy/Scope/formal/R0 evidence. S used 
 input and passed every frozen cost guard, but read-only task quality was only 2/3 for both variants because both
 migration runs omitted a required PROGRESS fact. The [R2 result](results/2026-08-19-pilot-009-ps-scope-terra-medium.md)
 does not adopt S. The next candidate improves task/Oracle diagnostics and paraphrase tolerance before another run.
+
+The [C1 Oracle v0.2 static control result](results/2026-08-22-c1-oracle-v0.2-static-controls.md) now passes 20 model-free
+cases. This is sufficient to request a Pilot 010 design, but not to create or run one: future task-specific controls,
+equal P/S Prompts, isolation, event/Scope preflight and a target-runtime handshake remain separate launch gates.
 
 ## Current independent-access boundary
 
