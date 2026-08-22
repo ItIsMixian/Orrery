@@ -334,3 +334,11 @@
 - `afdbc3b` 推送后的 GitHub Actions `32500503338` 在 Ubuntu 通过、Windows 失败；失败不是模型或 Adapter 行为，而是 Windows `RUNNER~1`／长路径别名比较和 runner 未安装 `wheel` 两项测试基础设施问题。
 - Core 路径规范化改为 realpath + normcase，仍只接受 Git 列出的 worktree；workflow 显式安装 wheel 测试依赖，不把它加入产品运行依赖。
 - 本地受影响专项 11/11、动态全仓 245 PASS + 3 Windows symlink privilege skips；原失败 run 保留。修复提交 `000111d` 的 GitHub Actions `32554191374` 随后取得 Windows／Ubuntu 双 PASS，跨平台修复完成。
+
+## 2026-08-22 — W1.1 Personal Phase 1A Candidate
+
+- 延续已完成的 W1 Phase 0，在独立 `codex/w1-1-personal-phase-1a` worktree 完成只读 worktree status 与 Git-private Workstream session；实现提交为 `6c5570d`，没有占用 W2 Scope/Finding 编号。
+- Core 0.1.2 派生 branch／HEAD、integration ref／OID、merge base、ahead／behind、dirty fingerprint 与计数；CLI 0.1.7 提供稳定 JSON `worktree status`，只有显式 `worktree session write` 才原子写入 `git rev-parse --git-path orrery/worktree.json`。
+- session 绑定 worktree ID、branch、HEAD、integration ref／OID 与 dirty fingerprint；status 以稳定原因码报告 stale，不自动重写。linked worktree 与独立 clone 均验证私有路径、scope 字段和作者工作树不变。
+- 专项 13/13、默认全仓 246 PASS + 5 existing skips、动态全仓 248 PASS + 3 Windows symlink privilege skips；integrated structure、隔离静态站、本地 Markdown links、secret scan 与 diff 检查通过。证据见 [W1.1 Validation](validation/2026-08-22-w1-1-personal-phase-1a.md)。
+- 本轮没有实现 worktree create、主目录写入守卫、完整 lifecycle／attach／rebind、Scope/Finding、review／integration／cleanup、Observatory、Team Mode、push、tag 或 Release；根 PROGRESS／HANDOFF 留给唯一整合者同步。
