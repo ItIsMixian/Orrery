@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-22 W1.3 Personal Phase 1C](2026-08-22-w1-3-personal-phase-1c.md) — lifecycle transitions and Review Ready revocation, Adapter capability matrix, read-only route, private attach, no-rebind fallback and zero-network Phase 1 completion; stacked Candidate only.
 - [2026-08-22 W1.1 Personal Phase 1A](2026-08-22-w1-1-personal-phase-1a.md) — read-only worktree status, Git-private Workstream session, stale binding, linked-worktree／clone parity and zero-network Candidate validation.
 - [2026-08-22 W1 and second-platform Adapter local integration](2026-08-22-w1-and-second-platform-adapters-integration.md) — clean W1→P3 absorption, ADR-0013 allocation, additive State reconciliation and combined validation without push, release or support promotion.
 - [2026-08-22 Personal collaboration Phase 0](2026-08-22-personal-collaboration-phase-0.md) — versioned Core contracts, synthetic Git topology, integration/main-worktree rules, subsystem/member/mode boundaries, zero-network default and Candidate-only verification.

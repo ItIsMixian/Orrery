@@ -350,3 +350,11 @@
 - `worktree guard` 作为平台中立只读 preflight：隔离 worktree allow；clean／dirty primary 均 block，dirty 只给人工恢复边界，不自动迁移。当前 Adapter 尚未强制调用，因此不宣称全局写入拦截。
 - 专项 18/18、默认全仓 251 PASS + 5 existing skips、动态全仓 253 PASS + 3 Windows symlink privilege skips；其余结构／站点／链接／secret／diff 证据见 [W1.2 Validation](validation/2026-08-22-w1-2-personal-phase-1b.md)。
 - 本轮没有实现 lifecycle transitions、launch／attach／rebind／message、Scope/Finding、review／integration／cleanup、Observatory、Team Mode、push、merge、tag 或 Release；根 PROGRESS／HANDOFF 留给唯一整合者同步。
+
+## 2026-08-22 — W1.3 Personal Phase 1C Candidate
+
+- 在 W1.2 Candidate 之上建立 stacked `codex/w1-3-personal-phase-1c`；实现提交 `8874f1a` 将 Core／CLI 提升到 0.1.4／0.1.9，并完成 Phase 1 最后两项，没有改写 W1／W1.1／W1.2 历史或占用 W2。
+- session schema 新增独立 evidence freshness、closure reason、lifecycle revision 与 transition reason；Core／CLI 只允许显式合法转换。Git／evidence 漂移会把有效 Review Ready 退回 `validating` 并保留原因；尚无 executable gate 时进入 Review Ready／Integrated 失败关闭。
+- 四个 Adapter Candidate 提升到 0.1.1 并声明 launch／attach／rebind／message matrix；Codex、Claude Code、DeepSeek Harness 当前只支持 caller-provided attach，Harness JSON 全关闭。三个 Agent Adapter Skill 强制先走只读 route；attach 只写 Git 私有 session，no-rebind 返回新 Workstream／新会话 continuation brief，dirty primary 不自动迁移。
+- 专项 22/22、默认全仓 255 PASS + 5 existing skips、动态全仓 257 PASS + 3 Windows symlink privilege skips；既有真实 Adapter runtime evidence 继续精确绑定 0.1.0，没有提升 0.1.1 支持状态。其余结构／站点／链接／secret／diff 证据见 [W1.3 Validation](validation/2026-08-22-w1-3-personal-phase-1c.md)。
+- W2 Scope/Finding、review／integration／cleanup、closure archive、Observatory、Team Mode、实际 platform launch／rebind／message、宿主级任意写入拦截、push、merge、tag 和 Release 均未实现；根 PROGRESS／HANDOFF 留给唯一整合者同步。

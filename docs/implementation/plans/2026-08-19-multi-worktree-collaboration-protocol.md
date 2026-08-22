@@ -74,8 +74,8 @@ Canonical checkpoint（2026-08-22）：上述 Phase 0 项由独立分支提交 `
 - [x] 验证 linked worktree 和独立 clone 都能产生一致的作用域字段。
 - [x] 为 CLI 输出定义结构化、可按需展开的状态摘要；证明 Agent 无需生成或固定读取可机械派生的 Manifest／Receipt。
 - [x] 提供平台中立的 primary-worktree product-write preflight guard：clean 主 worktree 与 dirty 主 worktree 均失败关闭，dirty 情况只进入人工恢复边界，不自动迁移。
-- [ ] 为 lifecycle phase、runtime condition、evidence freshness、closure reason 定义互不混淆的 schema 与合法转换；阶段回退和 Review Ready 撤销必须可解释。
-- [ ] 定义 Adapter 的 launch／attach／rebind／message capability matrix，并覆盖 Orrery-first、Agent-first 自动 attach、Adapter 对 guard 的强制调用、无法 rebind 时新会话降级和 dirty 主 worktree 恢复流程。
+- [x] 为 lifecycle phase、runtime condition、evidence freshness、closure reason 定义互不混淆的 schema 与合法转换；阶段回退和 Review Ready 撤销必须可解释。
+- [x] 定义 Adapter 的 launch／attach／rebind／message capability matrix，并覆盖 Orrery-first、Agent-first 自动 attach、Adapter 对 guard 的强制调用、无法 rebind 时新会话降级和 dirty 主 worktree 恢复流程。
 
 Candidate checkpoint W1.1（2026-08-22）：实现提交 `6c5570d` 在独立分支
 `codex/w1-1-personal-phase-1a` 完成上述五项最小 Phase 1A 闭环。Core 0.1.2 生成 branch／HEAD、
@@ -93,6 +93,16 @@ Candidate checkpoint W1.2（2026-08-22）：在 W1.1 之上，提交 `ebf9b75` �
 放行，clean／dirty primary worktree 阻断，dirty 不自动迁移。证据见
 [专项 Validation](../../validation/2026-08-22-w1-2-personal-phase-1b.md)。完整 Adapter 强制接线、
 attach／rebind、lifecycle、Scope/Finding、Observatory 与 Team runtime 仍未实现。
+
+Candidate checkpoint W1.3（2026-08-22）：在 W1.2 之上，提交 `8874f1a` 于 stacked 分支
+`codex/w1-3-personal-phase-1c` 完成 Phase 1C，使 Phase 1 清单全部落地。Core 0.1.4／CLI 0.1.9
+增加互相独立的 lifecycle／runtime／evidence／closure 字段、合法转换与带原因的 Review Ready
+有效状态撤销，并将未实现的 Review Ready／Integrated 工具门保持失败关闭。四个 Adapter 0.1.1
+声明 launch／attach／rebind／message matrix；三个 Agent Adapter 的 Skill 在首次产品写入前调用只读
+route，按需显式 attach，Harness JSON 明确没有 Agent runtime 能力。当前平台都不声明 launch／rebind／
+message；session ID 必须由调用方提供，no-rebind 返回新 Workstream／新平台会话的最小 continuation
+brief，不伪装原地迁移。证据见 [专项 Validation](../../validation/2026-08-22-w1-3-personal-phase-1c.md)。
+这不实现 W2 Scope/Finding、Phase 3 review／integration／cleanup、Observatory 或 Team runtime。
 
 ### Phase 2 — 范围采集与重叠检测
 

@@ -16,9 +16,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 本地大型原始运行根：`D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库。
 - 原始运行由仓库内 `experiments/context-routing/harness/raw-evidence-retention-policy.json` 与 `seal_raw_evidence.py` 管理 manifest、校验和、分类和到期状态；工具不自动删除。
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
-- Codex Adapter 0.1.0 的发行支持状态仍为 `experimental`／未发布；其 runtime manifest 只对 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`。
-- 本地 Canonical source 已在平台中立 Core 0.1.1 冻结 `project-orrery-collaboration-v1`：worktree identity、Workstream session、Scope、overlap finding、integration report、subsystem registry、Member capability 和 project mode 共用一套 schema；CLI 0.1.6 提供只读 `collaboration-contract` 检查。W1.1 Candidate 以 Core／CLI 0.1.2／0.1.7 增加只读 `worktree status` 与显式 `worktree session write`；本 stacked W1.2 Candidate 进一步提升到 0.1.3／0.1.8，并增加 `worktree create` 与 primary-write preflight guard。
-- `adapters/claude-code/` 与 `adapters/deepseek-harness/` 已形成 0.1.0、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。Claude Code 已证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
+- Codex Adapter 当前 Candidate 为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
+- 本地 Canonical source 已在平台中立 Core 0.1.1 冻结 `project-orrery-collaboration-v1`：worktree identity、Workstream session、Scope、overlap finding、integration report、subsystem registry、Member capability 和 project mode 共用一套 schema；CLI 0.1.6 提供只读 `collaboration-contract` 检查。W1.1 Candidate 以 Core／CLI 0.1.2／0.1.7 增加只读 status／私有 session，W1.2 提升到 0.1.3／0.1.8 并增加 create／guard；本 stacked W1.3 Candidate 进一步提升到 0.1.4／0.1.9，完成 lifecycle transition、Adapter route 与私有 attach primitive。
+- `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前 Candidate 为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
 ## 当前边界
 
@@ -35,7 +35,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - worktree 路径比较先收敛现有路径的真实绝对形式，再应用平台大小写规则；这让 Windows runner 的 8.3／长路径别名指向同一已列出 worktree，同时不允许不存在或跨仓库的 override 绕过检查。
 - W1.1 Candidate 通过 `git rev-parse --git-path orrery/worktree.json` 定位每个 linked worktree／clone 的 Git 私有 session；原子写入不改变作者工作树状态。session 绑定 worktree ID、branch、HEAD、integration ref／OID、merge base 和 dirty fingerprint；只读 status 在任一绑定事实漂移后报告稳定 stale reason，不自动改写 session。
 - W1.2 Candidate 的 `worktree create` 只使用配置的本地 integration ref，在创建前固定 commit OID，并以该 OID 建立新 branch + linked worktree；显式 `--path` 可选，缺省路径是源 worktree 同级的可预测名称。新 worktree 随后写入 Git-private `created` session；branch／path 碰撞在写入前拒绝，session 失败或 integration 漂移只回滚本操作创建的 clean worktree／branch。dirty primary worktree 的原状态不变，新 worktree 仍保持 clean。
-- W1.2 Candidate 的 `worktree guard` 是只读 product-write preflight primitive：隔离 worktree 返回 allow；clean primary 与 dirty primary 均返回稳定 block reason 和非零退出码，dirty 只指向人工审阅／选择性转移，不执行自动迁移。Adapter 尚未强制调用该 guard，因此不能宣称任意 Agent 写入已被全局拦截。
+- W1.2 Candidate 的 `worktree guard` 是只读 product-write preflight primitive：隔离 worktree 返回 allow；clean primary 与 dirty primary 均返回稳定 block reason 和非零退出码，dirty 只指向人工审阅／选择性转移，不执行自动迁移。
+- W1.3 Candidate 将 lifecycle phase、runtime condition、evidence freshness 与 closure reason 分开保存，并通过显式 `worktree session transition` 执行合法转换。Git 绑定或 review evidence 过期时，status 保留声明阶段但把有效 Review Ready 投影回 `validating` 并给出原因；进入 Review Ready／Integrated 必须等待 Phase 3 工具门，Agent 自报会失败关闭。
+- W1.3 Candidate 的 Adapter capability contract 明确 launch／attach／rebind／message 四项能力。Codex、Claude Code、DeepSeek Harness 当前只声明 caller-provided session ID 的 attach；Harness JSON 四项均关闭。三个 Agent Adapter Skill 要求首次产品写入前调用只读 `worktree route`，需要时再显式写入 Git-private attach；dirty primary 阻断、stale／absent session、no-rebind 新 Workstream 回退和最小 continuation brief 均由 Core 派生。该接线只约束实际调用这些 Adapter Skill 的流程，不是宿主级任意写入拦截，也不构成 platform runtime launch／rebind 支持证据。
 - 根 `AGENTS.md` 的七个 subsystem 入口已有显式稳定 ID；Core registry 只投影这些入口链接的既有 State Docs，缺失 State 时失败关闭，`unmapped` 与 `project-wide` 只是 Scope 保留表达，不自动创建作者文档。
 
 ## 实现证据
@@ -72,5 +74,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W1.2 Candidate 在 W1.1 上关闭手工 `worktree create` 与 primary-write preflight primitive；Adapter 强制 guard／launch／attach／rebind、完整 lifecycle、实际 Scope/path 采集、自动 overlap finding、integration/review/cleanup 命令、Observatory 投影与 Team 网络层仍未实现，不能宣称多 Agent 协调闭环已经完成。
-- Claude Code／DeepSeek Harness Adapter 尚未公开发布；Claude 仍缺成功认证后的模型调用与 CLI 路由证据。DeepSeek 的精确 manifest 范围已验证，但不得外推到当前 Candidate CLI 0.1.8、其他版本、OS、Provider、模型或未来发行物。
+- W1.3 Candidate 已关闭 Phase 1 清单，但当前平台仍未声明 launch／rebind／message，也没有宿主级写入拦截。实际 Scope/path 采集、自动 overlap finding、integration/review/cleanup 命令、closure archive、Observatory 投影与 Team 网络层仍未实现，不能宣称完整多 Agent 协调或 review／integration 闭环。
+- Claude Code／DeepSeek Harness Adapter 尚未公开发布；Claude 仍缺成功认证后的模型调用与 CLI 路由证据。DeepSeek 的精确 manifest 范围已验证，但不得外推到当前 Candidate Adapter 0.1.1／CLI 0.1.9、其他版本、OS、Provider、模型或未来发行物。

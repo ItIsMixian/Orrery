@@ -34,6 +34,7 @@ Updated: 2026-08-22
 - 首次远端 matrix `32500503338` 为 Ubuntu PASS／Windows FAIL：Windows 同时暴露临时目录 8.3／长路径 worktree alias 和缺少 `wheel` 测试依赖。修复保留已列出 worktree 硬门、使用 `realpath` 规范化别名，并在 workflow 显式安装 `wheel>=0.41,<1`；本地受影响专项 11/11、动态全仓 245 PASS + 3 privilege skips，后续 GitHub Actions `32554191374` Windows／Ubuntu 双 PASS。
 - W1.1 为 `tests/test_collaboration_contract.py` 增加 linked worktree／独立 clone 私有 session、稳定 status JSON、author tree 不变、zero-network 和 branch／HEAD／integration OID／dirty fingerprint stale reason 回归；专项 13/13，通过默认全仓 246 PASS + 5 existing skips 和动态全仓 248 PASS + 3 Windows symlink privilege skips。该证据是 Windows Candidate 本地验证，不构成 W1.1 跨平台 CI 或发布支持声明。
 - W1.2 将同一专项扩展到 18/18：覆盖 dirty primary 创建 clean linked worktree、精确 integration OID、Git-private created session、clean／dirty primary guard、隔离 worktree allow、branch／path 碰撞、session failure 与 integration drift 回滚、CLI JSON／exit code 和 zero-network Core 路径。默认全仓为 251 PASS + 5 existing skips，动态全仓为 253 PASS + 3 Windows symlink privilege skips；这是 stacked Windows Candidate 本地证据，不构成 W1.2 跨平台 CI 或发布支持声明。
+- W1.3 将同一专项扩展到 22/22：覆盖 lifecycle 合法／非法转换、phase／runtime／evidence／closure 独立性、Review Ready stale 撤销、未来 review／integration gate 失败关闭、四 Adapter capability contract、只读 route、Git-private attach、caller-provided Agent-first attach、no-rebind 新 Workstream 回退、dirty／clean primary 阻断和稳定 CLI JSON／exit code。默认全仓为 255 PASS + 5 existing skips，动态全仓为 257 PASS + 3 Windows symlink privilege skips；这是 stacked Windows Candidate 本地证据，不构成 W1.3 跨平台 CI、当前 Adapter runtime 验证或发布支持声明。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
@@ -124,6 +125,7 @@ Updated: 2026-08-22
 - [2026-08-21 Authority AI derived-view constraints](../validation/2026-08-21-authority-ai-derived-view-constraints.md)
 - [2026-08-21 Authority shadow diagnostic projection](../validation/2026-08-21-authority-shadow-diagnostic-projection.md)
 - [2026-08-22 Personal collaboration Phase 0](../validation/2026-08-22-personal-collaboration-phase-0.md)
+- [2026-08-22 W1.3 Personal Phase 1C](../validation/2026-08-22-w1-3-personal-phase-1c.md)
 - [2026-08-21 Claude Code Adapter Stage A](../validation/2026-08-21-claude-code-adapter-stage-a.md)
 - [2026-08-21 DeepSeek Harness Adapter Stage A](../validation/2026-08-21-deepseek-harness-adapter-stage-a.md)
 - [2026-08-21 Claude Code Adapter Stage B 认证阻塞](../validation/2026-08-21-claude-code-adapter-stage-b-auth-blocked.md)
@@ -145,6 +147,6 @@ Updated: 2026-08-22
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
-- ADR-0007／ADR-0008 的 Canonical Phase 0 已有 schema、解析和合成 fixture 测试；W1.1 Candidate 又覆盖只读 status 与 Git-private session。Phase 1 后续的主 worktree 写入守卫、worktree create、完整 attach/rebind，以及 Phase 2–4 的实际重叠／review／cleanup、Personal 指挥台与 Team Mode 网络测试仍未实现。
+- ADR-0007／ADR-0008 的 Canonical Phase 0 已有 schema、解析和合成 fixture 测试；stacked W1.1／W1.2／W1.3 Candidate 已覆盖 Phase 1 的 status、Git-private session、create、guard、lifecycle、route 与条件 attach。当前平台的 launch／rebind／message 均声明不支持，且 Adapter Skill 接线不等于宿主级写入拦截；Phase 2–4 的实际重叠／review／cleanup、Personal 指挥台与 Team Mode 网络测试仍未实现。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。
 - Claude Code 仍被认证阻断。DeepSeek Harness 已证明真实显式／隐式模型调用、模型侧 CLI 失败关闭和修复后的普通 wheel 路由；只有 manifest 中的精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1／模型与生命周期范围进入 `verified`，其余范围不外推。
