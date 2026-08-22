@@ -46,6 +46,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 
 ## 最近完成
 
+- [Candidate-first main promotion gate](validation/2026-08-22-candidate-first-main-promotion-gate.md)：Candidate `e4e4442` 先通过 Windows／Ubuntu，再由 strict/admin-enforced branch protection 允许快进 main；PR 非必需，main 不重复运行同一 SHA 的矩阵。
 - [W1／D1／C1 Canonical 集成](validation/2026-08-22-w1-d1-c1-canonical-integration.md)：按 W1→D1→C1 吸收三个独立 Candidate，修复 C1 行尾冻结与 Windows session-path 测试别名；联合 273 项回归及 GitHub Actions `32564334514` Windows／Ubuntu 双 PASS。
 - [main 验收与跨平台 CI](validation/2026-08-21-main-acceptance-and-cross-platform-ci.md)：本地 231 项动态回归、integrated build、Authority 投影回滚、链接与发布边界通过；首次 Ubuntu 发现的 Windows 路径夹具已修正，最终 Windows／Ubuntu 双 PASS，未创建新 Release。
 - [DeepSeek wheel runtime 与跨平台 CI](validation/2026-08-22-deepseek-w1-windows-ci-fix.md)：关闭普通 wheel assets 阻塞，精确 runtime 范围进入 `verified`；首次矩阵保留 Windows 失败证据，修复 8.3 路径与 wheel 测试依赖后，GitHub Actions `32554191374` Windows／Ubuntu 双 PASS。

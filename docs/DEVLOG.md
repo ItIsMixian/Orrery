@@ -387,3 +387,4 @@
 - 多次“先推 main、再由远端发现平台差异”说明本地全仓无法替代 GitHub runner；问题是推广顺序，不只是缺少更多测试。
 - self-host 流程改为先推 Candidate exact SHA 并等待 Windows／Ubuntu 双 PASS，再快进 main；服务端 required checks 对管理员生效，但不强制 PR。
 - 本记录先随 Candidate branch 运行自身矩阵，保护规则和 main 推广结果由同一 Validation 在外部状态完成后补全。
+- Candidate `e4e4442` 的 `32566445483` Windows／Ubuntu 双 PASS 后，main protection 已以 strict/admin enforcement 启用并接受同一 SHA；workflow 随后排除普通 main push，避免重复矩阵。

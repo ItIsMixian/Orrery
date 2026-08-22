@@ -46,6 +46,7 @@ Updated: 2026-08-22
 - ADR-0013 已将 Claude Code 与 DeepSeek Harness 选为相互独立的 Phase 4 Adapter。源码候选均为 0.1.0、`experimental`／`unreleased`；Claude Code 2.1.87 只证明 Plugin／Skill 发现后认证前失败关闭。DeepSeek Harness 只有 rc.8／Windows build 26200／Adapter 0.1.0／Core 0.1.0／CLI 0.1.1 wheel／`deepseek-official`／`deepseek-v4-flash` 与 manifest 所列生命周期范围为 `verified`。
 - W1 和第二平台 Adapter 已经独立 worktree、干净整合、普通 wheel 复验和双平台 CI 进入 `origin/main`；旧 P3 分支占用的 ADR-0010 已重编号为 ADR-0013，Authority ADR-0010／0011／0012 保持不变。当前没有 tag、Release 或 Adapter 独立发行。
 - W1.1／W1.2／W1.3、D1 与 C1 已按 W1→D1→C1 顺序进入 `origin/main`；本地联合 273 项回归通过，C1 fixture 行尾冻结为 LF。首次远端 `32564000587` 为 Ubuntu PASS／Windows FAIL；修复 session-path 短／长路径断言后，`32564334514` Windows／Ubuntu 双 PASS。没有创建 Pilot 010、tag 或 Release。
+- self-host GitHub main 已启用 Candidate-first branch protection：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu checks，管理员也不能绕过；PR 不强制，main push 不重复运行同一 SHA。首次门禁验证使用 Candidate `e4e4442` 与 run `32566445483`。
 
 ## 风险与常见陷阱
 

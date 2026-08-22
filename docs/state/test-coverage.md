@@ -7,7 +7,7 @@ Updated: 2026-08-22
 - `tests/test_project_orrery.py` 保护安装、非覆盖升级、发布包、更新兼容和凭据配置边界。
 - `tests/test_context_routing_benchmark.py` 保护历史语料、Pilot 装置、回执规则、未跟踪文件采集、安全 Oracle 和恢复行为。
 - `.github/workflows/validate.yml` 在 Windows／Ubuntu 上运行验证；动态文档站测试需要额外依赖和 `ORRERY_TEST_BUILD=1`。
-- self-host main promotion gate 使用上述两个稳定 job name 作为 required status checks，并启用 admin enforcement；未经 Candidate 分支矩阵验证的新 SHA 不得直接进入 main。PR 仍为可选。
+- self-host main promotion gate 使用上述两个稳定 job name 作为 required status checks，并启用 strict/admin enforcement；未经 Candidate 分支矩阵验证的新 SHA 不得直接进入 main。PR 仍为可选，普通 main push 不重复启动 workflow。
 - 自托管补全新增 installer 排除模板 Python 缓存的回归断言。
 - 2026-08-18 基线结果：默认套件 28 项中 27 项通过、动态 reader 测试按设计跳过；设置 `ORRERY_TEST_BUILD=1` 后完整 28/28 通过。24 项 benchmark 语料与工作树中的 6 份 run record 也通过验证。
 - 发布分支 CI `32057247222` 与 main CI `32057443759` 均在 Windows／Ubuntu 通过；最初失败轮 `32057075492` 暴露浅克隆缺少历史 commit，workflow 已改为 `fetch-depth: 0`。

@@ -16,7 +16,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 本地大型原始运行根：`D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库。
 - 原始运行由仓库内 `experiments/context-routing/harness/raw-evidence-retention-policy.json` 与 `seal_raw_evidence.py` 管理 manifest、校验和、分类和到期状态；工具不自动删除。
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
-- self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；该外部规则不是通用 Orrery 产品能力。
+- self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
 - Canonical source 当前为 Core 0.1.4／CLI 0.1.9：在 Phase 0 contract 上依次加入只读 status、Git-private session、create／guard、lifecycle transition、Adapter route 与私有 attach primitive；Observatory 保持 0.1.0，Core API 仍为 1。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。

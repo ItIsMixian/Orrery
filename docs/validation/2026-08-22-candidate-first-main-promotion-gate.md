@@ -2,7 +2,7 @@
 
 Date: 2026-08-22
 Scope: 为 Project Orrery self-host GitHub 建立服务端 main 推广门，阻止未经 Windows／Ubuntu 矩阵验证的新 SHA 先进入 main；不强制 PR，不修改发布版本
-Status: Candidate branch CI pending；main protection 尚未启用
+Result: PASS — Candidate exact SHA 双平台通过，main protection 已启用并只推广已验证 SHA
 
 ## 问题
 
@@ -27,3 +27,12 @@ required checks 依赖 `.github/workflows/validate.yml` 的稳定 job name。规
 - 矩阵通过后写入保护规则并回读 exact contexts／strict／admin enforcement；
 - 只把已验证 Candidate SHA 推到 main，再验证 main、origin/main 与 GitHub commit SHA 一致；
 - 不创建 tag、Release 或 PR。
+
+## 实际证据
+
+- Candidate `e4e4442` 先推送到 `codex/main-promotion-gate`；GitHub Actions [32566445483](https://github.com/yw9299-stack/project-orrery/actions/runs/32566445483) 为 Windows／Ubuntu 双 PASS。
+- main protection 回读：`strict=true`、`enforce_admins=true`；required contexts 精确为 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`；PR 非必需，force push／main deletion 关闭。
+- 保护启用后，同一已验证 `e4e4442` 被直接 fast-forward 到 main 并由 GitHub 接受；main、origin/main 与远端 commit SHA 一致。
+- workflow 的普通 push 排除 main，只在 Candidate branch、PR 或手动触发运行，避免同一 SHA 推广后重复消耗矩阵；未经 Candidate checks 的 SHA 仍会被 main protection 拒绝。
+
+该门禁是 GitHub self-host 外部状态，不代表 provider-neutral `orrery integrate` 已实现，也不创建 tag 或 Release。
