@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-orrery-team-v1",
+  "title": "Project Orrery opt-in Team metadata contracts",
+  "type": "object",
+  "properties": {"schema_version": {"const": 1}},
+  "required": ["schema_version"],
+  "additionalProperties": true,
+  "$defs": {
+    "team_config": {
+      "type": "object",
+      "description": "Git-private, explicit local enablement; absent means Personal zero-network.",
+      "additionalProperties": false
+    },
+    "metadata_envelope": {
+      "type": "object",
+      "description": "Strict 64 KiB maximum projection of existing Member/Host/Workstream/Git/Scope/finding/validation/review facts.",
+      "additionalProperties": false
+    },
+    "read_only_projection": {
+      "type": "object",
+      "description": "Member then Workstream aggregation; Host remains locator metadata and execution_capability is false.",
+      "additionalProperties": false
+    },
+    "action_request": {
+      "type": "object",
+      "description": "Central request only; acceptance/rejection requires a Git-private Host-local receipt and execution_performed is false.",
+      "additionalProperties": false
+    },
+    "manual_invite": {
+      "type": "object",
+      "description": "Project-fingerprint-bound manual fallback. Discovery is unsupported-next-phase in W5A.",
+      "additionalProperties": false
+    }
+  },
+  "x-orrery-boundaries": {
+    "personal_default_listener": false,
+    "lan_bind_requires_explicit_opt_in": true,
+    "cloud_dependency": false,
+    "automatic_leader_election": false,
+    "remote_execution": false,
+    "forbidden_payload_classes": [
+      "prompt", "answer", "reasoning", "transcript", "source-code", "file-content",
+      "unpush-diff", "credential", "token", "api-key", "private-key"
+    ]
+  }
+}
