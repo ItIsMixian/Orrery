@@ -196,6 +196,88 @@ def _w3_bundle(**overrides):
 
 
 class PersonalObservatoryTests(unittest.TestCase):
+
+    def test_health_projection_separates_36_worktree_like_delivery_reconciliation_and_hygiene(self):
+        def card(workstream_id, *, phase="implementing", freshness="current", session=True,
+                 current=False, primary=False, group="active"):
+            return {
+                "workstream_id": workstream_id,
+                "branch": f"codex/{workstream_id}",
+                "availability": "available",
+                "has_session": session,
+                "session_state": "current" if freshness == "current" else "stale",
+                "evidence_freshness": freshness,
+                "lifecycle_phase": phase,
+                "is_current": current,
+                "is_primary": primary,
+                "display_group": group,
+            }
+
+        current = [card(f"current-{index}") for index in range(4)]
+        current.append(card("review-pending", phase="review-ready"))
+        stale = [card(f"stale-{index}", freshness="stale", group="reconciliation") for index in range(2)]
+        primary = card("canonical-root", session=False, primary=True, group="protected-primary")
+        candidate = card("candidate-local", session=False, current=True, group="candidate-unregistered")
+        legacy = [
+            card(f"legacy-{index}", session=False, group="worktree-only")
+            for index in range(31)
+        ]
+        findings = [{
+            "finding_id": "direct-current", "kind": "direct",
+            "workstream_ids": ["current-0", "current-1"],
+        }]
+        findings.extend({
+            "finding_id": f"direct-stale-{index}", "kind": "direct",
+            "workstream_ids": ["current-0", "stale-0"],
+        } for index in range(37))
+        findings.extend({
+            "finding_id": f"unknown-legacy-{index}", "kind": "unknown",
+            "workstream_ids": [f"legacy-{index % 31}"],
+        } for index in range(32))
+        bundle = _w3_bundle(
+            review_queue=[
+                {"queue_status": "pending", "freshness": "current", "workstream_id": "review-pending"},
+                {"queue_status": "pending", "freshness": "stale", "workstream_id": "stale-0"},
+            ],
+            inventory={
+                "classification_counts": {
+                    "registered-active": 4,
+                    "review-integration-pending": 1,
+                    "integrated-closed": 0,
+                    "legacy-unmanaged": 31,
+                    "generated-disposable": 0,
+                    "evidence-retained": 2,
+                    "unknown": 0,
+                },
+                "entries": [
+                    {"estimated_reclaim_bytes": 1024} for _ in range(31)
+                ],
+            },
+        )
+        cards = [*current, *stale, primary, candidate, *legacy]
+        health = personal_observatory._derive_health_projection(cards, findings, bundle)
+        self.assertEqual(health["delivery_now"]["current_blocker_count"], 1)
+        self.assertEqual(health["delivery_now"]["workstream_count"], 5)
+        self.assertEqual(health["reconciliation"]["finding_count"], 37)
+        self.assertEqual(health["reconciliation"]["stale_session_count"], 2)
+        self.assertEqual(health["reconciliation"]["stale_review_count"], 1)
+        self.assertEqual(health["reconciliation"]["unregistered_candidate_count"], 1)
+        self.assertEqual(health["workspace_hygiene"]["total_worktrees"], 38)
+        self.assertEqual(health["workspace_hygiene"]["legacy_unmanaged"], 31)
+        self.assertEqual(health["workspace_hygiene"]["retained"], 2)
+        self.assertEqual(health["workspace_hygiene"]["estimated_reclaim_bytes"], 31 * 1024)
+        self.assertEqual(health["unknown_accounting"]["total"], 32)
+        self.assertEqual(health["unknown_accounting"]["hygiene"], 32)
+        panel = render_personal_observatory_panel(_ready_projection(
+            current=candidate, workstreams=cards, findings=findings,
+            w3_evidence=bundle, health=health,
+        ))
+        self.assertIn("交付状态", panel)
+        self.assertIn("当前阻断 · current Direct", panel)
+        self.assertIn("需要对账", panel)
+        self.assertIn("工作区卫生", panel)
+        self.assertIn("Candidate 未登记 Workstream，无法判断交付资格", panel)
+        self.assertNotIn("38 个确定的直接重叠", panel)
     def _sessions(self, fixture: CollaborationGitFixture) -> None:
         write_workstream_session(
             fixture.worktree_a,
@@ -246,10 +328,12 @@ class PersonalObservatoryTests(unittest.TestCase):
             item["workstream_id"]: item["display_group"]
             for item in projection["workstreams"]
         }
-        self.assertEqual(groups["PO-W1-FIXTURE"], "active")
-        self.assertEqual(groups["PO-W2-FIXTURE"], "active")
-        self.assertIn("worktree-only", groups.values())
+        self.assertEqual(groups["PO-W1-FIXTURE"], "reconciliation")
+        self.assertEqual(groups["PO-W2-FIXTURE"], "reconciliation")
+        self.assertIn("protected-primary", groups.values())
         self.assertGreaterEqual(projection["finding_counts"].get("direct", 0), 1)
+        self.assertEqual(projection["health"]["delivery_now"]["current_blocker_count"], 0)
+        self.assertGreaterEqual(projection["health"]["reconciliation"]["finding_count"], 1)
         self.assertEqual(projection["remote_observability"]["status"], "unknown")
 
     def test_excluded_worktree_is_listed_but_never_opened(self):
@@ -308,9 +392,12 @@ class PersonalObservatoryTests(unittest.TestCase):
         self.assertTrue(
             all(item["primary_subsystem_id"] == "Unknown" for item in projection["workstreams"])
         )
-        self.assertTrue(
-            all(item["display_group"] == "worktree-only" for item in projection["workstreams"])
-        )
+        groups = {item["display_group"] for item in projection["workstreams"]}
+        self.assertIn("protected-primary", groups)
+        self.assertIn("candidate-unregistered", groups)
+        self.assertTrue(groups.issubset({"protected-primary", "candidate-unregistered", "worktree-only"}))
+        self.assertEqual(projection["health"]["delivery_now"]["current_blocker_count"], 0)
+        self.assertEqual(projection["health"]["reconciliation"]["unregistered_candidate_count"], 1)
         self.assertNotIn("safe", str(projection).lower())
 
     def test_no_review_packages_still_projects_bounded_w3_inventory(self):
@@ -542,7 +629,7 @@ class PersonalObservatoryTests(unittest.TestCase):
         self.assertIn("runtime</span><b>waiting-for-user", panel)
         self.assertIn("evidence</span><b>stale", panel)
         self.assertIn('class="po-work-summary"', panel)
-        self.assertIn("项目现在怎么样", panel)
+        self.assertIn("交付状态", panel)
         self.assertIn("谁在推进什么", panel)
         self.assertIn("查看证据", panel)
         self.assertIn("技术证据", panel)

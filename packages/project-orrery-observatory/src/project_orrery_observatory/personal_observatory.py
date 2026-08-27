@@ -21,6 +21,7 @@ from typing import Any, Mapping, Sequence
 PROJECTION_SCHEMA = "project-orrery-personal-observatory-v1"
 W3_SLOT_KEYS = ("review_queue", "integration_eligibility", "cleanup_eligibility")
 W3_PROJECTION_SCHEMA_VERSION = 1
+DELIVERY_PHASES = {"created", "investigating", "implementing", "validating", "review-ready"}
 
 
 class _W3ProviderIncompatible(ValueError):
@@ -412,6 +413,161 @@ def _unavailable_worktree(record: Mapping[str, Any], reason: str) -> dict[str, A
         "unavailable_reason": reason,
         "has_session": False,
         "display_group": "unavailable",
+        "is_primary": False,
+    }
+
+
+def _derive_health_projection(
+    cards: Sequence[Mapping[str, Any]],
+    findings: Sequence[Mapping[str, Any]],
+    w3_evidence: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Route existing W1-W3 facts into delivery, reconciliation, and hygiene.
+
+    This is a presentation-only classification.  It never changes a finding,
+    workspace classification, review decision, or cleanup recommendation.
+    """
+
+    by_workstream = {
+        str(card.get("workstream_id")): card
+        for card in cards
+        if card.get("workstream_id") not in {None, "Unavailable"}
+    }
+    current_delivery: list[Mapping[str, Any]] = []
+    reconciliation_cards: list[Mapping[str, Any]] = []
+    hygiene_cards: list[Mapping[str, Any]] = []
+    primary_cards: list[Mapping[str, Any]] = []
+    unregistered_candidates: list[Mapping[str, Any]] = []
+    for card in cards:
+        if card.get("is_primary"):
+            primary_cards.append(card)
+            continue
+        has_session = card.get("has_session") is True
+        phase = str(card.get("lifecycle_phase", "unavailable"))
+        session_current = (
+            has_session
+            and card.get("availability") == "available"
+            and card.get("session_state") != "stale"
+            and card.get("evidence_freshness") == "current"
+        )
+        if session_current and phase in DELIVERY_PHASES:
+            current_delivery.append(card)
+        elif has_session and phase not in {"integrated", "closed"}:
+            reconciliation_cards.append(card)
+        elif not has_session and card.get("is_current"):
+            unregistered_candidates.append(card)
+        elif not has_session:
+            hygiene_cards.append(card)
+
+    delivery_ids = {str(card.get("workstream_id")) for card in current_delivery}
+    reconciliation_ids = {
+        str(card.get("workstream_id")) for card in reconciliation_cards
+    }
+    hygiene_ids = {str(card.get("workstream_id")) for card in hygiene_cards}
+    hygiene_ids.update(str(card.get("workstream_id")) for card in primary_cards)
+
+    current_blockers: list[dict[str, Any]] = []
+    delivery_advisories: list[dict[str, Any]] = []
+    reconciliation_findings: list[dict[str, Any]] = []
+    hygiene_findings: list[dict[str, Any]] = []
+    unknown_routes = Counter()
+    for source in findings:
+        finding = dict(source)
+        ids = {str(value) for value in finding.get("workstream_ids", [])}
+        missing = {value for value in ids if value not in by_workstream}
+        kind = str(finding.get("kind", "unknown")).lower()
+        all_current = len(ids) >= 2 and ids.issubset(delivery_ids)
+        if kind == "direct" and all_current:
+            current_blockers.append(finding)
+            route = "delivery"
+        elif kind != "unknown" and all_current:
+            delivery_advisories.append(finding)
+            route = "delivery"
+        elif missing or ids.intersection(hygiene_ids) or kind == "unknown":
+            hygiene_findings.append(finding)
+            route = "hygiene"
+        else:
+            reconciliation_findings.append(finding)
+            route = "reconciliation"
+        if kind == "unknown":
+            unknown_routes[route] += 1
+
+    inventory = dict(w3_evidence.get("inventory", {})) if w3_evidence else {}
+    inventory_counts = {
+        str(key): int(value)
+        for key, value in inventory.get("classification_counts", {}).items()
+    }
+    inventory_entries = list(inventory.get("entries", []))
+    estimated_reclaim = sum(
+        int(item.get("estimated_reclaim_bytes") or 0) for item in inventory_entries
+    )
+    stale_reviews: list[dict[str, Any]] = []
+    current_reviews: list[dict[str, Any]] = []
+    for item in (w3_evidence or {}).get("review_queue", []):
+        if item.get("queue_status") != "pending":
+            continue
+        if (
+            item.get("freshness") == "current"
+            and str(item.get("workstream_id")) in delivery_ids
+        ):
+            current_reviews.append(dict(item))
+        else:
+            stale_reviews.append(dict(item))
+
+    reconciliation_total = (
+        len(reconciliation_cards)
+        + len(reconciliation_findings)
+        + len(stale_reviews)
+        + len(unregistered_candidates)
+    )
+    hygiene_total = (
+        inventory_counts.get("legacy-unmanaged", 0)
+        + inventory_counts.get("unknown", 0)
+    )
+    return {
+        "schema": "project-orrery-personal-health-v1",
+        "authority": "derived-read-only",
+        "delivery_now": {
+            "workstream_count": len(current_delivery),
+            "review_pending_count": len(current_reviews),
+            "workstream_ids": sorted(delivery_ids),
+            "current_blocker_count": len(current_blockers),
+            "current_blockers": current_blockers,
+            "advisories": delivery_advisories,
+        },
+        "reconciliation": {
+            "total": reconciliation_total,
+            "stale_session_count": len(reconciliation_cards),
+            "stale_session_ids": sorted(reconciliation_ids),
+            "finding_count": len(reconciliation_findings),
+            "findings": reconciliation_findings,
+            "stale_review_count": len(stale_reviews),
+            "unregistered_candidate_count": len(unregistered_candidates),
+            "unregistered_candidates": [
+                str(card.get("branch", "Unknown")) for card in unregistered_candidates
+            ],
+        },
+        "workspace_hygiene": {
+            "total_worktrees": sum(inventory_counts.values()) or len(cards),
+            "classification_counts": inventory_counts,
+            "registered_active": inventory_counts.get("registered-active", 0),
+            "review_pending": inventory_counts.get("review-integration-pending", 0),
+            "legacy_unmanaged": inventory_counts.get("legacy-unmanaged", 0),
+            "no_session": len(hygiene_cards) + len(unregistered_candidates),
+            "retained": inventory_counts.get("evidence-retained", 0),
+            "unknown": inventory_counts.get("unknown", 0),
+            "debt_count": hygiene_total,
+            "estimated_reclaim_bytes": estimated_reclaim,
+            "finding_count": len(hygiene_findings),
+            "findings": hygiene_findings,
+            "primary_protected_count": len(primary_cards),
+        },
+        "unknown_accounting": {
+            "total": sum(unknown_routes.values()),
+            "delivery": unknown_routes["delivery"],
+            "reconciliation": unknown_routes["reconciliation"],
+            "hygiene": unknown_routes["hygiene"],
+        },
     }
 
 
@@ -541,11 +697,23 @@ def build_personal_observatory_projection(
         scope_paths = list(scope.get("path_entries", [])) if scope else []
         has_session = isinstance(session, Mapping)
         effective_phase = lifecycle.get("effective_phase", "unavailable")
+        is_primary = bool(identity["is_primary"])
+        session_current = (
+            has_session
+            and session_info["state"] != "stale"
+            and lifecycle.get("evidence_freshness") == "current"
+        )
         display_group = (
-            "active"
+            "protected-primary"
+            if is_primary
+            else "active"
+            if session_current and effective_phase in DELIVERY_PHASES
+            else "reconciliation"
             if has_session and effective_phase not in {"integrated", "closed"}
             else "inactive"
             if has_session
+            else "candidate-unregistered"
+            if _normalized_path(Path(identity["worktree_path"])) == current_path
             else "worktree-only"
         )
         cards.append(
@@ -603,7 +771,7 @@ def build_personal_observatory_projection(
                 "has_session": has_session,
                 "display_group": display_group,
                 "is_current": _normalized_path(Path(identity["worktree_path"])) == current_path,
-                "is_primary": identity["is_primary"],
+                "is_primary": is_primary,
             }
         )
     cards.extend(unavailable_cards)
@@ -699,6 +867,7 @@ def build_personal_observatory_projection(
     else:
         w3_slots = _w3_slots(w3_projection)
 
+    health = _derive_health_projection(cards, active_findings, w3_evidence)
     return {
         "projection_schema": PROJECTION_SCHEMA,
         "mode": "personal",
@@ -717,6 +886,7 @@ def build_personal_observatory_projection(
         "retired_findings": reconciled["retired"],
         "finding_counts": dict(finding_counts),
         "attention": attention,
+        "health": health,
         "remote_observability": {
             "status": "unknown",
             "label": "Unknown",
@@ -755,6 +925,7 @@ def unavailable_personal_observatory_projection(error: Exception) -> dict[str, A
         "subsystems": [],
         "findings": [],
         "attention": [],
+        "health": _derive_health_projection([], [], None),
         "remote_observability": {"status": "unknown", "label": "Unknown"},
         "w3": _w3_slots(None),
         "w3_evidence": None,
@@ -929,6 +1100,9 @@ def _worktree_inventory_row(card: Mapping[str, Any]) -> str:
     labels = {
         "inactive": "Integrated / closed session",
         "worktree-only": "No Workstream session",
+        "candidate-unregistered": "Candidate 未登记 / delivery unavailable",
+        "reconciliation": "Stale session · needs closure / reconcile",
+        "protected-primary": "Protected canonical root · not an Agent Workstream",
         "unavailable": "Unavailable / Unknown",
     }
     title = (
@@ -1216,6 +1390,15 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             % (_esc(error.get("type", "Unknown")), _esc(error.get("message", "Unknown")))
         )
     current = projection.get("current") or {}
+    health = projection.get("health")
+    if not isinstance(health, Mapping):
+        health = _derive_health_projection(
+            projection.get("workstreams", []),
+            projection.get("findings", []),
+            projection.get("w3_evidence")
+            if isinstance(projection.get("w3_evidence"), Mapping)
+            else None,
+        )
     w3_labels = {
         "review_queue": "Review queue",
         "integration_eligibility": "Integration eligibility",
@@ -1270,11 +1453,11 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         )
         for item in projection["subsystems"]
     ) or '<div class="po-empty" data-state="no-subsystem">No mapped subsystem · Unknown</div>'
-    finding_counts = projection.get("finding_counts", {})
-    direct_count = int(finding_counts.get("direct", 0))
-    authority_count = int(finding_counts.get("authority", 0))
-    semantic_count = int(finding_counts.get("semantic", 0))
-    unknown_count = int(finding_counts.get("unknown", 0))
+    delivery_health = health["delivery_now"]
+    reconciliation_health = health["reconciliation"]
+    hygiene_health = health["workspace_hygiene"]
+    unknown_health = health["unknown_accounting"]
+    direct_count = int(delivery_health["current_blocker_count"])
     running_count = sum(
         card.get("runtime_condition") == "active" for card in active_cards
     )
@@ -1292,7 +1475,15 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     focus = current if current.get("display_group") == "active" else (
         active_cards[0] if active_cards else None
     )
-    if focus:
+    if current.get("display_group") == "candidate-unregistered":
+        project_summary = (
+            "当前 Candidate 未登记 Workstream，无法判断交付资格；请先注册 session 并生成或绑定 review package。"
+        )
+    elif current.get("display_group") == "protected-primary":
+        project_summary = (
+            "当前目录是受保护的 canonical root，只用于集成，不计作普通 Agent Workstream。"
+        )
+    elif focus:
         project_summary = (
             "当前 %s 正在推进 %s，处于%s。"
             % (
@@ -1319,12 +1510,6 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             "%d 个确定的直接重叠需要处理" % direct_count,
             "这些是 W1/W2 已证明的路径或独占面重叠，不是推测。",
         ))
-    if authority_count or semantic_count:
-        priorities.append((
-            "warning",
-            "%d 个权威／语义交叉需要复核" % (authority_count + semantic_count),
-            "共享 subsystem 不自动等于冲突，但需要人工确认意图。",
-        ))
     if blocked_count or paused_count:
         priorities.append((
             "warning",
@@ -1334,11 +1519,17 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
                 paused_count,
             ),
         ))
-    if stale_count:
+    if reconciliation_health["total"]:
         priorities.append((
             "warning",
-            "%d 个未结束 Workstream 的证据已过期" % stale_count,
-            "页面仍展示最后一次本机观测，但不能把它当作当前事实。",
+            "%d 项需要 closure / reconcile" % reconciliation_health["total"],
+            "%d 个 stale session，%d 个历史 overlap，%d 个过期 review package，%d 个未登记 Candidate。"
+            % (
+                reconciliation_health["stale_session_count"],
+                reconciliation_health["finding_count"],
+                reconciliation_health["stale_review_count"],
+                reconciliation_health["unregistered_candidate_count"],
+            ),
         ))
     if isinstance(w3_evidence, Mapping):
         pending_reviews = [
@@ -1381,11 +1572,19 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             "当前不能判断审查、集成和清理资格",
             "W3 provider 缺失、失败或 schema 不受支持；已保持 W4A fallback。",
         ))
-    if unknown_count:
+    if hygiene_health["debt_count"] or hygiene_health["no_session"]:
         priorities.append((
             "unknown",
-            "%d 项重叠证据仍是 Unknown" % unknown_count,
-            "多数来自无 session 或隔离的本机 worktree；Unknown 不等于没有冲突。",
+            "%d 个 legacy / Unknown workspace 属于卫生债务" % hygiene_health["debt_count"],
+            "%d 个无 session，%d 个 retained；这些不计入当前 Direct blocker。"
+            % (hygiene_health["no_session"], hygiene_health["retained"]),
+        ))
+    if unknown_health["total"]:
+        priorities.append((
+            "unknown",
+            "%d 项 Unknown 已完整保留" % unknown_health["total"],
+            "其中 %d 项进入对账，%d 项进入工作区卫生；Unknown 没有被静默丢弃。"
+            % (unknown_health["reconciliation"], unknown_health["hygiene"]),
         ))
     if not priorities:
         priorities.append((
@@ -1403,17 +1602,18 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         'data-title="Personal Observatory" data-status="ready" data-read-only="true">'
         '<section class="po-shell" data-mode="personal" data-network-performed="false">'
         '<section class="po-brief" data-zone="project-status"><div class="po-brief-top">'
-        '<div><span class="po-kicker">PERSONAL OBSERVATORY · LOCAL BRIEF</span>'
-        '<h2>项目现在怎么样</h2><p>%s</p></div>'
+        '<div><span class="po-kicker">PERSONAL OBSERVATORY · DERIVED READ ONLY</span>'
+        '<h2>交付状态</h2><p>%s</p></div>'
         '<span class="po-lock">READ ONLY · ZERO EXTERNAL NETWORK</span></div>'
         '<div class="po-brief-grid"><div class="po-signals">'
-        '<div><b>%d</b><span>未结束 Workstream</span></div><div><b>%d</b><span>正在推进</span></div>'
-        '<div><b>%d</b><span>暂停／阻塞</span></div><div class="%s"><b>%d</b><span>确定直接重叠</span></div>'
+        '<div><b>%d</b><span>交付状态 · current Workstream</span></div>'
+        '<div class="%s"><b>%d</b><span>当前阻断 · current Direct</span></div>'
+        '<div><b>%d</b><span>需要对账</span></div><div><b>%d</b><span>工作区卫生</span></div>'
         '</div><aside class="po-proof"><div><small>本机范围</small><b>%d worktrees</b></div>'
         '<div><small>趋势</small><b>Unknown · 无历史快照</b></div><div><small>交付资格</small><b>%s</b></div>'
         '<div><small>采集时间</small><code>%s</code></div></aside></div></section>'
-        '<section class="po-zone" data-zone="attention"><div class="po-zone-head"><h3>先看这些</h3>'
-        '<span>确定事实优先；Unknown 单独保留</span></div><ol class="po-priorities">%s</ol></section>'
+        '<section class="po-zone" data-zone="attention"><div class="po-zone-head"><h3>当前阻断 / 需要对账 / 工作区卫生</h3>'
+        '<span>三层互不累加；Unknown 完整保留</span></div><ol class="po-priorities">%s</ol></section>'
         '<section class="po-zone" data-zone="workstreams"><div class="po-zone-head"><h3>谁在推进什么</h3>'
         '<span>未 integrated / closed；点击行查看审计证据</span></div>'
         '<div class="po-workstreams">%s</div></section>'
@@ -1425,11 +1625,11 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         '</section></article>'
         % (
             _esc(project_summary),
-            len(active_cards),
-            running_count,
-            paused_count + blocked_count,
+            delivery_health["workstream_count"],
             "critical" if direct_count else "",
             direct_count,
+            reconciliation_health["total"],
+            hygiene_health["debt_count"],
             len(projection["workstreams"]),
             _esc(projection["w3"]["integration_eligibility"]["label"]),
             _esc(projection["captured_at"]),
