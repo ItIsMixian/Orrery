@@ -1298,6 +1298,18 @@ def write_closure_record(
         }
     )
     _write_private_session(root, updated_session)
+    try:
+        from .maintenance import record_maintenance_event
+
+        maintenance_event = record_maintenance_event(
+            root, reason="integration-event", occurred_at=timestamp
+        )
+    except Exception as error:
+        maintenance_event = {
+            "status": "unavailable",
+            "error_type": type(error).__name__,
+            "integration_or_closure_affected": False,
+        }
     return {
         "closure_record": closure,
         "closure_path": str(path),
@@ -1306,6 +1318,7 @@ def write_closure_record(
         "integration_ref_updated": False,
         "writes_performed": True,
         "network_performed": False,
+        "maintenance_event": maintenance_event,
     }
 
 

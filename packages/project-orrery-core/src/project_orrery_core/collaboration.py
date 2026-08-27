@@ -34,7 +34,8 @@ EXCLUSIVE_RESOURCES_CONFIG_KEY = "collaboration.exclusive_resources"
 RESERVED_SUBSYSTEM_IDS = ("unmapped", "project-wide")
 CAPABILITIES = ("reviewer", "integrator", "admin")
 _COLLABORATION_CONFIG_FIELDS = {
-    "integration_ref", "primary_worktree", "project_mode", "exclusive_resources"
+    "integration_ref", "primary_worktree", "project_mode", "exclusive_resources",
+    "workspace_inventory", "workspace_maintenance"
 }
 _SUBSYSTEM_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 _OID = re.compile(r"^[0-9a-f]{40}(?:[0-9a-f]{24})?$")
@@ -244,6 +245,7 @@ class CollaborationConfig:
         {"resource_id": item["resource_id"], "path_patterns": list(item["path_patterns"])}
         for item in DEFAULT_EXCLUSIVE_RESOURCES
     )
+    workspace_maintenance: Mapping[str, Any] | None = None
 
     @classmethod
     def from_manifest(cls, manifest: Mapping[str, Any]) -> "CollaborationConfig":
@@ -297,11 +299,20 @@ class CollaborationConfig:
                 {"resource_id": resource_id, "path_patterns": list(dict.fromkeys(normalized_patterns))}
             )
             seen_resources.add(resource_id)
+        inventory = raw.get("workspace_inventory", {})
+        if not isinstance(inventory, Mapping):
+            raise ValueError("collaboration.workspace_inventory must be an object")
+        maintenance = raw.get("workspace_maintenance")
+        if maintenance is not None:
+            from .maintenance import validate_maintenance_policy
+
+            maintenance = validate_maintenance_policy(maintenance)
         return cls(
             integration_ref=integration_ref,
             primary_worktree=primary_worktree,
             project_mode=str(project_mode),
             exclusive_resources=tuple(exclusive_resources),
+            workspace_maintenance=maintenance,
         )
 
 
@@ -913,7 +924,21 @@ def transition_workstream_session(
             },
         }
     )
-    return _write_private_session(root, session)
+    result = _write_private_session(root, session)
+    if new_phase == "closed":
+        try:
+            from .maintenance import record_maintenance_event
+
+            result["maintenance_event"] = record_maintenance_event(
+                root, reason="closure-event", occurred_at=timestamp
+            )
+        except Exception as error:
+            result["maintenance_event"] = {
+                "status": "unavailable",
+                "error_type": type(error).__name__,
+                "lifecycle_transition_affected": False,
+            }
+    return result
 
 
 def load_adapter_capabilities(manifest_path: Path) -> dict[str, Any]:

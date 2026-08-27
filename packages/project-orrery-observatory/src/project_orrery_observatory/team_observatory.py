@@ -70,7 +70,7 @@ TEAM_OBSERVATORY_JS = r"""
   const node=(tag,cls,value)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(value!=null)el.textContent=String(value);return el};
   const presenceLabels={online:'在线',offline:'离线','stale-unknown':'状态已过期',unknown:'状态未知',unavailable:'暂不可用'};
   const phaseLabels={created:'已创建，尚未开始',planning:'正在规划',implementing:'正在实现',validating:'正在验证','review-ready':'等待审查',integrated:'已集成',closed:'已结束'};
-  const requestLabels={'pause-workstream':'请求暂停任务'};
+  const requestLabels={'pause-workstream':'请求暂停任务',cleanup:'请求本机评估工作区维护'};
   const requestStatusLabels={'pending-local-confirmation':'等待你确认','accepted-locally':'已在本机接受（未执行）','rejected-locally':'已在本机拒绝'};
   const dateLabel=(value)=>{if(!value)return'时间未知';const date=new Date(value);if(Number.isNaN(date.getTime()))return String(value);return new Intl.DateTimeFormat('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(date)};
   const presenceNote=(value)=>value==='stale-unknown'?'心跳关闭或最近状态已过期':value==='unknown'?'证据不足，不能判断是否在线':value==='unavailable'?'当前无法读取该成员状态':'来自最近一次团队状态投影';
@@ -128,7 +128,7 @@ TEAM_OBSERVATORY_JS = r"""
     text(q('[data-team-member]'),config.member_id||'implicit local');text(q('[data-team-host]'),config.host_id||'not configured');
     text(q('[data-team-sharing]'),config.sharing_enabled?'sharing':'off');text(q('[data-team-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'on':'off');
     text(q('[data-team-last-seen]'),value.projection&&value.projection.generated_at||'Unavailable');text(q('[data-team-outbox]'),value.outbox_count||0);
-    qa('[data-team-action]').forEach(button=>{const action=button.dataset.teamAction;button.disabled=(action==='enable'&&enabled)||(action==='disable'&&!enabled)||(action==='start'&&(!enabled||running||externalRegistered))||(action==='stop'&&!running)||(['heartbeat','sharing','capture','sync','request-create'].includes(action)&&!enabled)||(action==='sync'&&!running)});
+    qa('[data-team-action]').forEach(button=>{const action=button.dataset.teamAction;button.disabled=(action==='enable'&&enabled)||(action==='disable'&&!enabled)||(action==='start'&&(!enabled||running||externalRegistered))||(action==='stop'&&!running)||(['heartbeat','sharing','capture','sync','request-create','maintenance-request'].includes(action)&&!enabled)||(action==='sync'&&!running)});
     text(q('[data-action-start]'),running?'本机协作服务运行中':externalRegistered?'其他本机服务占用中':'启动本机协作服务');text(q('[data-action-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'关闭在线状态':'开启在线状态');text(q('[data-action-sharing]'),config.sharing_enabled?'暂停项目状态共享':'开始共享项目状态');text(q('[data-action-sync]'),(value.outbox_count||0)?'同步 '+value.outbox_count+' 项更新':'立即同步');
     renderBrief(value);renderMembers(value.projection);renderRequests(value.requests||[]);
   }
@@ -170,7 +170,7 @@ def render_team_observatory_panel() -> str:
         '<div><small>Host</small><b data-team-host>Unknown</b></div><div><small>Sharing / Heartbeat</small><b><span data-team-sharing>off</span> · <span data-team-heartbeat>off</span></b></div>'
         '<div><small>Last seen</small><b data-team-last-seen>Unavailable</b></div><div><small>Outbox</small><b data-team-outbox>0</b></div></div>'
         '<div class="to-controlbar"><span class="to-mode" data-team-mode>TEAM</span><button class="to-action" type="button" data-team-action="stop">暂停团队连接</button>'
-        '<button class="to-action" type="button" data-team-action="heartbeat" data-action-heartbeat>开启在线状态</button><button class="to-action" type="button" data-team-action="request-create">创建测试请求</button><span class="to-spacer"></span><button class="to-action danger" type="button" data-team-action="disable">退出 Team Mode</button></div>'
+        '<button class="to-action" type="button" data-team-action="heartbeat" data-action-heartbeat>开启在线状态</button><button class="to-action" type="button" data-team-action="maintenance-request">请求成员本机评估维护</button><button class="to-action" type="button" data-team-action="request-create">创建测试请求</button><span class="to-spacer"></span><button class="to-action danger" type="button" data-team-action="disable">退出 Team Mode</button></div>'
         '<div class="to-privacy"><b>只共享最小元数据</b><br>不发送 Prompt、回答、reasoning、transcript、源码正文、未 push diff、member token、API key 或 credential。最后快照只按 Core TTL 投影，不冒充实时在线。</div></div></details></section>'
         '<div class="to-notice" data-team-notice>正在读取本机团队状态…</div></section></article>'
     )

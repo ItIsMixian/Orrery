@@ -504,3 +504,12 @@
 - 首次 Candidate `230a6ff` 误改冻结 v0.2.0 manifest/bridge，远端 run `33107986476` 在 Windows／Ubuntu
   以同一 historical-input hash 门失败，main 未更新；修正恢复冻结文件而不更新冻结 hash，并要求新 exact
   SHA 重跑双平台门。
+
+## 2026-08-27 — W6 Workspace Maintenance Phase 0–2 Candidate
+
+- 从 W5C `6dd508f` 建立 `codex/w6-workspace-maintenance`，在首次产品写入前合入 `main@673e252`；只解决 DEVLOG 加法冲突，未改写 W5C、main、PROGRESS 或 HANDOFF。随后注册 Git-private `W6-workspace-maintenance` session，声明 multi-worktree primary、四个受影响 subsystem、预期写入与验证面。
+- Core 0.1.10 新增 strict maintenance v1 policy／scan／queue／authorization／receipt 与 11-scenario corpus，复用 W3 inventory／cleanup eligibility；integration／closed 事件、Observatory 24h catch-up、single-flight／debounce／hard timeout／interrupted recovery 和 evidence-bound suggestion queue 只写 common Git private `orrery/maintenance/`，不扫描整盘、不联网、不自动删除。
+- CLI 0.1.14 新增 `orrery maintenance policy|scan|queue|inspect|authorize|execute|receipt|schedule|status`。唯一 destructive path 只接受本机 human authorization ID，固定执行 `git worktree remove -- <已登记路径>`，并在前置漂移／lock／Unknown 时 Stale；成功后验证 path、registry、branch、commit 与 receipt。local／remote branch 不删除，scheduler 固定 unsupported，Phase 3／4 未实现。
+- Observatory 0.1.6 增加独立“工作区维护”页：静态输出只读，root-only loopback 动态页提供只读扫描、逐项／批量授权与逐项执行；worktree／local branch／remote branch 三类动作明确分栏。Team 中央新增 `cleanup` request，但 request／accept 均保持 `execution_performed=false`，不会调用 execute。
+- W6 focused 7/7、W3 + Personal 27/27、Team + component 4/4、version／W1-W2 compatibility 64/64 PASS；结构门通过。真实 in-app Chromium 在 1280×720 点击维护导航和只读扫描，在 390×844 点击历史 details；两种 viewport 均无横向溢出，移动布局为单列。浏览器扫描后当前仓库仍为 3 个 worktree、0 suggestion、0 receipt、branch 未变；完整隔离站、链接、diff 与命令证据记录在 [W6 Validation](validation/2026-08-27-workspace-maintenance-phase-0-2.md)。
+- 本分支不 push、不合并 main、不建 tag／Release；Candidate／Promotion 全仓与 exact-SHA Windows／Ubuntu checks 留给唯一整合者。

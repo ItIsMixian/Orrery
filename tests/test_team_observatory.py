@@ -185,6 +185,13 @@ class TeamObservatoryTests(unittest.TestCase):
                 self.assertEqual(accepted["requests"][0]["status"], "accepted-locally")
                 self.assertFalse(accepted["requests"][0]["execution_performed"])
 
+                response, raw = request("POST", "/team/api/maintenance-request", cookie=cookie)
+                requested = json.loads(raw)
+                self.assertEqual(response.status, 200)
+                cleanup_request = next(item for item in requested["requests"] if item["request_kind"] == "cleanup")
+                self.assertEqual(cleanup_request["status"], "pending-local-confirmation")
+                self.assertFalse(cleanup_request["execution_performed"])
+
                 response, raw = request("POST", "/team/api/request-create", cookie=cookie)
                 second = json.loads(raw)
                 pending = next(item for item in second["requests"] if item["status"] == "pending-local-confirmation")

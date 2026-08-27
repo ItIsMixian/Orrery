@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "project-orrery-cli"
-version = "0.1.13"
+version = "0.1.14"
 description = "Platform-neutral command line interface for Project Orrery"
 requires-python = ">=3.10"
 dependencies = [
-  "project-orrery-core==0.1.9",
+  "project-orrery-core==0.1.10",
   "project-orrery-observatory==0.1.0"
 ]
 
@@ -24,6 +24,7 @@ project-orrery-worktree = "project_orrery_cli.worktree:main"
 project-orrery-integrate = "project_orrery_cli.integration:main"
 project-orrery-review = "project_orrery_cli.review:main"
 project-orrery-team = "project_orrery_cli.team:main"
+project-orrery-maintenance = "project_orrery_cli.maintenance:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

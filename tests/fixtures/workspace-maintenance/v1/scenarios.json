@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "contract": "project-orrery-workspace-maintenance-synthetic-corpus-v1",
+  "scenarios": [
+    {"id": "clean-integrated", "expected": "suggested"},
+    {"id": "dirty", "expected": "protected"},
+    {"id": "unique-commit", "expected": "protected"},
+    {"id": "untracked", "expected": "protected"},
+    {"id": "allowlisted-ignored", "expected": "suggested"},
+    {"id": "sensitive-ignored", "expected": "protected"},
+    {"id": "reparse-escape", "expected": "protected"},
+    {"id": "stale-closure", "expected": "protected"},
+    {"id": "process-use", "expected": "protected"},
+    {"id": "recovery-evidence", "expected": "protected"},
+    {"id": "missing-path", "expected": "protected"}
+  ],
+  "network_performed": false,
+  "destructive_action_performed": false
+}

@@ -8,6 +8,7 @@ from . import (
     authority_restore,
     collaboration_contract,
     integration,
+    maintenance,
     review,
     scaffold,
     team,
@@ -23,7 +24,7 @@ def main(argv: list[str] | None = None) -> int:
         print(
             "usage: project-orrery "
             "{scaffold|validate|check-update|migrate-authority-model|"
-            "restore-authority-model|collaboration-contract|worktree|integrate|review|team} [options]"
+            "restore-authority-model|collaboration-contract|worktree|integrate|review|team|maintenance} [options]"
         )
         return 0
     command = arguments.pop(0)
@@ -38,6 +39,7 @@ def main(argv: list[str] | None = None) -> int:
         "integrate": integration.main,
         "review": review.main,
         "team": team.main,
+        "maintenance": maintenance.main,
     }
     selected = commands.get(command)
     if selected is None:

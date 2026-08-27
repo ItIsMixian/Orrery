@@ -1,7 +1,7 @@
 {
   "manifest_format": 1,
   "name": "project-orrery-observatory",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "status": "unreleased",
   "legacy_toolchain_version": "0.2.0",
   "template_projection": {

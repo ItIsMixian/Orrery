@@ -48,6 +48,7 @@ def render_personal_site(
     title: str,
     *,
     excluded_branches: tuple[str, ...] = (),
+    maintenance_control_available: bool = False,
 ):
     """Return the base Observatory unchanged unless explicit W4 opt-in is enabled."""
 
@@ -62,10 +63,31 @@ def render_personal_site(
     )
 
     try:
+        from project_orrery_core.maintenance import (
+            catch_up_maintenance_scan,
+            maintenance_status,
+        )
+
+        catch_up_maintenance_scan(root)
+        maintenance = maintenance_status(root)
+        maintenance["control_available"] = maintenance_control_available
+    except Exception as error:
+        maintenance = {
+            "status": "unavailable",
+            "error": {"type": type(error).__name__, "message": str(error)},
+            "control_available": maintenance_control_available,
+            "queue": [],
+            "authorizations": [],
+            "receipts": [],
+            "protected_reasons": {},
+        }
+
+    try:
         projection = build_personal_observatory_projection(
             root,
             include_local_worktrees=True,
             excluded_branches=excluded_branches,
+            maintenance_projection=maintenance,
         )
         page = inject_personal_observatory(page, projection)
     except Exception as error:

@@ -1,7 +1,7 @@
 # Workspace Maintenance 与定时清理实施计划
 
 Date: 2026-08-27
-Status: Proposed Candidate Plan；实现未开始
+Status: Phase 0–2 implemented in `codex/w6-workspace-maintenance` Candidate；Phase 3／4 未开始，Promotion 待中央验证
 Suggested task code: W6（仅在正式注册实现任务时生效）
 Governing decisions: [ADR-0007](../../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)
 Approved design: [Multi-worktree collaboration protocol — 集成后的保守清理](../../design/multi-worktree-collaboration-protocol.md#集成后的保守清理)
@@ -28,7 +28,7 @@ worktree 删除 ≠ branch 删除 ≠ remote branch 删除
 - 四种互不隐含且默认 `performed=false` 的清理动作；
 - Personal Observatory 的 delivery／reconciliation／hygiene 投影。
 
-当前尚不存在 scheduler、持久 maintenance queue、实际删除执行器、图形化本机确认或跨平台计划任务 Adapter。2026-08-27 的 38→2 worktree 清理是维护者授权的人工操作，不是产品实现。
+W6 Candidate 已实现 Git-private maintenance queue、action-specific remove-worktree 执行器和图形化本机确认；仍不存在后台自动删除或跨平台计划任务 Adapter。2026-08-27 的 38→2 worktree 清理仍是维护者授权的人工操作，不是产品实现证据。
 
 ## 2. 目标体验
 
@@ -222,28 +222,28 @@ Personal Observatory 增加“工作区维护”入口，而不是继续扩大�
 
 ### Phase 0 — Contract 与 fixture
 
-- [ ] 定义 maintenance policy、scan、queue、authorization、receipt schema；
-- [ ] 冻结 synthetic Git corpus：clean integrated、dirty、unique commit、untracked、allowlisted ignored、sensitive ignored、reparse escape、stale closure、process-use、recovery/evidence、missing path；
-- [ ] 为 project policy 与 host-private preference 建立迁移／兼容规则；
-- [ ] 明确现有 W3 inventory／cleanup schema 的复用边界；
-- [ ] CLI 仅实现 dependency-free `scan --json`，零删除。
+- [x] 定义 maintenance policy、scan、queue、authorization、receipt schema；
+- [x] 冻结 synthetic Git corpus：clean integrated、dirty、unique commit、untracked、allowlisted ignored、sensitive ignored、reparse escape、stale closure、process-use、recovery/evidence、missing path；
+- [x] 为 project policy 与 host-private preference 建立迁移／兼容规则；
+- [x] 明确现有 W3 inventory／cleanup schema 的复用边界；
+- [x] CLI 实现 dependency-free `scan --json`，零删除。
 
 ### Phase 1 — Event／startup scan 与建议队列
 
-- [ ] 接入 integration／closure 事件和 Observatory 24h catch-up；
-- [ ] 实现 single-flight、debounce、timeout、interrupted run 与幂等 last-run；
-- [ ] 生成 evidence-bound suggestion queue；
-- [ ] Observatory 展示维护摘要、受保护／Unknown 原因和策略；
-- [ ] 默认仍没有执行器。
+- [x] 接入 integration／closure 事件和 Observatory 24h catch-up；
+- [x] 实现 single-flight、debounce、timeout、interrupted run 与幂等 last-run；
+- [x] 生成 evidence-bound suggestion queue；
+- [x] Observatory 展示维护摘要、受保护／Unknown 原因和策略；
+- [x] Phase 1 检查点默认没有自动执行，执行器仅在 Phase 2 本机授权路径可达。
 
 ### Phase 2 — 本机确认执行
 
-- [ ] 实现 authorization ID 与 action-specific execute；
-- [ ] 删除前完整重新验证，漂移使授权 Stale；
-- [ ] 只实现 `remove-worktree`；branch 动作继续只提示；
-- [ ] 执行后验证目录、registry、branch、receipt 与失败恢复；
-- [ ] Observatory 支持逐项／批量本机确认，但逐项生成独立 authorization／receipt；
-- [ ] Team request 只进入本机 inbox，不调用 execute。
+- [x] 实现 authorization ID 与 action-specific execute；
+- [x] 删除前完整重新验证，漂移使授权 Stale；
+- [x] 只实现 `remove-worktree`；branch 动作继续只提示；
+- [x] 执行后验证目录、registry、branch、receipt 与失败恢复；
+- [x] Observatory 支持逐项／批量本机确认，但逐项生成独立 authorization／receipt；
+- [x] Team request 只进入本机 inbox，不调用 execute。
 
 ### Phase 3 — 显式 opt-in 自动 worktree cleanup
 

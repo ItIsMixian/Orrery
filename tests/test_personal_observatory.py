@@ -679,6 +679,57 @@ class PersonalObservatoryTests(unittest.TestCase):
                 )
         self.assertEqual(result, (sentinel[0], sentinel[1], None, None))
 
+    def test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local(self):
+        base = (
+            "<html><head><style></style></head><body><aside class=\"sidebar\">"
+            '<a class="nav-item" data-target="trends"><span class="dot proposed"></span><span class="lbl">🔭 路线与趋势</span></a></aside>'
+            '<main class="content"></main><aside class="toc" id="toc"></aside></body></html>'
+        )
+        static = inject_personal_observatory(base, _ready_projection())
+        self.assertIn('data-target="workspace-maintenance"', static)
+        self.assertIn('id="workspace-maintenance"', static)
+        self.assertIn('data-maintenance-control="false"', static)
+        self.assertIn("无 scheduler", static)
+        self.assertIn("branch 保留", static.lower())
+
+        binding = {
+            "workspace_id": "workspace-1",
+            "resolved_path": "C:/fixture/worktree",
+            "head": "1" * 40,
+            "branch": "refs/heads/codex/fixture",
+            "workstream_id": "W6",
+            "session_phase": "closed",
+            "integration_oid": "2" * 40,
+            "inventory_content_hash": "3" * 64,
+            "closure_id": "closure-1",
+            "review_package_id": "review-1",
+            "review_package_content_hash": "4" * 64,
+            "validation_refs_hash": "5" * 64,
+            "candidate_head": "1" * 40,
+            "tracked_changes": [],
+            "untracked_paths": [],
+            "ignored_paths_hash": "6" * 64,
+            "allowlisted_ignored_paths": [],
+            "unique_commits": [],
+            "evidence_hash": "7" * 64,
+        }
+        maintenance = {
+            "status": "ready",
+            "control_available": True,
+            "last_run": {"status": "succeeded", "counts": {"worktrees": 9, "suggested": 1, "estimated_reclaim_bytes": 1024}},
+            "queue": [{"item_id": "maintenance-item-" + "8" * 24, "workspace_id": "workspace-1", "workspace_path": "C:/fixture/worktree", "lifecycle": "suggested", "earliest_execute_at": "2026-08-27T00:00:00Z", "binding": binding}],
+            "authorizations": [],
+            "protected_reasons": {"primary-worktree": 1, "unknown:reparse": 1},
+            "policy": {"integrated_grace_days": 7, "auto_remove_eligible_worktrees": False},
+            "receipts": [],
+        }
+        dynamic = inject_personal_observatory(base, _ready_projection(maintenance=maintenance))
+        self.assertIn('data-maintenance-control="true"', dynamic)
+        self.assertIn("批量确认所选（仅授权）", dynamic)
+        self.assertIn('data-maintenance-authorize="maintenance-item-', dynamic)
+        self.assertIn("受保护／Unknown 原因", dynamic)
+        self.assertIn("window.confirm", dynamic)
+
     def test_unavailable_projection_renders_stable_fallback(self):
         projection = unavailable_personal_observatory_projection(
             ValueError("fixture unavailable")

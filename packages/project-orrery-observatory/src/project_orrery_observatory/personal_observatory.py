@@ -577,6 +577,7 @@ def build_personal_observatory_projection(
     include_local_worktrees: bool = True,
     excluded_branches: Sequence[str] = (),
     w3_projection: Mapping[str, Any] | None = None,
+    maintenance_projection: Mapping[str, Any] | None = None,
     captured_at: str | None = None,
 ) -> dict[str, Any]:
     """Aggregate W1/W2 contracts into a read-only Personal Mode snapshot.
@@ -895,6 +896,14 @@ def build_personal_observatory_projection(
         "w3": w3_slots,
         "w3_evidence": w3_evidence,
         "w3_provider_error": w3_error,
+        "maintenance": dict(maintenance_projection) if isinstance(maintenance_projection, Mapping) else {
+            "status": "unavailable",
+            "control_available": False,
+            "queue": [],
+            "authorizations": [],
+            "receipts": [],
+            "protected_reasons": {},
+        },
         "source_contracts": [
             "worktree-status-v1",
             "scope-observation-v1",
@@ -930,6 +939,14 @@ def unavailable_personal_observatory_projection(error: Exception) -> dict[str, A
         "w3": _w3_slots(None),
         "w3_evidence": None,
         "w3_provider_error": {"type": type(error).__name__, "message": str(error)},
+        "maintenance": {
+            "status": "unavailable",
+            "control_available": False,
+            "queue": [],
+            "authorizations": [],
+            "receipts": [],
+            "protected_reasons": {},
+        },
     }
 
 
@@ -1378,6 +1395,80 @@ PERSONAL_OBSERVATORY_CSS = r"""
 """
 
 
+MAINTENANCE_OBSERVATORY_CSS = r"""
+.mo-shell{--mo-green:#63d6cf;--mo-amber:#f2ba5e;--mo-red:#ff786b;margin:0 0 24px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg)}
+.mo-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;padding:22px 24px;background:linear-gradient(90deg,rgba(99,214,207,.09),transparent 65%);border-bottom:1px solid var(--line)}
+.mo-kicker{color:var(--mo-green);font:700 10px/1.3 "Cascadia Code",Consolas,monospace;letter-spacing:.14em}.mo-head h2{margin:5px 0;font-size:27px}.mo-head p{margin:0;color:var(--mut);font-size:12px;max-width:760px}.mo-boundary{align-self:start;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--mut);font-size:10px}
+.mo-signals{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}.mo-signals>div{padding:14px 18px;background:var(--bg2)}.mo-signals small{display:block;color:var(--mut);font-size:9px}.mo-signals b{display:block;margin-top:5px;font-size:15px}
+.mo-actions{display:flex;flex-wrap:wrap;gap:8px;padding:14px 24px;border-bottom:1px solid var(--line)}.mo-button{appearance:none;border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:var(--fg);padding:9px 12px;font:700 10px/1.2 inherit;cursor:pointer}.mo-button:hover:not(:disabled){border-color:var(--mo-green);color:var(--mo-green)}.mo-button:disabled{opacity:.4;cursor:not-allowed}.mo-button.danger{color:var(--mo-red)}
+.mo-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.75fr)}.mo-main,.mo-side{padding:20px 24px;min-width:0}.mo-side{border-left:1px solid var(--line);background:var(--bg2)}.mo-section+.mo-section{margin-top:22px}.mo-section h3{margin:0 0 9px;font-size:13px}.mo-item{border-top:1px solid var(--line);padding:12px 0}.mo-item-head{display:flex;justify-content:space-between;gap:12px}.mo-item b{font-size:11.5px}.mo-item code{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis}.mo-item p{margin:5px 0;color:var(--mut);font-size:10px}.mo-item-actions{display:flex;gap:7px;margin-top:9px}.mo-reason{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:8px 0;font-size:10px}.mo-policy{display:grid;grid-template-columns:1fr auto;gap:7px;font-size:10px}.mo-policy span{color:var(--mut)}.mo-history>summary{cursor:pointer;font-size:11px}.mo-empty,.mo-notice{color:var(--mut);font-size:10.5px;padding:11px 0}.mo-notice{padding:10px 24px;border-top:1px solid var(--line)}.mo-notice.error{color:var(--mo-red)}
+.mo-boundaries{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.mo-boundaries>div{padding:13px 18px;background:var(--bg2)}.mo-boundaries b{display:block;font-size:11px}.mo-boundaries span{display:block;margin-top:4px;color:var(--mut);font-size:9.5px}
+@media(max-width:850px){.mo-signals{grid-template-columns:1fr 1fr}.mo-grid{grid-template-columns:1fr}.mo-side{border-left:0;border-top:1px solid var(--line)}}
+@media(max-width:640px){.mo-shell{margin:0 -18px 24px;border-left:0;border-right:0;border-radius:0}.mo-head{grid-template-columns:1fr;padding:18px}.mo-boundary{justify-self:start}.mo-signals>div,.mo-actions,.mo-main,.mo-side,.mo-notice{padding-left:18px;padding-right:18px}.mo-boundaries{grid-template-columns:1fr}.mo-button{min-height:40px}.mo-item-head{display:block}}
+"""
+
+
+def _maintenance_panel(projection: Mapping[str, Any]) -> str:
+    maintenance = projection.get("maintenance")
+    if not isinstance(maintenance, Mapping):
+        maintenance = {}
+    control = bool(maintenance.get("control_available"))
+    last = maintenance.get("last_run") if isinstance(maintenance.get("last_run"), Mapping) else {}
+    counts = last.get("counts") if isinstance(last.get("counts"), Mapping) else {}
+    queue = [item for item in maintenance.get("queue", []) if isinstance(item, Mapping)]
+    authorizations = [item for item in maintenance.get("authorizations", []) if isinstance(item, Mapping)]
+    auth_by_item = {str(item.get("item_id")): item for item in authorizations}
+    items = []
+    for item in queue:
+        authorization = auth_by_item.get(str(item.get("item_id")))
+        action = ""
+        if item.get("lifecycle") == "suggested":
+            action = '<label class="mo-select"><input type="checkbox" data-maintenance-select="%s"%s> 选择</label><button class="mo-button" type="button" data-maintenance-authorize="%s"%s>本机确认移除 worktree</button>' % (_esc(item.get("item_id")), "" if control else " disabled", _esc(item.get("item_id")), "" if control else " disabled")
+        elif authorization and authorization.get("status") == "authorized":
+            action = '<button class="mo-button danger" type="button" data-maintenance-execute="%s"%s>执行 remove-worktree</button>' % (_esc(authorization.get("authorization_id")), "" if control else " disabled")
+        items.append(
+            '<div class="mo-item" data-maintenance-item="%s"><div class="mo-item-head"><b>%s</b><span>%s</span></div><code>%s</code><p>最早执行 %s · branch 将保留</p><div class="mo-item-actions">%s</div></div>'
+            % (_esc(item.get("item_id")), _esc(item.get("workspace_id")), _esc(item.get("lifecycle")), _esc(item.get("workspace_path")), _esc(item.get("earliest_execute_at")), action)
+        )
+    queue_html = "".join(items) or '<div class="mo-empty">当前没有满足全部门禁与缓冲期的 remove-worktree 建议。</div>'
+    protected = maintenance.get("protected_reasons") if isinstance(maintenance.get("protected_reasons"), Mapping) else {}
+    protected_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(reason), _esc(count)) for reason, count in sorted(protected.items())) or '<div class="mo-empty">没有已记录的受保护原因；未扫描不等于可清理。</div>'
+    policy = maintenance.get("policy") if isinstance(maintenance.get("policy"), Mapping) else {}
+    policy_html = "".join('<span>%s</span><b>%s</b>' % (_esc(key), _esc(value)) for key, value in policy.items() if key != "ignored_allowlist")
+    receipts = [item for item in maintenance.get("receipts", []) if isinstance(item, Mapping)]
+    branch_reminders = [item for item in maintenance.get("local_branch_reminders", []) if isinstance(item, Mapping)]
+    history_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(item.get("receipt_id")), _esc(item.get("outcome"))) for item in receipts[-8:]) or '<div class="mo-empty">尚无执行 receipt。</div>'
+    return (
+        '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s">'
+        '<section class="mo-shell"><header class="mo-head"><div><span class="mo-kicker">WORKSPACE MAINTENANCE · LOCAL ONLY</span><h2>工作区维护</h2><p>定时发现不等于自动删除。建议、授权和执行分离；本阶段只支持本机确认后的 remove-worktree。</p></div><span class="mo-boundary">PERSONAL ZERO-NETWORK · BRANCH 保留</span></header>'
+        '<div class="mo-signals"><div><small>最近扫描</small><b data-maintenance-scan-status>%s</b></div><div><small>worktrees</small><b data-maintenance-worktrees>%s</b></div><div><small>需要确认</small><b data-maintenance-suggestions>%s</b></div><div><small>预计空间</small><b data-maintenance-reclaim>%s</b></div></div>'
+        '<div class="mo-actions"><button class="mo-button" type="button" data-maintenance-scan%s>立即只读扫描</button><button class="mo-button" type="button" data-maintenance-authorize-selected%s>批量确认所选（仅授权）</button><span class="mo-empty">24h 启动补查 · single-flight · 无 scheduler</span></div>'
+        '<div class="mo-boundaries"><div><b>worktree</b><span>仅 evidence-bound 本机确认后可移除</span></div><div><b>local branch</b><span>%s 个到期提醒；本阶段不执行删除</span></div><div><b>remote branch</b><span>零网络，不观察、不删除</span></div></div>'
+        '<div class="mo-grid"><main class="mo-main"><section class="mo-section"><h3>需要你确认</h3><div data-maintenance-queue>%s</div></section><section class="mo-section"><h3>受保护／Unknown 原因</h3><div data-maintenance-protected>%s</div></section></main>'
+        '<aside class="mo-side"><section class="mo-section"><h3>策略</h3><div class="mo-policy">%s</div></section><section class="mo-section"><details class="mo-history"><summary>授权与执行历史</summary>%s</details></section></aside></div>'
+        '<div class="mo-notice" data-maintenance-notice>%s</div></section></article>'
+        % (
+            "true" if control else "false", _esc(last.get("status", maintenance.get("status", "unavailable"))), _esc(counts.get("worktrees", "Unknown")), _esc(counts.get("suggested", len(queue))), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "" if control else " disabled", "" if control and any(item.get("lifecycle") == "suggested" for item in queue) else " disabled", _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；每个动作都将重新验证。" if control else "静态只读视图；请使用 root-only 本机动态入口进行确认。",
+        )
+    )
+
+
+MAINTENANCE_OBSERVATORY_JS = r"""
+(function(){
+ const page=document.getElementById('workspace-maintenance');if(!page||page.dataset.maintenanceControl!=='true')return;
+ const notice=page.querySelector('[data-maintenance-notice]');
+ async function api(path,body){const response=await fetch(path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(body||{})});const value=await response.json();if(!response.ok)throw new Error(value.error||'本机维护操作失败');return value}
+ page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;let operations=[];
+   if(button.hasAttribute('data-maintenance-scan'))operations=[['/team/api/maintenance/scan',{}]];
+   else if(button.hasAttribute('data-maintenance-authorize-selected')){operations=Array.from(page.querySelectorAll('[data-maintenance-select]:checked')).map(input=>['/team/api/maintenance/authorize',{item_id:input.dataset.maintenanceSelect,action:'remove-worktree'}]);if(!operations.length){notice.className='mo-notice error';notice.textContent='请先选择至少一个当前建议。';return}}
+   else if(button.dataset.maintenanceAuthorize)operations=[['/team/api/maintenance/authorize',{item_id:button.dataset.maintenanceAuthorize,action:'remove-worktree'}]];
+   else if(button.dataset.maintenanceExecute){if(!window.confirm('仅移除此 linked worktree；local branch 与 commit 将保留。继续？'))return;operations=[['/team/api/maintenance/execute',{authorization_id:button.dataset.maintenanceExecute}]]}
+   else return;
+   button.disabled=true;notice.className='mo-notice';notice.textContent='正在执行本机维护步骤；不会删除 branch。';try{for(const [path,body] of operations)await api(path,body);notice.textContent='本机维护步骤已完成，正在刷新 evidence-bound 状态。';window.location.reload()}catch(error){notice.className='mo-notice error';notice.textContent=error.message;button.disabled=false}});
+})();
+"""
+
+
 def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     if projection.get("status") != "ready":
         error = projection.get("error", {})
@@ -1657,16 +1748,27 @@ def inject_personal_observatory(page: str, projection: Mapping[str, Any]) -> str
         raise ValueError("Observatory content marker not found")
     if "</style>" not in page:
         raise ValueError("document style marker not found")
-    result = page.replace("</style>", PERSONAL_OBSERVATORY_CSS + "</style>", 1)
+    result = page.replace(
+        "</style>", PERSONAL_OBSERVATORY_CSS + MAINTENANCE_OBSERVATORY_CSS + "</style>", 1
+    )
     nav_item = (
         '<a class="nav-item" data-target="personal-observatory">'
         '<span class="dot state"></span><span class="lbl">Personal Observatory</span></a>'
     )
-    result = result.replace(nav_marker, nav_marker + nav_item, 1)
-    return result.replace(
+    maintenance_nav = (
+        '<a class="nav-item" data-target="workspace-maintenance">'
+        '<span class="dot state"></span><span class="lbl">工作区维护</span></a>'
+    )
+    result = result.replace(nav_marker, nav_marker + nav_item + maintenance_nav, 1)
+    result = result.replace(
         content_marker,
-        render_personal_observatory_panel(projection) + content_marker,
+        render_personal_observatory_panel(projection)
+        + _maintenance_panel(projection)
+        + content_marker,
         1,
+    )
+    return result.replace(
+        "</body>", "<script>" + MAINTENANCE_OBSERVATORY_JS + "</script></body>", 1
     )
 
 

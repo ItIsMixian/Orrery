@@ -13,6 +13,22 @@
   "last_scaffold_run": "2026-08-18",
   "authority_status": "integrated",
   "toolchain_status": "current",
+  "collaboration": {
+    "workspace_maintenance": {
+      "policy_version": 1,
+      "scan_on_observatory_start": true,
+      "catch_up_after_hours": 24,
+      "worktree_count_threshold": 8,
+      "reclaim_threshold_mb": 500,
+      "integrated_grace_days": 7,
+      "local_branch_reminder_days": 30,
+      "auto_remove_eligible_worktrees": false,
+      "ignored_allowlist": [
+        "**/__pycache__/**",
+        "docs/_site/**"
+      ]
+    }
+  },
   "managed_tools": [
     "scripts/docsite/_llm.py",
     "scripts/docsite/build_docsite.py",

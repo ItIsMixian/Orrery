@@ -24,7 +24,34 @@
       "properties": {
         "integration_ref": {"type": "string", "pattern": "^refs/heads/[^/](?:.*[^/])?$"},
         "primary_worktree": {"type": "string", "minLength": 1},
-        "project_mode": {"enum": ["personal", "team"]}
+        "project_mode": {"enum": ["personal", "team"]},
+        "workspace_inventory": {
+          "type": "object",
+          "properties": {
+            "workspace_roots": {"type": "array", "items": {"type": "string"}},
+            "retained_paths": {"type": "array", "items": {"type": "string"}},
+            "recovery_paths": {"type": "array", "items": {"type": "string"}},
+            "credential_cache_paths": {"type": "array", "items": {"type": "string"}},
+            "recovery_refs": {"type": "array", "items": {"type": "string"}}
+          },
+          "additionalProperties": false
+        },
+        "workspace_maintenance": {
+          "type": "object",
+          "required": ["policy_version", "scan_on_observatory_start", "catch_up_after_hours", "worktree_count_threshold", "reclaim_threshold_mb", "integrated_grace_days", "local_branch_reminder_days", "auto_remove_eligible_worktrees", "ignored_allowlist"],
+          "properties": {
+            "policy_version": {"const": 1},
+            "scan_on_observatory_start": {"type": "boolean"},
+            "catch_up_after_hours": {"type": "integer", "minimum": 1},
+            "worktree_count_threshold": {"type": "integer", "minimum": 1},
+            "reclaim_threshold_mb": {"type": "integer", "minimum": 1},
+            "integrated_grace_days": {"type": "integer", "minimum": 0},
+            "local_branch_reminder_days": {"type": "integer", "minimum": 1},
+            "auto_remove_eligible_worktrees": {"const": false},
+            "ignored_allowlist": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },

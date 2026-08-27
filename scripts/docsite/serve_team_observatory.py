@@ -48,6 +48,12 @@ from project_orrery_core.team import (
     stop_owned_coordinator_server,
     sync_now,
 )
+from project_orrery_core.maintenance import (
+    authorize_maintenance_item,
+    execute_maintenance_authorization,
+    maintenance_status,
+    run_maintenance_scan,
+)
 from project_orrery_observatory.team_observatory import inject_team_observatory, safe_json
 
 
@@ -63,7 +69,8 @@ def build_team_page(project_root: Path) -> str:
     os.environ["ORRERY_PERSONAL_OBSERVATORY_VIEW"] = "1"
     try:
         page, _stats, _authority, _personal = build_personal_observatory.render_personal_site(
-            ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Project Orrery · Documentation"
+            ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Project Orrery · Documentation",
+            maintenance_control_available=True,
         )
     finally:
         if previous is None:
@@ -158,6 +165,10 @@ class TeamUIState:
             "execution_capability": False,
             "privacy": "metadata-only",
         }
+
+    def refresh_page(self) -> None:
+        if self.project_root.resolve() == ROOT.resolve():
+            self.page = build_team_page(self.project_root).encode("utf-8")
 
 
 class TeamUIServer(ThreadingHTTPServer):
@@ -259,6 +270,10 @@ class TeamUIHandler(BaseHTTPRequestHandler):
                 self._control()
                 self._json(HTTPStatus.OK, self.server.state.public_status())
                 return
+            if self.path == "/team/api/maintenance/status":
+                self._control()
+                self._json(HTTPStatus.OK, {"maintenance": maintenance_status(self.server.state.project_root)})
+                return
             self._json(HTTPStatus.NOT_FOUND, {"error": "not-found"})
         except PermissionError as error:
             self._error(HTTPStatus.FORBIDDEN, error)
@@ -269,12 +284,16 @@ class TeamUIHandler(BaseHTTPRequestHandler):
         try:
             self._origin()
             self._control()
-            body = self._body(
-                {"request_id", "decision"}
-                if self.path == "/team/api/request/decision"
-                else set()
-            )
+            expected = set()
+            if self.path == "/team/api/request/decision":
+                expected = {"request_id", "decision"}
+            elif self.path == "/team/api/maintenance/authorize":
+                expected = {"item_id", "action"}
+            elif self.path == "/team/api/maintenance/execute":
+                expected = {"authorization_id"}
+            body = self._body(expected)
             root = self.server.state.project_root
+            maintenance_action = self.path.startswith("/team/api/maintenance/")
             if self.path == "/team/api/enable":
                 enable_team(root, member_id="local-owner", device_id="local-device", host_id="local-host")
             elif self.path == "/team/api/disable":
@@ -306,6 +325,16 @@ class TeamUIHandler(BaseHTTPRequestHandler):
                     request_kind="pause-workstream",
                     summary="Pause at the next local safe point",
                 )
+            elif self.path == "/team/api/maintenance-request":
+                envelope = capture_metadata_envelope(root)
+                config = load_team_config(root)
+                send_request(
+                    root, endpoint=self.server.state.endpoint(),
+                    target_member_id=str(config["member_id"]),
+                    workstream_id=str(envelope["workstream_id"]),
+                    request_kind="cleanup",
+                    summary="Evaluate workspace maintenance on the target member host",
+                )
             elif self.path == "/team/api/request/decision":
                 request_id = str(body["request_id"])
                 decision = str(body["decision"])
@@ -322,10 +351,28 @@ class TeamUIHandler(BaseHTTPRequestHandler):
                     root, endpoint=self.server.state.endpoint(), request_record=selected,
                     decision=decision, reason=f"{decision}ed in Host-local Team Observatory",
                 )
+            elif self.path == "/team/api/maintenance/scan":
+                result = run_maintenance_scan(root, reason="manual")
+                if result["scan"]["status"] not in {"succeeded", "debounced"}:
+                    raise ValueError("maintenance scan did not complete")
+            elif self.path == "/team/api/maintenance/authorize":
+                authorize_maintenance_item(
+                    root,
+                    item_id=str(body["item_id"]),
+                    action=str(body["action"]),
+                    actor_id="local-owner",
+                )
+            elif self.path == "/team/api/maintenance/execute":
+                execute_maintenance_authorization(
+                    root, authorization_id=str(body["authorization_id"])
+                )
             else:
                 self._json(HTTPStatus.NOT_FOUND, {"error": "not-found"})
                 return
-            self._json(HTTPStatus.OK, self.server.state.public_status())
+            if maintenance_action:
+                self.server.state.refresh_page()
+            payload = {"maintenance": maintenance_status(root)} if maintenance_action else self.server.state.public_status()
+            self._json(HTTPStatus.OK, payload)
         except PermissionError as error:
             self._error(HTTPStatus.FORBIDDEN, error)
         except (ValueError, OSError) as error:

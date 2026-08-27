@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
-- 当前 W5C Worktree Candidate 在 W4 health／W5B 最终候选 `6266a44` 上把未发布 Core／CLI／Observatory 推进到 0.1.9／0.1.13／0.1.5：W1–W3 提供 Personal Scope/review/cleanup，W4 health 将交付、对账与工作区卫生分层，W5A 提供 Git-private Team foundation，W5B 提供 root-only loopback UI，W5C 只重组人类信息架构与文案。Core API 仍为 1；这些只属于 `codex/w5c-team-observatory-ux` Worktree scope，公开 v0.2.0 不变。
+- 当前 W6 Worktree Candidate 从 W5C `6dd508f` 吸收 `main@673e252` 后，把未发布 Core／CLI／Observatory 推进到 0.1.10／0.1.14／0.1.6：W1–W3 提供 Personal Scope/review/cleanup，W4 health 将交付、对账与工作区卫生分层，W5A–W5C 提供 Team foundation 与 root-only UI，W6 Phase 0–2 增加本机 workspace maintenance。Core API 仍为 1；这些只属于 `codex/w6-workspace-maintenance` Candidate／Worktree scope，公开 v0.2.0 不变。
 - 本机 worktree 已于 2026-08-27 经维护者授权从 38 个清理为 2 个，只保留 primary 与当前 W5C。31 个 clean legacy worktree 直接移除；3 个 stale-session worktree 先把 Git-private `orrery/` 元数据按 SHA-256 归档再移除；最后移除可由保留 branch 重建的 recovery 与 final W4/W5 candidate worktree。所有 branch／commit 保留；该人工操作不是自动 cleanup 产品能力。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
@@ -54,6 +54,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - W5B Candidate 的 `scripts/docsite/serve_team_observatory.py` 是独立 root-only 动态入口：UI 只绑定 `127.0.0.1`，默认页面在 Team disabled 时显示 Personal zero-network onboarding；enable 只写 Git-private 配置，start 才创建 UI 进程拥有的 loopback Coordinator，关闭 UI 会通过 Core-owned server object 停止该 runtime。Host／Origin、每次启动随机 HttpOnly control cookie、16 KiB body gate、固定 POST 动作与错误脱敏由本机 UI server 执行；页面／JSON 不包含 member credential、API key 或 runtime control token。
 - Team sibling page 只消费 Core `team-read-only-projection` 和 Git-private Team config，显示 mode／Host／Member／sharing／heartbeat／last-seen、Member → Workstream、presence、request inbox 与本机 receipt。页面不复制 revision／TTL／permission／review 规则，不提供任意命令／路径／URL／shell 参数；中央 request 与 accept／reject 始终 `execution_performed=false`，不会把 Agent 自报或最后快照升级为 Review Ready／Integrated／实时在线。
 - W5C 只改写上述页面的层次和语言：当前人话结论与建议操作置顶，成员／任务与 pending request 居中，已处理 request 折叠，Host／Coordinator／heartbeat／revision／测试入口下沉诊断。检测到其他本机 runtime registration 时禁用重复 start 并解释恢复路径；没有获得该 runtime 的 server object、PID 控制或越权停机能力。
+- W6 Phase 0–2 复用 W3 bounded inventory／cleanup eligibility，新增严格 versioned maintenance policy、scan／queue／authorization／receipt、Git-private `orrery/maintenance/`、integration／closed event scan、24h Observatory catch-up、single-flight／debounce／hard timeout／interrupted 记录与 evidence-bound 建议队列。唯一执行面是本机人类确认后、只接受 authorization ID 的固定 `git worktree remove -- <registered-path>`；执行前重新验证 exact workspace/path/HEAD/branch/integration/closure/review/Validation/dirty/ignored evidence，执行后验证目录、registry、branch、commit 与 receipt。branch 与 remote branch 不删除，Team 中央只发送 `cleanup` request；默认 Personal 保持 zero-network、无后台进程、无 OS scheduler、无自动删除。
 
 ## 实现证据
 
@@ -94,6 +95,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `packages/project-orrery-observatory/src/project_orrery_observatory/team_observatory.py`
 - `scripts/docsite/serve_team_observatory.py`
 - `tests/test_team_observatory.py`
+- `packages/project-orrery-core/src/project_orrery_core/maintenance.py`
+- `packages/project-orrery-core/src/project_orrery_core/schema/maintenance-v1.json`
+- `packages/project-orrery-cli/src/project_orrery_cli/maintenance.py`
+- `tests/test_workspace_maintenance.py`
 
 ## 已知缺口
 
@@ -103,5 +108,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W3 source 已实现 review／integration／cleanup；当前 Worktree Candidate 增加修正健康语义的 Personal Observatory、可运行 opt-in Team Core／CLI／loopback Coordinator 与 W5C 人类化 root-only Team UI。仍没有自动发现、真实多机／LAN 质量、自动 Coordinator 迁移／选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete；Team UI 未进入默认 docsite、公开模板或 Release。Canonical 与 promotion 状态由 containing ref／exact-SHA checks 决定。
+- W3 source 已实现 review／integration／cleanup；当前 W6 Worktree Candidate 还包含健康分层的 Personal Observatory、opt-in Team Core／CLI／loopback Coordinator、W5C Team UI 与 W6 默认建议＋本机确认维护闭环。Phase 3 自动 worktree removal 与 Phase 4 OS scheduler Adapter 未实现；仍没有自动发现、真实多机／LAN、自动 Coordinator 迁移／选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。动态 UI 未进入默认 docsite、公开模板或 Release；Canonical 与 promotion 状态由 containing ref／exact-SHA checks 决定。
 - Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.13、其他版本、OS、Provider、模型或未来发行物。
