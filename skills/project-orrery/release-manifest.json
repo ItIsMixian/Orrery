@@ -24,11 +24,11 @@
     }
   },
   "distribution": {
-    "repository": "https://github.com/ItIsMixian/Orrery",
+    "repository": "https://github.com/yw9299-stack/project-orrery",
     "tag": "v0.2.0",
-    "skill_url": "https://github.com/ItIsMixian/Orrery/tree/v0.2.0/skills/project-orrery",
-    "release_url": "https://github.com/ItIsMixian/Orrery/releases/tag/v0.2.0",
-    "archive_url": "https://github.com/ItIsMixian/Orrery/releases/download/v0.2.0/project-orrery-v0.2.0.zip"
+    "skill_url": "https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery",
+    "release_url": "https://github.com/yw9299-stack/project-orrery/releases/tag/v0.2.0",
+    "archive_url": "https://github.com/yw9299-stack/project-orrery/releases/download/v0.2.0/project-orrery-v0.2.0.zip"
   },
-  "latest_manifest_url": "https://raw.githubusercontent.com/ItIsMixian/Orrery/main/skills/project-orrery/release-manifest.json"
+  "latest_manifest_url": "https://raw.githubusercontent.com/yw9299-stack/project-orrery/main/skills/project-orrery/release-manifest.json"
 }

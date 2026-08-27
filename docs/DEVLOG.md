@@ -421,7 +421,10 @@
 
 ## 2026-08-27 — GitHub 当前入口同步 Candidate
 
-- 根 README 中英文展示名与公开链接同步到 Orrery／`ItIsMixian/Orrery`；当前 manifests、Core release
-  bridge 和 Adapter metadata 同步新 URL，`project-orrery` 技术 ID 与历史记录保持不变。
+- 根 README 中英文展示名与公开链接同步到 Orrery／`ItIsMixian/Orrery`；self-host 更新入口和 Adapter
+  metadata 同步新 URL，`project-orrery` 技术 ID与冻结 v0.2.0 manifest/bridge 保持不变。
 - 受影响 JSON、Project 16 项、Adapter 6 项、结构、diff、入口零残留扫描及 6 个公开 URL 验证通过；
   本 Candidate 未提交、未推送，也未修改 tag、Release、Git 历史或 GitHub 设置。
+- 首次 Candidate `230a6ff` 误改冻结 v0.2.0 manifest/bridge，远端 run `33107986476` 在 Windows／Ubuntu
+  以同一 historical-input hash 门失败，main 未更新；修正恢复冻结文件而不更新冻结 hash，并要求新 exact
+  SHA 重跑双平台门。
