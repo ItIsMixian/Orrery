@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - ADR-0004 已接受单仓库分包、canonical `AGENTS.md`、独立组件版本和真实 runtime 证据门；Phase 1 已在工作树建立 Core／CLI／Observatory 源码包，但 Codex Skill 仍是当前唯一发布集成，也没有第二平台兼容实现。
 - ADR-0004 Phase 0 已完成：v0.2.0 的 36 个发布路径、8 个 managed tools、checksum、CLI 入口与 manifest 必需字段已进入机器可读基线；installer／validator／update checker 的人类输出有回归断言，模板 `AGENTS.md` 标题已中立化。
 - 公开 README 当前把可直接运行但仍随 Skill 分发的 Core／CLI 路径、整体仍为 `experimental`／未发布但精确 runtime 范围为 `verified` 的 Codex Adapter，以及 `target` 其他平台分开表述；这不构成独立 Core／CLI 包发布，也不得把验证范围外推到其他 runtime 或 OS。
-- 三个未发布组件初始版本均为 `0.1.0`；当前 W4 health／W5B Candidate 为 Core 0.1.9／CLI 0.1.13／Observatory 0.1.4，Core API 仍为 1；仅 containing ref 为 main 时才是 Canonical。旧 Skill wrapper、managed-tool inventory 与冻结 v0.2 fallback 不变。
+- 三个未发布组件初始版本均为 `0.1.0`；当前 W5C Worktree Candidate 为 Core 0.1.9／CLI 0.1.13／Observatory 0.1.5，Core API 仍为 1；仅 containing ref 为 main 时才是 Canonical。旧 Skill wrapper、managed-tool inventory 与冻结 v0.2 fallback 不变。
 - Observatory 的 9 个当前 managed tools 由独立 component manifest 清点；根观测台与 Skill 模板之间的标题差异通过显式模板投影表达，不复制项目事实。
 - 工作树的未发布 Codex Adapter 当前为 0.1.1：独立 manifest、`SKILL.md`、`agents/openai.yaml`、安装说明与平台安装器位于 `adapters/codex/`；它只声明 Core API 1 与 CLI `>=0.1.0,<0.2.0` 依赖，不包含 canonical 模板、schema 或兼容规则。既有 verified runtime evidence 仍绑定 0.1.0。
 - `scripts/package_codex_adapter.py` 可生成固定条目顺序／时间／权限的独立 ZIP 和 SHA-256；平台安装器支持 dry-run、未知目录拒绝、旧 Skill／已识别 Adapter 整目录备份升级和移入可恢复回收目录的卸载。备份与回收目录位于 skills discovery 根之外，避免宿主重复发现旧 `SKILL.md`。
@@ -40,6 +40,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - W4 Worktree Candidate 的 `build_personal_observatory.py` 是与 M2.2 类似的 root-only opt-in entry；关闭开关时逐字节返回既有 base renderer，开启后组合 W1/W2 Personal projection 与 Canonical W3 read-only provider，并可与显式 Authority Candidate projection 组合。W3 package freshness／risk／human approval／integration eligibility、bounded inventory、cleanup gate 与 closure／receipt 由 Core 或其稳定 Git-private bundle提供；W4 不实现判定或执行动作。该脚本不进入 Observatory managed-tool 白名单或 Skill template，不改变默认 build／serve、wheel managed assets、installer、release manifest、用户级 Skill 或公开 v0.2.0。
 - W5A Candidate 在 W1–W3 contract 上增加 Team schema、Core、CLI 与 stdlib Coordinator。Personal 默认不导入或启动 listener；Team enable 只写 Git-private 配置，`serve` 才显式绑定 loopback，LAN wildcard/private bind 还要求本地开关。Coordinator 只读聚合和发送 request，不执行 shell／Agent／merge／delete；用户级 Skill与公开 v0.2.0 资产没有变化。
 - W5B Candidate 增加 Core-owned in-process Coordinator stop 原语与独立 `serve_team_observatory.py`。root-only UI server 固定绑定 `127.0.0.1`，只接受同源／合法 Host／随机 HttpOnly control cookie 保护的固定 POST，限制 16 KiB body 并脱敏错误；关闭 UI 会停止它拥有的 Coordinator。Team page、动态入口与测试没有加入默认 `build_docsite.py`／`serve.py`、Observatory managed tools、Skill template、installer、release manifest 或公开 v0.2.0。
+- W5C Candidate 只把 Observatory 提升到 0.1.5，并重排 Team page 的信息层级、状态文案、handled request archive 与 responsive layout；server route、POST action、cookie、body、network、Core／CLI contract 和发布清单均不变。
 
 ## 实现证据
 
@@ -99,6 +100,6 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - v0.2.0 已发布；下一补丁需要修复 Windows／Linux ZIP 行尾和权限元数据差异，才能宣称跨平台 byte-for-byte 可重复打包。
 - Phase 1 源码边界和 Phase 2 Codex Adapter 已实现，且一个精确 Windows／Codex 范围已通过真实 runtime E2E；其他 Codex 版本、OS、模型和审批模式仍未验证。Phase 3 Harness JSON 已通过同一提交的 Windows／Ubuntu CI，但这只验收平台中立 CLI／Harness 合约。Core／CLI 独立发行物、多组件发布流水线、manifest v2 和跨 runtime 支持矩阵仍未实现。
 - self-host `main` 的服务端保护要求 exact commit 已通过 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`；维护者仍可直接快进已验证 SHA，不强制 PR。该规则保护 source integration，不选择发布版本、tag 或 Release。
-- 当前多 Workstream Candidate 包含 W1–W3 review/cleanup、修正健康语义的 W4 Personal 指挥台、W5A Team foundation 和 root-only W5B Team UI。仍缺自动发现、真实多机/LAN、自动选主、云 relay、多设备迁移与完整发行接线；Canonical 状态由 containing ref 决定，公开 v0.2.0 不变。
+- 当前 Worktree Candidate 包含 W1–W3 review/cleanup、修正健康语义的 W4 Personal 指挥台、W5A Team foundation 和 root-only W5C Team UI。仍缺自动发现、真实多机/LAN、自动选主、云 relay、多设备迁移与完整发行接线；Canonical 状态由 containing ref 决定，公开 v0.2.0 不变。
 - Claude Code 尚未完成成功认证与模型调用；DeepSeek Harness 只有 manifest 中列出的 Adapter 0.1.0 精确 runtime 范围为 `verified`。两者均无公开分发或跨版本支持承诺，当前源码 Adapter 0.1.1／CLI 0.1.13 与其他 runtime／OS／模型不能继承旧验证结论。
 - Authority Meta Model 已有 fixture-bound Core evaluator、内部兼容判断、neutral CLI `validate` capability report、receipt-gated migration apply/restore、future-release projection contract、`check-update` migration review 与本地 release-candidate gate，但没有维护者选定的实际下一 SemVer／source manifest、M2.2 consumer production evidence、稳定顶层 Core API、独立发行物、Harness Adapter 迁移命令、managed Observatory banner 或发布支持状态变化；v0.2.0 发布事实不变。

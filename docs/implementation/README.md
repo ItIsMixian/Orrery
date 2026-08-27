@@ -14,6 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-27 W5C Team Observatory information architecture](plans/2026-08-27-w5c-team-observatory-ux.md) — active Worktree plan that turns the verified W5B protocol surface into a human-readable team command view without changing Team authority, network, request-only or release boundaries.
 - [2026-08-21 documentation governance and read-only audit](plans/2026-08-21-document-governance-and-audit.md) — active under ADR-0012; Phase 0 self-host governance and D1 internal finding contract／synthetic fixtures are complete as Candidate work, while scanner／CLI, Observatory and release adoption remain future phases.
 - [2026-08-21 M2.2 Observatory Authority Candidate projection](plans/2026-08-21-m2-2-observatory-authority-projection.md) — completed and locally integrated; consumes the M2.1 bundle under an explicit root-only opt-in while preserving the legacy default and independent rollback.
 - [2026-08-21 M2.3 Authority Model 1 release/installer candidate gate](plans/2026-08-21-m2-3-authority-release-candidate-gate.md) — completed and locally integrated; validates maintainer-supplied release inputs without selecting a public SemVer, changing v0.2.0 history or claiming release readiness.

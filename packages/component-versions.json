@@ -15,7 +15,7 @@
     },
     "observatory": {
       "distribution": "project-orrery-observatory",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "inventory_format": 1
     }
   },

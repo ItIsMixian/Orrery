@@ -475,3 +475,10 @@
 - W4 首屏正式拆成 current delivery blocker、reconciliation 与 workspace hygiene；截图中的历史 Direct、无 session Unknown 和 legacy worktree 不再共同组成一个危急总数，但它们仍作为对账或卫生债务保留，不被隐藏或自动清理。
 - W5B 提供 root-only loopback Team 图形流程，延续 W5A metadata-only／request-only／zero-remote-execution 边界；默认 docsite、发布模板与真实多机支持没有被扩大。
 - 中央 Candidate 的结构、隔离站、链接与 forbidden 门通过。动态全仓首次 320 项仅有 3 条 Core 0.1.8 冻结版本断言失败；期望同步到 0.1.9 后原失败定向 3/3 PASS。最终 exact-SHA Windows／Ubuntu required checks 和维护者体验确认仍待完成，未经确认不合并 `main`。
+
+## 2026-08-27 — W5C Team Observatory information architecture Candidate
+
+- 从已通过双平台 required checks 的 W4 health／W5B 候选 `6266a44` 建立独立 `codex/w5c-team-observatory-ux` worktree；没有改动已冻结候选、`main@7932a9c`、tag、Release 或公开 v0.2.0。
+- Observatory 0.1.5 把 Team 页面从协议调试面板改为人类指挥台：动态当前结论与建议操作置顶，成员／任务与 pending request 为主，handled request 和 Coordinator／Host／heartbeat／revision／测试入口默认折叠。
+- 实际浏览器发现并修正 Host 竖排与 Local-only 独占列；同时识别另一个本机 runtime registration／失效登记，不再误写“尚未启动”或只报英文 operation-failed，也不绕过 Core ownership 强停进程。
+- 最终 W5A／W5C／component adjacent checkpoint 17/17 PASS，111.523s；1280px 与 390×844 无横向溢出。首次真实页面生成在 37+ worktree 环境约需 2 分钟，缓存／渐进加载留作独立性能任务。根 PROGRESS／HANDOFF 未由本功能分支改写。
