@@ -418,3 +418,10 @@
 - 本地 integration candidate `c758827` 运行唯一一套动态全仓：291 项中 288 PASS + 3 个既有 Windows symlink privilege skips；integrated structure、1,471 KB 隔离站点、337 份 Markdown／862 个本地链接／0 unexpected missing、secret／forbidden 与 diff 门通过。
 - W3 仍不执行真实 main update 或清理动作；Promotion 必须先把包含最终集成记录的 exact SHA 推到非 main branch，并取得 Windows／Ubuntu required checks。公开 v0.2.0、W4/W5 和 Release 均不改变。
 - 首次远端 `32583193534` 为 Ubuntu PASS／Windows FAIL；Windows 失败来自 `RUNNER~1` 与等价长路径的测试字面比较，而非产品 cleanup 放行。测试统一使用与 Core 相同的 filesystem identity 后，两个原失败用例本地 2/2 PASS；保留首次失败并要求新 exact SHA 重跑双平台门。
+
+## 2026-08-27 — GitHub 当前入口同步 Candidate
+
+- 根 README 中英文展示名与公开链接同步到 Orrery／`ItIsMixian/Orrery`；当前 manifests、Core release
+  bridge 和 Adapter metadata 同步新 URL，`project-orrery` 技术 ID 与历史记录保持不变。
+- 受影响 JSON、Project 16 项、Adapter 6 项、结构、diff、入口零残留扫描及 6 个公开 URL 验证通过；
+  本 Candidate 未提交、未推送，也未修改 tag、Release、Git 历史或 GitHub 设置。

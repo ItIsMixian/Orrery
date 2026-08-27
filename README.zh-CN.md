@@ -1,30 +1,30 @@
 <div align="center">
 
-# Project Orrery
+# Orrery
 
 **面向长期软件项目的可追溯文档系统与本地项目观测台。**
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-[![Validate Project Orrery](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml/badge.svg)](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml)
+[![Validate Orrery](https://github.com/ItIsMixian/Orrery/actions/workflows/validate.yml/badge.svg)](https://github.com/ItIsMixian/Orrery/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Agent & Harness](https://img.shields.io/badge/Agent_%26_Harness-Platform_Neutral-111827)](#可用集成)
 
 </div>
 
-Project Orrery 是一套平台中立、同时面向人类与软件 Agent 的仓库级项目记忆。它把本地 Markdown 组织成持续生长的项目观测台，让产品意图、架构决策、实施计划、当前状态和验证证据保持关联，同时避免把这些性质不同的信息误当成同一种事实。
+Orrery 是一套平台中立、同时面向人类与软件 Agent 的仓库级项目记忆。它把本地 Markdown 组织成持续生长的项目观测台，让产品意图、架构决策、实施计划、当前状态和验证证据保持关联，同时避免把这些性质不同的信息误当成同一种事实。
 
-它的权威模型、Markdown 结构、命令行工具和本地阅读器都面向任何 Agent 或 Harness 平台。特定平台的集成只是可选的交付层，不是 Project Orrery 的身份或边界。
+它的权威模型、Markdown 结构、命令行工具和本地阅读器都面向任何 Agent 或 Harness 平台。特定平台的集成只是可选的交付层，不是 Orrery 的身份或边界。
 
-## 为什么需要 Project Orrery
+## 为什么需要 Orrery
 
-Project Orrery 经历了两个阶段，最初都来自一种非常具体的感受：在个人项目中，Agent 不断生成源码和文档，但这些文件的用途、权威性和相互关系越来越难以判断，最终让维护者对自己的代码库产生强烈的失控感。
+Orrery 经历了两个阶段，最初都来自一种非常具体的感受：在个人项目中，Agent 不断生成源码和文档，但这些文件的用途、权威性和相互关系越来越难以判断，最终让维护者对自己的代码库产生强烈的失控感。
 
 ### 第一阶段：区分阅读界面，但不分裂事实
 
 第一个设计启发是：Agent 和人类进入项目时需要的信息并不相同。Agent 需要精确的导航、当前约束、文件级事实和安全的下一步；人类更需要解释、决策背景、里程碑和清晰的全局概览。把同一堆没有分工的文档同时交给两类读者，对谁都不友好。
 
-因此，Project Orrery 区分的是**面向不同读者的入口与视图**，而不是底层事实。`AGENTS.md`、State 地图和操作性交接帮助 Agent 定位；叙事型文档与项目观测台帮助人类理解。两条阅读路径最终都回到同一组 Seed、有效 ADR、实际实现、当前 State 和验证证据。这是恢复控制感的第一层机制：Agent 可以在明确边界内行动，维护者也能看见项目为什么朝这个方向推进。
+因此，Orrery 区分的是**面向不同读者的入口与视图**，而不是底层事实。`AGENTS.md`、State 地图和操作性交接帮助 Agent 定位；叙事型文档与项目观测台帮助人类理解。两条阅读路径最终都回到同一组 Seed、有效 ADR、实际实现、当前 State 和验证证据。这是恢复控制感的第一层机制：Agent 可以在明确边界内行动，维护者也能看见项目为什么朝这个方向推进。
 
 ### 第二阶段：把文档增长转化为项目可观测性
 
@@ -34,17 +34,17 @@ Project Orrery 经历了两个阶段，最初都来自一种非常具体的感�
 
 Git 很擅长保存版本，却不会主动说明某份文档是设想还是决策、某项决策是否仍然有效、已经批准的设计是否真的交付，以及什么证据能够证明当前状态。在 AI 辅助开发中，这种歧义会迅速累积：文件产出更快，过期方案继续存在，未来的 Agent 还可能很自信地读错事实源。
 
-当多人协作时，这又会变成协调问题。Project Orrery 为提案、决策、计划、状态和证据提供职责稳定的文档位置，让并行工作汇入共享的项目记忆，而不是各自产生一套互相竞争的叙述。
+当多人协作时，这又会变成协调问题。Orrery 为提案、决策、计划、状态和证据提供职责稳定的文档位置，让并行工作汇入共享的项目记忆，而不是各自产生一套互相竞争的叙述。
 
-Project Orrery 为不同知识赋予清晰职责：
+Orrery 为不同知识赋予清晰职责：
 
-![Project Orrery 文档系统架构](docs/assets/document-architecture.zh-CN.svg)
+![Orrery 文档系统架构](docs/assets/document-architecture.zh-CN.svg)
 
 核心规则很简单：**已经接受不等于已经实现，列入计划也不等于已经证明。**
 
 ### 它是一套项目协议，而不是巨型 LLM Wiki
 
-Project Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模型和维护流程。AI 问答、综合分析与检索只是可选的读取层；它们无权决定什么是真的，也不能取代原始文档。
+Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模型和维护流程。AI 问答、综合分析与检索只是可选的读取层；它们无权决定什么是真的，也不能取代原始文档。
 
 对于中小型仓库，分类明确的 Markdown、稳定的阅读入口、显式链接和直接搜索，通常比过早把全部资料切块并向量化更能保留上下文。等仓库规模真正需要时，可以再叠加全文索引、向量索引或 RAG，但这些索引始终是可重建、可替换的派生层。即使没有模型、外部数据库或托管服务，核心权威链仍然能够被阅读和维护。
 
@@ -62,7 +62,7 @@ Project Orrery 的本体是服务于代码仓库与 Agent Harness 的权威模�
 
 ## 可用集成
 
-Project Orrery 的核心工作流可以直接通过命令行运行。当前源码树已经建立内部 Core、CLI 与 Observatory 包边界，以及可独立打包的 Codex、Claude Code、DeepSeek Harness 和 JSON Harness Adapter，但这些新组件都尚未发布；在 v0.2.0 中，受支持脚本仍随旧 Codex Skill 分发，Core／CLI 尚未作为独立 Core/CLI 包发布。平台集成只负责补充特定平台的安装和调用方式，不改变底层权威模型。
+Orrery 的核心工作流可以直接通过命令行运行。当前源码树已经建立内部 Core、CLI 与 Observatory 包边界，以及可独立打包的 Codex、Claude Code、DeepSeek Harness 和 JSON Harness Adapter，但这些新组件都尚未发布；在 v0.2.0 中，受支持脚本仍随旧 Codex Skill 分发，Core／CLI 尚未作为独立 Core/CLI 包发布。平台集成只负责补充特定平台的安装和调用方式，不改变底层权威模型。
 
 | 能力面 | 当前已有内容 | 支持状态 |
 | --- | --- | --- |
@@ -78,8 +78,8 @@ Project Orrery 的核心工作流可以直接通过命令行运行。当前源�
 ### 1. 通过平台中立 CLI 审计并建立文档系统
 
 ```bash
-git clone https://github.com/yw9299-stack/project-orrery.git
-python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
+git clone https://github.com/ItIsMixian/Orrery.git
+python Orrery/skills/project-orrery/scripts/install_project_orrery.py \
   --target /path/to/project \
   --title "我的项目" \
   --dry-run
@@ -95,9 +95,9 @@ python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
 
 向 Codex 提出：
 
-> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
+> Install the tagged Orrery v0.2.0 Skill from https://github.com/ItIsMixian/Orrery/tree/v0.2.0/skills/project-orrery
 
-Skill 会从下一轮对话开始可用。请通过 [GitHub 最新发布页](https://github.com/yw9299-stack/project-orrery/releases/latest)确认当前稳定标签。你也可以先验证发布包的 SHA-256 校验和，再把其中的 `project-orrery` 文件夹手动复制到 Codex Skill 目录。
+Skill 会从下一轮对话开始可用。请通过 [GitHub 最新发布页](https://github.com/ItIsMixian/Orrery/releases/latest)确认当前稳定标签。你也可以先验证发布包的 SHA-256 校验和，再把其中的 `project-orrery` 文件夹手动复制到 Codex Skill 目录。
 
 仅供开发验证：未发布薄 Adapter 可用 `python scripts/package_codex_adapter.py`
 生成归档，并用
@@ -158,7 +158,7 @@ python project-orrery/skills/project-orrery/scripts/validate_installation.py \
 
 ## 更新通知与兼容性
 
-Project Orrery 可以提醒用户存在新的稳定版 Skill，但不会静默修改已安装 Skill 或项目文档。对已经安装 Orrery 的项目使用该 Skill 时，工作流默认最多每 24 小时执行一次只读更新检查；如果用户要求离线，则不会访问网络：
+Orrery 可以提醒用户存在新的稳定版 Skill，但不会静默修改已安装 Skill 或项目文档。对已经安装 Orrery 的项目使用该 Skill 时，工作流默认最多每 24 小时执行一次只读更新检查；如果用户要求离线，则不会访问网络：
 
 ```bash
 python /path/to/project-orrery-skill/scripts/check_project_orrery_update.py \
@@ -179,9 +179,9 @@ python /path/to/project-orrery-skill/scripts/check_project_orrery_update.py \
 | 项目清单格式 | `.project-orrery.json` 的机器可读结构 |
 | 文档架构版本 | 作者文档中被当前版本理解的权威职责 |
 
-Project Orrery 遵循语义化版本，但是否能够直接兼容，以机器可读的 [`release-manifest.json`](skills/project-orrery/release-manifest.json) 为准。补丁版和次版本以保持兼容为目标；主版本可能需要显式迁移。任何版本都无权批量改写项目作者文档。
+Orrery 遵循语义化版本，但是否能够直接兼容，以机器可读的 [`release-manifest.json`](skills/project-orrery/release-manifest.json) 为准。补丁版和次版本以保持兼容为目标；主版本可能需要显式迁移。任何版本都无权批量改写项目作者文档。
 
-如果希望主动收到版本通知，可在 [GitHub 仓库](https://github.com/yw9299-stack/project-orrery)选择 **Watch → Custom → Releases**。正式发布包来自不可变标签，并附带 SHA-256 校验和。先安装精确标签对应的新 Skill，再单独预演目标项目的阅读器升级：
+如果希望主动收到版本通知，可在 [GitHub 仓库](https://github.com/ItIsMixian/Orrery)选择 **Watch → Custom → Releases**。正式发布包来自不可变标签，并附带 SHA-256 校验和。先安装精确标签对应的新 Skill，再单独预演目标项目的阅读器升级：
 
 ```bash
 python /path/to/new-project-orrery-skill/scripts/install_project_orrery.py \
@@ -194,7 +194,7 @@ python /path/to/new-project-orrery-skill/scripts/install_project_orrery.py \
 
 ## 采纳与升级安全
 
-Project Orrery 对既有项目采取保守策略。
+Orrery 对既有项目采取保守策略。
 
 - 默认安装器只创建缺失文件。
 - 脚手架不会覆盖已有的作者文档。
@@ -222,7 +222,7 @@ Project Orrery 对既有项目采取保守策略。
 | [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | 版本化 Codex Adapter 归档与 checksum 构建器 |
 | [`scripts/package_claude_code_adapter.py`](scripts/package_claude_code_adapter.py) | 确定性 Claude Code Plugin 归档与 checksum 构建器 |
 | [`scripts/package_deepseek_harness_adapter.py`](scripts/package_deepseek_harness_adapter.py) | 确定性 npm-compatible DeepSeek Adapter tarball 构建器 |
-| [`docs/`](docs/) | Project Orrery 自身的自托管权威链、当前 State、验证与历史 |
+| [`docs/`](docs/) | Orrery 自身的自托管权威链、当前 State、验证与历史 |
 | [`docs/library/`](docs/library/) | 非权威研究、文献综述、实验方案与设计假设 |
 | [`experiments/context-routing/`](experiments/context-routing/) | 用于上下文路由研究的 ADR 前置基准语料、运行结构与验证工具 |
 | [`tests/`](tests/) | 隔离安装和升级烟雾测试 |
@@ -233,11 +233,11 @@ Project Orrery 对既有项目采取保守策略。
 
 静态阅读器和文档权威模型不依赖 AI 服务。AI 文档问答、路线图综合和里程碑视图需要由目标项目注册 Broker；动态本地观测台不再提供直接 Provider 调用路径。默认托管 Broker 偏向成本与流量控制，外部 Broker 可把上游 Key 保留在独立 OS 身份内。趋势雷达可以使用 GitHub Search，并可选接入网页搜索。
 
-观测台默认只在本地运行。Project Orrery 不包含托管服务、遥测收集器或预置凭据。启用可选联网能力前，请先审查目标项目的服务商和网络配置。
+观测台默认只在本地运行。Orrery 不包含托管服务、遥测收集器或预置凭据。启用可选联网能力前，请先审查目标项目的服务商和网络配置。
 
 ## 当前状态
 
-Project Orrery 目前处于早期公开版本。迁移契约、安装器安全规则、带缓存的兼容性检查器、版本化发布打包、隔离烟雾测试、静态构建、图形化 AI 服务配置以及 Windows／Linux CI 已可运行。仓库现在也使用 [`docs/`](docs/) 下的 Project Orrery 权威链管理自身架构、State、实验和验证。当前阅读器界面以中文为主，但仓库内容可以使用任意语言；更完整的阅读器国际化将作为独立工作推进，不与本次双语项目说明混为一谈。
+Orrery 目前处于早期公开版本。迁移契约、安装器安全规则、带缓存的兼容性检查器、版本化发布打包、隔离烟雾测试、静态构建、图形化 AI 服务配置以及 Windows／Linux CI 已可运行。仓库现在也使用 [`docs/`](docs/) 下的 Orrery 权威链管理自身架构、State、实验和验证。当前阅读器界面以中文为主，但仓库内容可以使用任意语言；更完整的阅读器国际化将作为独立工作推进，不与本次双语项目说明混为一谈。
 
 ## 参与贡献
 
@@ -253,4 +253,4 @@ python -m unittest discover -s tests -v
 
 ## 许可证
 
-Project Orrery 使用 [MIT License](LICENSE) 发布。
+Orrery 使用 [MIT License](LICENSE) 发布。

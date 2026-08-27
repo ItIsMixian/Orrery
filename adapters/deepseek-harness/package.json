@@ -1,6 +1,6 @@
 {
   "name": "project-orrery-deepseek-harness-adapter",
-  "description": "Thin DeepSeek Harness packaged Skill adapter for Project Orrery",
+  "description": "Thin DeepSeek Harness packaged Skill adapter for Orrery",
   "version": "0.1.1",
   "type": "module",
   "main": "index.js",
@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yw9299-stack/project-orrery.git",
+    "url": "git+https://github.com/ItIsMixian/Orrery.git",
     "directory": "adapters/deepseek-harness"
   },
   "dsh": {

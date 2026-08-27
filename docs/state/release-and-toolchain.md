@@ -6,7 +6,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前事实
 
-- Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/yw9299-stack/project-orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。
+- Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/ItIsMixian/Orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。
+- 外部当前展示名和仓库入口已改为 Orrery／`ItIsMixian/Orrery`。Candidate 当前只同步根 README、活跃
+  manifests/runtime metadata 与链接；`project-orrery` 技术 ID、v0.2.0 tag/asset 和历史权威记录保持不变。
 - 正式 zip SHA-256 为 `13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`，发布资产中的 checksum 已通过重新下载复核。
 - Skill、目标工具链、项目 manifest 格式和文档 schema 分别版本化。
 - 默认安装只创建缺失文件；`--upgrade-tools` 只处理白名单并先备份。
