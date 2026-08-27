@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-23
+Updated: 2026-08-27
 
 ## 当前事实
 
@@ -44,6 +44,9 @@ Updated: 2026-08-23
 - W4／W5A 联合 non-main Candidate 的 W4+W5 focused 为 26/26，动态全仓为 316 项中 313 PASS + 3 个既有 Windows symlink privilege skips；结构、legacy/W4 站点、340 Markdown／874 links／0 unexpected missing、schema、安全与 diff 门通过。Candidate `2bc6207` 的 GitHub run `32603440758`：Ubuntu 1m16s PASS；Windows attempt 1 仅既有图形化 AI 设置本机 HTTP 请求 timeout，attempt 2 在同一 SHA 8m44s PASS。该证据不证明真实多机 LAN 或 Team UI，维护者确认仍待完成。
 - 状态同步 SHA `43678f6` 的 run `33095474987` 再次只在 Windows 的相同本机 HTTP 测试超时，证明 `127.0.0.1:9` 关闭端口不是稳定失败装置。测试改用进程内 loopback 503 假上游，保留错误脱敏／500 失败关闭断言；定向动态 1/1 PASS（4.767s），产品代码未改，最终 SHA 仍须双平台 checks。
 - W5A Candidate 新增 `tests/test_collaboration_team.py` 13 项：覆盖 Personal 零监听、显式 enable／disable、loopback runtime 与 LAN 双重开关、项目身份／邀请／Host 本机确认、非成员拒绝、递归 forbidden-field／64 KiB 门、event coalescing／sync-now、revision rollback、手工 active Host 切换、heartbeat off/on、TTL Unknown／Stale／Unavailable、request-only 本机 receipt／zero execution、capability revoke、DNS／公网失败关闭和稳定 CLI JSON。网络测试只绑定 loopback，不调用外部服务；自动发现明确保持 `unsupported-next-phase`。
+- 2026-08-27 W4 health 增加 36-worktree-like 合成 fixture：4 registered-active、1 review-pending、31 legacy-unmanaged，并组合 stale source sessions、37 个历史 Direct、1 个 current Direct、32 个 absent-session Unknown、Primary root、未登记 Candidate 与 retained evidence。断言 current blocker 仅为 1，历史 Direct 进入 reconciliation，Unknown／legacy/no-session／estimated reclaim 进入 hygiene 且不丢弃。
+- W5B 新增 `tests/test_team_observatory.py` 3 项，覆盖 Team sibling/onboarding、root-only、默认不暴露 LAN 输入、loopback-only UI、Host／Origin／随机 HttpOnly cookie、16 KiB body／未知字段拒绝、错误脱敏、enable/start/stop/disable、heartbeat/sharing、capture/sync、Member → Workstream、request accept/reject receipt、UI-owned runtime close 和 member/runtime secret 不回显。W4/W5B + W5A + Personal + 邻接 W1/W3/component checkpoint 最终 33/33 PASS，206.129s；未运行默认／动态全仓。
+- 真实 in-app Chromium 在 1280px 与 390×844 验证 Personal↔Team、disabled onboarding、全部上述按钮、状态变化和 request 两条决定路径；桌面 `scrollWidth=1265 < 1280`，移动 `scrollWidth=375 < 390`。真实本机健康快照只作为本机验证：37 worktrees、0 current Direct blocker、60 reconciliation（4 stale session + 55 historical overlap + 1 unregistered Candidate）、32 hygiene debt、33 Unknown 全部进入 hygiene；这些数字没有提交为项目 fixture 或 canonical 事实。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
 - Pilot 008 Scope Acquisition 重构后，上下文专项为 17/17：新增 passive proxy、4-case Scope analyzer、legacy aggregate-only 拒绝、P/S dry-run 和 formal fail-closed。文件稳定后的默认全仓为 51 项中 49 通过、2 项动态依赖按设计跳过；24 项 corpus、6 份 run record、integrated static build、195 份 Markdown 本地链接与 diff 检查通过。
 - Smoke 001 装置修正增加 2-case app-server ordering self-test，并把 smoke runner 纳入 Pilot 008 控制哈希；上下文专项 18/18，默认全仓 52 项中 50 通过、2 项动态依赖按设计跳过，24 项 corpus、6 份 run record、integrated static build、202 份 Markdown 本地链接与 diff 检查通过。
@@ -151,6 +154,7 @@ Updated: 2026-08-23
 - [2026-08-22 W2 Scope / Finding Candidate](../validation/2026-08-22-w2-scope-finding.md)
 - [2026-08-22 W4 Personal Observatory Worktree Candidate](../validation/2026-08-22-w4-personal-observatory.md)
 - [2026-08-23 W5A opt-in Team Mode foundation](../validation/2026-08-23-w5a-team-mode-foundation.md)
+- [2026-08-27 W4 health / W5B Team Observatory](../validation/2026-08-27-w4-health-w5b-team-observatory.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -163,6 +167,6 @@ Updated: 2026-08-23
 - 发布打包测试验证包内安全边界，但尚未比较不同操作系统生成 archive 的 byte-for-byte 一致性。
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
-- ADR-0007／ADR-0008 的最终候选覆盖 W1–W3 Personal contract、W4 Personal 指挥台和 W5A loopback Team Core／CLI；联合实现 SHA 已取得双平台 checks。仍无自动发现、Team UI 或真实多机 LAN 证据；promotion 必须等待维护者确认并要求 containing docs SHA 通过 required checks。
+- ADR-0007／ADR-0008 的当前 Candidate 覆盖 W1–W3 Personal contract、W4 health Personal 指挥台、W5A loopback Team Core／CLI 与 root-only W5B Team UI。仍无自动发现或真实多机 LAN 证据；本分支只有 Windows 本机 focused/checkpoint/browser 证据，promotion 仍要求中央 Candidate 与 containing docs SHA 的规定门。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。
 - Claude Code 仍被认证阻断。DeepSeek Harness 已证明真实显式／隐式模型调用、模型侧 CLI 失败关闭和修复后的普通 wheel 路由；只有 manifest 中的精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1／模型与生命周期范围进入 `verified`，其余范围不外推。

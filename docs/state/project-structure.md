@@ -1,6 +1,6 @@
 # 项目结构 State
 
-Updated: 2026-08-23
+Updated: 2026-08-27
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md)
 
 ## 当前事实
@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
-- 最终候选将未发布 Core／CLI／Observatory 推进到 0.1.8／0.1.13／0.1.2：W1–W3 提供 Personal Scope/review/cleanup，W4 提供只读 Personal 指挥台，W5A 增加 Git-private Team 身份、严格 metadata envelope、event outbox、Member → Workstream 只读聚合、request-only 本机确认和显式启动的 loopback／LAN Coordinator foundation。Core API 仍为 1；只有 containing ref 为 main 时才是 Canonical，公开 v0.2.0 不变。
+- 当前 W4 health／W5B Candidate 将未发布 Core／CLI／Observatory 推进到 0.1.9／0.1.13／0.1.4：W1–W3 提供 Personal Scope/review/cleanup，W4 health 将交付、对账与工作区卫生分层，W5A 提供 Git-private Team foundation，W5B 增加同一 Observatory 的 Team sibling page 与 root-only loopback UI。Core API 仍为 1；这些只属于 `codex/w4-health-w5-ui` Candidate，公开 v0.2.0 不变。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
 ## 当前边界
@@ -49,6 +49,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - W4 Worktree Candidate 的 root-only `build_personal_observatory.py` 与 Observatory 内部 Personal projection 逐 worktree 调用 W1/W2 status／Scope／finding／lifecycle Core 合约，并正式消费 Canonical W3 的 review package freshness、risk、人类 approval、integration eligibility、bounded workspace inventory、cleanup eligibility、closure 与 action receipt bundle。W4 不复制这些判定：review／integration 只调用 W3 Core，inventory 七类、protection、Unknown 与预计空间来自 W3 bundle，只有 Core 标为 `evaluate-cleanup-eligibility` 的条目才继续调用 cleanup gate；四个 action 始终分别投影且自动采集保持 `authorized=false`、`performed=false`、`implies_actions=[]`。receipt 只显示 caller-attested evidence，不能证明删除已发生。
 - W3 provider 缺失、失败或 schema 不兼容时，W4 整体页面仍保留 W1/W2 的 W4A 投影，W3 区域单独退回 Unavailable／Unknown；它不从目录名、前缀、年龄或页面状态自行推断 review、integration 或 cleanup 结论。
 - 该 W4 Candidate 只生成显式 opt-in 的本地 HTML／可选 JSON 快照；默认 `build_docsite.py`、现有 loopback service、Authority projection、AI Q&A、发布模板与 v0.2.0 行为均未切换。投影声明 `read_only=true`、`writes_performed=false`、`network_performed=false`、`team_runtime_enabled=false`，没有 LAN／Coordinator／Member 同步或页面执行动作。
+- W4 health Candidate 在不改变 W1–W3 Core finding／inventory／cleanup 事实的前提下生成 `derived-read-only` 健康路由。只有双方均为 current session/evidence 且 lifecycle 为 active／review-pending 的 Direct finding 进入 Delivery now blocker；stale session／finding、过期 review 和当前未登记 Candidate 进入 Reconciliation；legacy-unmanaged、no-session、retained、Unknown 与 estimated reclaim 进入 Workspace hygiene。Primary worktree 永远投影为 protected canonical root，不算普通 Agent Workstream；Unknown 按三层记账而不丢弃。
+- W5B Candidate 的 `scripts/docsite/serve_team_observatory.py` 是独立 root-only 动态入口：UI 只绑定 `127.0.0.1`，默认页面在 Team disabled 时显示 Personal zero-network onboarding；enable 只写 Git-private 配置，start 才创建 UI 进程拥有的 loopback Coordinator，关闭 UI 会通过 Core-owned server object 停止该 runtime。Host／Origin、每次启动随机 HttpOnly control cookie、16 KiB body gate、固定 POST 动作与错误脱敏由本机 UI server 执行；页面／JSON 不包含 member credential、API key 或 runtime control token。
+- Team sibling page 只消费 Core `team-read-only-projection` 和 Git-private Team config，显示 mode／Host／Member／sharing／heartbeat／last-seen、Member → Workstream、presence、request inbox 与本机 receipt。页面不复制 revision／TTL／permission／review 规则，不提供任意命令／路径／URL／shell 参数；中央 request 与 accept／reject 始终 `execution_performed=false`，不会把 Agent 自报或最后快照升级为 Review Ready／Integrated／实时在线。
 
 ## 实现证据
 
@@ -86,6 +89,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `packages/project-orrery-core/src/project_orrery_core/schema/team-v1.json`
 - `packages/project-orrery-cli/src/project_orrery_cli/team.py`
 - `tests/test_collaboration_team.py`
+- `packages/project-orrery-observatory/src/project_orrery_observatory/team_observatory.py`
+- `scripts/docsite/serve_team_observatory.py`
+- `tests/test_team_observatory.py`
 
 ## 已知缺口
 
@@ -95,5 +101,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W3 source 已实现 review／integration／cleanup；W4/W5A 最终候选增加 Personal Observatory 和可运行 opt-in Team Core／CLI／loopback Coordinator。仍没有自动发现、自动 Coordinator 迁移／选主、云 relay、多设备迁移或 Team UI，且不执行远程 shell／Agent／merge／delete。Canonical 与 promotion 状态由 containing ref／exact-SHA checks 决定。
+- W3 source 已实现 review／integration／cleanup；当前 Candidate 增加修正健康语义的 Personal Observatory、可运行 opt-in Team Core／CLI／loopback Coordinator 与 root-only Team UI。仍没有自动发现、真实多机／LAN 质量、自动 Coordinator 迁移／选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete；Team UI 未进入默认 docsite、公开模板或 Release。Canonical 与 promotion 状态由 containing ref／exact-SHA checks 决定。
 - Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.13、其他版本、OS、Provider、模型或未来发行物。

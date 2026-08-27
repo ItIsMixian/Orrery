@@ -460,3 +460,11 @@
 - 本轮只准备非 main Candidate；必须先取得 exact-SHA Windows／Ubuntu checks，并由维护者明早确认，才能决定是否合并 main。没有 tag、Release、真实远程执行或目录清理。
 - 实现 candidate `2bc6207` 的 Ubuntu PASS；Windows attempt 1 仅既有图形化 AI 设置本机 HTTP timeout，W3/W4/W5 均通过，随后同 SHA attempt 2 PASS。首次失败保留；在根入口和状态同步后，最终纯文档 SHA 仍须重新过 required checks，且继续等待维护者确认。
 - 状态同步 SHA `43678f6` 的 Windows 再次在同一图形化设置本机 HTTP 请求超时，Ubuntu 通过，W3/W4/W5 仍全部通过。连续复现后停止 rerun 策略：测试用进程内 loopback 503 假上游替换 `127.0.0.1:9` 关闭端口，定向动态 1/1 PASS；产品行为和网络安全边界未改，最终新 SHA 重新走 required checks。
+
+## 2026-08-27 — W4 health semantics / W5B Team Observatory Candidate
+
+- 从 W4／W5A non-main candidate base `31f04ff` 在独立 `codex/w4-health-w5-ui` worktree 开始；没有触碰主 worktree、根 PROGRESS／HANDOFF、push、PR、main、tag 或 Release。
+- Phase A `a900087` 把 Personal 健康页固定为 Delivery now／Reconciliation／Workspace hygiene：current Direct blocker 只计算双方 current session/evidence 的 active／review-pending Workstream；stale source session、历史 finding、过期 review 和未登记 Candidate 进入对账；legacy／no-session／retained／estimated reclaim 与 absent-session Unknown 进入卫生。Primary root 单独保护，Unknown 不丢弃。Observatory 推进到 0.1.3。
+- Phase B `b31e1d1` 增加 Core 0.1.9 owned Coordinator stop 与 Observatory 0.1.4 Team sibling page；新 root-only UI 固定 loopback、同源／Host、随机 HttpOnly cookie、16 KiB body、脱敏错误和固定 POST，复用 W5A projection／permission／revision／TTL／receipt，不增加任意命令／路径／URL 或远程执行面。
+- focused／adjacent checkpoint 最终 33/33 PASS，206.129s；真实 Chromium 在 1280 与 390×844 点击 Personal↔Team、enable、start/stop、heartbeat、sharing、capture/sync、request accept/reject、disable，无横向溢出。浏览器首次发现 Team 第 4 个概览入口被旧 CSS 隐藏，随后把概览组设为 expanded 并重建复验。
+- 浏览器结束后 Team disabled、runtime registration absent、network features empty，UI server 与测试页均关闭。完整证据和仍未实现的自动发现／真实多机／LAN／云 relay 边界见 [Validation](validation/2026-08-27-w4-health-w5b-team-observatory.md)。

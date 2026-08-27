@@ -1,6 +1,6 @@
 # 文档系统 State
 
-Updated: 2026-08-23
+Updated: 2026-08-27
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md)
 
 ## 当前事实
@@ -38,6 +38,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W3 的 State alignment 只检查受影响实现与既有 subsystem State 是否同行，ADR alignment 检查临时 ID、正式编号冲突和引用；工具不会自动改写或编号作者文档。功能分支只同步受影响 subsystem State、Plan、Validation 与 DEVLOG，根 PROGRESS／HANDOFF 仍由唯一整合者处理。
 - W4 Worktree Candidate 的 Personal Observatory 不解析作者文档来重新判断 Git／Scope／finding／Authority，也不重写 W3 review／integration／cleanup 规则。它作为总览仪表盘的 sibling page 由侧栏单独进入，总览本身不承载 Personal 内容。页面按人的阅读顺序呈现“项目现在怎么样／先看这些／谁在推进什么／影响到哪里”：首屏使用确定性本机计数与一句当前焦点，不把 OID、fact scope 或 finding 枚举当作主叙事；待审、阻断与可清理候选来自 W3 Core，raw package hash、OID、path、七类 inventory、closure／receipt 则下沉到默认折叠的技术证据。
 - W4 通过 Workstream session 的 `review_package_id` 调用 W3 freshness／eligibility，而不是扫描目录猜审查队列；bounded inventory 只消费 W3 的 Git metadata／private session／closure／允许根／显式候选来源。四类 cleanup action 在页面只显示资格、授权与 `performed=false`，没有表单或执行入口。provider 缺失、失败、schema 不兼容或存在显式 excluded-worktree 隔离边界时，W1/W2 页面继续可用，W3 区域明确显示 Unavailable／Unknown；隔离边界下自动 W3 provider 不运行。远端、无 session 或不可访问证据也不表达为全局零冲突。
+- W4 health Candidate 进一步把 Personal 首屏固定为“交付状态／当前阻断／需要对账／工作区卫生”。历史 Direct、stale session、absent-session Unknown 和 legacy inventory 不再累加成当前危急；只有双方 current 的 Direct 进入当前 blocker。当前 Candidate 无 session 时明确显示未登记／无法判断交付资格；Primary root 显示 protected canonical root。完整 Unknown 仍在对账或卫生层可追溯。
+- W5B Candidate 在同一 Observatory 增加独立 Team sibling page。Team disabled 时显示 Personal zero-network、enable／serve 分离与 metadata-only/request-only 安全边界；启用后只投影 Core `team-read-only-projection`、Git-private config、Member → Workstream、presence 和 request receipt。动态入口为 root-only／loopback-only，默认／静态 docsite 不启动 socket，也没有把 Team UI 加入 managed-tool 白名单或公开模板。
 
 ## 同步状态
 
@@ -72,11 +74,14 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `packages/project-orrery-core/src/project_orrery_core/team.py`
 - `packages/project-orrery-cli/src/project_orrery_cli/team.py`
 - `tests/test_collaboration_team.py`
+- `packages/project-orrery-observatory/src/project_orrery_observatory/team_observatory.py`
+- `scripts/docsite/serve_team_observatory.py`
+- `tests/test_team_observatory.py`
 
 ## 已知缺口
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
-- W3 已实现证据优先审查与清理资格；W4 最终候选只读投影 W1–W3；W5A 最终候选提供稳定 `team-read-only-projection` interface，但尚无 Team UI。Team runtime 只在显式 enable + serve 后启动；自动发现、富成员管理与跨 Coordinator 迁移仍未实现，当前事实作用域由 containing ref 决定。
+- W3 已实现证据优先审查与清理资格；当前 W4 health／W5B Candidate 只读投影 W1–W3 并提供 root-only Team UI。Team runtime 仍只在显式 enable + start 后启动；默认 docsite／发布模板不加载 Team，自动发现、富成员管理、真实多机/LAN 与跨 Coordinator 迁移仍未实现，当前事实作用域由 containing ref 决定。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

@@ -163,19 +163,19 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 
 - [x] 在本地观测台页首显示当前 scope、branch、HEAD、integration OID、merge base、ahead／behind、dirty 和 untracked 数量。
 - [x] 展示其他本机可见 worktree 的重叠告警，并把远端不可见状态显示为 Unknown。
-- [ ] 单人视图直接展示 Workstream／Agent；多人视图先按 Member 汇总再下钻到各自 Workstream，Host 只作为定位元数据。
-- [ ] 默认只显示 Personal Mode 本地多 Agent 体验；用户按项目明确开启 Team Mode 后才加载成员、中央视图、局域网 Host／加入和同步设置。
+- [x] 单人视图直接展示 Workstream／Agent；多人视图先按 Member 汇总再下钻到各自 Workstream，Host 只作为定位元数据。
+- [x] 默认只显示 Personal Mode 本地多 Agent 体验；用户按项目明确开启 Team Mode 后才加载成员、中央视图、局域网 Host／加入和同步设置。
 - [x] 在同一 Observatory 中为 Personal 指挥台建立独立页面，总览仪表盘只保留侧栏入口；Personal 页先回答项目当前焦点、需关注事项、谁在推进与影响范围，审查队列、Scope／路径／日志／finding／review／cleanup 作为技术证据按需展开。
-- [ ] Team Mode 只增加 Team 页签、Member 聚合、同步／请求／capability 视图；My Workstreams 保留本地执行动作，Team／他人卡片只能查看和发送请求。
-- [ ] 把只读展示层与执行层分开；执行动作必须经过成员权限和平台 Adapter capability 检查。
-- [ ] 中央指挥台允许所有已认证项目成员查看全员状态，但只能发送请求；成员本地指挥台必须对远程请求做明确确认后才执行。
+- [x] Team Mode 只增加 Team sibling page、Member 聚合、同步／请求／capability 视图；Team／他人数据只读且只能形成请求。完整 My Workstreams Agent 执行面仍未实现。
+- [x] 把只读展示层与本机控制层分开；W5B 只开放固定 Team lifecycle／sync／receipt 动作，没有任意命令、路径、URL 或参数入口。
+- [x] 中央指挥台允许已认证项目成员查看全员状态，但只能发送请求；成员本地指挥台只写 accept／reject receipt，始终 `execution_performed=false`。
 - [ ] 按 capability 约束审查、合流、ADR 编号、canonical State 同步、成员和团队设置；验证 Admin／Integrator 也不能直接操作其他成员机器或绕过 L3。
-- [ ] 中央同步层拒绝完整 Prompt／回答／transcript 和源文件正文，只接受版本化任务、Git、scope、验证、finding 与 last-seen 元数据。
-- [ ] 未 push 工作显示为 `Local-only`；路径级证据不足以判断的语义关系保持 Unknown。已 push 源码继续由 Git 托管权限处理，不复制进 Orrery 协调存储。
+- [x] 中央同步层拒绝完整 Prompt／回答／transcript 和源文件正文，只接受版本化任务、Git、scope、验证、finding 与 last-seen 元数据。
+- [x] 未 push 工作显示为 `Local-only`；路径级证据不足以判断的语义关系保持 Unknown。已 push 源码继续由 Git 托管权限处理，不复制进 Orrery 协调存储。
 - [ ] 在成员本地指挥台内置局域网 Coordinator Host 的启动、自动发现、成员验证、Host 确认和手工邀请地址回退；发现广播不能包含任务状态或源码元数据。
 - [ ] 实现单 active Host 与手工 Host 切换；Host 离线不影响本地工作，新的 Host 按单调 revision 重新聚合在线成员状态。首版不做自动 leader election。
-- [ ] 默认只在 Workstream／Scope、Agent 阶段、Git、验证或 finding 变化时经 debounce 后同步；提供立即同步，presence heartbeat 默认关闭并允许成员启用／调频／关闭。
-- [ ] 对断连、突然掉线、Sharing off 和长期未更新分别投影 Offline、Stale／Unknown、Unavailable，不把最后快照当成实时事实。
+- [x] 默认只在 Workstream／Scope、Agent 阶段、Git、验证或 finding 变化时经 debounce 后同步；提供 capture／sync-now，presence heartbeat 默认关闭并允许成员启用／关闭。
+- [x] 对 Offline、Stale／Unknown、Sharing off／Unavailable 分别投影，不把最后快照当成实时事实。
 - [x] 分开展示 Workstream 生命周期、运行状况和证据新鲜度；不能把 Agent 自报的“完成”直接映射为 Review Ready、Integrated 或 Closed。
 - [x] 保持核心 Git 数据模型与 Codex、Claude Code、CI 或代码托管平台适配器分离。
 - [x] 所有状态投影只读，不回写 State、ADR 或 Plan。
@@ -222,6 +222,19 @@ Git／Workstream／Validation／文档。手工 invite／join fallback 可运行
 邀请身份并经 Host-local Admin 确认。自动发现、跨 Coordinator 状态迁移／leader election、云 relay、
 多设备迁移、完整成员 credential re-issue UX、Observatory／Team UI 和公开发布留给 W5B／后续 W4 集成。
 本 checkpoint 不修改 Observatory／docsite，也不把 Candidate 写成 Canonical 或 released。
+
+W4 health／W5B Candidate checkpoint（2026-08-27）：独立分支 `codex/w4-health-w5-ui` 从
+W4／W5A integration candidate `31f04ff` 开始。Phase A 把 Personal 健康投影固定为
+Delivery now／Reconciliation／Workspace hygiene 三层：只有双方均为 current session/evidence 的
+active／review-pending Direct finding 计入当前 blocker；stale session、过期 review 与未登记 Candidate
+进入对账；legacy／no-session／retained／estimated reclaim 进入卫生，Unknown 完整保留。Primary root
+始终是 protected canonical root，不计普通 Agent Workstream。Phase B 把 Core 0.1.9 的 owned-runtime stop
+原语与 Observatory 0.1.4 的 Team sibling page 接到新 root-only `serve_team_observatory.py`；UI server 只绑
+`127.0.0.1`，使用同源／Host／随机 HttpOnly control cookie／16 KiB body gate 和脱敏错误，固定动作复用
+W5A `team-read-only-projection`、revision／TTL／permission／request receipt 规则。关闭 UI 安全停止它拥有的
+Coordinator；默认 build／serve、managed tools、Skill template 和公开 v0.2.0 不变。自动发现、真实多机、
+LAN UX、Host 迁移／选主、云 relay、多设备与远程执行仍未实现。证据见
+[W4 health／W5B Validation](../../validation/2026-08-27-w4-health-w5b-team-observatory.md)。
 
 ### Phase 5 — 自托管迁移与发布
 
