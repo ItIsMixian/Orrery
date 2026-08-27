@@ -19,6 +19,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
 - 当前 W5C Worktree Candidate 在 W4 health／W5B 最终候选 `6266a44` 上把未发布 Core／CLI／Observatory 推进到 0.1.9／0.1.13／0.1.5：W1–W3 提供 Personal Scope/review/cleanup，W4 health 将交付、对账与工作区卫生分层，W5A 提供 Git-private Team foundation，W5B 提供 root-only loopback UI，W5C 只重组人类信息架构与文案。Core API 仍为 1；这些只属于 `codex/w5c-team-observatory-ux` Worktree scope，公开 v0.2.0 不变。
+- 本机 worktree 已于 2026-08-27 经维护者授权从 38 个清理为 4 个：primary、不可变 recovery、最终 W4/W5 integration candidate 与当前 W5C。31 个 clean legacy worktree 直接移除；另 3 个 stale-session worktree 先把 Git-private `orrery/` 元数据按 SHA-256 归档至 `.git/orrery/retired-worktree-sessions/2026-08-27/` 再移除。所有 branch／commit 保留；该人工操作不是自动 cleanup 产品能力。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
 ## 当前边界

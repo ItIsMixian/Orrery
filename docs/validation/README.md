@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-27 local worktree cleanup](2026-08-27-local-worktree-cleanup.md) — reduces the self-host workspace from 38 to 4 registered worktrees after exact clean/ignored/process checks, preserves every branch and commit, archives three stale private sessions by SHA-256, and records the manual-not-automatic cleanup boundary.
 - [2026-08-27 W5C Team Observatory information architecture](2026-08-27-w5c-team-observatory-ux.md) — reorganizes the verified Team surface around a plain-language current brief, contextual next actions, members/tasks, pending-versus-handled requests and collapsed diagnostics without changing authority, network or request-only boundaries.
 - [2026-08-27 W4 health / W5B final integration candidate](2026-08-27-w4-health-w5b-integration-candidate.md) — integrates the corrected delivery/reconciliation/hygiene semantics and the root-only Team UI on a non-main candidate, records central structure/site/full-suite evidence, and keeps exact-SHA Promotion plus maintainer experience pending.
 - [2026-08-27 W4 health / W5B Team Observatory](2026-08-27-w4-health-w5b-team-observatory.md) — separates current delivery blockers from stale reconciliation and workspace hygiene, then adds a root-only loopback Team sibling page over Core projection with fixed local controls, request receipts, security gates and desktop/390px browser evidence.

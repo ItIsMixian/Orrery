@@ -482,3 +482,9 @@
 - Observatory 0.1.5 把 Team 页面从协议调试面板改为人类指挥台：动态当前结论与建议操作置顶，成员／任务与 pending request 为主，handled request 和 Coordinator／Host／heartbeat／revision／测试入口默认折叠。
 - 实际浏览器发现并修正 Host 竖排与 Local-only 独占列；同时识别另一个本机 runtime registration／失效登记，不再误写“尚未启动”或只报英文 operation-failed，也不绕过 Core ownership 强停进程。
 - 最终 W5A／W5C／component adjacent checkpoint 17/17 PASS，111.523s；1280px 与 390×844 无横向溢出。首次真实页面生成在 37+ worktree 环境约需 2 分钟，缓存／渐进加载留作独立性能任务。根 PROGRESS／HANDOFF 未由本功能分支改写。
+
+## 2026-08-27 — Local worktree cleanup and stale-session retirement
+
+- 维护者要求先清理本机工作区。只读审计确认 31 个 legacy 目标 tracked/untracked 为 0，ignored 只有 `__pycache__`／`docs/_site`，无可疑本机文件或占用进程；使用 `git worktree remove --force` 移除目录但保留所有 branch／commit，回收约 117.1 MB。
+- 三个 protected stale session 不被伪造为正常 closed：先把各自 Git-private `orrery/` 复制到 `.git/orrery/retired-worktree-sessions/2026-08-27/` 并验证 `worktree.json` SHA-256，再移除 worktree。恢复证据不进入作者文档或发布包。
+- 最终从 38 降至 4 个 worktree；当前 W5C 正式登记为 validating／waiting-for-user。Personal Observatory 从 41 reconciliation／34 hygiene 变为 0 reconciliation／2 intentional hygiene，后者是 recovery 与最终 integration candidate。branch、commit、remote、源码和 benchmark 未删除。
