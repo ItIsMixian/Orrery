@@ -488,3 +488,9 @@
 - 维护者要求先清理本机工作区。只读审计确认 31 个 legacy 目标 tracked/untracked 为 0，ignored 只有 `__pycache__`／`docs/_site`，无可疑本机文件或占用进程；使用 `git worktree remove --force` 移除目录但保留所有 branch／commit，回收约 117.1 MB。
 - 三个 protected stale session 不被伪造为正常 closed：先把各自 Git-private `orrery/` 复制到 `.git/orrery/retired-worktree-sessions/2026-08-27/` 并验证 `worktree.json` SHA-256，再移除 worktree。恢复证据不进入作者文档或发布包。
 - 最终从 38 降至 2 个 worktree；recovery 与最终 integration candidate 目录在确认 clean 后也被移除，但对应 branch／commit 保留。当前 W5C 正式登记为 validating／waiting-for-user；Personal Observatory 从 41 reconciliation／34 hygiene 变为 0／0。remote、源码和 benchmark 未删除。
+
+## 2026-08-27 — Workspace Maintenance / scheduled cleanup Plan
+
+- 维护者接受“定时盘点不等于定时删除”的方向，并要求建立正式 Implementation Plan。新 Plan 复用 ADR-0007／0008 和既有 W3 eligibility，不新增 ADR，也不把人工 38→2 清理写成产品能力。
+- 推荐顺序为 contract／fixture → 事件与启动补查＋建议队列 → 本机确认执行 → 显式 opt-in 自动 worktree removal → 跨平台 OS scheduler Adapter。默认阈值为 24h 补查、8 worktrees、500 MB、7 天 worktree 缓冲与 30 天 branch 提醒；所有 branch 动作继续独立且默认不执行。
+- 本轮只新增 Plan、索引和历史记录，没有实现 scheduler、executor、maintenance queue、配置字段或 Observatory 新页面；根 PROGRESS／HANDOFF 继续留给后续唯一整合者。
