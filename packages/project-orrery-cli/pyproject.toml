@@ -8,7 +8,7 @@ version = "0.1.13"
 description = "Platform-neutral command line interface for Project Orrery"
 requires-python = ">=3.10"
 dependencies = [
-  "project-orrery-core==0.1.8",
+  "project-orrery-core==0.1.9",
   "project-orrery-observatory==0.1.0"
 ]
 

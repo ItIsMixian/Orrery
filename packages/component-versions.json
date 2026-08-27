@@ -4,7 +4,7 @@
   "components": {
     "core": {
       "distribution": "project-orrery-core",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "api_version": 1
     },
     "cli": {
@@ -15,7 +15,7 @@
     },
     "observatory": {
       "distribution": "project-orrery-observatory",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "inventory_format": 1
     }
   },

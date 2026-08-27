@@ -1194,6 +1194,37 @@ def start_coordinator_server(
     return server, {key: value for key, value in runtime.items() if key != "control"}
 
 
+def stop_owned_coordinator_server(
+    project_root: Path, server: _CoordinatorServer, *, occurred_at: str | None = None,
+) -> dict[str, Any]:
+    """Stop the exact in-process Coordinator owned by a local UI/runtime.
+
+    This does not disable Team Mode or touch Workstream facts.  Possession of
+    the server object is the ownership boundary; no PID, URL, path, or shell
+    parameter can be supplied by a remote caller.
+    """
+
+    root = Path(project_root).expanduser().absolute()
+    if Path(server.project_root).resolve() != root.resolve():
+        raise ValueError("Coordinator server is owned by another project root")
+    server.shutdown()
+    server.server_close()
+    _runtime_path(root).unlink(missing_ok=True)
+    config = load_team_config(root)
+    if config.get("enabled"):
+        config["runtime_status"] = "team-enabled-stopped"
+        config["network_features"] = []
+        config["updated_at"] = _timestamp(occurred_at)
+        _validate_team_config(config)
+        _atomic_json(_team_config_path(root), config)
+    return {
+        "runtime_status": "team-enabled-stopped",
+        "network_features": [],
+        "team_enabled": bool(config.get("enabled")),
+        "local_facts_preserved": True,
+    }
+
+
 def disable_team(project_root: Path, *, occurred_at: str | None = None) -> dict[str, Any]:
     """Stop a known local runtime, then disable all Team network/sync features."""
     root = Path(project_root).expanduser().absolute()
