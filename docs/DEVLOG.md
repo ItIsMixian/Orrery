@@ -459,3 +459,4 @@
 - W4+W5 focused 26/26、动态全仓 313 PASS + 3 privilege skips；结构、legacy/W4 站点、340 Markdown／874 links／0 unexpected missing、安全、schema 与 diff 门通过。
 - 本轮只准备非 main Candidate；必须先取得 exact-SHA Windows／Ubuntu checks，并由维护者明早确认，才能决定是否合并 main。没有 tag、Release、真实远程执行或目录清理。
 - 实现 candidate `2bc6207` 的 Ubuntu PASS；Windows attempt 1 仅既有图形化 AI 设置本机 HTTP timeout，W3/W4/W5 均通过，随后同 SHA attempt 2 PASS。首次失败保留；在根入口和状态同步后，最终纯文档 SHA 仍须重新过 required checks，且继续等待维护者确认。
+- 状态同步 SHA `43678f6` 的 Windows 再次在同一图形化设置本机 HTTP 请求超时，Ubuntu 通过，W3/W4/W5 仍全部通过。连续复现后停止 rerun 策略：测试用进程内 loopback 503 假上游替换 `127.0.0.1:9` 关闭端口，定向动态 1/1 PASS；产品行为和网络安全边界未改，最终新 SHA 重新走 required checks。

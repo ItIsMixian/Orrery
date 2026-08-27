@@ -46,3 +46,10 @@ Status: Implementation candidate PASS；final documentation SHA checks pending�
 - Windows attempt 1：唯一错误为既有 `test_graphical_ai_settings_api_is_local_and_never_echoes_keys` 对本机假上游的 10s HTTP timeout；W3/W4/W5 新增测试全部通过；
 - Windows attempt 2：同一 SHA PASS，8m44s；首次失败保留，不重分类；
 - 本次状态同步会形成新的纯文档 SHA；它必须再次取得 required checks，才是可由维护者批准的最终 merge candidate。
+
+## Windows 本机 HTTP 测试装置修复
+
+- 状态同步 SHA `43678f6` 的 GitHub Actions [`33095474987`](https://github.com/yw9299-stack/project-orrery/actions/runs/33095474987)：Ubuntu PASS（1m11s），Windows 唯一错误仍是图形化 AI 设置测试对 `127.0.0.1:9` 的 10s 本机请求 timeout；W3/W4/W5 新增测试均通过；
+- 关闭端口在 Windows hosted runner 上并不保证立即 connection-refused，连续两个 SHA 复现后不再允许靠 rerun 碰运气；
+- 测试改为在进程内启动 loopback `ThreadingHTTPServer`，确定性返回 HTTP 503；仍验证 docsite 返回 500、失败关闭且不回显 API Key，不改变产品代码或放宽外部网络边界；
+- 修复后定向动态测试 1/1 PASS，4.767s；包含本段和装置修复的最终 exact SHA 必须重新取得 Windows／Ubuntu required checks。

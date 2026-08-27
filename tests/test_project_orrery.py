@@ -724,26 +724,51 @@ class ProjectOrreryTests(unittest.TestCase):
                     ), timeout=10)
                 self.assertEqual(blocked_http.exception.code, 400)
 
-                test_payload = json.dumps({
-                    "brokerMode": "managed",
-                    "provider": "custom",
-                    "baseUrl": "http://127.0.0.1:9/v1",
-                    "model": "settings-test-model",
-                    "intentModel": "",
-                    "auditModel": "",
-                    "apiKey": sentinel,
-                }).encode("utf-8")
-                test_request = urllib.request.Request(
-                    base + "/api/ai-config/test",
-                    data=test_payload,
-                    headers=authorized_headers,
-                    method="POST",
+                class FailingSettingsUpstream(BaseHTTPRequestHandler):
+                    def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
+                        body = b'{"error":"synthetic upstream failure"}'
+                        self.send_response(503)
+                        self.send_header("Content-Type", "application/json")
+                        self.send_header("Content-Length", str(len(body)))
+                        self.end_headers()
+                        self.wfile.write(body)
+
+                    def log_message(self, _format: str, *_args: object) -> None:
+                        return
+
+                failing_upstream = ThreadingHTTPServer(
+                    ("127.0.0.1", 0), FailingSettingsUpstream
                 )
-                with self.assertRaises(urllib.error.HTTPError) as failed_test:
-                    urllib.request.urlopen(test_request, timeout=10)
-                error_body = failed_test.exception.read().decode("utf-8")
-                self.assertNotIn(sentinel, error_body)
-                self.assertEqual(failed_test.exception.code, 500)
+                failing_thread = threading.Thread(
+                    target=failing_upstream.serve_forever, daemon=True
+                )
+                failing_thread.start()
+                try:
+                    test_payload = json.dumps({
+                        "brokerMode": "managed",
+                        "provider": "custom",
+                        "baseUrl": "http://127.0.0.1:%d/v1"
+                        % failing_upstream.server_address[1],
+                        "model": "settings-test-model",
+                        "intentModel": "",
+                        "auditModel": "",
+                        "apiKey": sentinel,
+                    }).encode("utf-8")
+                    test_request = urllib.request.Request(
+                        base + "/api/ai-config/test",
+                        data=test_payload,
+                        headers=authorized_headers,
+                        method="POST",
+                    )
+                    with self.assertRaises(urllib.error.HTTPError) as failed_test:
+                        urllib.request.urlopen(test_request, timeout=10)
+                    error_body = failed_test.exception.read().decode("utf-8")
+                    self.assertNotIn(sentinel, error_body)
+                    self.assertEqual(failed_test.exception.code, 500)
+                finally:
+                    failing_upstream.shutdown()
+                    failing_upstream.server_close()
+                    failing_thread.join(timeout=5)
 
                 external_token = "external-broker-token-must-not-echo"
                 external_payload = json.dumps({
