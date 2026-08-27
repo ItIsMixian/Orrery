@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-27 W4 health / W5B final integration candidate](2026-08-27-w4-health-w5b-integration-candidate.md) — integrates the corrected delivery/reconciliation/hygiene semantics and the root-only Team UI on a non-main candidate, records central structure/site/full-suite evidence, and keeps exact-SHA Promotion plus maintainer experience pending.
 - [2026-08-27 W4 health / W5B Team Observatory](2026-08-27-w4-health-w5b-team-observatory.md) — separates current delivery blockers from stale reconciliation and workspace hygiene, then adds a root-only loopback Team sibling page over Core projection with fixed local controls, request receipts, security gates and desktop/390px browser evidence.
 - [2026-08-23 W4/W5A integration candidate](2026-08-23-w4-w5-integration-candidate.md) — ordered non-main integration, 316-test dynamic regression, Personal/W3 read-only projection, opt-in Team foundation and explicit stop-before-main boundary for maintainer review.
 - [2026-08-22/23 W4 Personal Observatory Worktree Candidate](2026-08-22-w4-personal-observatory.md) — independent root-only Personal page over Canonical W1–W3 data, evidence-first review/integration/cleanup projection, seven-class bounded inventory, four-action/receipt non-inference, provider fallback, zero-external-network/read-only boundaries and responsive browser evidence without Team implementation.

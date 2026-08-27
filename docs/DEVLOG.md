@@ -468,3 +468,10 @@
 - Phase B `b31e1d1` 增加 Core 0.1.9 owned Coordinator stop 与 Observatory 0.1.4 Team sibling page；新 root-only UI 固定 loopback、同源／Host、随机 HttpOnly cookie、16 KiB body、脱敏错误和固定 POST，复用 W5A projection／permission／revision／TTL／receipt，不增加任意命令／路径／URL 或远程执行面。
 - focused／adjacent checkpoint 最终 33/33 PASS，206.129s；真实 Chromium 在 1280 与 390×844 点击 Personal↔Team、enable、start/stop、heartbeat、sharing、capture/sync、request accept/reject、disable，无横向溢出。浏览器首次发现 Team 第 4 个概览入口被旧 CSS 隐藏，随后把概览组设为 expanded 并重建复验。
 - 浏览器结束后 Team disabled、runtime registration absent、network features empty，UI server 与测试页均关闭。完整证据和仍未实现的自动发现／真实多机／LAN／云 relay 边界见 [Validation](validation/2026-08-27-w4-health-w5b-team-observatory.md)。
+
+## 2026-08-27 — W4 health／W5B final non-main integration candidate
+
+- 在既有非 `main` W4／W5A integration branch 上以 `--ff-only` 吸收 `a900087`、`b31e1d1` 与 `31b12f7`；候选推进到 Core 0.1.9／CLI 0.1.13／Observatory 0.1.4，`main@7932a9c`、v0.2.0、tag 与 Release 保持不变。
+- W4 首屏正式拆成 current delivery blocker、reconciliation 与 workspace hygiene；截图中的历史 Direct、无 session Unknown 和 legacy worktree 不再共同组成一个危急总数，但它们仍作为对账或卫生债务保留，不被隐藏或自动清理。
+- W5B 提供 root-only loopback Team 图形流程，延续 W5A metadata-only／request-only／zero-remote-execution 边界；默认 docsite、发布模板与真实多机支持没有被扩大。
+- 中央 Candidate 的结构、隔离站、链接与 forbidden 门通过。动态全仓首次 320 项仅有 3 条 Core 0.1.8 冻结版本断言失败；期望同步到 0.1.9 后原失败定向 3/3 PASS。最终 exact-SHA Windows／Ubuntu required checks 和维护者体验确认仍待完成，未经确认不合并 `main`。
