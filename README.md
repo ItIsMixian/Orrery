@@ -1,30 +1,30 @@
 <div align="center">
 
-# Project Orrery
+# Orrery
 
 **A traceable documentation system and local project observatory for long-lived software repositories.**
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-[![Validate Project Orrery](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml/badge.svg)](https://github.com/yw9299-stack/project-orrery/actions/workflows/validate.yml)
+[![Validate Orrery](https://github.com/ItIsMixian/Orrery/actions/workflows/validate.yml/badge.svg)](https://github.com/ItIsMixian/Orrery/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Agent & Harness](https://img.shields.io/badge/Agent_%26_Harness-Platform_Neutral-111827)](#available-integrations)
 
 </div>
 
-Project Orrery is platform-neutral, repository-scale project memory for humans and software agents. It turns local Markdown into a living project observatory where product intent, architectural decisions, implementation plans, current state, and validation evidence stay connected without being mistaken for the same kind of truth.
+Orrery is platform-neutral, repository-scale project memory for humans and software agents. It turns local Markdown into a living project observatory where product intent, architectural decisions, implementation plans, current state, and validation evidence stay connected without being mistaken for the same kind of truth.
 
 Its authority model, Markdown schema, command-line toolchain, and local viewer are designed for use with any Agent or Harness platform. Platform-specific integrations are optional delivery layers, not the identity or boundary of the project.
 
-## Why Project Orrery
+## Why Orrery
 
-Project Orrery grew in two stages from a specific feeling: losing control of a personal codebase because an agent could keep producing source files and documentation faster than their purpose, authority, and relationships could be understood.
+Orrery grew in two stages from a specific feeling: losing control of a personal codebase because an agent could keep producing source files and documentation faster than their purpose, authority, and relationships could be understood.
 
 ### Stage 1: separate reading surfaces without splitting the truth
 
 The first design insight was that agents and humans do not enter a project in the same way. Agents need precise routing, current constraints, file-level facts, and safe next actions. Humans need explanations, decision context, milestones, and a legible overview. Giving both readers the same undifferentiated document pile serves neither well.
 
-Project Orrery therefore separates **reader-specific entrances and views**, not the underlying truth. `AGENTS.md`, State maps, and operational handoffs orient agents; narrative documentation and the observatory orient people. Both resolve to the same Seed, effective ADRs, implementation, current State, and validation evidence. This was the first mechanism for restoring control: an agent can act from explicit boundaries while the maintainer can still see why the project is moving in that direction.
+Orrery therefore separates **reader-specific entrances and views**, not the underlying truth. `AGENTS.md`, State maps, and operational handoffs orient agents; narrative documentation and the observatory orient people. Both resolve to the same Seed, effective ADRs, implementation, current State, and validation evidence. This was the first mechanism for restoring control: an agent can act from explicit boundaries while the maintainer can still see why the project is moving in that direction.
 
 ### Stage 2: turn document growth into project observability
 
@@ -34,17 +34,17 @@ The local observatory grew from that need. Its dashboard, roadmap, milestone, he
 
 Git records versions extremely well, but it does not explain which document is a proposal, which decision is still effective, whether an approved design actually shipped, or what evidence proves the current state. In an AI-assisted repository, that ambiguity compounds quickly: more files are produced, stale alternatives survive, and a future agent may confidently read the wrong source.
 
-The same problem becomes a coordination problem in teams. Project Orrery gives contributors stable, typed places for proposals, decisions, plans, state, and evidence so parallel work can converge on shared project memory instead of producing competing narratives.
+The same problem becomes a coordination problem in teams. Orrery gives contributors stable, typed places for proposals, decisions, plans, state, and evidence so parallel work can converge on shared project memory instead of producing competing narratives.
 
-Project Orrery gives each kind of knowledge a distinct role:
+Orrery gives each kind of knowledge a distinct role:
 
-![Project Orrery documentation architecture](docs/assets/document-architecture.en.svg)
+![Orrery documentation architecture](docs/assets/document-architecture.en.svg)
 
 The governing rule is simple: **accepted does not mean implemented, and planned does not mean proven.**
 
 ### A project protocol, not a giant LLM wiki
 
-Project Orrery is primarily an authority and maintenance protocol for the repository and its agent harness. AI Q&A, synthesis, and retrieval are optional reading layers; they do not decide what is true and never replace the source documents.
+Orrery is primarily an authority and maintenance protocol for the repository and its agent harness. AI Q&A, synthesis, and retrieval are optional reading layers; they do not decide what is true and never replace the source documents.
 
 For small and medium repositories, typed Markdown, stable reading entrances, explicit links, and direct search preserve more context than prematurely chunking everything into embeddings. Larger repositories can add full-text, vector, or RAG indexes when scale justifies them, while keeping those indexes derived and replaceable. The authority chain remains readable without a model, an external database, or a hosted service.
 
@@ -62,7 +62,7 @@ The evidence and open questions behind the next context-routing experiments are 
 
 ## Available integrations
 
-Project Orrery's core workflow can be operated directly from the command line. The current source tree now has internal Core, CLI, and Observatory package boundaries plus independently packageable Codex, Claude Code, DeepSeek Harness, and JSON Harness Adapters, but all of those new components are unreleased. In v0.2.0, the supported scripts are still distributed inside the legacy Codex Skill, and there is not yet a separately packaged Core/CLI distribution. Packaged integrations add platform-specific installation and invocation without changing the underlying authority model.
+Orrery's core workflow can be operated directly from the command line. The current source tree now has internal Core, CLI, and Observatory package boundaries plus independently packageable Codex, Claude Code, DeepSeek Harness, and JSON Harness Adapters, but all of those new components are unreleased. In v0.2.0, the supported scripts are still distributed inside the legacy Codex Skill, and there is not yet a separately packaged Core/CLI distribution. Packaged integrations add platform-specific installation and invocation without changing the underlying authority model.
 
 | Surface | What exists today | Support status |
 | --- | --- | --- |
@@ -78,8 +78,8 @@ Project Orrery's core workflow can be operated directly from the command line. T
 ### 1. Audit and scaffold with the platform-neutral CLI
 
 ```bash
-git clone https://github.com/yw9299-stack/project-orrery.git
-python project-orrery/skills/project-orrery/scripts/install_project_orrery.py \
+git clone https://github.com/ItIsMixian/Orrery.git
+python Orrery/skills/project-orrery/scripts/install_project_orrery.py \
   --target /path/to/project \
   --title "My Project" \
   --dry-run
@@ -95,9 +95,9 @@ stable JSON categories and exit codes. It does not load an Agent Skill or runtim
 
 Ask Codex:
 
-> Install the tagged Project Orrery v0.2.0 Skill from https://github.com/yw9299-stack/project-orrery/tree/v0.2.0/skills/project-orrery
+> Install the tagged Orrery v0.2.0 Skill from https://github.com/ItIsMixian/Orrery/tree/v0.2.0/skills/project-orrery
 
-The skill becomes available on the next turn. Use the [latest GitHub Release](https://github.com/yw9299-stack/project-orrery/releases/latest) to confirm the current stable tag. You can also verify the release archive's SHA-256 checksum and copy its `project-orrery` folder into your Codex skills directory manually.
+The skill becomes available on the next turn. Use the [latest GitHub Release](https://github.com/ItIsMixian/Orrery/releases/latest) to confirm the current stable tag. You can also verify the release archive's SHA-256 checksum and copy its `project-orrery` folder into your Codex skills directory manually.
 
 For development only, the unreleased thin Adapter can be packaged with
 `python scripts/package_codex_adapter.py` and previewed with
@@ -159,7 +159,7 @@ python project-orrery/skills/project-orrery/scripts/validate_installation.py \
 
 ## Updates and compatibility
 
-Project Orrery can notify users about a stable Skill release without silently changing either the installed Skill or a project's documentation. When the Skill is used against an installed project, its workflow performs a read-only update check at most once every 24 hours (unless offline mode is requested):
+Orrery can notify users about a stable Skill release without silently changing either the installed Skill or a project's documentation. When the Skill is used against an installed project, its workflow performs a read-only update check at most once every 24 hours (unless offline mode is requested):
 
 ```bash
 python /path/to/project-orrery-skill/scripts/check_project_orrery_update.py \
@@ -180,9 +180,9 @@ Compatibility is not reduced to one version number:
 | Project-manifest format | Shape of `.project-orrery.json` |
 | Document schema | Authority roles understood in authored project documents |
 
-Project Orrery follows Semantic Versioning, but the machine-readable [`release-manifest.json`](skills/project-orrery/release-manifest.json) decides direct compatibility. Patch and minor updates are intended to remain compatible; major updates may require an explicit migration. No release may bulk-rewrite authored documentation.
+Orrery follows Semantic Versioning, but the machine-readable [`release-manifest.json`](skills/project-orrery/release-manifest.json) decides direct compatibility. Patch and minor updates are intended to remain compatible; major updates may require an explicit migration. No release may bulk-rewrite authored documentation.
 
-To receive releases proactively, select **Watch → Custom → Releases** on the [GitHub repository](https://github.com/yw9299-stack/project-orrery). Published release archives are built from immutable tags and include a SHA-256 checksum. Install the exact tagged Skill first, then preview a target viewer update separately:
+To receive releases proactively, select **Watch → Custom → Releases** on the [GitHub repository](https://github.com/ItIsMixian/Orrery). Published release archives are built from immutable tags and include a SHA-256 checksum. Install the exact tagged Skill first, then preview a target viewer update separately:
 
 ```bash
 python /path/to/new-project-orrery-skill/scripts/install_project_orrery.py \
@@ -195,7 +195,7 @@ Review backups and compatibility before applying. Existing v0.1 installations ne
 
 ## Adoption and upgrade safety
 
-Project Orrery is intentionally conservative around existing repositories.
+Orrery is intentionally conservative around existing repositories.
 
 - The default installer creates missing files only.
 - Existing authored documentation is never overwritten by scaffolding.
@@ -223,7 +223,7 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 | [`scripts/package_codex_adapter.py`](scripts/package_codex_adapter.py) | Versioned Codex Adapter archive and checksum builder |
 | [`scripts/package_claude_code_adapter.py`](scripts/package_claude_code_adapter.py) | Deterministic Claude Code Plugin archive and checksum builder |
 | [`scripts/package_deepseek_harness_adapter.py`](scripts/package_deepseek_harness_adapter.py) | Deterministic npm-compatible DeepSeek Adapter tarball builder |
-| [`docs/`](docs/) | Project Orrery's own self-hosted authority chain, current State, validation, and history |
+| [`docs/`](docs/) | Orrery's own self-hosted authority chain, current State, validation, and history |
 | [`docs/library/`](docs/library/) | Non-authoritative research, literature reviews, experiments, and design hypotheses |
 | [`experiments/context-routing/`](experiments/context-routing/) | Pre-ADR benchmark corpus, run schema, and validation tooling for context-routing research |
 | [`tests/`](tests/) | Isolated installation and upgrade smoke tests |
@@ -234,11 +234,11 @@ Read the complete [architecture](skills/project-orrery/references/architecture.m
 
 The static reader and authority model work without an AI provider. AI-assisted Q&A, roadmap synthesis, and milestone views require a Broker registration supplied by the target project; the dynamic local observatory no longer exposes a direct Provider path. The default managed Broker focuses on cost and traffic control, while an external Broker can keep the upstream key under a separate OS identity. The trend radar can use GitHub Search and, optionally, web search.
 
-The observatory runs locally by default. Project Orrery does not include a hosted service, telemetry collector, or bundled credentials. Review your provider and network configuration before enabling optional online features.
+The observatory runs locally by default. Orrery does not include a hosted service, telemetry collector, or bundled credentials. Review your provider and network configuration before enabling optional online features.
 
 ## Current status
 
-Project Orrery is in an early public release. The migration contract, installer safety rules, cached compatibility checker, versioned release packaging, isolated smoke tests, static build, graphical AI provider configuration, and Windows/Linux CI are operational. The repository now uses Project Orrery's own authority chain under [`docs/`](docs/) to manage its architecture, State, experiments, and validation. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
+Orrery is in an early public release. The migration contract, installer safety rules, cached compatibility checker, versioned release packaging, isolated smoke tests, static build, graphical AI provider configuration, and Windows/Linux CI are operational. The repository now uses Orrery's own authority chain under [`docs/`](docs/) to manage its architecture, State, experiments, and validation. The current reader interface is Chinese-first, while repository content may use any language; broader viewer localization is planned separately from this bilingual project documentation.
 
 ## Contributing
 
@@ -254,4 +254,4 @@ After installing the template's reader dependencies, set `ORRERY_TEST_BUILD=1` t
 
 ## License
 
-Project Orrery is released under the [MIT License](LICENSE).
+Orrery is released under the [MIT License](LICENSE).

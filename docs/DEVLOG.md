@@ -494,3 +494,13 @@
 - 维护者接受“定时盘点不等于定时删除”的方向，并要求建立正式 Implementation Plan。新 Plan 复用 ADR-0007／0008 和既有 W3 eligibility，不新增 ADR，也不把人工 38→2 清理写成产品能力。
 - 推荐顺序为 contract／fixture → 事件与启动补查＋建议队列 → 本机确认执行 → 显式 opt-in 自动 worktree removal → 跨平台 OS scheduler Adapter。默认阈值为 24h 补查、8 worktrees、500 MB、7 天 worktree 缓冲与 30 天 branch 提醒；所有 branch 动作继续独立且默认不执行。
 - 本轮只新增 Plan、索引和历史记录，没有实现 scheduler、executor、maintenance queue、配置字段或 Observatory 新页面；根 PROGRESS／HANDOFF 继续留给后续唯一整合者。
+
+## 2026-08-27 — GitHub 当前入口同步 Candidate
+
+- 根 README 中英文展示名与公开链接同步到 Orrery／`ItIsMixian/Orrery`；self-host 更新入口和 Adapter
+  metadata 同步新 URL，`project-orrery` 技术 ID与冻结 v0.2.0 manifest/bridge 保持不变。
+- 受影响 JSON、Project 16 项、Adapter 6 项、结构、diff、入口零残留扫描及 6 个公开 URL 验证通过；
+  本 Candidate 未提交、未推送，也未修改 tag、Release、Git 历史或 GitHub 设置。
+- 首次 Candidate `230a6ff` 误改冻结 v0.2.0 manifest/bridge，远端 run `33107986476` 在 Windows／Ubuntu
+  以同一 historical-input hash 门失败，main 未更新；修正恢复冻结文件而不更新冻结 hash，并要求新 exact
+  SHA 重跑双平台门。
