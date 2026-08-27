@@ -11,7 +11,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、完整内部 CLI claims、root-only opt-in Observatory projection 与本地 release-candidate gate 已进入 Canonical source baseline；默认 production consumer 和公开 release 未切换 | 审阅 managed consumer 的 production switch 与回滚证据，再由维护者选择真实 SemVer／candidate manifest |
-| 多 Workstream 协作 | W1–W3 已完成 worktree/session、Scope/finding、人工审查、推测性 integration、closure、bounded workspace inventory 与 advisory-only cleanup eligibility；实际 merge／删除仍需另行授权 | 在 W3 contract 上整合 W4 Personal Observatory；W5 Team Mode 继续冻结 |
+| 多 Workstream 协作 | W1–W3 Personal Core、W4 Personal Observatory 与 W5A opt-in Team foundation 已在最终候选中完成；W5A 仅有 loopback/IP-literal、metadata-only、request-only 证据 | 等待维护者确认候选；之后再决定 W5B Team UI、自动发现与真实多机/LAN 验证 |
 | Context routing 研究 | C1 Oracle v0.2 无模型静态 controls 已通过；只有 Pilot 010 设计申请 readiness，没有运行授权或 treatment 采纳 | 由维护者决定是否注册 C2 设计任务；不得自动创建／运行 Pilot 010 |
 | 平台与 Adapter | Claude／DeepSeek Adapter 0.1.0 均已实现但未发布；Claude 被认证阻断，DeepSeek 只有 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／指定模型和生命周期范围为 `verified` | Claude 只在另行授权且认证可用时继续；DeepSeek 后续工作转向独立发行与更多 runtime matrix，不外推当前证据 |
 | 文档治理 | D1 已冻结内部只读 finding schema、11 条规则与 11 组正负 fixture；所有 finding 非权威且默认 advisory | 另行设计 D2 scanner／CLI；不自动修复、压缩 HANDOFF 或启用硬门 |
@@ -21,7 +21,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 - 公开事实仍以 v0.2.0 Release 为准；本地 Canonical 实现、runtime-verified 范围与 released 能力必须分别表达。
 - Authority Model 1 已由 self-host 项目显式选择，但公开 v0.2.0 项目仍是 `legacy-unversioned`；普通工具升级不得替用户选择模型。
 - Authority M2 的 `candidate_ready` 不等于 `release_ready`：缺少默认 managed consumer 的 production evidence 和维护者选择的实际发布版本。
-- 多 Agent 已有 W1–W3 的机器 contract、Git-private session、Scope/finding、本机门禁、review／integration dry-run／closure／cleanup eligibility；Personal 指挥台仍是独立 W4 Candidate，Team telemetry 未实现。
+- 多 Agent 候选已有 W1–W3 机器 contract、W4 Personal 指挥台和 W5A Team Core／CLI；Team Mode 必须显式启用，中央只读/request-only，本机 receipt 始终 `execution_performed=false`。完整 Team UI、自动发现、真实多机与云 relay 未实现。
 - Context-routing 的 H1、H2、B 和 S 均未通过各自采纳门；发布 Skill 不强制 Agent 生成 Context Manifest、Selected Evidence 或访问回执。
 - Broker-only docsite 已统一模型调用入口，但同一 OS 用户下的本机托管只提供路由、缓存和预算门，不构成 Provider Key 的进程隔离。
 - 文档治理与 Authority Meta Model 分层：治理 finding 只是非权威观察，长度／密度只触发人工审查，不能单独使文档失效或自动改写作者内容。
@@ -29,7 +29,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 ## 活动计划与待办
 
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：只推进 production consumer 采纳与实际 release 选择；在此之前不导出稳定 Core API，也不发布模型 1 支持声明。
-- [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：W3 已完成；下一步在干净 Candidate 上整合 W4A 并实现 W3 只读投影，W5 Team Mode 不提前启动。
+- [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：W4 与 W5A 已完成联合候选和本地/远端验证；先等待维护者确认是否推广 main，再单独规划 W5B，不能把 W5A 写成完整 Team Mode。
 - [ ] [Context-routing 研究 State](state/context-routing-research.md)：C1 静态 controls 已完成；C2/Pilot 010 设计尚未获批，更没有模型运行授权。
 - [ ] [平台 Phase 4](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)：DeepSeek 的精确 runtime 门已完成；Claude 的成功认证／模型路由仍未完成，两个 Adapter 的独立发行和更广矩阵均未开始。
 - [ ] [文档治理 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)：D1 contract／fixture 已完成；下一步需另行批准 D2 只读 scanner／CLI，HANDOFF 专项压缩仍须人工复核。
@@ -46,6 +46,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 
 ## 最近完成
 
+- [W4／W5A 联合候选](validation/2026-08-23-w4-w5-integration-candidate.md)：Core 0.1.8／CLI 0.1.13／Observatory 0.1.2，动态全仓 316 项通过，候选实现 SHA `2bc6207` 的 Ubuntu／Windows checks 通过；最终入口 SHA 仍须 Candidate-first 验证并等待维护者确认。
 - [W3 Canonical 集成](validation/2026-08-23-w3-canonical-integration.md)：冻结 Core 0.1.7／CLI 0.1.12 的 review、integration、closure、workspace inventory 与 advisory cleanup contract；Promotion 仍以包含本记录的 exact SHA required checks 为准。
 - [W2 Canonical 集成](validation/2026-08-22-w2-canonical-integration.md)：基于最新 main 增量吸收五来源 Scope/finding；exact SHA `21a2e1c` 已在 GitHub Actions `32570545138` 取得 Windows／Ubuntu 双 PASS，并由受保护 main 接受。
 - [Candidate-first main promotion gate](validation/2026-08-22-candidate-first-main-promotion-gate.md)：Candidate `e4e4442` 先通过 Windows／Ubuntu，再由 strict/admin-enforced branch protection 允许快进 main；PR 非必需，main 不重复运行同一 SHA 的矩阵。
@@ -62,7 +63,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 ## 下一里程碑
 
 1. **Authority：** 明确 managed production consumer 的启用／回滚门，再由维护者选择实际 SemVer 和 candidate manifest。
-2. **协作：** 在 W3 contract 上整合 W4 Personal Observatory 并补齐 review／integration／cleanup 只读投影；Team Mode 继续冻结。
+2. **协作：** 先由维护者审阅 W4／W5A 最终候选；确认后再决定 main promotion 和 W5B，禁止把 loopback foundation 外推为完整 Team Mode。
 3. **研究：** 决定是否批准 C2 的 Pilot 010 设计冻结；在此之前不运行模型。
 4. **文档治理：** 决定是否批准 D2 只读 scanner／CLI；不实现自动修复或公开模板迁移。
 5. **平台：** 在认证可用且另行授权后决定是否继续 Claude Stage B；DeepSeek 不再重复 rc.8 证据，后续只处理发行或新增 runtime matrix。

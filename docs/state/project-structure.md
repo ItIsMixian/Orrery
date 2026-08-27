@@ -18,7 +18,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
-- 联合 Candidate 将未发布 Core／CLI 推进到 0.1.8／0.1.13、Observatory 推进到 0.1.2：W1–W3 提供 Personal Scope/review/cleanup contract，W4 提供只读 Personal 指挥台，W5A 增加 Git-private Team 配置与身份、严格 metadata envelope、event outbox、Member → Workstream 只读聚合、request-only 本机确认和显式启动的 loopback／LAN Coordinator foundation。Core API 仍为 1；公开 v0.2.0 与 Canonical main 尚未改变。
+- 最终候选将未发布 Core／CLI／Observatory 推进到 0.1.8／0.1.13／0.1.2：W1–W3 提供 Personal Scope/review/cleanup，W4 提供只读 Personal 指挥台，W5A 增加 Git-private Team 身份、严格 metadata envelope、event outbox、Member → Workstream 只读聚合、request-only 本机确认和显式启动的 loopback／LAN Coordinator foundation。Core API 仍为 1；只有 containing ref 为 main 时才是 Canonical，公开 v0.2.0 不变。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
 ## 当前边界
@@ -95,5 +95,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W3 source 已实现本地 review／integration dry-run／closure／workspace inventory／cleanup eligibility；W4 Candidate 已只读投影 W1–W3；W5A Candidate 又增加可运行的 opt-in Team Core／CLI 与 loopback Coordinator。仍没有自动发现、自动 Coordinator 迁移／选主、云 relay、多设备迁移或 Team UI，且不执行真实 main update、远程 shell／Agent／merge／delete。Canonical 与远端 promotion 状态仍由最终 exact SHA required checks 决定。
+- W3 source 已实现 review／integration／cleanup；W4/W5A 最终候选增加 Personal Observatory 和可运行 opt-in Team Core／CLI／loopback Coordinator。仍没有自动发现、自动 Coordinator 迁移／选主、云 relay、多设备迁移或 Team UI，且不执行远程 shell／Agent／merge／delete。Canonical 与 promotion 状态由 containing ref／exact-SHA checks 决定。
 - Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.13、其他版本、OS、Provider、模型或未来发行物。

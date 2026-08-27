@@ -72,7 +72,7 @@
 **ID**: `multi-worktree-collaboration`
 
 **What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅和干净集成。
-**Truth**: Git branch／HEAD／worktree 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；W1–W3 已有 worktree/session、五来源 Scope、Direct／Authority／Semantic／Unknown finding、Scope Expansion B、本机 acknowledgement、证据优先 review、推测性 integration、closure 与保守 workspace inventory／cleanup eligibility。Observatory 与 Team runtime 尚未进入 Canonical。
+**Truth**: Git branch／HEAD／worktree 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；W1–W3 提供 worktree/session、Scope/finding、review/integration/closure/cleanup；W4 提供 root-only Personal Observatory；W5A 提供显式 opt-in、metadata-only、request-only Team foundation。只有包含本入口的 exact SHA 位于 `main` 时 W4/W5A 才是 Canonical；Team UI、自动发现和真实多机验证尚未实现。
 **Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
 
 ## context-routing research

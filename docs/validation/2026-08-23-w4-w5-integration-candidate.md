@@ -2,7 +2,7 @@
 
 Date: 2026-08-23
 Scope: 在 `main@7932a9c` 上依次吸收分级验证原则、W4A/W4B Personal Observatory 与 W5A opt-in Team foundation；只形成非 main Candidate，不更新 Canonical main、不发布
-Status: Local PASS；Windows／Ubuntu exact-SHA Candidate checks pending；等待维护者确认后才允许合并 main
+Status: Implementation candidate PASS；final documentation SHA checks pending；等待维护者确认后才允许合并 main
 
 ## 输入与顺序
 
@@ -38,3 +38,11 @@ Status: Local PASS；Windows／Ubuntu exact-SHA Candidate checks pending；等�
 - W5A 只证明 loopback 和 IP-literal 安全边界，不证明真实多机或实际局域网质量；
 - Personal 页面没有 Team 页签；W5A 只提供稳定 `team-read-only-projection` interface；
 - 明早维护者应先审阅本记录、W4 页面和 W5A 边界，再决定是否允许 Candidate-first promotion。
+
+## 远端候选证据
+
+- Implementation candidate `2bc62077a4127da0e450857df84c10c293368ddd`，GitHub Actions [`32603440758`](https://github.com/yw9299-stack/project-orrery/actions/runs/32603440758)；
+- Ubuntu：PASS，1m16s；
+- Windows attempt 1：唯一错误为既有 `test_graphical_ai_settings_api_is_local_and_never_echoes_keys` 对本机假上游的 10s HTTP timeout；W3/W4/W5 新增测试全部通过；
+- Windows attempt 2：同一 SHA PASS，8m44s；首次失败保留，不重分类；
+- 本次状态同步会形成新的纯文档 SHA；它必须再次取得 required checks，才是可由维护者批准的最终 merge candidate。

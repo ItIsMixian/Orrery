@@ -13,7 +13,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 根 `PROGRESS.md` 与 `HANDOFF.md` 是集成视角入口，不是历史总账：PROGRESS 只保留当前线路、未完成事项、阻塞和近期里程碑，完整演化与逐次证据分别进入 DEVLOG／Validation。普通功能分支应让代码、测试和 subsystem State 同行，并在合流时由唯一整合者同步全局入口，避免多个 Agent 持续争写同一份全局状态。
 - ADR-0012 已进入本地 Canonical，并建立独立于 Authority Meta Model 的 Documentation Governance Policy：它按文档角色规定当前／历史边界、事件驱动同步、责任式拆分、soft review budget 和人工审查闭环。它不是新的作者文档类型，也不授权自动改写。
 - 当前 self-host 文档已采用治理入口：PROGRESS／Authority State 完成首轮职责压缩；HANDOFF 因包含大量安全接续细节，被记录为后续人工 review candidate，尚未做专项压缩。
-- ADR-0008 已接受默认 zero-network Personal Mode、手动开启 Team Mode、Local-only 元数据和中央只读／本机执行边界。W4 Candidate 已建立显式 opt-in 的本机 Workstream 指挥台；W5A Candidate 实现不进入作者工作树的 Team 配置、Member／Host、metadata sync、只读聚合、请求与本机决定回执。Team 页签与自动发现明确保持 next-phase。
+- ADR-0008 已接受默认 zero-network Personal Mode、手动开启 Team Mode、Local-only 元数据和中央只读／本机执行边界。最终候选包含显式 opt-in W4 Personal 指挥台和不进入作者工作树的 W5A Team 配置、Member／Host、metadata sync、只读聚合、请求与本机决定回执；只有 containing ref 为 main 时才是 Canonical。Team 页签与自动发现明确保持 next-phase。
 - 根观测台由模板 v0.2.0 安装；其输出 `docs/_site/index.html` 为可重建生成物。
 - 未发布 Core 包现持有 canonical 作者文档模板；Skill 下的 project-template 是兼容投影，测试要求作者模板内容一致。Observatory 工具不属于作者事实，并由独立组件清单管理。
 - 未发布 Codex Adapter 只把 Codex 调用路由到目标仓库根 `AGENTS.md` 和平台中立 CLI；它不携带 State、ADR、Validation、canonical 模板或项目摘要，因此没有形成第二套文档事实。
@@ -77,6 +77,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
-- W3 已在 W2 合约上实现证据优先审查包、推测性 integration、人工 decision、closure、bounded workspace inventory 与清理资格报告；W4 Candidate 已只读投影 W1–W3 证据；W5A Candidate 提供稳定的 `team-read-only-projection` bundle/interface，但尚无 Team UI。Team runtime 只在显式 enable 后由 CLI 启动，自动发现、富成员管理与跨 Coordinator 迁移仍未实现。
+- W3 已实现证据优先审查与清理资格；W4 最终候选只读投影 W1–W3；W5A 最终候选提供稳定 `team-read-only-projection` interface，但尚无 Team UI。Team runtime 只在显式 enable + serve 后启动；自动发现、富成员管理与跨 Coordinator 迁移仍未实现，当前事实作用域由 containing ref 决定。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

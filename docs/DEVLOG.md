@@ -458,3 +458,4 @@
 - 联合源码版本为 Core 0.1.8／CLI 0.1.13／Observatory 0.1.2；W4 只读投影 W1–W3，W5A 提供显式 opt-in、metadata-only、request-only Team foundation，公开 v0.2.0 与发布入口不变。
 - W4+W5 focused 26/26、动态全仓 313 PASS + 3 privilege skips；结构、legacy/W4 站点、340 Markdown／874 links／0 unexpected missing、安全、schema 与 diff 门通过。
 - 本轮只准备非 main Candidate；必须先取得 exact-SHA Windows／Ubuntu checks，并由维护者明早确认，才能决定是否合并 main。没有 tag、Release、真实远程执行或目录清理。
+- 实现 candidate `2bc6207` 的 Ubuntu PASS；Windows attempt 1 仅既有图形化 AI 设置本机 HTTP timeout，W3/W4/W5 均通过，随后同 SHA attempt 2 PASS。首次失败保留；在根入口和状态同步后，最终纯文档 SHA 仍须重新过 required checks，且继续等待维护者确认。
