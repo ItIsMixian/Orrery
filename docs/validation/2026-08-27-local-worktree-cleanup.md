@@ -15,7 +15,7 @@ Scope: Project Orrery self-host 本机工作区。操作由维护者明确要求
 - 没有其他进程引用候选路径；31 个目录约 117.1 MB；
 - patch/ancestry 不作为删除 branch 的依据：部分 source branch 经 cherry-pick 集成，所有 branch 和 commit 均保留。
 
-明确保留：
+第一阶段明确保留：
 
 - primary `D:\coding warehouse\project-orrery`；
 - immutable recovery `D:\coding warehouse\project-orrery-integration-20260820`；
@@ -45,17 +45,23 @@ Scope: Project Orrery self-host 本机工作区。操作由维护者明确要求
 - archive 位于 Git-private 区域，不进入作者文档、发布包或 Observatory 活动扫描；
 - 归档后移除三个 worktree；branch 和 commit 继续保留。
 
+## 第三阶段：移除可重建的保留目录
+
+- 重新审计 recovery 与 final W4/W5 candidate：两者 tracked/untracked 为 0，ignored 只含 `__pycache__`／`docs/_site`，无外部进程引用；
+- recovery 事实由保留分支 `codex/integrate-concurrent-work-20260820@117acac` 重建；final candidate 由 `codex/integrate-w4-w5-20260823@6266a44` 重建；
+- 使用 `git worktree remove --force` 移除两个目录，继续保留 branch／commit；没有删除任何 recovery branch 或已通过 required checks 的 candidate ref。
+
 ## 最终状态
 
-- 4 worktrees：primary、immutable recovery、final W4/W5 candidate、current W5C；
+- 2 worktrees：primary 与 current W5C；
 - W5C 正式登记为 `validating + waiting-for-user`，primary subsystem 为 `multi-worktree-collaboration`；
-- Personal Observatory：1 current Workstream、0 current Direct、0 reconciliation、2 hygiene；两项 hygiene 正是有意保留的 recovery 与 final candidate；
-- startup 从 37+ worktree 环境约 2 分钟降低到 4 worktree 环境 30 秒以内；仍未实现缓存或增量采集；
+- Personal Observatory：1 current Workstream、0 current Direct、0 reconciliation、0 hygiene；
+- startup 从 37+ worktree 环境约 2 分钟降低到 2 worktree 环境 30 秒以内；仍未实现缓存或增量采集；
 - 没有删除 branch、remote ref、commit、源码正文、作者文档、凭据或原始 benchmark。
 
 ## Recovery boundary
 
-- 被移除 worktree 的 tracked 内容可从保留 branch／commit 重建；
+- 被移除 worktree 的 tracked 内容可从保留 branch／commit 重建，包括 recovery 与 final candidate；
 - 三个 stale session 的原始私有元数据可从上述 Git-private archive 只读恢复；
 - `git worktree remove --force` 同时移除了各目录中的 ignored `__pycache__`／`docs/_site`，这些是可重建生成物，不在 Git 中恢复；
 - 本操作不是 Orrery 自动 cleanup 的发布实现，不能据此宣称 W3 closure／eligibility gate 已自动批准这些目标。

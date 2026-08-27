@@ -487,4 +487,4 @@
 
 - 维护者要求先清理本机工作区。只读审计确认 31 个 legacy 目标 tracked/untracked 为 0，ignored 只有 `__pycache__`／`docs/_site`，无可疑本机文件或占用进程；使用 `git worktree remove --force` 移除目录但保留所有 branch／commit，回收约 117.1 MB。
 - 三个 protected stale session 不被伪造为正常 closed：先把各自 Git-private `orrery/` 复制到 `.git/orrery/retired-worktree-sessions/2026-08-27/` 并验证 `worktree.json` SHA-256，再移除 worktree。恢复证据不进入作者文档或发布包。
-- 最终从 38 降至 4 个 worktree；当前 W5C 正式登记为 validating／waiting-for-user。Personal Observatory 从 41 reconciliation／34 hygiene 变为 0 reconciliation／2 intentional hygiene，后者是 recovery 与最终 integration candidate。branch、commit、remote、源码和 benchmark 未删除。
+- 最终从 38 降至 2 个 worktree；recovery 与最终 integration candidate 目录在确认 clean 后也被移除，但对应 branch／commit 保留。当前 W5C 正式登记为 validating／waiting-for-user；Personal Observatory 从 41 reconciliation／34 hygiene 变为 0／0。remote、源码和 benchmark 未删除。
