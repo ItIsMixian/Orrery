@@ -11,7 +11,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、完整内部 CLI claims、root-only opt-in Observatory projection 与本地 release-candidate gate 已进入 Canonical source baseline；默认 production consumer 和公开 release 未切换 | 审阅 managed consumer 的 production switch 与回滚证据，再由维护者选择真实 SemVer／candidate manifest |
-| 多 Workstream 协作 | W7D 非 `main` Integration Candidate 已组合 W7A succession contract、W7B 本机事务执行、CI2 分级测试与 W7C-B 只读关系图；Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，preflight/aggregate discovery 顺序门后 inventory 为 377 IDs／27 shards／51 Fast／70 Checkpoint | 对修复后的非 `main` exact SHA 重跑 Windows／Ubuntu；双 PASS 后等待维护者授权 main fast-forward，self-host apply、默认 UI 执行入口与公开发布继续后置 |
+| 多 Workstream 协作 | W7D 非 `main` Integration Candidate 已组合 W7A succession contract、W7B 本机事务执行、CI2 分级测试与 W7C-B 只读关系图；Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，inventory 377／27／51／70，exact `28f5fad` Windows／Ubuntu required checks 双 PASS | 等待维护者授权 main fast-forward；self-host apply、默认 UI 执行入口与公开发布继续后置 |
 | Context routing 研究 | C1 Oracle v0.2 无模型静态 controls 已通过；只有 Pilot 010 设计申请 readiness，没有运行授权或 treatment 采纳 | 由维护者决定是否注册 C2 设计任务；不得自动创建／运行 Pilot 010 |
 | 平台与 Adapter | Claude／DeepSeek Adapter 0.1.0 均已实现但未发布；Claude 被认证阻断，DeepSeek 只有 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／指定模型和生命周期范围为 `verified` | Claude 只在另行授权且认证可用时继续；DeepSeek 后续工作转向独立发行与更多 runtime matrix，不外推当前证据 |
 | 文档治理 | D1 已冻结内部只读 finding schema、11 条规则与 11 组正负 fixture；所有 finding 非权威且默认 advisory | 另行设计 D2 scanner／CLI；不自动修复、压缩 HANDOFF 或启用硬门 |
@@ -29,7 +29,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 ## 活动计划与待办
 
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：只推进 production consumer 采纳与实际 release 选择；在此之前不导出稳定 Core API，也不发布模型 1 支持声明。
-- [ ] [W7D Integration Candidate Plan](implementation/plans/2026-08-28-w7d-w7-integration-candidate.md)：完成本地分级验证与只读图形验收后，冻结非 `main` exact SHA 并取得 Windows／Ubuntu required checks；双 PASS 仍只允许交给维护者决定 main fast-forward。
+- [x] [W7D Integration Candidate Plan](implementation/plans/2026-08-28-w7d-w7-integration-candidate.md)：非 `main` exact SHA 已取得 Windows／Ubuntu required checks 双 PASS；只允许交给维护者决定 main fast-forward。
 - [ ] [Context-routing 研究 State](state/context-routing-research.md)：C1 静态 controls 已完成；C2/Pilot 010 设计尚未获批，更没有模型运行授权。
 - [ ] [平台 Phase 4](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)：DeepSeek 的精确 runtime 门已完成；Claude 的成功认证／模型路由仍未完成，两个 Adapter 的独立发行和更广矩阵均未开始。
 - [ ] [文档治理 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)：D1 contract／fixture 已完成；下一步需另行批准 D2 只读 scanner／CLI，HANDOFF 专项压缩仍须人工复核。
@@ -67,7 +67,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 ## 下一里程碑
 
 1. **Authority：** 明确 managed production consumer 的启用／回滚门，再由维护者选择实际 SemVer 和 candidate manifest。
-2. **协作：** W7D exact-SHA Windows／Ubuntu 双 PASS 后交由维护者决定 main fast-forward；未经确认不推广 main，不把本机事务 fixture、loopback 或只读图证据外推为真实 self-host apply／LAN／中央执行。
+2. **协作：** 由维护者决定是否把 W7D exact-SHA Candidate fast-forward 到 main；未经确认不推广 main，不把本机事务 fixture、loopback 或只读图证据外推为真实 self-host apply／LAN／中央执行。
 3. **研究：** 决定是否批准 C2 的 Pilot 010 设计冻结；在此之前不运行模型。
 4. **文档治理：** 决定是否批准 D2 只读 scanner／CLI；不实现自动修复或公开模板迁移。
 5. **平台：** 在认证可用且另行授权后决定是否继续 Claude Stage B；DeepSeek 不再重复 rc.8 证据，后续只处理发行或新增 runtime matrix。

@@ -1,6 +1,6 @@
 # 实施计划：W7D W7 Integration Candidate
 
-Status: Candidate implementation complete; local Promotion timing miss retained; exact-SHA hosted Promotion is the remaining gate
+Status: Complete; exact-SHA Windows/Ubuntu Promotion passed; maintainer-authorized main fast-forward remains external
 
 Date: 2026-08-28
 
@@ -48,5 +48,5 @@ browser output and raw timing JSON remain outside Git.
 
 ## Stop condition
 
-Stop only with a clean non-`main` Candidate whose exact pushed SHA has Windows and Ubuntu required-check results.
-Even after both pass, promotion to `main` remains a separate maintainer authorization.
+Stopped with a clean non-`main` Candidate whose exact pushed SHA passed both Windows and Ubuntu required checks.
+Promotion to `main` remains a separate maintainer authorization.

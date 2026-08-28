@@ -29,7 +29,7 @@ W7B is recorded as an implemented Candidate execution boundary: local discovery,
 - Component projection validator: PASS for Core 0.1.14／CLI 0.1.18／Observatory 0.1.9.
 - Integrated installation validation passed with `authority_status=integrated_candidate`, Core 0.1.14, CLI 0.1.18 and Core API 1.
 - Repository gates passed over 653 tracked/untracked paths, 349 Markdown files and 962 local links with no forbidden runtime/generated artifact.
-- After the aggregate repair and current closeout documentation, the isolated docsite rebuilt to 1,951,461 bytes with 14 ADRs, 6 States, 7 subsystems, 2 snapshots, 147 documents, 28 plans and 7 Library entries.
+- After the aggregate repair and final closeout documentation, the isolated docsite rebuilt to 1,952,668 bytes with 14 ADRs, 6 States, 7 subsystems, 2 snapshots, 147 documents, 28 plans and 7 Library entries.
 - `node --check` passed for the visual prototype, and `git diff --check` passed after documentation integration.
 - The dedicated W7B Promotion shard is intentionally deferred until the first stable integration commit and will be run exactly once; the closeout commit records that result without changing implementation or test selection afterward.
 
@@ -75,4 +75,6 @@ Exact Candidate `d9f55b5bd71634be23a54fe2fc50d107881de930` ran as GitHub Actions
 
 The repair installs wheel plus the docsite requirements in both aggregate jobs before artifact inventory aggregation, enables the same dependency cache and extends `validate_ci.py` with a two-platform ordering contract and focused regression. It does not change manifest budgets, selectors, product execution authority or relation UI. The added regression accounts for the final 377/27/51/70 inventory. A new exact SHA must run both required checks.
 
-The final repaired Candidate SHA and hosted run/check results are reported after execution. A green non-`main` Candidate remains only ready for maintainer-authorized main fast-forward; this task does not merge main, create a tag/Release, change branch protection or delete any branch, worktree, commit or Validation.
+Repaired exact Candidate `28f5fad24f8589e146ce56c5507b3e76d81c2bfe` passed all 59 jobs in GitHub Actions run `33194655256`. Both required checks passed: `smoke-test (windows-latest)` job `98929761747` and `smoke-test (ubuntu-latest)` job `98929961709`. The dedicated W7B shard passed in 164 seconds on Windows and 23 seconds on Ubuntu, within the unchanged 300-second budget; both aggregate jobs downloaded and reconciled all 27 platform artifacts successfully.
+
+The non-`main` Candidate is ready for maintainer-authorized main fast-forward. This task did not merge main, create a tag/Release, change branch protection or delete any branch, worktree, commit or Validation. The documentation-only closeout successor must pass the same exact-SHA checks before final handoff, so the reported branch HEAD remains mechanically verified rather than relying only on the implementation predecessor.

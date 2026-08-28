@@ -57,6 +57,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - W7D Integration Candidate 保留 CI manifest schema 2、Fast 15 秒／Checkpoint 90 秒 hard budget 与独立 `team-relations-execution` 300 秒 Promotion shard，并把 W7C-B 两个 dependency-light contract 加入 Fast/Checkpoint、完整 prototype/production module 加入既有 Team Observatory Promotion shard。hosted runs 先后暴露 preflight 与 required aggregate 在 final unittest discovery 前未安装 docsite requirements；workflow、validator 与回归现共同要求 preflight 绑定/清点以及 Windows/Ubuntu aggregate 清点前安装依赖。最终机械 inventory 为 377 unique IDs／27 shards／51 Fast／70 Checkpoint；required-check 名称、Candidate-first exact-SHA 绑定、branch protection、tag、Release 与公开 v0.2.0 均未改变。
 - 第二个 hosted run `33192808364` 已证明 preflight 修复有效且 W7B 独立 shard 在 Windows／Ubuntu 均低于 300 秒；required checks 仍因独立 shard 暴露的测试可移植性/导入顺序/ADR expected-map 问题失败。后续修复只调整确定性测试输入和测试路径规范化，不增加 managed tool、图形执行入口或发布资产。
 - 第三个 hosted run `33193955085` 的 54 个 Promotion shard 和两侧 repository gate 全部通过；两个 required checks 仅因 aggregate job 自身缺少 discovery requirements 失败。聚合 job 修复及静态顺序门不更改 Promotion test ownership、预算、artifact schema 或产品权限。
+- exact Candidate `28f5fad24f8589e146ce56c5507b3e76d81c2bfe` 的 hosted run `33194655256` 以 59/59 jobs PASS 完成；Windows required job `98929761747` 与 Ubuntu required job `98929961709` 双 PASS。该证据只使非 `main` Candidate ready for promotion，不等同于 main、tag、Release 或公开组件发布。
 
 ## 实现证据
 

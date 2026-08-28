@@ -8,6 +8,7 @@
 - Focused 13/13、初始 Fast 51/51 2.132432 秒、Checkpoint 68/68 81.201647 秒通过；preflight 修复后 CI contract 10/10、新增第 69 个 Checkpoint selector 独立通过，最终 hosted 修复后的 Fast 51/51 为 2.328416 秒，未机械重跑完整 Checkpoint。1280×900 与 390×844 in-app Chromium 覆盖三 lens、筛选、历史、节点/边 inspector、键盘、安全链接、零横向溢出与零 console warning/error。唯一一次 W7B Promotion 的 4/4 测试断言成功，但 311.803221 秒超过 300 秒预算而由 runner 正确判 FAIL；未放宽预算或重跑，逐测试对照、结构门与 hosted exact-SHA 结果进入独立 W7D Validation。
 - 修复后的 hosted run `33192808364` 进入完整矩阵，W7B 在 Windows 2m36s／Ubuntu 20s 双 PASS；required checks 仍因 W7C 测试读取 self-host Git-private session、Authority lazy `_llm`/ADR-0014 expected map 与 Windows workspace 字符串路径比较失败。对应修复后本地 workspace 3/3、Team UI 16/16、Authority 127/127 通过；没有改预算、产品关系执行权、图形按钮或发布边界。
 - 第三轮 hosted run `33193955085` 的 54 个跨平台 Promotion shard 与两侧 repository gate 全部通过，W7B 为 Windows 2m32s／Ubuntu 31s；两个 required aggregate 在下载完整 27 份 artifact 后因自身未安装 `mistune` 而失败。现已在 Windows/Ubuntu aggregate 清点前安装相同 discovery requirements，并新增双平台顺序门；这是 CI 聚合装置修复，不改变测试选择或产品边界。
+- exact Candidate `28f5fad24f8589e146ce56c5507b3e76d81c2bfe` 在 hosted run `33194655256` 取得 59/59 jobs PASS；Windows required job `98929761747`、Ubuntu required job `98929961709` 双 PASS，W7B 分别 164 秒／23 秒低于原 300 秒预算。Candidate 已 ready for maintainer-authorized main fast-forward；本任务没有推动 main、tag、Release、branch protection 或删除任何历史对象。
 
 ## 2026-08-28 — CI2 Tiered Test Performance Candidate
 
