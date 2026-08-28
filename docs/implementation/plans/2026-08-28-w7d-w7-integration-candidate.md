@@ -1,6 +1,6 @@
 # 实施计划：W7D W7 Integration Candidate
 
-Status: Completed local Candidate Plan; exact-SHA hosted Promotion is the remaining gate
+Status: Candidate implementation complete; local Promotion timing miss retained; exact-SHA hosted Promotion is the remaining gate
 
 Date: 2026-08-28
 

@@ -29,7 +29,7 @@ W7B is recorded as an implemented Candidate execution boundary: local discovery,
 - Component projection validator: PASS for Core 0.1.14／CLI 0.1.18／Observatory 0.1.9.
 - Integrated installation validation passed with `authority_status=integrated_candidate`, Core 0.1.14, CLI 0.1.18 and Core API 1.
 - Repository gates passed over 653 tracked/untracked paths, 349 Markdown files and 962 local links with no forbidden runtime/generated artifact.
-- The isolated docsite built 1,941,177 bytes with 14 ADRs, 6 States, 7 subsystems, 2 snapshots, 147 documents, 28 plans and 7 Library entries.
+- After closeout documentation, the isolated docsite rebuilt to 1,943,644 bytes with 14 ADRs, 6 States, 7 subsystems, 2 snapshots, 147 documents, 28 plans and 7 Library entries.
 - `node --check` passed for the visual prototype, and `git diff --check` passed after documentation integration.
 - The dedicated W7B Promotion shard is intentionally deferred until the first stable integration commit and will be run exactly once; the closeout commit records that result without changing implementation or test selection afterward.
 
@@ -43,6 +43,20 @@ The root-only synthetic browser fixture was served from the generated sibling pa
 - Mobile at 390×844: controls and accessible ledger reduced to one column, all three lenses remained available, Enter/Space opened edge and node inspection, and the W5E node kept its independent lifecycle/runtime/evidence/Scope axes. `scrollWidth=375` at `innerWidth=390`, so horizontal overflow was absent.
 - Both sizes reported zero browser console warnings/errors and zero execution buttons. Safe links remained same-document repository anchors; opaque evidence was not made navigable.
 
-## Closeout and remote Promotion
+## One-time local W7B Promotion
 
-The one-time W7B local Promotion result, exact implementation merge SHA, final documentation-only Candidate SHA, isolated gates and hosted run/check results are appended here after execution. A green non-`main` Candidate remains only ready for maintainer-authorized main fast-forward; this task does not merge main, create a tag/Release, change branch protection or delete any branch, worktree, commit or Validation.
+The stable implementation merge commit is `2a5d5d4d0065324e9453f0a0522fbc92011a6186`. The dedicated shard was run exactly once on that clean commit:
+
+```text
+python -X utf8 scripts/ci/run_test_shard.py --shard team-relations-execution --output <temp>
+4/4 test outcomes: success
+runner verdict: FAIL — 311.803221s > 300s hard budget
+```
+
+Per-test timings were 0.002979s, 88.452008s, 162.034236s and 61.313722s. The corresponding CI2 record was 0.003037s, 77.326388s, 135.184251s and 52.223925s, total 264.737873s. The three Git-backed journeys slowed by 14.4%, 19.9% and 17.4% in the later run. `git diff 8b635b1..2a5d5d4` is empty for the execution test, Core/CLI implementation and shard runner; W7C-B does not alter this path. This is therefore retained as a local timing-budget miss rather than rewritten as a product assertion failure.
+
+The 300-second budget and four-test selection were not changed, and the local Promotion was not rerun. Hosted exact-SHA Windows/Ubuntu execution is the next independent measurement; if either required check fails, a new Candidate commit and new hosted run are required.
+
+## Remote Promotion closeout
+
+The final documentation-only Candidate SHA and hosted run/check results are appended here after execution. A green non-`main` Candidate remains only ready for maintainer-authorized main fast-forward; this task does not merge main, create a tag/Release, change branch protection or delete any branch, worktree, commit or Validation.

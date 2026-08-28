@@ -40,6 +40,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 - Authority：M2.2 只有 root-only opt-in 证据；M2.3 不会自动选择版本，`release_ready` 仍为 false。
 - 协作：linked worktree 隔离索引和工作目录，但当前没有 OS 级路径沙箱；越界写入仍依赖工作目录纪律和整合审阅发现。
 - W7 Promotion：本地分级结果不能替代 exact-SHA hosted Windows／Ubuntu；双平台通过也不授权自动推进 `main`。
+- W7 本机 timing：唯一一次 `team-relations-execution` 的 4/4 断言成功，但 311.803 秒超过 300 秒 hard budget，runner 结果保持 FAIL；预算/选择未改且没有重跑，必须由 hosted exact-SHA 结果继续判定。
 - Context routing：Pilot 009 只覆盖三个任务、一个模型和一个 runtime；成本方向不能替代 3/3 质量门。
 - 发布：v0.2.0 ZIP checksum 有效，但 Windows／Linux 从同一 tag 重建仍非 byte-for-byte 一致。
 - 凭据：Broker client token 仍能在模型白名单和预算内产生调用；同用户托管不能宣称秘密隔离。
