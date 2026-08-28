@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Orrery Workstream Graph — provisional visual prototype</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#graph-workspace">Skip to graph workspace</a>
+  <header class="masthead">
+    <div class="brand-lockup" aria-label="Project Orrery prototype">
+      <span class="brand-mark" aria-hidden="true">O</span>
+      <span>PROJECT ORRERY</span>
+      <span class="edition">W7C-A / VISUAL LAB</span>
+    </div>
+    <div class="authority-stamp" aria-label="Provisional, non-authoritative fixture">
+      <span aria-hidden="true">◇</span>
+      PROVISIONAL / NON-AUTHORITATIVE
+    </div>
+  </header>
+
+  <main id="graph-workspace" class="page-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="kicker">DERIVED VIEW EXPLORATION · SYNTHETIC FIXTURE</p>
+        <h1 id="page-title">Workstream relation desk</h1>
+        <p class="lede">Trace succession, dependency, and conflict without turning every Workstream into a permanent node cloud.</p>
+      </div>
+      <dl class="scope-readout">
+        <div><dt>ACTIVE TIP</dt><dd id="tip-readout">W7C-A</dd></div>
+        <div><dt>BASE</dt><dd>W5E · 692d19b</dd></div>
+        <div><dt>FIXTURE</dt><dd>provisional v1</dd></div>
+      </dl>
+    </section>
+
+    <section class="control-deck" aria-label="Graph controls">
+      <div class="lens-switch" role="group" aria-label="Graph view">
+        <button class="lens-button is-active" type="button" data-mode="succession" aria-pressed="true">
+          <span class="lens-key">01</span>
+          <span><strong>Succession</strong><small>What continued from what</small></span>
+        </button>
+        <button class="lens-button" type="button" data-mode="dependency" aria-pressed="false">
+          <span class="lens-key">02</span>
+          <span><strong>Dependency</strong><small>What must land first</small></span>
+        </button>
+        <button class="lens-button" type="button" data-mode="conflict" aria-pressed="false">
+          <span class="lens-key">03</span>
+          <span><strong>Conflict</strong><small>Where evidence overlaps</small></span>
+        </button>
+      </div>
+
+      <div class="filter-bar">
+        <label>
+          <span>Subsystem</span>
+          <select id="subsystem-filter">
+            <option value="all">All subsystems</option>
+          </select>
+        </label>
+        <label>
+          <span>Runtime status</span>
+          <select id="status-filter">
+            <option value="all">All statuses</option>
+          </select>
+        </label>
+        <button id="history-toggle" class="quiet-button" type="button" aria-pressed="false">
+          <span aria-hidden="true">＋</span> Expand history
+        </button>
+        <button id="reset-view" class="quiet-button" type="button">Reset view</button>
+      </div>
+    </section>
+
+    <section class="workspace-grid">
+      <article class="graph-panel" aria-labelledby="graph-title">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-index">GRAPH / <span id="mode-index">01</span></p>
+            <h2 id="graph-title">Succession view</h2>
+          </div>
+          <div class="legend" aria-label="Graph legend">
+            <span><i class="legend-line solid"></i> Confirmed in fixture</span>
+            <span><i class="legend-line broken"></i> Proposed / Unknown</span>
+            <span><i class="legend-tip"></i> Active tip</span>
+          </div>
+        </div>
+
+        <div id="graph-frame" class="graph-frame" data-mode="succession">
+          <svg id="relation-graph" viewBox="0 0 1080 440" role="img" aria-labelledby="svg-title svg-desc">
+            <title id="svg-title">Synthetic Workstream succession graph</title>
+            <desc id="svg-desc">An interactive derived view. Select nodes and edges for evidence. Long history is collapsed by default.</desc>
+          </svg>
+          <div id="empty-state" class="empty-state" hidden>
+            <strong>No nodes match these filters.</strong>
+            <span>Reset the view or broaden a filter.</span>
+          </div>
+        </div>
+
+        <div class="graph-caption">
+          <p id="graph-summary">Active tip, inheritance chain, and one same-base sibling. Three earlier Workstreams are folded.</p>
+          <p><kbd>Tab</kbd> moves through graph items · <kbd>Enter</kbd> opens evidence</p>
+        </div>
+      </article>
+
+      <aside class="inspector" aria-labelledby="inspector-title">
+        <div class="inspector-topline">
+          <p>SELECTION / EVIDENCE</p>
+          <span id="selection-kind">NODE</span>
+        </div>
+        <div id="inspector-content">
+          <p class="inspector-placeholder">Loading fixture…</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="mobile-ledger" aria-labelledby="ledger-title">
+      <div class="section-heading">
+        <div>
+          <p class="panel-index">ACCESSIBLE FALLBACK</p>
+          <h2 id="ledger-title">Visible relation ledger</h2>
+        </div>
+        <span>Same selection · same evidence</span>
+      </div>
+      <div id="relation-ledger" class="ledger-list"></div>
+    </section>
+
+    <section class="evidence-register" aria-labelledby="evidence-title">
+      <details>
+        <summary><span id="evidence-title">Synthetic fixture evidence register</span><span>Open ledger</span></summary>
+        <p>These anchors exist only to test evidence navigation. They do not assert production project facts.</p>
+        <ol id="evidence-index"></ol>
+      </details>
+    </section>
+
+    <p id="live-region" class="sr-only" aria-live="polite"></p>
+  </main>
+
+  <footer class="footer-note">
+    <span>W7C-A visual exploration</span>
+    <span>No Core reads · no Session reads · no production wiring</span>
+  </footer>
+
+  <script src="prototype.js" defer></script>
+</body>
+</html>

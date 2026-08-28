@@ -546,3 +546,11 @@
 - 从 `CI1-tiered-parallel-validation@67a2fe9` 建立独立 W5E Worktree，并吸收 `0235116` 的组合式接口 Library 草案与 Brownfield Migration HANDOFF 接续；二者没有升级为 ADR、公共 API 或实现事实。
 - Observatory 0.1.8 删除重复的 Team 边界 pill 和“现在的情况”摘要，把四项关键状态上移；Team Mode、连接、在线状态与退出常驻外层，低频协议字段、测试／维护请求和隐私说明进入齿轮设置 dialog。Core／CLI／Team server 与安全契约未改。
 - Team／component 18/18、CI contract／inventory／repository gate、结构、隔离站、链接、compile 和 diff 通过。真实 in-app Chromium 在 1280px 与 390×844 完成 enable、连接、heartbeat、dialog、退出和响应式验收，最终恢复 Personal Mode；远端 Promotion 与 main 合流仍待中央执行。
+
+## 2026-08-28 — W7C-A Workstream Graph visual prototype Candidate
+
+- 从 `W5E-team-observatory-ui-closeout@692d19b` 建立独立 `codex/w7c-a-workstream-graph-visual-prototype`，首次产品写入前注册 Git-private `W7C-A-workstream-graph-visual-prototype` session，并绑定 W5E parent／task base、expected writes 和 Fast／browser validation surface。没有改 W5E、W7A、main、PROGRESS、HANDOFF、Core、Team server、默认 docsite、Skill 或 release manifest。
+- `experiments/workstream-graph-visual-prototype/` 新增 versioned `provisional/non-authoritative` synthetic fixture 与 dependency-free HTML／CSS／JS。Succession 默认折叠三节点历史并保留 active tip／主链／一层 sibling；Dependency 覆盖双前驱与 Unknown；Conflict 覆盖 synthetic confirmed Direct 与 proposed Semantic。所有 node／edge／cluster 选择共用 evidence inspector，桌面 inline SVG 与移动 HTML ledger 共用同一 fixture。
+- Design exploration 明确 fixture 字段不构成公共 schema，并把 stable identity、relation/provenance、multi-predecessor、evidence、status、tip、visibility、cluster、ordering/version 与 fail-closed 交给 W7A 冻结；真实 Core/Observatory consumer、安全链接、Personal/Team 投影与 release 接线留给 W7C-B。
+- W7A Git-private status 的只读对账确认两个 sibling 都声明修改三份 subsystem State、Validation index 与 DEVLOG，并共享 diff 验证面；该真实整合重叠不写入 synthetic fixture、不触碰 W7A 工作树，留给唯一整合者做加法合并。
+- 专项 6/6、JS／JSON、repository gate 与 diff 通过。真实 in-app Chromium 在 1280×720 与 390×844 点击三 lens、edge evidence、history、filter、keyboard/mobile ledger；两端无横向溢出，console 无 warning/error，页面资产只来自 loopback。没有 push、main 合流、tag 或 Release。
