@@ -53,6 +53,12 @@ SCHEMA = CORE_SOURCE / "project_orrery_core" / "schema" / "maintenance-v1.json"
 CORPUS = REPOSITORY_ROOT / "tests" / "fixtures" / "workspace-maintenance" / "v1" / "scenarios.json"
 
 
+def _same_workspace_path(left: str | os.PathLike[str], right: str | os.PathLike[str]) -> bool:
+    return os.path.normcase(os.path.realpath(os.path.abspath(left))) == os.path.normcase(
+        os.path.realpath(os.path.abspath(right))
+    )
+
+
 class WorkspaceMaintenanceTests(unittest.TestCase):
     def _closed(self, fixture: CollaborationGitFixture) -> tuple[dict[str, object], dict[str, object]]:
         (fixture.worktree_b / "README.md").write_text("# fixture\nmaintenance candidate\n", encoding="utf-8")
@@ -230,7 +236,7 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
                 for path in event_dir.glob("maintenance-event-*.json")
             }
             self.assertEqual(event_reasons, {"integration-event", "closure-event"})
-            item = next(value for value in scan["queue"] if Path(value["workspace_path"]) == fixture.worktree_b)
+            item = next(value for value in scan["queue"] if _same_workspace_path(value["workspace_path"], fixture.worktree_b))
             self.assertEqual(item["action"], "remove-worktree")
             self.assertEqual(len(item["binding"]["evidence_hash"]), 64)
             authorization = authorize_maintenance_item(fixture.repository, item_id=item["item_id"], action="remove-worktree", actor_id="maintainer", authorized_at="2026-08-27T12:01:00Z")
@@ -244,7 +250,7 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
 
             (fixture.worktree_b / "drift.txt").unlink()
             rescanned = run_maintenance_scan(fixture.repository, reason="manual", now="2026-08-27T12:03:00Z")
-            item = next(value for value in rescanned["queue"] if Path(value["workspace_path"]) == fixture.worktree_b)
+            item = next(value for value in rescanned["queue"] if _same_workspace_path(value["workspace_path"], fixture.worktree_b))
             authorization = authorize_maintenance_item(
                 fixture.repository,
                 item_id=item["item_id"],
@@ -263,7 +269,7 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
             fixture.git(fixture.repository, "worktree", "unlock", str(fixture.worktree_b))
 
             rescanned = run_maintenance_scan(fixture.repository, reason="manual", now="2026-08-27T12:06:00Z")
-            item = next(value for value in rescanned["queue"] if Path(value["workspace_path"]) == fixture.worktree_b)
+            item = next(value for value in rescanned["queue"] if _same_workspace_path(value["workspace_path"], fixture.worktree_b))
             authorization = authorize_maintenance_item(
                 fixture.repository,
                 item_id=item["item_id"],
@@ -291,7 +297,7 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
         with CollaborationGitFixture() as fixture:
             self._closed(fixture)
             scan = run_maintenance_scan(fixture.repository, reason="manual", now="2026-08-27T12:00:00Z")
-            item = next(value for value in scan["queue"] if Path(value["workspace_path"]) == fixture.worktree_b)
+            item = next(value for value in scan["queue"] if _same_workspace_path(value["workspace_path"], fixture.worktree_b))
             authorization = authorize_maintenance_item(fixture.repository, item_id=item["item_id"], action="remove-worktree", actor_id="maintainer", authorized_at="2026-08-27T12:01:00Z")["authorization"]
             branch = item["binding"]["branch"]
             head = item["binding"]["head"]
@@ -311,7 +317,7 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
         with CollaborationGitFixture() as fixture:
             self._closed(fixture)
             run_maintenance_scan(fixture.repository, reason="manual", now="2026-08-27T12:00:00Z")
-            item = next(value for value in list_maintenance_queue(fixture.repository)["items"] if Path(value["workspace_path"]) == fixture.worktree_b)
+            item = next(value for value in list_maintenance_queue(fixture.repository)["items"] if _same_workspace_path(value["workspace_path"], fixture.worktree_b))
             for action in ("delete-local-branch", "delete-remote-branch", "remove-directory", "shell"):
                 with self.assertRaisesRegex(ValueError, "only authorizes"):
                     authorize_maintenance_item(fixture.repository, item_id=item["item_id"], action=action, actor_id="maintainer")

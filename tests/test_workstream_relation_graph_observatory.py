@@ -196,8 +196,9 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             self.assertEqual(projection["status"], "unavailable")
             self.assertEqual(projection["error"]["code"], "relation-store-absent")
 
-    def test_corrected_w7a_real_payload_preserves_non_active_runtime_states(self) -> None:
-        payload = self.builder.core_relation_provider(ROOT)
+    def test_corrected_w7a_compatibility_payload_preserves_non_active_runtime_states(self) -> None:
+        payload = copy.deepcopy(self.builder.synthetic_browser_provider())
+        self.assertEqual(payload["authority"], "synthetic-non-authoritative")
         nodes = {
             item["workstream_id"]: item for item in payload["graph"]["nodes"]
         }
@@ -220,9 +221,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertEqual(payload["succession_plan"]["schema_version"], 1)
 
         projection = graph_ui.project_core_relation_graph(lambda: payload)
-        self.assertEqual(projection["status"], "unavailable")
-        self.assertEqual(projection["error"]["code"], "relation-store-absent")
-        self.assertEqual(projection["nodes"], [])
+        self.assertEqual(projection["status"], "ready")
+        self.assertTrue(projection["nodes"])
 
     def test_page_is_keyboard_responsive_read_only_and_has_no_frontend_semantics(self) -> None:
         page = graph_ui.inject_workstream_relation_graph(

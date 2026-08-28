@@ -55,6 +55,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - W7B 不修改 Observatory managed tools、Skill template、installer、release manifest、tag 或 Release。transaction/confirmation/receipt 与 relation event 均位于 Git common private state，不进入作者/发布 inventory；没有 push、main merge、branch protection、tag、Release 或网络调用。
 - W7C-B 只将未发布 Observatory 0.1.8 提升到 0.1.9，增加 root-only／default-off relation graph builder、Core-only projection 与 Team sibling 可选注入。该脚本没有加入 `component.json` managed tools，默认 `build_docsite.py`／`serve.py`、wheel assets、Skill template、installer、release manifest、tag、Release 和公开 v0.2.0 均未改变。
 - W7D Integration Candidate 保留 CI manifest schema 2、Fast 15 秒／Checkpoint 90 秒 hard budget 与独立 `team-relations-execution` 300 秒 Promotion shard，并把 W7C-B 两个 dependency-light contract 加入 Fast/Checkpoint、完整 prototype/production module 加入既有 Team Observatory Promotion shard。首个 hosted run 暴露 preflight 在 final unittest discovery 前未安装 docsite requirements；修复后 workflow、validator 与回归共同要求先安装依赖再绑定/清点。最终机械 inventory 为 376 unique IDs／27 shards／51 Fast／69 Checkpoint；required-check 名称、Candidate-first exact-SHA 绑定、branch protection、tag、Release 与公开 v0.2.0 均未改变。
+- 第二个 hosted run `33192808364` 已证明 preflight 修复有效且 W7B 独立 shard 在 Windows／Ubuntu 均低于 300 秒；required checks 仍因独立 shard 暴露的测试可移植性/导入顺序/ADR expected-map 问题失败。后续修复只调整确定性测试输入和测试路径规范化，不增加 managed tool、图形执行入口或发布资产。
 
 ## 实现证据
 

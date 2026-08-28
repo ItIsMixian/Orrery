@@ -10,6 +10,7 @@ DOCSITE_SOURCE = REPOSITORY_ROOT / "scripts" / "docsite"
 if str(DOCSITE_SOURCE) not in sys.path:
     sys.path.insert(0, str(DOCSITE_SOURCE))
 
+import _llm  # noqa: E402,F401 — preload docsite_qa's lazy sibling dependency for isolated shards
 import docsite_qa  # noqa: E402
 
 

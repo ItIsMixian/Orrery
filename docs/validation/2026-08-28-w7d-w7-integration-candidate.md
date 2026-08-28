@@ -23,13 +23,13 @@ W7B is recorded as an implemented Candidate execution boundary: local discovery,
 ## Local verification before the stable integration commit
 
 - Focused W7C contract: 13/13 PASS in 20.744 seconds.
-- Initial Fast profile: 51/51 PASS in 2.132432 seconds, under the 15-second budget. After the preflight fix, the final 51-test Fast profile passed again in 2.725398 seconds.
+- Initial Fast profile: 51/51 PASS in 2.132432 seconds, under the 15-second budget. After the final hosted repair, the same 51-test Fast profile passed again in 2.328416 seconds.
 - Initial Checkpoint profile: 68/68 PASS in 81.201647 seconds, under the 90-second budget; no budget relaxation was made. The later preflight-ordering regression is the 69th final Checkpoint selector and passed in the focused CI contract 10/10; the full Checkpoint was not mechanically rerun.
 - Final CI inventory and validator: PASS at 376 IDs／27 shards／51 Fast／69 Checkpoint.
 - Component projection validator: PASS for Core 0.1.14／CLI 0.1.18／Observatory 0.1.9.
 - Integrated installation validation passed with `authority_status=integrated_candidate`, Core 0.1.14, CLI 0.1.18 and Core API 1.
 - Repository gates passed over 653 tracked/untracked paths, 349 Markdown files and 962 local links with no forbidden runtime/generated artifact.
-- After the hosted-preflight repair and closeout documentation, the isolated docsite rebuilt to 1,945,582 bytes with 14 ADRs, 6 States, 7 subsystems, 2 snapshots, 147 documents, 28 plans and 7 Library entries.
+- After the final hosted repair and closeout documentation, the isolated docsite rebuilt to 1,949,023 bytes with 14 ADRs, 6 States, 7 subsystems, 2 snapshots, 147 documents, 28 plans and 7 Library entries.
 - `node --check` passed for the visual prototype, and `git diff --check` passed after documentation integration.
 - The dedicated W7B Promotion shard is intentionally deferred until the first stable integration commit and will be run exactly once; the closeout commit records that result without changing implementation or test selection afterward.
 
@@ -62,5 +62,13 @@ The 300-second budget and four-test selection were not changed, and the local Pr
 Initial exact Candidate `b7d2df6a94d496a6d7aa2225024f737314cb62e6` was pushed to `promotion/w7d-w7-integration-candidate`. GitHub Actions run `33192497123` failed in preflight before any Promotion matrix test: `validate_ci.py --all` performs final unittest discovery, but the preflight job had not installed the docsite requirements, so Ubuntu could not import `mistune`.
 
 The repair installs the same requirements (and wheel) before exact-SHA binding/inventory validation, and extends the CI validator plus a focused regression to require that ordering. Focused CI contract 10/10, final inventory/validator and Fast 51/51 pass locally. The first hosted failure remains evidence; a new exact SHA must run both required checks.
+
+Repaired exact Candidate `25a94aa82ddfa63eddf804eb92632aa1676d6a58` reached the full matrix in GitHub Actions run `33192808364`. Its hosted W7B `team-relations-execution` shard passed on Windows in 2m36s and Ubuntu in 20s, independently satisfying the unchanged 300-second budget. Required checks still failed because independent sharding exposed three latent contracts:
+
+- W7C-B's corrected-W7A test read self-host Git-private sessions, which do not exist in a clean runner; both OSes failed `team-ui-server`.
+- Authority shard isolation exposed an un-preloaded lazy `_llm` sibling import and a stale expected amendment map that omitted ADR-0014; both OSes failed `authority-core`.
+- Three maintenance tests compared Windows path spellings directly even though production normalizes real paths; Windows workspace action/queue/remove failed, while the corresponding Ubuntu shards passed.
+
+The next repair uses the committed synthetic/non-authoritative compatibility provider for W7C state-axis assertions while retaining a separate real missing-store zero-write test; preloads the local `_llm` contract and adds ADR-0014 to the expected Core relation map; and applies the same `realpath`/`normcase` comparison semantics to test workspace selection. Local repair evidence is workspace path-sensitive 3/3 in 256.957s, `team-ui-server` 16/16 in 39.547s and `authority-core` 127/127 in 44.340s with one existing Windows symlink-privilege skip.
 
 The final repaired Candidate SHA and hosted run/check results are reported after execution. A green non-`main` Candidate remains only ready for maintainer-authorized main fast-forward; this task does not merge main, create a tag/Release, change branch protection or delete any branch, worktree, commit or Validation.
