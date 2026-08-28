@@ -15,10 +15,12 @@ import json
 import os
 import re
 import secrets
+import socket
 import stat
 import subprocess
 import tempfile
 import threading
+import time
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -39,6 +41,11 @@ TEAM_SCHEMA_VERSION = 1
 TEAM_CONTRACT_ID = "project-orrery-team-v1"
 TEAM_ENVELOPE_MAX_BYTES = 64 * 1024
 TEAM_REQUEST_MAX_BYTES = 16 * 1024
+TEAM_DISCOVERY_MAX_BYTES = 1024
+TEAM_DISCOVERY_PROTOCOL_VERSION = 1
+TEAM_DISCOVERY_DEFAULT_PORT = 42853
+TEAM_DISCOVERY_DEFAULT_TTL_SECONDS = 15
+TEAM_HOST_SWITCH_MAX_BYTES = 256 * 1024
 DEFAULT_DEBOUNCE_MILLISECONDS = 750
 DEFAULT_TTL_SECONDS = 300
 DEFAULT_HEARTBEAT_SECONDS = 60
@@ -58,6 +65,12 @@ REQUEST_CAPABILITIES = {
 }
 _DOMAIN = b"project-orrery-team-v1\0"
 _STATE_LOCK = threading.RLock()
+
+
+def _hmac_hex(key: str, value: Mapping[str, Any]) -> str:
+    return hmac.new(
+        key.encode("utf-8"), _DOMAIN + _json_bytes(value), hashlib.sha256
+    ).hexdigest()
 
 
 def _timestamp(value: str | None = None) -> str:
@@ -216,6 +229,24 @@ def _runtime_path(project_root: Path) -> Path:
     return team_private_dir(project_root) / "runtime.json"
 
 
+def _discovery_status_path(project_root: Path) -> Path:
+    return team_private_dir(project_root) / "discovery-status.json"
+
+
+def _discovery_candidates_path(project_root: Path) -> Path:
+    return team_private_dir(project_root) / "discovery-candidates.json"
+
+
+def _normalize_coordinator_state(state: dict[str, Any]) -> dict[str, Any]:
+    """Add W5D Host-generation fields to an existing Git-private W5A state."""
+    state.setdefault("coordinator_generation", 1)
+    state.setdefault("coordinator_status", "active")
+    state.setdefault("coordinator_successor", None)
+    state.setdefault("host_switches", {})
+    state.setdefault("seen_join_nonces", {})
+    return state
+
+
 def enable_team(
     project_root: Path, *, member_id: str, device_id: str, host_id: str,
     allow_lan_bind: bool = False, ttl_seconds: int = DEFAULT_TTL_SECONDS,
@@ -242,35 +273,42 @@ def enable_team(
     }
     _validate_team_config(config)
     token = secrets.token_urlsafe(32)
+    local_credential_epoch = 1
     member = bootstrap_maintainer(member_id)
     coordinator = {
         "schema_version": 1, "contract_type": "coordinator-state",
         "project_fingerprint": config["project_fingerprint"], "coordinator_host_id": host_id,
+        "coordinator_generation": 1, "coordinator_status": "active",
+        "coordinator_successor": None,
         "members": {member_id: member},
         "credentials": {_hash(token): {"member_id": member_id, "credential_epoch": 1}},
         "active_hosts": {member_id: {"host_id": host_id, "device_id": device_id, "switched_at": timestamp}},
-        "snapshots": {}, "invites": {}, "join_requests": {}, "requests": {}, "updated_at": timestamp,
+        "snapshots": {}, "invites": {}, "join_requests": {}, "requests": {},
+        "host_switches": {}, "seen_join_nonces": {}, "updated_at": timestamp,
     }
     with _STATE_LOCK:
         _atomic_json(_team_config_path(root), config)
         if _coordinator_path(root).exists():
-            coordinator = _read_json(_coordinator_path(root))
+            coordinator = _normalize_coordinator_state(_read_json(_coordinator_path(root)))
             if not hmac.compare_digest(
                 str(coordinator.get("project_fingerprint")), str(config["project_fingerprint"])
             ):
                 raise ValueError("existing private Coordinator belongs to another project identity")
+            if coordinator.get("coordinator_status") == "retired":
+                raise ValueError("retired Coordinator state cannot be re-enabled; claim a fresh Host switch")
             current_member = coordinator.setdefault("members", {}).get(member_id)
             if current_member is None:
                 coordinator["members"][member_id] = member
                 current_member = member
             if current_member.get("status") != "active":
                 raise ValueError("removed member cannot re-enable Team Mode")
+            local_credential_epoch = int(current_member["credential_epoch"])
             coordinator["credentials"] = {
                 key: item for key, item in coordinator.get("credentials", {}).items()
                 if item.get("member_id") != member_id
             }
             coordinator["credentials"][_hash(token)] = {
-                "member_id": member_id, "credential_epoch": current_member["credential_epoch"],
+                "member_id": member_id, "credential_epoch": local_credential_epoch,
             }
             coordinator.setdefault("active_hosts", {})[member_id] = {
                 "host_id": host_id, "device_id": device_id, "switched_at": timestamp,
@@ -278,7 +316,8 @@ def enable_team(
             coordinator["updated_at"] = timestamp
         _atomic_json(_coordinator_path(root), coordinator)
         _atomic_json(_credential_path(root), {
-            "schema_version": 1, "member_id": member_id, "credential_epoch": 1, "token": token,
+            "schema_version": 1, "member_id": member_id,
+            "credential_epoch": local_credential_epoch, "token": token,
         })
     return {"config": _redacted_config(config), "writes_performed": True, "network_performed": False}
 
@@ -598,6 +637,251 @@ def inspect_outbox(project_root: Path) -> dict[str, Any]:
     return {"events": list(value.get("events", [])), "network_performed": False}
 
 
+class _UdpDiscoveryTransport:
+    """Small injectable UDP transport; production uses IP literals only."""
+
+    def send(self, payload: bytes, *, target: str, port: int) -> None:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as channel:
+            channel.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            channel.sendto(payload, (target, port))
+
+    def receive(self, *, bind: str, port: int, timeout_seconds: float) -> list[tuple[bytes, str]]:
+        deadline = time.monotonic() + timeout_seconds
+        packets: list[tuple[bytes, str]] = []
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as channel:
+            channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            channel.bind((bind, port))
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                channel.settimeout(min(remaining, 0.2))
+                try:
+                    raw, source = channel.recvfrom(TEAM_DISCOVERY_MAX_BYTES + 1)
+                except TimeoutError:
+                    continue
+                packets.append((raw, str(source[0])))
+        return packets
+
+
+def _validate_discovery_address(value: str, *, allow_lan: bool, label: str) -> str:
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError as exc:
+        raise ValueError(f"{label} must be an IP literal") from exc
+    if address.version != 4:
+        raise ValueError(f"{label} currently supports IPv4 only")
+    if address.is_loopback:
+        return value
+    is_limited_broadcast = value == "255.255.255.255"
+    if not allow_lan or not (address.is_private or address.is_unspecified or is_limited_broadcast):
+        raise ValueError(f"{label} requires explicit LAN opt-in and a private/broadcast IPv4 address")
+    return value
+
+
+def build_discovery_packet(
+    project_root: Path, *, endpoint: str, ttl_seconds: int = TEAM_DISCOVERY_DEFAULT_TTL_SECONDS,
+    occurred_at: str | None = None, nonce: str | None = None,
+) -> dict[str, Any]:
+    """Build the exact, deliberately untrusted LAN discovery hint."""
+    root = Path(project_root).expanduser().absolute()
+    config = load_team_config(root)
+    if not config.get("enabled"):
+        raise ValueError("Team Mode must be enabled before discovery")
+    state = _normalize_coordinator_state(_read_json(_coordinator_path(root)))
+    if state.get("coordinator_status") != "active":
+        raise ValueError("retired Coordinator Host cannot announce discovery")
+    if state.get("coordinator_host_id") != config.get("host_id"):
+        raise ValueError("only the active Coordinator Host can announce discovery")
+    if not 5 <= ttl_seconds <= 60:
+        raise ValueError("discovery TTL must be between 5 and 60 seconds")
+    endpoint = _validate_endpoint(endpoint, allow_lan=bool(config.get("allow_lan_bind")))
+    generated = _parse_timestamp(_timestamp(occurred_at))
+    candidate_nonce = nonce or secrets.token_hex(16)
+    if not re.fullmatch(r"[0-9a-f]{32}", candidate_nonce):
+        raise ValueError("discovery nonce must be 128-bit lowercase hex")
+    packet = {
+        "schema_version": 1,
+        "contract_type": "team-host-discovery",
+        "protocol_version": TEAM_DISCOVERY_PROTOCOL_VERSION,
+        "project_fingerprint": config["project_fingerprint"],
+        "host_hint": _hash(str(config["host_id"]))[:16],
+        "device_hint": _hash(str(config["device_id"]))[:16],
+        "endpoint": endpoint,
+        "nonce": candidate_nonce,
+        "generated_at": generated.isoformat().replace("+00:00", "Z"),
+        "expires_at": (generated + dt.timedelta(seconds=ttl_seconds)).isoformat().replace("+00:00", "Z"),
+    }
+    validate_discovery_packet(packet, now=packet["generated_at"])
+    return packet
+
+
+def validate_discovery_packet(packet: Mapping[str, Any], *, now: str | None = None) -> None:
+    if not isinstance(packet, Mapping):
+        raise ValueError("discovery packet must be an object")
+    if len(_json_bytes(packet)) > TEAM_DISCOVERY_MAX_BYTES:
+        raise ValueError("discovery packet exceeds 1 KiB")
+    _exact_keys(packet, {
+        "schema_version", "contract_type", "protocol_version", "project_fingerprint",
+        "host_hint", "device_hint", "endpoint", "nonce", "generated_at", "expires_at",
+    }, "discovery packet")
+    if packet["schema_version"] != 1 or packet["contract_type"] != "team-host-discovery":
+        raise ValueError("unsupported discovery packet contract")
+    if packet["protocol_version"] != TEAM_DISCOVERY_PROTOCOL_VERSION:
+        raise ValueError("unsupported discovery protocol version")
+    if not re.fullmatch(r"[0-9a-f]{64}", str(packet["project_fingerprint"])):
+        raise ValueError("invalid discovery project fingerprint")
+    for key in ("host_hint", "device_hint"):
+        if not re.fullmatch(r"[0-9a-f]{16}", str(packet[key])):
+            raise ValueError(f"invalid discovery {key}")
+    if not re.fullmatch(r"[0-9a-f]{32}", str(packet["nonce"])):
+        raise ValueError("invalid discovery nonce")
+    _validate_endpoint(str(packet["endpoint"]), allow_lan=True)
+    generated = _parse_timestamp(str(packet["generated_at"]))
+    expires = _parse_timestamp(str(packet["expires_at"]))
+    if expires <= generated or (expires - generated).total_seconds() > 60:
+        raise ValueError("discovery packet expiry window is invalid")
+    if expires <= _parse_timestamp(_timestamp(now)):
+        raise ValueError("discovery packet is expired")
+
+
+def publish_discovery_once(
+    project_root: Path, *, endpoint: str, target: str = "255.255.255.255",
+    port: int = TEAM_DISCOVERY_DEFAULT_PORT, transport: Any | None = None,
+    occurred_at: str | None = None,
+) -> dict[str, Any]:
+    """Explicitly send one minimal hint; enabling Team Mode never calls this."""
+    config = load_team_config(project_root)
+    target = _validate_discovery_address(
+        target, allow_lan=bool(config.get("allow_lan_bind")), label="discovery target"
+    )
+    if not 1 <= port <= 65535:
+        raise ValueError("discovery port is invalid")
+    packet = build_discovery_packet(project_root, endpoint=endpoint, occurred_at=occurred_at)
+    selected_transport = transport or _UdpDiscoveryTransport()
+    selected_transport.send(_json_bytes(packet), target=target, port=port)
+    status = {
+        "schema_version": 1, "status": "stopped-after-announce", "last_action": "announce",
+        "last_at": packet["generated_at"], "port": port, "target": target,
+        "packet": packet, "membership_granted": False,
+    }
+    _atomic_json(_discovery_status_path(project_root), status)
+    return {"packet": packet, "network_performed": True, "membership_granted": False}
+
+
+def scan_discovery_candidates(
+    project_root: Path, *, bind: str = "0.0.0.0", port: int = TEAM_DISCOVERY_DEFAULT_PORT,
+    timeout_seconds: float = 0.8, transport: Any | None = None, now: str | None = None,
+) -> dict[str, Any]:
+    """Open one bounded discovery window, then close it completely."""
+    config = load_team_config(project_root)
+    if not config.get("enabled"):
+        raise ValueError("Team Mode must be enabled before discovery scan")
+    bind = _validate_discovery_address(
+        bind, allow_lan=bool(config.get("allow_lan_bind")), label="discovery bind"
+    )
+    if not 1 <= port <= 65535 or not 0.05 <= timeout_seconds <= 10:
+        raise ValueError("discovery scan parameters are outside bounded limits")
+    selected_transport = transport or _UdpDiscoveryTransport()
+    received = selected_transport.receive(bind=bind, port=port, timeout_seconds=timeout_seconds)
+    candidates: dict[str, dict[str, Any]] = {}
+    rejected = 0
+    seen_nonces: set[str] = set()
+    current = _timestamp(now)
+    for item in received:
+        raw, source = item if isinstance(item, tuple) else (item, "controlled")
+        if len(raw) > TEAM_DISCOVERY_MAX_BYTES:
+            rejected += 1
+            continue
+        try:
+            packet = json.loads(raw.decode("utf-8"))
+            validate_discovery_packet(packet, now=current)
+            if not hmac.compare_digest(
+                str(packet["project_fingerprint"]), str(config["project_fingerprint"])
+            ):
+                raise ValueError("cross-project discovery hint")
+            if packet["nonce"] in seen_nonces:
+                raise ValueError("replayed discovery nonce")
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError, KeyError):
+            rejected += 1
+            continue
+        seen_nonces.add(str(packet["nonce"]))
+        candidate_id = "candidate-" + hashlib.sha256(_DOMAIN + _json_bytes(packet)).hexdigest()[:24]
+        candidates[candidate_id] = {
+            "candidate_id": candidate_id, "packet": packet, "source_hint": str(source),
+            "trust": "untrusted-discovery-hint", "membership_granted": False,
+        }
+    payload = {
+        "schema_version": 1, "status": "stopped-after-scan", "scanned_at": current,
+        "candidates": list(candidates.values()), "rejected_count": rejected,
+        "membership_granted": False,
+    }
+    _atomic_json(_discovery_candidates_path(project_root), payload)
+    _atomic_json(_discovery_status_path(project_root), {
+        "schema_version": 1, "status": "stopped-after-scan", "last_action": "scan",
+        "last_at": current, "port": port, "bind": bind,
+        "candidate_count": len(candidates), "rejected_count": rejected,
+        "membership_granted": False,
+    })
+    return {**payload, "network_performed": True}
+
+
+def select_discovery_candidate(
+    project_root: Path, *, candidate_id: str, now: str | None = None,
+) -> dict[str, Any]:
+    stored = _read_json(_discovery_candidates_path(project_root))
+    selected = next(
+        (item for item in stored.get("candidates", []) if item.get("candidate_id") == candidate_id), None
+    )
+    if not isinstance(selected, Mapping):
+        raise ValueError("discovery candidate is unavailable")
+    packet = selected.get("packet")
+    validate_discovery_packet(packet, now=now)
+    config = load_team_config(project_root)
+    if not hmac.compare_digest(str(packet["project_fingerprint"]), str(config["project_fingerprint"])):
+        raise ValueError("discovery candidate belongs to another project")
+    return {
+        "candidate_id": candidate_id, "endpoint": packet["endpoint"],
+        "project_fingerprint": packet["project_fingerprint"],
+        "trust": "untrusted-discovery-hint", "membership_granted": False,
+    }
+
+
+def inspect_discovery_status(project_root: Path) -> dict[str, Any]:
+    status = _read_json(_discovery_status_path(project_root), required=False)
+    candidates = _read_json(_discovery_candidates_path(project_root), required=False)
+    pending = _read_json(team_private_dir(project_root) / "pending-join.json", required=False)
+    coordinator = _normalize_coordinator_state(
+        _read_json(_coordinator_path(project_root), required=False)
+    ) if _coordinator_path(project_root).exists() else {}
+    join_requests = []
+    for request_id, request in coordinator.get("join_requests", {}).items():
+        if isinstance(request, Mapping):
+            join_requests.append({
+                "request_id": request_id, "member_id": request.get("member_id"),
+                "host_hint": _hash(str(request.get("host_id", "unknown")))[:16],
+                "status": request.get("status"), "requested_at": request.get("requested_at"),
+            })
+    return {
+        "status": status or {"status": "never-started"},
+        "candidates": list(candidates.get("candidates", [])),
+        "pending_join": {
+            "request_id": pending.get("request_id"),
+            "status": "pending-host-confirmation" if pending else None,
+        },
+        "join_requests": sorted(join_requests, key=lambda item: str(item["request_id"])),
+        "coordinator_host": {
+            "host_id": coordinator.get("coordinator_host_id"),
+            "generation": coordinator.get("coordinator_generation"),
+            "status": coordinator.get("coordinator_status"),
+            "successor": coordinator.get("coordinator_successor"),
+            "topology": "single-active-manual-no-election",
+        },
+        "membership_from_discovery": False,
+        "network_performed": False,
+    }
+
+
 def _validate_endpoint(endpoint: str, *, allow_lan: bool) -> str:
     parsed = urlparse(endpoint)
     if parsed.scheme != "http" or parsed.username or parsed.password or parsed.path not in {"", "/"}:
@@ -627,6 +911,7 @@ def _auth_header(credential: Mapping[str, Any]) -> str:
 def _http_json(
     endpoint: str, path: str, *, method: str = "GET", payload: Mapping[str, Any] | None = None,
     credential: Mapping[str, Any] | None = None, allow_lan: bool = False,
+    response_limit: int = TEAM_ENVELOPE_MAX_BYTES,
 ) -> dict[str, Any]:
     base = _validate_endpoint(endpoint, allow_lan=allow_lan)
     data = None if payload is None else _json_bytes(payload)
@@ -638,7 +923,9 @@ def _http_json(
     request = Request(f"{base}{path}", data=data, headers=headers, method=method)
     try:
         with urlopen(request, timeout=5) as response:  # noqa: S310 - endpoint is validated IP-only
-            raw = response.read(TEAM_ENVELOPE_MAX_BYTES + 1)
+            raw = response.read(response_limit + 1)
+            if len(raw) > response_limit:
+                raise ValueError("Coordinator response exceeds the bounded limit")
     except HTTPError as exc:
         raw = exc.read(TEAM_REQUEST_MAX_BYTES)
         try:
@@ -699,19 +986,21 @@ def create_invite(
         invite_id = f"invite-{secrets.token_hex(12)}"
         invite_secret = secrets.token_urlsafe(32)
         state["invites"][invite_id] = {
-            "candidate_member_id": candidate_member_id, "secret_hash": _hash(invite_secret),
+            "candidate_member_id": candidate_member_id, "secret": invite_secret,
+            "secret_hash": _hash(invite_secret),
             "expires_at": expires_at, "created_by": actor, "status": "open",
         }
         state["updated_at"] = _timestamp()
         _atomic_json(_coordinator_path(project_root), state)
     public = {
-        "schema_version": 1, "contract_type": "manual-team-invite", "endpoint": endpoint,
+        "schema_version": 1, "contract_type": "manual-team-invite",
+        "protocol_version": TEAM_DISCOVERY_PROTOCOL_VERSION, "endpoint": endpoint,
         "project_fingerprint": config["project_fingerprint"], "invite_id": invite_id,
         "candidate_member_id": candidate_member_id, "invite_secret": invite_secret,
-        "expires_at": expires_at, "discovery": "unsupported-next-phase",
+        "expires_at": expires_at, "endpoint_source": "manual-fallback",
     }
     encoded = base64.urlsafe_b64encode(_json_bytes(public)).decode("ascii").rstrip("=")
-    return {"invite": encoded, "invite_id": invite_id, "discovery": "unsupported-next-phase"}
+    return {"invite": encoded, "invite_id": invite_id, "endpoint_source": "manual-fallback"}
 
 
 def _decode_invite(encoded: str) -> dict[str, Any]:
@@ -721,16 +1010,25 @@ def _decode_invite(encoded: str) -> dict[str, Any]:
     except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise ValueError("manual Team invite is malformed") from exc
     expected = {
-        "schema_version", "contract_type", "endpoint", "project_fingerprint", "invite_id",
-        "candidate_member_id", "invite_secret", "expires_at", "discovery",
+        "schema_version", "contract_type", "protocol_version", "endpoint", "project_fingerprint", "invite_id",
+        "candidate_member_id", "invite_secret", "expires_at", "endpoint_source",
     }
-    if not isinstance(value, dict) or set(value) != expected or value.get("contract_type") != "manual-team-invite":
+    if (
+        not isinstance(value, dict) or set(value) != expected
+        or value.get("schema_version") != 1 or value.get("contract_type") != "manual-team-invite"
+        or value.get("protocol_version") != TEAM_DISCOVERY_PROTOCOL_VERSION
+        or value.get("endpoint_source") != "manual-fallback"
+    ):
         raise ValueError("manual Team invite has an invalid contract")
-    _parse_timestamp(value["expires_at"])
+    if _parse_timestamp(value["expires_at"]) <= dt.datetime.now(dt.timezone.utc):
+        raise ValueError("manual Team invite is expired")
+    _validate_endpoint(str(value["endpoint"]), allow_lan=True)
     return value
 
 
-def request_join(project_root: Path, *, invite: str) -> dict[str, Any]:
+def request_join(
+    project_root: Path, *, invite: str, candidate_id: str | None = None,
+) -> dict[str, Any]:
     config = load_team_config(project_root)
     if not config.get("enabled"):
         raise ValueError("Team Mode must be enabled before joining")
@@ -739,20 +1037,38 @@ def request_join(project_root: Path, *, invite: str) -> dict[str, Any]:
         raise ValueError("invite project identity does not match this checkout")
     if value["candidate_member_id"] != config["member_id"]:
         raise ValueError("invite member identity does not match the local member")
+    selected = None
+    endpoint = value["endpoint"]
+    endpoint_source = "manual-fallback"
+    if candidate_id:
+        selected = select_discovery_candidate(project_root, candidate_id=candidate_id)
+        if not hmac.compare_digest(selected["project_fingerprint"], value["project_fingerprint"]):
+            raise ValueError("selected discovery candidate does not match the invitation project")
+        endpoint = selected["endpoint"]
+        endpoint_source = "discovered-candidate"
+    join_nonce = secrets.token_hex(16)
+    proof_material = {
+        "project_fingerprint": config["project_fingerprint"], "invite_id": value["invite_id"],
+        "member_id": config["member_id"], "device_id": config["device_id"],
+        "host_id": config["host_id"], "join_nonce": join_nonce,
+    }
     result = _http_json(
-        value["endpoint"], "/v1/join/request", method="POST",
+        endpoint, "/v1/join/request", method="POST",
         payload={
-            "project_fingerprint": config["project_fingerprint"], "invite_id": value["invite_id"],
-            "invite_secret": value["invite_secret"], "member_id": config["member_id"],
-            "device_id": config["device_id"], "host_id": config["host_id"],
+            **proof_material, "join_proof": _hmac_hex(value["invite_secret"], proof_material),
         }, allow_lan=bool(config["allow_lan_bind"]),
     )
     pending = {
-        "schema_version": 1, "endpoint": value["endpoint"], "request_id": result["request_id"],
+        "schema_version": 1, "endpoint": endpoint, "request_id": result["request_id"],
         "join_claim": result["join_claim"], "member_id": config["member_id"],
+        "endpoint_source": endpoint_source, "candidate_id": candidate_id,
     }
     _atomic_json(team_private_dir(project_root) / "pending-join.json", pending)
-    return {"request_id": result["request_id"], "status": "pending-host-confirmation", "network_performed": True}
+    return {
+        "request_id": result["request_id"], "status": "pending-host-confirmation",
+        "endpoint_source": endpoint_source, "discovery_granted_membership": False,
+        "network_performed": True,
+    }
 
 
 def confirm_join(project_root: Path, *, request_id: str, actor_id: str | None = None) -> dict[str, Any]:
@@ -882,6 +1198,166 @@ def switch_coordinator_member_host(
     return dict(state["active_hosts"][member_id])
 
 
+def _invalidate_ephemeral_authority_for_host_switch(
+    state: dict[str, Any], *, consumed_switch_id: str,
+) -> None:
+    """Retire one-time join/switch authority instead of copying it to a new Host."""
+    for invite in state.get("invites", {}).values():
+        if not isinstance(invite, dict):
+            continue
+        invite.pop("secret", None)
+        invite.pop("secret_hash", None)
+        if invite.get("status") in {"open", "pending-confirmation"}:
+            invite["status"] = "invalidated-host-switch"
+    for request in state.get("join_requests", {}).values():
+        if not isinstance(request, dict):
+            continue
+        request.pop("credential_token", None)
+        request.pop("join_claim_hash", None)
+        if request.get("status") in {"pending", "confirmed"}:
+            request["status"] = "invalidated-host-switch"
+    for switch_id, switch in state.get("host_switches", {}).items():
+        if not isinstance(switch, dict):
+            continue
+        switch.pop("secret", None)
+        switch.pop("secret_hash", None)
+        if switch_id == consumed_switch_id:
+            switch["status"] = "consumed"
+        elif switch.get("status") == "open":
+            switch["status"] = "invalidated-host-switch"
+
+
+def create_coordinator_host_switch_invite(
+    project_root: Path, *, target_member_id: str, target_host_id: str, target_device_id: str,
+    endpoint: str, expires_at: str, actor_id: str | None = None,
+) -> dict[str, Any]:
+    """Authorize one manual Coordinator Host transfer; never elect automatically."""
+    root = Path(project_root).expanduser().absolute()
+    config = load_team_config(root)
+    endpoint = _validate_endpoint(endpoint, allow_lan=bool(config.get("allow_lan_bind")))
+    expiry = _parse_timestamp(expires_at)
+    if expiry <= dt.datetime.now(dt.timezone.utc):
+        raise ValueError("Host switch invitation expiry must be in the future")
+    _validate_id(target_member_id, "target_member_id")
+    _validate_id(target_host_id, "target_host_id")
+    _validate_id(target_device_id, "target_device_id")
+    with _STATE_LOCK:
+        state = _normalize_coordinator_state(_read_json(_coordinator_path(root)))
+        if state["coordinator_status"] != "active":
+            raise ValueError("only the active Coordinator Host can create a switch")
+        actor = actor_id or config.get("member_id")
+        actor_member = state.get("members", {}).get(actor)
+        if not isinstance(actor_member, Mapping) or "admin" not in actor_member.get("capabilities", []):
+            raise ValueError("Coordinator Host switch requires Host-local Admin capability")
+        target_member = state.get("members", {}).get(target_member_id)
+        if not isinstance(target_member, Mapping) or target_member.get("status") != "active":
+            raise ValueError("Coordinator successor must be an active project member")
+        switch_id = f"host-switch-{secrets.token_hex(12)}"
+        switch_secret = secrets.token_urlsafe(32)
+        state["host_switches"][switch_id] = {
+            "target_member_id": target_member_id, "target_host_id": target_host_id,
+            "target_device_id": target_device_id, "secret": switch_secret,
+            "secret_hash": _hash(switch_secret), "source_generation": state["coordinator_generation"],
+            "created_by": actor, "expires_at": expires_at, "status": "open",
+        }
+        state["updated_at"] = _timestamp()
+        _atomic_json(_coordinator_path(root), state)
+    invitation = {
+        "schema_version": 1, "contract_type": "manual-coordinator-host-switch",
+        "protocol_version": TEAM_DISCOVERY_PROTOCOL_VERSION,
+        "project_fingerprint": config["project_fingerprint"], "endpoint": endpoint,
+        "switch_id": switch_id, "switch_secret": switch_secret,
+        "source_host_id": state["coordinator_host_id"],
+        "source_generation": state["coordinator_generation"],
+        "target_member_id": target_member_id, "target_host_id": target_host_id,
+        "target_device_id": target_device_id, "expires_at": expires_at,
+        "automatic_election": False,
+    }
+    encoded = base64.urlsafe_b64encode(_json_bytes(invitation)).decode("ascii").rstrip("=")
+    return {
+        "switch_invite": encoded, "switch_id": switch_id,
+        "source_generation": state["coordinator_generation"], "automatic_election": False,
+    }
+
+
+def _decode_host_switch_invite(encoded: str) -> dict[str, Any]:
+    try:
+        padding = "=" * (-len(encoded) % 4)
+        value = json.loads(base64.urlsafe_b64decode(encoded + padding).decode("utf-8"))
+    except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("Coordinator Host switch invitation is malformed") from exc
+    expected = {
+        "schema_version", "contract_type", "protocol_version", "project_fingerprint", "endpoint",
+        "switch_id", "switch_secret", "source_host_id", "source_generation", "target_member_id",
+        "target_host_id", "target_device_id", "expires_at", "automatic_election",
+    }
+    if not isinstance(value, dict) or set(value) != expected:
+        raise ValueError("Coordinator Host switch invitation has an invalid contract")
+    if (
+        value.get("schema_version") != 1
+        or value.get("contract_type") != "manual-coordinator-host-switch"
+        or value.get("protocol_version") != TEAM_DISCOVERY_PROTOCOL_VERSION
+        or value.get("automatic_election") is not False
+    ):
+        raise ValueError("unsupported Coordinator Host switch invitation")
+    if _parse_timestamp(str(value["expires_at"])) <= dt.datetime.now(dt.timezone.utc):
+        raise ValueError("Coordinator Host switch invitation is expired")
+    _validate_endpoint(str(value["endpoint"]), allow_lan=True)
+    return value
+
+
+def claim_coordinator_host_switch(project_root: Path, *, switch_invite: str) -> dict[str, Any]:
+    """Claim a Host-local Admin-approved transfer and install its monotonic state."""
+    root = Path(project_root).expanduser().absolute()
+    config = load_team_config(root)
+    invitation = _decode_host_switch_invite(switch_invite)
+    if not hmac.compare_digest(
+        str(invitation["project_fingerprint"]), str(config.get("project_fingerprint"))
+    ):
+        raise ValueError("Coordinator Host switch belongs to another project")
+    if (
+        invitation["target_member_id"] != config.get("member_id")
+        or invitation["target_host_id"] != config.get("host_id")
+        or invitation["target_device_id"] != config.get("device_id")
+    ):
+        raise ValueError("Coordinator Host switch target identity does not match this node")
+    transfer = _http_json(
+        invitation["endpoint"], "/v1/coordinator/switch/claim", method="POST",
+        payload={
+            "project_fingerprint": invitation["project_fingerprint"],
+            "switch_id": invitation["switch_id"], "switch_secret": invitation["switch_secret"],
+            "source_generation": invitation["source_generation"],
+            "target_host_id": invitation["target_host_id"],
+            "target_device_id": invitation["target_device_id"],
+        }, credential=_load_local_credential(root), allow_lan=bool(config.get("allow_lan_bind")),
+        response_limit=TEAM_HOST_SWITCH_MAX_BYTES,
+    ).get("transfer")
+    if not isinstance(transfer, dict):
+        raise ValueError("Coordinator Host switch returned no transfer state")
+    transferred = _normalize_coordinator_state(transfer)
+    if (
+        not hmac.compare_digest(str(transferred.get("project_fingerprint")), str(config["project_fingerprint"]))
+        or transferred.get("coordinator_status") != "active"
+        or transferred.get("coordinator_host_id") != config["host_id"]
+        or transferred.get("coordinator_generation") != int(invitation["source_generation"]) + 1
+    ):
+        raise ValueError("Coordinator Host switch transfer failed identity or generation validation")
+    _atomic_json(_coordinator_path(root), transferred)
+    config["active_host_id"] = config["host_id"]
+    config["runtime_status"] = "team-enabled-stopped"
+    config["network_features"] = []
+    config["revision"] = int(config["revision"]) + 1
+    config["updated_at"] = _timestamp()
+    _validate_team_config(config)
+    _atomic_json(_team_config_path(root), config)
+    return {
+        "coordinator_host_id": transferred["coordinator_host_id"],
+        "coordinator_generation": transferred["coordinator_generation"],
+        "coordinator_status": "active", "automatic_election": False,
+        "network_performed": True,
+    }
+
+
 def aggregate_projection(state: Mapping[str, Any], *, now: str | None = None) -> dict[str, Any]:
     current = _parse_timestamp(_timestamp(now))
     grouped: dict[str, list[dict[str, Any]]] = {}
@@ -926,7 +1402,13 @@ def aggregate_projection(state: Mapping[str, Any], *, now: str | None = None) ->
     return {
         "schema_version": 1, "contract_type": "team-read-only-projection",
         "project_fingerprint": state["project_fingerprint"],
-        "coordinator": {"host_id": state["coordinator_host_id"], "topology": "single-active-manual-no-election"},
+        "coordinator": {
+            "host_id": state["coordinator_host_id"],
+            "generation": state.get("coordinator_generation", 1),
+            "status": state.get("coordinator_status", "active"),
+            "successor": state.get("coordinator_successor"),
+            "topology": "single-active-manual-no-election",
+        },
         "aggregation": "member-workstream", "members": members, "generated_at": _timestamp(now),
         "authority": "derived-read-only", "execution_capability": False,
     }
@@ -1032,7 +1514,10 @@ class _CoordinatorHandler(BaseHTTPRequestHandler):
         config = load_team_config(self.server.project_root)
         if not config.get("enabled"):
             raise PermissionError("Team Mode is disabled")
-        return _read_json(_coordinator_path(self.server.project_root))
+        state = _normalize_coordinator_state(_read_json(_coordinator_path(self.server.project_root)))
+        if state.get("coordinator_status") != "active":
+            raise PermissionError("Coordinator Host is retired and cannot accept new operations")
+        return state
 
     def _save(self, state: Mapping[str, Any]) -> None:
         _atomic_json(_coordinator_path(self.server.project_root), state)
@@ -1069,24 +1554,40 @@ class _CoordinatorHandler(BaseHTTPRequestHandler):
             state = self._state()
             if self.path == "/v1/join/request":
                 body, _ = self._body(TEAM_REQUEST_MAX_BYTES)
-                expected = {"project_fingerprint", "invite_id", "invite_secret", "member_id", "device_id", "host_id"}
+                expected = {
+                    "project_fingerprint", "invite_id", "member_id", "device_id", "host_id",
+                    "join_nonce", "join_proof",
+                }
                 _exact_keys(body, expected, "join request")
                 if not hmac.compare_digest(str(body["project_fingerprint"]), str(state["project_fingerprint"])):
                     raise PermissionError("project identity verification failed")
                 invite = state.get("invites", {}).get(body["invite_id"])
+                proof_material = {
+                    key: body[key] for key in (
+                        "project_fingerprint", "invite_id", "member_id", "device_id", "host_id", "join_nonce"
+                    )
+                }
                 if (
                     not isinstance(invite, dict) or invite.get("status") != "open"
                     or invite.get("candidate_member_id") != body["member_id"]
-                    or not hmac.compare_digest(invite.get("secret_hash", ""), _hash(str(body["invite_secret"])))
+                    or not hmac.compare_digest(
+                        str(body["join_proof"]), _hmac_hex(str(invite.get("secret", "")), proof_material)
+                    )
                     or _parse_timestamp(invite["expires_at"]) <= dt.datetime.now(dt.timezone.utc)
                 ):
                     raise PermissionError("invite is invalid, expired, or for another member")
+                if not re.fullmatch(r"[0-9a-f]{32}", str(body["join_nonce"])):
+                    raise PermissionError("join nonce is invalid")
+                nonce_hash = _hash(str(body["join_nonce"]))
+                if nonce_hash in state.setdefault("seen_join_nonces", {}):
+                    raise PermissionError("join replay rejected")
                 request_id = f"join-{secrets.token_hex(12)}"
                 claim = secrets.token_urlsafe(32)
+                state["seen_join_nonces"][nonce_hash] = {"request_id": request_id, "seen_at": _timestamp()}
                 state["join_requests"][request_id] = {
                     "member_id": body["member_id"], "device_id": body["device_id"], "host_id": body["host_id"],
                     "invite_id": body["invite_id"], "join_claim_hash": _hash(claim), "status": "pending",
-                    "requested_at": _timestamp(),
+                    "requested_at": _timestamp(), "join_nonce_hash": nonce_hash,
                 }
                 invite["status"] = "pending-confirmation"
                 self._save(state)
@@ -1106,11 +1607,55 @@ class _CoordinatorHandler(BaseHTTPRequestHandler):
                     "member": state["members"][pending["member_id"]],
                 }
                 pending["status"] = "finalized"
-                state["invites"][pending["invite_id"]]["status"] = "consumed"
+                consumed_invite = state["invites"][pending["invite_id"]]
+                consumed_invite["status"] = "consumed"
+                consumed_invite.pop("secret", None)
                 self._save(state)
                 self._send(HTTPStatus.OK, response)
                 return
             member_id, member = _authenticate(state, self.headers.get("Authorization"))
+            if self.path == "/v1/coordinator/switch/claim":
+                body, _ = self._body(TEAM_REQUEST_MAX_BYTES)
+                _exact_keys(body, {
+                    "project_fingerprint", "switch_id", "switch_secret", "source_generation",
+                    "target_host_id", "target_device_id",
+                }, "Coordinator Host switch claim")
+                if not hmac.compare_digest(str(body["project_fingerprint"]), str(state["project_fingerprint"])):
+                    raise PermissionError("Coordinator Host switch project identity mismatch")
+                switch = state.get("host_switches", {}).get(body["switch_id"])
+                if (
+                    not isinstance(switch, dict) or switch.get("status") != "open"
+                    or switch.get("target_member_id") != member_id
+                    or switch.get("target_host_id") != body["target_host_id"]
+                    or switch.get("target_device_id") != body["target_device_id"]
+                    or switch.get("source_generation") != body["source_generation"]
+                    or state.get("coordinator_generation") != body["source_generation"]
+                    or not hmac.compare_digest(switch.get("secret_hash", ""), _hash(str(body["switch_secret"])))
+                    or _parse_timestamp(str(switch["expires_at"])) <= dt.datetime.now(dt.timezone.utc)
+                ):
+                    raise PermissionError("Coordinator Host switch is forged, replayed, expired, or for another node")
+                transfer = json.loads(json.dumps(state))
+                _invalidate_ephemeral_authority_for_host_switch(
+                    transfer, consumed_switch_id=body["switch_id"]
+                )
+                transfer["coordinator_generation"] = int(state["coordinator_generation"]) + 1
+                transfer["coordinator_host_id"] = body["target_host_id"]
+                transfer["coordinator_status"] = "active"
+                transfer["coordinator_successor"] = None
+                transfer["updated_at"] = _timestamp()
+                _invalidate_ephemeral_authority_for_host_switch(
+                    state, consumed_switch_id=body["switch_id"]
+                )
+                state["coordinator_status"] = "retired"
+                state["coordinator_successor"] = {
+                    "host_id": body["target_host_id"],
+                    "generation": transfer["coordinator_generation"],
+                    "switched_at": _timestamp(),
+                }
+                state["updated_at"] = _timestamp()
+                self._save(state)
+                self._send(HTTPStatus.OK, {"transfer": transfer, "automatic_election": False})
+                return
             body, raw_size = self._body()
             if self.path == "/v1/sync":
                 if body.get("member_id") != member_id:
@@ -1161,6 +1706,7 @@ class _CoordinatorHandler(BaseHTTPRequestHandler):
 
 def start_coordinator_server(
     project_root: Path, *, bind: str = "127.0.0.1", port: int = 0,
+    advertise_address: str | None = None,
 ) -> tuple[_CoordinatorServer, dict[str, Any]]:
     """Create (but do not background) one explicitly enabled Coordinator server."""
     config = load_team_config(project_root)
@@ -1168,6 +1714,11 @@ def start_coordinator_server(
         raise ValueError("Team Mode must be explicitly enabled before Coordinator start")
     if _runtime_path(project_root).exists():
         raise ValueError("a Coordinator runtime is already registered; disable it before manual Host switch")
+    coordinator = _normalize_coordinator_state(_read_json(_coordinator_path(project_root)))
+    if coordinator.get("coordinator_status") != "active":
+        raise ValueError("retired Coordinator Host cannot start; claim a fresh manual Host switch")
+    if coordinator.get("coordinator_host_id") != config.get("host_id"):
+        raise ValueError("local Host identity is not the active Coordinator Host")
     try:
         address = ipaddress.ip_address(bind)
     except ValueError as exc:
@@ -1180,11 +1731,23 @@ def start_coordinator_server(
     control = secrets.token_urlsafe(32)
     server = _CoordinatorServer((bind, port), Path(project_root), control)
     host, bound_port = server.server_address[:2]
-    endpoint_host = "127.0.0.1" if ipaddress.ip_address(host).is_unspecified else host
+    if ipaddress.ip_address(host).is_unspecified:
+        if not advertise_address:
+            server.server_close()
+            raise ValueError("wildcard LAN bind requires an explicit private advertise_address")
+        endpoint_host = _validate_discovery_address(
+            advertise_address, allow_lan=True, label="Coordinator advertise address"
+        )
+        if ipaddress.ip_address(endpoint_host).is_unspecified:
+            server.server_close()
+            raise ValueError("Coordinator advertise address cannot be wildcard")
+    else:
+        endpoint_host = host
     runtime = {
         "schema_version": 1, "endpoint": f"http://{endpoint_host}:{bound_port}",
         "bind": bind, "port": bound_port, "pid": os.getpid(), "control": control,
         "coordinator_host_id": config["host_id"], "started_at": _timestamp(),
+        "coordinator_generation": coordinator["coordinator_generation"],
     }
     _atomic_json(_runtime_path(project_root), runtime)
     config["runtime_status"] = "team-runtime-active"

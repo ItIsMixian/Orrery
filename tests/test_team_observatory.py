@@ -59,6 +59,10 @@ class TeamObservatoryTests(unittest.TestCase):
         self.assertIn("现在的情况", page)
         self.assertIn("建议操作", page)
         self.assertIn("成员与工作任务", page)
+        self.assertIn("发现、加入与连接", page)
+        self.assertIn("显式发现同项目 Host", page)
+        self.assertIn("发现包仅含 protocol version", page)
+        self.assertIn("Host switch 只允许手工 generation 递增", page)
         self.assertIn("待处理请求", page)
         self.assertIn("已处理请求（0）", page)
         self.assertIn("本机控制与技术诊断", page)
@@ -97,7 +101,7 @@ class TeamObservatoryTests(unittest.TestCase):
             port = server.server_address[1]
             origin = f"http://127.0.0.1:{port}"
             def request(method: str, path: str, body=None, *, cookie=None, origin_header=True, host=None):
-                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=15)
                 headers = {"Accept": "application/json", "Host": host or f"127.0.0.1:{port}"}
                 if cookie:
                     headers["Cookie"] = cookie
@@ -166,6 +170,14 @@ class TeamObservatoryTests(unittest.TestCase):
                 self.assertEqual(started["projection"]["contract_type"], "team-read-only-projection")
                 self.assertEqual(started["projection"]["authority"], "derived-read-only")
                 self.assertFalse(started["projection"]["execution_capability"])
+
+                response, raw = request("POST", "/team/api/discovery", cookie=cookie)
+                discovered = json.loads(raw)
+                self.assertEqual(response.status, 200)
+                self.assertEqual(discovered["lan"]["status"]["status"], "stopped-after-scan")
+                self.assertEqual(len(discovered["lan"]["candidates"]), 1)
+                self.assertFalse(discovered["lan"]["membership_from_discovery"])
+                self.assertEqual(discovered["lan"]["coordinator_host"]["generation"], 1)
 
                 for action in ("heartbeat", "sharing", "sharing", "capture", "sync"):
                     response, raw = request("POST", f"/team/api/{action}", cookie=cookie)

@@ -96,7 +96,7 @@ class TeamFoundationTests(unittest.TestCase):
         invite = create_invite(
             host_root, candidate_member_id="reviewer", endpoint=endpoint, expires_at=expires,
         )
-        self.assertEqual(invite["discovery"], "unsupported-next-phase")
+        self.assertEqual(invite["endpoint_source"], "manual-fallback")
         requested = request_join(candidate_root, invite=invite["invite"])
         self.assertEqual(requested["status"], "pending-host-confirmation")
         confirm_join(host_root, request_id=requested["request_id"])
@@ -293,6 +293,20 @@ class TeamFoundationTests(unittest.TestCase):
                     _http_json(
                         coordinator.runtime["endpoint"], "/v1/projection", credential=old_credential,
                     )
+
+    def test_reenable_after_credential_epoch_change_issues_current_local_credential(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            self._enable(fixture.repository)
+            changed = change_member_capability(
+                fixture.repository, member_id="owner", action="revoke", capability="reviewer",
+            )
+            expected_epoch = changed["member"]["credential_epoch"]
+            self._enable(fixture.repository)
+            local = _read_json(_credential_path(fixture.repository))
+            self.assertEqual(local["credential_epoch"], expected_epoch)
+            with CoordinatorFixture(fixture.repository) as coordinator:
+                projection = fetch_projection(fixture.repository, endpoint=coordinator.runtime["endpoint"])
+                self.assertEqual(projection["members"][0]["member_id"], "owner")
 
     def test_public_or_dns_endpoints_are_rejected_before_network_and_cli_is_stable(self) -> None:
         with CollaborationGitFixture() as fixture:

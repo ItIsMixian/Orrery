@@ -5,14 +5,17 @@ import argparse
 import datetime as dt
 import json
 import sys
+import time
 from pathlib import Path
 
 from project_orrery_core.team import (
     capture_metadata_envelope,
+    claim_coordinator_host_switch,
     change_member_capability,
     configure_heartbeat,
     confirm_join,
     create_invite,
+    create_coordinator_host_switch_invite,
     decide_request,
     disable_team,
     enable_team,
@@ -20,10 +23,13 @@ from project_orrery_core.team import (
     fetch_requests,
     finalize_join,
     inspect_outbox,
+    inspect_discovery_status,
     load_team_config,
     queue_sync_event,
+    publish_discovery_once,
     request_host_switch,
     request_join,
+    scan_discovery_candidates,
     send_request,
     set_sharing,
     start_coordinator_server,
@@ -70,6 +76,23 @@ def build_parser() -> argparse.ArgumentParser:
     _common(serve)
     serve.add_argument("--bind", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=0)
+    serve.add_argument("--advertise-address")
+
+    discovery_serve = commands.add_parser("discovery-serve")
+    _common(discovery_serve)
+    discovery_serve.add_argument("--endpoint", required=True)
+    discovery_serve.add_argument("--target-ip", default="255.255.255.255")
+    discovery_serve.add_argument("--port", type=int, default=42853)
+    discovery_serve.add_argument("--interval-seconds", type=float, default=2.0)
+
+    discovery_scan = commands.add_parser("discovery-scan")
+    _common(discovery_scan)
+    discovery_scan.add_argument("--bind-ip", default="0.0.0.0")
+    discovery_scan.add_argument("--port", type=int, default=42853)
+    discovery_scan.add_argument("--timeout-seconds", type=float, default=0.8)
+
+    discovery_status = commands.add_parser("discovery-status")
+    _common(discovery_status)
 
     capture = commands.add_parser("capture")
     _common(capture)
@@ -92,6 +115,7 @@ def build_parser() -> argparse.ArgumentParser:
     join_request = commands.add_parser("join-request")
     _common(join_request)
     join_request.add_argument("--invite", required=True)
+    join_request.add_argument("--candidate-id")
 
     join_confirm = commands.add_parser("join-confirm")
     _common(join_confirm)
@@ -111,6 +135,18 @@ def build_parser() -> argparse.ArgumentParser:
     host.add_argument("--host-id", required=True)
     host.add_argument("--device-id", required=True)
     host.add_argument("--endpoint")
+
+    coordinator_switch_create = commands.add_parser("coordinator-switch-create")
+    _common(coordinator_switch_create)
+    coordinator_switch_create.add_argument("--target-member-id", required=True)
+    coordinator_switch_create.add_argument("--target-host-id", required=True)
+    coordinator_switch_create.add_argument("--target-device-id", required=True)
+    coordinator_switch_create.add_argument("--endpoint", required=True)
+    coordinator_switch_create.add_argument("--expires-at")
+
+    coordinator_switch_claim = commands.add_parser("coordinator-switch-claim")
+    _common(coordinator_switch_claim)
+    coordinator_switch_claim.add_argument("--switch-invite", required=True)
 
     projection = commands.add_parser("projection")
     _common(projection)
@@ -163,7 +199,10 @@ def main(argv: list[str] | None = None) -> int:
         elif action == "sharing":
             data = set_sharing(target, enabled=arguments.mode == "on")
         elif action == "serve":
-            server, runtime = start_coordinator_server(target, bind=arguments.bind, port=arguments.port)
+            server, runtime = start_coordinator_server(
+                target, bind=arguments.bind, port=arguments.port,
+                advertise_address=arguments.advertise_address,
+            )
             if arguments.json_output:
                 emit(response("team-serve", status="ok", exit_code=JsonExitCode.OK, data=runtime))
             else:
@@ -175,6 +214,30 @@ def main(argv: list[str] | None = None) -> int:
             finally:
                 server.server_close()
             return int(JsonExitCode.OK)
+        elif action == "discovery-serve":
+            if not 0.2 <= arguments.interval_seconds <= 60:
+                raise ValueError("discovery interval must be between 0.2 and 60 seconds")
+            try:
+                while True:
+                    data = publish_discovery_once(
+                        target, endpoint=arguments.endpoint, target=arguments.target_ip,
+                        port=arguments.port,
+                    )
+                    if not arguments.json_output:
+                        _print_human("discovery-announce", data)
+                    time.sleep(arguments.interval_seconds)
+            except KeyboardInterrupt:
+                data = {"status": "stopped", "network_performed": True}
+            if arguments.json_output:
+                emit(response("team-discovery-serve", status="ok", exit_code=JsonExitCode.OK, data=data))
+            return int(JsonExitCode.OK)
+        elif action == "discovery-scan":
+            data = scan_discovery_candidates(
+                target, bind=arguments.bind_ip, port=arguments.port,
+                timeout_seconds=arguments.timeout_seconds,
+            )
+        elif action == "discovery-status":
+            data = inspect_discovery_status(target)
         elif action == "capture":
             envelope = capture_metadata_envelope(target)
             data = {
@@ -196,7 +259,7 @@ def main(argv: list[str] | None = None) -> int:
                 endpoint=arguments.endpoint, expires_at=expires,
             )
         elif action == "join-request":
-            data = request_join(target, invite=arguments.invite)
+            data = request_join(target, invite=arguments.invite, candidate_id=arguments.candidate_id)
         elif action == "join-confirm":
             data = confirm_join(target, request_id=arguments.request_id)
         elif action == "join-finalize":
@@ -210,6 +273,18 @@ def main(argv: list[str] | None = None) -> int:
             data = switch_active_host(target, host_id=arguments.host_id, device_id=arguments.device_id)
             if arguments.endpoint:
                 data["coordinator"] = request_host_switch(target, endpoint=arguments.endpoint)
+        elif action == "coordinator-switch-create":
+            expires = arguments.expires_at or (
+                dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=10)
+            ).isoformat().replace("+00:00", "Z")
+            data = create_coordinator_host_switch_invite(
+                target, target_member_id=arguments.target_member_id,
+                target_host_id=arguments.target_host_id,
+                target_device_id=arguments.target_device_id,
+                endpoint=arguments.endpoint, expires_at=expires,
+            )
+        elif action == "coordinator-switch-claim":
+            data = claim_coordinator_host_switch(target, switch_invite=arguments.switch_invite)
         elif action == "projection":
             data = fetch_projection(target, endpoint=arguments.endpoint)
         elif action == "request-create":

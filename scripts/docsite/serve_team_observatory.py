@@ -11,6 +11,7 @@ import re
 import secrets
 import sys
 import threading
+import time
 from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -34,14 +35,18 @@ import build_personal_observatory
 from project_orrery_core.team import (
     capture_metadata_envelope,
     configure_heartbeat,
+    confirm_join,
     decide_request,
     disable_team,
     enable_team,
     fetch_projection,
     fetch_requests,
     inspect_outbox,
+    inspect_discovery_status,
     load_team_config,
     queue_sync_event,
+    publish_discovery_once,
+    scan_discovery_candidates,
     send_request,
     set_sharing,
     start_coordinator_server,
@@ -161,10 +166,39 @@ class TeamUIState:
             "projection": projection,
             "requests": requests,
             "outbox_count": outbox_count,
+            "lan": inspect_discovery_status(self.project_root) if enabled else {
+                "status": {"status": "personal-zero-network"}, "candidates": [],
+                "join_requests": [], "membership_from_discovery": False,
+            },
             "authority": "derived-read-only",
             "execution_capability": False,
             "privacy": "metadata-only",
         }
+
+    def discovery_probe(self) -> None:
+        """One explicit, bounded loopback probe used by the local UI."""
+        endpoint = self.endpoint()
+        failure: list[BaseException] = []
+
+        def scan() -> None:
+            try:
+                scan_discovery_candidates(
+                    self.project_root, bind="127.0.0.1", timeout_seconds=0.5
+                )
+            except BaseException as exc:  # surfaced on the UI request thread
+                failure.append(exc)
+
+        thread = threading.Thread(target=scan, daemon=True, name="orrery-team-discovery-probe")
+        thread.start()
+        time.sleep(0.05)
+        publish_discovery_once(
+            self.project_root, endpoint=endpoint, target="127.0.0.1"
+        )
+        thread.join(timeout=2)
+        if thread.is_alive():
+            raise ValueError("bounded discovery probe did not stop")
+        if failure:
+            raise ValueError("bounded discovery probe failed") from failure[0]
 
     def refresh_page(self) -> None:
         if self.project_root.resolve() == ROOT.resolve():
@@ -177,6 +211,12 @@ class TeamUIServer(ThreadingHTTPServer):
     def __init__(self, address: tuple[str, int], state: TeamUIState):
         self.state = state
         super().__init__(address, TeamUIHandler)
+
+    def handle_error(self, request: Any, client_address: Any) -> None:
+        error = sys.exc_info()[1]
+        if isinstance(error, (BrokenPipeError, ConnectionAbortedError, ConnectionResetError)):
+            return
+        super().handle_error(request, client_address)
 
     def server_close(self) -> None:
         self.state.close()
@@ -287,6 +327,8 @@ class TeamUIHandler(BaseHTTPRequestHandler):
             expected = set()
             if self.path == "/team/api/request/decision":
                 expected = {"request_id", "decision"}
+            elif self.path == "/team/api/join/confirm":
+                expected = {"request_id"}
             elif self.path == "/team/api/maintenance/authorize":
                 expected = {"item_id", "action"}
             elif self.path == "/team/api/maintenance/execute":
@@ -315,6 +357,13 @@ class TeamUIHandler(BaseHTTPRequestHandler):
                 queue_sync_event(root, envelope, event_kind="workstream-change", immediate=True)
             elif self.path == "/team/api/sync":
                 sync_now(root, endpoint=self.server.state.endpoint())
+            elif self.path == "/team/api/discovery":
+                self.server.state.discovery_probe()
+            elif self.path == "/team/api/join/confirm":
+                request_id = str(body["request_id"])
+                if not re.fullmatch(r"join-[0-9a-f]{24}", request_id):
+                    raise ValueError("join request is invalid")
+                confirm_join(root, request_id=request_id)
             elif self.path == "/team/api/request-create":
                 envelope = capture_metadata_envelope(root)
                 config = load_team_config(root)

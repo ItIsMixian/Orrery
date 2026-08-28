@@ -26,6 +26,7 @@ SESSION_ROUTE_SCHEMA_VERSION = 1
 SCOPE_OBSERVATION_SCHEMA_VERSION = 1
 OVERLAP_REPORT_SCHEMA_VERSION = 1
 SCOPE_EXPANSION_SCHEMA_VERSION = 1
+STACKED_LINEAGE_SCHEMA_VERSION = 1
 DEFAULT_INTEGRATION_REF = "refs/heads/main"
 INTEGRATION_REF_CONFIG_KEY = "collaboration.integration_ref"
 PRIMARY_WORKTREE_CONFIG_KEY = "collaboration.primary_worktree"
@@ -389,6 +390,111 @@ def resolve_integration_oid(repository: Path, integration_ref: str) -> str:
     return oid
 
 
+def _resolve_commit_oid(repository: Path, oid: str, label: str) -> str:
+    if not isinstance(oid, str) or not _OID.fullmatch(oid.lower()):
+        raise ValueError(f"{label} must be a full commit OID")
+    try:
+        resolved = str(
+            _run_git(repository, "rev-parse", "--verify", "--end-of-options", f"{oid}^{{commit}}")
+        ).strip().lower()
+    except ValueError as exc:
+        raise ValueError(f"{label} does not identify an existing local commit") from exc
+    if resolved != oid.lower():
+        raise ValueError(f"{label} must identify an exact full commit OID")
+    return resolved
+
+
+def _stacked_lineage(
+    repository: Path,
+    *,
+    workstream_id: str,
+    head: str,
+    base_workstream_id: str | None,
+    task_base_oid: str | None,
+    require_parent_head_match: bool = True,
+) -> dict[str, Any]:
+    """Build an explicit task-base binding or a non-inferred legacy/Unknown marker."""
+    if base_workstream_id is None and task_base_oid is None:
+        return {
+            "lineage_schema_version": STACKED_LINEAGE_SCHEMA_VERSION,
+            "status": "legacy-unknown",
+            "base_workstream_id": None,
+            "task_base_oid": None,
+            "validated_head": None,
+        }
+    if not isinstance(base_workstream_id, str) or not base_workstream_id.strip() or task_base_oid is None:
+        raise ValueError("stacked lineage requires both base_workstream_id and task_base_oid")
+    if base_workstream_id == workstream_id:
+        raise ValueError("a Workstream cannot use itself as its stacked lineage parent")
+    base_oid = _resolve_commit_oid(repository, task_base_oid, "task_base_oid")
+    current_head = _resolve_commit_oid(repository, head, "current HEAD")
+    if not _git_succeeds(repository, "merge-base", "--is-ancestor", base_oid, current_head):
+        raise ValueError("task_base_oid must be an ancestor of current HEAD")
+    parent_heads: set[str] = set()
+    if require_parent_head_match:
+        try:
+            records = _worktree_records(repository)
+        except ValueError:
+            records = []
+        for record in records:
+            candidate = Path(str(record.get("worktree", "")))
+            if not candidate.is_dir():
+                continue
+            try:
+                parent_session = _read_workstream_session(worktree_session_path(candidate))
+            except ValueError:
+                continue
+            if (
+                isinstance(parent_session, Mapping)
+                and parent_session.get("workstream_id") == base_workstream_id
+                and isinstance(parent_session.get("head"), str)
+            ):
+                parent_heads.add(str(parent_session["head"]))
+    if require_parent_head_match:
+        if len(parent_heads) > 1:
+            raise ValueError("multiple local parent Workstream HEAD bindings are ambiguous")
+        if parent_heads and base_oid not in parent_heads:
+            raise ValueError("task_base_oid does not match the exact recorded parent Workstream HEAD")
+    return {
+        "lineage_schema_version": STACKED_LINEAGE_SCHEMA_VERSION,
+        "status": (
+            "current"
+            if base_oid in parent_heads or not require_parent_head_match
+            else "parent-unverified-unknown"
+        ),
+        "base_workstream_id": base_workstream_id,
+        "task_base_oid": base_oid,
+        "validated_head": current_head,
+    }
+
+
+def _lineage_from_record(
+    repository: Path, record: Mapping[str, Any], *, head: str,
+) -> dict[str, Any]:
+    value = record.get("lineage")
+    if not isinstance(value, Mapping) or value.get("status") == "legacy-unknown":
+        return _stacked_lineage(
+            repository,
+            workstream_id=str(record["workstream_id"]),
+            head=head,
+            base_workstream_id=None,
+            task_base_oid=None,
+        )
+    if value.get("lineage_schema_version") != STACKED_LINEAGE_SCHEMA_VERSION:
+        raise ValueError("unsupported stacked lineage schema version")
+    normalized = _stacked_lineage(
+        repository,
+        workstream_id=str(record["workstream_id"]),
+        head=head,
+        base_workstream_id=value.get("base_workstream_id"),
+        task_base_oid=value.get("task_base_oid"),
+        require_parent_head_match=False,
+    )
+    if value.get("status") == "parent-unverified-unknown":
+        normalized["status"] = "parent-unverified-unknown"
+    return normalized
+
+
 def _normalized_path(path: Path) -> str:
     # Git can report the long Windows spelling of a worktree even when TEMP or
     # the caller supplied the equivalent 8.3 path (for example RUNNER~1).
@@ -692,6 +798,19 @@ def inspect_worktree_status(project_root: Path) -> dict[str, Any]:
         if session is not None
         else []
     )
+    if session is not None and isinstance(session.get("lineage"), Mapping):
+        lineage = session["lineage"]
+        if lineage.get("status") in {"current", "parent-unverified-unknown"}:
+            if lineage.get("validated_head") != session.get("head"):
+                stale_reasons.append("lineage-validation-head-drifted")
+            base_oid = lineage.get("task_base_oid")
+            if (
+                not isinstance(base_oid, str)
+                or not _git_succeeds(root, "cat-file", "-e", f"{base_oid}^{{commit}}")
+                or not _git_succeeds(root, "merge-base", "--is-ancestor", base_oid, identity["head"])
+            ):
+                stale_reasons.append("task-base-invalid-or-not-ancestor")
+    stale_reasons = list(dict.fromkeys(stale_reasons))
     return {
         "status_schema_version": WORKTREE_STATUS_SCHEMA_VERSION,
         "identity": identity,
@@ -757,11 +876,20 @@ def build_workstream_session(
     member_id: str = "local-owner",
     host_id: str = "local-host",
     captured_at: str | None = None,
+    base_workstream_id: str | None = None,
+    task_base_oid: str | None = None,
 ) -> dict[str, Any]:
     """Build a session bound to current Git facts without writing it."""
     root = Path(project_root).expanduser().absolute()
     config = load_collaboration_config(root)
     identity = inspect_worktree_identity(root, config, member_id=member_id, host_id=host_id)
+    lineage = _stacked_lineage(
+        root,
+        workstream_id=workstream_id,
+        head=identity["head"],
+        base_workstream_id=base_workstream_id,
+        task_base_oid=task_base_oid,
+    )
     registry = load_subsystem_registry(root)
     scope = build_scope_contract(
         workstream_id=workstream_id,
@@ -774,6 +902,7 @@ def build_workstream_session(
         validation_surfaces=validation_surfaces,
         member_id=member_id,
         host_id=host_id,
+        lineage=lineage,
     )
     timestamp = captured_at or dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
     session = {
@@ -807,6 +936,7 @@ def build_workstream_session(
         "visibility": "worktree-local",
         "observability": "local",
         "captured_at": timestamp,
+        "lineage": lineage,
     }
     validate_collaboration_contract(session)
     _validate_lifecycle_semantics(session)
@@ -1184,6 +1314,8 @@ def create_worktree(
     validation_surfaces: Sequence[str] = (),
     member_id: str = "local-owner",
     host_id: str = "local-host",
+    base_workstream_id: str | None = None,
+    task_base_oid: str | None = None,
 ) -> dict[str, Any]:
     """Create one linked worktree at an exact local integration OID and initialize its session."""
     source_text = str(_run_git(Path(project_root), "rev-parse", "--show-toplevel")).strip()
@@ -1198,6 +1330,11 @@ def create_worktree(
         source_root, config, member_id=member_id, host_id=host_id
     )
     integration_oid = source_identity["integration_oid"]
+    selected_start_oid = integration_oid
+    if base_workstream_id is not None or task_base_oid is not None:
+        if not isinstance(base_workstream_id, str) or not base_workstream_id.strip() or task_base_oid is None:
+            raise ValueError("stacked worktree creation requires both lineage inputs")
+        selected_start_oid = _resolve_commit_oid(source_root, task_base_oid, "task_base_oid")
     branch_ref = _validate_new_branch(source_root, branch)
     target = Path(path).expanduser().absolute() if path is not None else _default_worktree_path(
         source_root, workstream_id
@@ -1217,6 +1354,13 @@ def create_worktree(
         validation_surfaces=validation_surfaces,
         member_id=member_id,
         host_id=host_id,
+        lineage=_stacked_lineage(
+            source_root,
+            workstream_id=workstream_id,
+            head=selected_start_oid,
+            base_workstream_id=base_workstream_id,
+            task_base_oid=task_base_oid,
+        ),
     )
 
     created = False
@@ -1228,7 +1372,7 @@ def create_worktree(
             "-b",
             branch,
             str(target),
-            integration_oid,
+            selected_start_oid,
         )
         created = True
         session_result = write_workstream_session(
@@ -1242,6 +1386,8 @@ def create_worktree(
             lifecycle_phase="created",
             member_id=member_id,
             host_id=host_id,
+            base_workstream_id=base_workstream_id,
+            task_base_oid=task_base_oid,
         )
         if session_result["session"]["integration_oid"] != integration_oid:
             raise ValueError("integration ref changed while the worktree was being created")
@@ -1262,6 +1408,8 @@ def create_worktree(
             "dirty": source_identity["dirty"],
             "integration_ref": selected_ref,
             "integration_oid": integration_oid,
+            "task_start_oid": selected_start_oid,
+            "base_workstream_id": base_workstream_id,
         },
         "branch": branch_ref,
         "worktree_path": str(target),
@@ -1370,6 +1518,7 @@ def build_scope_contract(
     host_id: str = "local-host",
     visibility: str = "worktree-local",
     observability: str = "local",
+    lineage: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if not workstream_id or isinstance(revision, bool) or revision < 1:
         raise ValueError("scope requires a workstream ID and positive revision")
@@ -1405,6 +1554,13 @@ def build_scope_contract(
         "host_id": host_id,
         "visibility": visibility,
         "observability": observability,
+        "lineage": dict(lineage) if lineage is not None else {
+            "lineage_schema_version": STACKED_LINEAGE_SCHEMA_VERSION,
+            "status": "legacy-unknown",
+            "base_workstream_id": None,
+            "task_base_oid": None,
+            "validated_head": None,
+        },
     }
     validate_collaboration_contract(contract)
     return contract
@@ -1538,6 +1694,23 @@ def _git_untracked_paths(repository: Path) -> list[str]:
     ]
 
 
+def _git_last_change_oid(repository: Path, baseline: str, head: str, path: str) -> str:
+    value = str(
+        _run_git(
+            repository,
+            "log",
+            "-1",
+            "--format=%H",
+            f"{baseline}..{head}",
+            "--",
+            path,
+        )
+    ).strip().lower()
+    if not _OID.fullmatch(value):
+        raise ValueError(f"Git did not report committed provenance for {path}")
+    return value
+
+
 def collect_scope_observation(
     project_root: Path,
     *,
@@ -1555,6 +1728,12 @@ def collect_scope_observation(
         raise ValueError("scope collection requires a private Workstream session")
     registry = load_subsystem_registry(root)
     identity = status["identity"]
+    lineage = _lineage_from_record(root, record, head=identity["head"])
+    committed_baseline = (
+        str(lineage["task_base_oid"])
+        if lineage["status"] in {"current", "parent-unverified-unknown"}
+        else str(identity["merge_base"])
+    )
     sources: dict[str, set[str]] = {}
 
     def add_paths(values: Sequence[str], source: str, *, patterns: bool = False) -> None:
@@ -1563,7 +1742,7 @@ def collect_scope_observation(
             sources.setdefault(normalized, set()).add(source)
 
     add_paths(
-        _git_changed_paths(root, "diff", f"{identity['merge_base']}..{identity['head']}"),
+        _git_changed_paths(root, "diff", f"{committed_baseline}..{identity['head']}"),
         "committed",
     )
     add_paths(_git_changed_paths(root, "diff", "--cached"), "staged")
@@ -1582,6 +1761,11 @@ def collect_scope_observation(
                 "path": path,
                 "is_pattern": is_pattern,
                 "sources": [source for source in _PATH_SOURCES if source in sources[path]],
+                "committed_last_oid": (
+                    _git_last_change_oid(root, committed_baseline, identity["head"], path)
+                    if "committed" in sources[path]
+                    else None
+                ),
                 "authority_surfaces": _authority_surfaces(path, is_pattern=is_pattern),
                 "subsystem_ids": subsystem_ids,
                 "exclusive_resource_ids": _exclusive_resources_for_path(
@@ -1619,6 +1803,7 @@ def collect_scope_observation(
         "visibility": str(record.get("visibility", "worktree-local")),
         "observability": str(record.get("observability", "local")),
         "captured_at": _utc_timestamp(captured_at),
+        "lineage": lineage,
     }
     fingerprint_input = dict(observation)
     fingerprint_input.pop("scope_fingerprint")
@@ -1711,10 +1896,142 @@ def _add_path_provenance(
     ]
 
 
+def collect_lineage_ancestry_proofs(
+    repository: Path, scopes: Sequence[Mapping[str, Any]],
+) -> dict[str, list[str]]:
+    """Verify only the commit OIDs needed for local lineage folding."""
+    candidate_oids = {
+        str(entry["committed_last_oid"])
+        for scope in scopes
+        for entry in scope.get("path_entries", [])
+        if isinstance(entry, Mapping) and isinstance(entry.get("committed_last_oid"), str)
+    }
+    proofs: dict[str, list[str]] = {}
+    for scope in scopes:
+        lineage = scope.get("lineage")
+        if (
+            not isinstance(lineage, Mapping)
+            or lineage.get("status") != "current"
+            or lineage.get("validated_head") != scope.get("head")
+            or not isinstance(lineage.get("task_base_oid"), str)
+        ):
+            continue
+        task_base = str(lineage["task_base_oid"])
+        if (
+            not _git_succeeds(repository, "cat-file", "-e", f"{task_base}^{{commit}}")
+            or not _git_succeeds(
+                repository, "merge-base", "--is-ancestor", task_base, str(scope["head"])
+            )
+        ):
+            continue
+        try:
+            ancestor_oids = {
+                value.strip().lower()
+                for value in str(_run_git(repository, "rev-list", task_base)).splitlines()
+                if _OID.fullmatch(value.strip().lower())
+            }
+        except ValueError:
+            continue
+        verified = sorted(candidate_oids & ancestor_oids)
+        proofs[str(scope["workstream_id"])] = verified
+    return proofs
+
+
+def _lineage_graph(
+    scopes: Sequence[Mapping[str, Any]],
+    proofs: Mapping[str, Sequence[str]] | None,
+) -> tuple[dict[str, str], list[dict[str, Any]]]:
+    known = {str(scope["workstream_id"]) for scope in scopes}
+    parent_map: dict[str, str] = {}
+    summaries: list[dict[str, Any]] = []
+    by_child: dict[str, dict[str, Any]] = {}
+    for scope in scopes:
+        child = str(scope["workstream_id"])
+        lineage = scope.get("lineage")
+        summary = {
+            "lineage_schema_version": STACKED_LINEAGE_SCHEMA_VERSION,
+            "workstream_id": child,
+            "base_workstream_id": None,
+            "task_base_oid": None,
+            "status": "legacy-unknown",
+            "inherited_path_count": 0,
+            "blocking": False,
+        }
+        if isinstance(lineage, Mapping):
+            summary["base_workstream_id"] = lineage.get("base_workstream_id")
+            summary["task_base_oid"] = lineage.get("task_base_oid")
+            if lineage.get("status") == "parent-unverified-unknown":
+                summary["status"] = "parent-unverified-unknown"
+            elif lineage.get("status") == "current":
+                parent = lineage.get("base_workstream_id")
+                task_base = lineage.get("task_base_oid")
+                if lineage.get("validated_head") != scope.get("head"):
+                    summary["status"] = "input-drift-unknown"
+                elif not isinstance(parent, str) or parent == child or not isinstance(task_base, str):
+                    summary["status"] = "invalid-lineage-unknown"
+                elif parent not in known:
+                    summary["status"] = "parent-unavailable-unknown"
+                elif proofs is None or child not in proofs:
+                    summary["status"] = "ancestry-proof-unavailable-unknown"
+                else:
+                    summary["status"] = "current"
+                    parent_map[child] = parent
+        summaries.append(summary)
+        by_child[child] = summary
+
+    for child in list(parent_map):
+        seen = {child}
+        current = child
+        while current in parent_map:
+            current = parent_map[current]
+            if current in seen:
+                for member in seen:
+                    parent_map.pop(member, None)
+                    if member in by_child:
+                        by_child[member]["status"] = "cycle-unknown"
+                break
+            seen.add(current)
+    return parent_map, summaries
+
+
+def _lineage_descendant(
+    left_id: str, right_id: str, parent_map: Mapping[str, str]
+) -> str | None:
+    def descends(candidate: str, ancestor: str) -> bool:
+        seen: set[str] = set()
+        current = candidate
+        while current in parent_map and current not in seen:
+            seen.add(current)
+            current = parent_map[current]
+            if current == ancestor:
+                return True
+        return False
+
+    if descends(left_id, right_id):
+        return left_id
+    if descends(right_id, left_id):
+        return right_id
+    return None
+
+
+def _without_inherited_committed_source(
+    entry: Mapping[str, Any], inherited_oids: set[str]
+) -> dict[str, Any] | None:
+    value = dict(entry)
+    sources = list(value.get("sources", []))
+    last_oid = value.get("committed_last_oid")
+    if "committed" in sources and isinstance(last_oid, str) and last_oid in inherited_oids:
+        sources.remove("committed")
+        value["sources"] = sources
+        value["committed_last_oid"] = None
+    return value if sources else None
+
+
 def compute_overlap_findings(
     scopes: Sequence[Mapping[str, Any]],
     *,
     unavailable_peers: Sequence[Mapping[str, str]] = (),
+    lineage_ancestry_proofs: Mapping[str, Sequence[str]] | None = None,
 ) -> dict[str, Any]:
     """Compute local/metadata findings without network access or semantic overclaiming."""
     validated_scopes: list[dict[str, Any]] = []
@@ -1724,12 +2041,41 @@ def compute_overlap_findings(
         if scope.get("contract_type") != "scope-observation":
             raise ValueError("overlap inputs must be scope-observation contracts")
         validated_scopes.append(scope)
+    parent_map, lineage_summaries = _lineage_graph(validated_scopes, lineage_ancestry_proofs)
+    summary_by_child = {item["workstream_id"]: item for item in lineage_summaries}
+    excluded_paths: dict[str, set[str]] = {key: set() for key in summary_by_child}
     findings: list[dict[str, Any]] = []
     semantic_priorities: list[dict[str, Any]] = []
     for left_index, left in enumerate(validated_scopes):
         for right in validated_scopes[left_index + 1 :]:
             if left["workstream_id"] == right["workstream_id"]:
                 continue
+            descendant = _lineage_descendant(
+                str(left["workstream_id"]), str(right["workstream_id"]), parent_map
+            )
+            inherited_oids = set(lineage_ancestry_proofs.get(descendant, ())) if (
+                descendant is not None and lineage_ancestry_proofs is not None
+            ) else set()
+            left_entries = list(left["path_entries"])
+            right_entries = list(right["path_entries"])
+            if descendant == left["workstream_id"]:
+                filtered: list[dict[str, Any]] = []
+                for entry in right_entries:
+                    effective = _without_inherited_committed_source(entry, inherited_oids)
+                    if effective is None:
+                        excluded_paths[descendant].add(str(entry["path"]))
+                    else:
+                        filtered.append(effective)
+                right_entries = filtered
+            elif descendant == right["workstream_id"]:
+                filtered = []
+                for entry in left_entries:
+                    effective = _without_inherited_committed_source(entry, inherited_oids)
+                    if effective is None:
+                        excluded_paths[descendant].add(str(entry["path"]))
+                    else:
+                        filtered.append(effective)
+                left_entries = filtered
             shared_subsystems = sorted(
                 set(left["derived_subsystem_ids"]) & set(right["derived_subsystem_ids"])
             )
@@ -1742,8 +2088,8 @@ def compute_overlap_findings(
                         "reason": "shared-subsystem-priority-is-not-alone-proof-of-conflict",
                     }
                 )
-            for left_entry in left["path_entries"]:
-                for right_entry in right["path_entries"]:
+            for left_entry in left_entries:
+                for right_entry in right_entries:
                     if not _path_specs_overlap(left_entry, right_entry):
                         continue
                     evidence = sorted({left_entry["path"], right_entry["path"]})
@@ -1775,12 +2121,12 @@ def compute_overlap_findings(
                 )
             left_resources = {
                 resource
-                for entry in left["path_entries"]
+                for entry in left_entries
                 for resource in entry["exclusive_resource_ids"]
             }
             right_resources = {
                 resource
-                for entry in right["path_entries"]
+                for entry in right_entries
                 for resource in entry["exclusive_resource_ids"]
             }
             shared_resources = sorted(left_resources & right_resources)
@@ -1815,11 +2161,14 @@ def compute_overlap_findings(
     for finding in findings:
         validate_collaboration_contract(finding)
         deduplicated[finding["finding_id"]] = finding
+    for child, paths in excluded_paths.items():
+        summary_by_child[child]["inherited_path_count"] = len(paths)
     return {
         "report_schema_version": OVERLAP_REPORT_SCHEMA_VERSION,
         "scopes": validated_scopes,
         "findings": [deduplicated[key] for key in sorted(deduplicated)],
         "semantic_priorities": semantic_priorities,
+        "lineage_summaries": lineage_summaries,
         "writes_performed": False,
         "network_performed": False,
     }
@@ -2032,7 +2381,12 @@ def inspect_worktree_overlap(
         if value.get("contract_type") != "scope-observation":
             raise ValueError("peer scope file must contain a scope-observation contract")
         scopes.append(value)
-    computed = compute_overlap_findings(scopes, unavailable_peers=unavailable)
+    lineage_proofs = collect_lineage_ancestry_proofs(root, scopes)
+    computed = compute_overlap_findings(
+        scopes,
+        unavailable_peers=unavailable,
+        lineage_ancestry_proofs=lineage_proofs,
+    )
     previous = session.get("findings", [])
     reconciled = reconcile_overlap_findings(computed["findings"], previous)
     review_ready_blocked = any(
@@ -2105,7 +2459,11 @@ def refresh_workstream_scope(
             captured_at=timestamp,
         )
         scopes = [observation, *[scope for scope in overlap["scopes"] if scope is not overlap["current_scope"]]]
-        recomputed = compute_overlap_findings(scopes, unavailable_peers=overlap["unavailable_peers"])
+        recomputed = compute_overlap_findings(
+            scopes,
+            unavailable_peers=overlap["unavailable_peers"],
+            lineage_ancestry_proofs=collect_lineage_ancestry_proofs(root, scopes),
+        )
         reconciled = reconcile_overlap_findings(recomputed["findings"], session.get("findings", []))
         overlap["findings"] = reconciled["active"]
         overlap["retired_findings"] = reconciled["retired"]

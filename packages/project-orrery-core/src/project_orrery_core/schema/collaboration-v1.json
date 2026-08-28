@@ -137,6 +137,7 @@
         }
         ,"review_package_id": {"type": "string", "minLength": 1}
         ,"review_package_content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        ,"lineage": {"$ref": "#/$defs/stacked_lineage"}
       },
       "additionalProperties": false
     },
@@ -161,7 +162,23 @@
         "member_id": {"type": "string", "minLength": 1},
         "host_id": {"type": "string", "minLength": 1},
         "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
-        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]}
+        "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
+        "lineage": {"$ref": "#/$defs/stacked_lineage"}
+      },
+      "additionalProperties": false
+    },
+    "stacked_lineage": {
+      "type": "object",
+      "required": [
+        "lineage_schema_version", "status", "base_workstream_id", "task_base_oid",
+        "validated_head"
+      ],
+      "properties": {
+        "lineage_schema_version": {"const": 1},
+        "status": {"enum": ["current", "legacy-unknown", "parent-unverified-unknown"]},
+        "base_workstream_id": {"type": ["string", "null"]},
+        "task_base_oid": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+        "validated_head": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"}
       },
       "additionalProperties": false
     },
@@ -255,6 +272,7 @@
           "items": {"enum": ["committed", "staged", "unstaged", "untracked", "expected"]},
           "uniqueItems": true
         },
+        "committed_last_oid": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
         "authority_surfaces": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "subsystem_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "exclusive_resource_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
@@ -290,7 +308,8 @@
         "scope_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "visibility": {"enum": ["worktree-local", "local-only", "shared-metadata", "unknown"]},
         "observability": {"enum": ["local", "shared-metadata", "unavailable", "unknown"]},
-        "captured_at": {"type": "string", "format": "date-time"}
+        "captured_at": {"type": "string", "format": "date-time"},
+        "lineage": {"$ref": "#/$defs/stacked_lineage"}
       },
       "additionalProperties": false
     },

@@ -19,6 +19,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
 - 当前 W6 Worktree Candidate 从 W5C `6dd508f` 吸收 `main@673e252` 后，把未发布 Core／CLI／Observatory 推进到 0.1.10／0.1.14／0.1.6：W1–W3 提供 Personal Scope/review/cleanup，W4 health 将交付、对账与工作区卫生分层，W5A–W5C 提供 Team foundation 与 root-only UI，W6 Phase 0–2 增加本机 workspace maintenance。Core API 仍为 1；这些只属于 `codex/w6-workspace-maintenance` Candidate／Worktree scope，公开 v0.2.0 不变。
+- 当前 W5D Worktree Candidate 从 `codex/w6-workspace-maintenance@db78a7f` 建立，把未发布 Core／CLI／Observatory 推进到 0.1.11／0.1.15／0.1.7。它新增显式启动／停止的最小 LAN discovery、Host-confirmed join、单 active Coordinator generation／手工 Host switch、双 clone acceptance Harness，并修正 stacked Workstream lineage；这些仍只属于 `codex/w5d-lan-collaboration-harness` Candidate，不构成真实双机 LAN、Canonical 或 Release 事实。
 - 本机 worktree 已于 2026-08-27 经维护者授权从 38 个清理为 2 个，只保留 primary 与当前 W5C。31 个 clean legacy worktree 直接移除；3 个 stale-session worktree 先把 Git-private `orrery/` 元数据按 SHA-256 归档再移除；最后移除可由保留 branch 重建的 recovery 与 final W4/W5 candidate worktree。所有 branch／commit 保留；该人工操作不是自动 cleanup 产品能力。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
@@ -40,7 +41,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - lifecycle phase、runtime condition、evidence freshness 与 closure reason 独立保存；Git／review evidence 漂移会撤销有效 Review Ready。W3 Candidate 的 review／closure 操作会在关键绑定漂移时失败关闭，并只更新 Git-private session；它不自动把 Candidate 合入 main。
 - Adapter capability contract 分离 launch／attach／rebind／message。Codex、Claude、DeepSeek 当前只声明 caller-provided attach，Harness JSON 全关闭；Adapter Skill 要求先走 route/guard，但不能拦截绕过 Adapter 的任意宿主写入，也不证明 platform runtime launch／rebind 支持。
 - 根 `AGENTS.md` 的七个 subsystem 入口已有显式稳定 ID；Core registry 只投影这些入口链接的既有 State Docs，缺失 State 时失败关闭，`unmapped` 与 `project-wide` 只是 Scope 保留表达，不自动创建作者文档。
-- W2 从 merge base→HEAD、staged、unstaged、untracked 与 session expected writes 生成同一 `scope-observation`，每条路径保留来源；registry 从 `AGENTS.md` Truth 路径与 authority links 派生 subsystem mapping。无法映射的路径保持 `Unmapped`，共享 subsystem 只提高 Semantic 优先级。
+- W2 的 legacy session 仍从 merge base→HEAD 生成 committed scope 并标为 lineage Legacy／Unknown；显式 stacked session 记录 versioned `base_workstream_id`＋精确 `task_base_oid`，创建时要求 task base 是当前 HEAD 的祖先，并在本机父 session 可见时绑定其精确 HEAD。stacked committed delta 改为 task base→HEAD，staged／unstaged／untracked／expected 仍属于当前任务。Overlap 只在显式 lineage、scope HEAD 和本地 Git ancestor proof 都当前时排除 inherited committed provenance；parent fork 后新提交、siblings、legacy／proof unavailable 继续正常产生 finding，且不会生成“已解决的继承冲突”。
 - Direct／Authority／Semantic／Unknown finding 与 Open／Acknowledged／Resolved／Stale 生命周期存放于 Git-private session。fingerprint 绑定 Scope revision、HEAD、integration OID、路径、验证面和对端；跨成员 L2 保存 required members 与逐成员确认，整体 `n/m` 未完成时阻止 Review Ready。
 - Personal Mode 的 W2 collector、overlap、scope refresh 与 acknowledgement 都只执行本地 Git／文件系统操作；没有新增 listener、discovery、Coordinator、heartbeat 或 Team transport。凭据、release、schema migration 的默认独占路径可由项目配置收紧／替换，Direct／L3 以及未本机确认的 L2 已接入 Adapter route 并失败关闭。
 - W3 Candidate 的 `integrate --dry-run` 固定 target OID 与 candidate HEAD，在新建、干净、一次性 integration worktree 中执行 merge／rebase 推测和声明验证；无论成功、冲突或验证失败都不更新 target ref，并核对作者 worktree 的 HEAD／status 前后不变。只有该工具创建的临时 worktree 会在运行后移除。
@@ -99,6 +100,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `packages/project-orrery-core/src/project_orrery_core/schema/maintenance-v1.json`
 - `packages/project-orrery-cli/src/project_orrery_cli/maintenance.py`
 - `tests/test_workspace_maintenance.py`
+- `tests/test_collaboration_lineage.py`
+- `tests/test_lan_collaboration_harness.py`
+- `scripts/acceptance/run_lan_collaboration_acceptance.py`
+- `docs/operations/lan-team-preflight.md`
 
 ## 已知缺口
 
@@ -108,5 +113,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   修正使用新 Pilot。R0 原始运行只位于仓库外 `project-orrery-benchmark`，仓库内只保存 R2 结论与
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
-- W3 source 已实现 review／integration／cleanup；当前 W6 Worktree Candidate 还包含健康分层的 Personal Observatory、opt-in Team Core／CLI／loopback Coordinator、W5C Team UI 与 W6 默认建议＋本机确认维护闭环。Phase 3 自动 worktree removal 与 Phase 4 OS scheduler Adapter 未实现；仍没有自动发现、真实多机／LAN、自动 Coordinator 迁移／选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。动态 UI 未进入默认 docsite、公开模板或 Release；Canonical 与 promotion 状态由 containing ref／exact-SHA checks 决定。
+- W3 source 已实现 review／integration／cleanup；当前 W5D Worktree Candidate 还包含健康分层的 Personal Observatory、opt-in Team Core／CLI／root-only UI、LAN candidate discovery、Host-confirmed join、手工 Coordinator Host switch、W6 maintenance 和 stacked lineage。Phase 3 自动 worktree removal 与 Phase 4 OS scheduler Adapter 未实现；仍没有真实双机／真实 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。真实 W5C／W6 legacy session 未由 W5D 自动改写，整合者仍需显式 rebind／retire；动态 UI 未进入默认 docsite、公开模板或 Release。
 - Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.13、其他版本、OS、Provider、模型或未来发行物。

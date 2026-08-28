@@ -29,12 +29,24 @@
     },
     "manual_invite": {
       "type": "object",
-      "description": "Project-fingerprint-bound manual fallback. Discovery is unsupported-next-phase in W5A.",
+      "description": "Project-fingerprint-bound, expiring manual endpoint fallback with a one-use join secret.",
+      "additionalProperties": false
+    },
+    "host_discovery": {
+      "type": "object",
+      "description": "Untrusted <=1 KiB hint containing only protocol version, opaque project/host/device hints, endpoint, nonce and expiry. It never grants membership.",
+      "additionalProperties": false
+    },
+    "coordinator_host_switch": {
+      "type": "object",
+      "description": "Manual, expiring single-active Coordinator Host generation transfer; old Hosts retire and automatic election is false.",
       "additionalProperties": false
     }
   },
   "x-orrery-boundaries": {
     "personal_default_listener": false,
+    "team_enable_starts_discovery": false,
+    "discovery_membership_authority": false,
     "lan_bind_requires_explicit_opt_in": true,
     "cloud_dependency": false,
     "automatic_leader_election": false,

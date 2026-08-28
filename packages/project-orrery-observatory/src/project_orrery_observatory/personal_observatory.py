@@ -591,6 +591,7 @@ def build_personal_observatory_projection(
         _normalized_path,
         _worktree_records,
         collect_scope_observation,
+        collect_lineage_ancestry_proofs,
         compute_overlap_findings,
         inspect_worktree_status,
         reconcile_overlap_findings,
@@ -670,7 +671,12 @@ def build_personal_observatory_projection(
                 }
             )
 
-    computed = compute_overlap_findings(scopes, unavailable_peers=unavailable_peers)
+    lineage_proofs = collect_lineage_ancestry_proofs(root, scopes)
+    computed = compute_overlap_findings(
+        scopes,
+        unavailable_peers=unavailable_peers,
+        lineage_ancestry_proofs=lineage_proofs,
+    )
     reconciled = reconcile_overlap_findings(
         computed["findings"], list(previous_findings.values())
     )
@@ -746,6 +752,17 @@ def build_personal_observatory_projection(
                 "scope_revision": scope.get("scope_revision") if scope else None,
                 "scope_path_count": len(scope_paths) if scope else None,
                 "scope_paths": scope_paths,
+                "lineage": (
+                    dict(scope.get("lineage", {}))
+                    if scope
+                    else {
+                        "lineage_schema_version": 1,
+                        "status": "legacy-unknown",
+                        "base_workstream_id": None,
+                        "task_base_oid": None,
+                        "validated_head": None,
+                    }
+                ),
                 "lifecycle_phase": effective_phase,
                 "declared_lifecycle_phase": lifecycle.get("declared_phase", "unavailable"),
                 "runtime_condition": lifecycle.get("runtime_condition", "stale-unknown"),
@@ -776,6 +793,22 @@ def build_personal_observatory_projection(
             }
         )
     cards.extend(unavailable_cards)
+    parent_map = {
+        str(item["workstream_id"]): str(item["base_workstream_id"])
+        for item in computed.get("lineage_summaries", [])
+        if item.get("status") == "current" and item.get("base_workstream_id")
+    }
+    for card in cards:
+        workstream_id = str(card.get("workstream_id", ""))
+        depth = 0
+        root_id = workstream_id
+        seen = {workstream_id}
+        while root_id in parent_map and parent_map[root_id] not in seen:
+            root_id = parent_map[root_id]
+            seen.add(root_id)
+            depth += 1
+        card["lineage_depth"] = depth
+        card["lineage_chain_root"] = root_id
     cards.sort(
         key=lambda item: (
             not item.get("is_current", False),
@@ -885,6 +918,7 @@ def build_personal_observatory_projection(
         "subsystems": subsystems,
         "findings": active_findings,
         "retired_findings": reconciled["retired"],
+        "lineage_summaries": computed.get("lineage_summaries", []),
         "finding_counts": dict(finding_counts),
         "attention": attention,
         "health": health,
@@ -1038,7 +1072,8 @@ def _human_freshness(value: object) -> str:
 
 def _workstream_card(card: Mapping[str, Any]) -> str:
     branch = card.get("branch", "Unknown")
-    title = card.get("workstream_id", branch)
+    title = str(card.get("workstream_id", branch))
+    display_title = ("↳ " * int(card.get("lineage_depth", 0))) + title
     path_rows = "".join(
         '<li><code>%s</code><span>%s</span></li>'
         % (_esc(item.get("path", "Unknown")), _esc(" · ".join(item.get("sources", []))))
@@ -1050,6 +1085,14 @@ def _workstream_card(card: Mapping[str, Any]) -> str:
         if isinstance(agent, Mapping)
         else "Agent session Unavailable"
     )
+    lineage = card.get("lineage") if isinstance(card.get("lineage"), Mapping) else {}
+    if lineage.get("status") == "current":
+        agent_label += " · stacked on %s@%s" % (
+            lineage.get("base_workstream_id", "Unknown"),
+            _short_oid(lineage.get("task_base_oid")),
+        )
+    else:
+        agent_label += " · lineage Legacy/Unknown"
     findings = card.get("findings", [])
     counts = card.get("finding_counts", {})
     finding_types = " · ".join(
@@ -1079,7 +1122,7 @@ def _workstream_card(card: Mapping[str, Any]) -> str:
             _esc(title),
             _esc(card.get("session_state", "unknown")),
             "CURRENT WORKSTREAM" if card.get("is_current") else "OPEN WORKSTREAM",
-            _esc(title),
+            _esc(display_title),
             _esc(branch),
             _esc(_human_phase(card.get("lifecycle_phase", "unavailable"))),
             _esc(_human_runtime(card.get("runtime_condition", "stale-unknown"))),
@@ -1515,11 +1558,49 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         card for card in projection["workstreams"]
         if card.get("display_group") == "active"
     ]
+    visible_ids = {
+        str(card.get("workstream_id")) for card in projection.get("workstreams", [])
+    }
+    lineage_rows = "".join(
+        '<div class="po-inventory-row" data-lineage-status="%s"><div><b>%s</b>'
+        '<span>%s</span></div><code>%s</code><span>%s</span><span>%s inherited paths</span></div>'
+        % (
+            _esc(item.get("status", "unknown")),
+            _esc(item.get("workstream_id", "Unknown")),
+            _esc("stacked on " + str(item.get("base_workstream_id", "Unknown"))),
+            _esc(_short_oid(item.get("task_base_oid"))),
+            _esc(item.get("status", "unknown")),
+            _esc(item.get("inherited_path_count", 0)),
+        )
+        for item in projection.get("lineage_summaries", [])
+        if item.get("base_workstream_id") and item.get("workstream_id") in visible_ids
+    )
+    lineage_member_ids = {
+        str(value)
+        for item in projection.get("lineage_summaries", [])
+        if item.get("base_workstream_id") and item.get("workstream_id") in visible_ids
+        for value in (item.get("workstream_id"), item.get("base_workstream_id"))
+        if value
+    }
+    chain_finding_ids = {
+        item.get("finding_id")
+        for item in projection.get("findings", [])
+        if item.get("finding_id")
+        and set(map(str, item.get("workstream_ids", []))).issubset(lineage_member_ids)
+    }
+    lineage_panel = (
+        '<details class="po-vault po-lineage-chain" open><summary><div><b>Stacked chain</b>'
+        '<span>精确 task base；继承路径不计作 conflict finding</span></div>'
+        '<span>%s unique findings in explicit chain</span></summary><div class="po-vault-body">%s</div></details>'
+        % (len(chain_finding_ids), lineage_rows)
+        if lineage_rows
+        else ""
+    )
     inventory_cards = [
         card for card in projection["workstreams"]
         if card.get("display_group") != "active"
     ]
-    workstreams = "".join(_workstream_card(card) for card in active_cards)
+    workstreams = lineage_panel + "".join(_workstream_card(card) for card in active_cards)
     if not workstreams:
         workstreams = (
             '<div class="po-empty" data-state="no-worktree">No active Workstream · Unknown</div>'

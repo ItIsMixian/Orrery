@@ -513,3 +513,12 @@
 - Observatory 0.1.6 增加独立“工作区维护”页：静态输出只读，root-only loopback 动态页提供只读扫描、逐项／批量授权与逐项执行；worktree／local branch／remote branch 三类动作明确分栏。Team 中央新增 `cleanup` request，但 request／accept 均保持 `execution_performed=false`，不会调用 execute。
 - W6 focused 7/7、W3 + Personal 27/27、Team + component 4/4、version／W1-W2 compatibility 64/64 PASS；结构门通过。真实 in-app Chromium 在 1280×720 点击维护导航和只读扫描，在 390×844 点击历史 details；两种 viewport 均无横向溢出，移动布局为单列。浏览器扫描后当前仓库仍为 3 个 worktree、0 suggestion、0 receipt、branch 未变；完整隔离站、链接、diff 与命令证据记录在 [W6 Validation](validation/2026-08-27-workspace-maintenance-phase-0-2.md)。
 - 本分支不 push、不合并 main、不建 tag／Release；Candidate／Promotion 全仓与 exact-SHA Windows／Ubuntu checks 留给唯一整合者。
+
+## 2026-08-27 — W5D LAN Collaboration Harness and stacked lineage Candidate
+
+- 从 `codex/w6-workspace-maintenance@db78a7f` 建立独立 `codex/w5d-lan-collaboration-harness`，注册 Git-private `W5D-lan-collaboration-harness` session；首次写入前本地 `main@673e252` 未超出基线，远端 fetch 因本机代理不可用未能复核。本分支未改写 W5C／W6 session、main、根 PROGRESS／HANDOFF、tag 或 Release。
+- Core 0.1.11／CLI 0.1.15／Observatory 0.1.7 完成默认关闭的最小 LAN discovery、完整 invite／join／Host-local Admin 确认、单 active Host／手工 switch、旧 Host revision 拒绝、断线／TTL／单调重连、request-only 与 capability revoke；Personal Mode 继续 zero-network，Team enable 不会自动广播或启动 Host。
+- 单机双身份 acceptance runner 只使用独立临时 clone／credential／runtime、受控 discovery 与 loopback HTTP，7 stages PASS；脱敏 manifest 和阶段结果经独立 validator 校验，未使用真实凭据、外网、DNS 或真实 LAN。真实双机、防火墙／多网卡、睡眠恢复和 exact-SHA Ubuntu required check 仍是后续验收边界。
+- collaboration v1 新增显式版本化 `base_workstream_id`＋`task_base_oid` lineage；current lineage 的 committed scope 改为 `task_base_oid..HEAD`，只在可验证祖先链中排除精确 base 已包含的 inherited committed provenance。parent post-fork、siblings、legacy／Unknown、staged／unstaged／untracked／expected 与 L2／L3、exclusive resource、ack／Review Ready 门保持保守语义。
+- Synthetic W5C→W6→W5D fixture 的祖先两两计算由修正前 4 Direct／3 Authority 降为纯继承 0／0；child 新增仍可见，parent fork 后同路径重新形成冲突，非法／不存在／非祖先／漂移 base 失败关闭或 Unknown。Personal Observatory 按显式 stacked chain 折叠并显示 base OID、inherited path 和 chain 内 unique current finding；真实 W5C／W6 legacy session 留给中央显式 rebind／retire。
+- LAN／Team／Review Ready 定向回归 22/22、lineage／schema／Personal 17/17、结构、隔离 docsite、作者 Markdown 链接、JSON／compile／diff 检查和真实 in-app Chromium 1280px／390px 点击验收通过；完整命令、校验和与平台限制记录在 [W5D Validation](validation/2026-08-27-w5d-lan-collaboration-harness.md)。

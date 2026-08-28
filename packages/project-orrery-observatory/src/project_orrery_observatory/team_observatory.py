@@ -84,7 +84,7 @@ TEAM_OBSERVATORY_JS = r"""
   function renderMembers(projection){
     const root=q('[data-team-members]');root.replaceChildren();
     const members=(projection&&projection.members)||[];
-    text(q('[data-team-member-note]'),members.length<=1?'目前只有你的本机状态；其他成员接入与自动发现仍未实现。':'按成员查看其最近共享的任务状态；过期快照不会冒充实时在线。');
+    text(q('[data-team-member-note]'),members.length<=1?'目前只有你的本机状态；可显式扫描最小 LAN 候选，成员资格仍需 Host 本机确认。':'按成员查看其最近共享的任务状态；过期快照不会冒充实时在线。');
     if(!members.length){root.append(node('div','to-empty','还没有可用的成员状态。当前不能据此判断团队是否空闲。'));return}
     members.forEach(member=>{const details=node('details','to-member');details.open=true;const summary=node('summary');
       const title=node('div','to-member-title');title.append(node('h4',null,member.member_id==='local-owner'?'你（本机成员）':member.member_id),node('small',null,member.member_id));
@@ -110,16 +110,24 @@ TEAM_OBSERVATORY_JS = r"""
     if(!pending.length)pendingRoot.append(node('div','to-empty','目前没有需要你处理的请求。'));
     pending.forEach(request=>pendingRoot.append(requestItem(request,false)));done.forEach(request=>historyRoot.append(requestItem(request,true)));history.hidden=!done.length;
   }
+  function renderLan(lan){lan=lan||{};const status=lan.status||{},candidates=lan.candidates||[],joins=lan.join_requests||[],host=lan.coordinator_host||{};
+    text(q('[data-lan-discovery]'),status.status||'never-started');text(q('[data-lan-candidates]'),candidates.length);text(q('[data-lan-host-generation]'),host.generation==null?'Unknown':'g'+host.generation+' · '+(host.status||'unknown'));
+    const root=q('[data-lan-results]');root.replaceChildren();
+    if(!candidates.length)root.append(node('div','to-empty','尚未发现候选 Host。发现提示不授予成员资格；可使用 CLI 的手工邀请地址回退。'));
+    candidates.forEach(candidate=>{const item=node('div','to-request');item.append(node('b',null,'候选 Host · '+((candidate.packet||{}).host_hint||'opaque')),node('p',null,(candidate.packet||{}).endpoint||'endpoint unavailable'),node('div','to-request-meta','不可信提示 · 必须继续校验 project fingerprint、成员凭据并由 Host Admin 确认'));root.append(item)});
+    joins.filter(item=>item.status==='pending').forEach(item=>{const row=node('div','to-request');row.append(node('b',null,'加入确认 · '+item.member_id),node('p',null,'该成员仍未加入；确认只签发成员凭据，不执行其机器上的任何动作.'));const button=node('button','to-action','在 Host 本机确认加入');button.type='button';button.dataset.joinRequestId=item.request_id;row.append(button);root.append(row)});
+  }
   function renderBrief(value){const config=value.config||{},running=!!(value.coordinator&&value.coordinator.running),projection=value.projection||{},members=projection.members||[];
     const workstreams=members.reduce((count,member)=>count+(member.workstreams||[]).length,0),pending=(value.requests||[]).filter(request=>request.status==='pending-local-confirmation').length,outbox=value.outbox_count||0;
     const externalRegistered=!running&&config.runtime_status==='team-runtime-active';let summary,guidance;
     if(externalRegistered){summary='检测到另一个本机协作服务登记，当前页面不能直接控制它。';guidance='请回到原 Team 页面正常停止；如果原进程已经退出，可在技术诊断中退出 Team Mode 后重新启用。'}
     else if(!running){summary='Team Mode 已启用，但本机协作服务还没有启动。';guidance='先启动本机协作服务；这只会监听 127.0.0.1，不会把执行权交给其他成员。'}
     else if(!config.sharing_enabled){summary='协作服务正在运行，但项目状态尚未开始共享。';guidance='开启项目状态共享后，其他成员才能看到你主动提供的最小元数据。源码、对话和未 push diff 不会上传。'}
-    else if(members.length<=1){summary='本机状态已经准备好，目前还没有其他成员接入。';guidance=outbox?'还有 '+outbox+' 项本机状态等待同步。':'当前没有待同步状态；自动发现与真实多机接入仍属于后续能力。'}
+    else if(members.length<=1){summary='本机状态已经准备好，目前还没有其他成员接入。';guidance=outbox?'还有 '+outbox+' 项本机状态等待同步。':'当前没有待同步状态；可显式扫描最小 LAN 候选，或使用手工 invitation endpoint 回退。'}
     else{summary='当前可见 '+members.length+' 名成员、'+workstreams+' 个工作任务。';guidance=pending?'有 '+pending+' 个请求等待你在本机确认。':'目前没有需要你处理的团队请求。'}
     if(running&&!(config.heartbeat&&config.heartbeat.enabled))guidance+=' 在线状态广播已关闭，因此“状态已过期／未知”是预期结果。';
     text(q('[data-team-summary]'),summary);text(q('[data-team-guidance]'),guidance);text(q('[data-team-service]'),running?'本机服务运行中':externalRegistered?'其他本机服务登记':'尚未启动');text(q('[data-team-member-count]'),members.length);text(q('[data-team-pending-count]'),pending);qa('[data-team-outbox]').forEach(element=>text(element,outbox));
+    text(q('[data-lan-connection]'),running?'connected · monotonic revision aggregation':externalRegistered?'external runtime · control unavailable':'disconnected · local work preserved');
   }
   function render(value){state=value;const config=value.config||{};const enabled=!!config.enabled;const running=!!(value.coordinator&&value.coordinator.running);
     const externalRegistered=!running&&config.runtime_status==='team-runtime-active';
@@ -128,13 +136,13 @@ TEAM_OBSERVATORY_JS = r"""
     text(q('[data-team-member]'),config.member_id||'implicit local');text(q('[data-team-host]'),config.host_id||'not configured');
     text(q('[data-team-sharing]'),config.sharing_enabled?'sharing':'off');text(q('[data-team-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'on':'off');
     text(q('[data-team-last-seen]'),value.projection&&value.projection.generated_at||'Unavailable');text(q('[data-team-outbox]'),value.outbox_count||0);
-    qa('[data-team-action]').forEach(button=>{const action=button.dataset.teamAction;button.disabled=(action==='enable'&&enabled)||(action==='disable'&&!enabled)||(action==='start'&&(!enabled||running||externalRegistered))||(action==='stop'&&!running)||(['heartbeat','sharing','capture','sync','request-create','maintenance-request'].includes(action)&&!enabled)||(action==='sync'&&!running)});
+    qa('[data-team-action]').forEach(button=>{const action=button.dataset.teamAction;button.disabled=(action==='enable'&&enabled)||(action==='disable'&&!enabled)||(action==='start'&&(!enabled||running||externalRegistered))||(action==='stop'&&!running)||(['heartbeat','sharing','capture','sync','request-create','maintenance-request','discovery'].includes(action)&&!enabled)||(['sync','discovery'].includes(action)&&!running)});
     text(q('[data-action-start]'),running?'本机协作服务运行中':externalRegistered?'其他本机服务占用中':'启动本机协作服务');text(q('[data-action-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'关闭在线状态':'开启在线状态');text(q('[data-action-sharing]'),config.sharing_enabled?'暂停项目状态共享':'开始共享项目状态');text(q('[data-action-sync]'),(value.outbox_count||0)?'同步 '+value.outbox_count+' 项更新':'立即同步');
-    renderBrief(value);renderMembers(value.projection);renderRequests(value.requests||[]);
+    renderBrief(value);renderMembers(value.projection);renderRequests(value.requests||[]);renderLan(value.lan);
   }
   async function refresh(){try{render(await api('/team/api/status'));q('[data-team-notice]').className='to-notice';text(q('[data-team-notice]'),'本机状态已刷新；没有返回凭据或源码内容。')}catch(error){q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),error.message)}}
   page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;let path=null,body={};
-    if(button.dataset.teamAction){path='/team/api/'+button.dataset.teamAction}else if(button.dataset.requestDecision){path='/team/api/request/decision';body={request_id:button.dataset.requestId,decision:button.dataset.requestDecision}}else{return}
+    if(button.dataset.teamAction){path='/team/api/'+button.dataset.teamAction}else if(button.dataset.requestDecision){path='/team/api/request/decision';body={request_id:button.dataset.requestId,decision:button.dataset.requestDecision}}else if(button.dataset.joinRequestId){path='/team/api/join/confirm';body={request_id:button.dataset.joinRequestId}}else{return}
     button.disabled=true;try{await api(path,body);await refresh()}catch(error){const action=button.dataset.teamAction||button.dataset.requestDecision;const friendly={start:'无法启动本机协作服务。可能存在其他 Team 页面或失效的本机登记，请按上方说明恢复。',disable:'无法退出 Team Mode。请先关闭其他本机 Team 页面后重试。',sync:'同步没有完成；本机待同步状态仍会保留。',accept:'请求尚未确认，请刷新后重试。',reject:'请求尚未拒绝，请刷新后重试。'}[action]||'本机操作没有完成；没有执行远程命令。';q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),friendly);button.disabled=false}});
   refresh();
 })();
@@ -160,18 +168,19 @@ def render_team_observatory_panel() -> str:
         '<section class="to-brief"><div><span class="to-brief-label">现在的情况</span><h3 data-team-summary>正在读取本机团队状态…</h3><p data-team-guidance>状态不足时会保留 Unknown，不会推测成员在线或任务完成。</p></div>'
         '<div class="to-signals"><div class="to-signal"><small>团队连接</small><b data-team-service>尚未启动</b></div><div class="to-signal"><small>可见成员</small><b><span data-team-member-count>0</span> 人</b></div><div class="to-signal"><small>等待你处理</small><b><span data-team-pending-count>0</span> 项</b></div><div class="to-signal"><small>等待同步</small><b><span data-team-outbox>0</span> 项</b></div></div></section>'
         '<section class="to-actions"><div class="to-actions-head"><div><span class="to-section-label">建议操作</span><h3>按当前状态完成下一步</h3></div><span>这里的操作只影响你的本机节点</span></div><div class="to-action-strip">'
-        '<button class="to-action primary" type="button" data-team-action="start" data-action-start>启动本机协作服务</button><button class="to-action" type="button" data-team-action="sharing" data-action-sharing>开始共享项目状态</button>'
+        '<button class="to-action primary" type="button" data-team-action="start" data-action-start>启动本机协作服务</button><button class="to-action" type="button" data-team-action="discovery">显式发现同项目 Host</button><button class="to-action" type="button" data-team-action="sharing" data-action-sharing>开始共享项目状态</button>'
         '<button class="to-action" type="button" data-team-action="capture">采集本机状态</button><button class="to-action" type="button" data-team-action="sync" data-action-sync>立即同步</button></div></section>'
-        '<div class="to-grid"><main class="to-main"><section class="to-section"><div class="to-section-head"><h3>成员与工作任务</h3><span data-team-member-note>按成员查看最近共享的 Workstream</span></div><div data-team-members></div></section></main>'
+        '<div class="to-grid"><main class="to-main"><section class="to-section"><div class="to-section-head"><h3>发现、加入与连接</h3><span>发现是不可信提示，加入仍需凭据与 Host 本机确认</span></div><div data-lan-results></div></section><section class="to-section"><div class="to-section-head"><h3>成员与工作任务</h3><span data-team-member-note>按成员查看最近共享的 Workstream</span></div><div data-team-members></div></section></main>'
         '<aside class="to-side"><section class="to-section" data-team-requests><div class="to-section-head"><h3>待处理请求</h3><span>确认只记录决定，不会自动执行</span></div><div data-team-pending-requests></div>'
         '<details class="to-history" data-team-request-history hidden><summary data-team-history-summary>已处理请求（0）</summary><div data-team-request-history-list></div></details></section></aside></div>'
         '<details class="to-diagnostics"><summary><div><b>本机控制与技术诊断</b><span>Coordinator、Host、在线状态、内部 ID 与测试入口</span></div><em>展开</em></summary><div>'
         '<div class="to-statusline"><div><small>Mode</small><b data-team-runtime>Unknown</b></div><div><small>Member</small><b data-team-member>Unknown</b></div>'
         '<div><small>Host</small><b data-team-host>Unknown</b></div><div><small>Sharing / Heartbeat</small><b><span data-team-sharing>off</span> · <span data-team-heartbeat>off</span></b></div>'
-        '<div><small>Last seen</small><b data-team-last-seen>Unavailable</b></div><div><small>Outbox</small><b data-team-outbox>0</b></div></div>'
+        '<div><small>Last seen</small><b data-team-last-seen>Unavailable</b></div><div><small>Outbox</small><b data-team-outbox>0</b></div>'
+        '<div><small>Discovery / candidates</small><b><span data-lan-discovery>never-started</span> · <span data-lan-candidates>0</span></b></div><div><small>Active Coordinator Host</small><b data-lan-host-generation>Unknown</b></div><div><small>Connection / reconnect</small><b data-lan-connection>disconnected · local work preserved</b></div></div>'
         '<div class="to-controlbar"><span class="to-mode" data-team-mode>TEAM</span><button class="to-action" type="button" data-team-action="stop">暂停团队连接</button>'
         '<button class="to-action" type="button" data-team-action="heartbeat" data-action-heartbeat>开启在线状态</button><button class="to-action" type="button" data-team-action="maintenance-request">请求成员本机评估维护</button><button class="to-action" type="button" data-team-action="request-create">创建测试请求</button><span class="to-spacer"></span><button class="to-action danger" type="button" data-team-action="disable">退出 Team Mode</button></div>'
-        '<div class="to-privacy"><b>只共享最小元数据</b><br>不发送 Prompt、回答、reasoning、transcript、源码正文、未 push diff、member token、API key 或 credential。最后快照只按 Core TTL 投影，不冒充实时在线。</div></div></details></section>'
+        '<div class="to-privacy"><b>只共享最小元数据</b><br>发现包仅含 protocol version、opaque project／Host／device hint、ephemeral endpoint／nonce／expiry；不发送 Prompt、回答、reasoning、transcript、源码正文、未 push diff、member token、API key 或 credential。最后快照只按 Core TTL 投影，不冒充实时在线；Host switch 只允许手工 generation 递增，不自动选主。</div></div></details></section>'
         '<div class="to-notice" data-team-notice>正在读取本机团队状态…</div></section></article>'
     )
 

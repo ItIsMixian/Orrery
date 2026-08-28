@@ -42,6 +42,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W5B Candidate 在同一 Observatory 增加独立 Team sibling page。Team disabled 时显示 Personal zero-network、enable／serve 分离与 metadata-only/request-only 安全边界；启用后只投影 Core `team-read-only-projection`、Git-private config、Member → Workstream、presence 和 request receipt。动态入口为 root-only／loopback-only，默认／静态 docsite 不启动 socket，也没有把 Team UI 加入 managed-tool 白名单或公开模板。
 - W5C Worktree Candidate 不改变上述投影来源，只把 Team sibling page 改为人类控制面：首先总结“现在怎样／下一步做什么”，再呈现成员与工作任务、待处理请求；handled request 与 Coordinator／Host／heartbeat／revision 等诊断默认折叠。派生页面仍没有权威或执行能力。
 - W6 Worktree Candidate 增加独立“工作区维护” sibling page，投影 Git-private maintenance scan／queue／authorization／receipt、保护／Unknown 原因、共享策略和 branch 动作边界。静态 Personal 构建只读且按钮禁用；root-only loopback 动态入口才允许本机确认。页面不把建议、授权或 receipt 升级为 State／ADR／Validation，也不回写作者文档；Team 页只能发送 `cleanup` request，不能把中央决定变为 execute。
+- W5D Worktree Candidate 在 Team sibling page 增加 discovery candidate、join confirmation、connection／reconnection 和 Coordinator generation／manual Host switch 状态；所有网络动作仍需本机显式触发，enable 本身不广播，页面不接收任意 URL／命令或执行请求。Personal sibling page 读取 Scope lineage summary，把显式 stacked chain 作为可折叠的派生视图显示 parent／task-base OID／inherited path 数和 chain 内 unique finding；Legacy／Unknown 不按 branch 名猜测，也不被伪装为 resolved finding。
 
 ## 同步状态
 
@@ -81,11 +82,14 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `tests/test_team_observatory.py`
 - `packages/project-orrery-core/src/project_orrery_core/maintenance.py`
 - `tests/test_workspace_maintenance.py`
+- `tests/test_collaboration_lineage.py`
+- `tests/test_lan_collaboration_harness.py`
+- `docs/operations/lan-team-preflight.md`
 
 ## 已知缺口
 
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
-- W3 已实现证据优先审查与清理资格；当前 W6 Worktree Candidate 在 W4 health／W5C UI 上增加 Git-private maintenance 投影与本机确认入口。默认 docsite／发布模板不加载动态 Team／Maintenance，Phase 3 自动删除、Phase 4 scheduler、自动发现、富成员管理、真实多机/LAN 与跨 Coordinator 迁移仍未实现；当前事实作用域由 containing ref 决定。
+- W3 已实现证据优先审查与清理资格；当前 W5D Worktree Candidate 在 W4 health／W5C UI／W6 maintenance 上增加显式 LAN discovery、join、manual Host switch 与 lineage chain 投影。默认 docsite／发布模板不加载动态 Team／Maintenance；Phase 3 自动删除、Phase 4 scheduler、富成员管理、真实双机/LAN、自动选主与云 relay 仍未实现，当前事实作用域由 containing ref 决定。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

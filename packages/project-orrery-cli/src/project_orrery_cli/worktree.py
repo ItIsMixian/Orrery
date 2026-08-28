@@ -78,6 +78,8 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--expected-write", action="append", default=[])
     create.add_argument("--governing-doc", action="append", default=[])
     create.add_argument("--validation-surface", action="append", default=[])
+    create.add_argument("--base-workstream-id")
+    create.add_argument("--task-base-oid")
 
     session = actions.add_parser("session", help="manage the private Workstream session")
     session_actions = session.add_subparsers(dest="session_action", required=True)
@@ -90,6 +92,8 @@ def build_parser() -> argparse.ArgumentParser:
     write.add_argument("--governing-doc", action="append", default=[])
     write.add_argument("--validation-surface", action="append", default=[])
     write.add_argument("--scope-revision", type=int, default=1)
+    write.add_argument("--base-workstream-id")
+    write.add_argument("--task-base-oid")
 
     transition = session_actions.add_parser("transition", help="apply one legal lifecycle transition")
     _add_common_target(transition)
@@ -335,6 +339,8 @@ def main(argv: list[str] | None = None) -> int:
                 expected_writes=arguments.expected_write,
                 governing_docs=arguments.governing_doc,
                 validation_surfaces=arguments.validation_surface,
+                base_workstream_id=arguments.base_workstream_id,
+                task_base_oid=arguments.task_base_oid,
             )
         except ValueError as exc:
             return _failure(command, arguments.json_output, exc)
@@ -399,6 +405,8 @@ def main(argv: list[str] | None = None) -> int:
             governing_docs=arguments.governing_doc,
             validation_surfaces=arguments.validation_surface,
             scope_revision=arguments.scope_revision,
+            base_workstream_id=arguments.base_workstream_id,
+            task_base_oid=arguments.task_base_oid,
         )
     except ValueError as exc:
         return _failure(command, arguments.json_output, exc)
