@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-28 — W7D W7 Integration Candidate
+
+- 精确从 CI2 `8b635b1` 建立独立 `codex/w7d-w7-integration-candidate`，写入前注册 Git-private Workstream；复核 W7A→W7B→CI2 祖先链、两输入 clean worktree 与 W7C-A 对应树已被 W7C-B 字节级吸收，只加法合入 W7C-B `d411fd6`。
+- 对 DEVLOG、Implementation/Validation 索引、四份 subsystem State、组件版本和 CI manifest 做语义整合。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9；schema 2 保留 Fast 15 秒、Checkpoint 90 秒和独立 W7B Promotion 300 秒，机械 inventory 为 375 IDs／27 shards／51 Fast／68 Checkpoint。
+- W7B 的 discovery/plan/human confirmation/apply/recovery/receipt/undo 是已实现 Candidate 能力，但真实 self-host apply、默认 UI 执行入口和公开发布仍未发生；W7C 图继续只读且没有 apply/undo/close/delete 控件，中央 Team 视图没有执行权。
+- Focused 13/13、Fast 51/51 2.132432 秒、Checkpoint 68/68 81.201647 秒通过；1280×900 与 390×844 in-app Chromium 覆盖三 lens、筛选、历史、节点/边 inspector、键盘、安全链接、零横向溢出与零 console warning/error。最终结构门、一次 W7B Promotion 与 hosted exact-SHA 结果进入独立 W7D Validation。
+
 ## 2026-08-28 — CI2 Tiered Test Performance Candidate
 
 - 从干净 W7B `1160df4` 建立独立 `codex/ci2-tiered-test-performance`，注册 Git-private session 并声明测试、CI manifest/runner、test/release State、Validation、Plan 与 DEVLOG 范围；未改 W7B、main、PROGRESS 或 HANDOFF。
@@ -14,6 +21,13 @@
 - CLI 0.1.18 新增 `relations discover|plan|inspect|apply|undo|receipt`；Unknown/blocked 稳定非零失败关闭，伪造/重放/过期/跨项目 token、actor/plan mismatch、graph/Session/HEAD/Scope drift 与重复 history 均拒绝。没有 shell/path/URL 执行面、网络调用、merge/push/delete/tag/Release。
 - 隔离 W5C→W6→W5D→CI1/W5E fixture 完成 late CI、多 predecessor、active/completed takeover、故障注入/recovery、receipt/undo 与 CLI 全闭环；CI1 inventory 为 366 IDs／26 shards／49 Fast。self-host 真实项目只运行 dry-run：8 proposed／2 Unknown／exit 5，relation store 仍不存在、作者树不变。
 - 受影响 subsystem State、W7B Validation、DEVLOG 与索引同行；根 PROGRESS/HANDOFF 留给唯一整合者。任何真实项目 apply 仍需维护者本机 exact confirmation 和中央另行授权。
+
+## 2026-08-28 — W7C-B Production Workstream Relation Graph Observatory
+
+- 从 corrected W7A `52e88b8` 建立独立 Workstream，并精确吸收 W7C-A `a39f6a7`；共享 project/documentation/test State、Validation index 与 DEVLOG 只做加法合并，W7C-A fixture 继续保持 provisional/non-authoritative。
+- Observatory 0.1.9 新增 root-only／default-off sibling page；provider 只接受 Core `workstream-relation-graph`／`workstream-succession-plan` v1，三 lens、history folding、filters、SVG/ledger/inspector 不扫描 Git/Session/branch/path，也不提供 apply/undo/close/delete/merge/remote execution。
+- provider/schema/root/node/evidence/legacy Unknown/Core failure 整体失败关闭；safe source links 只投影白名单仓库文档锚点，Git-private/opaque evidence 不导航。默认 docsite、managed tools、Skill template、release manifest 与公开 v0.2.0 未改变。
+- Focused 13/13、Fast 50/50、W7A/W7C-A/Personal/Team 45/45 以及 CI/structure/install/isolated-site gates 通过；真实 in-app Chromium 在 1280px 与 390×844 完成三 lens、过滤、历史、点击、Enter/Space、inspector、safe link、zero-overflow 与截图。未运行 Promotion，未 push、合 main、改 protection、tag 或 Release；W7B 的执行层当时已在 sibling Candidate 实现，本页面未接入 apply/undo。
 
 ## 2026-08-28 — W7A Dynamic Workstream Succession Contract
 
@@ -561,3 +575,11 @@
 - 从 `CI1-tiered-parallel-validation@67a2fe9` 建立独立 W5E Worktree，并吸收 `0235116` 的组合式接口 Library 草案与 Brownfield Migration HANDOFF 接续；二者没有升级为 ADR、公共 API 或实现事实。
 - Observatory 0.1.8 删除重复的 Team 边界 pill 和“现在的情况”摘要，把四项关键状态上移；Team Mode、连接、在线状态与退出常驻外层，低频协议字段、测试／维护请求和隐私说明进入齿轮设置 dialog。Core／CLI／Team server 与安全契约未改。
 - Team／component 18/18、CI contract／inventory／repository gate、结构、隔离站、链接、compile 和 diff 通过。真实 in-app Chromium 在 1280px 与 390×844 完成 enable、连接、heartbeat、dialog、退出和响应式验收，最终恢复 Personal Mode；远端 Promotion 与 main 合流仍待中央执行。
+
+## 2026-08-28 — W7C-A Workstream Graph visual prototype Candidate
+
+- 从 `W5E-team-observatory-ui-closeout@692d19b` 建立独立 `codex/w7c-a-workstream-graph-visual-prototype`，首次产品写入前注册 Git-private `W7C-A-workstream-graph-visual-prototype` session，并绑定 W5E parent／task base、expected writes 和 Fast／browser validation surface。没有改 W5E、W7A、main、PROGRESS、HANDOFF、Core、Team server、默认 docsite、Skill 或 release manifest。
+- `experiments/workstream-graph-visual-prototype/` 新增 versioned `provisional/non-authoritative` synthetic fixture 与 dependency-free HTML／CSS／JS。Succession 默认折叠三节点历史并保留 active tip／主链／一层 sibling；Dependency 覆盖双前驱与 Unknown；Conflict 覆盖 synthetic confirmed Direct 与 proposed Semantic。所有 node／edge／cluster 选择共用 evidence inspector，桌面 inline SVG 与移动 HTML ledger 共用同一 fixture。
+- Design exploration 明确 fixture 字段不构成公共 schema，并把 stable identity、relation/provenance、multi-predecessor、evidence、status、tip、visibility、cluster、ordering/version 与 fail-closed 交给 W7A 冻结；真实 Core/Observatory consumer、安全链接、Personal/Team 投影与 release 接线留给 W7C-B。
+- W7A Git-private status 的只读对账确认两个 sibling 都声明修改三份 subsystem State、Validation index 与 DEVLOG，并共享 diff 验证面；该真实整合重叠不写入 synthetic fixture、不触碰 W7A 工作树，留给唯一整合者做加法合并。
+- 专项 6/6、JS／JSON、repository gate 与 diff 通过。真实 in-app Chromium 在 1280×720 与 390×844 点击三 lens、edge evidence、history、filter、keyboard/mobile ledger；两端无横向溢出，console 无 warning/error，页面资产只来自 loopback。没有 push、main 合流、tag 或 Release。

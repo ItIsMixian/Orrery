@@ -20,6 +20,8 @@
       "test_workstream_relations.WorkstreamRelationTests.test_self_duplicate_and_cycle_fail_closed",
       "test_workstream_relations.WorkstreamRelationTests.test_stale_head_and_scope_evidence_never_suppress",
       "test_workstream_relations.WorkstreamRelationTests.test_w7c_consumer_compatibility_fixture_maps_without_ui_authority",
+      "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_core_payload_maps_three_lenses_and_independent_axes",
+      "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_invalid_provider_store_graph_legacy_and_links_fail_closed",
       "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_execution_schema_cli_surface_and_no_delete_contract_are_dependency_light",
       "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
       "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
@@ -41,6 +43,8 @@
       "test_workstream_relations.*",
       "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_execution_schema_cli_surface_and_no_delete_contract_are_dependency_light",
       "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_minimal_git_binding_rejections_and_state_axes_checkpoint",
+      "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_core_payload_maps_three_lenses_and_independent_axes",
+      "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_invalid_provider_store_graph_legacy_and_links_fail_closed",
       "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
       "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
@@ -193,7 +197,9 @@
       "id": "team-ui-server",
       "surface": "Team/LAN",
       "selectors": [
-        "test_team_observatory.*"
+        "test_team_observatory.*",
+        "test_workstream_graph_visual_prototype.*",
+        "test_workstream_relation_graph_observatory.*"
       ]
     },
     {

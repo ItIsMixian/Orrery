@@ -82,7 +82,12 @@ def build_team_page(project_root: Path) -> str:
             os.environ.pop("ORRERY_PERSONAL_OBSERVATORY_VIEW", None)
         else:
             os.environ["ORRERY_PERSONAL_OBSERVATORY_VIEW"] = previous
-    return inject_team_observatory(page)
+    page = inject_team_observatory(page)
+    if os.environ.get("ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW", "").strip().lower() in {"1", "true", "yes", "on"}:
+        import build_workstream_relation_graph
+
+        page, _projection = build_workstream_relation_graph.inject_enabled_relation_graph(page, ROOT)
+    return page
 
 
 class TeamUIState:

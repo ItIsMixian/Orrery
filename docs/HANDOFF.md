@@ -1,9 +1,10 @@
 # 跨会话交接
 
-Updated: 2026-08-27
+Updated: 2026-08-28
 
 ## 当前情况
 
+- W7D 唯一整合者精确从 CI2 `8b635b1` 建立非 `main` Candidate，只加法合入 W7C-B `d411fd6`；W7C-A 对应树已被 sibling 字节级吸收而未重复合入。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，schema-2 inventory 为 375 IDs／27 shards／51 Fast／68 Checkpoint。W7B 已实现本机 discovery／plan／确认／apply／recovery／receipt／undo，但 self-host apply、默认 UI 执行入口和公开发布未发生；W7C 图继续只读，中央 Team 没有执行权。完整验证、exact SHA 与 hosted checks 以 [W7D Validation](validation/2026-08-28-w7d-w7-integration-candidate.md)为准。
 - 根文档系统已依据 ADR-0001 完成自托管集成；`.project-orrery.json` 应保持 `authority_status: integrated`。
 - Project Orrery v0.2.0 已公开发布：`main`、tag、Release、zip、checksum 和远端 manifest 均已核验。
 - 2026-08-21 的本地 Canonical 集成已在 `main@42aebae` 同步至公开 `origin/main`；本地动态 231 项与远端 GitHub Actions `32492830151` 的 Windows／Ubuntu 矩阵通过。该同步没有创建 tag、Release 或新的公开支持声明。
@@ -94,7 +95,7 @@ Updated: 2026-08-27
 8. 平台适配工作先读取 [ADR-0004](decisions/0004-platform-neutral-core-and-adapter-boundaries.md)、[ADR-0013](decisions/0013-claude-code-and-deepseek-harness-adapters.md)、[Implementation Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)、[DeepSeek Wheel Validation](validation/2026-08-22-cli-wheel-observatory-assets.md)和[跨平台 CI 修复](validation/2026-08-22-deepseek-w1-windows-ci-fix.md)。DeepSeek 精确 runtime 门已完成但发行仍未发布；Claude 继续受认证与另行授权约束。
 9. docsite 安全接续先读取 [ADR-0003](decisions/0003-provider-bound-credentials-and-optional-local-broker.md)、[ADR-0006](decisions/0006-broker-only-docsite-provider-gateway.md)、[Broker-first Design](design/broker-first-docsite-provider-gateway.md)和[Validation](validation/2026-08-19-broker-first-docsite-gateway.md)；公开 v0.2.0 尚不包含这些工作树改动。
 10. 若继续研究外部工作记忆层，先读取 [sivtr 观察](library/2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)；除非用户明确接受新的 ADR／Plan，不安装 sivtr、不扫描真实 transcript、不修改 Scope Router，也不自动创建 Pilot 010。
-11. 多人协作先读取 [ADR-0007](decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)、[ADR-0008](decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)、[活动 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)、[W3 集成](validation/2026-08-23-w3-canonical-integration.md)、[W4／W5A](validation/2026-08-23-w4-w5-integration-candidate.md)与[W4 health／W5B](validation/2026-08-27-w4-health-w5b-integration-candidate.md)。未进入 main 前不得表述为 Canonical；UI 不能重写 Core review／Team 规则。
+11. 多人协作先读取 [ADR-0007](decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md)、[ADR-0008](decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)、[ADR-0014](decisions/0014-dynamic-workstream-succession-contract.md)、[W7D Plan](implementation/plans/2026-08-28-w7d-w7-integration-candidate.md)与[W7D Validation](validation/2026-08-28-w7d-w7-integration-candidate.md)。只有维护者把通过 exact-SHA 双平台门的 Candidate fast-forward 到 main 后才可表述为 Canonical；UI 不能重写 Core review／Team／relation 执行规则，也不能新增 apply／undo／close／delete 图形按钮。
 12. Team／telemetry 相关工作还必须读取 [ADR-0008](decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)与[Design 收敛 Validation](validation/2026-08-20-multi-worktree-collaboration-design-consolidation.md)；默认 Personal Mode 不得监听网络，Team extension 不得先于 Personal foundation。
 13. Authority semantics 工作必须读取 [ADR-0009](decisions/0009-authority-meta-model-and-semantic-conformance.md)、[ADR-0010](decisions/0010-core-owned-authority-evaluator.md)、[ADR-0011](decisions/0011-authority-model-version-and-compatibility.md)、[活动 Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)、[State](state/authority-meta-model.md)和[M2 integration Validation](validation/2026-08-21-authority-meta-model-m2-local-canonical-integration.md)。下一步先单独审阅 managed production consumer／rollback，再由维护者另行选择实际 SemVer／candidate manifest；不得把两项阻塞在同一未经审阅的发布动作中关闭。
 14. 文档治理工作先读取 [ADR-0012](decisions/0012-document-governance-and-information-lifecycle.md)、[D1 Validation](validation/2026-08-22-d1-document-governance-finding-contract.md)和[Documentation State](state/documentation-system.md)。D2 scanner／CLI 尚未批准；不得自动清理 HANDOFF、把 finding 设为权威硬门或修改公开模板。

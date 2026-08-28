@@ -1,0 +1,243 @@
+{
+  "fixture_version": "workstream-graph-provisional-v1",
+  "authority": "provisional/non-authoritative",
+  "purpose": "Synthetic consumer fixture for W7C-A visual exploration only. It is not a Core relation contract and must not be ingested as project fact.",
+  "default_active_tip_id": "w7c-a",
+  "collapsed_history": [
+    {
+      "id": "history-w5c-w5d",
+      "label": "3 earlier workstreams",
+      "node_ids": ["w5c", "w6", "w5d"],
+      "summary": "W5C → W6 → W5D",
+      "provisional": true
+    }
+  ],
+  "nodes": [
+    {
+      "id": "w5c",
+      "label": "W5C",
+      "title": "Team Observatory UX",
+      "phase": "integrated-candidate",
+      "runtime_condition": "paused",
+      "evidence_freshness": "historical",
+      "subsystems": ["multi-worktree-collaboration", "documentation-system"],
+      "branch": "codex/w5c-team-observatory-ux",
+      "short_ref": "6dd508f",
+      "is_active_tip": false,
+      "evidence": [
+        {"label": "Synthetic W5C checkpoint", "href": "#fixture-evidence-w5c", "kind": "synthetic-fixture"}
+      ]
+    },
+    {
+      "id": "w6",
+      "label": "W6",
+      "title": "Workspace maintenance",
+      "phase": "integrated-candidate",
+      "runtime_condition": "paused",
+      "evidence_freshness": "historical",
+      "subsystems": ["multi-worktree-collaboration", "project-structure", "test-coverage"],
+      "branch": "codex/w6-workspace-maintenance",
+      "short_ref": "db78a7f",
+      "is_active_tip": false,
+      "evidence": [
+        {"label": "Synthetic W6 checkpoint", "href": "#fixture-evidence-w6", "kind": "synthetic-fixture"}
+      ]
+    },
+    {
+      "id": "w5d",
+      "label": "W5D",
+      "title": "LAN harness + stacked lineage",
+      "phase": "integrated-candidate",
+      "runtime_condition": "paused",
+      "evidence_freshness": "historical",
+      "subsystems": ["multi-worktree-collaboration", "test-coverage"],
+      "branch": "codex/w5d-lan-collaboration-harness",
+      "short_ref": "ae6913e",
+      "is_active_tip": false,
+      "evidence": [
+        {"label": "Synthetic W5D checkpoint", "href": "#fixture-evidence-w5d", "kind": "synthetic-fixture"}
+      ]
+    },
+    {
+      "id": "ci1",
+      "label": "CI1",
+      "title": "Tiered parallel validation",
+      "phase": "validated-candidate",
+      "runtime_condition": "paused",
+      "evidence_freshness": "current",
+      "subsystems": ["test-coverage", "project-structure"],
+      "branch": "codex/ci1-tiered-parallel-validation",
+      "short_ref": "67a2fe9",
+      "is_active_tip": false,
+      "evidence": [
+        {"label": "Synthetic CI1 checkpoint", "href": "#fixture-evidence-ci1", "kind": "synthetic-fixture"}
+      ]
+    },
+    {
+      "id": "w5e",
+      "label": "W5E",
+      "title": "Team UI closeout",
+      "phase": "validated-candidate",
+      "runtime_condition": "waiting-for-user",
+      "evidence_freshness": "current",
+      "subsystems": ["multi-worktree-collaboration", "documentation-system", "project-structure", "test-coverage"],
+      "branch": "codex/w5e-team-observatory-ui-closeout",
+      "short_ref": "692d19b",
+      "is_active_tip": false,
+      "evidence": [
+        {"label": "Synthetic W5E base marker", "href": "#fixture-evidence-w5e", "kind": "synthetic-fixture"}
+      ]
+    },
+    {
+      "id": "w7a",
+      "label": "W7A",
+      "title": "Relation schema freeze",
+      "phase": "implementing",
+      "runtime_condition": "active",
+      "evidence_freshness": "current",
+      "subsystems": ["multi-worktree-collaboration", "documentation-system", "test-coverage"],
+      "branch": "codex/w7a-dynamic-workstream-succession-contract",
+      "short_ref": "synthetic",
+      "is_active_tip": false,
+      "evidence": [
+        {"label": "Synthetic sibling declaration", "href": "#fixture-evidence-w7a", "kind": "synthetic-fixture"}
+      ]
+    },
+    {
+      "id": "w7c-a",
+      "label": "W7C-A",
+      "title": "Graph visual prototype",
+      "phase": "implementing",
+      "runtime_condition": "active",
+      "evidence_freshness": "current",
+      "subsystems": ["multi-worktree-collaboration", "documentation-system", "project-structure", "test-coverage"],
+      "branch": "codex/w7c-a-workstream-graph-visual-prototype",
+      "short_ref": "worktree",
+      "is_active_tip": true,
+      "evidence": [
+        {"label": "Synthetic active-tip marker", "href": "#fixture-evidence-w7c-a", "kind": "synthetic-fixture"}
+      ]
+    },
+    {
+      "id": "w7c-b",
+      "label": "W7C-B",
+      "title": "Production consumer wiring",
+      "phase": "proposed",
+      "runtime_condition": "stale-unknown",
+      "evidence_freshness": "unknown",
+      "subsystems": ["multi-worktree-collaboration", "documentation-system"],
+      "branch": "not-created",
+      "short_ref": "unknown",
+      "is_active_tip": false,
+      "evidence": [
+        {"label": "Synthetic future consumer", "href": "#fixture-evidence-w7c-b", "kind": "synthetic-fixture"}
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "succ-w5c-w6",
+      "source": "w5c",
+      "target": "w6",
+      "view": "succession",
+      "relation": "continues-from",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic task-base ancestry", "href": "#fixture-edge-succ-w5c-w6", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "succ-w6-w5d",
+      "source": "w6",
+      "target": "w5d",
+      "view": "succession",
+      "relation": "continues-from",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic task-base ancestry", "href": "#fixture-edge-succ-w6-w5d", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "succ-w5d-ci1",
+      "source": "w5d",
+      "target": "ci1",
+      "view": "succession",
+      "relation": "continues-from",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic task-base ancestry", "href": "#fixture-edge-succ-w5d-ci1", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "succ-ci1-w5e",
+      "source": "ci1",
+      "target": "w5e",
+      "view": "succession",
+      "relation": "continues-from",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic task-base ancestry", "href": "#fixture-edge-succ-ci1-w5e", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "succ-w5e-w7a",
+      "source": "w5e",
+      "target": "w7a",
+      "view": "succession",
+      "relation": "sibling-from-same-base",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic shared task base", "href": "#fixture-edge-succ-w5e-w7a", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "succ-w5e-w7c-a",
+      "source": "w5e",
+      "target": "w7c-a",
+      "view": "succession",
+      "relation": "continues-from",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic shared task base", "href": "#fixture-edge-succ-w5e-w7c-a", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "dep-w7a-w7c-b",
+      "source": "w7a",
+      "target": "w7c-b",
+      "view": "dependency",
+      "relation": "depends-on",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic schema consumer dependency", "href": "#fixture-edge-dep-w7a-w7c-b", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "dep-w7c-a-w7c-b",
+      "source": "w7c-a",
+      "target": "w7c-b",
+      "view": "dependency",
+      "relation": "depends-on",
+      "certainty": "confirmed",
+      "evidence": [{"label": "Synthetic visual consumer dependency", "href": "#fixture-edge-dep-w7c-a-w7c-b", "kind": "synthetic-fixture"}]
+    },
+    {
+      "id": "dep-w5d-w7c-b-unknown",
+      "source": "w5d",
+      "target": "w7c-b",
+      "view": "dependency",
+      "relation": "may-influence",
+      "certainty": "unknown",
+      "evidence": [{"label": "No source evidence in fixture", "href": "#fixture-edge-dep-unknown", "kind": "absence-marker"}]
+    },
+    {
+      "id": "conflict-w7a-w7c-a",
+      "source": "w7a",
+      "target": "w7c-a",
+      "view": "conflict",
+      "relation": "direct-surface-overlap",
+      "certainty": "confirmed",
+      "severity": "L3/direct",
+      "evidence": [
+        {"label": "Synthetic overlap: docs/state/documentation-system.md", "href": "#fixture-edge-conflict-direct", "kind": "synthetic-path-overlap"},
+        {"label": "Synthetic shared validation surface", "href": "#fixture-edge-conflict-validation", "kind": "synthetic-validation-overlap"}
+      ]
+    },
+    {
+      "id": "conflict-w5e-w7c-b-proposed",
+      "source": "w5e",
+      "target": "w7c-b",
+      "view": "conflict",
+      "relation": "semantic-overlap",
+      "certainty": "proposed",
+      "severity": "L2/semantic",
+      "evidence": [{"label": "Synthetic proposal without Core proof", "href": "#fixture-edge-conflict-proposed", "kind": "agent-proposal"}]
+    }
+  ]
+}
