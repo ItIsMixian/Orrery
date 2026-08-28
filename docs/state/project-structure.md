@@ -5,6 +5,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 
 ## 当前事实
 
+- 当前 CI3 Worktree Candidate `codex/ci3-fast-validation-dependency-fix` 精确从 W7D `e2c049ebd6c6476eac8b9555e00edc046d673199` 建立；Git-private session 以 `test-coverage` 为 primary，声明 release/documentation/project affected surfaces。作者树改动限于独立 Fast workflow、CI validator/tests 与权威链同步；Promotion topology、产品包、组件版本、main/tag/Release 均未改。
 - 单一 Git 仓库根：`D:\coding warehouse\project-orrery`。
 - 并发协作当前人工采用“一个 Workstream = 一个分支 + 一个独立 linked worktree 或 clone”；一个平台会话可以在该 Workstream 中完成多个相关 Change Set。主 worktree 只供维护者集成。2026-08-20 已用独立 integration worktree 恢复并拆分三个共享工作目录任务，随后为 context-routing、platform／adapters 和 docsite／broker 分配三个干净 linked worktree，证明人工隔离与干净集成路径可行。
 - 已发布 v0.2.0 产品源仍是 `skills/project-orrery/`；当前工作树包含未发布的 `packages/project-orrery-{core,cli,observatory}/` 源码边界、`adapters/codex/` 薄平台 Adapter，以及候选 `adapters/harness-json/` subprocess JSON 参考 Adapter。

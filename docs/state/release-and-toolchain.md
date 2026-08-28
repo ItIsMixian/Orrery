@@ -6,6 +6,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前事实
 
+- CI3 Candidate 只修复 `.github/workflows/fast-validation.yml` 的 fresh-runner setup 和 artifact 失败噪声：Fast 继续是 `non-promotion-feedback`，15 秒预算、51 项既有选择、无 `ORRERY_TEST_BUILD`、无 required smoke 名；Promotion workflow、27 shards、required checks、组件版本、branch protection、tag、Release 与 v0.2.0 均不变。最终推广证据仍要求同一 exact SHA 的独立 Fast Windows/Ubuntu 与 Promotion required Windows/Ubuntu 全绿。
 - Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/ItIsMixian/Orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。
 - 外部当前展示名和仓库入口已改为 Orrery／`ItIsMixian/Orrery`。Candidate 当前只同步根 README、
   self-host 更新入口、Adapter metadata 与当前链接；`project-orrery` 技术 ID、冻结 v0.2.0

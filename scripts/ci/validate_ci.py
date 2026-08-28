@@ -63,6 +63,30 @@ def validate_workflows(
         errors.append("Fast workflow must not use Promotion required-check names")
     _require(fast, "validate_ci.py --all", errors, "Fast workflow")
     _require(fast, "validate_installation.py --target . --require-integrated", errors, "Fast workflow")
+    fast_dependency_step = "- name: Install Fast discovery dependencies"
+    fast_dependency_command = (
+        'run: python -m pip install "wheel>=0.41,<1" -r '
+        "skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt"
+    )
+    fast_validation_step = "- name: Validate Fast and Promotion contracts"
+    _require(fast, fast_dependency_step, errors, "Fast workflow")
+    _require(fast, fast_dependency_command, errors, "Fast workflow")
+    if fast_dependency_command in fast and fast_validation_step in fast:
+        if fast.index(fast_dependency_command) > fast.index(fast_validation_step):
+            errors.append("Fast workflow must install discovery dependencies before contract validation")
+    fast_result_step = "- name: Detect non-Promotion timing result"
+    fast_upload_step = "- name: Upload non-Promotion timing result"
+    _require(fast, fast_result_step, errors, "Fast workflow")
+    _require(fast, 'available={str(result.is_file()).lower()}', errors, "Fast workflow")
+    _require(
+        fast,
+        "if: ${{ always() && steps.fast-result.outputs.available == 'true' }}",
+        errors,
+        "Fast workflow",
+    )
+    if fast_result_step in fast and fast_upload_step in fast:
+        if fast.index(fast_result_step) > fast.index(fast_upload_step):
+            errors.append("Fast workflow must detect the timing result before artifact upload")
 
     if "  workflow_dispatch:" not in promotion_triggers:
         errors.append("Promotion workflow must use explicit workflow_dispatch")

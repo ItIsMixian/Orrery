@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-28 CI3 Fast Validation Dependency Fix](2026-08-28-ci3-fast-validation-dependency-fix.md) — fixes fresh-runner Fast discovery dependencies, adds mechanical ordering and missing-artifact-noise regressions, records local Fast plus retained Checkpoint budget failures, and leaves same-SHA hosted Fast/Promotion evidence to the task receipt.
 - [2026-08-28 W7D W7 Integration Candidate](2026-08-28-w7d-w7-integration-candidate.md) — additively integrates CI2/W7B and W7C-B, mechanically freezes the schema-2 profile inventory and budgets, validates the read-only graph on desktop/mobile and records exact-SHA local/hosted Promotion without advancing `main`.
 - [2026-08-28 W7C-B Production Workstream Relation Graph Observatory](2026-08-28-w7c-b-production-workstream-relation-graph.md) — validates exact W7A/W7C-A intake, a Core-only v1 root opt-in sibling page, all-or-Unavailable evidence safety, three lenses, independent state axes, Personal/Team adjacency and real in-app Chromium at 1280px/390px without execution or release changes.
 - [2026-08-28 W7A dynamic Workstream succession contract](2026-08-28-dynamic-workstream-succession-contract.md) — freezes the versioned relation／graph／plan contract, exact Git evidence and deterministic active-tip semantics, implements Git-common-private read-only loading plus isolated proposed writes, and leaves confirmed apply／undo and Observatory views to W7B／W7C.

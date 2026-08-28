@@ -11,7 +11,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、完整内部 CLI claims、root-only opt-in Observatory projection 与本地 release-candidate gate 已进入 Canonical source baseline；默认 production consumer 和公开 release 未切换 | 审阅 managed consumer 的 production switch 与回滚证据，再由维护者选择真实 SemVer／candidate manifest |
-| 多 Workstream 协作 | W7D 非 `main` Integration Candidate 已组合 W7A succession contract、W7B 本机事务执行、CI2 分级测试与 W7C-B 只读关系图；Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，inventory 377／27／51／70，exact `28f5fad` Windows／Ubuntu required checks 双 PASS | 等待维护者授权 main fast-forward；self-host apply、默认 UI 执行入口与公开发布继续后置 |
+| 多 Workstream 协作 | W7D `e2c049e` Promotion run `33195264226` required Windows／Ubuntu 双 PASS，但独立 Fast `33195264316` 在 fresh runner discovery 缺 `mistune` 双平台失败；CI3 Candidate 已增加确定性依赖顺序与 conditional artifact upload，本机 Fast 51/51 PASS，hosted 同 SHA 验收待完成 | 冻结 CI3 clean exact SHA，取得独立 Fast 与 Promotion 的 Windows／Ubuntu 全绿后再交维护者决定 main fast-forward；self-host apply、默认 UI 执行入口与公开发布继续后置 |
 | Context routing 研究 | C1 Oracle v0.2 无模型静态 controls 已通过；只有 Pilot 010 设计申请 readiness，没有运行授权或 treatment 采纳 | 由维护者决定是否注册 C2 设计任务；不得自动创建／运行 Pilot 010 |
 | 平台与 Adapter | Claude／DeepSeek Adapter 0.1.0 均已实现但未发布；Claude 被认证阻断，DeepSeek 只有 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／指定模型和生命周期范围为 `verified` | Claude 只在另行授权且认证可用时继续；DeepSeek 后续工作转向独立发行与更多 runtime matrix，不外推当前证据 |
 | 文档治理 | D1 已冻结内部只读 finding schema、11 条规则与 11 组正负 fixture；所有 finding 非权威且默认 advisory | 另行设计 D2 scanner／CLI；不自动修复、压缩 HANDOFF 或启用硬门 |
@@ -30,6 +30,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：只推进 production consumer 采纳与实际 release 选择；在此之前不导出稳定 Core API，也不发布模型 1 支持声明。
 - [x] [W7D Integration Candidate Plan](implementation/plans/2026-08-28-w7d-w7-integration-candidate.md)：非 `main` exact SHA 已取得 Windows／Ubuntu required checks 双 PASS；只允许交给维护者决定 main fast-forward。
+- [ ] [CI3 Fast Validation Dependency Fix](implementation/plans/2026-08-28-ci3-fast-validation-dependency-fix.md)：本机 Fast 与静态 contract 已通过；Checkpoint timing FAIL 保留，最终必须由一个 clean exact SHA 同时取得独立 Fast 和 Promotion 双平台全绿。
 - [ ] [Context-routing 研究 State](state/context-routing-research.md)：C1 静态 controls 已完成；C2/Pilot 010 设计尚未获批，更没有模型运行授权。
 - [ ] [平台 Phase 4](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)：DeepSeek 的精确 runtime 门已完成；Claude 的成功认证／模型路由仍未完成，两个 Adapter 的独立发行和更广矩阵均未开始。
 - [ ] [文档治理 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)：D1 contract／fixture 已完成；下一步需另行批准 D2 只读 scanner／CLI，HANDOFF 专项压缩仍须人工复核。
@@ -40,6 +41,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 - Authority：M2.2 只有 root-only opt-in 证据；M2.3 不会自动选择版本，`release_ready` 仍为 false。
 - 协作：linked worktree 隔离索引和工作目录，但当前没有 OS 级路径沙箱；越界写入仍依赖工作目录纪律和整合审阅发现。
 - W7 Promotion：本地分级结果不能替代 exact-SHA hosted Windows／Ubuntu；双平台通过也不授权自动推进 `main`。
+- CI3：W7D `e2c049e` 的 Promotion 已绿但独立 Fast 为红；在 CI3 同 SHA 的四个 hosted platform jobs 全绿前不得报告 ready。两次本机 Checkpoint 72/72 断言成功但 95.382s／98.320s 超 90s，未放宽预算或改变选择。
 - W7 本机 timing：唯一一次 `team-relations-execution` 的 4/4 断言成功，但 311.803 秒超过 300 秒 hard budget，runner 结果保持 FAIL；预算/选择未改且没有重跑，必须由 hosted exact-SHA 结果继续判定。
 - Context routing：Pilot 009 只覆盖三个任务、一个模型和一个 runtime；成本方向不能替代 3/3 质量门。
 - 发布：v0.2.0 ZIP checksum 有效，但 Windows／Linux 从同一 tag 重建仍非 byte-for-byte 一致。

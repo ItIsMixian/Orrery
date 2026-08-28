@@ -586,3 +586,9 @@
 - Design exploration 明确 fixture 字段不构成公共 schema，并把 stable identity、relation/provenance、multi-predecessor、evidence、status、tip、visibility、cluster、ordering/version 与 fail-closed 交给 W7A 冻结；真实 Core/Observatory consumer、安全链接、Personal/Team 投影与 release 接线留给 W7C-B。
 - W7A Git-private status 的只读对账确认两个 sibling 都声明修改三份 subsystem State、Validation index 与 DEVLOG，并共享 diff 验证面；该真实整合重叠不写入 synthetic fixture、不触碰 W7A 工作树，留给唯一整合者做加法合并。
 - 专项 6/6、JS／JSON、repository gate 与 diff 通过。真实 in-app Chromium 在 1280×720 与 390×844 点击三 lens、edge evidence、history、filter、keyboard/mobile ledger；两端无横向溢出，console 无 warning/error，页面资产只来自 loopback。没有 push、main 合流、tag 或 Release。
+
+## 2026-08-28 — CI3 Fast Validation Dependency Fix Candidate
+
+- 精确从 `codex/w7d-w7-integration-candidate@e2c049e` 建立 `codex/ci3-fast-validation-dependency-fix`，首次产品写入前注册 Git-private Workstream。基线 Promotion `33195264226` 双 required checks PASS；独立 Fast `33195264316` 双平台在 final discovery 因缺 `mistune` 失败，Fast 未启动且无条件 artifact 上传形成次生错误。
+- Fast 复用 Promotion 已验证的 wheel＋版本化 docsite requirements 安装和 pip cache，并在 `validate_ci.py --all` 前执行；validator 与 mutation regression 机械保护命令和顺序。结果文件先由跨平台 setup Python 检测，存在才上传；真实 Fast failure 仍保持红色且结果存在时继续上传。
+- CI focused 13/13、inventory 379／27／51／72、validator 与 Fast 51/51（2.324s／15s）通过。Checkpoint 两次均为 72/72 assertion PASS，但以 95.382s、98.320s 超 90s 保持 FAIL；预算、selector、W7B/W7C 和 Promotion 未修改，本地 Promotion 未运行。最终 hosted Fast＋Promotion 将绑定一个 clean exact SHA，并只在任务回执报告以避免 docs-only SHA 循环。

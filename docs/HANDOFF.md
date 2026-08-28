@@ -4,6 +4,7 @@ Updated: 2026-08-28
 
 ## 当前情况
 
+- CI3 Fast Validation Dependency Fix 精确从 W7D `e2c049e` 建立。外部停止门确认 Promotion run `33195264226` 在该 SHA 成功且 required Windows／Ubuntu 双 PASS；独立 Fast `33195264316` 双平台在 `validate_ci.py --all` final discovery 因缺 `mistune` 失败，Fast 未启动，随后必然缺失的 artifact 又产生次生错误。CI3 已在 Fast contract 前安装 Promotion 同源依赖、增加机械顺序回归，并仅在 timing JSON 存在时上传；本机 focused 13/13、inventory 379／27／51／72、validator、Fast 51/51（2.324s／15s）通过。Checkpoint 两次 72/72 assertion PASS 但 95.382s／98.320s 超 90s，保持 FAIL且未调预算/选择。最终 clean exact SHA 仍须独立 Fast 与 Promotion Windows／Ubuntu 全绿；hosted run/job/依赖安装/测试耗时只在任务回执报告，避免 docs-only SHA 循环。
 - W7D 唯一整合者精确从 CI2 `8b635b1` 建立非 `main` Candidate，只加法合入 W7C-B `d411fd6`；W7C-A 对应树已被 sibling 字节级吸收而未重复合入。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，schema-2 inventory 为 377 IDs／27 shards／51 Fast／70 Checkpoint。前三轮 hosted 分别定位并修复 preflight requirements、clean-runner／Authority／Windows path 与 aggregate requirements；exact `28f5fad` 的 run `33194655256` 已 59/59 jobs PASS，Windows／Ubuntu required checks 双 PASS，Candidate ready for maintainer-authorized main fast-forward。W7B 已实现本机 discovery／plan／确认／apply／recovery／receipt／undo，但 self-host apply、默认 UI 执行入口和公开发布未发生；W7C 图继续只读，中央 Team 没有执行权。唯一一次本地 W7B Promotion 的 4/4 断言成功但 311.803 秒超预算并保持 FAIL，未放宽或重跑；hosted W7B 则为 164 秒／23 秒双 PASS。完整证据以 [W7D Validation](validation/2026-08-28-w7d-w7-integration-candidate.md)为准。
 - 根文档系统已依据 ADR-0001 完成自托管集成；`.project-orrery.json` 应保持 `authority_status: integrated`。
 - Project Orrery v0.2.0 已公开发布：`main`、tag、Release、zip、checksum 和远端 manifest 均已核验。

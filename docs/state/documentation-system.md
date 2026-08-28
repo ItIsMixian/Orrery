@@ -5,6 +5,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 ## 当前事实
 
+- CI3 Candidate 将 fresh-runner dependency order 与 conditional artifact upload 作为可机械验证的 CI contract，并让 Plan／Validation／State／DEVLOG／全局入口与实现同行。为避免记录 hosted run 再产生未验证 docs-only successor，最终同 SHA hosted job/run 证据由任务回执精确报告；这不把回执升级为项目 Authority，也不改写 W7D 历史 Validation。
 - Project Orrery 已在本仓库正式采纳自身权威链。
 - Agent 入口是根 `AGENTS.md`；维护者入口是本目录 `README.md`、`PROGRESS.md` 与本地观测台。
 - Seed、ADR、Approved Design、Implementation Plan、State、Validation 和 Snapshot 已各有独立职责。

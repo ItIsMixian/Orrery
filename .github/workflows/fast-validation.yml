@@ -24,6 +24,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+          cache: pip
+          cache-dependency-path: skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+
+      - name: Install Fast discovery dependencies
+        run: python -m pip install "wheel>=0.41,<1" -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
 
       - name: Validate Fast and Promotion contracts
         run: python scripts/ci/validate_ci.py --all
@@ -34,8 +39,20 @@ jobs:
       - name: Run non-Promotion Fast profile
         run: python scripts/ci/run_test_shard.py --profile fast --output "${{ runner.temp }}/fast-result.json"
 
-      - name: Upload non-Promotion timing result
+      - name: Detect non-Promotion timing result
+        id: fast-result
         if: ${{ always() }}
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+
+          result = Path(os.environ["RUNNER_TEMP"]) / "fast-result.json"
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              print(f"available={str(result.is_file()).lower()}", file=output)
+
+      - name: Upload non-Promotion timing result
+        if: ${{ always() && steps.fast-result.outputs.available == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: fast-feedback-${{ matrix.os }}

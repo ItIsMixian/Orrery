@@ -264,6 +264,48 @@ class CIValidationTests(unittest.TestCase):
             errors = validate_workflows(fast, promotion)
             self.assertTrue(any("preflight" in error.lower() and "dependencies" in error for error in errors))
 
+    def test_fast_installs_discovery_dependencies_before_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            fast = directory / "fast.yml"
+            promotion = directory / "promotion.yml"
+            text = (ROOT / ".github/workflows/fast-validation.yml").read_text(encoding="utf-8")
+            dependency_step = (
+                "      - name: Install Fast discovery dependencies\n"
+                "        run: python -m pip install \"wheel>=0.41,<1\" -r "
+                "skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt\n\n"
+            )
+            validation_step = (
+                "      - name: Validate Fast and Promotion contracts\n"
+                "        run: python scripts/ci/validate_ci.py --all\n\n"
+            )
+            self.assertLess(text.index(dependency_step), text.index(validation_step))
+            reordered = text.replace(dependency_step, "", 1).replace(
+                validation_step, validation_step + dependency_step, 1
+            )
+            fast.write_text(reordered, encoding="utf-8")
+            shutil.copy2(ROOT / ".github/workflows/validate.yml", promotion)
+            errors = validate_workflows(fast, promotion)
+            self.assertTrue(
+                any("before contract validation" in error for error in errors)
+            )
+
+    def test_fast_skips_artifact_upload_when_timing_result_is_absent(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            fast = directory / "fast.yml"
+            promotion = directory / "promotion.yml"
+            text = (ROOT / ".github/workflows/fast-validation.yml").read_text(encoding="utf-8")
+            detection_step = "      - name: Detect non-Promotion timing result"
+            upload_step = "      - name: Upload non-Promotion timing result"
+            condition = "        if: ${{ always() && steps.fast-result.outputs.available == 'true' }}"
+            self.assertLess(text.index(detection_step), text.index(upload_step))
+            self.assertIn(condition, text)
+            fast.write_text(text.replace(condition, "        if: ${{ always() }}", 1), encoding="utf-8")
+            shutil.copy2(ROOT / ".github/workflows/validate.yml", promotion)
+            errors = validate_workflows(fast, promotion)
+            self.assertTrue(any("fast-result.outputs.available" in error for error in errors))
+
     def test_promotion_aggregates_install_discovery_dependencies_before_inventory(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)

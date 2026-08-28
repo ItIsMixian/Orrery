@@ -4,6 +4,7 @@ Updated: 2026-08-28
 
 ## 当前事实
 
+- CI3 Candidate 精确从 W7D `e2c049e` 修复独立 Fast fresh-runner discovery：Fast 在 `validate_ci.py --all` 前安装与 Promotion 相同的 wheel＋版本化 docsite requirements，静态 validator／mutation regression 机械保护命令与顺序；timing result 只有真实存在时才上传，主步骤失败仍保持红色。当前机械 inventory 为 379 IDs／27 shards／51 Fast／72 Checkpoint；本机 Fast 51/51、2.324s／15s PASS。Checkpoint 两次均 72/72 断言通过但以 95.382s、98.320s 超 90s 保持 FAIL，预算与 selector 未改；同一 clean exact-SHA hosted Fast／Promotion 仍待验证。
 - `tests/test_project_orrery.py` 保护安装、非覆盖升级、发布包、更新兼容和凭据配置边界。
 - `tests/test_context_routing_benchmark.py` 保护历史语料、Pilot 装置、回执规则、未跟踪文件采集、安全 Oracle 和恢复行为。
 - CI1 Worktree Candidate 将 self-host CI 分为 `.github/workflows/fast-validation.yml` 与 `.github/workflows/validate.yml`。Fast 对每次 push／PR 运行 40 项结构、schema／contract、纯单元与最小高风险路径，明确标为 `non-promotion-feedback`，不启用动态 build，也不使用 required-check 名称。
