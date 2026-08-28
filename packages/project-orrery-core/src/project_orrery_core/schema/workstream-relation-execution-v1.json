@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.invalid/schema/workstream-relation-execution-v1.json",
+  "title": "Project Orrery local Workstream relation execution contracts v1",
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "safe_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "timestamp": {"type": "string", "minLength": 20, "maxLength": 64},
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "actor_id"],
+      "properties": {
+        "kind": {"const": "human-local"},
+        "actor_id": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "discovery": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "project_hash", "graph_hash", "candidates", "unknown_candidates", "w7a_discovery_plan", "similarity_inference_permitted", "read_only", "writes_performed", "destructive_actions", "discovery_hash", "discovery_id"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-execution-discovery"},
+        "project_hash": {"$ref": "#/$defs/hash"},
+        "graph_hash": {"$ref": "#/$defs/hash"},
+        "candidates": {"type": "array"},
+        "unknown_candidates": {"type": "array"},
+        "w7a_discovery_plan": {"type": "object"},
+        "similarity_inference_permitted": {"const": false},
+        "read_only": {"const": true},
+        "writes_performed": {"const": false},
+        "destructive_actions": {"type": "array", "maxItems": 0},
+        "discovery_hash": {"$ref": "#/$defs/hash"},
+        "discovery_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "execution_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "contract_type", "project_hash", "discovery_plan_hash", "graph_hash", "candidate_bindings", "apply_plan", "actor", "issued_at", "expires_at", "confirmation_required", "execution_supported", "writes_performed", "destructive_actions", "plan_hash", "plan_id"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-execution-plan"},
+        "project_hash": {"$ref": "#/$defs/hash"},
+        "discovery_plan_hash": {"$ref": "#/$defs/hash"},
+        "graph_hash": {"$ref": "#/$defs/hash"},
+        "candidate_bindings": {"type": "array", "minItems": 1},
+        "apply_plan": {"type": "object"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "issued_at": {"$ref": "#/$defs/timestamp"},
+        "expires_at": {"$ref": "#/$defs/timestamp"},
+        "confirmation_required": {"const": true},
+        "execution_supported": {"const": true},
+        "writes_performed": {"const": false},
+        "destructive_actions": {"type": "array", "maxItems": 0},
+        "plan_hash": {"$ref": "#/$defs/hash"},
+        "plan_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "contract_type", "confirmation_id", "project_hash", "plan_id", "plan_hash", "actor", "token_hash", "issued_at", "expires_at", "status", "consumed_by"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-local-confirmation"},
+        "confirmation_id": {"$ref": "#/$defs/safe_id"},
+        "project_hash": {"$ref": "#/$defs/hash"},
+        "plan_id": {"$ref": "#/$defs/safe_id"},
+        "plan_hash": {"$ref": "#/$defs/hash"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "token_hash": {"$ref": "#/$defs/hash"},
+        "issued_at": {"$ref": "#/$defs/timestamp"},
+        "expires_at": {"$ref": "#/$defs/timestamp"},
+        "status": {"enum": ["issued", "consumed"]},
+        "consumed_by": {"type": ["string", "null"]}
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "operation", "transaction_id", "project_hash", "execution_plan_id", "execution_plan_hash", "confirmation_id", "actor", "occurred_at", "resulting_graph_hash", "status", "writes_performed", "destructive_actions", "receipt_hash", "receipt_id"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-transaction-receipt"},
+        "operation": {"enum": ["apply", "undo"]},
+        "transaction_id": {"$ref": "#/$defs/safe_id"},
+        "project_hash": {"$ref": "#/$defs/hash"},
+        "execution_plan_id": {"$ref": "#/$defs/safe_id"},
+        "execution_plan_hash": {"$ref": "#/$defs/hash"},
+        "confirmation_id": {"$ref": "#/$defs/safe_id"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "occurred_at": {"$ref": "#/$defs/timestamp"},
+        "resulting_graph_hash": {"$ref": "#/$defs/hash"},
+        "status": {"const": "committed"},
+        "writes_performed": {"const": true},
+        "destructive_actions": {"type": "array", "maxItems": 0},
+        "receipt_hash": {"$ref": "#/$defs/hash"},
+        "receipt_id": {"$ref": "#/$defs/safe_id"}
+      }
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/discovery"},
+    {"$ref": "#/$defs/execution_plan"},
+    {"$ref": "#/$defs/confirmation"},
+    {"$ref": "#/$defs/receipt"}
+  ]
+}

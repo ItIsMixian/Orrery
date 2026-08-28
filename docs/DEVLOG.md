@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-28 — W7B Succession Apply／Undo／Legacy Inference Candidate
+
+- 精确从修正后的 `codex/w7a-dynamic-workstream-succession-contract@52e88b8` 建立独立分支，并在首次产品写入前注册 Git-private `W7B-succession-apply-undo-legacy-inference` session；primary 为 multi-worktree collaboration，声明 project-structure、documentation-system、release/toolchain、test-coverage、预计写入与验证面。
+- Core 0.1.14 新增 execution schema、exact Session/HEAD/Scope/project/graph binding、legacy/explicit discovery、one-time local-human confirmation、write-ahead journal、apply/undo receipt 与 append-only recovery。非 terminal journal 阻断 graph；恢复只还原 exact Session 或追加 cancelled/stale compensation，W6 删除授权保持独立。
+- CLI 0.1.18 新增 `relations discover|plan|inspect|apply|undo|receipt`；Unknown/blocked 稳定非零失败关闭，伪造/重放/过期/跨项目 token、actor/plan mismatch、graph/Session/HEAD/Scope drift 与重复 history 均拒绝。没有 shell/path/URL 执行面、网络调用、merge/push/delete/tag/Release。
+- 隔离 W5C→W6→W5D→CI1/W5E fixture 完成 late CI、多 predecessor、active/completed takeover、故障注入/recovery、receipt/undo 与 CLI 全闭环；CI1 inventory 为 366 IDs／26 shards／49 Fast。self-host 真实项目只运行 dry-run：8 proposed／2 Unknown／exit 5，relation store 仍不存在、作者树不变。
+- 受影响 subsystem State、W7B Validation、DEVLOG 与索引同行；根 PROGRESS/HANDOFF 留给唯一整合者。任何真实项目 apply 仍需维护者本机 exact confirmation 和中央另行授权。
+
 ## 2026-08-28 — W7A Dynamic Workstream Succession Contract
 
 - 中央只读验收拒绝初始 `b6be68e`：旧 node summary 把 waiting/paused/blocked/failed 误判 active，且 apply/undo 无法原子标记/恢复 predecessor Session。本 correction 在同一 ADR-0014 下修正，不改写 peer Session 或 W7C-A。

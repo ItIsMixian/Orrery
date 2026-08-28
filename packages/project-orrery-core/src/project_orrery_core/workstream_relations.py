@@ -508,6 +508,65 @@ def append_proposed_relation(
     }
 
 
+def append_relation_event(project_root: Path, record: Mapping[str, Any]) -> dict[str, Any]:
+    """Append one exact full-state revision without replacing relation history."""
+    payload = dict(record)
+    validate_relation_record(payload, project_root=Path(project_root))
+    if payload.get("writes_performed") is not True:
+        raise ValueError("appended relation event must declare writes_performed=true")
+    storage_root = relation_storage_root(project_root)
+    _validate_private_storage_ancestors(storage_root)
+    relation_dir = storage_root / payload["relation_id"]
+    created_relation_dir = False
+    if relation_dir.exists():
+        if not relation_dir.is_dir() or _is_reparse_or_symlink(relation_dir):
+            raise ValueError("relation history directory must be a real directory")
+        history = next(
+            (item for item in load_relation_history(project_root)["histories"]
+             if item["relation_id"] == payload["relation_id"]),
+            None,
+        )
+        if history is None or not history["events"]:
+            raise ValueError("existing relation history is unreadable")
+        previous = history["events"][-1]
+        if payload["revision"] != previous["revision"] + 1:
+            raise ValueError("relation event revision does not continue exact history")
+        for key in ("relation_type", "source_workstream_id", "target_workstream_id"):
+            if payload[key] != previous[key]:
+                raise ValueError("relation event cannot change the immutable edge identity")
+    else:
+        if payload["revision"] != 1:
+            raise ValueError("new relation history must begin at revision 1")
+        relation_dir.mkdir(parents=True, exist_ok=False)
+        created_relation_dir = True
+    event_path = relation_dir / f"{payload['revision']:08d}-{payload['event_id']}.json"
+    descriptor: int | None = None
+    try:
+        descriptor = os.open(event_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as stream:
+            descriptor = None
+            json.dump(payload, stream, ensure_ascii=False, indent=2, sort_keys=True)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+    except OSError as exc:
+        if descriptor is not None:
+            os.close(descriptor)
+        if created_relation_dir:
+            try:
+                relation_dir.rmdir()
+            except OSError:
+                pass
+        raise ValueError(f"cannot append relation event: {exc}") from exc
+    return {
+        "record": payload,
+        "event_path": str(event_path),
+        "storage": "git-common-private-append-only",
+        "writes_performed": True,
+        "destructive_actions": [],
+    }
+
+
 def _record_sort_key(record: Mapping[str, Any]) -> tuple[str, str, str, str, int]:
     return (
         str(record.get("source_workstream_id", "")),
@@ -980,7 +1039,19 @@ def build_relation_graph(
     return body
 
 
-def load_relation_graph(project_root: Path, *, include_legacy: bool = True) -> dict[str, Any]:
+def load_relation_graph(
+    project_root: Path,
+    *,
+    include_legacy: bool = True,
+    allow_incomplete_transactions: bool = False,
+) -> dict[str, Any]:
+    if not allow_incomplete_transactions:
+        try:
+            from .workstream_relation_execution import assert_no_incomplete_transactions
+        except ImportError:
+            assert_no_incomplete_transactions = None
+        if assert_no_incomplete_transactions is not None:
+            assert_no_incomplete_transactions(Path(project_root))
     native = load_relation_history(project_root)
     records = list(native["current_records"])
     nodes: list[dict[str, Any]] = []
@@ -1318,6 +1389,7 @@ def build_apply_plan(
     discovery_plan: Mapping[str, Any],
     *,
     takeover_requests: Sequence[Mapping[str, Any]] = (),
+    relation_lifecycle_requests: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     if discovery_plan.get("contract_type") != "workstream-relation-discovery-plan":
         raise ValueError("apply plan requires a discovery plan")
@@ -1347,18 +1419,30 @@ def build_apply_plan(
     operations: list[dict[str, Any]] = []
     session_bindings: list[dict[str, Any]] = []
     candidate_ids = {record["relation_id"] for record in candidates}
+    lifecycle_requests = dict(relation_lifecycle_requests or {})
+    unknown_lifecycle_requests = sorted(set(lifecycle_requests) - candidate_ids)
+    if unknown_lifecycle_requests:
+        raise ValueError(
+            f"relation lifecycle request does not match a discovery candidate: {unknown_lifecycle_requests[0]}"
+        )
+    for relation_id, lifecycle in lifecycle_requests.items():
+        _validate_identifier(relation_id, "relation lifecycle relation_id", filesystem_safe=True)
+        if lifecycle not in {"proposed", "active", "completed"}:
+            raise ValueError("relation lifecycle request must be proposed, active, or completed")
     unknown_requests = sorted(set(request_map) - candidate_ids)
     if unknown_requests:
         raise ValueError(f"takeover request does not match a discovery candidate: {unknown_requests[0]}")
     for record in candidates:
         request = request_map.get(record["relation_id"])
-        target_lifecycle = "proposed"
+        target_lifecycle = lifecycle_requests.get(record["relation_id"], "proposed")
         if request is not None:
             if record["relation_type"] not in {"derived_from", "absorbs"}:
                 raise ValueError("only succession relations can transition predecessor sessions")
             target_lifecycle = str(request.get("target_lifecycle"))
             if target_lifecycle not in {"active", "completed"}:
                 raise ValueError("takeover target_lifecycle must be active or completed")
+        elif target_lifecycle in {"active", "completed"} and record["relation_type"] in {"derived_from", "absorbs"}:
+            raise ValueError("succession lifecycle activation requires an exact takeover request")
         event = dict(record)
         event["lifecycle"] = target_lifecycle
         operations.append({
@@ -1665,6 +1749,7 @@ __all__ = [
     "RELATION_LIFECYCLES",
     "RELATION_TYPES",
     "append_proposed_relation",
+    "append_relation_event",
     "build_apply_plan",
     "build_discovery_plan",
     "build_relation_graph",
