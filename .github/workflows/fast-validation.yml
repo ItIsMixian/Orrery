@@ -1,0 +1,43 @@
+name: Fast validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  fast-validation:
+    name: fast-validation (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Validate Fast and Promotion contracts
+        run: python scripts/ci/validate_ci.py --all
+
+      - name: Validate integrated structure
+        run: python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated
+
+      - name: Run non-Promotion Fast profile
+        run: python scripts/ci/run_test_shard.py --profile fast --output "${{ runner.temp }}/fast-result.json"
+
+      - name: Upload non-Promotion timing result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-feedback-${{ matrix.os }}
+          path: ${{ runner.temp }}/fast-result.json
+          if-no-files-found: error

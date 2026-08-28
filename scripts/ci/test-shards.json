@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "discovery": {
+    "start_dir": "tests",
+    "pattern": "test_*.py"
+  },
+  "fast": {
+    "role": "non-promotion-feedback",
+    "selectors": [
+      "test_authority_meta_model.*",
+      "test_authority_model_compatibility.*",
+      "test_documentation_governance_contract.*",
+      "test_collaboration_contract.CollaborationContractTests.test_schema_bundle_freezes_all_phase_zero_contracts",
+      "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
+      "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
+      "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
+      "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes",
+      "test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved",
+      "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"
+    ]
+  },
+  "shards": [
+    {
+      "id": "authority-core",
+      "surface": "Authority/Core",
+      "selectors": [
+        "test_authority_ai_derived_view.*",
+        "test_authority_cli_claims.*",
+        "test_authority_cli_compatibility.*",
+        "test_authority_cli_shadow.*",
+        "test_authority_meta_model.*",
+        "test_authority_model_compatibility.*",
+        "test_authority_model_projection.*",
+        "test_authority_observatory_managed_shadow.*",
+        "test_authority_observatory_projection.*",
+        "test_authority_observatory_roles_shadow.*",
+        "test_authority_observatory_runtime_shadow.*",
+        "test_authority_observatory_shadow.*",
+        "test_ci_validation.*",
+        "test_documentation_governance_contract.*"
+      ]
+    },
+    {
+      "id": "w1-w2-a",
+      "surface": "W1-W2",
+      "selectors": [
+        "test_collaboration_contract.CollaborationContractTests.test_adapter_route_attach_and_no_rebind_fallback_are_private_and_zero_network",
+        "test_collaboration_contract.CollaborationContractTests.test_cli_contract_inspection_is_json_local_only_and_write_free",
+        "test_collaboration_contract.CollaborationContractTests.test_create_worktree_collisions_and_session_failure_leave_no_partial_state",
+        "test_collaboration_contract.CollaborationContractTests.test_create_worktree_pins_integration_and_preserves_dirty_primary",
+        "test_collaboration_contract.CollaborationContractTests.test_create_worktree_rolls_back_if_integration_ref_drifts",
+        "test_collaboration_contract.CollaborationContractTests.test_fixture_has_main_two_linked_worktrees_clone_untracked_and_unpushed",
+        "test_collaboration_contract.CollaborationContractTests.test_integration_ref_default_and_oid_resolution_are_local_and_exact",
+        "test_collaboration_contract.CollaborationContractTests.test_lifecycle_and_adapter_cli_commands_have_stable_json_and_fail_closed_routes",
+        "test_collaboration_contract.CollaborationContractTests.test_lifecycle_transitions_are_legal_separate_and_fail_closed_at_future_gates",
+        "test_collaboration_contract.CollaborationContractTests.test_member_capabilities_are_composable_audited_and_revoke_local_credentials",
+        "test_collaboration_contract.CollaborationContractTests.test_personal_default_and_team_contract_never_start_network_runtime",
+        "test_collaboration_contract.CollaborationContractTests.test_primary_worktree_defaults_to_git_main_and_allows_listed_override",
+        "test_collaboration_contract.CollaborationContractTests.test_primary_write_guard_blocks_clean_and_dirty_primary_but_allows_isolation",
+        "test_collaboration_contract.CollaborationContractTests.test_schema_bundle_freezes_all_phase_zero_contracts"
+      ]
+    },
+    {
+      "id": "w1-w2-b",
+      "surface": "W1-W2",
+      "selectors": [
+        "test_collaboration_contract.CollaborationContractTests.test_scope_supports_mapped_unmapped_and_project_wide_without_registry_mutation",
+        "test_collaboration_contract.CollaborationContractTests.test_session_finding_and_integration_report_samples_validate_and_reject_extra_data",
+        "test_collaboration_contract.CollaborationContractTests.test_session_staleness_tracks_branch_head_integration_and_dirty_fingerprint",
+        "test_collaboration_contract.CollaborationContractTests.test_stale_git_binding_revokes_effective_review_ready_without_mutating_session",
+        "test_collaboration_contract.CollaborationContractTests.test_subsystem_registry_projects_explicit_agent_index_without_creating_state",
+        "test_collaboration_contract.CollaborationContractTests.test_w2_cli_overlap_and_scope_refresh_use_stable_json_and_zero_network",
+        "test_collaboration_contract.CollaborationContractTests.test_w2_collects_all_path_sources_and_derives_authority_subsystems_and_resources",
+        "test_collaboration_contract.CollaborationContractTests.test_w2_cross_member_ack_progress_stales_on_scope_change_and_resolves_mechanically",
+        "test_collaboration_contract.CollaborationContractTests.test_w2_direct_authority_semantic_unknown_and_source_provenance",
+        "test_collaboration_contract.CollaborationContractTests.test_w2_scope_expansion_b_l1_l2_and_l3_are_local_and_fail_closed",
+        "test_collaboration_contract.CollaborationContractTests.test_worktree_cli_has_stable_json_and_explicit_private_write",
+        "test_collaboration_contract.CollaborationContractTests.test_worktree_create_and_guard_cli_use_stable_json_and_exit_codes",
+        "test_collaboration_contract.CollaborationContractTests.test_worktree_status_is_read_only_and_private_sessions_cover_linked_and_clone"
+      ]
+    },
+    {
+      "id": "w3-a",
+      "surface": "W3",
+      "selectors": [
+        "test_collaboration_w3.CollaborationW3Tests.test_active_benchmark_recovery_and_path_escape_are_retained_or_blocked",
+        "test_collaboration_w3.CollaborationW3Tests.test_cleanup_authorizations_are_independent_zero_delete_and_receipts_remain_private",
+        "test_collaboration_w3.CollaborationW3Tests.test_cli_json_and_exit_codes_are_stable_without_main_or_cleanup_mutation",
+        "test_collaboration_w3.CollaborationW3Tests.test_closure_and_cleanup_are_private_advisory_and_invalidate_on_local_files",
+        "test_collaboration_w3.CollaborationW3Tests.test_dirty_integration_worktree_and_conflicting_dry_run_fail_closed"
+      ]
+    },
+    {
+      "id": "w3-b",
+      "surface": "W3",
+      "selectors": [
+        "test_collaboration_w3.CollaborationW3Tests.test_elevated_authority_change_requires_non_author_reviewer",
+        "test_collaboration_w3.CollaborationW3Tests.test_inventory_is_bounded_and_legacy_unknown_requires_explicit_adoption",
+        "test_collaboration_w3.CollaborationW3Tests.test_package_stales_on_candidate_input_drift",
+        "test_collaboration_w3.CollaborationW3Tests.test_review_package_is_evidence_first_bound_hashed_private_and_zero_network"
+      ]
+    },
+    {
+      "id": "w3-c",
+      "surface": "W3",
+      "selectors": [
+        "test_collaboration_w3.CollaborationW3Tests.test_risk_policy_human_actions_and_ai_only_do_not_satisfy_review",
+        "test_collaboration_w3.CollaborationW3Tests.test_temporary_and_conflicting_adr_numbers_block_integration",
+        "test_collaboration_w3.CollaborationW3Tests.test_unique_commit_unknown_files_and_sensitive_ignored_paths_block_cleanup",
+        "test_collaboration_w3.CollaborationW3Tests.test_validation_failure_and_candidate_state_drift_block_review_ready"
+      ]
+    },
+    {
+      "id": "team-lan-core",
+      "surface": "Team/LAN",
+      "selectors": [
+        "test_collaboration_lineage.*",
+        "test_collaboration_team.*"
+      ]
+    },
+    {
+      "id": "team-personal-a",
+      "surface": "Team/LAN",
+      "selectors": [
+        "test_personal_observatory.PersonalObservatoryTests.test_absent_session_and_remote_boundary_stay_unknown",
+        "test_personal_observatory.PersonalObservatoryTests.test_excluded_worktree_is_listed_but_never_opened",
+        "test_personal_observatory.PersonalObservatoryTests.test_health_projection_separates_36_worktree_like_delivery_reconciliation_and_hygiene",
+        "test_personal_observatory.PersonalObservatoryTests.test_injection_adds_a_separate_page_and_leaves_dashboard_untouched",
+        "test_personal_observatory.PersonalObservatoryTests.test_no_review_packages_still_projects_bounded_w3_inventory"
+      ]
+    },
+    {
+      "id": "team-personal-b",
+      "surface": "Team/LAN",
+      "selectors": [
+        "test_personal_observatory.PersonalObservatoryTests.test_projection_reuses_w1_w2_contracts_without_network_or_writes",
+        "test_personal_observatory.PersonalObservatoryTests.test_renderer_has_four_zones_progressive_detail_and_no_actions",
+        "test_personal_observatory.PersonalObservatoryTests.test_renderer_separates_lifecycle_runtime_and_freshness",
+        "test_personal_observatory.PersonalObservatoryTests.test_root_only_entry_preserves_legacy_bytes_when_disabled",
+        "test_personal_observatory.PersonalObservatoryTests.test_unavailable_projection_renders_stable_fallback"
+      ]
+    },
+    {
+      "id": "team-personal-c",
+      "surface": "Team/LAN",
+      "selectors": [
+        "test_personal_observatory.PersonalObservatoryTests.test_w3_projection_keeps_policy_actions_and_receipts_separate",
+        "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_consumes_real_core_review_bundle_without_writes",
+        "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_failure_and_old_schema_keep_w4a_fallback",
+        "test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local"
+      ]
+    },
+    {
+      "id": "team-ui-server",
+      "surface": "Team/LAN",
+      "selectors": [
+        "test_team_observatory.*"
+      ]
+    },
+    {
+      "id": "team-lan-harness",
+      "surface": "Team/LAN",
+      "selectors": [
+        "test_lan_collaboration_harness.*"
+      ]
+    },
+    {
+      "id": "workspace-action",
+      "surface": "Workspace Maintenance",
+      "selectors": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_action_surface_rejects_branch_path_shell_url_and_ai_authority"
+      ]
+    },
+    {
+      "id": "workspace-cli",
+      "surface": "Workspace Maintenance",
+      "selectors": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_cli_json_policy_schedule_and_invalid_execute_are_stable"
+      ]
+    },
+    {
+      "id": "workspace-observatory",
+      "surface": "Workspace Maintenance",
+      "selectors": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_observatory_catch_up_respects_24_hour_freshness"
+      ]
+    },
+    {
+      "id": "workspace-queue",
+      "surface": "Workspace Maintenance",
+      "selectors": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_queue_authorization_is_evidence_bound_and_drift_stales"
+      ]
+    },
+    {
+      "id": "workspace-remove",
+      "surface": "Workspace Maintenance",
+      "selectors": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_remove_worktree_executor_preserves_branch_commit_and_receipt"
+      ]
+    },
+    {
+      "id": "workspace-scan",
+      "surface": "Workspace Maintenance",
+      "selectors": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_scan_is_bounded_zero_network_debounced_single_flight_and_times_out"
+      ]
+    },
+    {
+      "id": "workspace-contract",
+      "surface": "Workspace Maintenance",
+      "selectors": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed"
+      ]
+    },
+    {
+      "id": "context-benchmark",
+      "surface": "Context Routing/Harness",
+      "selectors": [
+        "test_context_routing_benchmark.*"
+      ]
+    },
+    {
+      "id": "context-harness",
+      "surface": "Context Routing/Harness",
+      "selectors": [
+        "test_context_routing_h2.*"
+      ]
+    },
+    {
+      "id": "context-oracle",
+      "surface": "Context Routing/Harness",
+      "selectors": [
+        "test_context_routing_oracle_v02.*"
+      ]
+    },
+    {
+      "id": "packaging-project",
+      "surface": "Packaging/Adapters/docsite",
+      "selectors": [
+        "test_project_orrery.*"
+      ]
+    },
+    {
+      "id": "packaging-adapters",
+      "surface": "Packaging/Adapters/docsite",
+      "selectors": [
+        "test_claude_code_adapter.*",
+        "test_cli_wheel_installation.*",
+        "test_codex_adapter.*",
+        "test_deepseek_harness_adapter.*",
+        "test_harness_json_adapter.*"
+      ]
+    },
+    {
+      "id": "release-migrate",
+      "surface": "Release/migration/restore",
+      "selectors": [
+        "test_authority_model_migration.*",
+        "test_authority_release_candidate_gate.*"
+      ]
+    },
+    {
+      "id": "release-restore",
+      "surface": "Release/migration/restore",
+      "selectors": [
+        "test_authority_model_restore.*",
+        "test_authority_update_compatibility.*"
+      ]
+    }
+  ]
+}

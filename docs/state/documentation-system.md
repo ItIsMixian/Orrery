@@ -43,6 +43,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W5C Worktree Candidate 不改变上述投影来源，只把 Team sibling page 改为人类控制面：首先总结“现在怎样／下一步做什么”，再呈现成员与工作任务、待处理请求；handled request 与 Coordinator／Host／heartbeat／revision 等诊断默认折叠。派生页面仍没有权威或执行能力。
 - W6 Worktree Candidate 增加独立“工作区维护” sibling page，投影 Git-private maintenance scan／queue／authorization／receipt、保护／Unknown 原因、共享策略和 branch 动作边界。静态 Personal 构建只读且按钮禁用；root-only loopback 动态入口才允许本机确认。页面不把建议、授权或 receipt 升级为 State／ADR／Validation，也不回写作者文档；Team 页只能发送 `cleanup` request，不能把中央决定变为 execute。
 - W5D Worktree Candidate 在 Team sibling page 增加 discovery candidate、join confirmation、connection／reconnection 和 Coordinator generation／manual Host switch 状态；所有网络动作仍需本机显式触发，enable 本身不广播，页面不接收任意 URL／命令或执行请求。Personal sibling page 读取 Scope lineage summary，把显式 stacked chain 作为可折叠的派生视图显示 parent／task-base OID／inherited path 数和 chain 内 unique finding；Legacy／Unknown 不按 branch 名猜测，也不被伪装为 resolved finding。
+- CI1 Worktree Candidate 的 inventory、timing result、aggregate receipt 与 Fast artifact 都是 machine-readable Validation evidence，不是 State／ADR／Promotion 事实。Fast 输出显式标注非 Promotion；只有冻结 exact SHA 的双平台 aggregator 与既有 required checks 能形成后续推广证据，且 hosted 性能目标仍须远端实测。
 
 ## 同步状态
 
@@ -85,6 +86,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - `tests/test_collaboration_lineage.py`
 - `tests/test_lan_collaboration_harness.py`
 - `docs/operations/lan-team-preflight.md`
+- `scripts/ci/test_inventory.py`
+- `scripts/ci/run_test_shard.py`
+- `scripts/ci/aggregate_test_results.py`
+- `docs/validation/2026-08-27-ci1-tiered-parallel-validation.md`
 
 ## 已知缺口
 

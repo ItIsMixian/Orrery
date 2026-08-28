@@ -15,7 +15,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 非权威研究控制面：`experiments/context-routing/`。
 - 本地大型原始运行根：`D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库。
 - 原始运行由仓库内 `experiments/context-routing/harness/raw-evidence-retention-policy.json` 与 `seal_raw_evidence.py` 管理 manifest、校验和、分类和到期状态；工具不自动删除。
-- 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；现有 `.github/workflows/` 尚未发布多组件产物。
+- 发布打包与 CI：旧 Skill 使用 `scripts/package_release.py`；未发布 Codex Adapter 使用 `scripts/package_codex_adapter.py`；CI1 Worktree Candidate 的 `.github/workflows/fast-validation.yml` 负责普通 push／PR 快速反馈，`.github/workflows/validate.yml` 负责冻结 ref／exact-SHA 的 Windows／Ubuntu 分片 Promotion；尚未发布多组件产物。
 - self-host GitHub 的 main 推广采用 Candidate-first：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu smoke checks，随后才允许快进 main。服务端 branch protection 对管理员生效，不要求 PR；workflow 排除普通 main push，避免同一 SHA 重复矩阵。该外部规则不是通用 Orrery 产品能力。
 - Codex Adapter 当前源码版本为 0.1.1，发行支持状态仍为 `experimental`／未发布；其 runtime manifest 中的历史证据只对 Adapter 0.1.0、Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Core／CLI 0.1.0 与已记录模型／审批组合标记 `verified`，不自动覆盖 0.1.1。
 - 当前 W6 Worktree Candidate 从 W5C `6dd508f` 吸收 `main@673e252` 后，把未发布 Core／CLI／Observatory 推进到 0.1.10／0.1.14／0.1.6：W1–W3 提供 Personal Scope/review/cleanup，W4 health 将交付、对账与工作区卫生分层，W5A–W5C 提供 Team foundation 与 root-only UI，W6 Phase 0–2 增加本机 workspace maintenance。Core API 仍为 1；这些只属于 `codex/w6-workspace-maintenance` Candidate／Worktree scope，公开 v0.2.0 不变。
@@ -102,6 +102,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `tests/test_workspace_maintenance.py`
 - `tests/test_collaboration_lineage.py`
 - `tests/test_lan_collaboration_harness.py`
+- `scripts/ci/`
+- `tests/test_ci_validation.py`
 - `scripts/acceptance/run_lan_collaboration_acceptance.py`
 - `docs/operations/lan-team-preflight.md`
 

@@ -1,36 +1,272 @@
-name: Validate Project Orrery
+name: Promotion validation
 
 on:
   push:
-    branches-ignore:
-      - main
-  pull_request:
+    branches:
+      - "promotion/**"
   workflow_dispatch:
+    inputs:
+      candidate_ref:
+        description: Frozen non-main candidate branch or ref
+        required: true
+        type: string
+      candidate_sha:
+        description: Exact 40-character commit SHA expected at candidate_ref
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 jobs:
-  smoke-test:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-
+  preflight:
+    name: promotion inventory and exact-SHA preflight
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.inventory.outputs.shards }}
+      candidate_ref: ${{ steps.candidate.outputs.candidate_ref }}
+      candidate_sha: ${{ steps.candidate.outputs.candidate_sha }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.candidate_ref || github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+      - name: Bind checkout to frozen candidate ref and SHA
+        id: candidate
+        shell: bash
+        env:
+          CANDIDATE_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.candidate_ref || github.ref }}
+          CANDIDATE_SHA: ${{ github.event_name == 'workflow_dispatch' && inputs.candidate_sha || github.sha }}
+        run: |
+          python scripts/ci/validate_ci.py --all --bind --candidate-ref "$CANDIDATE_REF" --candidate-sha "$CANDIDATE_SHA"
+          echo "candidate_ref=$CANDIDATE_REF" >> "$GITHUB_OUTPUT"
+          echo "candidate_sha=$CANDIDATE_SHA" >> "$GITHUB_OUTPUT"
+      - name: Discover complete Promotion inventory
+        id: inventory
+        shell: bash
+        run: |
+          python scripts/ci/test_inventory.py --output "$RUNNER_TEMP/test-inventory.json"
+          echo "shards=$(python scripts/ci/test_inventory.py --shard-list)" >> "$GITHUB_OUTPUT"
+      - name: Upload exact inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-test-inventory
+          path: ${{ runner.temp }}/test-inventory.json
+          if-no-files-found: error
 
+  windows-shards:
+    name: promotion shard windows-latest / ${{ matrix.shard }}
+    needs: preflight
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: ${{ fromJSON(needs.preflight.outputs.shards) }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.preflight.outputs.candidate_sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
       - name: Install test dependencies
         run: python -m pip install "wheel>=0.41,<1" -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
-
-      - name: Run portable installation tests
+      - name: Verify exact candidate checkout
+        run: >-
+          python scripts/ci/validate_ci.py --bind
+          --candidate-ref "${{ needs.preflight.outputs.candidate_ref }}"
+          --candidate-sha "${{ needs.preflight.outputs.candidate_sha }}"
+      - name: Run complete Promotion shard
         env:
           ORRERY_TEST_BUILD: "1"
-        run: python -m unittest discover -s tests -v
+        run: >-
+          python scripts/ci/run_test_shard.py --shard "${{ matrix.shard }}"
+          --output "${{ runner.temp }}/result-${{ matrix.shard }}.json"
+      - name: Upload shard result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-windows-latest-${{ matrix.shard }}
+          path: ${{ runner.temp }}/result-${{ matrix.shard }}.json
+          if-no-files-found: error
+
+  windows-gates:
+    name: promotion repository gates / windows-latest
+    needs: preflight
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.preflight.outputs.candidate_sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+      - name: Install test dependencies
+        run: python -m pip install "wheel>=0.41,<1" -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+      - name: Verify exact candidate checkout
+        run: >-
+          python scripts/ci/validate_ci.py --bind
+          --candidate-ref "${{ needs.preflight.outputs.candidate_ref }}"
+          --candidate-sha "${{ needs.preflight.outputs.candidate_sha }}"
+      - name: Validate integrated structure
+        run: python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated
+      - name: Build isolated docsite
+        run: python scripts/docsite/build_docsite.py --out "${{ runner.temp }}/orrery-docsite.html"
+      - name: Validate links and forbidden artifacts
+        run: python scripts/ci/validate_repository_gates.py
+      - name: Build release package without publishing
+        run: python scripts/package_release.py --output-dir "${{ runner.temp }}/release-package"
+      - name: Verify clean checkout diff
+        run: git diff --check
+
+  ubuntu-shards:
+    name: promotion shard ubuntu-latest / ${{ matrix.shard }}
+    needs: [preflight, windows-shards]
+    if: ${{ always() && needs.preflight.result == 'success' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: ${{ fromJSON(needs.preflight.outputs.shards) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.preflight.outputs.candidate_sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+      - name: Install test dependencies
+        run: python -m pip install "wheel>=0.41,<1" -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+      - name: Verify exact candidate checkout
+        run: >-
+          python scripts/ci/validate_ci.py --bind
+          --candidate-ref "${{ needs.preflight.outputs.candidate_ref }}"
+          --candidate-sha "${{ needs.preflight.outputs.candidate_sha }}"
+      - name: Run complete Promotion shard
+        env:
+          ORRERY_TEST_BUILD: "1"
+        run: >-
+          python scripts/ci/run_test_shard.py --shard "${{ matrix.shard }}"
+          --output "${{ runner.temp }}/result-${{ matrix.shard }}.json"
+      - name: Upload shard result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-ubuntu-latest-${{ matrix.shard }}
+          path: ${{ runner.temp }}/result-${{ matrix.shard }}.json
+          if-no-files-found: error
+
+  ubuntu-gates:
+    name: promotion repository gates / ubuntu-latest
+    needs: [preflight, windows-shards]
+    if: ${{ always() && needs.preflight.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.preflight.outputs.candidate_sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+      - name: Install test dependencies
+        run: python -m pip install "wheel>=0.41,<1" -r skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt
+      - name: Verify exact candidate checkout
+        run: >-
+          python scripts/ci/validate_ci.py --bind
+          --candidate-ref "${{ needs.preflight.outputs.candidate_ref }}"
+          --candidate-sha "${{ needs.preflight.outputs.candidate_sha }}"
+      - name: Validate integrated structure
+        run: python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated
+      - name: Build isolated docsite
+        run: python scripts/docsite/build_docsite.py --out "${{ runner.temp }}/orrery-docsite.html"
+      - name: Validate links and forbidden artifacts
+        run: python scripts/ci/validate_repository_gates.py
+      - name: Build release package without publishing
+        run: python scripts/package_release.py --output-dir "${{ runner.temp }}/release-package"
+      - name: Verify clean checkout diff
+        run: git diff --check
+
+  smoke-test-windows:
+    name: smoke-test (windows-latest)
+    if: ${{ always() }}
+    needs: [preflight, windows-shards, windows-gates]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.preflight.outputs.candidate_sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: promotion-windows-latest-*
+          path: ${{ runner.temp }}/promotion-results
+      - name: Fail-closed aggregate
+        run: >-
+          python scripts/ci/aggregate_test_results.py
+          --results-dir "${{ runner.temp }}/promotion-results"
+          --expected-os Windows
+          --expected-sha "${{ needs.preflight.outputs.candidate_sha }}"
+          --matrix-result "${{ needs.windows-shards.result }}"
+          --gate-result "${{ needs.windows-gates.result }}"
+          --output "${{ runner.temp }}/promotion-windows-latest.json"
+      - name: Upload aggregate receipt
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-aggregate-windows-latest
+          path: ${{ runner.temp }}/promotion-windows-latest.json
+          if-no-files-found: error
+
+  smoke-test-ubuntu:
+    name: smoke-test (ubuntu-latest)
+    if: ${{ always() }}
+    needs: [preflight, ubuntu-shards, ubuntu-gates]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.preflight.outputs.candidate_sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: promotion-ubuntu-latest-*
+          path: ${{ runner.temp }}/promotion-results
+      - name: Fail-closed aggregate
+        run: >-
+          python scripts/ci/aggregate_test_results.py
+          --results-dir "${{ runner.temp }}/promotion-results"
+          --expected-os Linux
+          --expected-sha "${{ needs.preflight.outputs.candidate_sha }}"
+          --matrix-result "${{ needs.ubuntu-shards.result }}"
+          --gate-result "${{ needs.ubuntu-gates.result }}"
+          --output "${{ runner.temp }}/promotion-ubuntu-latest.json"
+      - name: Upload aggregate receipt
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-aggregate-ubuntu-latest
+          path: ${{ runner.temp }}/promotion-ubuntu-latest.json
+          if-no-files-found: error

@@ -522,3 +522,10 @@
 - collaboration v1 新增显式版本化 `base_workstream_id`＋`task_base_oid` lineage；current lineage 的 committed scope 改为 `task_base_oid..HEAD`，只在可验证祖先链中排除精确 base 已包含的 inherited committed provenance。parent post-fork、siblings、legacy／Unknown、staged／unstaged／untracked／expected 与 L2／L3、exclusive resource、ack／Review Ready 门保持保守语义。
 - Synthetic W5C→W6→W5D fixture 的祖先两两计算由修正前 4 Direct／3 Authority 降为纯继承 0／0；child 新增仍可见，parent fork 后同路径重新形成冲突，非法／不存在／非祖先／漂移 base 失败关闭或 Unknown。Personal Observatory 按显式 stacked chain 折叠并显示 base OID、inherited path 和 chain 内 unique current finding；真实 W5C／W6 legacy session 留给中央显式 rebind／retire。
 - LAN／Team／Review Ready 定向回归 22/22、lineage／schema／Personal 17/17、结构、隔离 docsite、作者 Markdown 链接、JSON／compile／diff 检查和真实 in-app Chromium 1280px／390px 点击验收通过；完整命令、校验和与平台限制记录在 [W5D Validation](validation/2026-08-27-w5d-lan-collaboration-harness.md)。
+
+## 2026-08-27 — CI1 tiered parallel validation Worktree Candidate
+
+- 从 `codex/w5d-lan-collaboration-harness@ae6913e` 建立独立 `codex/ci1-tiered-parallel-validation`；首次写入前确认本地 `main@673e252` 已是基线祖先，并注册 Git-private `CI1-tiered-parallel-validation` session。未改 W5D／W6／W5C／main、PROGRESS、HANDOFF、branch protection、tag 或 Release。
+- 新增 dependency-free final unittest inventory、26-shard manifest、逐 test timing JSON runner、fail-closed aggregate、repository gate 与独立 workflow validator。当前 342 个 discovery ID 全部恰好分配一次；W6 七个方法逐项拆分，Personal Observatory 拆为三片。
+- 普通 push／PR 只运行 40-test Fast 并标注非 Promotion；完整 Windows／Ubuntu Promotion 只由显式 ref＋SHA dispatch 或 `promotion/**` 冻结分支触发。preflight 后所有 job checkout exact SHA，最终 required-check 名仍为 `smoke-test (windows-latest)`／`smoke-test (ubuntu-latest)`。
+- CI1 回归 8/8、最终 Fast 40/40（runner 3.897s／wall 4.639s）、最终 `workspace-remove` 1/1（runner 148.990s／wall 149.805s）、inventory／YAML／static contract、结构、隔离站、332 Markdown／911 links、forbidden artifact 与 diff 通过。hosted Fast ≤90s 与 Windows Promotion ≤4m 只作投影，留给中央冻结 exact-SHA run 验证。
