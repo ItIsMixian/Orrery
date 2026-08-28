@@ -10,6 +10,7 @@ from _common import (
     CIValidationError,
     DEFAULT_MANIFEST,
     ROOT,
+    expand_profile,
     git_sha,
     load_json,
     sha256_json,
@@ -20,6 +21,7 @@ from _common import (
 def build_inventory(manifest_path: Path) -> dict[str, object]:
     manifest = load_json(manifest_path)
     test_ids, assignments, fast_ids = validate_and_expand_manifest(manifest)
+    checkpoint_ids = expand_profile(manifest, "checkpoint", test_ids)
     return {
         "schema_version": 1,
         "contract_type": "orrery-unittest-inventory",
@@ -30,12 +32,15 @@ def build_inventory(manifest_path: Path) -> dict[str, object]:
         "test_ids": test_ids,
         "fast_test_count": len(fast_ids),
         "fast_test_ids": fast_ids,
+        "checkpoint_test_count": len(checkpoint_ids),
+        "checkpoint_test_ids": checkpoint_ids,
         "shards": [
             {
                 "id": shard["id"],
                 "surface": shard["surface"],
                 "test_count": len(assignments[shard["id"]]),
                 "test_ids": assignments[shard["id"]],
+                "budget_seconds": shard.get("budget_seconds"),
             }
             for shard in manifest["shards"]
         ],
@@ -60,6 +65,7 @@ def main() -> int:
             print(
                 f"PASS inventory: {inventory['test_count']} unique test IDs, "
                 f"{len(inventory['shards'])} shards, {inventory['fast_test_count']} Fast tests"
+                f", {inventory['checkpoint_test_count']} Checkpoint tests"
             )
         return 0
     except CIValidationError as exc:

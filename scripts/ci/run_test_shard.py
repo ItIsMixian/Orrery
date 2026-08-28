@@ -14,6 +14,7 @@ from _common import (
     DEFAULT_MANIFEST,
     ROOT,
     atomic_write_json,
+    expand_profile,
     flatten_suite,
     git_sha,
     load_json,
@@ -95,21 +96,26 @@ def run_selected(
     *, manifest_path: Path, shard: str | None, profile: str | None, output: Path
 ) -> tuple[dict[str, object], bool]:
     manifest = load_json(manifest_path)
-    all_ids, assignments, fast_ids = validate_and_expand_manifest(manifest)
+    all_ids, assignments, _ = validate_and_expand_manifest(manifest)
     if (shard is None) == (profile is None):
         raise CIValidationError("select exactly one of --shard or --profile")
     if profile is not None:
-        if profile != "fast":
-            raise CIValidationError(f"unsupported profile: {profile}")
-        selected_ids = fast_ids
-        shard_id = "fast"
-        role = "non-promotion-feedback"
+        selected_ids = expand_profile(manifest, profile, all_ids)
+        shard_id = profile
+        role = str(manifest[profile]["role"])
+        budget_seconds: float | None = float(manifest[profile]["budget_seconds"])
     else:
         if shard not in assignments:
             raise CIValidationError(f"unknown shard: {shard}")
         selected_ids = assignments[shard]
         shard_id = str(shard)
         role = "promotion-shard"
+        shard_config = next(item for item in manifest["shards"] if item["id"] == shard)
+        budget_seconds = (
+            float(shard_config["budget_seconds"])
+            if "budget_seconds" in shard_config
+            else None
+        )
     suite = _load_selected_tests(selected_ids)
     started = time.perf_counter()
     with repository_import_path(ROOT):
@@ -122,7 +128,8 @@ def run_selected(
     for record in records:
         record.update({"sha": sha, "os": runner_os, "python": python_version, "shard": shard_id})
     record_ids = [str(item["test_id"]) for item in records]
-    successful = result.wasSuccessful() and record_ids == selected_ids
+    budget_exceeded = budget_seconds is not None and duration > budget_seconds
+    successful = result.wasSuccessful() and record_ids == selected_ids and not budget_exceeded
     payload: dict[str, object] = {
         "schema_version": 1,
         "contract_type": "orrery-test-shard-result-v1",
@@ -141,6 +148,8 @@ def run_selected(
         "successful": successful,
         "completed": True,
         "duration_seconds": round(duration, 6),
+        "budget_seconds": budget_seconds,
+        "budget_exceeded": budget_exceeded,
         "runner_errors": [test.id() for test, _ in result.errors if test.id() not in selected_ids],
     }
     atomic_write_json(output, payload)
@@ -152,7 +161,7 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--shard")
-    group.add_argument("--profile")
+    group.add_argument("--profile", choices=("fast", "checkpoint"))
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
     try:

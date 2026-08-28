@@ -10,6 +10,7 @@ from _common import (
     CIValidationError,
     DEFAULT_MANIFEST,
     ROOT,
+    expand_profile,
     load_json,
     validate_and_expand_manifest,
 )
@@ -128,10 +129,24 @@ def validate_all(manifest_path: Path) -> list[str]:
     try:
         manifest = load_json(manifest_path)
         all_ids, assignments, fast_ids = validate_and_expand_manifest(manifest)
+        checkpoint_ids = expand_profile(manifest, "checkpoint", all_ids)
         if len(assignments) < 8:
             errors.append("Promotion manifest must retain meaningful parallel sharding")
         if set(fast_ids) == set(all_ids):
             errors.append("Fast profile must remain a strict subset and cannot masquerade as Promotion")
+        if not set(fast_ids).issubset(checkpoint_ids):
+            errors.append("Checkpoint must include every Fast test before adding adjacency")
+        if set(checkpoint_ids) == set(all_ids):
+            errors.append("Checkpoint must remain a strict subset and cannot masquerade as Promotion")
+        if float(manifest["fast"]["budget_seconds"]) > 15:
+            errors.append("Fast profile budget must remain at or below 15 seconds")
+        if float(manifest["checkpoint"]["budget_seconds"]) > 90:
+            errors.append("Checkpoint profile budget must remain at or below 90 seconds")
+        w7b_shards = [item for item in manifest["shards"] if item["id"] == "team-relations-execution"]
+        if len(w7b_shards) != 1:
+            errors.append("W7B execution must have one dedicated Promotion shard")
+        elif float(w7b_shards[0].get("budget_seconds", 0)) != 300:
+            errors.append("W7B Promotion shard must retain its 300-second hard budget")
         packaging_ids = {
             test_id
             for shard in manifest["shards"]

@@ -82,29 +82,52 @@ def atomic_write_json(path: Path, value: Any) -> None:
 
 
 def validate_manifest_shape(manifest: dict[str, Any]) -> None:
-    if set(manifest) != {"schema_version", "discovery", "fast", "shards"}:
-        raise CIValidationError("manifest must contain only schema_version, discovery, fast, and shards")
-    if manifest["schema_version"] != 1:
+    if set(manifest) != {"schema_version", "discovery", "fast", "checkpoint", "shards"}:
+        raise CIValidationError(
+            "manifest must contain only schema_version, discovery, fast, checkpoint, and shards"
+        )
+    if manifest["schema_version"] != 2:
         raise CIValidationError("unsupported shard manifest schema_version")
     discovery = manifest["discovery"]
     if not isinstance(discovery, dict) or set(discovery) != {"start_dir", "pattern"}:
         raise CIValidationError("discovery must contain exactly start_dir and pattern")
     if discovery["start_dir"] != "tests" or discovery["pattern"] != "test_*.py":
         raise CIValidationError("promotion discovery must remain final unittest discovery over tests/test_*.py")
-    fast = manifest["fast"]
-    if not isinstance(fast, dict) or set(fast) != {"role", "selectors"}:
-        raise CIValidationError("fast must contain exactly role and selectors")
-    if fast["role"] != "non-promotion-feedback":
-        raise CIValidationError("Fast profile must be explicitly non-promotion-feedback")
-    _validate_selectors(fast["selectors"], "fast")
+    for profile, expected_role in (
+        ("fast", "non-promotion-feedback"),
+        ("checkpoint", "non-promotion-checkpoint"),
+    ):
+        value = manifest[profile]
+        if not isinstance(value, dict) or set(value) != {
+            "role",
+            "budget_seconds",
+            "selectors",
+        }:
+            raise CIValidationError(
+                f"{profile} must contain exactly role, budget_seconds, and selectors"
+            )
+        if value["role"] != expected_role:
+            raise CIValidationError(f"{profile} profile has the wrong non-Promotion role")
+        if (
+            not isinstance(value["budget_seconds"], (int, float))
+            or isinstance(value["budget_seconds"], bool)
+            or value["budget_seconds"] <= 0
+        ):
+            raise CIValidationError(f"{profile} budget_seconds must be positive")
+        _validate_selectors(value["selectors"], profile)
     shards = manifest["shards"]
     if not isinstance(shards, list) or not shards:
         raise CIValidationError("manifest shards must be a non-empty array")
     shard_ids: set[str] = set()
     surfaces: set[str] = set()
     for shard in shards:
-        if not isinstance(shard, dict) or set(shard) != {"id", "surface", "selectors"}:
-            raise CIValidationError("each shard must contain exactly id, surface, selectors")
+        if not isinstance(shard, dict) or set(shard) not in (
+            {"id", "surface", "selectors"},
+            {"id", "surface", "selectors", "budget_seconds"},
+        ):
+            raise CIValidationError(
+                "each shard must contain id, surface, selectors, and optional budget_seconds"
+            )
         shard_id = shard["id"]
         if not isinstance(shard_id, str) or not SHARD_ID_RE.fullmatch(shard_id):
             raise CIValidationError(f"invalid shard id: {shard_id!r}")
@@ -115,6 +138,12 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> None:
             raise CIValidationError(f"invalid surface for shard {shard_id}")
         surfaces.add(shard["surface"])
         _validate_selectors(shard["selectors"], f"shard {shard_id}")
+        if "budget_seconds" in shard and (
+            not isinstance(shard["budget_seconds"], (int, float))
+            or isinstance(shard["budget_seconds"], bool)
+            or shard["budget_seconds"] <= 0
+        ):
+            raise CIValidationError(f"shard {shard_id} budget_seconds must be positive")
     missing_surfaces = sorted(REQUIRED_SURFACES - surfaces)
     if missing_surfaces:
         raise CIValidationError(f"required promotion surfaces missing: {missing_surfaces}")
@@ -192,6 +221,13 @@ def validate_and_expand_manifest(
         raise CIValidationError(f"promotion assignment is incomplete; missing={missing}, extra={extra}")
     fast_ids = expand_selectors(manifest["fast"]["selectors"], test_ids, "fast profile")
     return test_ids, assignments, fast_ids
+
+
+def expand_profile(manifest: dict[str, Any], profile: str, test_ids: list[str]) -> list[str]:
+    validate_manifest_shape(manifest)
+    if profile not in {"fast", "checkpoint"}:
+        raise CIValidationError(f"unsupported profile: {profile}")
+    return expand_selectors(manifest[profile]["selectors"], test_ids, f"{profile} profile")
 
 
 def git_sha(root: Path = ROOT) -> str:

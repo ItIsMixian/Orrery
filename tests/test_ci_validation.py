@@ -20,6 +20,7 @@ from _common import (  # noqa: E402
     CIValidationError,
     DEFAULT_MANIFEST,
     atomic_write_json,
+    expand_profile,
     git_sha,
     load_json,
     sha256_json,
@@ -85,10 +86,27 @@ class CIValidationTests(unittest.TestCase):
 
     def test_inventory_assigns_every_final_test_once_and_splits_workspace_methods(self) -> None:
         test_ids, assignments, fast_ids = validate_and_expand_manifest(self.manifest)
+        checkpoint_ids = expand_profile(self.manifest, "checkpoint", test_ids)
         assigned = [test_id for selected in assignments.values() for test_id in selected]
         self.assertEqual(sorted(assigned), test_ids)
         self.assertEqual(len(assigned), len(set(assigned)))
         self.assertLess(len(fast_ids), len(test_ids))
+        self.assertTrue(set(fast_ids).issubset(checkpoint_ids))
+        self.assertLess(len(checkpoint_ids), len(test_ids))
+        self.assertEqual(self.manifest["fast"]["budget_seconds"], 15)
+        self.assertEqual(self.manifest["checkpoint"]["budget_seconds"], 90)
+        w7b = next(
+            shard for shard in self.manifest["shards"] if shard["id"] == "team-relations-execution"
+        )
+        self.assertEqual(w7b["budget_seconds"], 300)
+        self.assertEqual(
+            assignments["team-relations-execution"],
+            sorted(
+                test_id
+                for test_id in test_ids
+                if test_id.startswith("test_workstream_relation_execution.")
+            ),
+        )
         workspace = [
             shard for shard in self.manifest["shards"] if shard["surface"] == "Workspace Maintenance"
         ]
@@ -150,7 +168,28 @@ class CIValidationTests(unittest.TestCase):
             self.assertEqual(payload["records"][0]["os"], payload["os"])
             self.assertEqual(payload["records"][0]["python"], payload["python"])
             self.assertEqual(payload["records"][0]["shard"], "fast")
+            self.assertEqual(payload["budget_seconds"], 15.0)
+            self.assertFalse(payload["budget_exceeded"])
             self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["shard"], "fast")
+
+    def test_runner_enforces_profile_budget_without_changing_promotion_semantics(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            manifest = copy.deepcopy(self.manifest)
+            manifest["fast"]["budget_seconds"] = 0.000001
+            manifest["fast"]["selectors"] = [
+                "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes"
+            ]
+            manifest_path = self._write_manifest(directory, manifest)
+            payload, successful = run_selected(
+                manifest_path=manifest_path,
+                shard=None,
+                profile="fast",
+                output=directory / "result.json",
+            )
+            self.assertFalse(successful)
+            self.assertTrue(payload["budget_exceeded"])
+            self.assertEqual(payload["role"], "non-promotion-feedback")
 
     def test_aggregate_accepts_complete_once_only_results(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

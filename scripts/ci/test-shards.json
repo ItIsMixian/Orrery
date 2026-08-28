@@ -1,11 +1,12 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "discovery": {
     "start_dir": "tests",
     "pattern": "test_*.py"
   },
   "fast": {
     "role": "non-promotion-feedback",
+    "budget_seconds": 15,
     "selectors": [
       "test_authority_meta_model.*",
       "test_authority_model_compatibility.*",
@@ -20,6 +21,26 @@
       "test_workstream_relations.WorkstreamRelationTests.test_stale_head_and_scope_evidence_never_suppress",
       "test_workstream_relations.WorkstreamRelationTests.test_w7c_consumer_compatibility_fixture_maps_without_ui_authority",
       "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_execution_schema_cli_surface_and_no_delete_contract_are_dependency_light",
+      "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
+      "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
+      "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
+      "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes",
+      "test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved",
+      "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"
+    ]
+  },
+  "checkpoint": {
+    "role": "non-promotion-checkpoint",
+    "budget_seconds": 90,
+    "selectors": [
+      "test_authority_meta_model.*",
+      "test_authority_model_compatibility.*",
+      "test_documentation_governance_contract.*",
+      "test_ci_validation.*",
+      "test_collaboration_contract.CollaborationContractTests.test_schema_bundle_freezes_all_phase_zero_contracts",
+      "test_workstream_relations.*",
+      "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_execution_schema_cli_surface_and_no_delete_contract_are_dependency_light",
+      "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_minimal_git_binding_rejections_and_state_axes_checkpoint",
       "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
       "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
@@ -125,8 +146,15 @@
       "selectors": [
         "test_collaboration_lineage.*",
         "test_collaboration_team.*",
-        "test_workstream_relation_execution.*",
         "test_workstream_relations.*"
+      ]
+    },
+    {
+      "id": "team-relations-execution",
+      "surface": "Team/LAN",
+      "budget_seconds": 300,
+      "selectors": [
+        "test_workstream_relation_execution.*"
       ]
     },
     {

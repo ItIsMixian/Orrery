@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-28 — CI2 Tiered Test Performance Candidate
+
+- 从干净 W7B `1160df4` 建立独立 `codex/ci2-tiered-test-performance`，注册 Git-private session 并声明测试、CI manifest/runner、test/release State、Validation、Plan 与 DEVLOG 范围；未改 W7B、main、PROGRESS 或 HANDOFF。
+- W7B 的九套完整 fixture 重建收敛为一个 dependency-light Fast、一个 minimal-Git Checkpoint 和两个完整 Promotion journey；完整拓扑只构造两次，W1 生产 `create_worktree` acceptance 不再被 W7B fixture 重复调用。
+- CI manifest schema 2 新增显式 Checkpoint 与 hard budget；Fast 为 15 秒、Checkpoint 为 90 秒，W7B 独立 `team-relations-execution` Promotion shard 为 300 秒。最终 inventory 为 362 IDs／27 shards／49 Fast／66 Checkpoint，0 missing／duplicate／dead selector。
+- 本机 Windows Worktree：最终 Fast 49/49 2.117s、Checkpoint 66/66 83.629s、W7B Promotion 4/4 264.738s，较原 921.066s 缩短约 71%。没有完整全仓、hosted exact-SHA、push、main merge、tag 或 Release；远端证据留给唯一整合者。
+
 ## 2026-08-28 — W7B Succession Apply／Undo／Legacy Inference Candidate
 
 - 精确从修正后的 `codex/w7a-dynamic-workstream-succession-contract@52e88b8` 建立独立分支，并在首次产品写入前注册 Git-private `W7B-succession-apply-undo-legacy-inference` session；primary 为 multi-worktree collaboration，声明 project-structure、documentation-system、release/toolchain、test-coverage、预计写入与验证面。
