@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Orrery Rename and Compatibility Contract](orrery-rename-and-compatibility-contract.md) — approved under ADR-0015; maps brand, stable identifiers, explicit opt-in CLI thin alias, host-specific display/alias behavior, brownfield migration, first-release asset naming, privacy, rollback and R3–R5 gates without claiming implementation.
 - [Dynamic Workstream Succession Contract](dynamic-workstream-succession-contract.md) — provider-neutral relation events, exact Git evidence, append-only common-private storage, active-tip conflict-pair policy and W7B/W7C consumer boundaries governed by ADR-0014.
 - [Self-hosting documentation system](self-hosting-documentation-system.md) — the reader paths, storage boundaries, and synchronization rules governed by ADR-0001.
 - [Real-development context-routing benchmark](real-development-context-routing-benchmark.md) — isolated application-development task mix, Oracle hierarchy, fixture boundaries, and passive pre-write Scope Acquisition measurement governed by ADR-0002 and ADR-0005.
@@ -18,4 +19,4 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Draft designs
 
-- [Orrery Rename and Compatibility Contract](orrery-rename-and-compatibility-contract.md) — proposed Approved Design candidate under ADR-0015; maps brand, stable identifiers, aliases, brownfield migration, privacy, rollback and R3–R5 gates without authorizing implementation.
+- No active Draft Design is registered.

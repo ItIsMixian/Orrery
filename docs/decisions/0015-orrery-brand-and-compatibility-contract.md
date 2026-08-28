@@ -1,6 +1,6 @@
 # ADR-0015: Orrery 品牌与兼容标识契约
 
-Status: Proposed
+Status: Accepted
 
 Date: 2026-08-28
 
@@ -20,9 +20,7 @@ PyPI 已由无关项目占用 `orrery` distribution 与顶层 import。v0.2.0 �
 manifest 已公开且必须保持原样。已有用户、旧命令和 mixed-version project 需要先兼容，再决定是否切换
 默认入口。
 
-## Proposed decision
-
-若本 ADR 被接受：
+## Decision
 
 1. 面向人的当前产品品牌统一为 **Orrery**。自托管文档必须在首次出现时区分 current product brand、
    current technical identifier 和 historical name。
@@ -39,18 +37,23 @@ manifest 已公开且必须保持原样。已有用户、旧命令和 mixed-vers
    rollback 和 release notes。
 5. 路线固定为 `Brand-only → compatible identifiers/aliases → optional package/CLI transition → optional
    cleanup`。alias 必须路由到同一实现；一个宿主不得发现两个完整 Skill/Plugin 实现。
-6. CLI 可在 R4 后增加 user-facing `orrery` alias，但只能在 PATH/third-party collision 检查、显式安装或
-   宿主 capability 允许时启用。旧命令与 alias 必须产生相同 exit code、JSON envelope、写入计划和结果；
-   warning 不得污染 JSON stdout。
-7. Skill/plugin/adapter 的 display name 可变为 Orrery；canonical ID 继续为现值，直到各宿主分别证明 alias
-   discovery、upgrade、uninstall 与 mixed-install 行为。一个平台的证据不外推到另一个平台。
+6. R4 的 user-facing `orrery` CLI alias 采用显式 opt-in、collision-checked 的 thin launcher，并路由到唯一
+   canonical implementation；不得复制完整实现。旧命令与 alias 必须产生相同 exit code、JSON envelope、
+   写入计划和结果；warning 不得污染 JSON stdout。
+7. Skill/plugin/adapter 在各宿主的默认迁移只改变 display name，canonical ID 保持现值。只有宿主独立证明
+   safe alias discovery、upgrade、uninstall 与 mixed-install 行为后，才可增加路由到同一 canonical
+   implementation 的 thin alias；一个平台的证据不外推到另一个平台。
 8. GitHub current authority 为 `ItIsMixian/Orrery`；旧仓库 redirect 是兼容 alias。当前 README、badges、
    install links 使用新 URL；历史 release notes、Actions runs 和旧 URL 引用不重写。
 9. v0.2.0 annotated tag、commit、Release、ZIP/checksum、frozen release manifest/bridge/baseline 以及所有历史
-   ADR、Validation、Snapshot、Pilot/benchmark fixture 永久按原字节或原事实保留。
-10. 本地 repository directory、Codex Saved Project 和 Codex data root 不属于 package identity。只有产品
-    brand/compat rollout 验收后，才可在独立维护窗口按“关闭/保存 worktree → 重命名 root → 重新登记 Saved
-    Project/重建 worktree → 验证 → 另行迁移 Codex 数据到 D 盘”的顺序处理；本 ADR 不授权这些操作。
+   ADR、Validation、Snapshot、Pilot/benchmark fixture 永久按原字节或原事实保留。首个新的 Orrery Release
+   继续使用稳定 `project-orrery-*` archive/asset filename，同时以 Orrery 作为品牌显示；未来改变 asset
+   display filename 必须另行评审。
+10. 本地 repository directory、Codex Saved Project 和 Codex data root 不属于 package identity。R3 Brand-only
+    完成、exact Candidate SHA 通过规定门并进入 `main` 后，即可在独立本机维护 Workstream 中依次 freeze
+    clean SHA、保存并关闭或重建 worktree、把 primary root 从 `project-orrery` 改为 `Orrery`、更新 Codex
+    Saved Project、验证并保留旧路径回滚。随后才能另开 Codex application-data D 盘迁移。该本机维护不依赖
+    R4/R5 公共兼容周期；本 ADR 本身不授权执行上述文件系统、Codex 设置或数据迁移操作。
 11. 没有新增匿名 telemetry。兼容判断只使用本地、显式、无 secret 的 capability/receipt；不得同步
     prompt、answer、transcript、源码正文、未 push diff、凭据或 keyring 内容，也不得以“没有报告”推断
     用户已迁移。
@@ -61,14 +64,14 @@ manifest 已公开且必须保持原样。已有用户、旧命令和 mixed-vers
 |---|---|
 | README/中英文文案、Observatory title、repository description | R3 brand-only allowlist；当前内容和历史引用分开 |
 | GitHub owner/repo、redirect、badges、install links | GitHub current state + maintainer remote authority；本地 docs 不能改远端 |
-| Skill/plugin/adapter ID | host-specific R4 contract；ID 先保持，display name 可迁移 |
-| CLI entrypoint | R4 alias capability；R5 才可评审默认入口，旧入口覆盖 0.3.x |
+| Skill/plugin/adapter ID | 默认仅迁移 display name；host-specific 证据通过后才增加指向同一实现的 thin alias |
+| CLI entrypoint | R4 显式 opt-in、collision-checked thin launcher；R5 才可评审默认入口，旧入口覆盖 0.3.x |
 | Python distribution/import | 保持 `project-orrery-*`／`project_orrery_*`；本 ADR 不迁移 |
 | project manifest/env/config | `.project-orrery.json` 与 `ORRERY_*` 保持；config names 不因品牌复制 |
 | keyring/cache/backup | 既有 namespace 是恢复权威；默认不搬移、不复制 secret |
 | schema/contract/hash/Authority/Workstream IDs | 各 versioned producer/reader；brand-only 禁止修改 |
-| v0.2.0/frozen evidence | immutable tag/assets/checksum/fixture/hash；只能新增说明 |
-| local directory/Saved Project/Codex data | 本机维护计划与用户确认；后于产品 rollout，彼此分离 |
+| v0.2.0/frozen evidence | immutable tag/assets/checksum/fixture/hash；首个新 Release 仍用 `project-orrery-*` asset filename |
+| local directory/Saved Project/Codex data | R3 exact-SHA 进入 main 后的独立本机维护；不依赖 R4/R5，Codex data 另立任务 |
 
 ## Reasons
 
@@ -83,19 +86,19 @@ manifest 已公开且必须保持原样。已有用户、旧命令和 mixed-vers
 - 新代码和文档必须按 display/technical/protocol/history 分类，而不是按字符串机械替换。
 - R3 只改活跃品牌面；R4 才能增加 versioned aliases；R5 可以选择继续永久保留技术 ID。
 - 0.4.0 之前不得删除旧入口；到达 0.4.0 也不构成删除授权。
-- 本提案若被接受，Approved Design 才能从 candidate 状态提升为 Approved，R3 才能开始实现。
+- 本 ADR 已由维护者接受，配套 Design 已 Approved；R3 的决策／设计门已解除，但接受决定不等于 R3 已实现。
 
 ## Remaining review choices
 
-以下选择不阻塞品牌原则，但需维护者在对应阶段确认：
+以下选择不阻塞 R3，但只能在对应阶段凭新增证据确认：
 
-- R4 的 `orrery` CLI alias 是显式 opt-in shim、独立 launcher，还是仅在无 PATH collision 的安装器投影；
-- 各宿主是否支持单 canonical discovery + thin alias，若不支持则只迁移 display name；
-- 首个新 release 是否改变新资产 display filename，或继续使用稳定 `project-orrery-*` archive name；
-- 产品 rollout 后本地 root/Saved Project 维护窗口的确切时间。
+- R3 进入 main 后，本机 root/Saved Project 维护窗口的具体时间、操作人和备份落点；
+- R5 是否把 `orrery` 从显式 opt-in launcher 提升为 preferred/default CLI；证据不足时保持现状；
+- 首个新 Release 之后是否改变未来 archive/asset display filename；需要独立发布兼容评审；
+- 每个宿主是否有足够证据增加 thin alias；没有安全 discovery/upgrade/uninstall 证据的宿主只改 display name。
 
 ## Mapping
 
-- Approved Design candidate: [Orrery rename and compatibility contract](../design/orrery-rename-and-compatibility-contract.md)
+- Approved Design: [Orrery rename and compatibility contract](../design/orrery-rename-and-compatibility-contract.md)
 - Implementation Plan: [R3–R5 phased plan](../implementation/plans/2026-08-28-orrery-rename-and-compatibility.md)
 - Validation: [R2 decision contract](../validation/2026-08-28-orrery-rename-decision-contract.md)

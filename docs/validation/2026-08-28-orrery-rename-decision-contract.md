@@ -9,8 +9,9 @@ Fact scope: Worktree Candidate `codex/r2-orrery-rename-decision-contract`, based
 
 Validate a documentation-only R2 candidate: additive R1 provenance, reproducible current-main naming inventory,
 external read-only identity facts, ADR/Design/Plan/Library/State/index linkage and repository documentation gates.
-This Validation does not claim ADR acceptance, Design approval, R3 implementation, package/runtime compatibility,
-main integration or release.
+The initial pass validated the proposed decision package; this closeout also records maintainer acceptance of ADR-0015
+and approval of its Design. It does not claim R3 implementation, package/runtime compatibility, main integration or
+release.
 
 ## Baseline and provenance review
 
@@ -20,6 +21,20 @@ main integration or release.
   index. It is not merged into main. R2 retained its method/history as attributed input and did not cherry-pick it.
 - Git-private session registration recorded the R2 branch, exact integration/merge-base OID, primary/affected
   subsystems, expected writes and validation surfaces before the first authored-file write.
+
+## Maintainer acceptance closeout
+
+- The maintainer accepted ADR-0015 and approved the companion Design on 2026-08-28. The Implementation Plan now
+  releases R3 to a separately registered Workstream; R3, R4 and R5 remain unimplemented.
+- R4's `orrery` CLI alias default is an explicit opt-in, collision-checked thin launcher to one canonical
+  implementation. Host integrations change display name only unless that host independently proves safe alias
+  discovery, upgrade and uninstall.
+- The first new Orrery Release retains stable `project-orrery-*` archive/asset filenames while displaying the Orrery
+  brand. Any later filename change remains an evidence-triggered review.
+- Local root/Saved Project maintenance may be separately authorized after R3 passes exact-SHA gates and enters main;
+  it does not wait for R4/R5. Codex application-data relocation to D: remains a later independent Workstream.
+- Acceptance/approval changes decision authority only. No package, schema, CLI, Skill, Adapter, local path, Saved
+  Project, Codex data, GitHub setting, tag or Release was changed by this closeout.
 
 ## Reproducible current-main inventory
 
@@ -54,7 +69,7 @@ zero-count target.
 
 ## Documentation and repository gates
 
-Final authored-file pass:
+Initial proposal authored-file pass:
 
 | Command | Result |
 |---|---|
@@ -73,8 +88,26 @@ The Fast profile includes Authority non-escalation, v0.2 frozen hash, documentat
 inventory and component projection checks. A full Checkpoint/Promotion suite was not run because R2 changes authored
 documentation only and does not implement R3 or runtime behavior.
 
+## Acceptance closeout gates
+
+The acceptance revision was validated against the same R2 Worktree Candidate without changing runtime inputs:
+
+| Command | Result |
+|---|---|
+| `python -X utf8 scripts/ci/validate_repository_gates.py` | PASS: 660 tracked/untracked paths, 356 Markdown files, 998 local links, no forbidden runtime/generated artifacts |
+| `python -X utf8 skills/project-orrery/scripts/validate_installation.py --target . --require-integrated` | PASS: integrated candidate, Authority Model 1 supported/strict eligible |
+| `python -X utf8 -m unittest tests.test_project_orrery -v` | PASS: 16 run, 14 pass, 2 dynamic-dependency skips by design |
+| `python -X utf8 scripts/ci/run_test_shard.py --profile fast --output <system-temp>` | PASS: 51/51 in 2.681523s under 15s; inventory `d95b3062…`, manifest `0b191bc2…` |
+| `git diff --check` | PASS |
+| changed-path boundary | PASS: 13 docs-only paths; root PROGRESS/HANDOFF and all package/schema/CLI/Skill/Adapter/code/remote surfaces unchanged |
+
+The Fast profile includes the Authority, documentation-governance, v0.2 frozen-contract and component projection
+checks affected by changing an ADR from Proposed to Accepted. No full Checkpoint or Promotion run was necessary for
+this documentation-only acceptance closeout; R3 must obtain its own exact-SHA Promotion evidence when implemented.
+
 ## Known limits
 
 - External observations are point-in-time facts from 2026-08-28 and do not reserve future registry/CLI names.
-- Proposed ADR-0015 has no decision authority yet; the Design remains a candidate and the Plan is blocked.
+- ADR-0015 is Accepted and the Design is Approved, but R3 is only ready to start in a separate Workstream and remains
+  unimplemented. R4/R5 and both local-maintenance tasks remain separately gated.
 - No CLI/Skill/Adapter/package/schema/runtime behavior was changed or tested by this Validation.

@@ -1,18 +1,21 @@
 # 实施计划：Orrery Rename and Compatibility R3–R5
 
-Status: Planned; blocked on ADR-0015 acceptance and Design approval
+Status: Active; R3 ready to start, R4/R5 remain future independent Workstreams
 
 Date: 2026-08-28
 
-Governing proposal: [ADR-0015](../../decisions/0015-orrery-brand-and-compatibility-contract.md)
+Governing decision: [ADR-0015](../../decisions/0015-orrery-brand-and-compatibility-contract.md)
 
-Approved Design candidate: [Orrery Rename and Compatibility Contract](../../design/orrery-rename-and-compatibility-contract.md)
+Approved Design: [Orrery Rename and Compatibility Contract](../../design/orrery-rename-and-compatibility-contract.md)
 
 ## Goal and current stop
 
 在不改写历史、不抢占 PyPI `orrery`、不破坏已安装用户的前提下，分三项后续 Workstream 完成品牌收口、
 兼容 alias 和可选默认入口评审。本 R2 只建立决策/设计/计划/证据，不执行 R3，不修改 package/schema/
 CLI/Skill/Adapter/remote/tag/Release。
+
+ADR/Design 门已经解除，R3 可以另行注册并启动；截至本 Plan 更新，R3 尚未实现。R4、R5 不随 R3 自动
+启动，必须分别建立后续独立 Workstream。
 
 ## R3 — Brand-only closeout
 
@@ -47,7 +50,9 @@ CLI/Skill/Adapter/remote/tag/Release。
 
 - future（非 v0.2）manifest/capability schema 与 old/new reader fixtures；
 - Core resolver、CLI collision diagnostics 和机器稳定 warning；
-- 各宿主独立的 thin alias/display metadata；安装/升级/卸载/mixed-state tests；
+- 显式 opt-in、collision-checked 的 `orrery` thin launcher，严格路由到单一 canonical CLI；不得复制完整实现；
+- 各宿主默认只改 display metadata；仅在宿主独立证明 safe discovery/upgrade/uninstall 后增加 thin alias；
+- 安装/升级/卸载/mixed-state tests；
 - brownfield inspect/dry-run/apply/restore contract（若实际产生任何本地 identifier write）。
 
 ### Acceptance
@@ -75,7 +80,8 @@ restore 必须绑定 receipt 并只撤销该事务创建的对象。
 ### Expected writes
 
 - 可选 preferred `orrery` CLI launcher/default 与文档；旧命令不删除；
-- 可选未来 archive display filename，同时保留 updater 对旧名读取；
+- 首个新 Release 固定使用 `project-orrery-*` archive/asset filename 并显示 Orrery 品牌；更晚的 filename
+  变化另行评审，同时保留 updater 对旧名读取；
 - **不**新增 `orrery` Python distribution/import；`project-orrery-*`／`project_orrery_*` 保持；
 - release candidate manifest/tests、State/Validation/DEVLOG；远端 tag/Release 另需明确授权。
 
@@ -98,9 +104,10 @@ v1 protocol、v0.2/frozen evidence、backup restore、secret fallback 和历史 
 
 ## Local directory and Codex data follow-up
 
-R3–R5 产品 rollout 完成并验收后，另开本机维护 Workstream：freeze clean SHA → 保存/关闭 worktrees →
-Git-safe 重建到 `Orrery` root → 更新 Codex Saved Project → 验证。随后才能另开 Codex application-data D 盘
-迁移；两项任务的 plan、backup、rollback 和确认不得复用。
+R3 Brand-only 完成、exact Candidate SHA 通过规定门并进入 `main` 后，即可另开本机维护 Workstream：
+freeze clean SHA → 保存并关闭或重建 worktrees → primary root 从 `project-orrery` 改为 `Orrery` → 更新 Codex
+Saved Project → 验证并保留旧路径回滚。该维护不依赖 R4/R5 公共兼容周期，也不由本 Plan 自动执行。
+随后才能另开 Codex application-data D 盘迁移；两项任务的 plan、backup、rollback 和确认不得复用。
 
 ## State and promotion obligations
 

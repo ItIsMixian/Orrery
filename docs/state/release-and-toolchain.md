@@ -2,11 +2,11 @@
 
 Updated: 2026-08-28
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md)
 
 ## 当前事实
 
-- R2 Candidate 只提出 [ADR-0015 compatibility contract](../decisions/0015-orrery-brand-and-compatibility-contract.md)：公开品牌保持 Orrery，但现有 Skill/CLI/Adapter IDs、`project-orrery-*` distributions、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 和 credential/cache/backup namespaces 当前均未改变。PyPI `orrery` 已被无关项目占用，因此本 Candidate 不新增该 distribution/import；R3/R4/R5 尚未开始。
+- [ADR-0015 compatibility contract](../decisions/0015-orrery-brand-and-compatibility-contract.md) 已 Accepted，配套 Design 已 Approved：公开品牌为 Orrery；现有 Skill/CLI/Adapter IDs、`project-orrery-*` distributions、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 和 credential/cache/backup namespaces 当前均未改变。R4 默认采用显式 opt-in、collision-checked thin CLI launcher，各宿主默认只改 display name；首个新 Release 保持 `project-orrery-*` asset filename。PyPI `orrery` 仍被无关项目占用，因此不新增该 distribution/import。R3 已解除决策门但尚未开始，R4/R5 也未开始。
 - CI3 Candidate 只修复 `.github/workflows/fast-validation.yml` 的 fresh-runner setup 和 artifact 失败噪声：Fast 继续是 `non-promotion-feedback`，15 秒预算、51 项既有选择、无 `ORRERY_TEST_BUILD`、无 required smoke 名；Promotion workflow、27 shards、required checks、组件版本、branch protection、tag、Release 与 v0.2.0 均不变。最终推广证据仍要求同一 exact SHA 的独立 Fast Windows/Ubuntu 与 Promotion required Windows/Ubuntu 全绿。
 - Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/ItIsMixian/Orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。
 - 外部当前展示名和仓库入口已改为 Orrery／`ItIsMixian/Orrery`。Candidate 当前只同步根 README、

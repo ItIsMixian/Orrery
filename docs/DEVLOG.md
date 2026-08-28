@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-28 — R2 Orrery decision acceptance closeout
+
+- 维护者接受 ADR-0015 并批准 Orrery Rename and Compatibility Design；R3 的 ADR/Design 门已解除，可另立 Workstream 启动，但本次仍未实现 R3，R4/R5 继续是后续独立 Workstream。
+- 固化 R4 默认：`orrery` 为显式 opt-in、collision-checked thin launcher，路由到单一 canonical implementation；各宿主默认只改 display name，只有独立证明 safe discovery/upgrade/uninstall 后才增加 thin alias。首个新 Orrery Release 继续使用 `project-orrery-*` archive/asset filename。
+- 本机 root/Saved Project 维护改为 R3 exact-SHA 进入 main 后即可另行授权，不依赖 R4/R5；随后 Codex application-data D 盘迁移仍须再开独立 Workstream。本次没有执行本机迁移、remote/package/schema/CLI/Skill/Adapter/tag/Release 变更，根 PROGRESS/HANDOFF 保持不变。
+- acceptance closeout 通过 repository gate（660 paths／356 Markdown／998 links）、integrated installation validator、产品专项 16 run／14 pass／2 expected skips、Fast 51/51（2.681523s／15s）、diff 与 13-path docs-only boundary；未运行完整 Checkpoint/Promotion，R3 后续必须取得自身 exact-SHA 门。
+
 ## 2026-08-28 — R2 Orrery Rename Decision and Compatibility Contract
 
 - 精确从 clean `main@2037cab7a46ae048147115c3c317f8d542a8cee9` 建立 `codex/r2-orrery-rename-decision-contract`，并在作者写入前注册 Git-private `R2-orrery-rename-decision-contract`；primary 为 project-structure，affected 为 release-and-toolchain、documentation-system、test-coverage。普通功能分支未修改根 PROGRESS/HANDOFF。

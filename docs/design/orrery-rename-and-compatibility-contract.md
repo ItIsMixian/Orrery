@@ -1,13 +1,13 @@
 # Orrery Rename and Compatibility Contract
 
-Status: Proposed for approval (Approved Design candidate)
+Status: Approved
 
 Updated: 2026-08-28
 
-Governing proposal: [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md)
+Governing decision: [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md)
 
-Approval gate: this document becomes `Approved` only after ADR-0015 is `Accepted`; until then it is reviewable
-design intent and does not authorize R3 implementation.
+Approval boundary: ADR-0015 is Accepted and this Design is Approved. That releases the decision/design gate for a
+separate R3 Workstream; it does not claim that R3, R4, R5 or local maintenance has been implemented.
 
 ## 1. Identity model
 
@@ -30,10 +30,10 @@ allowlist is current; it never means legacy identifiers or historical strings ar
 | README EN/ZH, active prose | Orrery plus mixed legacy text | migrate allowlist | n/a | n/a | revert text only |
 | Observatory/Broker titles | `Project Orrery · Documentation` etc. | change self-host display; preserve target title token | old flags/config unchanged | none required | old title constant |
 | repository description | current Orrery description | read-only verify; remote change requires maintainer | old repo redirect remains | none | GitHub settings rollback |
-| GitHub URL/badges/install | `ItIsMixian/Orrery` | current links only | old URL 301 is alias | new releases use current repo | restore prior link; no asset rewrite |
+| GitHub URL/badges/install | `ItIsMixian/Orrery` | current links only | old URL 301 is alias | first new Release keeps `project-orrery-*` asset filenames and shows Orrery as brand | restore prior link; no asset rewrite |
 | Skill name/directory | `project-orrery` | unchanged | one canonical Skill plus host-proven thin alias only | optional preferred invocation | remove alias, keep old Skill |
-| plugin/Adapter ID | `project-orrery-*` | display fields only | host capability maps alias to same ID/CLI | optional preferred display | restore metadata |
-| CLI | `project-orrery` + sub-entrypoints | unchanged | opt-in `orrery` launcher after collision check | may become preferred, not sole | uninstall alias; old commands remain |
+| plugin/Adapter ID | `project-orrery-*` | display fields only | no alias by default; host-proven thin alias maps to same ID/CLI | optional preferred display | restore metadata |
+| CLI | `project-orrery` + sub-entrypoints | unchanged | explicit opt-in, collision-checked thin `orrery` launcher to one implementation | may become preferred, not sole | uninstall alias; old commands remain |
 | Python distributions | `project-orrery-*` | unchanged | no `orrery` distribution | remain stable unless later ADR | no migration needed |
 | Python imports | `project_orrery_*` | unchanged | no `import orrery` | remain stable unless later ADR | no migration needed |
 | project manifest | `.project-orrery.json`, `name=project-orrery`, `title=Orrery` | title already target | old path is canonical reader | no default path switch | existing file unchanged |
@@ -45,7 +45,7 @@ allowlist is current; it never means legacy identifiers or historical strings ar
 | Authority Model | version 1 | unchanged | capability metadata only | separate model ADR | current model selection remains |
 | Workstream/receipt IDs | issued values | unchanged | no reissue | no cleanup | append-only history |
 | v0.2.0/frozen evidence | exact tag/assets/checksum/manifest | denylist | old reader test | immutable | hash gate fails closed |
-| local root/Saved Project | current machine paths | unchanged | plan only | separate maintenance window | restore old path/re-add Saved Project |
+| local root/Saved Project | current machine paths | unchanged | independent of public alias rollout | separate maintenance after R3 exact-SHA enters main | restore old path/re-add Saved Project |
 
 ## 3. Alias resolver and mixed versions
 
@@ -57,6 +57,10 @@ The resolver has one implementation and ordered routes:
 4. if two complete implementations, divergent manifests, or different write plans are present, fail closed with a
    human-readable remediation and stable machine error category;
 5. never infer alias support from directory name, display text or repository rename redirect.
+
+The R4 CLI alias is an explicit opt-in, collision-checked thin launcher. It must dispatch to the canonical CLI and
+must not copy the command tree or business implementation. Host integrations default to display-name migration only;
+they add a thin alias only after that host independently proves safe discovery, upgrade and uninstall behavior.
 
 For CLI JSON mode, warnings go to structured `warnings` or stderr according to the existing envelope contract; stdout
 remains parseable and exit codes are identical. Human deprecation notices may begin only in a later 0.3.x release and
@@ -97,15 +101,17 @@ No manifest ID, path, CLI, import, Skill discovery or remote setting changes are
 
 ### R4 — Compatible identifiers and aliases
 
-Introduce versioned alias capability, resolver, collision diagnostics and host-specific thin routes. Each platform must
-prove install/upgrade/uninstall, explicit/implicit invocation, missing/incompatible CLI and single discovery. It is
-valid for a platform to retain only the old ID when the host cannot safely alias.
+Introduce versioned alias capability, resolver, collision diagnostics and the explicit opt-in CLI thin launcher.
+Each platform must prove install/upgrade/uninstall, explicit/implicit invocation, missing/incompatible CLI and single
+discovery before receiving a host alias. Until then it changes display name only and retains the canonical ID.
 
 ### R5 — Optional package/CLI transition
 
-Re-evaluate whether `orrery` becomes a preferred CLI launcher and whether future archive display names change.
-Python distribution/import remain unchanged under ADR-0015. R5 may conclude “no default transition”; that is a valid
-outcome. A new public release requires a separately selected SemVer and immutable candidate manifest.
+Re-evaluate whether the R4 `orrery` launcher becomes preferred/default. The first new public Release continues to use
+stable `project-orrery-*` archive/asset filenames while displaying the Orrery brand; changing later asset display
+filenames requires a separate compatibility review. Python distribution/import remain unchanged under ADR-0015.
+R5 may conclude “no default transition”; that is a valid outcome. A release still requires a separately selected
+SemVer and immutable candidate manifest.
 
 ### Optional cleanup
 
@@ -115,15 +121,16 @@ new ADR and explicit user evidence; silence is insufficient.
 
 ## 7. Local directory, Saved Project and D-drive order
 
-Product rollout is completed and released before filesystem relocation. In a separate maintenance task:
+R3 Brand-only must be complete, pass the exact-SHA gates and enter `main` before filesystem relocation. The local
+maintenance does not wait for R4 or R5. In a separately authorized maintenance Workstream:
 
-1. freeze a clean exact commit; close or preserve branches and Git-private Workstream evidence;
-2. remove/recreate linked worktrees through Git-safe operations rather than moving registered worktree directories;
+1. freeze a clean exact commit; preserve branches and Git-private Workstream evidence;
+2. save and close or recreate linked worktrees through Git-safe operations rather than moving registered worktree directories;
 3. rename the primary local root from `project-orrery` to `Orrery` only after path consumers are inventoried;
 4. re-add/update the Codex Saved Project and recreate required worktrees from preserved branches;
 5. run repository/CLI/Observatory checks and retain a rollback path to the old root;
-6. only then create a separate plan for moving Codex application data to D:, without treating product rename receipts
-   as authorization for application-data migration.
+6. only then create a separate Workstream for moving Codex application data to D:, without treating ADR acceptance,
+   R3 promotion or product-rename receipts as authorization for application-data migration.
 
 ## 8. Promotion and rollback
 
@@ -131,3 +138,6 @@ Every R3/R4/R5 candidate must be pushed to a non-main ref at an exact SHA and ob
 `smoke-test (windows-latest)` plus `smoke-test (ubuntu-latest)` before main promotion. Feature branches do not update
 root PROGRESS/HANDOFF; the unique integrator does. Rollback is phase-local: R3 reverts display text, R4 removes only
 aliases/capabilities it added, R5 returns the preferred/default route while retaining old readers and assets.
+
+R3 may now start only as its own registered Workstream. R4 and R5 remain later independent Workstreams and are not
+implicitly authorized by R3 implementation or promotion.
