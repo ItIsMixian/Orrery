@@ -94,6 +94,18 @@ def validate_workflows(
     for required_name in ("name: smoke-test (windows-latest)", "name: smoke-test (ubuntu-latest)"):
         if promotion.count(required_name) != 1:
             errors.append(f"Promotion workflow must define required name exactly once: {required_name}")
+    preflight = promotion.split("  windows-shards:", 1)[0]
+    dependency_step = "- name: Install preflight discovery dependencies"
+    _require(preflight, dependency_step, errors, "Promotion preflight")
+    _require(
+        preflight,
+        "skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt",
+        errors,
+        "Promotion preflight",
+    )
+    if dependency_step in preflight and "- name: Bind checkout to frozen candidate ref and SHA" in preflight:
+        if preflight.index(dependency_step) > preflight.index("- name: Bind checkout to frozen candidate ref and SHA"):
+            errors.append("Promotion preflight must install discovery dependencies before exact-SHA inventory validation")
     branch_items = [line.strip() for line in promotion_triggers.splitlines() if line.strip().startswith("-")]
     if branch_items != ['- "promotion/**"']:
         errors.append(f"Promotion push branches must be exactly promotion/**: {branch_items}")

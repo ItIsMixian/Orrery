@@ -4,7 +4,7 @@ Updated: 2026-08-28
 
 ## 当前情况
 
-- W7D 唯一整合者精确从 CI2 `8b635b1` 建立非 `main` Candidate，只加法合入 W7C-B `d411fd6`；W7C-A 对应树已被 sibling 字节级吸收而未重复合入。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，schema-2 inventory 为 375 IDs／27 shards／51 Fast／68 Checkpoint。W7B 已实现本机 discovery／plan／确认／apply／recovery／receipt／undo，但 self-host apply、默认 UI 执行入口和公开发布未发生；W7C 图继续只读，中央 Team 没有执行权。唯一一次本地 W7B Promotion 的 4/4 断言成功，但 311.803 秒超出 300 秒预算并保持 FAIL，未放宽或重跑。完整验证、exact SHA 与 hosted checks 以 [W7D Validation](validation/2026-08-28-w7d-w7-integration-candidate.md)为准。
+- W7D 唯一整合者精确从 CI2 `8b635b1` 建立非 `main` Candidate，只加法合入 W7C-B `d411fd6`；W7C-A 对应树已被 sibling 字节级吸收而未重复合入。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9。首个 hosted run `33192497123` 在矩阵前暴露 preflight 缺 docsite discovery requirements；workflow/validator/回归修复后 schema-2 inventory 为 376 IDs／27 shards／51 Fast／69 Checkpoint。W7B 已实现本机 discovery／plan／确认／apply／recovery／receipt／undo，但 self-host apply、默认 UI 执行入口和公开发布未发生；W7C 图继续只读，中央 Team 没有执行权。唯一一次本地 W7B Promotion 的 4/4 断言成功，但 311.803 秒超出 300 秒预算并保持 FAIL，未放宽或重跑。完整验证、exact SHA 与 hosted checks 以 [W7D Validation](validation/2026-08-28-w7d-w7-integration-candidate.md)为准。
 - 根文档系统已依据 ADR-0001 完成自托管集成；`.project-orrery.json` 应保持 `authority_status: integrated`。
 - Project Orrery v0.2.0 已公开发布：`main`、tag、Release、zip、checksum 和远端 manifest 均已核验。
 - 2026-08-21 的本地 Canonical 集成已在 `main@42aebae` 同步至公开 `origin/main`；本地动态 231 项与远端 GitHub Actions `32492830151` 的 Windows／Ubuntu 矩阵通过。该同步没有创建 tag、Release 或新的公开支持声明。

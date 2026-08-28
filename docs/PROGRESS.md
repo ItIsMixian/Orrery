@@ -11,7 +11,7 @@ Project Orrery v0.2.0 是当前公开版本；`origin/main` 已在其后集成�
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、完整内部 CLI claims、root-only opt-in Observatory projection 与本地 release-candidate gate 已进入 Canonical source baseline；默认 production consumer 和公开 release 未切换 | 审阅 managed consumer 的 production switch 与回滚证据，再由维护者选择真实 SemVer／candidate manifest |
-| 多 Workstream 协作 | W7D 非 `main` Integration Candidate 已组合 W7A succession contract、W7B 本机事务执行、CI2 分级测试与 W7C-B 只读关系图；Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，inventory 375 IDs／27 shards／51 Fast／68 Checkpoint | 完成非 `main` exact-SHA Windows／Ubuntu 双 PASS 后等待维护者授权 main fast-forward；self-host apply、默认 UI 执行入口与公开发布继续后置 |
+| 多 Workstream 协作 | W7D 非 `main` Integration Candidate 已组合 W7A succession contract、W7B 本机事务执行、CI2 分级测试与 W7C-B 只读关系图；Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，修复 hosted preflight discovery 依赖后 inventory 为 376 IDs／27 shards／51 Fast／69 Checkpoint | 对修复后的非 `main` exact SHA 重跑 Windows／Ubuntu；双 PASS 后等待维护者授权 main fast-forward，self-host apply、默认 UI 执行入口与公开发布继续后置 |
 | Context routing 研究 | C1 Oracle v0.2 无模型静态 controls 已通过；只有 Pilot 010 设计申请 readiness，没有运行授权或 treatment 采纳 | 由维护者决定是否注册 C2 设计任务；不得自动创建／运行 Pilot 010 |
 | 平台与 Adapter | Claude／DeepSeek Adapter 0.1.0 均已实现但未发布；Claude 被认证阻断，DeepSeek 只有 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／指定模型和生命周期范围为 `verified` | Claude 只在另行授权且认证可用时继续；DeepSeek 后续工作转向独立发行与更多 runtime matrix，不外推当前证据 |
 | 文档治理 | D1 已冻结内部只读 finding schema、11 条规则与 11 组正负 fixture；所有 finding 非权威且默认 advisory | 另行设计 D2 scanner／CLI；不自动修复、压缩 HANDOFF 或启用硬门 |

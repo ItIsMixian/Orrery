@@ -247,6 +247,23 @@ class CIValidationTests(unittest.TestCase):
             errors = validate_workflows(fast, promotion)
             self.assertTrue(any("workflow_dispatch" in error for error in errors))
 
+    def test_promotion_preflight_installs_discovery_dependencies_before_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            fast = directory / "fast.yml"
+            promotion = directory / "promotion.yml"
+            shutil.copy2(ROOT / ".github/workflows/fast-validation.yml", fast)
+            text = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+            step = (
+                "      - name: Install preflight discovery dependencies\n"
+                "        run: python -m pip install \"wheel>=0.41,<1\" -r "
+                "skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt\n"
+            )
+            self.assertIn(step, text)
+            promotion.write_text(text.replace(step, "", 1), encoding="utf-8")
+            errors = validate_workflows(fast, promotion)
+            self.assertTrue(any("preflight" in error.lower() and "dependencies" in error for error in errors))
+
     def test_exact_sha_binding_rejects_main_sha_alias_and_mismatch(self) -> None:
         head = git_sha()
         self.assertEqual(validate_binding("codex/frozen-candidate", head), [])

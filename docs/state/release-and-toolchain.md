@@ -54,7 +54,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - W7A 不修改 Observatory managed tools、Skill template、installer、release manifest、tag 或 Release。Git-common-private relation 文件不属于 package input。
 - W7B 不修改 Observatory managed tools、Skill template、installer、release manifest、tag 或 Release。transaction/confirmation/receipt 与 relation event 均位于 Git common private state，不进入作者/发布 inventory；没有 push、main merge、branch protection、tag、Release 或网络调用。
 - W7C-B 只将未发布 Observatory 0.1.8 提升到 0.1.9，增加 root-only／default-off relation graph builder、Core-only projection 与 Team sibling 可选注入。该脚本没有加入 `component.json` managed tools，默认 `build_docsite.py`／`serve.py`、wheel assets、Skill template、installer、release manifest、tag、Release 和公开 v0.2.0 均未改变。
-- W7D Integration Candidate 保留 CI manifest schema 2、Fast 15 秒／Checkpoint 90 秒 hard budget 与独立 `team-relations-execution` 300 秒 Promotion shard，并把 W7C-B 两个 dependency-light contract 加入 Fast/Checkpoint、完整 prototype/production module 加入既有 Team Observatory Promotion shard。机械 inventory 为 375 unique IDs／27 shards／51 Fast／68 Checkpoint；required-check 名称、Candidate-first exact-SHA 绑定、branch protection、tag、Release 与公开 v0.2.0 均未改变。
+- W7D Integration Candidate 保留 CI manifest schema 2、Fast 15 秒／Checkpoint 90 秒 hard budget 与独立 `team-relations-execution` 300 秒 Promotion shard，并把 W7C-B 两个 dependency-light contract 加入 Fast/Checkpoint、完整 prototype/production module 加入既有 Team Observatory Promotion shard。首个 hosted run 暴露 preflight 在 final unittest discovery 前未安装 docsite requirements；修复后 workflow、validator 与回归共同要求先安装依赖再绑定/清点。最终机械 inventory 为 376 unique IDs／27 shards／51 Fast／69 Checkpoint；required-check 名称、Candidate-first exact-SHA 绑定、branch protection、tag、Release 与公开 v0.2.0 均未改变。
 
 ## 实现证据
 
