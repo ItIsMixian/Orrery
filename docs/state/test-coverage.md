@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-27
+Updated: 2026-08-28
 
 ## 当前事实
 
@@ -54,6 +54,8 @@ Updated: 2026-08-27
 - W5D Worktree Candidate 新增 `tests/test_lan_collaboration_harness.py`、`tests/test_collaboration_lineage.py` 和一键 acceptance runner。双 clone Harness 的 7 阶段覆盖隔离身份／credential/runtime、最小 discovery 泄漏门、spoof／replay／cross-project／expiry、Host-local join、disconnect／TTL／reconnect、monotonic revision、manual Host switch、request-only 与 revoke；脱敏 manifest 明确 `external_network=false`、`real_credentials=false`、`real_lan_validated=false`。lineage synthetic 的 legacy fixture 为 Direct 4／Authority 3，显式 W5C→W6→W5D 后为 0／0；child delta、parent post-fork、sibling L3、非法／非祖先 base、drift Unknown、ack 与 Review Ready 门均有回归。
 - CI1 dependency-free 回归为 8/8 PASS；完整 inventory 342 unique IDs／26 shards／0 missing／0 duplicate／0 dead selector。最终 Fast 本机 Windows 40/40，runner 3.897s／端到端 4.639s；最终最慢选择性检查 `workspace-remove` 1/1，runner 148.990s／端到端 149.805s。hosted Windows ≤90s／完整 Promotion ≤4m 仍是待中央验证的目标，不是本机已达成事实。
 - W5E Team／component adjacent checkpoint 18/18 PASS（217.750s），覆盖 root-only server、Host／Origin／cookie／body／secret、Personal zero-network、Team enable/start/stop/disable、sharing／heartbeat、request receipt、revision／TTL 和 Observatory 0.1.8 投影。CI contract、342-ID／26-shard inventory、repository gate（335 Markdown／919 links）、integrated structure、1,781,677-byte 隔离站、compile 与 diff 均通过。真实 in-app Chromium 在 1280px 与 390×844 验证状态上移、常驻连接／在线／退出控制、齿轮弹窗、连接和 heartbeat 状态切换、无旧摘要／pill 以及零横向溢出；测试后恢复 Personal Mode。
+- W7A 新增 `tests/test_workstream_relations.py` 12 项与脱敏 W5C→W6→W5D→CI1→W5E＋late CI fixture，覆盖三种关系、五态 lifecycle、single Git parent、多 predecessor、cycle/self/duplicate、exact OID/ancestor、post-fork parent、sibling、stale HEAD/Scope、Unknown/L3、active tips、append-only/no-author-write/no-network、worktree 删除后存续、deterministic CLI JSON、legacy read-only projection 和 W7B apply/undo no-delete contract。Focused 12/12 PASS；CI1 inventory 更新为 354 unique IDs／26 shards／45 Fast，0 missing／duplicate／dead selector。
+- W7A 邻接中 W1/W2 全量 27 项首轮为 25 PASS＋2 个旧组件版本期望失败；同步 Core/CLI 0.1.12/0.1.16 后原失败定向 2/2 PASS。W3 CLI 版本邻接 PASS，Authority migration/restore 正确类名定向 2/2 PASS，CI1 8/8＋component 1/1 PASS。W5D lineage 2/2 与 LAN contract 2/2 PASS；双 clone runner 两次并发 loopback 请求超时后独占重跑 1/1 PASS，失败与重跑均保留在 W7A Validation。
 - Windows focused/checkpoint 已通过：W1/W2 27 项中 26 PASS＋1 个新增 schema 期望失败，期望同步后定向 PASS；lineage＋Personal 17/17、LAN／Team／UI／W3 gate 22/22 PASS。真实 in-app Chromium 在 1280px 与 390×844 显示 explicit chain、task-base OID、inherited path 与 chain 内 unique finding；两端均无横向溢出。当前主机没有可用 WSL distro，Docker Linux engine 未运行，因此本分支没有本地 Ubuntu 动态 PASS；`.github/workflows/validate.yml` 的 `unittest discover` 会在 Windows／Ubuntu exact SHA 上发现新增测试，Promotion 证据仍待中央执行。
 - 本机 cleanup 验证对 36 个移除目标逐项检查 registered path、允许根、tracked/untracked、ignored allowlist 与进程引用；第一批 31 个目标只含 1,377 个 `__pycache__` 和 5 个 `docs/_site`，约 117.1 MB。三个 stale session 在删除前复制到 Git-private archive 并逐项通过 SHA-256 一致性；最后两个 recovery/final candidate worktree 由保留 branch 精确重建。最终 2 worktrees、0 reconciliation、0 hygiene；branch／commit 未删除。
 - Phase 3 Windows 候选专项与产品回归为 20 passed + 2 expected skips；默认全仓为 68 项中 66 通过、2 项动态依赖按设计跳过，设置 `ORRERY_TEST_BUILD=1` 后完整 68/68 通过。CI run 28 的 Windows 通过、Ubuntu 因测试夹具错误失败；`c30acab` 改用平台原生命令名后，同一专项在 Windows 与 Ubuntu WSL 通过。run 29 保留 Ubuntu 成功与无关 Windows 本机 HTTP 超时的历史；run 30 在同一 `4a006fe` 提交取得 Windows／Ubuntu 双 PASS，Phase 3 跨平台门通过。
@@ -170,6 +172,7 @@ Updated: 2026-08-27
 - [2026-08-27 W6 Workspace Maintenance Phase 0–2](../validation/2026-08-27-workspace-maintenance-phase-0-2.md)
 - [2026-08-27 W5D LAN collaboration Harness and stacked lineage](../validation/2026-08-27-w5d-lan-collaboration-harness.md)
 - [2026-08-27 W5E Team Observatory UI closeout](../validation/2026-08-27-w5e-team-observatory-ui-closeout.md)
+- [2026-08-28 W7A Dynamic Workstream Succession Contract](../validation/2026-08-28-dynamic-workstream-succession-contract.md)
 - `python -m unittest discover -s tests -v`
 - `python skills/project-orrery/scripts/validate_installation.py --target . --require-integrated`
 - `python -X utf8 scripts/docsite/build_docsite.py`
@@ -183,5 +186,6 @@ Updated: 2026-08-27
 - Codex Adapter 只有 Windows 11 build 26200、Codex Desktop 26.818.2441.0／`codex-cli 0.148.0-alpha.21`、Adapter／Core／CLI 0.1.0 与已记录模型／审批组合的 runtime compatibility 为 `verified`；Adapter 发行仍为 `experimental`，其他 OS、runtime、模型和权限模式也没有外推证据。
 - Harness JSON 已有 Windows 本地、Ubuntu WSL 与同一提交的 Windows／Ubuntu CI 证据，Phase 3 跨平台验收完成。该 Adapter 证明 CLI subprocess 合约，不证明模型读取或任何第三方 Agent 平台兼容；发行状态仍为 `experimental`／`unreleased`。
 - ADR-0007／ADR-0008 的当前 W5D Worktree Candidate 覆盖 W1–W3 Personal contract、W4 health、Team Core／CLI／root-only UI、W6 maintenance、显式 discovery/join/manual Host switch 与 stacked lineage。仍无 Phase 3 自动删除、Phase 4 scheduler、真实双机 LAN、自动选主或云 relay 证据；本分支只有 Windows 本机 focused/checkpoint/browser 和受控 transport 证据，Ubuntu／Promotion 仍要求中央 exact-SHA 双平台门。
+- ADR-0014/W7A 当前只有 Windows 本机 Fast/Checkpoint 与隔离 Git fixture 证据；没有 W7B 真实 migration/apply/undo、W7C browser/UI、Ubuntu exact-SHA 或 Promotion 结果。双 clone runner 在并发负载下的两次本机 loopback timeout 说明该邻接面仍有既有波动，独占 PASS 不外推为 transport 稳定性修复。
 - ADR-0009/0010/0011 的 fixture、experimental Core evaluator、M2.1 完整内部 CLI claims、M2.2 root-only opt-in projection、AI derived-view guard、receipt-gated 迁移／恢复与 M2.3 本地 candidate gate 已进入本地 Canonical baseline；仍没有默认 Observatory production projection、维护者选择的实际下一 release manifest、production-switch、稳定公共 API 或公开 release 证据。
 - Claude Code 仍被认证阻断。DeepSeek Harness 已证明真实显式／隐式模型调用、模型侧 CLI 失败关闭和修复后的普通 wheel 路由；只有 manifest 中的精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1／模型与生命周期范围进入 `verified`，其余范围不外推。

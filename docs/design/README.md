@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Dynamic Workstream Succession Contract](dynamic-workstream-succession-contract.md) — provider-neutral relation events, exact Git evidence, append-only common-private storage, active-tip conflict-pair policy and W7B/W7C consumer boundaries governed by ADR-0014.
 - [Self-hosting documentation system](self-hosting-documentation-system.md) — the reader paths, storage boundaries, and synchronization rules governed by ADR-0001.
 - [Real-development context-routing benchmark](real-development-context-routing-benchmark.md) — isolated application-development task mix, Oracle hierarchy, fixture boundaries, and passive pre-write Scope Acquisition measurement governed by ADR-0002 and ADR-0005.
 - [Docsite credential isolation and local broker](docsite-credential-isolation-and-broker.md) — provider binding, fail-closed activation, local HTTP hardening, and the optional deterministic broker governed by ADR-0003.

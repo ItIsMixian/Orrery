@@ -15,6 +15,7 @@ from . import (
     update,
     validate,
     worktree,
+    workstream_relations,
 )
 
 
@@ -24,7 +25,7 @@ def main(argv: list[str] | None = None) -> int:
         print(
             "usage: project-orrery "
             "{scaffold|validate|check-update|migrate-authority-model|"
-            "restore-authority-model|collaboration-contract|worktree|integrate|review|team|maintenance} [options]"
+            "restore-authority-model|collaboration-contract|worktree|relations|integrate|review|team|maintenance} [options]"
         )
         return 0
     command = arguments.pop(0)
@@ -36,6 +37,7 @@ def main(argv: list[str] | None = None) -> int:
         "restore-authority-model": authority_restore.main,
         "collaboration-contract": collaboration_contract.main,
         "worktree": worktree.main,
+        "relations": workstream_relations.main,
         "integrate": integration.main,
         "review": review.main,
         "team": team.main,

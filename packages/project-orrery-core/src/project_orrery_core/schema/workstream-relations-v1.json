@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.invalid/schema/workstream-relations-v1.json",
+  "title": "Project Orrery Workstream Relations v1",
+  "oneOf": [
+    {"$ref": "#/$defs/relation_record"},
+    {"$ref": "#/$defs/relation_graph"},
+    {"$ref": "#/$defs/succession_plan"},
+    {"$ref": "#/$defs/discovery_plan"},
+    {"$ref": "#/$defs/apply_plan"},
+    {"$ref": "#/$defs/undo_plan"},
+    {"$ref": "#/$defs/legacy_projection"}
+  ],
+  "$defs": {
+    "relation_type": {"enum": ["derived_from", "depends_on", "absorbs"]},
+    "relation_lifecycle": {"enum": ["proposed", "active", "completed", "cancelled", "stale"]},
+    "evidence_state": {"enum": ["confirmed", "unknown", "stale", "rejected", "not-applicable"]},
+    "head_state": {"enum": ["current", "stale", "unknown"]},
+    "node_state": {"enum": ["active", "review-pending", "completed", "cancelled", "stale", "unknown"]},
+    "safe_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "workstream_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "oid": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "source_link": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "ref"],
+      "properties": {
+        "kind": {"enum": ["git-commit", "workstream-session", "scope", "validation", "relation", "other"]},
+        "ref": {"type": "string", "minLength": 1, "maxLength": 512}
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "status", "source_head_oid", "target_head_oid", "task_base_oid", "source_head_status",
+        "target_head_status", "scope_status", "ancestry_status", "dependency_status",
+        "ownership_transfer_oid", "ownership_transfer_status", "target_unique_commits_after_base"
+      ],
+      "properties": {
+        "status": {"$ref": "#/$defs/evidence_state"},
+        "source_head_oid": {"$ref": "#/$defs/oid"},
+        "target_head_oid": {"$ref": "#/$defs/oid"},
+        "task_base_oid": {"$ref": "#/$defs/oid"},
+        "source_head_status": {"$ref": "#/$defs/head_state"},
+        "target_head_status": {"$ref": "#/$defs/head_state"},
+        "scope_status": {"$ref": "#/$defs/head_state"},
+        "ancestry_status": {"$ref": "#/$defs/evidence_state"},
+        "dependency_status": {"$ref": "#/$defs/evidence_state"},
+        "ownership_transfer_oid": {"$ref": "#/$defs/oid"},
+        "ownership_transfer_status": {"$ref": "#/$defs/evidence_state"},
+        "target_unique_commits_after_base": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "actor": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "actor_id"],
+      "properties": {
+        "kind": {"enum": ["human", "tool", "import"]},
+        "actor_id": {"type": ["string", "null"], "maxLength": 256}
+      }
+    },
+    "relation_record_fields": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "event_id", "relation_id", "revision", "relation_type",
+        "source_workstream_id", "target_workstream_id", "lifecycle", "recorded_at", "actor", "origin",
+        "reason", "evidence", "source_links", "writes_performed"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-record"},
+        "event_id": {"$ref": "#/$defs/safe_id"},
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "revision": {"type": "integer", "minimum": 1},
+        "relation_type": {"$ref": "#/$defs/relation_type"},
+        "source_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "target_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "lifecycle": {"$ref": "#/$defs/relation_lifecycle"},
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "origin": {"enum": ["native", "legacy-session-projection", "discovery"]},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "source_links": {"type": "array", "items": {"$ref": "#/$defs/source_link"}, "maxItems": 64},
+        "writes_performed": {"type": "boolean"}
+      }
+    },
+    "relation_record": {
+      "allOf": [{"$ref": "#/$defs/relation_record_fields"}],
+      "unevaluatedProperties": false
+    },
+    "node": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workstream_id", "status", "evidence_status", "head_oid", "scope_status", "source_links", "origin"],
+      "properties": {
+        "workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "status": {"$ref": "#/$defs/node_state"},
+        "evidence_status": {"$ref": "#/$defs/head_state"},
+        "head_oid": {"$ref": "#/$defs/oid"},
+        "scope_status": {"$ref": "#/$defs/head_state"},
+        "source_links": {"type": "array", "items": {"$ref": "#/$defs/source_link"}, "maxItems": 64},
+        "origin": {"enum": ["native", "legacy-session-projection", "relation-only", "discovery"]}
+      }
+    },
+    "edge": {
+      "allOf": [
+        {"$ref": "#/$defs/relation_record_fields"},
+        {
+          "type": "object", "required": ["effective_active_succession", "evidence_reason_codes"],
+          "properties": {
+            "effective_active_succession": {"type": "boolean"},
+            "evidence_reason_codes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "pair_constraint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["left_workstream_id", "right_workstream_id", "reasons"],
+      "properties": {
+        "left_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "right_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "reasons": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "diagnostic": {
+      "type": "object", "required": ["code"],
+      "properties": {"code": {"type": "string", "minLength": 1}}
+    },
+    "relation_graph": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "contract_type", "nodes", "edges", "pair_constraints",
+        "active_tip_workstream_ids", "unknown_workstream_ids", "validation", "read_only",
+        "writes_performed", "graph_hash"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-graph"},
+        "nodes": {"type": "array", "items": {"$ref": "#/$defs/node"}},
+        "edges": {"type": "array", "items": {"$ref": "#/$defs/edge"}},
+        "pair_constraints": {"type": "array", "items": {"$ref": "#/$defs/pair_constraint"}},
+        "active_tip_workstream_ids": {"type": "array", "items": {"$ref": "#/$defs/workstream_id"}, "uniqueItems": true},
+        "unknown_workstream_ids": {"type": "array", "items": {"$ref": "#/$defs/workstream_id"}, "uniqueItems": true},
+        "validation": {
+          "type": "object", "additionalProperties": false, "required": ["valid", "errors", "warnings"],
+          "properties": {
+            "valid": {"type": "boolean"},
+            "errors": {"type": "array", "items": {"$ref": "#/$defs/diagnostic"}},
+            "warnings": {"type": "array", "items": {"$ref": "#/$defs/diagnostic"}}
+          }
+        },
+        "read_only": {"const": true},
+        "writes_performed": {"const": false},
+        "graph_hash": {"$ref": "#/$defs/hash"},
+        "storage": {"const": "git-common-private-append-only"},
+        "storage_ref": {"const": "git-common:orrery/workstream-relations"},
+        "legacy_projection_included": {"type": "boolean"}
+      }
+    },
+    "pair_decision": {
+      "type": "object", "additionalProperties": false,
+      "required": ["left_workstream_id", "right_workstream_id", "reason_codes"],
+      "properties": {
+        "left_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "right_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "reason_codes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "blocking_dependency": {
+      "type": "object", "additionalProperties": false,
+      "required": ["relation_id", "source_workstream_id", "target_workstream_id", "evidence_status"],
+      "properties": {
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "source_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "target_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "evidence_status": {"$ref": "#/$defs/evidence_state"}
+      }
+    },
+    "succession_plan": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "contract_type", "graph_hash", "active_tip_workstream_ids", "compare_pairs",
+        "suppress_direct_pairs", "blocking_dependencies", "unknown_workstream_ids", "pair_policy",
+        "read_only", "writes_performed", "destructive_actions"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-succession-plan"},
+        "graph_hash": {"$ref": "#/$defs/hash"},
+        "active_tip_workstream_ids": {"type": "array", "items": {"$ref": "#/$defs/workstream_id"}, "uniqueItems": true},
+        "compare_pairs": {"type": "array", "items": {"$ref": "#/$defs/pair_decision"}},
+        "suppress_direct_pairs": {"type": "array", "items": {"$ref": "#/$defs/pair_decision"}},
+        "blocking_dependencies": {"type": "array", "items": {"$ref": "#/$defs/blocking_dependency"}},
+        "unknown_workstream_ids": {"type": "array", "items": {"$ref": "#/$defs/workstream_id"}, "uniqueItems": true},
+        "pair_policy": {"const": "active-tips-v1"},
+        "read_only": {"const": true},
+        "writes_performed": {"const": false},
+        "destructive_actions": {"type": "array", "maxItems": 0}
+      }
+    },
+    "rejected_hint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_workstream_id", "target_workstream_id", "status", "reason_code"],
+      "properties": {
+        "source_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "target_workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "status": {"const": "unknown"},
+        "reason_code": {"const": "branch-or-path-similarity-insufficient-evidence"}
+      }
+    },
+    "discovery_plan": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "contract_type", "graph_hash", "candidates", "rejected_hints",
+        "similarity_inference_permitted", "confirmation_required", "confirmation_scope", "silence_policy",
+        "writes_performed", "destructive_actions", "plan_id"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-discovery-plan"},
+        "graph_hash": {"$ref": "#/$defs/hash"},
+        "candidates": {"type": "array", "items": {"$ref": "#/$defs/relation_record"}},
+        "rejected_hints": {"type": "array", "items": {"$ref": "#/$defs/rejected_hint"}},
+        "similarity_inference_permitted": {"const": false},
+        "confirmation_required": {"const": true},
+        "confirmation_scope": {"const": "one-local-confirmation-per-exact-plan"},
+        "silence_policy": {"const": "no-permanent-suppression"},
+        "writes_performed": {"const": false},
+        "destructive_actions": {"type": "array", "maxItems": 0},
+        "plan_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "preservation_contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["worktrees", "branches", "commits", "validations", "author_documents", "relation_history"],
+      "properties": {
+        "worktrees": {"const": true}, "branches": {"const": true}, "commits": {"const": true},
+        "validations": {"const": true}, "author_documents": {"const": true}, "relation_history": {"const": true}
+      }
+    },
+    "output_contract": {
+      "type": "object", "additionalProperties": false, "required": ["contract_type", "required_fields"],
+      "properties": {
+        "contract_type": {"enum": ["workstream-relation-apply-receipt", "workstream-relation-undo-receipt"]},
+        "required_fields": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "apply_operation": {
+      "type": "object", "additionalProperties": false, "required": ["action", "relation_id", "event_hash"],
+      "properties": {
+        "action": {"const": "append-relation-event"},
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "event_hash": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "apply_plan": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "contract_type", "discovery_plan_id", "graph_hash", "operations",
+        "confirmation_required", "confirmation_scope", "output_contract", "preservation_contract",
+        "writes_performed", "execution_supported", "destructive_actions", "plan_id"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-apply-plan"},
+        "discovery_plan_id": {"$ref": "#/$defs/safe_id"},
+        "graph_hash": {"$ref": "#/$defs/hash"},
+        "operations": {"type": "array", "items": {"$ref": "#/$defs/apply_operation"}},
+        "confirmation_required": {"const": true},
+        "confirmation_scope": {"const": "one-local-confirmation-per-exact-plan"},
+        "output_contract": {"$ref": "#/$defs/output_contract"},
+        "preservation_contract": {"$ref": "#/$defs/preservation_contract"},
+        "writes_performed": {"const": false},
+        "execution_supported": {"const": false},
+        "destructive_actions": {"type": "array", "maxItems": 0},
+        "plan_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "undo_operation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "relation_id", "target_lifecycle"],
+      "properties": {
+        "action": {"const": "append-compensating-event"},
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "target_lifecycle": {"enum": ["cancelled", "stale"]}
+      }
+    },
+    "undo_plan": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "contract_type", "apply_receipt_id", "operations", "confirmation_required",
+        "confirmation_scope", "output_contract", "preservation_contract", "writes_performed",
+        "execution_supported", "deletes_history", "destructive_actions", "plan_id"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-undo-plan"},
+        "apply_receipt_id": {"$ref": "#/$defs/workstream_id"},
+        "operations": {"type": "array", "items": {"$ref": "#/$defs/undo_operation"}},
+        "confirmation_required": {"const": true},
+        "confirmation_scope": {"const": "one-local-confirmation-per-exact-plan"},
+        "output_contract": {"$ref": "#/$defs/output_contract"},
+        "preservation_contract": {"$ref": "#/$defs/preservation_contract"},
+        "writes_performed": {"const": false},
+        "execution_supported": {"const": false},
+        "deletes_history": {"const": false},
+        "destructive_actions": {"type": "array", "maxItems": 0},
+        "plan_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "legacy_projection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "contract_type", "records", "nodes", "writes_performed", "storage_writes_performed"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-legacy-relation-projection"},
+        "records": {"type": "array", "items": {"$ref": "#/$defs/relation_record"}},
+        "nodes": {"type": "array", "items": {"$ref": "#/$defs/node"}},
+        "writes_performed": {"const": false},
+        "storage_writes_performed": {"const": false}
+      }
+    }
+  }
+}

@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0014: Dynamic Workstream Succession Contract](0014-dynamic-workstream-succession-contract.md) — Accepted; adds incremental `derived_from`／`depends_on`／`absorbs` relations, append-only Git-common-private evidence, reversible lifecycle and conservative active-tip conflict semantics without creating a scheduler or deletion authority.
 - [ADR-0001: Project Orrery self-hosting](0001-project-orrery-self-hosting.md) — Accepted; establishes this repository's own documentation authority chain.
 - [ADR-0002: Real-development benchmark portfolio](0002-real-development-benchmark-portfolio.md) — Accepted; requires future context-routing adoption studies to include isolated application-development tasks, not only documentation maintenance.
 - [ADR-0003: Provider-bound credentials and optional local broker](0003-provider-bound-credentials-and-optional-local-broker.md) — Accepted; fails closed on endpoint drift and separates standard keyring storage from optional process-isolated Provider keys.

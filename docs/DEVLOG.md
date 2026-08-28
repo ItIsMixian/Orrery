@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-28 — W7A Dynamic Workstream Succession Contract
+
+- 从 `W5E-team-observatory-ui-closeout@692d19b` 注册独立 Git-private W7A session，并以 ADR-0014／Approved Design／Candidate Plan 正式接受增量关系方向。
+- 新增 provider-neutral `derived_from`／`depends_on`／`absorbs` event、五态 lifecycle、graph／active-tip／discovery／apply／undo／legacy projection contract，以及 `$GIT_COMMON_DIR/orrery/workstream-relations/` append-only 边界。
+- Core 0.1.12 与 CLI 0.1.16 提供 dependency-free exact OID/ancestor、cycle/multi-parent、post-fork/sibling/Unknown/L2-L3 保守判定和 `relations graph|succession-plan|propose`；Observatory 与公开 v0.2.0 未改变。
+- 脱敏 W5C→W6→W5D→CI1→W5E＋late CI fixture 与 12 项 focused 测试全部通过；CI1 为 354 IDs／26 shards／45 Fast。邻接版本断言已同步；W5D 双 clone runner 两次并发 loopback timeout 后独占 PASS，未修改其 transport。
+- W7B 保留真实自动发现、一次本机确认批量 apply、transition/undo 和 legacy migration；W7C 保留三类图形派生与可访问列表。W7A 未 push、未合 main、未改 branch protection、未 tag 或 Release。
+
 ## 2026-08-17 — v0.2 发布候选与上下文路由研究启动
 
 - 建立版本化发布、兼容性清单、更新检查、图形化 AI 设置和中英文公开 README。

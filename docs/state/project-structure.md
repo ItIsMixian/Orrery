@@ -1,7 +1,7 @@
 # 项目结构 State
 
-Updated: 2026-08-27
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md)
+Updated: 2026-08-28
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md)
 
 ## 当前事实
 
@@ -21,6 +21,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 当前 W6 Worktree Candidate 从 W5C `6dd508f` 吸收 `main@673e252` 后，把未发布 Core／CLI／Observatory 推进到 0.1.10／0.1.14／0.1.6：W1–W3 提供 Personal Scope/review/cleanup，W4 health 将交付、对账与工作区卫生分层，W5A–W5C 提供 Team foundation 与 root-only UI，W6 Phase 0–2 增加本机 workspace maintenance。Core API 仍为 1；这些只属于 `codex/w6-workspace-maintenance` Candidate／Worktree scope，公开 v0.2.0 不变。
 - 当前 W5D Worktree Candidate 从 `codex/w6-workspace-maintenance@db78a7f` 建立，把未发布 Core／CLI／Observatory 推进到 0.1.11／0.1.15／0.1.7。它新增显式启动／停止的最小 LAN discovery、Host-confirmed join、单 active Coordinator generation／手工 Host switch、双 clone acceptance Harness，并修正 stacked Workstream lineage；这些仍只属于 `codex/w5d-lan-collaboration-harness` Candidate，不构成真实双机 LAN、Canonical 或 Release 事实。
 - 当前 W5E Worktree Candidate 从 `CI1-tiered-parallel-validation@67a2fe9` 建立并吸收组合式接口／Brownfield Migration 文档提交，把 Observatory 推进到 0.1.8；Core 0.1.11、CLI 0.1.15 与 Core API 1 不变。它只收口 Team 信息架构和本机设置弹窗，不改变 LAN、Team authority、CI、公开模板或 Release 行为。
+- 当前 W7A Worktree Candidate 从 `W5E-team-observatory-ui-closeout@692d19b` 建立，把未发布 Core／CLI 推进到 0.1.12／0.1.16，Observatory 维持 0.1.8、Core API 维持 1。它新增 versioned `derived_from`／`depends_on`／`absorbs` record／graph／plan、exact Git evidence、deterministic active-tip 与只读 legacy lineage projection；该事实只属于当前 Candidate。
 - 本机 worktree 已于 2026-08-27 经维护者授权从 38 个清理为 2 个，只保留 primary 与当前 W5C。31 个 clean legacy worktree 直接移除；3 个 stale-session worktree 先把 Git-private `orrery/` 元数据按 SHA-256 归档再移除；最后移除可由保留 branch 重建的 recovery 与 final W4/W5 candidate worktree。所有 branch／commit 保留；该人工操作不是自动 cleanup 产品能力。
 - `adapters/claude-code/` 与 `adapters/deepseek-harness/` 当前源码版本为 0.1.1、`experimental`／未发布的薄平台 Adapter；两者均只依赖平台中立 CLI，不拥有项目作者文档。现有真实 runtime evidence 仍精确绑定 Adapter 0.1.0：Claude Code 只证明 Plugin／Skill 发现后在认证前失败关闭；DeepSeek Harness 只有 manifest 所列 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围为 `verified`。
 
@@ -57,6 +58,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - Team sibling page 只消费 Core `team-read-only-projection` 和 Git-private Team config，显示 mode／Host／Member／sharing／heartbeat／last-seen、Member → Workstream、presence、request inbox 与本机 receipt。页面不复制 revision／TTL／permission／review 规则，不提供任意命令／路径／URL／shell 参数；中央 request 与 accept／reject 始终 `execution_performed=false`，不会把 Agent 自报或最后快照升级为 Review Ready／Integrated／实时在线。
 - W5C 只改写上述页面的层次和语言：当前人话结论与建议操作置顶，成员／任务与 pending request 居中，已处理 request 折叠，Host／Coordinator／heartbeat／revision／测试入口下沉诊断。检测到其他本机 runtime registration 时禁用重复 start 并解释恢复路径；没有获得该 runtime 的 server object、PID 控制或越权停机能力。
 - W5E 在 W5C 之上删除重复的共享边界 pill 与“现在的情况”摘要，把连接／成员／待处理／待同步四项状态上移；Team Mode、团队连接、在线状态与退出始终位于非折叠控制层。Host、内部 ID、last-seen、revision、测试／维护请求与隐私说明只通过齿轮弹窗按需展开；页面仍复用原固定 POST 和 Core projection，不增加权限或执行面。
+- W7A 的 native relation event 位于 `$GIT_COMMON_DIR/orrery/workstream-relations/<relation-id>/`，以连续 revision 的独立 JSON 文件 append-only 保存；只读加载在目录不存在时零写入，worktree 删除后记录仍存续。关系 lifecycle 不删除 session、worktree、branch、commit、Validation 或作者文档；W6 maintenance 继续独占删除授权。
+- W7A active-tip 只消费 active `derived_from`／`absorbs` 的当前精确 evidence；Git `task_base_oid` 与 ownership `ownership_transfer_oid` 分字段验证。parent post-fork 独有提交、sibling、`depends_on`、stale／Unknown、pair L2/L3／exclusive constraint 继续进入 compare pairs；branch 名或路径相似度只产生 rejected Unknown hint。
 - W6 Phase 0–2 复用 W3 bounded inventory／cleanup eligibility，新增严格 versioned maintenance policy、scan／queue／authorization／receipt、Git-private `orrery/maintenance/`、integration／closed event scan、24h Observatory catch-up、single-flight／debounce／hard timeout／interrupted 记录与 evidence-bound 建议队列。唯一执行面是本机人类确认后、只接受 authorization ID 的固定 `git worktree remove -- <registered-path>`；执行前重新验证 exact workspace/path/HEAD/branch/integration/closure/review/Validation/dirty/ignored evidence，执行后验证目录、registry、branch、commit 与 receipt。branch 与 remote branch 不删除，Team 中央只发送 `cleanup` request；默认 Personal 保持 zero-network、无后台进程、无 OS scheduler、无自动删除。
 
 ## 实现证据
@@ -104,6 +107,11 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `tests/test_workspace_maintenance.py`
 - `tests/test_collaboration_lineage.py`
 - `tests/test_lan_collaboration_harness.py`
+- `packages/project-orrery-core/src/project_orrery_core/workstream_relations.py`
+- `packages/project-orrery-core/src/project_orrery_core/schema/workstream-relations-v1.json`
+- `packages/project-orrery-cli/src/project_orrery_cli/workstream_relations.py`
+- `tests/fixtures/workstream-relations/v1/succession-chain.json`
+- `tests/test_workstream_relations.py`
 - `scripts/ci/`
 - `tests/test_ci_validation.py`
 - `scripts/acceptance/run_lan_collaboration_acceptance.py`
@@ -118,4 +126,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
   可复现控制面。
 - 三个 Core／CLI／Observatory 组件目前只是未发布源码包，尚未形成独立 wheel 或多组件发布流水线。Codex Adapter 已能独立归档并完成一个精确 runtime 范围的 E2E，但尚未进入 release workflow；其他 runtime／OS 范围仍未验证。Harness JSON 已在同一候选提交通过 Windows／Ubuntu CI，但仍是 `experimental`／`unreleased` 参考 Adapter，尚未作为独立产物发布，也不构成第三方 Agent runtime 兼容证据。
 - W3 source 已实现 review／integration／cleanup；当前 W5D Worktree Candidate 还包含健康分层的 Personal Observatory、opt-in Team Core／CLI／root-only UI、LAN candidate discovery、Host-confirmed join、手工 Coordinator Host switch、W6 maintenance 和 stacked lineage。Phase 3 自动 worktree removal 与 Phase 4 OS scheduler Adapter 未实现；仍没有真实双机／真实 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。真实 W5C／W6 legacy session 未由 W5D 自动改写，整合者仍需显式 rebind／retire；动态 UI 未进入默认 docsite、公开模板或 Release。
+- W7A 只实现单条显式 proposed append、只读 graph/succession plan 与 W7B contract builder；真实自动发现 UX、一次确认批量 apply、transition/undo execution、legacy session migration 和 retention/compaction 属于 W7B。Succession／Dependency／Conflict 正式图形页面、active-tip 高亮、历史折叠、Unknown 虚线与可访问列表属于 W7C。
 - Claude Code／DeepSeek Harness Adapter 尚未公开发布；DeepSeek 的精确 manifest 范围不得外推到当前源码 Adapter 0.1.1／CLI 0.1.13、其他版本、OS、Provider、模型或未来发行物。
