@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-28 — R2 Orrery Rename Decision and Compatibility Contract
+
+- 精确从 clean `main@2037cab7a46ae048147115c3c317f8d542a8cee9` 建立 `codex/r2-orrery-rename-decision-contract`，并在作者写入前注册 Git-private `R2-orrery-rename-decision-contract`；primary 为 project-structure，affected 为 release-and-toolchain、documentation-system、test-coverage。普通功能分支未修改根 PROGRESS/HANDOFF。
+- 把未合入 R1 `f991bef` 作为 Library provenance，而非 cherry-pick 或 current State；在 current main 重算 655 tracked paths、品牌/技术/协议/冻结面，并只读核验 GitHub current repo/redirect/v0.2.0 assets 与 PyPI `orrery` 冲突。
+- 新增 Proposed ADR-0015、Proposed-for-approval Design 和 blocked R3–R5 Plan：产品 brand 为 Orrery；Python distribution/import、project manifest、v1 schema/contract/hash/Authority/Workstream、credential/cache/backup namespaces 保持稳定；旧 Skill/CLI/config/Adapter 入口覆盖完整 0.3.x，最早 0.4.0 只评审而不承诺移除。
+- 本任务没有执行 R3、全仓改名、本地目录/Saved Project/Codex 数据迁移，也未修改 package/schema/CLI/Skill/Adapter/GitHub settings/tag/Release。验证只覆盖 current-main inventory、文档权威链、索引/链接、repository gates 和 diff；R3 必须等待维护者接受 ADR 并批准 Design。
+
 ## 2026-08-28 — W7D W7 Integration Candidate
 
 - 精确从 CI2 `8b635b1` 建立独立 `codex/w7d-w7-integration-candidate`，写入前注册 Git-private Workstream；复核 W7A→W7B→CI2 祖先链、两输入 clean worktree 与 W7C-A 对应树已被 W7C-B 字节级吸收，只加法合入 W7C-B `d411fd6`。

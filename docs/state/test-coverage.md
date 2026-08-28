@@ -4,6 +4,7 @@ Updated: 2026-08-28
 
 ## 当前事实
 
+- [R2 文档候选 Validation](../validation/2026-08-28-orrery-rename-decision-contract.md) 在 `main@2037cab` 上重算命名 inventory：655 tracked paths；`Project Orrery` 399/223、`project-orrery` 1,372/298、`project_orrery` 462/147、standalone `Orrery` 242/79（次数/文件）。冻结根为 163/92、528/136、104/53；14 个旧 slug schema `$id` 与 46 个 distinct `contract_type` 作为协议面保留。此计数验证审计方法，不要求旧词归零，也不构成 rename 实现测试。
 - CI3 Candidate 精确从 W7D `e2c049e` 修复独立 Fast fresh-runner discovery：Fast 在 `validate_ci.py --all` 前安装与 Promotion 相同的 wheel＋版本化 docsite requirements，静态 validator／mutation regression 机械保护命令与顺序；timing result 只有真实存在时才上传，主步骤失败仍保持红色。当前机械 inventory 为 379 IDs／27 shards／51 Fast／72 Checkpoint；本机 Fast 51/51、2.324s／15s PASS。Checkpoint 两次均 72/72 断言通过但以 95.382s、98.320s 超 90s 保持 FAIL，预算与 selector 未改；同一 clean exact-SHA hosted Fast／Promotion 仍待验证。
 - `tests/test_project_orrery.py` 保护安装、非覆盖升级、发布包、更新兼容和凭据配置边界。
 - `tests/test_context_routing_benchmark.py` 保护历史语料、Pilot 装置、回执规则、未跟踪文件采集、安全 Oracle 和恢复行为。

@@ -6,11 +6,13 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前事实
 
+- R2 Candidate 只提出 [ADR-0015 compatibility contract](../decisions/0015-orrery-brand-and-compatibility-contract.md)：公开品牌保持 Orrery，但现有 Skill/CLI/Adapter IDs、`project-orrery-*` distributions、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 和 credential/cache/backup namespaces 当前均未改变。PyPI `orrery` 已被无关项目占用，因此本 Candidate 不新增该 distribution/import；R3/R4/R5 尚未开始。
 - CI3 Candidate 只修复 `.github/workflows/fast-validation.yml` 的 fresh-runner setup 和 artifact 失败噪声：Fast 继续是 `non-promotion-feedback`，15 秒预算、51 项既有选择、无 `ORRERY_TEST_BUILD`、无 required smoke 名；Promotion workflow、27 shards、required checks、组件版本、branch protection、tag、Release 与 v0.2.0 均不变。最终推广证据仍要求同一 exact SHA 的独立 Fast Windows/Ubuntu 与 Promotion required Windows/Ubuntu 全绿。
 - Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/ItIsMixian/Orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。
 - 外部当前展示名和仓库入口已改为 Orrery／`ItIsMixian/Orrery`。Candidate 当前只同步根 README、
   self-host 更新入口、Adapter metadata 与当前链接；`project-orrery` 技术 ID、冻结 v0.2.0
   manifest/bridge、tag/asset 和历史权威记录保持不变。
+- 2026-08-28 R2 再次只读核验：旧 GitHub slug 仍 301 到 `ItIsMixian/Orrery`，v0.2.0 tag 仍解析到 `20fc95b`，自定义 ZIP/checksum asset 名与 ZIP SHA-256 仍为历史值。该核验不修改远端，也不授权给 v0.2.0 资产改名。
 - 正式 zip SHA-256 为 `13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`，发布资产中的 checksum 已通过重新下载复核。
 - Skill、目标工具链、项目 manifest 格式和文档 schema 分别版本化。
 - 默认安装只创建缺失文件；`--upgrade-tools` 只处理白名单并先备份。

@@ -5,6 +5,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 
 ## 当前事实
 
+- 当前 R2 Worktree Candidate `codex/r2-orrery-rename-decision-contract` 精确从 clean `main@2037cab7a46ae048147115c3c317f8d542a8cee9` 建立并注册 Git-private session。它只增加 current-main Library audit、Proposed ADR-0015、Approved Design candidate、blocked R3–R5 Plan、State/Validation/DEVLOG 和索引；没有执行全仓改名，也没有修改 package/schema/CLI/Skill/Adapter/remote/tag/Release。外部 product brand/repository 已是 Orrery，当前本地 root 与稳定技术标识仍使用 `project-orrery`。
 - 当前 CI3 Worktree Candidate `codex/ci3-fast-validation-dependency-fix` 精确从 W7D `e2c049ebd6c6476eac8b9555e00edc046d673199` 建立；Git-private session 以 `test-coverage` 为 primary，声明 release/documentation/project affected surfaces。作者树改动限于独立 Fast workflow、CI validator/tests 与权威链同步；Promotion topology、产品包、组件版本、main/tag/Release 均未改。
 - 单一 Git 仓库根：`D:\coding warehouse\project-orrery`。
 - 并发协作当前人工采用“一个 Workstream = 一个分支 + 一个独立 linked worktree 或 clone”；一个平台会话可以在该 Workstream 中完成多个相关 Change Set。主 worktree 只供维护者集成。2026-08-20 已用独立 integration worktree 恢复并拆分三个共享工作目录任务，随后为 context-routing、platform／adapters 和 docsite／broker 分配三个干净 linked worktree，证明人工隔离与干净集成路径可行。
@@ -34,7 +35,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 
 - canonical 作者模板位于 Core 包；`skills/project-orrery/assets/project-template/` 是 v0.2 兼容投影，并由测试要求与 canonical 内容一致。
 - Observatory 实现源码仍位于根 `scripts/docsite/`，组件包负责清点与版本化；Skill 模板通过显式标题 token 投影保持目标项目可定制。
-- 旧 Skill 三个脚本路径现在是薄 wrapper；源码仓库调用新 CLI，单独分发 Skill 时回退到冻结的 v0.2 兼容实现。wrapper 保留至 `0.3.x`，最早在 `0.4.0` 移除。
+- 旧 Skill 三个脚本路径现在是薄 wrapper；源码仓库调用新 CLI，单独分发 Skill 时回退到冻结的 v0.2 兼容实现。wrapper 覆盖完整 `0.3.x`；最早到 `0.4.0` 才具备移除评审资格，当前不承诺届时删除。
+- [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) 当前仍为 Proposed：它建议把 Orrery display brand 与稳定 `project-orrery`／`project_orrery_*`／protocol/history identity 分层，完整保留 0.3.x 旧入口并只在 0.4.0 评审移除。该提案、[Design candidate](../design/orrery-rename-and-compatibility-contract.md) 和 [Plan](../implementation/plans/2026-08-28-orrery-rename-and-compatibility.md) 不证明 R3 brand rollout、alias、package/CLI transition、本地 root rename、Saved Project 更新或 Codex 数据迁移已实现。
 - `adapters/codex/` 只包含 Codex 发现／调用元数据和 Adapter 生命周期安装器；它通过 manifest 引用 Core／CLI，不复制 canonical 作者模板、schema、兼容规则或项目状态。平台安装器只管理目标 skills 根下的 `project-orrery` Adapter 目录。
 - `adapters/harness-json/` 不包含 `SKILL.md` 或平台发现文件；它拥有 versioned request／response schema、参数白名单、subprocess 边界和 timeout 分类，只调用 CLI 的 opt-in JSON，不读取作者文档来重新判定事实。
 - `adapters/claude-code/` 使用原生 Plugin discovery；`adapters/deepseek-harness/` 使用 profile Cordis Plugin Bundle。两者有独立 manifest、打包器、生命周期和 runtime evidence，不共享对第三方平台兼容性的推断。

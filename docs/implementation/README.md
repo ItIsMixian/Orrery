@@ -14,6 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-28 Orrery Rename and Compatibility R3–R5](plans/2026-08-28-orrery-rename-and-compatibility.md) — planned and blocked on ADR-0015 acceptance; separates brand-only closeout, compatible aliases and an optional package/CLI default transition while preserving Python identity and frozen v0.2.0 evidence.
 - [2026-08-28 CI3 Fast Validation Dependency Fix](plans/2026-08-28-ci3-fast-validation-dependency-fix.md) — installs real Fast discovery dependencies before contract validation, mechanically protects ordering and conditionally uploads only an existing timing result without changing the 15-second Fast or Promotion contracts.
 - [2026-08-28 W7D W7 Integration Candidate](plans/2026-08-28-w7d-w7-integration-candidate.md) — integrates CI2/W7B and W7C-B additively, preserves tiered budgets and read-only graph authority, and freezes the non-`main` exact-SHA Promotion handoff.
 - [2026-08-28 CI2 tiered test performance](plans/2026-08-28-ci2-tiered-test-performance.md) — completed Worktree Candidate that preserves W7B coverage while reducing full-topology construction to two Promotion journeys and adds explicit Fast／Checkpoint／W7B hard budgets.

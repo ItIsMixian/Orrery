@@ -18,4 +18,4 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Draft designs
 
-No active Draft Design.
+- [Orrery Rename and Compatibility Contract](orrery-rename-and-compatibility-contract.md) — proposed Approved Design candidate under ADR-0015; maps brand, stable identifiers, aliases, brownfield migration, privacy, rollback and R3–R5 gates without authorizing implementation.

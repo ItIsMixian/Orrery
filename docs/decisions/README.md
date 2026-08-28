@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0015: Orrery brand and compatibility contract](0015-orrery-brand-and-compatibility-contract.md) — Proposed; separates the Orrery display brand from stable technical/protocol identities, preserves v0.2.0 history and the full 0.3.x compatibility window, and blocks Python `orrery` namespace takeover.
 - [ADR-0014: Dynamic Workstream Succession Contract](0014-dynamic-workstream-succession-contract.md) — Accepted; adds incremental `derived_from`／`depends_on`／`absorbs` relations, append-only Git-common-private evidence, reversible lifecycle and conservative active-tip conflict semantics without creating a scheduler or deletion authority.
 - [ADR-0001: Project Orrery self-hosting](0001-project-orrery-self-hosting.md) — Accepted; establishes this repository's own documentation authority chain.
 - [ADR-0002: Real-development benchmark portfolio](0002-real-development-benchmark-portfolio.md) — Accepted; requires future context-routing adoption studies to include isolated application-development tasks, not only documentation maintenance.
@@ -32,6 +33,7 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-No active proposals. `PO-DEC-AUTH-002` was integrated as ADR-0011.
+- ADR-0015 is awaiting maintainer review. Its Design remains a proposed Approved Design candidate and its R3–R5 Plan does not authorize implementation before acceptance.
+- `PO-DEC-AUTH-002` was integrated as ADR-0011.
 
 Concurrent branches use stable IDs under `docs/decisions/proposals/` until the maintainer accepts a proposal and an integrator allocates the next canonical ADR number.

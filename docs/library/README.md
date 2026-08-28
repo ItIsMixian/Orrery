@@ -17,6 +17,7 @@ Material in this directory is **non-authoritative**. It may inform a proposal, b
 - [OpenProgram](https://github.com/Fzkuji/OpenProgram) — unreviewed source lead suggested by the maintainer for possible future DAG and task-orchestration study; no source inspection, evidence claim, or adoption decision has been made.
 - [Authority semantics, product core, and complexity boundaries](2026-08-20-authority-semantics-and-product-complexity-discussion.zh-CN.md) — maintainer-provided Chinese web-discussion capture distinguishing user Seed from Orrery's meta-level Authority Model, incremental semantic extraction from the Observatory, and user-facing versus internal research complexity.
 - [Composable integration interface notes](2026-08-27-composable-integration-interface-notes.zh-CN.md) — non-authoritative Chinese sketch of Context Export, Evidence Import, Runtime Identity Link, and Specialist Skill Contract, with a protocol-first and optional-adapter boundary.
+- [Orrery rename surface and compatibility audit — current-main refresh](2026-08-28-orrery-rename-migration-audit.zh-CN.md) — additive refresh of unmerged R1 research against `main@2037cab`, with reproducible naming counts, PyPI/GitHub read-only facts, protocol/frozen boundaries and decision inputs.
 - [Context-routing benchmark](../../experiments/context-routing/) — non-authoritative experiment infrastructure and Git-grounded historical task corpus.
 - [Pilot 004 B/H holdout](../../experiments/context-routing/results/2026-08-18-pilot-004-bh-holdout-terra-medium.md) — both strategies passed the corrected independent acceptance surface; H was not adopted because it used 47% more input tokens overall.
 - [Current research State](../state/context-routing-research.md) — the authoritative current-project summary derived from the non-authoritative evidence above.
@@ -28,6 +29,8 @@ Material in this directory is **non-authoritative**. It may inform a proposal, b
 这里的材料均为**非权威资料**。它们可以推动提案、基准实验、Design 或 ADR，但不会自行改变已发布 Skill、安装契约或目标项目的权威链。
 
 ### 研究笔记
+
+- [Orrery 命名面审计与兼容迁移输入（current-main refresh）](2026-08-28-orrery-rename-migration-audit.zh-CN.md) — 保留未合入 R1 的分类与历史来源，在 `main@2037cab` 重算品牌／技术／协议／冻结面，并明确其仍为非权威决策输入。
 
 - [任务中心上下文、可追溯证据与文档开销](2026-08-17-task-context-provenance-and-documentation-overhead.zh-CN.md)——关于上下文路由、访问回执、文档成本与并行开发的证据综述及本地基准方案。
 - [Task-centered context, provenance, and documentation overhead](2026-08-17-task-context-provenance-and-documentation-overhead.md)——英文版本。
