@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-27 W5E Team Observatory UI closeout](2026-08-27-w5e-team-observatory-ui-closeout.md) — removes redundant Team summaries, keeps mode／connection／online controls visible, moves low-frequency diagnostics into an accessible settings dialog, and absorbs the non-authoritative interface／Brownfield notes without changing Core or release authority.
 - [2026-08-27 CI1 tiered parallel validation](2026-08-27-ci1-tiered-parallel-validation.md) — adds dependency-free final unittest inventory, per-test timing JSON, Fast-only feedback, exact-SHA sharded Promotion and fail-closed required-name aggregation while leaving hosted timing and branch-protection verification to the central frozen Candidate.
 - [2026-08-27 local worktree cleanup](2026-08-27-local-worktree-cleanup.md) — reduces the self-host workspace from 38 to 4 registered worktrees after exact clean/ignored/process checks, preserves every branch and commit, archives three stale private sessions by SHA-256, and records the manual-not-automatic cleanup boundary.
 - [2026-08-27 W5C Team Observatory information architecture](2026-08-27-w5c-team-observatory-ux.md) — reorganizes the verified Team surface around a plain-language current brief, contextual next actions, members/tasks, pending-versus-handled requests and collapsed diagnostics without changing authority, network or request-only boundaries.

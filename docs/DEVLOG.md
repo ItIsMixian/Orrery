@@ -529,3 +529,9 @@
 - 新增 dependency-free final unittest inventory、26-shard manifest、逐 test timing JSON runner、fail-closed aggregate、repository gate 与独立 workflow validator。当前 342 个 discovery ID 全部恰好分配一次；W6 七个方法逐项拆分，Personal Observatory 拆为三片。
 - 普通 push／PR 只运行 40-test Fast 并标注非 Promotion；完整 Windows／Ubuntu Promotion 只由显式 ref＋SHA dispatch 或 `promotion/**` 冻结分支触发。preflight 后所有 job checkout exact SHA，最终 required-check 名仍为 `smoke-test (windows-latest)`／`smoke-test (ubuntu-latest)`。
 - CI1 回归 8/8、最终 Fast 40/40（runner 3.897s／wall 4.639s）、最终 `workspace-remove` 1/1（runner 148.990s／wall 149.805s）、inventory／YAML／static contract、结构、隔离站、332 Markdown／911 links、forbidden artifact 与 diff 通过。hosted Fast ≤90s 与 Windows Promotion ≤4m 只作投影，留给中央冻结 exact-SHA run 验证。
+
+## 2026-08-27 — W5E Team Observatory UI closeout Candidate
+
+- 从 `CI1-tiered-parallel-validation@67a2fe9` 建立独立 W5E Worktree，并吸收 `0235116` 的组合式接口 Library 草案与 Brownfield Migration HANDOFF 接续；二者没有升级为 ADR、公共 API 或实现事实。
+- Observatory 0.1.8 删除重复的 Team 边界 pill 和“现在的情况”摘要，把四项关键状态上移；Team Mode、连接、在线状态与退出常驻外层，低频协议字段、测试／维护请求和隐私说明进入齿轮设置 dialog。Core／CLI／Team server 与安全契约未改。
+- Team／component 18/18、CI contract／inventory／repository gate、结构、隔离站、链接、compile 和 diff 通过。真实 in-app Chromium 在 1280px 与 390×844 完成 enable、连接、heartbeat、dialog、退出和响应式验收，最终恢复 Personal Mode；远端 Promotion 与 main 合流仍待中央执行。

@@ -44,6 +44,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W6 Worktree Candidate 增加独立“工作区维护” sibling page，投影 Git-private maintenance scan／queue／authorization／receipt、保护／Unknown 原因、共享策略和 branch 动作边界。静态 Personal 构建只读且按钮禁用；root-only loopback 动态入口才允许本机确认。页面不把建议、授权或 receipt 升级为 State／ADR／Validation，也不回写作者文档；Team 页只能发送 `cleanup` request，不能把中央决定变为 execute。
 - W5D Worktree Candidate 在 Team sibling page 增加 discovery candidate、join confirmation、connection／reconnection 和 Coordinator generation／manual Host switch 状态；所有网络动作仍需本机显式触发，enable 本身不广播，页面不接收任意 URL／命令或执行请求。Personal sibling page 读取 Scope lineage summary，把显式 stacked chain 作为可折叠的派生视图显示 parent／task-base OID／inherited path 数和 chain 内 unique finding；Legacy／Unknown 不按 branch 名猜测，也不被伪装为 resolved finding。
 - CI1 Worktree Candidate 的 inventory、timing result、aggregate receipt 与 Fast artifact 都是 machine-readable Validation evidence，不是 State／ADR／Promotion 事实。Fast 输出显式标注非 Promotion；只有冻结 exact SHA 的双平台 aggregator 与既有 required checks 能形成后续推广证据，且 hosted 性能目标仍须远端实测。
+- W5E Worktree Candidate 只改变 Team 派生页面的信息层级：去除重复摘要，把四项状态与三个关键本机控制置顶，并以齿轮弹窗承载低频诊断。组合式接口草案继续位于 Library，Brownfield Migration 只进入 HANDOFF 接续约束；二者没有升级为 ADR、公共 API、Plan 已实施或 released 能力。
 
 ## 同步状态
 

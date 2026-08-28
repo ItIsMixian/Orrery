@@ -21,12 +21,10 @@ def _esc(value: object) -> str:
 TEAM_OBSERVATORY_CSS = r"""
 .to-shell{--to-green:#63d6cf;--to-amber:#f2ba5e;--to-red:#ff786b;--to-blue:#7fb0ff;
  margin:0 0 24px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg)}
-.to-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;padding:22px 24px 18px;
+.to-head{display:block;padding:22px 24px 18px;
  border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(127,176,255,.09),transparent 66%)}
 .to-kicker{display:block;color:var(--to-blue);font:700 10px/1.3 "Cascadia Code",Consolas,monospace;
  letter-spacing:.14em;text-transform:uppercase}.to-head h2{font-size:27px;margin:5px 0}.to-head p{margin:0;color:var(--mut);font-size:12.5px;max-width:760px}
-.to-boundary{align-self:start;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--mut);font-size:10px;font-weight:650}
-.to-boundary::before{content:"● ";color:var(--to-green)}
 .to-onboarding{padding:24px}.to-onboarding[hidden],.to-workspace[hidden],.to-history[hidden]{display:none}.to-onboarding h3{font-size:15px;margin:0 0 5px}
 .to-onboarding>p{margin:0 0 18px;color:var(--mut);font-size:12px;max-width:760px}.to-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;
  align-items:stretch;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--line);gap:1px}.to-step{padding:16px;background:var(--bg2)}
@@ -36,11 +34,11 @@ TEAM_OBSERVATORY_CSS = r"""
 .to-action{appearance:none;border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:var(--fg);padding:9px 12px;
  font:700 10.5px/1.2 inherit;cursor:pointer}.to-action:hover:not(:disabled){border-color:var(--to-blue);color:var(--to-blue)}.to-action:focus-visible{outline:2px solid var(--to-blue);outline-offset:2px}
 .to-action.primary{background:var(--to-blue);border-color:var(--to-blue);color:#07111f}.to-action.danger{color:var(--to-red)}.to-action:disabled{opacity:.42;cursor:not-allowed}
-.to-onboarding .to-action{margin-top:15px}.to-brief{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:22px;padding:22px 24px;border-bottom:1px solid var(--line)}
-.to-brief-label,.to-section-label{color:var(--to-blue);font:700 9px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.12em;text-transform:uppercase}
-.to-brief h3{margin:6px 0 5px;font-size:18px;line-height:1.35}.to-brief p{margin:0;color:var(--mut);font-size:11.5px;line-height:1.6}
-.to-signals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--line)}
+.to-onboarding .to-action{margin-top:15px}.to-overview{padding:16px 24px 14px;border-bottom:1px solid var(--line)}
+.to-section-label{color:var(--to-blue);font:700 9px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.12em;text-transform:uppercase}
+.to-signals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--line)}
 .to-signal{padding:12px 13px;background:var(--bg2);min-width:0}.to-signal small{display:block;color:var(--mut);font-size:9px}.to-signal b{display:block;margin-top:4px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.to-essential{display:flex;align-items:center;gap:13px;margin-top:11px}.to-mode-state{min-width:155px}.to-mode-state small{display:block;color:var(--mut);font:700 8.5px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}.to-mode-state b{display:block;margin-top:3px;font-size:11px}.to-command-note{min-width:0;flex:1;margin:0;color:var(--mut);font-size:10px;line-height:1.45}.to-essential-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:7px}.to-icon-action{width:36px;height:34px;padding:0;display:inline-grid;place-items:center;font-size:15px}
 .to-actions{padding:17px 24px;border-bottom:1px solid var(--line);background:var(--bg2)}.to-actions-head{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-bottom:10px}
 .to-actions-head h3{margin:4px 0 0;font-size:13px}.to-actions-head span{color:var(--mut);font-size:10px}.to-action-strip{display:flex;flex-wrap:wrap;gap:7px}
 .to-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(270px,.72fr)}.to-main,.to-side{min-width:0;padding:20px 24px}.to-side{border-left:1px solid var(--line);background:var(--bg2)}
@@ -50,14 +48,14 @@ TEAM_OBSERVATORY_CSS = r"""
 .to-workrow{display:grid;grid-template-columns:minmax(190px,1.15fr) minmax(170px,1fr);gap:14px;padding:12px 2px;border-bottom:1px solid var(--line);font-size:10px;align-items:center}.to-work-title b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.to-work-title small,.to-work-state small{display:block;margin-top:3px;color:var(--mut);font-size:9.5px}.to-presence{font-weight:800}.to-presence.online{color:var(--to-green)}.to-presence.offline,.to-presence.stale-unknown{color:var(--to-amber)}.to-presence.unavailable,.to-presence.unknown{color:var(--mut)}
 .to-request{border-top:1px solid var(--line);padding:12px 0}.to-request-head{display:flex;justify-content:space-between;gap:10px;align-items:start}.to-request b{font-size:11px}.to-request-status{color:var(--to-amber);font-size:9.5px;text-align:right}.to-request-status.done{color:var(--mut)}.to-request p{margin:5px 0;color:var(--mut);font-size:10px;line-height:1.5}.to-request-meta{color:var(--mut);font-size:9px}.to-request-actions{display:flex;gap:6px;margin-top:8px}.to-request .to-action{padding:7px 10px;font-size:9.5px}
 .to-history{margin-top:13px;border-top:1px solid var(--line);padding-top:10px}.to-history>summary{cursor:pointer;color:var(--mut);font-size:10.5px}.to-history .to-request{opacity:.78}
-.to-diagnostics{border-top:1px solid var(--line);background:var(--bg2)}.to-diagnostics>summary{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:14px 24px;cursor:pointer;list-style:none}.to-diagnostics>summary::-webkit-details-marker{display:none}.to-diagnostics>summary b{font-size:11.5px}.to-diagnostics>summary span{display:block;margin-top:3px;color:var(--mut);font-size:9.5px}.to-diagnostics>summary em{color:var(--to-blue);font-style:normal;font-size:10px}.to-diagnostics[open]>summary{border-bottom:1px solid var(--line)}
-.to-statusline{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line)}.to-statusline>div{min-width:0;padding:11px 13px;background:var(--bg)}.to-statusline small{display:block;color:var(--mut);font:700 8.5px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.07em;text-transform:uppercase}.to-statusline b{display:block;margin-top:4px;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.to-statusline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line)}.to-statusline>div{min-width:0;padding:11px 13px;background:var(--bg)}.to-statusline small{display:block;color:var(--mut);font:700 8.5px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.07em;text-transform:uppercase}.to-statusline b{display:block;margin-top:4px;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .to-controlbar{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:12px 24px}.to-controlbar .to-spacer{flex:1}.to-mode{font:700 10px/1.2 "Cascadia Code",Consolas,monospace;color:var(--to-green);padding-right:8px}
 .to-privacy{border-top:1px solid var(--line);padding:12px 24px;color:var(--mut);font-size:10.5px;line-height:1.55}.to-privacy b{color:var(--fg)}.to-empty{padding:13px 0;color:var(--mut);font-size:11px;border-top:1px solid var(--line)}
 .to-notice{min-height:34px;padding:10px 24px;border-top:1px solid var(--line);color:var(--mut);font-size:10.5px}.to-notice.error{color:var(--to-red)}
-@media(max-width:900px){.to-brief,.to-grid{grid-template-columns:1fr}.to-side{border-left:0;border-top:1px solid var(--line)}.to-statusline{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:640px){.to-shell{margin:0 -18px 24px;border-left:0;border-right:0;border-radius:0}.to-head{grid-template-columns:1fr;padding:18px}.to-boundary{justify-self:start}.to-onboarding,.to-brief,.to-actions,.to-main,.to-side{padding:17px 18px}.to-flow{grid-template-columns:1fr}.to-arrow{padding:5px;transform:rotate(90deg)}.to-safe{grid-template-columns:1fr}.to-safe>div+div{border-left:0;border-top:1px solid var(--line)}
- .to-signals{grid-template-columns:1fr 1fr}.to-actions-head{align-items:start;flex-direction:column}.to-action{min-height:40px}.to-action-strip .to-action{flex:1 1 calc(50% - 7px)}.to-statusline{grid-template-columns:1fr 1fr}.to-workrow{grid-template-columns:1fr}.to-member>summary{grid-template-columns:1fr auto}.to-member>summary code{grid-column:1/-1}.to-diagnostics>summary,.to-controlbar,.to-privacy,.to-notice{padding-left:18px;padding-right:18px}.to-controlbar .to-spacer{display:none}}
+.to-dialog-backdrop{position:fixed;inset:0;z-index:280;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(4,10,16,.68);backdrop-filter:blur(3px)}.to-dialog-backdrop.open{display:flex}.to-dialog{width:min(760px,100%);max-height:90vh;overflow:auto;border:1px solid var(--line);border-radius:16px;background:var(--bg2);box-shadow:0 24px 72px rgba(0,0,0,.52)}.to-dialog-head{display:flex;align-items:flex-start;gap:14px;padding:17px 20px 14px;border-bottom:1px solid var(--line)}.to-dialog-head h3{margin:0 0 4px;font-size:16px}.to-dialog-head p{margin:0;color:var(--mut);font-size:10.5px;line-height:1.5}.to-dialog-close{margin-left:auto;border:0;background:transparent;color:var(--mut);font-size:22px;line-height:1;cursor:pointer}.to-dialog-close:hover{color:var(--fg)}
+@media(max-width:900px){.to-grid{grid-template-columns:1fr}.to-side{border-left:0;border-top:1px solid var(--line)}.to-statusline{grid-template-columns:repeat(3,1fr)}.to-essential{align-items:flex-start;flex-wrap:wrap}.to-command-note{order:3;flex-basis:100%}.to-essential-actions{margin-left:auto}}
+@media(max-width:640px){.to-shell{margin:0 -18px 24px;border-left:0;border-right:0;border-radius:0}.to-head{padding:18px}.to-onboarding,.to-overview,.to-actions,.to-main,.to-side{padding:17px 18px}.to-flow{grid-template-columns:1fr}.to-arrow{padding:5px;transform:rotate(90deg)}.to-safe{grid-template-columns:1fr}.to-safe>div+div{border-left:0;border-top:1px solid var(--line)}
+ .to-signals{grid-template-columns:1fr 1fr}.to-essential{display:block}.to-mode-state{margin-bottom:9px}.to-essential-actions{display:grid;grid-template-columns:1fr 1fr}.to-essential-actions .to-action{width:100%;min-width:0}.to-essential-actions .to-icon-action{width:100%}.to-command-note{margin:10px 0}.to-actions-head{align-items:start;flex-direction:column}.to-action{min-height:40px}.to-action-strip .to-action{flex:1 1 calc(50% - 7px)}.to-statusline{grid-template-columns:1fr 1fr}.to-workrow{grid-template-columns:1fr}.to-member>summary{grid-template-columns:1fr auto}.to-member>summary code{grid-column:1/-1}.to-dialog-backdrop{padding:10px}.to-dialog{max-height:94vh}.to-dialog-head,.to-controlbar,.to-privacy,.to-notice{padding-left:18px;padding-right:18px}.to-controlbar .to-spacer{display:none}}
 @media(prefers-reduced-motion:reduce){.to-shell *{scroll-behavior:auto!important;transition:none!important}}
 """
 
@@ -117,16 +115,16 @@ TEAM_OBSERVATORY_JS = r"""
     candidates.forEach(candidate=>{const item=node('div','to-request');item.append(node('b',null,'候选 Host · '+((candidate.packet||{}).host_hint||'opaque')),node('p',null,(candidate.packet||{}).endpoint||'endpoint unavailable'),node('div','to-request-meta','不可信提示 · 必须继续校验 project fingerprint、成员凭据并由 Host Admin 确认'));root.append(item)});
     joins.filter(item=>item.status==='pending').forEach(item=>{const row=node('div','to-request');row.append(node('b',null,'加入确认 · '+item.member_id),node('p',null,'该成员仍未加入；确认只签发成员凭据，不执行其机器上的任何动作.'));const button=node('button','to-action','在 Host 本机确认加入');button.type='button';button.dataset.joinRequestId=item.request_id;row.append(button);root.append(row)});
   }
-  function renderBrief(value){const config=value.config||{},running=!!(value.coordinator&&value.coordinator.running),projection=value.projection||{},members=projection.members||[];
-    const workstreams=members.reduce((count,member)=>count+(member.workstreams||[]).length,0),pending=(value.requests||[]).filter(request=>request.status==='pending-local-confirmation').length,outbox=value.outbox_count||0;
-    const externalRegistered=!running&&config.runtime_status==='team-runtime-active';let summary,guidance;
-    if(externalRegistered){summary='检测到另一个本机协作服务登记，当前页面不能直接控制它。';guidance='请回到原 Team 页面正常停止；如果原进程已经退出，可在技术诊断中退出 Team Mode 后重新启用。'}
-    else if(!running){summary='Team Mode 已启用，但本机协作服务还没有启动。';guidance='先启动本机协作服务；这只会监听 127.0.0.1，不会把执行权交给其他成员。'}
-    else if(!config.sharing_enabled){summary='协作服务正在运行，但项目状态尚未开始共享。';guidance='开启项目状态共享后，其他成员才能看到你主动提供的最小元数据。源码、对话和未 push diff 不会上传。'}
-    else if(members.length<=1){summary='本机状态已经准备好，目前还没有其他成员接入。';guidance=outbox?'还有 '+outbox+' 项本机状态等待同步。':'当前没有待同步状态；可显式扫描最小 LAN 候选，或使用手工 invitation endpoint 回退。'}
-    else{summary='当前可见 '+members.length+' 名成员、'+workstreams+' 个工作任务。';guidance=pending?'有 '+pending+' 个请求等待你在本机确认。':'目前没有需要你处理的团队请求。'}
+  function renderOverview(value){const config=value.config||{},running=!!(value.coordinator&&value.coordinator.running),projection=value.projection||{},members=projection.members||[];
+    const pending=(value.requests||[]).filter(request=>request.status==='pending-local-confirmation').length,outbox=value.outbox_count||0;
+    const externalRegistered=!running&&config.runtime_status==='team-runtime-active';let guidance;
+    if(externalRegistered){guidance='检测到另一个本机协作服务登记；请回到原页面正常停止，或退出 Team Mode 后重新启用。'}
+    else if(!running){guidance='团队连接尚未启动；本地工作保持不受影响。'}
+    else if(!config.sharing_enabled){guidance='团队连接已启动，项目状态共享仍处于暂停。'}
+    else if(members.length<=1){guidance=outbox?'还有 '+outbox+' 项本机状态等待同步。':'目前只有你的本机成员状态。'}
+    else{guidance=pending?'有 '+pending+' 个请求等待你在本机确认。':'目前没有需要你处理的团队请求。'}
     if(running&&!(config.heartbeat&&config.heartbeat.enabled))guidance+=' 在线状态广播已关闭，因此“状态已过期／未知”是预期结果。';
-    text(q('[data-team-summary]'),summary);text(q('[data-team-guidance]'),guidance);text(q('[data-team-service]'),running?'本机服务运行中':externalRegistered?'其他本机服务登记':'尚未启动');text(q('[data-team-member-count]'),members.length);text(q('[data-team-pending-count]'),pending);qa('[data-team-outbox]').forEach(element=>text(element,outbox));
+    text(q('[data-team-guidance]'),guidance);text(q('[data-team-service]'),running?'本机服务运行中':externalRegistered?'其他本机服务登记':'尚未启动');text(q('[data-team-member-count]'),members.length);text(q('[data-team-pending-count]'),pending);qa('[data-team-outbox]').forEach(element=>text(element,outbox));
     text(q('[data-lan-connection]'),running?'connected · monotonic revision aggregation':externalRegistered?'external runtime · control unavailable':'disconnected · local work preserved');
   }
   function render(value){state=value;const config=value.config||{};const enabled=!!config.enabled;const running=!!(value.coordinator&&value.coordinator.running);
@@ -136,14 +134,19 @@ TEAM_OBSERVATORY_JS = r"""
     text(q('[data-team-member]'),config.member_id||'implicit local');text(q('[data-team-host]'),config.host_id||'not configured');
     text(q('[data-team-sharing]'),config.sharing_enabled?'sharing':'off');text(q('[data-team-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'on':'off');
     text(q('[data-team-last-seen]'),value.projection&&value.projection.generated_at||'Unavailable');text(q('[data-team-outbox]'),value.outbox_count||0);
+    const connection=q('[data-team-connection-action]');connection.dataset.teamAction=running?'stop':'start';
     qa('[data-team-action]').forEach(button=>{const action=button.dataset.teamAction;button.disabled=(action==='enable'&&enabled)||(action==='disable'&&!enabled)||(action==='start'&&(!enabled||running||externalRegistered))||(action==='stop'&&!running)||(['heartbeat','sharing','capture','sync','request-create','maintenance-request','discovery'].includes(action)&&!enabled)||(['sync','discovery'].includes(action)&&!running)});
-    text(q('[data-action-start]'),running?'本机协作服务运行中':externalRegistered?'其他本机服务占用中':'启动本机协作服务');text(q('[data-action-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'关闭在线状态':'开启在线状态');text(q('[data-action-sharing]'),config.sharing_enabled?'暂停项目状态共享':'开始共享项目状态');text(q('[data-action-sync]'),(value.outbox_count||0)?'同步 '+value.outbox_count+' 项更新':'立即同步');
-    renderBrief(value);renderMembers(value.projection);renderRequests(value.requests||[]);renderLan(value.lan);
+    text(connection,running?'暂停团队连接':externalRegistered?'其他本机服务占用中':'启动团队连接');
+    text(q('[data-action-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'关闭在线状态':'开启在线状态');text(q('[data-action-sharing]'),config.sharing_enabled?'暂停项目状态共享':'开始共享项目状态');text(q('[data-action-sync]'),(value.outbox_count||0)?'同步 '+value.outbox_count+' 项更新':'立即同步');
+    renderOverview(value);renderMembers(value.projection);renderRequests(value.requests||[]);renderLan(value.lan);
   }
+  function setSettings(open){const backdrop=q('[data-team-settings-backdrop]'),trigger=q('[data-team-settings-open]');backdrop.classList.toggle('open',open);backdrop.setAttribute('aria-hidden',open?'false':'true');trigger.setAttribute('aria-expanded',open?'true':'false');if(open)q('[data-team-settings-close]').focus();else trigger.focus()}
   async function refresh(){try{render(await api('/team/api/status'));q('[data-team-notice]').className='to-notice';text(q('[data-team-notice]'),'本机状态已刷新；没有返回凭据或源码内容。')}catch(error){q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),error.message)}}
-  page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;let path=null,body={};
+  page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;if(button.hasAttribute('data-team-settings-open')){setSettings(true);return}if(button.hasAttribute('data-team-settings-close')){setSettings(false);return}let path=null,body={};
     if(button.dataset.teamAction){path='/team/api/'+button.dataset.teamAction}else if(button.dataset.requestDecision){path='/team/api/request/decision';body={request_id:button.dataset.requestId,decision:button.dataset.requestDecision}}else if(button.dataset.joinRequestId){path='/team/api/join/confirm';body={request_id:button.dataset.joinRequestId}}else{return}
     button.disabled=true;try{await api(path,body);await refresh()}catch(error){const action=button.dataset.teamAction||button.dataset.requestDecision;const friendly={start:'无法启动本机协作服务。可能存在其他 Team 页面或失效的本机登记，请按上方说明恢复。',disable:'无法退出 Team Mode。请先关闭其他本机 Team 页面后重试。',sync:'同步没有完成；本机待同步状态仍会保留。',accept:'请求尚未确认，请刷新后重试。',reject:'请求尚未拒绝，请刷新后重试。'}[action]||'本机操作没有完成；没有执行远程命令。';q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),friendly);button.disabled=false}});
+  q('[data-team-settings-backdrop]').addEventListener('click',event=>{if(event.target===event.currentTarget)setSettings(false)});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&q('[data-team-settings-backdrop]').classList.contains('open'))setSettings(false)});
   refresh();
 })();
 """
@@ -154,8 +157,7 @@ def render_team_observatory_panel() -> str:
         '<article class="page wide" id="team-observatory" data-kind="team-observatory" '
         'data-title="Team Observatory" data-authority="derived-read-only">'
         '<section class="to-shell"><header class="to-head"><div><span class="to-kicker">TEAM OBSERVATORY · LOCAL CONTROL</span>'
-        '<h2>团队指挥台</h2><p>先看谁在推进、哪里需要你处理；所有请求仍由目标成员在自己的电脑上确认。</p></div>'
-        '<span class="to-boundary">只共享状态 · 请求需本机确认</span></header>'
+        '<h2>团队指挥台</h2><p>先看谁在推进、哪里需要你处理；所有请求仍由目标成员在自己的电脑上确认。</p></div></header>'
         '<section class="to-onboarding" data-team-onboarding><h3>Personal Mode 正在保护默认体验</h3>'
         '<p>当前不会启动 Team socket。启用项目身份与启动 Coordinator 是两个独立动作；LAN bind 继续留在单独显式开关之后。</p>'
         '<div class="to-flow"><div class="to-step"><small>01 · DEFAULT</small><b>Personal</b><span>零监听、零发现、零同步</span></div><div class="to-arrow">→</div>'
@@ -165,23 +167,25 @@ def render_team_observatory_panel() -> str:
         '<div><b>中央不能做什么</b><span>不能执行 shell／Agent／merge／delete；accept/reject 也只写本机 receipt。</span></div></div>'
         '<button class="to-action primary" type="button" data-team-action="enable">在本机启用 Team Mode</button></section>'
         '<section class="to-workspace" data-team-workspace hidden>'
-        '<section class="to-brief"><div><span class="to-brief-label">现在的情况</span><h3 data-team-summary>正在读取本机团队状态…</h3><p data-team-guidance>状态不足时会保留 Unknown，不会推测成员在线或任务完成。</p></div>'
-        '<div class="to-signals"><div class="to-signal"><small>团队连接</small><b data-team-service>尚未启动</b></div><div class="to-signal"><small>可见成员</small><b><span data-team-member-count>0</span> 人</b></div><div class="to-signal"><small>等待你处理</small><b><span data-team-pending-count>0</span> 项</b></div><div class="to-signal"><small>等待同步</small><b><span data-team-outbox>0</span> 项</b></div></div></section>'
+        '<section class="to-overview"><div class="to-signals"><div class="to-signal"><small>团队连接</small><b data-team-service>尚未启动</b></div><div class="to-signal"><small>可见成员</small><b><span data-team-member-count>0</span> 人</b></div><div class="to-signal"><small>等待你处理</small><b><span data-team-pending-count>0</span> 项</b></div><div class="to-signal"><small>等待同步</small><b><span data-team-outbox>0</span> 项</b></div></div>'
+        '<div class="to-essential"><div class="to-mode-state"><small>Team Mode</small><b data-team-mode>TEAM · OPT-IN</b></div><p class="to-command-note" data-team-guidance>正在读取本机团队状态…</p><div class="to-essential-actions">'
+        '<button class="to-action primary" type="button" data-team-action="start" data-team-connection-action>启动团队连接</button><button class="to-action" type="button" data-team-action="heartbeat" data-action-heartbeat>开启在线状态</button>'
+        '<button class="to-action to-icon-action" type="button" data-team-settings-open aria-label="本机设置与诊断" title="本机设置与诊断" aria-haspopup="dialog" aria-controls="team-local-settings" aria-expanded="false">⚙</button><button class="to-action danger" type="button" data-team-action="disable">退出 Team Mode</button></div></div></section>'
         '<section class="to-actions"><div class="to-actions-head"><div><span class="to-section-label">建议操作</span><h3>按当前状态完成下一步</h3></div><span>这里的操作只影响你的本机节点</span></div><div class="to-action-strip">'
-        '<button class="to-action primary" type="button" data-team-action="start" data-action-start>启动本机协作服务</button><button class="to-action" type="button" data-team-action="discovery">显式发现同项目 Host</button><button class="to-action" type="button" data-team-action="sharing" data-action-sharing>开始共享项目状态</button>'
+        '<button class="to-action" type="button" data-team-action="discovery">显式发现同项目 Host</button><button class="to-action" type="button" data-team-action="sharing" data-action-sharing>开始共享项目状态</button>'
         '<button class="to-action" type="button" data-team-action="capture">采集本机状态</button><button class="to-action" type="button" data-team-action="sync" data-action-sync>立即同步</button></div></section>'
         '<div class="to-grid"><main class="to-main"><section class="to-section"><div class="to-section-head"><h3>发现、加入与连接</h3><span>发现是不可信提示，加入仍需凭据与 Host 本机确认</span></div><div data-lan-results></div></section><section class="to-section"><div class="to-section-head"><h3>成员与工作任务</h3><span data-team-member-note>按成员查看最近共享的 Workstream</span></div><div data-team-members></div></section></main>'
         '<aside class="to-side"><section class="to-section" data-team-requests><div class="to-section-head"><h3>待处理请求</h3><span>确认只记录决定，不会自动执行</span></div><div data-team-pending-requests></div>'
         '<details class="to-history" data-team-request-history hidden><summary data-team-history-summary>已处理请求（0）</summary><div data-team-request-history-list></div></details></section></aside></div>'
-        '<details class="to-diagnostics"><summary><div><b>本机控制与技术诊断</b><span>Coordinator、Host、在线状态、内部 ID 与测试入口</span></div><em>展开</em></summary><div>'
+        '</section><div class="to-notice" data-team-notice>正在读取本机团队状态…</div></section>'
+        '<div class="to-dialog-backdrop" data-team-settings-backdrop aria-hidden="true"><section class="to-dialog" id="team-local-settings" role="dialog" aria-modal="true" aria-labelledby="team-local-settings-title">'
+        '<header class="to-dialog-head"><div><h3 id="team-local-settings-title">本机设置与诊断</h3><p>低频控制与协议字段；这里的动作仍只影响当前本机节点。</p></div><button class="to-dialog-close" type="button" data-team-settings-close aria-label="关闭本机设置">×</button></header>'
         '<div class="to-statusline"><div><small>Mode</small><b data-team-runtime>Unknown</b></div><div><small>Member</small><b data-team-member>Unknown</b></div>'
         '<div><small>Host</small><b data-team-host>Unknown</b></div><div><small>Sharing / Heartbeat</small><b><span data-team-sharing>off</span> · <span data-team-heartbeat>off</span></b></div>'
         '<div><small>Last seen</small><b data-team-last-seen>Unavailable</b></div><div><small>Outbox</small><b data-team-outbox>0</b></div>'
         '<div><small>Discovery / candidates</small><b><span data-lan-discovery>never-started</span> · <span data-lan-candidates>0</span></b></div><div><small>Active Coordinator Host</small><b data-lan-host-generation>Unknown</b></div><div><small>Connection / reconnect</small><b data-lan-connection>disconnected · local work preserved</b></div></div>'
-        '<div class="to-controlbar"><span class="to-mode" data-team-mode>TEAM</span><button class="to-action" type="button" data-team-action="stop">暂停团队连接</button>'
-        '<button class="to-action" type="button" data-team-action="heartbeat" data-action-heartbeat>开启在线状态</button><button class="to-action" type="button" data-team-action="maintenance-request">请求成员本机评估维护</button><button class="to-action" type="button" data-team-action="request-create">创建测试请求</button><span class="to-spacer"></span><button class="to-action danger" type="button" data-team-action="disable">退出 Team Mode</button></div>'
-        '<div class="to-privacy"><b>只共享最小元数据</b><br>发现包仅含 protocol version、opaque project／Host／device hint、ephemeral endpoint／nonce／expiry；不发送 Prompt、回答、reasoning、transcript、源码正文、未 push diff、member token、API key 或 credential。最后快照只按 Core TTL 投影，不冒充实时在线；Host switch 只允许手工 generation 递增，不自动选主。</div></div></details></section>'
-        '<div class="to-notice" data-team-notice>正在读取本机团队状态…</div></section></article>'
+        '<div class="to-controlbar"><button class="to-action" type="button" data-team-action="maintenance-request">请求成员本机评估维护</button><button class="to-action" type="button" data-team-action="request-create">创建测试请求</button></div>'
+        '<div class="to-privacy"><b>只共享最小元数据</b><br>发现包仅含 protocol version、opaque project／Host／device hint、ephemeral endpoint／nonce／expiry；不发送 Prompt、回答、reasoning、transcript、源码正文、未 push diff、member token、API key 或 credential。最后快照只按 Core TTL 投影，不冒充实时在线；Host switch 只允许手工 generation 递增，不自动选主。</div></section></div></article>'
     )
 
 

@@ -14,6 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-27 W5E Team Observatory UI closeout](plans/2026-08-27-w5e-team-observatory-ui-closeout.md) — active Worktree plan that removes redundant Team summaries, keeps Team Mode／connection／online controls visible, and moves low-frequency local diagnostics into a secondary dialog without changing Core or network authority.
 - [2026-08-27 Workspace Maintenance and scheduled cleanup](plans/2026-08-27-workspace-maintenance-and-scheduled-cleanup.md) — proposed W6 Candidate Plan under ADR-0007/0008: event-driven and startup catch-up scans first, local confirmation execution second, explicit opt-in automatic worktree removal third, and cross-platform OS scheduler Adapters last.
 - [2026-08-27 W5C Team Observatory information architecture](plans/2026-08-27-w5c-team-observatory-ux.md) — active Worktree plan that turns the verified W5B protocol surface into a human-readable team command view without changing Team authority, network, request-only or release boundaries.
 - [2026-08-21 documentation governance and read-only audit](plans/2026-08-21-document-governance-and-audit.md) — active under ADR-0012; Phase 0 self-host governance and D1 internal finding contract／synthetic fixtures are complete as Candidate work, while scanner／CLI, Observatory and release adoption remain future phases.
