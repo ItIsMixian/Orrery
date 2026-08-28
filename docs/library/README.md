@@ -16,6 +16,7 @@ Material in this directory is **non-authoritative**. It may inform a proposal, b
 - [sivtr as a unified work-memory evidence layer](2026-08-19-sivtr-work-memory-source-notes.zh-CN.md) — Chinese source study of typed work records, stable refs, progressive retrieval, local-first boundaries, and the distinction between episodic evidence and authoritative project state.
 - [OpenProgram](https://github.com/Fzkuji/OpenProgram) — unreviewed source lead suggested by the maintainer for possible future DAG and task-orchestration study; no source inspection, evidence claim, or adoption decision has been made.
 - [Authority semantics, product core, and complexity boundaries](2026-08-20-authority-semantics-and-product-complexity-discussion.zh-CN.md) — maintainer-provided Chinese web-discussion capture distinguishing user Seed from Orrery's meta-level Authority Model, incremental semantic extraction from the Observatory, and user-facing versus internal research complexity.
+- [Composable integration interface notes](2026-08-27-composable-integration-interface-notes.zh-CN.md) — non-authoritative Chinese sketch of Context Export, Evidence Import, Runtime Identity Link, and Specialist Skill Contract, with a protocol-first and optional-adapter boundary.
 - [Context-routing benchmark](../../experiments/context-routing/) — non-authoritative experiment infrastructure and Git-grounded historical task corpus.
 - [Pilot 004 B/H holdout](../../experiments/context-routing/results/2026-08-18-pilot-004-bh-holdout-terra-medium.md) — both strategies passed the corrected independent acceptance surface; H was not adopted because it used 47% more input tokens overall.
 - [Current research State](../state/context-routing-research.md) — the authoritative current-project summary derived from the non-authoritative evidence above.
@@ -34,6 +35,7 @@ Material in this directory is **non-authoritative**. It may inform a proposal, b
 - [sivtr 统一工作记忆层观察](2026-08-19-sivtr-work-memory-source-notes.zh-CN.md)——分析类型化工作记录、稳定引用、渐进检索、local-first 边界，以及情境证据与权威项目事实的区别。
 - [OpenProgram](https://github.com/Fzkuji/OpenProgram)——维护者提供的未研究线索，未来可用于 DAG 与任务编排代码观察；当前没有打开源码、形成证据或作出采纳决定。
 - [Authority Semantics、产品核心与复杂性边界讨论](2026-08-20-authority-semantics-and-product-complexity-discussion.zh-CN.md)——维护者提供的网页端讨论摘录，区分用户 Seed 与 Orrery meta-level Authority Model，并记录 Observatory 渐进拆分及用户复杂性隔离方向；当前没有直接升级为 ADR 或实现。
+- [组合式集成接口草案](2026-08-27-composable-integration-interface-notes.zh-CN.md)——非权威记录 Context Export、Evidence Import、Runtime Identity Link 与 Specialist Skill Contract，以及协议优先、Adapter 可选、Core 不反向依赖生态的边界。
 - [上下文路由基准](../../experiments/context-routing/)——非权威实验基础设施与可由 Git 复核的历史任务语料。
 - [Pilot 004 B/H 留出任务结果](../../experiments/context-routing/results/2026-08-18-pilot-004-bh-holdout-terra-medium.md)——修正后的独立验收面上两种策略都通过；H 因总 input token 高 47% 而暂不采纳。
 - [当前研究 State](../state/context-routing-research.md)——由上述非权威证据派生的项目当前事实摘要。

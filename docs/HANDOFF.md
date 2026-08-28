@@ -1,6 +1,6 @@
 # 跨会话交接
 
-Updated: 2026-08-22
+Updated: 2026-08-27
 
 ## 当前情况
 
@@ -47,6 +47,7 @@ Updated: 2026-08-22
 - W1 和第二平台 Adapter 已经独立 worktree、干净整合、普通 wheel 复验和双平台 CI 进入 `origin/main`；旧 P3 分支占用的 ADR-0010 已重编号为 ADR-0013，Authority ADR-0010／0011／0012 保持不变。当前没有 tag、Release 或 Adapter 独立发行。
 - W1.1／W1.2／W1.3、D1 与 C1 已按 W1→D1→C1 顺序进入 `origin/main`；本地联合 273 项回归通过，C1 fixture 行尾冻结为 LF。首次远端 `32564000587` 为 Ubuntu PASS／Windows FAIL；修复 session-path 短／长路径断言后，`32564334514` Windows／Ubuntu 双 PASS。没有创建 Pilot 010、tag 或 Release。
 - self-host GitHub main 已启用 Candidate-first branch protection：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu checks，管理员也不能绕过；PR 不强制，main push 不重复运行同一 SHA。首次门禁验证使用 Candidate `e4e4442` 与 run `32566445483`。
+- CI1 已在 Candidate `codex/ci1-tiered-parallel-validation@67a2fe9` 完成本地 Worktree checkpoint：Fast／Promotion 分层、342 个最终 test ID 的 26 路唯一分片、exact-SHA 绑定、fail-closed 聚合器和 8/8 CI 专项均已本地验证。该 Candidate 尚未 push、尚未合入 `main`，也没有 hosted Windows／Ubuntu Promotion 结果；下一步仍是由唯一整合者执行 exact-SHA 远端晋级验证，不能写成 Canonical 已实现或性能目标已达成。
 
 ## 风险与常见陷阱
 
@@ -97,3 +98,4 @@ Updated: 2026-08-22
 12. Team／telemetry 相关工作还必须读取 [ADR-0008](decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)与[Design 收敛 Validation](validation/2026-08-20-multi-worktree-collaboration-design-consolidation.md)；默认 Personal Mode 不得监听网络，Team extension 不得先于 Personal foundation。
 13. Authority semantics 工作必须读取 [ADR-0009](decisions/0009-authority-meta-model-and-semantic-conformance.md)、[ADR-0010](decisions/0010-core-owned-authority-evaluator.md)、[ADR-0011](decisions/0011-authority-model-version-and-compatibility.md)、[活动 Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)、[State](state/authority-meta-model.md)和[M2 integration Validation](validation/2026-08-21-authority-meta-model-m2-local-canonical-integration.md)。下一步先单独审阅 managed production consumer／rollback，再由维护者另行选择实际 SemVer／candidate manifest；不得把两项阻塞在同一未经审阅的发布动作中关闭。
 14. 文档治理工作先读取 [ADR-0012](decisions/0012-document-governance-and-information-lifecycle.md)、[D1 Validation](validation/2026-08-22-d1-document-governance-finding-contract.md)和[Documentation State](state/documentation-system.md)。D2 scanner／CLI 尚未批准；不得自动清理 HANDOFF、把 finding 设为权威硬门或修改公开模板。
+15. 存量项目中途接入目前只有保守迁移契约，区分 `scaffold installed`、`authority migration pending` 与 `authority integrated`；尚未形成完整 Brownfield Adoption 研究或 Implementation Plan。未来继续时先研究真实存量仓库的文档角色映射、部分采纳、Legacy／Unknown、采用时间边界和分模块迁移，再由维护者确认结果后制定 Plan；不得把安装脚手架冒充正式采纳、批量覆盖作者文档或补造历史决策理由。
