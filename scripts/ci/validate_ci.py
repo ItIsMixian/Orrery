@@ -106,6 +106,27 @@ def validate_workflows(
     if dependency_step in preflight and "- name: Bind checkout to frozen candidate ref and SHA" in preflight:
         if preflight.index(dependency_step) > preflight.index("- name: Bind checkout to frozen candidate ref and SHA"):
             errors.append("Promotion preflight must install discovery dependencies before exact-SHA inventory validation")
+    aggregate_dependency_step = "- name: Install aggregate discovery dependencies"
+    aggregate_sections = {
+        "Windows": promotion.split("  smoke-test-windows:", 1)[-1].split(
+            "  smoke-test-ubuntu:", 1
+        )[0],
+        "Ubuntu": promotion.split("  smoke-test-ubuntu:", 1)[-1],
+    }
+    for platform, section in aggregate_sections.items():
+        _require(section, aggregate_dependency_step, errors, f"Promotion {platform} aggregate")
+        _require(
+            section,
+            "skills/project-orrery/assets/project-template/scripts/docsite/requirements.txt",
+            errors,
+            f"Promotion {platform} aggregate",
+        )
+        aggregate_step = "- name: Fail-closed aggregate"
+        if aggregate_dependency_step in section and aggregate_step in section:
+            if section.index(aggregate_dependency_step) > section.index(aggregate_step):
+                errors.append(
+                    f"Promotion {platform} aggregate must install discovery dependencies before inventory aggregation"
+                )
     branch_items = [line.strip() for line in promotion_triggers.splitlines() if line.strip().startswith("-")]
     if branch_items != ['- "promotion/**"']:
         errors.append(f"Promotion push branches must be exactly promotion/**: {branch_items}")

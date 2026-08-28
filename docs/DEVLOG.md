@@ -3,10 +3,11 @@
 ## 2026-08-28 — W7D W7 Integration Candidate
 
 - 精确从 CI2 `8b635b1` 建立独立 `codex/w7d-w7-integration-candidate`，写入前注册 Git-private Workstream；复核 W7A→W7B→CI2 祖先链、两输入 clean worktree 与 W7C-A 对应树已被 W7C-B 字节级吸收，只加法合入 W7C-B `d411fd6`。
-- 对 DEVLOG、Implementation/Validation 索引、四份 subsystem State、组件版本和 CI manifest 做语义整合。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9；schema 2 保留 Fast 15 秒、Checkpoint 90 秒和独立 W7B Promotion 300 秒。首个 hosted run `33192497123` 在矩阵前暴露 preflight 缺 docsite discovery requirements；workflow、validator 与顺序回归修复后机械 inventory 为 376 IDs／27 shards／51 Fast／69 Checkpoint。
+- 对 DEVLOG、Implementation/Validation 索引、四份 subsystem State、组件版本和 CI manifest 做语义整合。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9；schema 2 保留 Fast 15 秒、Checkpoint 90 秒和独立 W7B Promotion 300 秒。preflight 与双平台 aggregate discovery dependency 顺序均纳入 workflow validator/回归，最终机械 inventory 为 377 IDs／27 shards／51 Fast／70 Checkpoint。
 - W7B 的 discovery/plan/human confirmation/apply/recovery/receipt/undo 是已实现 Candidate 能力，但真实 self-host apply、默认 UI 执行入口和公开发布仍未发生；W7C 图继续只读且没有 apply/undo/close/delete 控件，中央 Team 视图没有执行权。
 - Focused 13/13、初始 Fast 51/51 2.132432 秒、Checkpoint 68/68 81.201647 秒通过；preflight 修复后 CI contract 10/10、新增第 69 个 Checkpoint selector 独立通过，最终 hosted 修复后的 Fast 51/51 为 2.328416 秒，未机械重跑完整 Checkpoint。1280×900 与 390×844 in-app Chromium 覆盖三 lens、筛选、历史、节点/边 inspector、键盘、安全链接、零横向溢出与零 console warning/error。唯一一次 W7B Promotion 的 4/4 测试断言成功，但 311.803221 秒超过 300 秒预算而由 runner 正确判 FAIL；未放宽预算或重跑，逐测试对照、结构门与 hosted exact-SHA 结果进入独立 W7D Validation。
 - 修复后的 hosted run `33192808364` 进入完整矩阵，W7B 在 Windows 2m36s／Ubuntu 20s 双 PASS；required checks 仍因 W7C 测试读取 self-host Git-private session、Authority lazy `_llm`/ADR-0014 expected map 与 Windows workspace 字符串路径比较失败。对应修复后本地 workspace 3/3、Team UI 16/16、Authority 127/127 通过；没有改预算、产品关系执行权、图形按钮或发布边界。
+- 第三轮 hosted run `33193955085` 的 54 个跨平台 Promotion shard 与两侧 repository gate 全部通过，W7B 为 Windows 2m32s／Ubuntu 31s；两个 required aggregate 在下载完整 27 份 artifact 后因自身未安装 `mistune` 而失败。现已在 Windows/Ubuntu aggregate 清点前安装相同 discovery requirements，并新增双平台顺序门；这是 CI 聚合装置修复，不改变测试选择或产品边界。
 
 ## 2026-08-28 — CI2 Tiered Test Performance Candidate
 
