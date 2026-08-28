@@ -46,7 +46,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - CI1 Worktree Candidate 的 inventory、timing result、aggregate receipt 与 Fast artifact 都是 machine-readable Validation evidence，不是 State／ADR／Promotion 事实。Fast 输出显式标注非 Promotion；只有冻结 exact SHA 的双平台 aggregator 与既有 required checks 能形成后续推广证据，且 hosted 性能目标仍须远端实测。
 - W5E Worktree Candidate 只改变 Team 派生页面的信息层级：去除重复摘要，把四项状态与三个关键本机控制置顶，并以齿轮弹窗承载低频诊断。组合式接口草案继续位于 Library，Brownfield Migration 只进入 HANDOFF 接续约束；二者没有升级为 ADR、公共 API、Plan 已实施或 released 能力。
 - W7A Worktree Candidate 的 relation record／graph／plan 与 Git-common-private event 都是协调控制面，不是作者 State／Plan／Validation。legacy `base_workstream_id/task_base_oid` 只读投影不会改写 session；graph source links 可以回到 Git-private／Validation 证据，但不得被 Observatory 或 AI 升级为项目权威。
-- W7A Core graph 只输出 node／edge status、evidence、active tips、Unknown、source links 与 compare/suppress reason codes；不输出颜色、坐标、布局或 UI 文案。W7C 的图形派生必须消费该 versioned graph，不能重新解释关系或隐藏保守 Unknown。
+- W7A Core graph 的 node 分开输出 lifecycle phase、runtime condition、evidence freshness、Scope、primary/affected subsystem、visibility、observability 与安全 source links；edge 输出 lifecycle/evidence/source links，pair plan 输出 active tips、Unknown 与 compare/suppress reason codes。Core 不输出颜色、坐标、布局、折叠或 UI 文案。W7C-B 的图形派生必须消费该 versioned graph，不能重新解释关系或隐藏保守 Unknown。
 
 ## 同步状态
 
@@ -104,6 +104,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
 - W3 已实现证据优先审查与清理资格；当前 W5D Worktree Candidate 在 W4 health／W5C UI／W6 maintenance 上增加显式 LAN discovery、join、manual Host switch 与 lineage chain 投影。默认 docsite／发布模板不加载动态 Team／Maintenance；Phase 3 自动删除、Phase 4 scheduler、富成员管理、真实双机/LAN、自动选主与云 relay 仍未实现，当前事实作用域由 containing ref 决定。
-- W7A 尚未实现 W7B 的真实关系迁移/apply/undo，也未实现 W7C 正式图形页；当前默认 docsite、Skill template 与生成站点没有 relation graph consumer。
+- W7A 尚未实现 W7B 的真实关系迁移/apply/undo，也未实现 W7C-B 正式图形页；当前只用标记为 synthetic-non-authoritative 的兼容 fixture 对照 W7C-A `a39f6a7` 设计探索，未复制其 provisional schema 或页面。默认 docsite、Skill template 与生成站点没有 relation graph consumer。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

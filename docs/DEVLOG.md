@@ -2,6 +2,9 @@
 
 ## 2026-08-28 — W7A Dynamic Workstream Succession Contract
 
+- 中央只读验收拒绝初始 `b6be68e`：旧 node summary 把 waiting/paused/blocked/failed 误判 active，且 apply/undo 无法原子标记/恢复 predecessor Session。本 correction 在同一 ADR-0014 下修正，不改写 peer Session 或 W7C-A。
+- Core 0.1.13／CLI 0.1.17 保留独立 lifecycle/runtime/evidence/Scope/subsystem/visibility/observability 轴，以严格 active eligibility 和 completed predecessor `closed/superseded` 失败关闭修复 active-tip；apply/receipt/undo 冻结 exact graph/Session/HEAD/no-drift 与无删除原子 I/O，执行仍留给 W7B。
+- 新增 synthetic-non-authoritative W7C consumer compatibility fixture；只读对照 `w7c-a@a39f6a7` 的字段需求，不复制 provisional schema、页面、布局或 UI 权威。Focused 15/15，CI1 inventory 357 IDs／26 shards／48 Fast。
 - 从 `W5E-team-observatory-ui-closeout@692d19b` 注册独立 Git-private W7A session，并以 ADR-0014／Approved Design／Candidate Plan 正式接受增量关系方向。
 - 新增 provider-neutral `derived_from`／`depends_on`／`absorbs` event、五态 lifecycle、graph／active-tip／discovery／apply／undo／legacy projection contract，以及 `$GIT_COMMON_DIR/orrery/workstream-relations/` append-only 边界。
 - Core 0.1.12 与 CLI 0.1.16 提供 dependency-free exact OID/ancestor、cycle/multi-parent、post-fork/sibling/Unknown/L2-L3 保守判定和 `relations graph|succession-plan|propose`；Observatory 与公开 v0.2.0 未改变。

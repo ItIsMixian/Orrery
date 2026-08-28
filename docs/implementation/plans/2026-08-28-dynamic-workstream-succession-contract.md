@@ -1,6 +1,6 @@
 # 实施计划：W7A Dynamic Workstream Succession Contract
 
-Status: Active Candidate Plan
+Status: Completed Candidate Plan
 
 Date: 2026-08-28
 
@@ -33,12 +33,16 @@ tasks, control Agents, delete worktrees/branches, push, merge main, change branc
    - Resolve exact local OIDs/ancestry without network; retain proposed/Unknown on insufficient evidence.
    - Compute deterministic active tips and compare/suppress pair reasons without hiding sibling, parent post-fork,
      stale/Unknown, L2/L3 or exclusive findings.
+   - Preserve independent Session/lifecycle/runtime/evidence/Scope/subsystem/visibility/observability node axes;
+     derive status fail-closed and exclude every non-active runtime from active tips.
+   - Reject completed takeover whose predecessor is not exact `closed/superseded`.
    - Project legacy `base_workstream_id/task_base_oid` sessions read-only.
 3. **Storage and CLI**
    - Implement read-only `$GIT_COMMON_DIR/orrery/workstream-relations/` loading with absent-root zero-write behavior.
    - Add stable `relations graph` and `relations succession-plan` JSON envelopes.
    - Permit only explicit local `relations propose` append for revision 1; do not use it on real project relations.
-   - Freeze W7B discovery/apply/undo I/O builders with `writes_performed=false`.
+   - Freeze W7B atomic predecessor Session transition, apply receipt, exact no-drift undo/restore and preservation
+     I/O builders with `writes_performed=false`／`execution_supported=false`.
 4. **Version and CI inventory**
    - Raise unreleased Core/CLI component versions while keeping Core API and JSON envelope version stable.
    - Add W7A tests to CI1 Fast and exactly one Promotion shard; update inventory expectations mechanically.
@@ -61,7 +65,13 @@ tasks, control Agents, delete worktrees/branches, push, merge main, change branc
 - append-only, no author-document write, no network and deterministic JSON;
 - legacy `base_workstream_id/task_base_oid` read-only projection;
 - W7B apply/undo/legacy inference contract contains no delete/execute operations;
-- W7C graph JSON contains node/edge status, evidence, active tips, Unknown and source links, but no layout/color/UI text.
+- waiting-for-user, paused, blocked-by-conflict, failed, offline and stale-unknown never become active tips;
+- runtime active and review-ready/review-pending positive controls;
+- completed takeover fails closed while predecessor remains open, and accepts exact closed/superseded state or a
+  same-plan atomic transition;
+- apply/undo binds exact Session transition, receipt and no-drift restore without delete operations;
+- W7C compatibility fixture maps stable IDs, independent axes, subsystem, visibility/observability, edge evidence,
+  active tips, Unknown and compare/suppress reasons without layout/color/folding/UI text.
 
 ## Validation ladder
 
@@ -85,3 +95,10 @@ integrator's later responsibility on a frozen exact SHA.
   accessible list fallback; it must not reimplement Core semantics.
 - Any request to execute migration against real W5C/W6/W5D/CI1/W5E sessions, delete workspace objects or change the
   graph contract requires a new reviewed Plan/ADR as applicable.
+
+## Correction checkpoint
+
+Central read-only acceptance rejected initial Candidate `b6be68e55c149f43bbec420654b56855a4068a28` because its
+node summary treated paused/waiting/blocked/failed tasks as active and its apply/undo plan could not mark/restore the
+predecessor Session. This checkpoint corrects the implementation and the same accepted ADR/Design; it does not
+rewrite peer Sessions, materialize real relations, or promote W7A/W7C-A experiment artifacts into authority.

@@ -1,0 +1,86 @@
+{
+  "fixture_id": "w7c-consumer-compatibility-v1",
+  "schema_version": 1,
+  "authority": "synthetic-non-authoritative",
+  "source_exploration": "codex/w7c-a-workstream-graph-visual-prototype@a39f6a701ef39e6bb3eb3b7ec05a9b5dc7416ef1:experiments/workstream-graph-visual-prototype/design-exploration.md",
+  "description": "Read-only semantic compatibility fixture; it does not import the provisional W7C-A schema or page implementation.",
+  "required_node_fields": [
+    "workstream_id", "status", "session_state", "lifecycle_phase", "runtime_condition",
+    "evidence_freshness", "scope_status", "primary_subsystem_id", "affected_subsystem_ids",
+    "visibility", "observability", "source_links"
+  ],
+  "required_edge_fields": [
+    "relation_id", "relation_type", "lifecycle", "evidence", "source_links",
+    "effective_active_succession", "evidence_reason_codes"
+  ],
+  "required_plan_fields": [
+    "active_tip_workstream_ids", "unknown_workstream_ids", "compare_pairs", "suppress_direct_pairs",
+    "blocking_dependencies"
+  ],
+  "nodes": [
+    {
+      "workstream_id": "predecessor", "status": "inactive", "session_state": "current",
+      "lifecycle_phase": "validating", "runtime_condition": "paused", "evidence_freshness": "current",
+      "head_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope_status": "current", "closure_reason": null,
+      "primary_subsystem_id": "multi-worktree-collaboration",
+      "affected_subsystem_ids": ["documentation-system"], "visibility": "worktree-local",
+      "observability": "local", "source_links": [{"kind": "workstream-session", "ref": "fixture:predecessor"}],
+      "origin": "native"
+    },
+    {
+      "workstream_id": "successor", "status": "active", "session_state": "current",
+      "lifecycle_phase": "implementing", "runtime_condition": "active", "evidence_freshness": "current",
+      "head_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "scope_status": "current", "closure_reason": null,
+      "primary_subsystem_id": "multi-worktree-collaboration",
+      "affected_subsystem_ids": ["release-and-toolchain", "test-coverage"], "visibility": "team-metadata",
+      "observability": "local", "source_links": [{"kind": "workstream-session", "ref": "fixture:successor"}],
+      "origin": "native"
+    },
+    {
+      "workstream_id": "unknown-peer", "status": "unknown", "session_state": "current",
+      "lifecycle_phase": "implementing", "runtime_condition": "offline", "evidence_freshness": "unknown",
+      "head_oid": "cccccccccccccccccccccccccccccccccccccccc",
+      "scope_status": "unknown", "closure_reason": null,
+      "primary_subsystem_id": "test-coverage", "affected_subsystem_ids": [],
+      "visibility": "team-metadata", "observability": "unavailable",
+      "source_links": [{"kind": "workstream-session", "ref": "fixture:unknown-peer"}], "origin": "discovery"
+    }
+  ],
+  "records": [
+    {
+      "schema_version": 1, "contract_type": "workstream-relation-record",
+      "event_id": "event-successor-predecessor", "relation_id": "rel-successor-predecessor", "revision": 1,
+      "relation_type": "derived_from", "source_workstream_id": "successor", "target_workstream_id": "predecessor",
+      "lifecycle": "active", "recorded_at": "2026-08-28T00:00:00Z",
+      "actor": {"kind": "human", "actor_id": "maintainer"}, "origin": "native",
+      "reason": "synthetic exact succession evidence",
+      "evidence": {
+        "status": "confirmed", "source_head_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "target_head_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "task_base_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "ownership_transfer_oid": null,
+        "source_head_status": "current", "target_head_status": "current", "scope_status": "current",
+        "ancestry_status": "confirmed", "dependency_status": "not-applicable",
+        "ownership_transfer_status": "not-applicable", "target_unique_commits_after_base": 0
+      },
+      "source_links": [{"kind": "git-commit", "ref": "fixture:aaaaaaaa"}], "writes_performed": false
+    },
+    {
+      "schema_version": 1, "contract_type": "workstream-relation-record",
+      "event_id": "event-unknown-successor", "relation_id": "rel-unknown-successor", "revision": 1,
+      "relation_type": "depends_on", "source_workstream_id": "unknown-peer", "target_workstream_id": "successor",
+      "lifecycle": "proposed", "recorded_at": "2026-08-28T00:01:00Z",
+      "actor": {"kind": "tool", "actor_id": "fixture-builder"}, "origin": "discovery",
+      "reason": "synthetic Unknown dependency remains visible",
+      "evidence": {
+        "status": "unknown", "source_head_oid": "cccccccccccccccccccccccccccccccccccccccc",
+        "target_head_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "task_base_oid": null,
+        "ownership_transfer_oid": null, "source_head_status": "unknown", "target_head_status": "current",
+        "scope_status": "unknown", "ancestry_status": "not-applicable", "dependency_status": "unknown",
+        "ownership_transfer_status": "not-applicable", "target_unique_commits_after_base": null
+      },
+      "source_links": [{"kind": "relation", "ref": "fixture:unknown-dependency"}], "writes_performed": false
+    }
+  ]
+}

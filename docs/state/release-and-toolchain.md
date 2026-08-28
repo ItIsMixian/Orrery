@@ -22,7 +22,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - ADR-0004 Phase 0 已完成：v0.2.0 的 36 个发布路径、8 个 managed tools、checksum、CLI 入口与 manifest 必需字段已进入机器可读基线；installer／validator／update checker 的人类输出有回归断言，模板 `AGENTS.md` 标题已中立化。
 - 公开 README 当前把可直接运行但仍随 Skill 分发的 Core／CLI 路径、整体仍为 `experimental`／未发布但精确 runtime 范围为 `verified` 的 Codex Adapter，以及 `target` 其他平台分开表述；这不构成独立 Core／CLI 包发布，也不得把验证范围外推到其他 runtime 或 OS。
 - 三个未发布组件初始版本均为 `0.1.0`；当前 W5E Worktree Candidate 为 Core 0.1.11／CLI 0.1.15／Observatory 0.1.8，Core API 仍为 1；仅 containing ref 为 main 时才是 Canonical。旧 Skill wrapper、managed-tool inventory 与冻结 v0.2 fallback 不变。
-- 当前 W7A Worktree Candidate 为 Core 0.1.12／CLI 0.1.16／Observatory 0.1.8，Core API 与 CLI JSON envelope schema 仍为 1。`project-orrery relations graph|succession-plan` 只读加载 Core graph；`relations propose` 只在本机显式调用时 append revision 1 proposed event。该 CLI、schema 与版本尚未发布。
+- 当前 W7A correction Worktree Candidate 为 Core 0.1.13／CLI 0.1.17／Observatory 0.1.8，Core API、relation schema version 与 CLI JSON envelope schema 仍为 1。`project-orrery relations graph|succession-plan` 只读加载修正后的多轴 Core graph；`relations propose` 只在本机显式调用时 append revision 1 proposed event。apply/undo 仅有 `execution_supported=false` 的 exact Session/receipt contract，该 CLI、schema 与版本尚未发布。
 - Observatory 的 9 个当前 managed tools 由独立 component manifest 清点；根观测台与 Skill 模板之间的标题差异通过显式模板投影表达，不复制项目事实。
 - 工作树的未发布 Codex Adapter 当前为 0.1.1：独立 manifest、`SKILL.md`、`agents/openai.yaml`、安装说明与平台安装器位于 `adapters/codex/`；它只声明 Core API 1 与 CLI `>=0.1.0,<0.2.0` 依赖，不包含 canonical 模板、schema 或兼容规则。既有 verified runtime evidence 仍绑定 0.1.0。
 - `scripts/package_codex_adapter.py` 可生成固定条目顺序／时间／权限的独立 ZIP 和 SHA-256；平台安装器支持 dry-run、未知目录拒绝、旧 Skill／已识别 Adapter 整目录备份升级和移入可恢复回收目录的卸载。备份与回收目录位于 skills discovery 根之外，避免宿主重复发现旧 `SKILL.md`。
@@ -49,7 +49,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - W5D Candidate 增加 `team discovery-serve|discovery-scan|discovery-status`、candidate-aware join、`coordinator-switch-create|coordinator-switch-claim` 与 `worktree ... --base-workstream-id/--task-base-oid`。LAN acceptance runner／validator 是仓库工具，不进入公开 v0.2.0 包；它只在系统临时目录创建本地 clone，使用 controlled discovery＋loopback HTTP，并输出脱敏 checksum verdict。没有 push、tag、Release、云 relay、自动选主或 scheduler 变更。
 - CI1 Worktree Candidate 增加 dependency-free unittest inventory／26-shard manifest、逐项 timing JSON runner、fail-closed aggregate 与 workflow static validator；Fast 对普通 push／PR 提供非 Promotion 反馈，Promotion 只接受显式 ref＋exact SHA 或 `promotion/**` 冻结分支。既有 branch-protection context 名不变，`release.yml` 的 tag 发布门不在本 Workstream 改写，且本 Candidate 没有调用 GitHub API、push、tag 或 Release。
 - W5E Worktree Candidate 只将 Observatory 0.1.7 提升至 0.1.8：重排 Team 页面与本机设置弹窗，未修改 Core／CLI、Team server route、安全 POST、CI workflow、managed-tool inventory、Skill template、installer、release manifest、tag 或 Release。
-- W7A 不修改 Observatory managed tools、Skill template、installer、release manifest、tag 或 Release。Git-common-private relation 文件不属于 package input；W7B apply/undo 与 W7C UI 均保持未实现。
+- W7A 不修改 Observatory managed tools、Skill template、installer、release manifest、tag 或 Release。Git-common-private relation 文件不属于 package input；W7B apply/undo execution 与 W7C-B UI 均保持未实现。
 
 ## 实现证据
 

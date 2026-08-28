@@ -33,18 +33,25 @@ State、Plan、Validation 或新的调度权威。
    `derived_from` 主要 Git task base。其他 predecessor 必须明确表达为 `depends_on` 或 `absorbs`。
 5. 关系事件以 append-only 记录保存在 `$GIT_COMMON_DIR/orrery/workstream-relations/`。读取不得创建目录；
    写入不得覆盖历史事件。该区域不进入作者文档、发布包、默认模板或生成站点。
-6. W7A 冻结 provider-neutral record／graph／discovery／apply／undo／legacy inference contract。自动发现和
-   验证只产生 proposed plan；批量 apply 需要一次明确的本机 plan 确认，undo 追加补偿事件，不删除历史。
-   W7A 只实现 proposed relation 的单条显式本机 append，不实施真实批量迁移。
+6. W7A 冻结 provider-neutral record／graph／discovery／apply／apply-receipt／undo／undo-receipt／legacy
+   inference contract。自动发现和验证只产生 proposed plan；批量 apply 需要一次明确的本机 plan 确认，
+   并原子绑定 exact graph、predecessor Session hash／HEAD／原 lifecycle／runtime。undo 必须绑定 exact
+   apply receipt，在无漂移时追加补偿事件并恢复 predecessor Session；W7A 不实施真实批量迁移。
 7. 图验证必须拒绝自指、重复有效 edge、cycle、多个主要 Git parent、非法 OID 和被证明非祖先的
    `derived_from`。branch 名或路径相似度不是证据；无法读取 parent／OID／HEAD 时保持 Unknown。
-8. `active tip` 是未被当前、证据充分的 active `derived_from`／`absorbs` 后继接管的活跃叶节点。
-   只有 active tips 参与当前 Direct finding 的祖先／后继去重。parent 在 fork 后有独有提交、sibling、
-   stale／Unknown、证据漂移、真实 L2/L3 与 exclusive resource 均不得被隐藏。
-9. relation apply／undo 只追加关系事件。它不删除 worktree、branch、commit、Validation 或作者文档；
-   删除仍由 W6 maintenance 的独立授权和重新验证负责。
-10. Core 输出无布局意见的 versioned relation graph JSON：node／edge status、evidence、active tips、Unknown、
-    source links 与冲突比较／抑制原因。Core 不输出颜色、坐标、动画或 UI 文案。
+8. `active tip` 只来自 Session、evidence 与 Scope 均 current、`runtime_condition=active` 且尚未结束的节点；
+   `review-ready` 可派生为 `review-pending`。`waiting-for-user`、`paused`、`blocked-by-conflict`、`failed`、
+   `offline` 与 `stale-unknown` 均不是 active tip。只有 active tips 参与当前 Direct finding 的祖先／后继去重；
+   parent 在 fork 后有独有提交、sibling、stale／Unknown、证据漂移、真实 L2/L3 与 exclusive resource
+   均不得被隐藏。
+9. active takeover 必须在同一 exact plan 中把 predecessor 标记为可逆的 Git-private 非活跃 Session 状态，
+   并在 receipt 中保存原状态。completed takeover 只有在 predecessor 已 `closed/superseded`，或同一原子
+   plan 把它转成该状态时才成立；否则 graph 失败关闭并保持比较。apply／undo 不删除 worktree、branch、
+   commit、Validation、关系历史或作者文档；删除仍由 W6 maintenance 独立授权和重新验证。
+10. Core 输出无布局意见的 versioned relation graph JSON。node 分开保存 `lifecycle_phase`、
+    `runtime_condition`、`evidence_freshness`、Scope、subsystem、visibility、observability 与安全 source links；
+    edge 保存 lifecycle、evidence 与 source links，succession plan 保存 active tips 及 compare／suppress reason。
+    Core 不输出颜色、坐标、动画、折叠策略或 UI 文案。
 11. Observatory 只能消费 Core graph。W7C 可在此契约上实现 Succession／Dependency／Conflict 派生视图、
     active-tip 高亮、历史折叠、Unknown 虚线和可访问列表；W7A 不实现正式图形页面。
 12. 本契约不是通用 DAG 调度器，不负责模型选择、任务排程、Agent 启停、自动执行、云资源或远程控制。
@@ -64,7 +71,19 @@ State、Plan、Validation 或新的调度权威。
 - 关系存储会长期保留事件，未来 W7B 需要 retention／compaction 设计时必须保持可审计历史。
 - 旧 `base_workstream_id`／`task_base_oid` 只能投影为只读兼容 edge，不自动回写真实 session。
 - Active-tip 计算需要精确 HEAD／task-base／ancestor 与 parent drift 证据；无法证明时比较保持开启。
+- `completed` succession 不能仅靠 relation lifecycle 隐式关闭旧任务；predecessor 的 exact
+  `closed/superseded` Session 或同一 apply plan 内的原子 transition 是必需证据。
 - 图形展示与批量迁移分别属于 W7C／W7B，不能以 W7A schema 已存在宣称它们完成。
+
+## 2026-08-28 correction checkpoint
+
+初始实现提交 `b6be68e55c149f43bbec420654b56855a4068a28` 把多个 Session 轴压成 node
+`status/evidence/scope`，并把除 offline／stale-unknown 外的非结束 runtime 误映射为 active；其 apply／undo
+shape 也只包含 relation append，无法原子标记或恢复 predecessor。中央只读验收据此拒绝整合。
+
+本次修正不改变上述已接受方向，也不新增 ADR：它把独立状态轴、严格 active eligibility、completed
+takeover fail-closed、exact Session transition／receipt／undo no-drift 以及 W7C-B 的 layout-neutral consumer
+字段补入同一 ADR-0014。旧提交仍作为被修正的 Candidate 历史保留，不被描述为已整合或已发布。
 
 ## Implementation and validation mapping
 

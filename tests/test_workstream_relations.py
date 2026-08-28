@@ -26,6 +26,7 @@ from project_orrery_cli import workstream_relations as relations_cli  # noqa: E4
 from project_orrery_core.collaboration import create_worktree, write_workstream_session  # noqa: E402
 from project_orrery_core.schema import WORKSTREAM_RELATIONS_SCHEMA  # noqa: E402
 from project_orrery_core.workstream_relations import (  # noqa: E402
+    _node_from_session,
     append_proposed_relation,
     build_apply_plan,
     build_discovery_plan,
@@ -39,12 +40,14 @@ from project_orrery_core.workstream_relations import (  # noqa: E402
     load_relation_graph,
     load_relation_history,
     relation_storage_root,
+    validate_apply_receipt,
     validate_relation_record,
 )
 from tests.fixtures.collaboration.git_fixture import CollaborationGitFixture  # noqa: E402
 
 
 FIXTURE = ROOT / "tests" / "fixtures" / "workstream-relations" / "v1" / "succession-chain.json"
+W7C_FIXTURE = ROOT / "tests" / "fixtures" / "workstream-relations" / "v1" / "w7c-consumer-compatibility.json"
 TIMESTAMP = "2026-08-28T00:00:00Z"
 
 
@@ -154,6 +157,59 @@ def relation(
     )
 
 
+def node(
+    workstream_id: str,
+    head_oid: str | None,
+    *,
+    lifecycle_phase: str = "implementing",
+    runtime_condition: str = "active",
+    evidence_freshness: str = "current",
+    session_state: str = "current",
+    scope_status: str = "current",
+    closure_reason: str | None = None,
+    status: str | None = None,
+    origin: str = "native",
+    primary_subsystem_id: str = "multi-worktree-collaboration",
+    affected_subsystem_ids: list[str] | None = None,
+    visibility: str = "worktree-local",
+    observability: str = "local",
+) -> dict[str, object]:
+    if status is None:
+        if session_state != "current":
+            status = "stale"
+        elif lifecycle_phase in {"closed", "integrated"}:
+            status = "completed"
+        elif runtime_condition == "blocked-by-conflict":
+            status = "blocked"
+        elif runtime_condition == "failed":
+            status = "failed"
+        elif runtime_condition in {"waiting-for-user", "paused"}:
+            status = "inactive"
+        elif runtime_condition in {"offline", "stale-unknown", "unknown"}:
+            status = "unknown"
+        elif lifecycle_phase == "review-ready":
+            status = "review-pending"
+        else:
+            status = "active"
+    return {
+        "workstream_id": workstream_id,
+        "status": status,
+        "session_state": session_state,
+        "lifecycle_phase": lifecycle_phase,
+        "runtime_condition": runtime_condition,
+        "evidence_freshness": evidence_freshness,
+        "head_oid": head_oid,
+        "scope_status": scope_status,
+        "closure_reason": closure_reason,
+        "primary_subsystem_id": primary_subsystem_id,
+        "affected_subsystem_ids": affected_subsystem_ids or [],
+        "visibility": visibility,
+        "observability": observability,
+        "source_links": [{"kind": "workstream-session", "ref": f"fixture:{workstream_id}"}],
+        "origin": origin,
+    }
+
+
 class WorkstreamRelationTests(unittest.TestCase):
     def test_schema_fixture_active_tips_late_ci_and_no_layout_contract(self) -> None:
         self.assertEqual(WORKSTREAM_RELATIONS_SCHEMA["$defs"]["relation_type"]["enum"], ["derived_from", "depends_on", "absorbs"])
@@ -189,6 +245,72 @@ class WorkstreamRelationTests(unittest.TestCase):
             self.assertNotIn(forbidden, serialized)
         self.assertTrue(all("source_links" in node for node in graph["nodes"]))
         self.assertTrue(all("evidence" in edge for edge in graph["edges"]))
+
+    def test_runtime_and_evidence_axes_fail_closed_for_active_tips(self) -> None:
+        def session(workstream_id: str, runtime: str, *, lifecycle: str = "implementing", evidence: str = "current") -> dict[str, object]:
+            return {
+                "workstream_id": workstream_id,
+                "head": (workstream_id[0].lower() if workstream_id[0].lower() in "abcdef" else "a") * 40,
+                "lifecycle_phase": lifecycle,
+                "runtime_condition": runtime,
+                "evidence_freshness": evidence,
+                "closure_reason": None,
+                "primary_subsystem_id": "multi-worktree-collaboration",
+                "affected_subsystem_ids": ["test-coverage"],
+                "visibility": "worktree-local",
+                "observability": "local",
+            }
+
+        inactive_conditions = [
+            "waiting-for-user", "paused", "blocked-by-conflict", "failed", "offline", "stale-unknown",
+        ]
+        projected = [
+            _node_from_session(session(runtime, runtime), "current") for runtime in inactive_conditions
+        ]
+        projected.extend([
+            _node_from_session(session("active", "active"), "current"),
+            _node_from_session(session("review", "active", lifecycle="review-ready"), "current"),
+            _node_from_session(session("unknown-evidence", "active", evidence="unknown"), "current"),
+        ])
+        graph = build_relation_graph([], nodes=projected)
+        self.assertEqual(graph["active_tip_workstream_ids"], ["active", "review"])
+        status = {item["workstream_id"]: item["status"] for item in graph["nodes"]}
+        self.assertEqual(status["waiting-for-user"], "inactive")
+        self.assertEqual(status["paused"], "inactive")
+        self.assertEqual(status["blocked-by-conflict"], "blocked")
+        self.assertEqual(status["failed"], "failed")
+        self.assertEqual(status["offline"], "unknown")
+        self.assertEqual(status["stale-unknown"], "unknown")
+        self.assertEqual(status["review"], "review-pending")
+        self.assertIn("unknown-evidence", graph["unknown_workstream_ids"])
+        contradictory = node("contradictory", "f" * 40, runtime_condition="paused")
+        contradictory["status"] = "active"
+        with self.assertRaisesRegex(ValueError, "does not match its independent state axes"):
+            build_relation_graph([], nodes=[contradictory])
+
+    def test_completed_takeover_requires_closed_superseded_predecessor(self) -> None:
+        completed = relation("rel-successor-predecessor", "derived_from", "successor", "predecessor", lifecycle="completed")
+        open_nodes = [node("successor", "b" * 40), node("predecessor", "a" * 40)]
+        invalid = build_relation_graph([completed], nodes=open_nodes)
+        self.assertFalse(invalid["validation"]["valid"])
+        self.assertIn(
+            "completed-takeover-predecessor-not-closed-superseded",
+            {item["code"] for item in invalid["validation"]["errors"]},
+        )
+        pair = build_succession_plan(invalid)["compare_pairs"][0]
+        self.assertIn("completed-takeover-predecessor-not-closed-superseded", pair["reason_codes"])
+
+        closed_nodes = [
+            node("successor", "b" * 40),
+            node(
+                "predecessor", "a" * 40, lifecycle_phase="closed", runtime_condition="paused",
+                closure_reason="superseded",
+            ),
+        ]
+        valid = build_relation_graph([completed], nodes=closed_nodes)
+        self.assertTrue(valid["validation"]["valid"])
+        self.assertEqual(valid["active_tip_workstream_ids"], ["successor"])
+        self.assertEqual(build_succession_plan(valid)["compare_pairs"], [])
 
     def test_multiple_semantic_predecessors_allow_only_one_primary_git_parent(self) -> None:
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -250,8 +372,8 @@ class WorkstreamRelationTests(unittest.TestCase):
         child = "b" * 40
         sibling = "c" * 40
         nodes = [
-            {"workstream_id":"parent","status":"active","evidence_status":"current","head_oid":parent,"scope_status":"current","source_links":[],"origin":"native"},
-            {"workstream_id":"child","status":"active","evidence_status":"current","head_oid":child,"scope_status":"current","source_links":[],"origin":"native"},
+            node("parent", parent),
+            node("child", child),
         ]
         drift = relation(
             "rel-child-parent", "derived_from", "child", "parent", lifecycle="active",
@@ -263,7 +385,7 @@ class WorkstreamRelationTests(unittest.TestCase):
         drift_plan = build_succession_plan(drift_graph)
         self.assertIn("parent-post-fork-or-unknown-commits", drift_plan["compare_pairs"][0]["reason_codes"])
 
-        sibling_nodes = [*nodes, {"workstream_id":"sibling","status":"active","evidence_status":"current","head_oid":sibling,"scope_status":"current","source_links":[],"origin":"native"}]
+        sibling_nodes = [node("parent", parent, runtime_condition="paused"), node("child", child), node("sibling", sibling)]
         child_edge = relation(
             "rel-child-parent-current", "derived_from", "child", "parent", lifecycle="active",
             source_head=child, target_head=parent, task_base=parent, evidence_status="confirmed",
@@ -302,10 +424,7 @@ class WorkstreamRelationTests(unittest.TestCase):
         )
         graph = build_relation_graph(
             [unknown],
-            nodes=[{
-                "workstream_id": "child", "status": "active", "evidence_status": "current",
-                "head_oid": child_head, "scope_status": "current", "source_links": [], "origin": "native",
-            }],
+            nodes=[node("child", child_head)],
         )
         self.assertEqual(graph["unknown_workstream_ids"], ["missing-parent"])
         unknown_pair = build_succession_plan(graph)["compare_pairs"][0]
@@ -322,8 +441,8 @@ class WorkstreamRelationTests(unittest.TestCase):
         stale["evidence"]["source_head_status"] = "stale"
         stale["evidence"]["scope_status"] = "stale"
         nodes = [
-            {"workstream_id":"child","status":"active","evidence_status":"current","head_oid":child_head,"scope_status":"current","source_links":[],"origin":"native"},
-            {"workstream_id":"parent","status":"active","evidence_status":"current","head_oid":parent_head,"scope_status":"current","source_links":[],"origin":"native"},
+            node("child", child_head),
+            node("parent", parent_head),
         ]
         graph = build_relation_graph([stale], nodes=nodes)
         edge = graph["edges"][0]
@@ -396,24 +515,111 @@ class WorkstreamRelationTests(unittest.TestCase):
             self.assertFalse(projection["writes_performed"])
             self.assertEqual((parent_session.read_bytes(), child_session.read_bytes()), before)
 
-    def test_apply_undo_and_discovery_contracts_never_delete_or_execute(self) -> None:
-        candidate = relation("rel-future", "depends_on", "future-ci", "W5E")
+    def test_apply_undo_and_discovery_contracts_bind_session_receipt_and_no_drift(self) -> None:
+        candidate = relation("rel-future", "derived_from", "future-ci", "W5E")
         discovery = build_discovery_plan([candidate], graph_hash="a" * 64)
-        apply_plan = build_apply_plan(discovery)
-        undo_plan = build_undo_plan(apply_receipt_id="receipt-local-1", relation_ids=["rel-future"])
+        predecessor = {
+            "workstream_id": "W5E", "session_hash": "b" * 64, "session_state": "current",
+            "head_oid": "c" * 40, "lifecycle_phase": "validating", "runtime_condition": "active",
+            "evidence_freshness": "current", "scope_status": "current", "closure_reason": None,
+        }
+        active_request = {
+            "relation_id": "rel-future", "target_lifecycle": "active",
+            "predecessor_session": predecessor,
+            "transition": {
+                "lifecycle_phase": "validating", "runtime_condition": "paused",
+                "evidence_freshness": "current", "closure_reason": None,
+            },
+        }
+        apply_plan = build_apply_plan(discovery, takeover_requests=[active_request])
+        append_operation = next(item for item in apply_plan["operations"] if item["action"] == "append-relation-event")
+        receipt = {
+            "schema_version": 1,
+            "contract_type": "workstream-relation-apply-receipt",
+            "receipt_id": "receipt-local-1",
+            "plan_id": apply_plan["plan_id"],
+            "plan_hash": apply_plan["plan_hash"],
+            "graph_hash": apply_plan["graph_hash"],
+            "confirmed_locally": True,
+            "relation_events": [{
+                "relation_id": "rel-future", "event_id": "event-rel-future-applied",
+                "event_hash": append_operation["event_hash"], "prior_lifecycle": None,
+                "resulting_lifecycle": "active",
+            }],
+            "predecessor_transitions": [{
+                "relation_id": "rel-future", "workstream_id": "W5E",
+                "original_session_hash": "b" * 64, "resulting_session_hash": "d" * 64,
+                "original_head_oid": "c" * 40, "resulting_head_oid": "c" * 40,
+                "original_lifecycle_phase": "validating", "resulting_lifecycle_phase": "validating",
+                "original_runtime_condition": "active", "resulting_runtime_condition": "paused",
+                "original_evidence_freshness": "current", "resulting_evidence_freshness": "current",
+                "original_scope_status": "current", "resulting_scope_status": "current",
+                "original_closure_reason": None, "resulting_closure_reason": None,
+            }],
+            "writes_performed": True,
+        }
+        validate_apply_receipt(receipt, apply_plan=apply_plan)
+        undo_plan = build_undo_plan(apply_receipt=receipt)
         self.assertTrue(discovery["confirmation_required"])
         self.assertFalse(apply_plan["execution_supported"])
+        self.assertEqual(apply_plan["atomicity"], "all-operations-or-none")
+        self.assertEqual(apply_plan["no_drift_policy"], "exact-graph-session-and-head-or-fail")
         self.assertEqual(apply_plan["destructive_actions"], [])
         self.assertEqual(apply_plan["output_contract"]["contract_type"], "workstream-relation-apply-receipt")
         self.assertTrue(all(apply_plan["preservation_contract"].values()))
         self.assertFalse(undo_plan["deletes_history"])
+        self.assertEqual(undo_plan["no_drift_policy"], "exact-receipt-session-and-head-or-fail")
         self.assertEqual(undo_plan["output_contract"]["contract_type"], "workstream-relation-undo-receipt")
         self.assertTrue(all(undo_plan["preservation_contract"].values()))
         self.assertEqual(undo_plan["operations"][0]["action"], "append-compensating-event")
+        restore = next(item for item in undo_plan["operations"] if item["action"] == "restore-predecessor-session")
+        self.assertEqual(restore["expected_session_hash"], "d" * 64)
+        self.assertEqual(restore["restore_session_hash"], "b" * 64)
+        drifted = copy.deepcopy(receipt)
+        drifted["plan_hash"] = "e" * 64
+        with self.assertRaisesRegex(ValueError, "does not match the exact apply plan"):
+            validate_apply_receipt(drifted, apply_plan=apply_plan)
+
+        completed_request = copy.deepcopy(active_request)
+        completed_request["target_lifecycle"] = "completed"
+        completed_request["transition"] = {
+            "lifecycle_phase": "closed", "runtime_condition": "paused",
+            "evidence_freshness": "current", "closure_reason": "superseded",
+        }
+        completed_plan = build_apply_plan(discovery, takeover_requests=[completed_request])
+        self.assertTrue(any(
+            item["action"] == "transition-predecessor-session" and item["target_lifecycle_phase"] == "closed"
+            for item in completed_plan["operations"]
+        ))
+        incomplete_request = copy.deepcopy(completed_request)
+        incomplete_request["transition"] = None
+        with self.assertRaisesRegex(ValueError, "requires closed/superseded predecessor or atomic transition"):
+            build_apply_plan(discovery, takeover_requests=[incomplete_request])
         for payload in (discovery, apply_plan, undo_plan):
             serialized = json.dumps(payload, sort_keys=True)
             self.assertNotIn("delete-worktree", serialized)
             self.assertNotIn("delete-branch", serialized)
+
+    def test_w7c_consumer_compatibility_fixture_maps_without_ui_authority(self) -> None:
+        payload = json.loads(W7C_FIXTURE.read_text(encoding="utf-8"))
+        self.assertEqual(payload["authority"], "synthetic-non-authoritative")
+        graph = build_relation_graph(payload["records"], nodes=payload["nodes"])
+        plan = build_succession_plan(graph)
+        self.assertTrue(graph["validation"]["valid"])
+        for graph_node in graph["nodes"]:
+            self.assertTrue(set(payload["required_node_fields"]).issubset(graph_node))
+        for edge in graph["edges"]:
+            self.assertTrue(set(payload["required_edge_fields"]).issubset(edge))
+        self.assertTrue(set(payload["required_plan_fields"]).issubset(plan))
+        self.assertEqual(graph["active_tip_workstream_ids"], ["successor"])
+        self.assertEqual(graph["unknown_workstream_ids"], ["unknown-peer"])
+        serialized = json.dumps({"graph": graph, "plan": plan}, sort_keys=True)
+        for forbidden in ('"color"', '"coordinates"', '"layout"', '"collapsed"', '"ui_text"'):
+            self.assertNotIn(forbidden, serialized)
+        unsafe = copy.deepcopy(payload["records"][0])
+        unsafe["source_links"][0]["ref"] = "fixture:unsafe\nlink"
+        with self.assertRaisesRegex(ValueError, "source link ref"):
+            build_relation_graph([unsafe], nodes=payload["nodes"])
 
     def test_graph_and_cli_json_are_deterministic(self) -> None:
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))

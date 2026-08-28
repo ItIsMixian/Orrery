@@ -14,7 +14,7 @@ import stat
 import subprocess
 from itertools import combinations
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 
 RELATION_SCHEMA_VERSION = 1
@@ -22,7 +22,19 @@ RELATION_TYPES = ("absorbs", "depends_on", "derived_from")
 RELATION_LIFECYCLES = ("active", "cancelled", "completed", "proposed", "stale")
 EVIDENCE_STATES = ("confirmed", "not-applicable", "rejected", "stale", "unknown")
 HEAD_STATES = ("current", "stale", "unknown")
-NODE_STATES = ("active", "cancelled", "completed", "review-pending", "stale", "unknown")
+NODE_STATES = (
+    "active", "blocked", "cancelled", "completed", "failed", "inactive",
+    "review-pending", "stale", "unknown",
+)
+NODE_LIFECYCLE_PHASES = (
+    "closed", "created", "implementing", "integrated", "investigating",
+    "review-ready", "unknown", "validating",
+)
+NODE_RUNTIME_CONDITIONS = (
+    "active", "blocked-by-conflict", "failed", "offline", "paused",
+    "stale-unknown", "unknown", "waiting-for-user",
+)
+NODE_CLOSURE_REASONS = ("abandoned", "duplicate", "integrated", "superseded")
 SOURCE_LINK_KINDS = ("git-commit", "other", "relation", "scope", "validation", "workstream-session")
 RELATION_RECORD_KEYS = {
     "actor",
@@ -187,7 +199,12 @@ def _normalize_source_links(source_links: Sequence[Mapping[str, Any]]) -> list[d
         reference = item.get("ref")
         if kind not in SOURCE_LINK_KINDS:
             raise ValueError(f"unsupported source link kind: {kind}")
-        if not isinstance(reference, str) or not reference or len(reference) > 512 or "\0" in reference:
+        if (
+            not isinstance(reference, str)
+            or not reference
+            or len(reference) > 512
+            or any(character in reference for character in "\r\n\0")
+        ):
             raise ValueError("source link ref must be non-empty and bounded")
         normalized.append({"kind": str(kind), "ref": reference})
     if len(normalized) > 64:
@@ -615,30 +632,81 @@ def project_legacy_session_relation(
     )
 
 
-def _node_from_session(session: Mapping[str, Any], session_state: str) -> dict[str, Any]:
-    lifecycle = str(session.get("lifecycle_phase", ""))
-    runtime = str(session.get("runtime_condition", ""))
+def _derive_node_status(
+    *,
+    session_state: str,
+    lifecycle_phase: str,
+    runtime_condition: str,
+    evidence_freshness: str,
+    scope_status: str,
+    closure_reason: str | None,
+) -> str:
     if session_state != "current":
-        status = "stale"
-        evidence_status = "stale"
-    elif lifecycle in {"integrated", "closed"}:
-        status = "completed"
-        evidence_status = "current"
-    elif lifecycle == "review-ready":
-        status = "review-pending"
-        evidence_status = "current"
-    elif runtime in {"stale-unknown", "offline"}:
-        status = "unknown"
-        evidence_status = "unknown"
-    else:
-        status = "active"
-        evidence_status = "current"
+        return "stale" if session_state == "stale" else "unknown"
+    if lifecycle_phase == "integrated":
+        return "completed"
+    if lifecycle_phase == "closed":
+        return "cancelled" if closure_reason in {"abandoned", "duplicate"} else "completed"
+    if runtime_condition == "blocked-by-conflict":
+        return "blocked"
+    if runtime_condition == "failed":
+        return "failed"
+    if runtime_condition in {"waiting-for-user", "paused"}:
+        return "inactive"
+    if runtime_condition in {"stale-unknown", "offline", "unknown"}:
+        return "unknown"
+    if evidence_freshness != "current" or scope_status != "current":
+        return "stale" if "stale" in {evidence_freshness, scope_status} else "unknown"
+    if lifecycle_phase == "review-ready" and runtime_condition == "active":
+        return "review-pending"
+    if lifecycle_phase == "unknown":
+        return "unknown"
+    return "active"
+
+
+def _node_from_session(session: Mapping[str, Any], session_state: str) -> dict[str, Any]:
+    lifecycle = str(session.get("lifecycle_phase", "unknown"))
+    if lifecycle not in NODE_LIFECYCLE_PHASES:
+        lifecycle = "unknown"
+    runtime = str(session.get("runtime_condition", "unknown"))
+    if runtime not in NODE_RUNTIME_CONDITIONS:
+        runtime = "unknown"
+    evidence_freshness = str(session.get("evidence_freshness", "unknown"))
+    if evidence_freshness not in HEAD_STATES:
+        evidence_freshness = "unknown"
+    normalized_session_state = session_state if session_state in HEAD_STATES else "unknown"
+    scope_status = "current" if normalized_session_state == "current" else normalized_session_state
+    closure_reason = session.get("closure_reason")
+    if closure_reason not in (*NODE_CLOSURE_REASONS, None):
+        closure_reason = None
+    primary_subsystem = session.get("primary_subsystem_id", "unknown")
+    if not isinstance(primary_subsystem, str) or not primary_subsystem:
+        primary_subsystem = "unknown"
+    affected = session.get("affected_subsystem_ids", [])
+    if not isinstance(affected, list):
+        affected = []
+    status = _derive_node_status(
+        session_state=normalized_session_state,
+        lifecycle_phase=lifecycle,
+        runtime_condition=runtime,
+        evidence_freshness=evidence_freshness,
+        scope_status=scope_status,
+        closure_reason=closure_reason,
+    )
     return {
         "workstream_id": str(session["workstream_id"]),
         "status": status,
-        "evidence_status": evidence_status,
+        "session_state": normalized_session_state,
+        "lifecycle_phase": lifecycle,
+        "runtime_condition": runtime,
+        "evidence_freshness": evidence_freshness,
         "head_oid": session.get("head"),
-        "scope_status": "current" if session_state == "current" else "stale",
+        "scope_status": scope_status,
+        "closure_reason": closure_reason,
+        "primary_subsystem_id": primary_subsystem,
+        "affected_subsystem_ids": sorted(set(str(item) for item in affected)),
+        "visibility": str(session.get("visibility", "unknown")),
+        "observability": str(session.get("observability", "unknown")),
         "source_links": [{"kind": "workstream-session", "ref": f"git-private:{session['workstream_id']}"}],
         "origin": "legacy-session-projection",
     }
@@ -646,27 +714,72 @@ def _node_from_session(session: Mapping[str, Any], session_state: str) -> dict[s
 
 def _normalize_node(node: Mapping[str, Any]) -> dict[str, Any]:
     workstream_id = _validate_identifier(node.get("workstream_id"), "node workstream_id")
-    status = node.get("status", "unknown")
-    evidence_status = node.get("evidence_status", "unknown")
+    session_state = node.get("session_state", "unknown")
+    lifecycle_phase = node.get("lifecycle_phase", "unknown")
+    runtime_condition = node.get("runtime_condition", "unknown")
+    evidence_freshness = node.get("evidence_freshness", "unknown")
     scope_status = node.get("scope_status", "unknown")
-    if status not in NODE_STATES or evidence_status not in HEAD_STATES or scope_status not in HEAD_STATES:
+    if (
+        session_state not in HEAD_STATES
+        or lifecycle_phase not in NODE_LIFECYCLE_PHASES
+        or runtime_condition not in NODE_RUNTIME_CONDITIONS
+        or evidence_freshness not in HEAD_STATES
+        or scope_status not in HEAD_STATES
+    ):
         raise ValueError("node status fields do not match the v1 graph contract")
     head = _validate_oid(node.get("head_oid"), "node head_oid")
+    closure_reason = node.get("closure_reason")
+    if closure_reason not in (*NODE_CLOSURE_REASONS, None):
+        raise ValueError("node closure_reason does not match the v1 graph contract")
+    if (lifecycle_phase == "closed") != (closure_reason is not None):
+        raise ValueError("node closed lifecycle and closure_reason disagree")
+    status = _derive_node_status(
+        session_state=session_state,
+        lifecycle_phase=lifecycle_phase,
+        runtime_condition=runtime_condition,
+        evidence_freshness=evidence_freshness,
+        scope_status=scope_status,
+        closure_reason=closure_reason,
+    )
+    if node.get("status", status) != status:
+        raise ValueError("node status does not match its independent state axes")
+    primary_subsystem_id = _validate_identifier(
+        node.get("primary_subsystem_id", "unknown"), "node primary_subsystem_id", filesystem_safe=True
+    )
+    affected = node.get("affected_subsystem_ids", [])
+    if not isinstance(affected, list):
+        raise ValueError("node affected_subsystem_ids must be a list")
+    affected_subsystem_ids = sorted({
+        _validate_identifier(item, "node affected_subsystem_id", filesystem_safe=True) for item in affected
+    })
+    visibility = _validate_identifier(node.get("visibility", "unknown"), "node visibility", filesystem_safe=True)
+    observability = _validate_identifier(node.get("observability", "unknown"), "node observability", filesystem_safe=True)
     origin = node.get("origin", "relation-only")
     if origin not in {"native", "legacy-session-projection", "relation-only", "discovery"}:
         raise ValueError("unsupported node origin")
     return {
         "workstream_id": workstream_id,
         "status": status,
-        "evidence_status": evidence_status,
+        "session_state": session_state,
+        "lifecycle_phase": lifecycle_phase,
+        "runtime_condition": runtime_condition,
+        "evidence_freshness": evidence_freshness,
         "head_oid": head,
         "scope_status": scope_status,
+        "closure_reason": closure_reason,
+        "primary_subsystem_id": primary_subsystem_id,
+        "affected_subsystem_ids": affected_subsystem_ids,
+        "visibility": visibility,
+        "observability": observability,
         "source_links": _normalize_source_links(node.get("source_links", [])),
         "origin": origin,
     }
 
 
-def _graph_diagnostics(records: Sequence[Mapping[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def _graph_diagnostics(
+    records: Sequence[Mapping[str, Any]],
+    nodes: Mapping[str, Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     errors: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
     effective = [record for record in records if record["lifecycle"] not in {"cancelled", "stale"}]
@@ -716,6 +829,18 @@ def _graph_diagnostics(records: Sequence[Mapping[str, Any]]) -> tuple[list[dict[
     for node in sorted(adjacency):
         visit(node)
     for record in records:
+        if record["relation_type"] in {"derived_from", "absorbs"} and record["lifecycle"] == "completed":
+            predecessor = nodes.get(record["target_workstream_id"])
+            if (
+                predecessor is None
+                or predecessor.get("lifecycle_phase") != "closed"
+                or predecessor.get("closure_reason") != "superseded"
+            ):
+                errors.append({
+                    "code": "completed-takeover-predecessor-not-closed-superseded",
+                    "relation_id": record["relation_id"],
+                    "predecessor_workstream_id": record["target_workstream_id"],
+                })
         if (
             record["relation_type"] in {"derived_from", "absorbs"}
             and record["lifecycle"] == "active"
@@ -728,7 +853,14 @@ def _graph_diagnostics(records: Sequence[Mapping[str, Any]]) -> tuple[list[dict[
 
 
 def _node_is_active(node: Mapping[str, Any]) -> bool:
-    return node.get("status") in {"active", "review-pending"} and node.get("scope_status") == "current"
+    return (
+        node.get("status") in {"active", "review-pending"}
+        and node.get("session_state") == "current"
+        and node.get("runtime_condition") == "active"
+        and node.get("evidence_freshness") == "current"
+        and node.get("scope_status") == "current"
+        and node.get("lifecycle_phase") not in {"integrated", "closed", "unknown"}
+    )
 
 
 def _relation_is_effective(record: Mapping[str, Any], nodes: Mapping[str, Mapping[str, Any]] | None) -> tuple[bool, list[str]]:
@@ -759,11 +891,21 @@ def _relation_is_effective(record: Mapping[str, Any], nodes: Mapping[str, Mappin
     if nodes is not None:
         source = nodes.get(record["source_workstream_id"])
         target = nodes.get(record["target_workstream_id"])
-        if source is None or target is None or not _node_is_active(source) or not _node_is_active(target):
-            reasons.append("endpoint-not-current-active")
+        endpoints = (source, target)
+        if source is None or target is None or any(
+            node.get("session_state") != "current"
+            or node.get("evidence_freshness") != "current"
+            or node.get("scope_status") != "current"
+            for node in endpoints if node is not None
+        ):
+            reasons.append("endpoint-not-current")
         else:
             if evidence["source_head_oid"] != source.get("head_oid") or evidence["target_head_oid"] != target.get("head_oid"):
                 reasons.append("endpoint-head-drift")
+            if target.get("runtime_condition") != "paused":
+                reasons.append("predecessor-not-marked-inactive")
+            if target.get("lifecycle_phase") in {"integrated", "closed", "unknown"}:
+                reasons.append("predecessor-lifecycle-not-active-takeover")
     return not reasons, sorted(set(reasons))
 
 
@@ -773,6 +915,9 @@ def build_relation_graph(
     nodes: Sequence[Mapping[str, Any]] = (),
     pair_constraints: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
+    def unknown_node(workstream_id: str) -> dict[str, Any]:
+        return _normalize_node({"workstream_id": workstream_id})
+
     normalized_records: list[dict[str, Any]] = []
     for record in records:
         validate_relation_record(record)
@@ -781,15 +926,7 @@ def build_relation_graph(
     node_map = {node["workstream_id"]: node for node in (_normalize_node(item) for item in nodes)}
     for record in normalized_records:
         for workstream_id in (record["source_workstream_id"], record["target_workstream_id"]):
-            node_map.setdefault(workstream_id, {
-                "workstream_id": workstream_id,
-                "status": "unknown",
-                "evidence_status": "unknown",
-                "head_oid": None,
-                "scope_status": "unknown",
-                "source_links": [],
-                "origin": "relation-only",
-            })
+            node_map.setdefault(workstream_id, unknown_node(workstream_id))
     normalized_constraints: list[dict[str, Any]] = []
     for item in pair_constraints:
         left = _validate_identifier(item.get("left_workstream_id"), "constraint left workstream")
@@ -801,18 +938,10 @@ def build_relation_graph(
             raise ValueError("pair constraint reasons must be a non-empty string list")
         ordered = sorted((left, right))
         for workstream_id in ordered:
-            node_map.setdefault(workstream_id, {
-                "workstream_id": workstream_id,
-                "status": "unknown",
-                "evidence_status": "unknown",
-                "head_oid": None,
-                "scope_status": "unknown",
-                "source_links": [],
-                "origin": "relation-only",
-            })
+            node_map.setdefault(workstream_id, unknown_node(workstream_id))
         normalized_constraints.append({"left_workstream_id": ordered[0], "right_workstream_id": ordered[1], "reasons": sorted(set(reasons))})
     normalized_constraints.sort(key=lambda item: (item["left_workstream_id"], item["right_workstream_id"], item["reasons"]))
-    errors, warnings = _graph_diagnostics(normalized_records)
+    errors, warnings = _graph_diagnostics(normalized_records, node_map)
     edges: list[dict[str, Any]] = []
     for record in normalized_records:
         effective, reasons = _relation_is_effective(record, node_map)
@@ -828,7 +957,12 @@ def build_relation_graph(
     )
     unknown = sorted(
         workstream_id for workstream_id, node in node_map.items()
-        if node["status"] in {"unknown", "stale"} or node["evidence_status"] in {"unknown", "stale"}
+        if (
+            node["status"] in {"unknown", "stale"}
+            or node["session_state"] in {"unknown", "stale"}
+            or node["evidence_freshness"] in {"unknown", "stale"}
+            or node["scope_status"] in {"unknown", "stale"}
+        )
     )
     body = {
         "schema_version": RELATION_SCHEMA_VERSION,
@@ -912,7 +1046,8 @@ def build_succession_plan(graph: Mapping[str, Any]) -> dict[str, Any]:
         endpoints = (nodes[pair[0]], nodes[pair[1]])
         endpoint_unknown = any(
             node.get("status") in {"stale", "unknown"}
-            or node.get("evidence_status") in {"stale", "unknown"}
+            or node.get("session_state") in {"stale", "unknown"}
+            or node.get("evidence_freshness") in {"stale", "unknown"}
             or node.get("scope_status") in {"stale", "unknown"}
             for node in endpoints
         )
@@ -922,7 +1057,16 @@ def build_succession_plan(graph: Mapping[str, Any]) -> dict[str, Any]:
             and edge["lifecycle"] not in {"cancelled", "completed"}
             and not edge.get("effective_active_succession")
         )
-        if endpoint_unknown or dependency_visible or uncertain_succession:
+        invalid_completed_takeover = (
+            edge["relation_type"] in {"derived_from", "absorbs"}
+            and edge["lifecycle"] == "completed"
+            and any(
+                item.get("code") == "completed-takeover-predecessor-not-closed-superseded"
+                and item.get("relation_id") == edge["relation_id"]
+                for item in graph.get("validation", {}).get("errors", [])
+            )
+        )
+        if endpoint_unknown or dependency_visible or uncertain_succession or invalid_completed_takeover:
             relevant_pairs.add(pair)
 
     compare_pairs: list[dict[str, Any]] = []
@@ -944,7 +1088,8 @@ def build_succession_plan(graph: Mapping[str, Any]) -> dict[str, Any]:
         if not reasons:
             if any(
                 nodes[workstream_id].get("status") in {"stale", "unknown"}
-                or nodes[workstream_id].get("evidence_status") in {"stale", "unknown"}
+                or nodes[workstream_id].get("session_state") in {"stale", "unknown"}
+                or nodes[workstream_id].get("evidence_freshness") in {"stale", "unknown"}
                 or nodes[workstream_id].get("scope_status") in {"stale", "unknown"}
                 for workstream_id in pair
             ):
@@ -970,6 +1115,17 @@ def build_succession_plan(graph: Mapping[str, Any]) -> dict[str, Any]:
                 for edge in direct_edges
             ):
                 reasons.append("parent-post-fork-or-unknown-commits")
+            if any(
+                edge["relation_type"] in {"derived_from", "absorbs"}
+                and edge["lifecycle"] == "completed"
+                and any(
+                    item.get("code") == "completed-takeover-predecessor-not-closed-superseded"
+                    and item.get("relation_id") == edge["relation_id"]
+                    for item in graph.get("validation", {}).get("errors", [])
+                )
+                for edge in direct_edges
+            ):
+                reasons.append("completed-takeover-predecessor-not-closed-superseded")
             if not reasons:
                 reasons.append("independent-or-unproven-pair")
         compare_pairs.append({
@@ -1063,26 +1219,236 @@ def discover_relation_candidates(
     return build_discovery_plan(legacy["records"], graph_hash=graph["graph_hash"], rejected_hints=rejected)
 
 
-def build_apply_plan(discovery_plan: Mapping[str, Any]) -> dict[str, Any]:
+_SESSION_BINDING_KEYS = {
+    "closure_reason", "evidence_freshness", "head_oid", "lifecycle_phase",
+    "runtime_condition", "scope_status", "session_hash", "session_state",
+    "workstream_id",
+}
+_SESSION_TRANSITION_KEYS = {
+    "closure_reason", "evidence_freshness", "lifecycle_phase", "runtime_condition",
+}
+_APPLY_RECEIPT_KEYS = {
+    "confirmed_locally", "contract_type", "graph_hash", "plan_hash", "plan_id",
+    "predecessor_transitions", "receipt_id", "relation_events", "schema_version",
+    "writes_performed",
+}
+_RELATION_EVENT_RECEIPT_KEYS = {
+    "event_hash", "event_id", "prior_lifecycle", "relation_id", "resulting_lifecycle",
+}
+_SESSION_TRANSITION_RECEIPT_KEYS = {
+    "original_closure_reason", "original_evidence_freshness", "original_head_oid",
+    "original_lifecycle_phase", "original_runtime_condition", "original_scope_status",
+    "original_session_hash", "relation_id", "resulting_closure_reason",
+    "resulting_evidence_freshness", "resulting_head_oid", "resulting_lifecycle_phase",
+    "resulting_runtime_condition", "resulting_scope_status", "resulting_session_hash",
+    "workstream_id",
+}
+
+
+def _validate_hash(value: Any, label: str) -> str:
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value):
+        raise ValueError(f"{label} must be an exact lowercase SHA-256 digest")
+    return value
+
+
+def _normalize_session_binding(value: Any, *, predecessor_id: str) -> dict[str, Any]:
+    if not isinstance(value, Mapping) or set(value) != _SESSION_BINDING_KEYS:
+        raise ValueError("predecessor_session fields do not match the v1 apply contract")
+    workstream_id = _validate_identifier(value.get("workstream_id"), "predecessor workstream_id")
+    if workstream_id != predecessor_id:
+        raise ValueError("predecessor_session does not match the relation target")
+    session_state = value.get("session_state")
+    evidence_freshness = value.get("evidence_freshness")
+    scope_status = value.get("scope_status")
+    if session_state != "current" or evidence_freshness != "current" or scope_status != "current":
+        raise ValueError("takeover requires current predecessor session, evidence, and scope")
+    lifecycle_phase = value.get("lifecycle_phase")
+    runtime_condition = value.get("runtime_condition")
+    closure_reason = value.get("closure_reason")
+    if lifecycle_phase not in NODE_LIFECYCLE_PHASES or lifecycle_phase == "unknown":
+        raise ValueError("predecessor lifecycle_phase is not executable")
+    if runtime_condition not in NODE_RUNTIME_CONDITIONS or runtime_condition == "unknown":
+        raise ValueError("predecessor runtime_condition is not executable")
+    if closure_reason not in (*NODE_CLOSURE_REASONS, None):
+        raise ValueError("predecessor closure_reason is invalid")
+    if (lifecycle_phase == "closed") != (closure_reason is not None):
+        raise ValueError("predecessor closed lifecycle and closure_reason disagree")
+    head_oid = _validate_oid(value.get("head_oid"), "predecessor head_oid")
+    if head_oid is None:
+        raise ValueError("takeover requires an exact predecessor HEAD")
+    return {
+        "workstream_id": workstream_id,
+        "session_hash": _validate_hash(value.get("session_hash"), "predecessor session_hash"),
+        "session_state": session_state,
+        "head_oid": head_oid,
+        "lifecycle_phase": lifecycle_phase,
+        "runtime_condition": runtime_condition,
+        "evidence_freshness": evidence_freshness,
+        "scope_status": scope_status,
+        "closure_reason": closure_reason,
+    }
+
+
+def _normalize_session_transition(value: Any) -> dict[str, Any]:
+    if not isinstance(value, Mapping) or set(value) != _SESSION_TRANSITION_KEYS:
+        raise ValueError("predecessor transition fields do not match the v1 apply contract")
+    lifecycle_phase = value.get("lifecycle_phase")
+    runtime_condition = value.get("runtime_condition")
+    evidence_freshness = value.get("evidence_freshness")
+    closure_reason = value.get("closure_reason")
+    if lifecycle_phase not in NODE_LIFECYCLE_PHASES or lifecycle_phase == "unknown":
+        raise ValueError("target predecessor lifecycle_phase is invalid")
+    if runtime_condition not in NODE_RUNTIME_CONDITIONS or runtime_condition == "unknown":
+        raise ValueError("target predecessor runtime_condition is invalid")
+    if evidence_freshness not in HEAD_STATES:
+        raise ValueError("target predecessor evidence_freshness is invalid")
+    if closure_reason not in (*NODE_CLOSURE_REASONS, None):
+        raise ValueError("target predecessor closure_reason is invalid")
+    if (lifecycle_phase == "closed") != (closure_reason is not None):
+        raise ValueError("target predecessor closed lifecycle and closure_reason disagree")
+    return {
+        "lifecycle_phase": lifecycle_phase,
+        "runtime_condition": runtime_condition,
+        "evidence_freshness": evidence_freshness,
+        "closure_reason": closure_reason,
+    }
+
+
+def build_apply_plan(
+    discovery_plan: Mapping[str, Any],
+    *,
+    takeover_requests: Sequence[Mapping[str, Any]] = (),
+) -> dict[str, Any]:
     if discovery_plan.get("contract_type") != "workstream-relation-discovery-plan":
         raise ValueError("apply plan requires a discovery plan")
-    operations = [
-        {"action": "append-relation-event", "relation_id": record["relation_id"], "event_hash": _digest(record)}
-        for record in discovery_plan.get("candidates", [])
-    ]
+    graph_hash = _validate_hash(discovery_plan.get("graph_hash"), "discovery graph_hash")
+    discovery_plan_id = _validate_identifier(
+        discovery_plan.get("plan_id"), "discovery plan_id", filesystem_safe=True
+    )
+    discovery_body = dict(discovery_plan)
+    discovery_body.pop("plan_id", None)
+    if discovery_plan_id != f"discovery-{_digest(discovery_body)[:24]}":
+        raise ValueError("discovery plan_id does not bind its exact content")
+    candidates = sorted((dict(item) for item in discovery_plan.get("candidates", [])), key=_record_sort_key)
+    for candidate in candidates:
+        validate_relation_record(candidate)
+        if candidate["lifecycle"] != "proposed" or candidate["writes_performed"]:
+            raise ValueError("discovery candidate must be a read-only proposed relation")
+    request_map: dict[str, Mapping[str, Any]] = {}
+    for request in takeover_requests:
+        if not isinstance(request, Mapping) or set(request) != {
+            "relation_id", "target_lifecycle", "predecessor_session", "transition"
+        }:
+            raise ValueError("takeover request fields do not match the v1 apply contract")
+        relation_id = _validate_identifier(request.get("relation_id"), "takeover relation_id", filesystem_safe=True)
+        if relation_id in request_map:
+            raise ValueError("duplicate takeover request")
+        request_map[relation_id] = request
+    operations: list[dict[str, Any]] = []
+    session_bindings: list[dict[str, Any]] = []
+    candidate_ids = {record["relation_id"] for record in candidates}
+    unknown_requests = sorted(set(request_map) - candidate_ids)
+    if unknown_requests:
+        raise ValueError(f"takeover request does not match a discovery candidate: {unknown_requests[0]}")
+    for record in candidates:
+        request = request_map.get(record["relation_id"])
+        target_lifecycle = "proposed"
+        if request is not None:
+            if record["relation_type"] not in {"derived_from", "absorbs"}:
+                raise ValueError("only succession relations can transition predecessor sessions")
+            target_lifecycle = str(request.get("target_lifecycle"))
+            if target_lifecycle not in {"active", "completed"}:
+                raise ValueError("takeover target_lifecycle must be active or completed")
+        event = dict(record)
+        event["lifecycle"] = target_lifecycle
+        operations.append({
+            "action": "append-relation-event",
+            "relation_id": record["relation_id"],
+            "target_lifecycle": target_lifecycle,
+            "event_hash": _digest(event),
+        })
+        if request is None:
+            continue
+        binding = _normalize_session_binding(
+            request.get("predecessor_session"), predecessor_id=record["target_workstream_id"]
+        )
+        transition_value = request.get("transition")
+        transition = None if transition_value is None else _normalize_session_transition(transition_value)
+        if target_lifecycle == "active":
+            if transition is None:
+                raise ValueError("active takeover requires an atomic predecessor inactive transition")
+            if binding["runtime_condition"] != "active":
+                raise ValueError("active takeover predecessor must be runtime active before the transition")
+            if (
+                transition["lifecycle_phase"] != binding["lifecycle_phase"]
+                or transition["runtime_condition"] != "paused"
+                or transition["evidence_freshness"] != "current"
+                or transition["closure_reason"] != binding["closure_reason"]
+            ):
+                raise ValueError("active takeover transition must preserve lifecycle and mark runtime paused")
+        elif binding["lifecycle_phase"] == "closed" and binding["closure_reason"] == "superseded":
+            if transition is not None:
+                raise ValueError("already superseded predecessor must not be transitioned again")
+        else:
+            if transition is None:
+                raise ValueError("completed takeover requires closed/superseded predecessor or atomic transition")
+            if (
+                transition["lifecycle_phase"] != "closed"
+                or transition["runtime_condition"] != "paused"
+                or transition["evidence_freshness"] != "current"
+                or transition["closure_reason"] != "superseded"
+            ):
+                raise ValueError("completed takeover transition must close predecessor as superseded")
+        session_bindings.append({
+            "relation_id": record["relation_id"],
+            "target_lifecycle": target_lifecycle,
+            "predecessor_session": binding,
+            "transition": transition,
+        })
+        if transition is None:
+            operations.append({
+                "action": "assert-predecessor-closed-superseded",
+                "relation_id": record["relation_id"],
+                "workstream_id": binding["workstream_id"],
+                "expected_session_hash": binding["session_hash"],
+                "expected_head_oid": binding["head_oid"],
+            })
+        else:
+            operations.append({
+                "action": "transition-predecessor-session",
+                "relation_id": record["relation_id"],
+                "workstream_id": binding["workstream_id"],
+                "expected_session_hash": binding["session_hash"],
+                "expected_head_oid": binding["head_oid"],
+                "expected_lifecycle_phase": binding["lifecycle_phase"],
+                "expected_runtime_condition": binding["runtime_condition"],
+                "expected_evidence_freshness": binding["evidence_freshness"],
+                "expected_scope_status": binding["scope_status"],
+                "expected_closure_reason": binding["closure_reason"],
+                "target_lifecycle_phase": transition["lifecycle_phase"],
+                "target_runtime_condition": transition["runtime_condition"],
+                "target_evidence_freshness": transition["evidence_freshness"],
+                "target_closure_reason": transition["closure_reason"],
+                "transition_reason": f"succession-takeover:{record['relation_id']}:{target_lifecycle}",
+                "restore_receipt_required": True,
+            })
     body = {
         "schema_version": RELATION_SCHEMA_VERSION,
         "contract_type": "workstream-relation-apply-plan",
-        "discovery_plan_id": discovery_plan.get("plan_id"),
-        "graph_hash": discovery_plan.get("graph_hash"),
+        "discovery_plan_id": discovery_plan_id,
+        "graph_hash": graph_hash,
         "operations": operations,
+        "session_bindings": sorted(session_bindings, key=lambda item: item["relation_id"]),
+        "atomicity": "all-operations-or-none",
+        "no_drift_policy": "exact-graph-session-and-head-or-fail",
         "confirmation_required": True,
         "confirmation_scope": "one-local-confirmation-per-exact-plan",
         "output_contract": {
             "contract_type": "workstream-relation-apply-receipt",
             "required_fields": [
-                "receipt_id", "plan_id", "graph_hash", "confirmed_locally",
-                "appended_event_ids", "writes_performed",
+                "schema_version", "contract_type", "receipt_id", "plan_id", "plan_hash",
+                "graph_hash", "confirmed_locally", "relation_events",
+                "predecessor_transitions", "writes_performed",
             ],
         },
         "preservation_contract": {
@@ -1097,27 +1463,183 @@ def build_apply_plan(discovery_plan: Mapping[str, Any]) -> dict[str, Any]:
         "execution_supported": False,
         "destructive_actions": [],
     }
-    body["plan_id"] = f"apply-{_digest(body)[:24]}"
+    body["plan_hash"] = _digest(body)
+    body["plan_id"] = f"apply-{body['plan_hash'][:24]}"
     return body
 
 
-def build_undo_plan(*, apply_receipt_id: str, relation_ids: Iterable[str]) -> dict[str, Any]:
-    _validate_identifier(apply_receipt_id, "apply_receipt_id")
-    normalized = sorted({_validate_identifier(value, "relation_id", filesystem_safe=True) for value in relation_ids})
+def validate_apply_receipt(
+    receipt: Mapping[str, Any],
+    *,
+    apply_plan: Mapping[str, Any] | None = None,
+) -> None:
+    if set(receipt) != _APPLY_RECEIPT_KEYS:
+        raise ValueError("apply receipt fields do not match the v1 contract")
+    if receipt.get("schema_version") != RELATION_SCHEMA_VERSION or receipt.get("contract_type") != "workstream-relation-apply-receipt":
+        raise ValueError("unsupported apply receipt contract")
+    _validate_identifier(receipt.get("receipt_id"), "apply receipt_id", filesystem_safe=True)
+    _validate_identifier(receipt.get("plan_id"), "apply receipt plan_id", filesystem_safe=True)
+    _validate_hash(receipt.get("plan_hash"), "apply receipt plan_hash")
+    _validate_hash(receipt.get("graph_hash"), "apply receipt graph_hash")
+    if receipt.get("confirmed_locally") is not True or receipt.get("writes_performed") is not True:
+        raise ValueError("apply receipt requires confirmed local writes")
+    relation_events = receipt.get("relation_events")
+    transitions = receipt.get("predecessor_transitions")
+    if not isinstance(relation_events, list) or not isinstance(transitions, list):
+        raise ValueError("apply receipt events and transitions must be lists")
+    for event in relation_events:
+        if not isinstance(event, Mapping) or set(event) != _RELATION_EVENT_RECEIPT_KEYS:
+            raise ValueError("apply receipt relation event fields do not match the v1 contract")
+        _validate_identifier(event.get("relation_id"), "receipt relation_id", filesystem_safe=True)
+        _validate_identifier(event.get("event_id"), "receipt event_id", filesystem_safe=True)
+        _validate_hash(event.get("event_hash"), "receipt event_hash")
+        if event.get("prior_lifecycle") not in (*RELATION_LIFECYCLES, None):
+            raise ValueError("receipt prior_lifecycle is invalid")
+        if event.get("resulting_lifecycle") not in RELATION_LIFECYCLES:
+            raise ValueError("receipt resulting_lifecycle is invalid")
+    if relation_events != sorted(relation_events, key=lambda item: item["relation_id"]):
+        raise ValueError("apply receipt relation events must be deterministically sorted")
+    for transition in transitions:
+        if not isinstance(transition, Mapping) or set(transition) != _SESSION_TRANSITION_RECEIPT_KEYS:
+            raise ValueError("apply receipt predecessor transition fields do not match the v1 contract")
+        _validate_identifier(transition.get("relation_id"), "transition relation_id", filesystem_safe=True)
+        _validate_identifier(transition.get("workstream_id"), "transition workstream_id")
+        for key in ("original_session_hash", "resulting_session_hash"):
+            _validate_hash(transition.get(key), f"transition {key}")
+        if transition["original_session_hash"] == transition["resulting_session_hash"]:
+            raise ValueError("predecessor transition receipt must bind changed session content")
+        for key in ("original_head_oid", "resulting_head_oid"):
+            if _validate_oid(transition.get(key), f"transition {key}") is None:
+                raise ValueError("predecessor transition receipt requires exact HEADs")
+        if transition["original_head_oid"] != transition["resulting_head_oid"]:
+            raise ValueError("succession session transition must not move predecessor HEAD")
+        for prefix in ("original", "resulting"):
+            if transition.get(f"{prefix}_lifecycle_phase") not in NODE_LIFECYCLE_PHASES:
+                raise ValueError("transition lifecycle phase is invalid")
+            if transition.get(f"{prefix}_runtime_condition") not in NODE_RUNTIME_CONDITIONS:
+                raise ValueError("transition runtime condition is invalid")
+            if transition.get(f"{prefix}_evidence_freshness") not in HEAD_STATES:
+                raise ValueError("transition evidence freshness is invalid")
+            if transition.get(f"{prefix}_scope_status") not in HEAD_STATES:
+                raise ValueError("transition scope status is invalid")
+            if transition.get(f"{prefix}_closure_reason") not in (*NODE_CLOSURE_REASONS, None):
+                raise ValueError("transition closure reason is invalid")
+    if transitions != sorted(transitions, key=lambda item: (item["relation_id"], item["workstream_id"])):
+        raise ValueError("apply receipt transitions must be deterministically sorted")
+    if apply_plan is not None:
+        if apply_plan.get("contract_type") != "workstream-relation-apply-plan":
+            raise ValueError("apply receipt binding requires an apply plan")
+        apply_body = dict(apply_plan)
+        apply_body.pop("plan_id", None)
+        apply_body.pop("plan_hash", None)
+        expected_plan_hash = _digest(apply_body)
+        if (
+            apply_plan.get("plan_hash") != expected_plan_hash
+            or apply_plan.get("plan_id") != f"apply-{expected_plan_hash[:24]}"
+        ):
+            raise ValueError("apply plan hash does not bind its exact content")
+        for receipt_key, plan_key in (("plan_id", "plan_id"), ("plan_hash", "plan_hash"), ("graph_hash", "graph_hash")):
+            if receipt.get(receipt_key) != apply_plan.get(plan_key):
+                raise ValueError(f"apply receipt {receipt_key} does not match the exact apply plan")
+        expected_relations = sorted(
+            operation["relation_id"] for operation in apply_plan.get("operations", [])
+            if operation.get("action") == "append-relation-event"
+        )
+        if [item["relation_id"] for item in relation_events] != expected_relations:
+            raise ValueError("apply receipt relation events do not match the exact apply plan")
+        append_operations = {
+            operation["relation_id"]: operation for operation in apply_plan.get("operations", [])
+            if operation.get("action") == "append-relation-event"
+        }
+        for event in relation_events:
+            operation = append_operations[event["relation_id"]]
+            if (
+                event["event_hash"] != operation["event_hash"]
+                or event["resulting_lifecycle"] != operation["target_lifecycle"]
+            ):
+                raise ValueError("apply receipt event evidence does not match the exact apply operation")
+        expected_transitions = sorted(
+            (operation["relation_id"], operation["workstream_id"])
+            for operation in apply_plan.get("operations", [])
+            if operation.get("action") == "transition-predecessor-session"
+        )
+        actual_transitions = [(item["relation_id"], item["workstream_id"]) for item in transitions]
+        if actual_transitions != expected_transitions:
+            raise ValueError("apply receipt predecessor transitions do not match the exact apply plan")
+        transition_operations = {
+            (operation["relation_id"], operation["workstream_id"]): operation
+            for operation in apply_plan.get("operations", [])
+            if operation.get("action") == "transition-predecessor-session"
+        }
+        for transition in transitions:
+            operation = transition_operations[(transition["relation_id"], transition["workstream_id"])]
+            field_pairs = (
+                ("original_session_hash", "expected_session_hash"),
+                ("original_head_oid", "expected_head_oid"),
+                ("original_lifecycle_phase", "expected_lifecycle_phase"),
+                ("original_runtime_condition", "expected_runtime_condition"),
+                ("original_evidence_freshness", "expected_evidence_freshness"),
+                ("original_scope_status", "expected_scope_status"),
+                ("original_closure_reason", "expected_closure_reason"),
+                ("resulting_lifecycle_phase", "target_lifecycle_phase"),
+                ("resulting_runtime_condition", "target_runtime_condition"),
+                ("resulting_evidence_freshness", "target_evidence_freshness"),
+                ("resulting_closure_reason", "target_closure_reason"),
+            )
+            if any(transition[receipt_key] != operation[operation_key] for receipt_key, operation_key in field_pairs):
+                raise ValueError("apply receipt session evidence does not match the exact transition operation")
+
+
+def build_undo_plan(*, apply_receipt: Mapping[str, Any]) -> dict[str, Any]:
+    validate_apply_receipt(apply_receipt)
+    receipt_hash = _digest(apply_receipt)
+    operations: list[dict[str, Any]] = []
+    for event in apply_receipt["relation_events"]:
+        operations.append({
+            "action": "append-compensating-event",
+            "relation_id": event["relation_id"],
+            "expected_event_id": event["event_id"],
+            "expected_event_hash": event["event_hash"],
+            "target_lifecycle": event["prior_lifecycle"] or "cancelled",
+        })
+    for transition in apply_receipt["predecessor_transitions"]:
+        operations.append({
+            "action": "restore-predecessor-session",
+            "relation_id": transition["relation_id"],
+            "workstream_id": transition["workstream_id"],
+            "expected_session_hash": transition["resulting_session_hash"],
+            "expected_head_oid": transition["resulting_head_oid"],
+            "expected_lifecycle_phase": transition["resulting_lifecycle_phase"],
+            "expected_runtime_condition": transition["resulting_runtime_condition"],
+            "expected_evidence_freshness": transition["resulting_evidence_freshness"],
+            "expected_scope_status": transition["resulting_scope_status"],
+            "expected_closure_reason": transition["resulting_closure_reason"],
+            "restore_session_hash": transition["original_session_hash"],
+            "restore_head_oid": transition["original_head_oid"],
+            "restore_lifecycle_phase": transition["original_lifecycle_phase"],
+            "restore_runtime_condition": transition["original_runtime_condition"],
+            "restore_evidence_freshness": transition["original_evidence_freshness"],
+            "restore_scope_status": transition["original_scope_status"],
+            "restore_closure_reason": transition["original_closure_reason"],
+        })
     body = {
         "schema_version": RELATION_SCHEMA_VERSION,
         "contract_type": "workstream-relation-undo-plan",
-        "apply_receipt_id": apply_receipt_id,
-        "operations": [
-            {"action": "append-compensating-event", "relation_id": relation_id, "target_lifecycle": "cancelled"}
-            for relation_id in normalized
-        ],
+        "apply_receipt_id": apply_receipt["receipt_id"],
+        "apply_receipt_hash": receipt_hash,
+        "apply_plan_hash": apply_receipt["plan_hash"],
+        "graph_hash": apply_receipt["graph_hash"],
+        "operations": operations,
+        "atomicity": "all-operations-or-none",
+        "no_drift_policy": "exact-receipt-session-and-head-or-fail",
         "confirmation_required": True,
         "confirmation_scope": "one-local-confirmation-per-exact-plan",
         "output_contract": {
             "contract_type": "workstream-relation-undo-receipt",
             "required_fields": [
-                "receipt_id", "plan_id", "apply_receipt_id", "appended_event_ids", "writes_performed",
+                "schema_version", "contract_type", "receipt_id", "plan_id", "plan_hash",
+                "apply_receipt_id", "apply_receipt_hash", "confirmed_locally",
+                "appended_compensating_event_ids", "restored_sessions", "writes_performed",
             ],
         },
         "preservation_contract": {
@@ -1133,7 +1655,8 @@ def build_undo_plan(*, apply_receipt_id: str, relation_ids: Iterable[str]) -> di
         "deletes_history": False,
         "destructive_actions": [],
     }
-    body["plan_id"] = f"undo-{_digest(body)[:24]}"
+    body["plan_hash"] = _digest(body)
+    body["plan_id"] = f"undo-{body['plan_hash'][:24]}"
     return body
 
 
@@ -1155,5 +1678,6 @@ __all__ = [
     "load_relation_history",
     "project_legacy_session_relation",
     "relation_storage_root",
+    "validate_apply_receipt",
     "validate_relation_record",
 ]

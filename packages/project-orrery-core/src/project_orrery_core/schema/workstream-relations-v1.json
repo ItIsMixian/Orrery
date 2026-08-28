@@ -8,7 +8,9 @@
     {"$ref": "#/$defs/succession_plan"},
     {"$ref": "#/$defs/discovery_plan"},
     {"$ref": "#/$defs/apply_plan"},
+    {"$ref": "#/$defs/apply_receipt"},
     {"$ref": "#/$defs/undo_plan"},
+    {"$ref": "#/$defs/undo_receipt"},
     {"$ref": "#/$defs/legacy_projection"}
   ],
   "$defs": {
@@ -16,7 +18,10 @@
     "relation_lifecycle": {"enum": ["proposed", "active", "completed", "cancelled", "stale"]},
     "evidence_state": {"enum": ["confirmed", "unknown", "stale", "rejected", "not-applicable"]},
     "head_state": {"enum": ["current", "stale", "unknown"]},
-    "node_state": {"enum": ["active", "review-pending", "completed", "cancelled", "stale", "unknown"]},
+    "node_state": {"enum": ["active", "blocked", "cancelled", "completed", "failed", "inactive", "review-pending", "stale", "unknown"]},
+    "lifecycle_phase": {"enum": ["created", "investigating", "implementing", "validating", "review-ready", "integrated", "closed", "unknown"]},
+    "runtime_condition": {"enum": ["active", "waiting-for-user", "paused", "blocked-by-conflict", "failed", "offline", "stale-unknown", "unknown"]},
+    "closure_reason": {"type": ["string", "null"], "enum": ["integrated", "abandoned", "superseded", "duplicate", null]},
     "safe_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
     "workstream_id": {"type": "string", "minLength": 1, "maxLength": 256},
     "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
@@ -89,13 +94,26 @@
     },
     "node": {
       "type": "object", "additionalProperties": false,
-      "required": ["workstream_id", "status", "evidence_status", "head_oid", "scope_status", "source_links", "origin"],
+      "required": [
+        "workstream_id", "status", "session_state", "lifecycle_phase", "runtime_condition",
+        "evidence_freshness", "head_oid", "scope_status", "closure_reason",
+        "primary_subsystem_id", "affected_subsystem_ids", "visibility", "observability",
+        "source_links", "origin"
+      ],
       "properties": {
         "workstream_id": {"$ref": "#/$defs/workstream_id"},
         "status": {"$ref": "#/$defs/node_state"},
-        "evidence_status": {"$ref": "#/$defs/head_state"},
+        "session_state": {"$ref": "#/$defs/head_state"},
+        "lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "evidence_freshness": {"$ref": "#/$defs/head_state"},
         "head_oid": {"$ref": "#/$defs/oid"},
         "scope_status": {"$ref": "#/$defs/head_state"},
+        "closure_reason": {"$ref": "#/$defs/closure_reason"},
+        "primary_subsystem_id": {"$ref": "#/$defs/workstream_id"},
+        "affected_subsystem_ids": {"type": "array", "items": {"$ref": "#/$defs/workstream_id"}, "uniqueItems": true},
+        "visibility": {"$ref": "#/$defs/workstream_id"},
+        "observability": {"$ref": "#/$defs/workstream_id"},
         "source_links": {"type": "array", "items": {"$ref": "#/$defs/source_link"}, "maxItems": 64},
         "origin": {"enum": ["native", "legacy-session-projection", "relation-only", "discovery"]}
       }
@@ -245,20 +263,107 @@
         "required_fields": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
       }
     },
-    "apply_operation": {
-      "type": "object", "additionalProperties": false, "required": ["action", "relation_id", "event_hash"],
+    "session_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "workstream_id", "session_hash", "session_state", "head_oid", "lifecycle_phase",
+        "runtime_condition", "evidence_freshness", "scope_status", "closure_reason"
+      ],
+      "properties": {
+        "workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "session_hash": {"$ref": "#/$defs/hash"},
+        "session_state": {"const": "current"},
+        "head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "evidence_freshness": {"const": "current"},
+        "scope_status": {"const": "current"},
+        "closure_reason": {"$ref": "#/$defs/closure_reason"}
+      }
+    },
+    "session_transition": {
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["lifecycle_phase", "runtime_condition", "evidence_freshness", "closure_reason"],
+      "properties": {
+        "lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "evidence_freshness": {"$ref": "#/$defs/head_state"},
+        "closure_reason": {"$ref": "#/$defs/closure_reason"}
+      }
+    },
+    "takeover_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["relation_id", "target_lifecycle", "predecessor_session", "transition"],
+      "properties": {
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "target_lifecycle": {"enum": ["active", "completed"]},
+        "predecessor_session": {"$ref": "#/$defs/session_binding"},
+        "transition": {"$ref": "#/$defs/session_transition"}
+      }
+    },
+    "append_apply_operation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "relation_id", "target_lifecycle", "event_hash"],
       "properties": {
         "action": {"const": "append-relation-event"},
         "relation_id": {"$ref": "#/$defs/safe_id"},
+        "target_lifecycle": {"$ref": "#/$defs/relation_lifecycle"},
         "event_hash": {"$ref": "#/$defs/hash"}
       }
+    },
+    "assert_closed_apply_operation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "relation_id", "workstream_id", "expected_session_hash", "expected_head_oid"],
+      "properties": {
+        "action": {"const": "assert-predecessor-closed-superseded"},
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "expected_session_hash": {"$ref": "#/$defs/hash"},
+        "expected_head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "transition_apply_operation": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "action", "relation_id", "workstream_id", "expected_session_hash", "expected_head_oid",
+        "expected_lifecycle_phase", "expected_runtime_condition", "expected_evidence_freshness",
+        "expected_scope_status", "expected_closure_reason", "target_lifecycle_phase",
+        "target_runtime_condition", "target_evidence_freshness", "target_closure_reason",
+        "transition_reason", "restore_receipt_required"
+      ],
+      "properties": {
+        "action": {"const": "transition-predecessor-session"},
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "expected_session_hash": {"$ref": "#/$defs/hash"},
+        "expected_head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "expected_lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "expected_runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "expected_evidence_freshness": {"$ref": "#/$defs/head_state"},
+        "expected_scope_status": {"$ref": "#/$defs/head_state"},
+        "expected_closure_reason": {"$ref": "#/$defs/closure_reason"},
+        "target_lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "target_runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "target_evidence_freshness": {"$ref": "#/$defs/head_state"},
+        "target_closure_reason": {"$ref": "#/$defs/closure_reason"},
+        "transition_reason": {"type": "string", "minLength": 1, "maxLength": 512},
+        "restore_receipt_required": {"const": true}
+      }
+    },
+    "apply_operation": {
+      "oneOf": [
+        {"$ref": "#/$defs/append_apply_operation"},
+        {"$ref": "#/$defs/assert_closed_apply_operation"},
+        {"$ref": "#/$defs/transition_apply_operation"}
+      ]
     },
     "apply_plan": {
       "type": "object", "additionalProperties": false,
       "required": [
-        "schema_version", "contract_type", "discovery_plan_id", "graph_hash", "operations",
+        "schema_version", "contract_type", "discovery_plan_id", "graph_hash", "operations", "session_bindings",
+        "atomicity", "no_drift_policy",
         "confirmation_required", "confirmation_scope", "output_contract", "preservation_contract",
-        "writes_performed", "execution_supported", "destructive_actions", "plan_id"
+        "writes_performed", "execution_supported", "destructive_actions", "plan_hash", "plan_id"
       ],
       "properties": {
         "schema_version": {"const": 1},
@@ -266,6 +371,9 @@
         "discovery_plan_id": {"$ref": "#/$defs/safe_id"},
         "graph_hash": {"$ref": "#/$defs/hash"},
         "operations": {"type": "array", "items": {"$ref": "#/$defs/apply_operation"}},
+        "session_bindings": {"type": "array", "items": {"$ref": "#/$defs/takeover_binding"}},
+        "atomicity": {"const": "all-operations-or-none"},
+        "no_drift_policy": {"const": "exact-graph-session-and-head-or-fail"},
         "confirmation_required": {"const": true},
         "confirmation_scope": {"const": "one-local-confirmation-per-exact-plan"},
         "output_contract": {"$ref": "#/$defs/output_contract"},
@@ -273,30 +381,127 @@
         "writes_performed": {"const": false},
         "execution_supported": {"const": false},
         "destructive_actions": {"type": "array", "maxItems": 0},
+        "plan_hash": {"$ref": "#/$defs/hash"},
         "plan_id": {"$ref": "#/$defs/safe_id"}
       }
     },
-    "undo_operation": {
+    "relation_event_receipt": {
       "type": "object", "additionalProperties": false,
-      "required": ["action", "relation_id", "target_lifecycle"],
+      "required": ["relation_id", "event_id", "event_hash", "prior_lifecycle", "resulting_lifecycle"],
+      "properties": {
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "event_id": {"$ref": "#/$defs/safe_id"},
+        "event_hash": {"$ref": "#/$defs/hash"},
+        "prior_lifecycle": {"anyOf": [{"$ref": "#/$defs/relation_lifecycle"}, {"type": "null"}]},
+        "resulting_lifecycle": {"$ref": "#/$defs/relation_lifecycle"}
+      }
+    },
+    "session_transition_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "relation_id", "workstream_id", "original_session_hash", "resulting_session_hash",
+        "original_head_oid", "resulting_head_oid", "original_lifecycle_phase", "resulting_lifecycle_phase",
+        "original_runtime_condition", "resulting_runtime_condition", "original_evidence_freshness",
+        "resulting_evidence_freshness", "original_scope_status", "resulting_scope_status",
+        "original_closure_reason", "resulting_closure_reason"
+      ],
+      "properties": {
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "original_session_hash": {"$ref": "#/$defs/hash"},
+        "resulting_session_hash": {"$ref": "#/$defs/hash"},
+        "original_head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "resulting_head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "original_lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "resulting_lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "original_runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "resulting_runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "original_evidence_freshness": {"$ref": "#/$defs/head_state"},
+        "resulting_evidence_freshness": {"$ref": "#/$defs/head_state"},
+        "original_scope_status": {"$ref": "#/$defs/head_state"},
+        "resulting_scope_status": {"$ref": "#/$defs/head_state"},
+        "original_closure_reason": {"$ref": "#/$defs/closure_reason"},
+        "resulting_closure_reason": {"$ref": "#/$defs/closure_reason"}
+      }
+    },
+    "apply_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "contract_type", "receipt_id", "plan_id", "plan_hash", "graph_hash",
+        "confirmed_locally", "relation_events", "predecessor_transitions", "writes_performed"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-apply-receipt"},
+        "receipt_id": {"$ref": "#/$defs/safe_id"},
+        "plan_id": {"$ref": "#/$defs/safe_id"},
+        "plan_hash": {"$ref": "#/$defs/hash"},
+        "graph_hash": {"$ref": "#/$defs/hash"},
+        "confirmed_locally": {"const": true},
+        "relation_events": {"type": "array", "items": {"$ref": "#/$defs/relation_event_receipt"}},
+        "predecessor_transitions": {"type": "array", "items": {"$ref": "#/$defs/session_transition_receipt"}},
+        "writes_performed": {"const": true}
+      }
+    },
+    "append_undo_operation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "relation_id", "expected_event_id", "expected_event_hash", "target_lifecycle"],
       "properties": {
         "action": {"const": "append-compensating-event"},
         "relation_id": {"$ref": "#/$defs/safe_id"},
-        "target_lifecycle": {"enum": ["cancelled", "stale"]}
+        "expected_event_id": {"$ref": "#/$defs/safe_id"},
+        "expected_event_hash": {"$ref": "#/$defs/hash"},
+        "target_lifecycle": {"$ref": "#/$defs/relation_lifecycle"}
       }
     },
+    "restore_undo_operation": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "action", "relation_id", "workstream_id", "expected_session_hash", "expected_head_oid",
+        "expected_lifecycle_phase", "expected_runtime_condition", "expected_evidence_freshness",
+        "expected_scope_status", "expected_closure_reason", "restore_session_hash", "restore_head_oid",
+        "restore_lifecycle_phase", "restore_runtime_condition", "restore_evidence_freshness",
+        "restore_scope_status", "restore_closure_reason"
+      ],
+      "properties": {
+        "action": {"const": "restore-predecessor-session"},
+        "relation_id": {"$ref": "#/$defs/safe_id"},
+        "workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "expected_session_hash": {"$ref": "#/$defs/hash"},
+        "expected_head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "expected_lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "expected_runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "expected_evidence_freshness": {"$ref": "#/$defs/head_state"},
+        "expected_scope_status": {"$ref": "#/$defs/head_state"},
+        "expected_closure_reason": {"$ref": "#/$defs/closure_reason"},
+        "restore_session_hash": {"$ref": "#/$defs/hash"},
+        "restore_head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "restore_lifecycle_phase": {"$ref": "#/$defs/lifecycle_phase"},
+        "restore_runtime_condition": {"$ref": "#/$defs/runtime_condition"},
+        "restore_evidence_freshness": {"$ref": "#/$defs/head_state"},
+        "restore_scope_status": {"$ref": "#/$defs/head_state"},
+        "restore_closure_reason": {"$ref": "#/$defs/closure_reason"}
+      }
+    },
+    "undo_operation": {"oneOf": [{"$ref": "#/$defs/append_undo_operation"}, {"$ref": "#/$defs/restore_undo_operation"}]},
     "undo_plan": {
       "type": "object", "additionalProperties": false,
       "required": [
-        "schema_version", "contract_type", "apply_receipt_id", "operations", "confirmation_required",
+        "schema_version", "contract_type", "apply_receipt_id", "apply_receipt_hash", "apply_plan_hash",
+        "graph_hash", "operations", "atomicity", "no_drift_policy", "confirmation_required",
         "confirmation_scope", "output_contract", "preservation_contract", "writes_performed",
-        "execution_supported", "deletes_history", "destructive_actions", "plan_id"
+        "execution_supported", "deletes_history", "destructive_actions", "plan_hash", "plan_id"
       ],
       "properties": {
         "schema_version": {"const": 1},
         "contract_type": {"const": "workstream-relation-undo-plan"},
         "apply_receipt_id": {"$ref": "#/$defs/workstream_id"},
+        "apply_receipt_hash": {"$ref": "#/$defs/hash"},
+        "apply_plan_hash": {"$ref": "#/$defs/hash"},
+        "graph_hash": {"$ref": "#/$defs/hash"},
         "operations": {"type": "array", "items": {"$ref": "#/$defs/undo_operation"}},
+        "atomicity": {"const": "all-operations-or-none"},
+        "no_drift_policy": {"const": "exact-receipt-session-and-head-or-fail"},
         "confirmation_required": {"const": true},
         "confirmation_scope": {"const": "one-local-confirmation-per-exact-plan"},
         "output_contract": {"$ref": "#/$defs/output_contract"},
@@ -305,7 +510,38 @@
         "execution_supported": {"const": false},
         "deletes_history": {"const": false},
         "destructive_actions": {"type": "array", "maxItems": 0},
+        "plan_hash": {"$ref": "#/$defs/hash"},
         "plan_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "restored_session_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workstream_id", "previous_session_hash", "restored_session_hash"],
+      "properties": {
+        "workstream_id": {"$ref": "#/$defs/workstream_id"},
+        "previous_session_hash": {"$ref": "#/$defs/hash"},
+        "restored_session_hash": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "undo_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "schema_version", "contract_type", "receipt_id", "plan_id", "plan_hash",
+        "apply_receipt_id", "apply_receipt_hash", "confirmed_locally",
+        "appended_compensating_event_ids", "restored_sessions", "writes_performed"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "workstream-relation-undo-receipt"},
+        "receipt_id": {"$ref": "#/$defs/safe_id"},
+        "plan_id": {"$ref": "#/$defs/safe_id"},
+        "plan_hash": {"$ref": "#/$defs/hash"},
+        "apply_receipt_id": {"$ref": "#/$defs/safe_id"},
+        "apply_receipt_hash": {"$ref": "#/$defs/hash"},
+        "confirmed_locally": {"const": true},
+        "appended_compensating_event_ids": {"type": "array", "items": {"$ref": "#/$defs/safe_id"}, "uniqueItems": true},
+        "restored_sessions": {"type": "array", "items": {"$ref": "#/$defs/restored_session_receipt"}},
+        "writes_performed": {"const": true}
       }
     },
     "legacy_projection": {

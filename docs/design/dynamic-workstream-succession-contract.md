@@ -24,7 +24,9 @@ All contract objects use `schema_version: 1` and a distinct `contract_type`:
 - `workstream-succession-plan`
 - `workstream-relation-discovery-plan`
 - `workstream-relation-apply-plan`
+- `workstream-relation-apply-receipt`
 - `workstream-relation-undo-plan`
+- `workstream-relation-undo-receipt`
 - `workstream-legacy-relation-projection`
 
 Unknown is data, not an exception or a green result. JSON arrays and diagnostics use deterministic ordering.
@@ -91,6 +93,8 @@ For `derived_from` to become evidence-confirmed active succession:
 - recorded target HEAD equals task base;
 - source and target head status are `current`;
 - ancestry is `confirmed` and `target_unique_commits_after_base` is `0`.
+- predecessor Session is current and carries the explicit reversible takeover marker
+  `runtime_condition=paused`; ordinary `waiting-for-user` is not a takeover marker.
 
 If parent HEAD moved after the fork, ancestry is unavailable, or any binding drifts, the edge remains visible but is
 stale/Unknown for suppression. Branch-name and path similarity never upgrade evidence.
@@ -102,13 +106,22 @@ uses `dependency_status` for planning and never changes Git provenance or owners
 
 Graph validation detects self edges, duplicate current `(type, source, target)` edges, multiple current
 `derived_from` parents and directed cycles across non-cancelled/non-stale edges. Proposed edges participate in
-structural checks but never suppress conflicts.
+structural checks but never suppress conflicts. A completed `derived_from`／`absorbs` requires its predecessor node
+to be exactly `lifecycle_phase=closed` and `closure_reason=superseded`; otherwise the graph is invalid and the pair
+keeps a `completed-takeover-predecessor-not-closed-superseded` comparison reason.
 
 ## 6. Nodes, active tips, and conflict pairs
 
-Node input records workstream ID, lifecycle/runtime/evidence status, optional exact HEAD, source links and origin.
-Missing node/session evidence produces an `unknown` node. A node is eligible as active only when runtime is active or
-review-pending and evidence is current.
+Node output keeps independent `session_state`, `lifecycle_phase`, `runtime_condition`, `evidence_freshness`,
+`scope_status`, `closure_reason`, exact optional HEAD, `primary_subsystem_id`, sorted
+`affected_subsystem_ids`, `visibility`, `observability`, safe source links and origin. `workstream_id` is the stable
+node identity; branch/path names are not identities. `status` is a deterministic summary derived from those axes and
+must not contradict them. Missing or inconsistent node/session evidence fails closed as `unknown`/`stale`.
+
+An ordinary node is active-eligible only when Session, evidence and Scope are all `current`, lifecycle has not ended,
+and `runtime_condition=active`; lifecycle `review-ready` maps to summary `review-pending` while retaining runtime
+`active`. `waiting-for-user`, `paused`, `blocked-by-conflict`, `failed`, `offline`, `stale-unknown` and unknown evidence
+never enter active tips.
 
 An effective active succession edge is an `active` `derived_from` or `absorbs` edge whose type-specific evidence is
 confirmed. Active tips are eligible nodes that are not the target of such an edge. The deterministic succession plan
@@ -128,10 +141,23 @@ This output advises the existing overlap consumer; it does not itself resolve or
 Discovery is read-only and may use exact local sessions, OIDs and ancestry. Inferred candidates always begin as
 `proposed`; similarity-only candidates carry `insufficient-evidence` and cannot be activated.
 
-An apply plan binds the graph hash, candidate event hashes and ordered append operations. It requires one explicit
-local confirmation for that exact plan and returns a receipt; any drift invalidates the plan. An undo plan references
-the apply receipt and appends `cancelled` or `stale` compensating events. Neither plan contains delete, merge, branch,
-Validation or author-document operations. W7A freezes these I/O shapes but leaves batch execution to W7B.
+An apply plan binds the exact graph hash, candidate event hashes, predecessor Session hash/HEAD/state axes and ordered
+operations under `all-operations-or-none`. A proposed-only edge needs no Session mutation. An active
+`derived_from`/`absorbs` takeover must atomically append the relation event and transition the current predecessor
+from runtime `active` to `paused` without changing its lifecycle or HEAD. A completed takeover requires either an
+already exact `closed/superseded` predecessor assertion or a same-plan transition to `closed`, `paused`,
+`closure_reason=superseded`.
+
+`session_hash` is lowercase SHA-256 of the exact UTF-8 bytes read from that Git-private Session file; it is not a hash
+of selected fields or caller prose. W7B must re-read and compare the full byte hash plus exact HEAD/state axes inside
+the atomic apply boundary before writing, then record the resulting full-byte hash in the receipt.
+
+The apply receipt binds plan/graph hashes, exact appended event evidence, original/resulting Session hashes, HEAD,
+lifecycle/runtime/evidence/Scope and closure reason. Undo accepts the full receipt rather than caller-supplied relation
+IDs; it appends compensating events and restores predecessor state only when the current Session hash/HEAD/state still
+equals the receipt's resulting state. Drift fails before writes. Neither plan deletes relation history, worktrees,
+branches, commits, Validation or author documents. W7A validates and freezes these I/O shapes with
+`execution_supported=false`; only W7B may implement execution after one local confirmation.
 
 Legacy sessions with `base_workstream_id` and `task_base_oid` project deterministically to read-only
 `derived_from` edges. `lineage.status=current` plus exact evidence may project `active`; missing/drifted inputs project
@@ -140,8 +166,14 @@ Legacy sessions with `base_workstream_id` and `task_base_oid` project determinis
 ## 8. Observatory consumer boundary
 
 W7C may render three derived views—Succession, Dependency and Conflict—but must consume the same Core graph and
-pair plan. Core source links remain navigable evidence; node/edge lifecycle, Unknown and active tips stay machine
-facts. Layout, colors, coordinates, dashed-line styling, labels and localization belong exclusively to Observatory.
+pair plan. Core source links remain navigable evidence; independent node axes, subsystem, visibility/observability,
+edge lifecycle/evidence, Unknown, active tips and compare/suppress reason codes stay machine facts. Layout, colors,
+coordinates, dashed-line styling, folding, labels and localization belong exclusively to Observatory.
+
+Compatibility was checked read-only against the provisional exploration at
+`codex/w7c-a-workstream-graph-visual-prototype@a39f6a701ef39e6bb3eb3b7ec05a9b5dc7416ef1` using a synthetic fixture marked
+`synthetic-non-authoritative`. That exploration is a consumer input, not Core authority; its provisional schema and
+page implementation are not copied into this contract.
 
 ## 9. Security and privacy
 
