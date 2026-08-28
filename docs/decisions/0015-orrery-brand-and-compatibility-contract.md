@@ -4,9 +4,7 @@ Status: Accepted
 
 Date: 2026-08-28
 
-Amends: [ADR-0001](0001-project-orrery-self-hosting.md),
-[ADR-0004](0004-platform-neutral-core-and-adapter-boundaries.md),
-[ADR-0011](0011-authority-model-version-and-compatibility.md)
+Amends: [ADR-0001](0001-project-orrery-self-hosting.md), [ADR-0004](0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0011](0011-authority-model-version-and-compatibility.md)
 
 Research input: [current-main rename audit](../library/2026-08-28-orrery-rename-migration-audit.zh-CN.md)
 
