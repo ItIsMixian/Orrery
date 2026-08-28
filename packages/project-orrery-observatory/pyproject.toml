@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "project-orrery-observatory"
-version = "0.1.8"
+version = "0.1.9"
 description = "Versioned managed-tool inventory for the Project Orrery observatory"
 requires-python = ">=3.10"
 

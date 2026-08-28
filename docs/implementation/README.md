@@ -14,6 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-28 W7C-B Production Workstream Relation Graph Observatory](plans/2026-08-28-w7c-b-production-workstream-relation-graph.md) — completed Worktree Candidate for the root-only/default-off Core v1 graph consumer, three read-only lenses, fail-closed evidence projection and desktop/mobile browser acceptance; W7B execution and Promotion remain separate.
 - [2026-08-28 W7A Dynamic Workstream Succession Contract](plans/2026-08-28-dynamic-workstream-succession-contract.md) — active Candidate Plan for the v1 relation record/graph/plan schema, dependency-free Core validation, Git-common-private read/append boundary, read-only graph/succession CLI and W7B/W7C handoff contracts.
 - [2026-08-27 W5E Team Observatory UI closeout](plans/2026-08-27-w5e-team-observatory-ui-closeout.md) — active Worktree plan that removes redundant Team summaries, keeps Team Mode／connection／online controls visible, and moves low-frequency local diagnostics into a secondary dialog without changing Core or network authority.
 - [2026-08-27 Workspace Maintenance and scheduled cleanup](plans/2026-08-27-workspace-maintenance-and-scheduled-cleanup.md) — proposed W6 Candidate Plan under ADR-0007/0008: event-driven and startup catch-up scans first, local confirmation execution second, explicit opt-in automatic worktree removal third, and cross-platform OS scheduler Adapters last.

@@ -48,6 +48,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W7A Worktree Candidate 的 relation record／graph／plan 与 Git-common-private event 都是协调控制面，不是作者 State／Plan／Validation。legacy `base_workstream_id/task_base_oid` 只读投影不会改写 session；graph source links 可以回到 Git-private／Validation 证据，但不得被 Observatory 或 AI 升级为项目权威。
 - W7A Core graph 的 node 分开输出 lifecycle phase、runtime condition、evidence freshness、Scope、primary/affected subsystem、visibility、observability 与安全 source links；edge 输出 lifecycle/evidence/source links，pair plan 输出 active tips、Unknown 与 compare/suppress reason codes。Core 不输出颜色、坐标、布局、折叠或 UI 文案。W7C-B 的图形派生必须消费该 versioned graph，不能重新解释关系或隐藏保守 Unknown。
 - W7C-A Worktree Candidate 的 `design-exploration.md` 与静态图原型共同位于隔离 `experiments/` 根；它们明确标为 provisional／non-authoritative，只列出 W7A 需要冻结的 consumer contract，不新增 ADR、Approved Design 或公共 schema。图与 accessible list 都从同一 synthetic fixture 派生，证据链接只能回到 fixture register，不能形成项目事实。
+- W7C-B Worktree Candidate 将 W7C-A 视觉证据作为实验输入保留，但生产 sibling page 只投影 corrected W7A Core v1 graph／plan。页面的 Succession／Dependency／Conflict lens、折叠、筛选、SVG、ledger 与 inspector 都是 derived/read-only view；Unsupported/invalid schema、relation root absent、dangling evidence、legacy Unknown、unsafe link 或 provider failure 会清空全部 graph facts并显示 Unavailable/Unknown，不把局部数据升级为可信事实。
 
 ## 同步状态
 
@@ -108,7 +109,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 当前观测台界面主要为中文，完整国际化仍未实施。
 - D1 已建立内部 finding schema／registry、11 组合成 fixture 和 dependency-free contract validator；尚未实现 `docs audit` scanner／CLI、真实项目 advisory 配置位置与阈值、acknowledge／defer 持久化、State／实现链接时效检查或任何自动修复。该 Core contract 也未导出为稳定公共 API。
 - W3 已实现证据优先审查与清理资格；当前 W5D Worktree Candidate 在 W4 health／W5C UI／W6 maintenance 上增加显式 LAN discovery、join、manual Host switch 与 lineage chain 投影。默认 docsite／发布模板不加载动态 Team／Maintenance；Phase 3 自动删除、Phase 4 scheduler、富成员管理、真实双机/LAN、自动选主与云 relay 仍未实现，当前事实作用域由 containing ref 决定。
-- W7A 尚未实现 W7B 的真实关系迁移/apply/undo，也未实现 W7C-B 正式图形页；当前只用标记为 synthetic-non-authoritative 的兼容 fixture 对照 W7C-A `a39f6a7` 设计探索，未复制其 provisional schema 或页面。默认 docsite、Skill template 与生成站点没有 relation graph consumer。
-- W7C-A 只验证 synthetic visual consumer。真实 relation graph 的 schema ownership、source links、Unknown／Local-only 投影、兼容版本、provider failure 与 Observatory 信息架构接线尚未实现；不得把 prototype fixture 字段提升为文档或 Core 公共合约。
+- W7A 尚未实现 W7B 的真实自动发现／migration／本机确认 apply／undo；W7C-B 也不提供任何执行按钮。中央 Team 视图保持 request-only，未来本机确认接线必须在 W7B 完成后另行评审。
+- W7C-A 仍只验证 synthetic visual consumer；W7C-B 已实现真实 Core consumer、safe source-link projection、Unknown／Local-only 保留、provider/schema fail-closed 与 Observatory 信息架构，但当前仍是本地 Worktree Candidate，未进入默认 docsite、Skill template、managed tools、release manifest、hosted Promotion 或公开 v0.2.0。
 - Authority Meta Model 已有 Candidate fixture、experimental Core evaluator、self-host 模型选择、managed shadow sidecar／诊断面板与 AI non-escalation guard，但仍无稳定公共 parser／domain API、默认 Authority 页面 projection、consumer production switch 或公开 release 实现。
 - M2.2 已有进入本地 Canonical baseline 的 root-only、显式 opt-in 完整 Authority projection，但没有改变上述默认／发布边界。

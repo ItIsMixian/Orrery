@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-28 — W7C-B Production Workstream Relation Graph Observatory
+
+- 从 corrected W7A `52e88b8` 建立独立 Workstream，并精确吸收 W7C-A `a39f6a7`；共享 project/documentation/test State、Validation index 与 DEVLOG 只做加法合并，W7C-A fixture 继续保持 provisional/non-authoritative。
+- Observatory 0.1.9 新增 root-only／default-off sibling page；provider 只接受 Core `workstream-relation-graph`／`workstream-succession-plan` v1，三 lens、history folding、filters、SVG/ledger/inspector 不扫描 Git/Session/branch/path，也不提供 apply/undo/close/delete/merge/remote execution。
+- provider/schema/root/node/evidence/legacy Unknown/Core failure 整体失败关闭；safe source links 只投影白名单仓库文档锚点，Git-private/opaque evidence 不导航。默认 docsite、managed tools、Skill template、release manifest 与公开 v0.2.0 未改变。
+- Focused 13/13、Fast 50/50、W7A/W7C-A/Personal/Team 45/45 以及 CI/structure/install/isolated-site gates 通过；真实 in-app Chromium 在 1280px 与 390×844 完成三 lens、过滤、历史、点击、Enter/Space、inspector、safe link、zero-overflow 与截图。未运行 Promotion，未 push、合 main、改 protection、tag 或 Release；W7B 仍负责未来本机确认与执行接线。
+
 ## 2026-08-28 — W7A Dynamic Workstream Succession Contract
 
 - 中央只读验收拒绝初始 `b6be68e`：旧 node summary 把 waiting/paused/blocked/failed 误判 active，且 apply/undo 无法原子标记/恢复 predecessor Session。本 correction 在同一 ADR-0014 下修正，不改写 peer Session 或 W7C-A。

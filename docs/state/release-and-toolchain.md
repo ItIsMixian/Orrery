@@ -49,7 +49,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - W5D Candidate 增加 `team discovery-serve|discovery-scan|discovery-status`、candidate-aware join、`coordinator-switch-create|coordinator-switch-claim` 与 `worktree ... --base-workstream-id/--task-base-oid`。LAN acceptance runner／validator 是仓库工具，不进入公开 v0.2.0 包；它只在系统临时目录创建本地 clone，使用 controlled discovery＋loopback HTTP，并输出脱敏 checksum verdict。没有 push、tag、Release、云 relay、自动选主或 scheduler 变更。
 - CI1 Worktree Candidate 增加 dependency-free unittest inventory／26-shard manifest、逐项 timing JSON runner、fail-closed aggregate 与 workflow static validator；Fast 对普通 push／PR 提供非 Promotion 反馈，Promotion 只接受显式 ref＋exact SHA 或 `promotion/**` 冻结分支。既有 branch-protection context 名不变，`release.yml` 的 tag 发布门不在本 Workstream 改写，且本 Candidate 没有调用 GitHub API、push、tag 或 Release。
 - W5E Worktree Candidate 只将 Observatory 0.1.7 提升至 0.1.8：重排 Team 页面与本机设置弹窗，未修改 Core／CLI、Team server route、安全 POST、CI workflow、managed-tool inventory、Skill template、installer、release manifest、tag 或 Release。
-- W7A 不修改 Observatory managed tools、Skill template、installer、release manifest、tag 或 Release。Git-common-private relation 文件不属于 package input；W7B apply/undo execution 与 W7C-B UI 均保持未实现。
+- W7A 不修改 Observatory managed tools、Skill template、installer、release manifest、tag 或 Release。Git-common-private relation 文件不属于 package input；W7B apply/undo execution 保持未实现。
+- W7C-B 只将未发布 Observatory 0.1.8 提升到 0.1.9，增加 root-only／default-off relation graph builder、Core-only projection 与 Team sibling 可选注入。该脚本没有加入 `component.json` managed tools，默认 `build_docsite.py`／`serve.py`、wheel assets、Skill template、installer、release manifest、tag、Release 和公开 v0.2.0 均未改变。
 
 ## 实现证据
 
@@ -127,5 +128,6 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - CI1 只在 Worktree scope 实现新检查拓扑；GitHub-hosted Fast ≤90s、Windows Promotion ≤4m、artifact upload/download 与既有 branch protection 接线仍需对冻结 exact SHA 做远端验证。未取得该证据前不得把本机投影写成 hosted 性能或 Canonical CI 事实。
 - 当前 W5E Worktree Candidate 包含 W1–W3 review/cleanup、W4 Personal 指挥台、W5A Team foundation、W5E root-only Team UI、W6 maintenance、显式 LAN discovery/join/manual Host switch、stacked lineage 与 CI1。仍缺 Phase 3 自动 removal、Phase 4 scheduler Adapter、真实双机/LAN、自动选主、云 relay、多设备迁移、hosted CI1 性能证据与完整发行接线；Canonical 状态由 containing ref 决定，公开 v0.2.0 不变。
 - W7A 的 relation contract 仅存在于源码 Candidate；未进入独立 wheel/release、Adapter capability manifest、默认 Observatory consumer 或 hosted Promotion。真实批量 apply/undo 和图形页面不能继承本地单元测试的发布支持声明。
+- W7C-B 图形页只在本地 root opt-in 下消费 W7A v1；本机 Chromium 与单元／邻接测试不构成 hosted Promotion、Canonical integration、跨平台或发布支持证据。W7B 的本机确认入口、真实 relation store migration 与执行仍未接线。
 - Claude Code 尚未完成成功认证与模型调用；DeepSeek Harness 只有 manifest 中列出的 Adapter 0.1.0 精确 runtime 范围为 `verified`。两者均无公开分发或跨版本支持承诺，当前源码 Adapter 0.1.1／CLI 0.1.13 与其他 runtime／OS／模型不能继承旧验证结论。
 - Authority Meta Model 已有 fixture-bound Core evaluator、内部兼容判断、neutral CLI `validate` capability report、receipt-gated migration apply/restore、future-release projection contract、`check-update` migration review 与本地 release-candidate gate，但没有维护者选定的实际下一 SemVer／source manifest、M2.2 consumer production evidence、稳定顶层 Core API、独立发行物、Harness Adapter 迁移命令、managed Observatory banner 或发布支持状态变化；v0.2.0 发布事实不变。

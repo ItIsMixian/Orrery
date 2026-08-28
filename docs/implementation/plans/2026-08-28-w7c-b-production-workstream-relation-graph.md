@@ -1,6 +1,6 @@
 # 实施计划：W7C-B Production Workstream Relation Graph Observatory
 
-Status: Active Candidate Plan
+Status: Completed Worktree Candidate
 
 Date: 2026-08-28
 
@@ -80,3 +80,11 @@ Completion updates `docs/state/{project-structure,documentation-system,release-a
 `docs/validation/2026-08-28-w7c-b-production-workstream-relation-graph.md`, `docs/validation/README.md`,
 `docs/implementation/README.md` and `docs/DEVLOG.md`. Shared State/DEVLOG/index edits remain Candidate-scope
 integration conflicts for the unique integrator; root `docs/PROGRESS.md` and `docs/HANDOFF.md` stay untouched.
+
+## Outcome
+
+Implemented as Observatory 0.1.9 on the exact corrected W7A base and imported exact W7C-A visual evidence. The
+root-only page consumes provider/graph/plan schema 1, fails closed as one projection, preserves independent state
+axes and exposes no execution surface. Focused 13/13, Fast 50/50 and W7A/W7C-A/Personal/Team Checkpoint 45/45
+passed; structure, CI contract, installation, isolated docsite, repository links and real 1280px/390px Chromium
+acceptance passed. Hosted Promotion, push, main integration and W7B execution remain outside this plan.
