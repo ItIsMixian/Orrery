@@ -23,19 +23,27 @@ from _common import (  # noqa: E402
     expand_profile,
     git_sha,
     load_json,
+    load_mapping_registry,
+    machine_inventory,
     promotion_lane_assignments,
     sha256_json,
     validate_and_expand_manifest,
+    validate_mapping_registry,
 )
 from aggregate_test_results import aggregate  # noqa: E402
 from run_test_lane import run_lane  # noqa: E402
 from run_test_shard import TimedTextResult, run_selected  # noqa: E402
+from validate_change import SelectionRefused, build_selection, main as validate_change_main  # noqa: E402
 from validate_ci import validate_binding, validate_workflows  # noqa: E402
 
 
 class CIValidationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.manifest = load_json(DEFAULT_MANIFEST)
+        self.registry = load_mapping_registry(self.manifest)
+        self.portfolios = load_json(
+            ROOT / "tests" / "fixtures" / "ci-validation" / "change-portfolios-v1.json"
+        )
 
     def _write_manifest(self, directory: Path, manifest: dict) -> Path:
         path = directory / "manifest.json"
@@ -45,19 +53,21 @@ class CIValidationTests(unittest.TestCase):
     def _result_payloads(self, expected_os: str = "Windows") -> tuple[dict, dict[str, list[str]]]:
         test_ids, assignments, _ = validate_and_expand_manifest(self.manifest)
         manifest_hash = sha256_json(self.manifest)
-        inventory_hash = sha256_json(test_ids)
+        inventory = machine_inventory(self.manifest)
+        inventory_hash = inventory["inventory_sha256"]
         head = git_sha()
         payloads = {}
         for shard, selected in assignments.items():
             payloads[shard] = {
-                "schema_version": 1,
-                "contract_type": "orrery-test-shard-result-v1",
+                "schema_version": 2,
+                "contract_type": "orrery-test-shard-result-v2",
                 "role": "promotion-shard",
                 "sha": head,
                 "os": expected_os,
                 "python": "3.11.0",
                 "shard": shard,
                 "manifest_sha256": manifest_hash,
+                "mapping_registry_sha256": inventory["mapping_registry_sha256"],
                 "inventory_sha256": inventory_hash,
                 "orrery_test_build": "1",
                 "selected_test_count": len(selected),
@@ -97,6 +107,7 @@ class CIValidationTests(unittest.TestCase):
                     "python": sample["python"],
                     "lane": lane,
                     "manifest_sha256": sample["manifest_sha256"],
+                    "mapping_registry_sha256": sample["mapping_registry_sha256"],
                     "shards": shards,
                     "records": [
                         {
@@ -124,8 +135,8 @@ class CIValidationTests(unittest.TestCase):
         self.assertLess(len(fast_ids), len(test_ids))
         self.assertTrue(set(fast_ids).issubset(checkpoint_ids))
         self.assertLess(len(checkpoint_ids), len(test_ids))
-        self.assertEqual(self.manifest["fast"]["budget_seconds"], 15)
-        self.assertEqual(self.manifest["checkpoint"]["budget_seconds"], 90)
+        self.assertEqual(self.registry["stages"]["fast"]["budget_seconds"], 15)
+        self.assertEqual(self.registry["stages"]["checkpoint"]["budget_seconds"], 90)
         self.assertEqual(len(lanes), 10)
         lane_shards = [shard for members in lanes.values() for shard in members]
         self.assertEqual(sorted(lane_shards), sorted(assignments))
@@ -147,13 +158,146 @@ class CIValidationTests(unittest.TestCase):
             shard for shard in self.manifest["shards"] if shard["surface"] == "Workspace Maintenance"
         ]
         self.assertGreaterEqual(len(workspace), 4)
-        self.assertFalse(any("test_workspace_maintenance.*" in shard["selectors"] for shard in workspace))
+        self.assertTrue(all(set(shard).issubset({"id", "surface", "budget_seconds"}) for shard in workspace))
         minimal_git = (
             "test_workstream_relation_execution.WorkstreamRelationExecutionTests."
             "test_minimal_git_binding_rejections_and_state_axes_checkpoint"
         )
         self.assertNotIn(minimal_git, checkpoint_ids)
         self.assertIn(minimal_git, assignments["team-relations-execution"])
+
+    def test_machine_inventory_gives_every_test_owner_stage_cost_budget_and_reason(self) -> None:
+        inventory = machine_inventory(self.manifest)
+        self.assertEqual(inventory["test_count"], len(inventory["tests"]))
+        self.assertEqual(
+            {item["test_id"] for item in inventory["tests"]},
+            set(validate_and_expand_manifest(self.manifest)[0]),
+        )
+        for item in inventory["tests"]:
+            self.assertTrue(item["owner_surface"])
+            self.assertTrue(item["owner_shard"])
+            self.assertTrue(item["allowed_stages"])
+            self.assertIn(item["cost_class"], {"low", "medium", "heavy"})
+            self.assertGreater(item["budget_seconds"], 0)
+            self.assertTrue(item["dependencies"])
+            self.assertTrue(item["reason"])
+        self.assertEqual(inventory["mapping_registry_sha256"], sha256_json(self.registry))
+
+    @staticmethod
+    def _portfolio_session(portfolio: dict) -> dict:
+        subsystems = portfolio["subsystems"]
+        return {
+            "primary_subsystem_id": subsystems[0] if subsystems else "",
+            "affected_subsystem_ids": subsystems[1:],
+            "expected_writes": portfolio["expected_writes"],
+        }
+
+    def _select_portfolio(self, portfolio: dict) -> dict:
+        with mock.patch(
+            "validate_change.changed_paths", return_value=(portfolio["changed_paths"], False)
+        ), mock.patch("validate_change.dirty_fingerprint", return_value="1" * 64):
+            return build_selection(
+                self.manifest,
+                portfolio["stage"],
+                git_sha(),
+                "synthetic-portfolio",
+                self._portfolio_session(portfolio),
+                "synthetic-session.json",
+            )
+
+    def test_generic_router_selects_docs_authority_and_collaboration_portfolios(self) -> None:
+        generic = [
+            portfolio for portfolio in self.portfolios["portfolios"]
+            if portfolio["id"] != "w6-1-regression"
+        ]
+        self.assertEqual([item["id"] for item in generic], [
+            "docs-only", "authority-schema-cli", "collaboration-maintenance"
+        ])
+        for portfolio in generic:
+            with self.subTest(portfolio=portfolio["id"]):
+                plan = self._select_portfolio(portfolio)
+                self.assertEqual(plan["mapping_ids"], portfolio["expected_mapping_ids"])
+                self.assertLessEqual(plan["selected_test_count"], portfolio["max_selected"])
+                self.assertTrue(set(portfolio["required_test_ids"]).issubset(plan["selected_test_ids"]))
+                self.assertFalse(set(portfolio["forbidden_test_ids"]) & set(plan["selected_test_ids"]))
+
+    def test_regression_portfolio_is_data_only_and_heavy_claims_are_promotion_owned_once(self) -> None:
+        portfolio = next(
+            item for item in self.portfolios["portfolios"] if item["id"] == "w6-1-regression"
+        )
+        plan = self._select_portfolio(portfolio)
+        entries = {item["test_id"]: item for item in self.registry["tests"]}
+        assignments = validate_and_expand_manifest(self.manifest)[1]
+        assigned = [test_id for values in assignments.values() for test_id in values]
+        regression_ids = portfolio["regression_test_ids"]
+        promotion_only = [
+            test_id for test_id in regression_ids
+            if entries[test_id]["allowed_stages"] == ["promotion"]
+        ]
+        self.assertEqual(len(regression_ids), 24)
+        self.assertGreaterEqual(len(promotion_only), 20)
+        self.assertLess(plan["selected_test_count"], 24)
+        self.assertFalse(set(promotion_only) & set(plan["selected_test_ids"]))
+        self.assertTrue(all(assigned.count(test_id) == 1 for test_id in promotion_only))
+
+    def test_production_router_and_registry_have_no_task_or_branch_specific_switch(self) -> None:
+        forbidden = ("w6" + "-1", "codex/" + "w6", "incremental-maintenance-quick-remove")
+        production = list(CI_SCRIPTS.glob("*.py")) + [
+            CI_SCRIPTS / "test-shards.json",
+            CI_SCRIPTS / "change-mapping.json",
+            CI_SCRIPTS / "README.md",
+        ]
+        for path in production:
+            text = path.read_text(encoding="utf-8").lower()
+            with self.subTest(path=path.name):
+                self.assertFalse(any(token in text for token in forbidden))
+
+    def test_registry_mutations_fail_closed_for_unregistered_duplicate_unknown_and_heavy(self) -> None:
+        self.assertEqual(
+            [item["id"] for item in self.portfolios["mutations"]],
+            ["unregistered-test", "unmapped-path", "unknown-dependency"],
+        )
+        shard_surfaces = {item["id"]: item["surface"] for item in self.manifest["shards"]}
+        unregistered = copy.deepcopy(self.registry)
+        unregistered["tests"].pop()
+        with mock.patch("_common.load_mapping_registry", return_value=unregistered), self.assertRaisesRegex(
+            CIValidationError, "unregistered.*owner_surface.*dependencies"
+        ):
+            validate_and_expand_manifest(self.manifest)
+
+        duplicate = copy.deepcopy(self.registry)
+        duplicate["tests"].append(copy.deepcopy(duplicate["tests"][0]))
+        with self.assertRaisesRegex(CIValidationError, "duplicate registered test ID"):
+            validate_mapping_registry(duplicate, shard_surfaces)
+
+        unknown = copy.deepcopy(self.registry)
+        unknown["tests"][0]["dependencies"] = ["missing-generic-mapping"]
+        with self.assertRaisesRegex(CIValidationError, "Unknown dependencies.*path_mappings metadata"):
+            validate_mapping_registry(unknown, shard_surfaces)
+
+        heavy = copy.deepcopy(self.registry)
+        heavy_entry = next(item for item in heavy["tests"] if item["cost_class"] == "heavy")
+        heavy_entry["allowed_stages"] = ["checkpoint", "promotion"]
+        with self.assertRaisesRegex(CIValidationError, "heavy registered test.*lower stage"):
+            validate_mapping_registry(heavy, shard_surfaces)
+
+    def test_unmapped_path_refuses_formal_receipt_and_explains_registry_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "refusal.json"
+            argv = [
+                "validate_change.py", "--stage", "fast", "--base", git_sha(),
+                "--output", str(output), "--dry-run",
+            ]
+            with mock.patch("validate_change.changed_paths", return_value=(["unknown/new.xyz"], False)), mock.patch(
+                "sys.argv", argv
+            ):
+                return_code = validate_change_main()
+            receipt = load_json(output)
+        self.assertNotEqual(return_code, 0)
+        self.assertEqual(receipt["contract_type"], "orrery-local-validation-refusal-v1")
+        self.assertFalse(receipt["evidence_eligible"])
+        self.assertIn("unmapped", "\n".join(receipt["runner_errors"]))
+        self.assertIn("path_mappings", "\n".join(receipt["required_metadata"]))
 
     def test_lane_contract_rejects_missing_duplicate_unknown_and_heavy_cohabitation(self) -> None:
         missing = copy.deepcopy(self.manifest)
@@ -190,7 +334,7 @@ class CIValidationTests(unittest.TestCase):
                 atomic_write_json(
                     output,
                     {
-                        "contract_type": "orrery-test-shard-result-v1",
+                        "contract_type": "orrery-test-shard-result-v2",
                         "shard": shard,
                         "successful": successful,
                         "completed": True,
@@ -214,24 +358,22 @@ class CIValidationTests(unittest.TestCase):
             receipt = json.loads((output_dir / "lane-result.json").read_text(encoding="utf-8"))
             self.assertEqual(receipt["contract_type"], "orrery-test-lane-result-v1")
 
-    def test_inventory_rejects_missing_duplicate_and_dead_selectors(self) -> None:
-        missing = copy.deepcopy(self.manifest)
-        workspace_contract = next(item for item in missing["shards"] if item["id"] == "workspace-contract")
-        workspace_contract["selectors"] = [
-            "test_workspace_maintenance.WorkspaceMaintenanceTests.test_action_surface_rejects_branch_path_shell_url_and_ai_authority"
-        ]
-        with self.assertRaisesRegex(CIValidationError, "multiple shards|incomplete"):
-            validate_and_expand_manifest(missing)
+    def test_inventory_rejects_stale_registry_and_unknown_owner_shard(self) -> None:
+        stale = copy.deepcopy(self.registry)
+        stale["tests"].append({
+            **copy.deepcopy(stale["tests"][0]),
+            "test_id": "test_missing_module.MissingTests.test_dead_selector_equivalent",
+        })
+        with mock.patch("_common.load_mapping_registry", return_value=stale), self.assertRaisesRegex(
+            CIValidationError, "exact test registry differs.*stale="
+        ):
+            validate_and_expand_manifest(self.manifest)
 
-        duplicate = copy.deepcopy(self.manifest)
-        duplicate["shards"][0]["selectors"].append("test_context_routing_oracle_v02.*")
-        with self.assertRaisesRegex(CIValidationError, "multiple shards"):
-            validate_and_expand_manifest(duplicate)
-
-        dead = copy.deepcopy(self.manifest)
-        dead["shards"][0]["selectors"][0] = "test_module_that_does_not_exist.*"
-        with self.assertRaisesRegex(CIValidationError, "matched no final unittest ID"):
-            validate_and_expand_manifest(dead)
+        unknown_owner = copy.deepcopy(self.registry)
+        unknown_owner["tests"][0]["owner_shard"] = "missing-owner-shard"
+        shard_surfaces = {item["id"]: item["surface"] for item in self.manifest["shards"]}
+        with self.assertRaisesRegex(CIValidationError, "owner shard/surface mismatch|unknown owner_shard"):
+            validate_mapping_registry(unknown_owner, shard_surfaces)
 
     def test_timing_result_preserves_unittest_failure_semantics(self) -> None:
         class FailingTest(unittest.TestCase):
@@ -249,15 +391,19 @@ class CIValidationTests(unittest.TestCase):
     def test_runner_emits_sha_os_python_test_id_outcome_and_duration(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
-            manifest = copy.deepcopy(self.manifest)
-            manifest["fast"]["selectors"] = [
-                "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes"
-            ]
-            manifest_path = self._write_manifest(directory, manifest)
+            test_id = (
+                "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests."
+                "test_historical_v020_inputs_match_frozen_hashes"
+            )
+            registry = copy.deepcopy(self.registry)
+            for entry in registry["tests"]:
+                entry["allowed_stages"] = ["fast", "checkpoint", "promotion"] if entry["test_id"] == test_id else ["promotion"]
             output = directory / "result.json"
-            with mock.patch.dict(os.environ, {"RUNNER_OS": "FixtureOS"}, clear=False):
+            with mock.patch.dict(os.environ, {"RUNNER_OS": "FixtureOS"}, clear=False), mock.patch(
+                "_common.load_mapping_registry", return_value=registry
+            ), mock.patch("run_test_shard.load_mapping_registry", return_value=registry):
                 payload, successful = run_selected(
-                    manifest_path=manifest_path, shard=None, profile="fast", output=output
+                    manifest_path=DEFAULT_MANIFEST, shard=None, profile="fast", output=output
                 )
             self.assertTrue(successful)
             self.assertEqual(payload["sha"], git_sha())
@@ -270,27 +416,33 @@ class CIValidationTests(unittest.TestCase):
             self.assertEqual(payload["records"][0]["python"], payload["python"])
             self.assertEqual(payload["records"][0]["shard"], "fast")
             self.assertEqual(payload["budget_seconds"], 15.0)
+            self.assertEqual(payload["mapping_registry_sha256"], sha256_json(registry))
             self.assertFalse(payload["budget_exceeded"])
             self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["shard"], "fast")
 
     def test_runner_enforces_profile_budget_without_changing_promotion_semantics(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
-            manifest = copy.deepcopy(self.manifest)
-            manifest["fast"]["budget_seconds"] = 0.000001
-            manifest["fast"]["selectors"] = [
-                "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes"
-            ]
-            manifest_path = self._write_manifest(directory, manifest)
-            payload, successful = run_selected(
-                manifest_path=manifest_path,
-                shard=None,
-                profile="fast",
-                output=directory / "result.json",
+            test_id = (
+                "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests."
+                "test_historical_v020_inputs_match_frozen_hashes"
             )
+            registry = copy.deepcopy(self.registry)
+            registry["stages"]["fast"]["budget_seconds"] = 0.000001
+            for entry in registry["tests"]:
+                entry["allowed_stages"] = ["fast", "checkpoint", "promotion"] if entry["test_id"] == test_id else ["promotion"]
+            with mock.patch("_common.load_mapping_registry", return_value=registry), mock.patch(
+                "run_test_shard.load_mapping_registry", return_value=registry
+            ):
+                payload, successful = run_selected(
+                    manifest_path=DEFAULT_MANIFEST,
+                    shard=None,
+                    profile="fast",
+                    output=directory / "result.json",
+                )
             self.assertFalse(successful)
             self.assertTrue(payload["budget_exceeded"])
-            self.assertEqual(payload["role"], "non-promotion-feedback")
+            self.assertEqual(payload["role"], "local-fast-evidence")
 
     def test_aggregate_accepts_complete_once_only_results(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

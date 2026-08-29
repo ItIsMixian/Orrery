@@ -13,6 +13,7 @@ from _common import (
     expand_profile,
     git_sha,
     load_json,
+    machine_inventory,
     promotion_lane_assignments,
     sha256_json,
     validate_and_expand_manifest,
@@ -24,14 +25,18 @@ def build_inventory(manifest_path: Path) -> dict[str, object]:
     test_ids, assignments, fast_ids = validate_and_expand_manifest(manifest)
     checkpoint_ids = expand_profile(manifest, "checkpoint", test_ids)
     lanes = promotion_lane_assignments(manifest)
+    routed = machine_inventory(manifest)
     return {
-        "schema_version": 2,
-        "contract_type": "orrery-unittest-inventory",
+        "schema_version": 4,
+        "contract_type": "orrery-unittest-inventory-v4",
         "sha": git_sha(),
         "python": platform.python_version(),
         "manifest_sha256": sha256_json(manifest),
         "test_count": len(test_ids),
         "test_ids": test_ids,
+        "inventory_sha256": routed["inventory_sha256"],
+        "mapping_registry_sha256": routed["mapping_registry_sha256"],
+        "tests": routed["tests"],
         "fast_test_count": len(fast_ids),
         "fast_test_ids": fast_ids,
         "checkpoint_test_count": len(checkpoint_ids),

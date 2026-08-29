@@ -281,8 +281,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
         shards = json.loads((ROOT / "scripts" / "ci" / "test-shards.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.9")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.9")
+        self.assertEqual(component["version"], "0.1.10")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.10")
         selectors = [selector for shard in shards["shards"] for selector in shard["selectors"]]
         self.assertIn("test_workstream_relation_graph_observatory.*", selectors)
         self.assertIn("test_workstream_graph_visual_prototype.*", selectors)

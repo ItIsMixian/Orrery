@@ -49,6 +49,7 @@ def render_personal_site(
     *,
     excluded_branches: tuple[str, ...] = (),
     maintenance_control_available: bool = False,
+    maintenance_api_base: str = "/team/api/maintenance",
 ):
     """Return the base Observatory unchanged unless explicit W4 opt-in is enabled."""
 
@@ -63,14 +64,11 @@ def render_personal_site(
     )
 
     try:
-        from project_orrery_core.maintenance import (
-            catch_up_maintenance_scan,
-            maintenance_status,
-        )
+        from project_orrery_core.maintenance import maintenance_status
 
-        catch_up_maintenance_scan(root)
         maintenance = maintenance_status(root)
         maintenance["control_available"] = maintenance_control_available
+        maintenance["api_base"] = maintenance_api_base
     except Exception as error:
         maintenance = {
             "status": "unavailable",

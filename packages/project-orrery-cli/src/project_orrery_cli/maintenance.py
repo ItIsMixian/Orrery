@@ -8,10 +8,12 @@ from pathlib import Path
 from project_orrery_core.maintenance import (
     authorize_maintenance_item,
     execute_maintenance_authorization,
+    execute_quick_remove_item,
     inspect_maintenance_item,
     list_maintenance_queue,
     load_maintenance_policy,
     maintenance_status,
+    quick_remove_preflight,
     read_maintenance_receipt,
     run_maintenance_scan,
 )
@@ -39,6 +41,9 @@ def build_parser() -> argparse.ArgumentParser:
     inspect = commands.add_parser("inspect")
     _common(inspect)
     inspect.add_argument("item_id")
+    preflight = commands.add_parser("preflight")
+    _common(preflight)
+    preflight.add_argument("target_id")
     authorize = commands.add_parser("authorize")
     _common(authorize)
     authorize.add_argument("item_id")
@@ -47,6 +52,11 @@ def build_parser() -> argparse.ArgumentParser:
     execute = commands.add_parser("execute")
     _common(execute)
     execute.add_argument("authorization_id")
+    quick = commands.add_parser("quick-remove")
+    _common(quick)
+    quick.add_argument("item_id")
+    quick.add_argument("--actor", required=True)
+    quick.add_argument("--confirm-preserve-branch-and-commit", action="store_true", required=True)
     receipt = commands.add_parser("receipt")
     _common(receipt)
     receipt.add_argument("receipt_id")
@@ -81,6 +91,11 @@ def _success(command: str, data: dict[str, object], json_output: bool) -> int:
         elif command == "maintenance-execute":
             print(f"Receipt: {data['receipt']['receipt_id']} · {data['receipt']['outcome']}")
             print("Branch deleted: no")
+        elif command == "maintenance-preflight":
+            print(f"Quick Remove preflight: {data['status']} · {data['workspace_id']}")
+        elif command == "maintenance-quick-remove":
+            print(f"Receipt: {data['receipt']['receipt_id']} · {data['receipt']['outcome']}")
+            print("Only the worktree was targeted; branch and commit are preserved.")
         else:
             print(data)
     return int(JsonExitCode.OK)
@@ -100,10 +115,21 @@ def main(argv: list[str] | None = None) -> int:
             data = list_maintenance_queue(arguments.target)
         elif arguments.command == "inspect":
             data = {"item": inspect_maintenance_item(arguments.target, arguments.item_id), "writes_performed": False, "network_performed": False}
+        elif arguments.command == "preflight":
+            data = quick_remove_preflight(arguments.target, target_id=arguments.target_id)
         elif arguments.command == "authorize":
             data = authorize_maintenance_item(arguments.target, item_id=arguments.item_id, action=arguments.action, actor_id=arguments.actor)
         elif arguments.command == "execute":
             data = execute_maintenance_authorization(arguments.target, authorization_id=arguments.authorization_id)
+        elif arguments.command == "quick-remove":
+            preflight = quick_remove_preflight(arguments.target, target_id=arguments.item_id)
+            if not preflight.get("eligible") or not isinstance(preflight.get("item"), dict):
+                raise ValueError("Quick Remove target is not eligible after fresh preflight")
+            data = execute_quick_remove_item(
+                arguments.target,
+                item_id=str(preflight["item"]["item_id"]),
+                actor_id=arguments.actor,
+            )
         elif arguments.command == "receipt":
             data = {"receipt": read_maintenance_receipt(arguments.target, arguments.receipt_id), "writes_performed": False, "network_performed": False}
         elif arguments.command == "schedule":

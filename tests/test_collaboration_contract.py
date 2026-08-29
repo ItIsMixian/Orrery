@@ -521,8 +521,8 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(status.returncode, 0, status.stdout + status.stderr)
             status_payload = json.loads(status.stdout)
             self.assertEqual(status_payload["command"], "worktree-status")
-            self.assertEqual(status_payload["versions"]["core"], "0.1.14")
-            self.assertEqual(status_payload["versions"]["cli"], "0.1.18")
+            self.assertEqual(status_payload["versions"]["core"], "0.1.15")
+            self.assertEqual(status_payload["versions"]["cli"], "0.1.19")
             self.assertEqual(status_payload["data"]["session"]["state"], "absent")
             self.assertFalse(status_payload["data"]["writes_performed"])
 
@@ -809,8 +809,8 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(created.returncode, 0, created.stdout + created.stderr)
             payload = json.loads(created.stdout)
             self.assertEqual(payload["command"], "worktree-create")
-            self.assertEqual(payload["versions"]["core"], "0.1.14")
-            self.assertEqual(payload["versions"]["cli"], "0.1.18")
+            self.assertEqual(payload["versions"]["core"], "0.1.15")
+            self.assertEqual(payload["versions"]["cli"], "0.1.19")
             self.assertEqual(payload["data"]["status"]["session"]["state"], "current")
 
             allowed = subprocess.run(
