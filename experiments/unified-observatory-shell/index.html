@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Synthetic non-authoritative Unified Orrery Observatory shell prototype">
+  <title>Orrery · Unified Observatory Shell Prototype</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="prototype.css">
+</head>
+<body>
+  <a class="skip-link" href="#workspace">跳到主内容</a>
+  <div class="prototype-flag" role="note">
+    ARCHITECTURE INTERACTION STUDY · NOT FINAL DOCSITE REDESIGN
+  </div>
+
+  <header class="topbar">
+    <button class="icon-button menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="打开导航">☰</button>
+    <div class="brand-block">
+      <span class="orbit-mark" aria-hidden="true"><i></i></span>
+      <div><strong>Orrery</strong><small>Unified Observatory</small></div>
+    </div>
+    <div class="mode-switch" role="group" aria-label="运行模式">
+      <button type="button" data-mode="static">静态只读</button>
+      <button type="button" data-mode="dynamic" aria-pressed="true">本地动态</button>
+    </div>
+    <div class="socket-state" title="Synthetic runtime boundary">
+      <span class="status-light ready" aria-hidden="true"></span>
+      <span><b>ONE VISIBLE URL</b><small id="socket-label">127.0.0.1 · helpers supervised</small></span>
+    </div>
+  </header>
+
+  <div class="boundary-strip" id="boundary-strip" role="status" aria-live="polite">
+    <b>DYNAMIC LOCAL</b>
+    <span>Personal zero-network</span>
+    <span>Default no console</span>
+    <span>Team off</span>
+  </div>
+
+  <div class="shell">
+    <aside class="sidebar" id="sidebar" aria-label="Observatory navigation">
+      <div class="sidebar-heading">
+        <span>PROJECT / ORRERY</span>
+        <code>shell-v1 · synthetic</code>
+      </div>
+      <nav>
+        <p class="nav-label">Observe</p>
+        <button class="nav-item active" type="button" data-view="overview"><span>01</span>总览<small>Shell health</small></button>
+        <button class="nav-item" type="button" data-view="docs"><span>02</span>文档与搜索<small>Static safe</small></button>
+        <button class="nav-item" type="button" data-view="ask"><span>03</span>Ask Docs<small>Provider opt-in</small></button>
+        <button class="nav-item" type="button" data-view="authority"><span>04</span>Authority<small>Unavailable</small></button>
+        <p class="nav-label">Coordinate</p>
+        <button class="nav-item" type="button" data-view="personal"><span>05</span>Personal<small>Local projection</small></button>
+        <button class="nav-item" type="button" data-view="team"><span>06</span>Team<small id="team-nav-state">Opt-in</small></button>
+        <button class="nav-item" type="button" data-view="workstreams"><span>07</span>Workstream Graph<small>Read-only</small></button>
+        <button class="nav-item" type="button" data-view="maintenance"><span>08</span>工作区维护<small>Cached / stale</small></button>
+      </nav>
+      <div class="sidebar-foot">
+        <span>FACT SOURCE</span>
+        <b>synthetic-fixture@u1</b>
+        <small>No repository facts loaded</small>
+      </div>
+    </aside>
+    <button class="scrim" id="scrim" type="button" aria-label="关闭导航"></button>
+
+    <main id="workspace" class="workspace" tabindex="-1">
+      <section class="view active" data-page="overview" aria-labelledby="overview-title">
+        <div class="page-heading">
+          <div><p class="kicker">SHELL / OVERVIEW</p><h1 id="overview-title">一个入口，边界仍然可见。</h1></div>
+          <span class="scope-badge">SYNTHETIC · NOT UI SPEC</span>
+        </div>
+        <p class="lead">同一可见 URL 组合阅读、推理与本机控制；内部 helper 可隔离运行，但由 supervisor 统一收口。此页面是架构交互研究，不替代 production docsite 的阅读与视觉基线。</p>
+
+        <div class="signal-rail" aria-label="Shell signals">
+          <div><small>Launcher</small><b>Headless default</b><span class="signal-line cyan"></span></div>
+          <div><small>Network</small><b id="network-signal">Zero-network</b><span class="signal-line cyan"></span></div>
+          <div><small>Authority</small><b>Unavailable</b><span class="signal-line amber"></span></div>
+          <div><small>Maintenance</small><b>2 cached · 1 stale</b><span class="signal-line amber"></span></div>
+        </div>
+
+        <div class="overview-grid">
+          <article class="focus-panel">
+            <header><span>CAPABILITY MAP</span><small>one visible URL · supervised helpers</small></header>
+            <div class="capability-list">
+              <button type="button" data-jump="docs"><i class="cap-dot ready"></i><span><b>Docs / Search</b><small>Static and dynamic</small></span><em>READY</em></button>
+              <button type="button" data-jump="ask"><i class="cap-dot muted"></i><span><b>Ask Docs</b><small>Broker not configured</small></span><em>OFF</em></button>
+              <button type="button" data-jump="authority"><i class="cap-dot warning"></i><span><b>Authority</b><small>A3 contract missing</small></span><em>UNAVAILABLE</em></button>
+              <button type="button" data-jump="team"><i class="cap-dot muted"></i><span><b>Team</b><small>Explicit project opt-in</small></span><em id="team-cap-state">OFF</em></button>
+              <button type="button" data-jump="maintenance"><i class="cap-dot warning"></i><span><b>Maintenance</b><small>Cached state, fresh preflight required</small></span><em>CACHED</em></button>
+            </div>
+          </article>
+
+          <aside class="isolation-panel">
+            <p class="kicker">ERROR ISOLATION</p>
+            <h2>Authority failed closed.</h2>
+            <p>A3 provider is absent, so claims remain unavailable. Docs, Personal and Graph stay usable; no legacy prose is promoted.</p>
+            <dl><div><dt>Visible console</dt><dd>none by default</dd></div><div><dt>Runtime helpers</dt><dd>supervised</dd></div><div><dt>Diagnostics</dt><dd>Git-private log</dd></div></dl>
+            <button class="text-button" id="diagnostics-button" type="button">Open synthetic diagnostics →</button>
+            <button class="text-button" type="button" data-jump="authority">Inspect boundary →</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" data-page="docs" aria-labelledby="docs-title">
+        <div class="page-heading"><div><p class="kicker">READ / DOCUMENTS</p><h1 id="docs-title">文档与搜索</h1></div><span class="scope-badge safe">STATIC SAFE</span></div>
+        <p class="lead">静态与动态模式共享同一个 navigation identity；搜索只使用 synthetic 文档索引。</p>
+        <label class="search-box"><span>⌕</span><input id="doc-search" type="search" placeholder="搜索 Seed、ADR、State…" autocomplete="off"></label>
+        <div class="document-ledger" id="document-ledger">
+          <button type="button" data-search-text="Seed maintenance control local first"><code>SEED</code><span><b>维护者保持控制感</b><small>Long-lived product constraint</small></span><em>→</em></button>
+          <button type="button" data-search-text="ADR single shell broker team"><code>ADR</code><span><b>Unified shell proposal</b><small>Proposed · not effective</small></span><em>→</em></button>
+          <button type="button" data-search-text="State current unavailable authority"><code>STATE</code><span><b>Authority consumer unavailable</b><small>Synthetic current view</small></span><em>→</em></button>
+          <button type="button" data-search-text="Validation desktop mobile focus"><code>VALID</code><span><b>Browser acceptance</b><small>Pending in this prototype</small></span><em>→</em></button>
+        </div>
+      </section>
+
+      <section class="view" data-page="ask" aria-labelledby="ask-title">
+        <div class="page-heading"><div><p class="kicker">DERIVED / ASK DOCS</p><h1 id="ask-title">AI 只解释，不产生事实。</h1></div><span class="scope-badge warning">PROVIDER OFF</span></div>
+        <div class="empty-state"><span class="empty-symbol">AI</span><div><h2>Broker capability 未配置</h2><p>Docs 与 deterministic views 仍可用。启用 Provider 需要显式配置；静态模式永远不会出现凭据控制。</p><button class="primary-button" id="provider-button" type="button">检查本地 capability</button></div></div>
+      </section>
+
+      <section class="view" data-page="authority" aria-labelledby="authority-title">
+        <div class="page-heading"><div><p class="kicker">DETERMINISTIC / AUTHORITY</p><h1 id="authority-title">Unavailable 不是失败的绿色版本。</h1></div><span class="scope-badge warning">A3 UNKNOWN</span></div>
+        <div class="error-boundary">
+          <div class="error-code">04 / UNAVAILABLE</div>
+          <div><h2>Managed consumer contract not registered</h2><p>当前 shell 不知道 selection、active consumer、readiness 或 rollback hash。它不会从 legacy prose、AI 或 Coordinator 推断。</p></div>
+          <button class="secondary-button" id="authority-check" type="button">重新检查 contract</button>
+        </div>
+        <div class="contract-grid"><div><small>selection</small><b>Unknown</b></div><div><small>active consumer</small><b>legacy</b></div><div><small>partial render</small><b>forbidden</b></div><div><small>shell impact</small><b>isolated</b></div></div>
+      </section>
+
+      <section class="view" data-page="personal" aria-labelledby="personal-title">
+        <div class="page-heading"><div><p class="kicker">LOCAL / PERSONAL</p><h1 id="personal-title">你的本机工作面</h1></div><span class="scope-badge safe">ZERO-NETWORK</span></div>
+        <div class="workstream-list"><article><span class="workstream-index">01</span><div><h2>U1 unified shell</h2><p>Implementing · documentation-system</p></div><em>ACTIVE</em></article><article><span class="workstream-index">02</span><div><h2>W6.1 maintenance</h2><p>Worktree evidence · provider contract pending</p></div><em class="amber-text">UNKNOWN</em></article><article><span class="workstream-index">03</span><div><h2>A3 Authority consumer</h2><p>Plan observed · implementation unavailable</p></div><em class="amber-text">UNKNOWN</em></article></div>
+      </section>
+
+      <section class="view" data-page="team" aria-labelledby="team-title">
+        <div class="page-heading"><div><p class="kicker">OPT-IN / TEAM</p><h1 id="team-title">中央只发送请求。</h1></div><span class="scope-badge" id="team-badge">TEAM OFF</span></div>
+        <div class="team-boundary">
+          <div><span class="team-glyph">T</span><p><b id="team-title-state">Team Mode 未开启</b><small id="team-copy">Personal Mode 保持 zero-network；没有发现、Host、同步或 heartbeat。</small></p></div>
+          <button class="primary-button" id="team-toggle" type="button">显式开启 synthetic Team</button>
+        </div>
+        <div class="permission-table" aria-label="Team permission boundary">
+          <div class="table-head"><span>Surface</span><span>Can do</span><span>Cannot do</span></div>
+          <div><b>Central view</b><span>view metadata · send request</span><span>execute · merge · delete</span></div>
+          <div><b>Member host</b><span>confirm local action</span><span>grant AI governance</span></div>
+          <div><b>Telemetry</b><span>IDs · scope · status</span><span>prompt · source · diff · secret</span></div>
+        </div>
+      </section>
+
+      <section class="view" data-page="workstreams" aria-labelledby="workstreams-title">
+        <div class="page-heading"><div><p class="kicker">READ-ONLY / WORKSTREAM GRAPH</p><h1 id="workstreams-title">关系不是调度命令。</h1></div><span class="scope-badge safe">CORE GRAPH</span></div>
+        <div class="graph-board" role="img" aria-label="Synthetic workstream relationship graph">
+          <svg viewBox="0 0 760 330" aria-hidden="true">
+            <path class="edge stale" d="M155 90 C280 90 250 240 375 240"></path>
+            <path class="edge" d="M155 90 C280 90 250 90 375 90"></path>
+            <path class="edge" d="M470 90 C585 90 560 190 675 190"></path>
+            <g class="node active-node" transform="translate(40 52)"><rect width="115" height="76" rx="5"></rect><text x="14" y="28">U1</text><text x="14" y="53">active tip</text></g>
+            <g class="node" transform="translate(375 52)"><rect width="115" height="76" rx="5"></rect><text x="14" y="28">A3</text><text x="14" y="53">Unknown</text></g>
+            <g class="node" transform="translate(375 202)"><rect width="115" height="76" rx="5"></rect><text x="14" y="28">W6.1</text><text x="14" y="53">cached</text></g>
+            <g class="node" transform="translate(625 152)"><rect width="115" height="76" rx="5"></rect><text x="14" y="28">integrator</text><text x="14" y="53">future</text></g>
+          </svg>
+          <div class="graph-legend"><span><i class="line-solid"></i>confirmed</span><span><i class="line-dashed"></i>Unknown / stale</span><span>Read-only · no apply</span></div>
+        </div>
+      </section>
+
+      <section class="view" data-page="maintenance" aria-labelledby="maintenance-title">
+        <div class="page-heading"><div><p class="kicker">HOST-LOCAL / MAINTENANCE</p><h1 id="maintenance-title">缓存加速理解，不能代替 fresh preflight。</h1></div><span class="scope-badge warning">W6.1 JOIN</span></div>
+        <div class="maintenance-summary"><div><small>cache</small><b>2 entries</b></div><div><small>current</small><b>1</b></div><div><small>stale / Unknown</small><b>1</b></div><div><small>branch actions</small><b>0</b></div></div>
+        <div class="maintenance-list">
+          <article><span class="cache-rail current"></span><div><header><h2>codex/finished-example</h2><em>CACHED · CURRENT</em></header><p>Clean · integrated · branch and commit preserved</p><code>target fixture-current-01</code></div><button class="secondary-button maintenance-preflight" type="button" data-target-name="finished-example">Fresh preflight</button></article>
+          <article><span class="cache-rail stale"></span><div><header><h2>codex/drifted-example</h2><em>STALE · UNKNOWN</em></header><p>Integration OID changed · execute disabled</p><code>target fixture-stale-02</code></div><button class="secondary-button" type="button" disabled>Unavailable</button></article>
+        </div>
+        <div class="preflight-panel" id="preflight-panel" hidden>
+          <div><p class="kicker">SYNTHETIC PREFLIGHT</p><h2>Only remove linked worktree?</h2><p>Fresh fixture evidence passed. Branch and commit remain. This prototype performs no filesystem action.</p></div>
+          <div><button class="secondary-button" id="cancel-preflight" type="button">取消</button><button class="danger-button" id="confirm-preflight" type="button">记录 synthetic receipt</button></div>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    </main>
+  </div>
+
+  <script src="prototype.js"></script>
+</body>
+</html>
