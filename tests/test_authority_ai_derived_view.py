@@ -195,7 +195,7 @@ class AuthorityAIDerivedViewTests(unittest.TestCase):
         template_serve = (template_root / "serve.py").read_text(encoding="utf-8")
         self.assertEqual(
             root_serve,
-            template_serve.replace("{{PROJECT_TITLE_PY}}", "Project Orrery"),
+            template_serve.replace("{{PROJECT_TITLE_PY}}", "Orrery"),
         )
         self.assertIn("AUTHORITY_CONTEXT = docsite_qa.build_authority_context", root_serve)
         self.assertIn('"X-Orrery-View-Type", "derived-ai-view"', root_serve)

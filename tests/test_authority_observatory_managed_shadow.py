@@ -181,7 +181,7 @@ class AuthorityObservatoryManagedShadowTests(unittest.TestCase):
             encoding="utf-8"
         )
         normalized_template = template_build.replace(
-            "{{PROJECT_TITLE_PY}}", "Project Orrery"
+            "{{PROJECT_TITLE_PY}}", "Orrery"
         )
         self.assertEqual(root_build, normalized_template)
         self.assertIn("ORRERY_AUTHORITY_SHADOW_VIEW", root_build)

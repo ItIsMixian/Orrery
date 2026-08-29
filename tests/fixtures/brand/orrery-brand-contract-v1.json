@@ -64,6 +64,8 @@
       "tests/test_personal_observatory.py",
       "tests/test_team_observatory.py",
       "tests/test_workstream_relation_graph_observatory.py",
+      "tests/test_authority_ai_derived_view.py",
+      "tests/test_authority_observatory_managed_shadow.py",
       "scripts/ci/test-shards.json",
       "tests/fixtures/brand/orrery-brand-contract-v1.json",
       "docs/validation/2026-08-28-r3-orrery-brand-only-closeout.md",
