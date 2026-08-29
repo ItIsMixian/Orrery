@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "tests" / "fixtures" / "brand" / "orrery-brand-contract-v1.json"
 
 
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def _canonical_text_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 class OrreryBrandContractTests(unittest.TestCase):
@@ -23,6 +23,7 @@ class OrreryBrandContractTests(unittest.TestCase):
     def test_contract_classifies_brand_technical_protocol_and_history(self) -> None:
         self.assertEqual(self.contract["schema_version"], 1)
         self.assertEqual(self.contract["contract_type"], "orrery-brand-only-contract")
+        self.assertEqual(self.contract["text_hash_canonicalization"], "sha256(crlf-to-lf)")
         self.assertEqual(self.contract["current_brand"]["display_name"], "Orrery")
         self.assertEqual(self.contract["current_brand"]["repository"], "ItIsMixian/Orrery")
         self.assertIn("project-orrery", self.contract["stable_technical_ids"]["denylist"])
@@ -152,10 +153,10 @@ class OrreryBrandContractTests(unittest.TestCase):
 
     def test_protocol_and_historical_hash_denylists_are_unchanged(self) -> None:
         protected = {}
-        protected.update(self.contract["protocol_ids"]["immutable_schema_sha256"])
-        protected.update(self.contract["historical_facts"]["immutable_sha256"])
+        protected.update(self.contract["protocol_ids"]["immutable_schema_canonical_lf_sha256"])
+        protected.update(self.contract["historical_facts"]["immutable_canonical_lf_sha256"])
         for relative, expected_hash in protected.items():
-            self.assertEqual(_sha256(ROOT / relative), expected_hash, relative)
+            self.assertEqual(_canonical_text_sha256(ROOT / relative), expected_hash, relative)
 
         baseline = json.loads(
             (ROOT / "tests/fixtures/platform_neutral_phase0_baseline.json").read_text(encoding="utf-8")

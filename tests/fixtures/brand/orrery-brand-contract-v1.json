@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "contract_type": "orrery-brand-only-contract",
+  "text_hash_canonicalization": "sha256(crlf-to-lf)",
   "candidate_base_oid": "1e67d4ac7f18e11459417ff4e04eef0ce065b28b",
   "current_brand": {
     "display_name": "Orrery",
@@ -126,15 +127,15 @@
       "ORRERY_* environment variables",
       "X-Orrery-* headers"
     ],
-    "immutable_schema_sha256": {
-      "packages/project-orrery-core/src/project_orrery_core/schema/authority-v1.json": "c73f3ba3ae2ccf7c1bb0efacfd197f2706a45585e95f0b2402245ede5e927953",
-      "packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json": "6f9fc7bcee7462fbd804cec5c06e79bec60b5d90ee5a71fd150ec8f5b58bb8d9",
-      "packages/project-orrery-core/src/project_orrery_core/schema/documentation-governance-finding-v1.json": "98314d584704bc5575b00e36c502fe86637efe50d0ec91f9bb78910ad635fedb",
-      "packages/project-orrery-core/src/project_orrery_core/schema/maintenance-v1.json": "15eb0f46464afd8f6a351148a1ee9ccbffe8a220178179db400543db7988a276",
-      "packages/project-orrery-core/src/project_orrery_core/schema/project-manifest-v1.json": "4b4f92c3c8325a0328ed4ea1c078e338327ab926f158c1f9f74d7bfd153ca9bf",
-      "packages/project-orrery-core/src/project_orrery_core/schema/team-v1.json": "291a18ac7f0a6e434060e76fc202d43fe7ed5bb195812f74c6d34c551b862f04",
-      "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-execution-v1.json": "26d8e533e60508f5ee956ebccce40d5facf4a3229923e04fc23f470c4b41add5",
-      "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relations-v1.json": "bcb3e0e047bb96217b3471f57c59775d4a8492b4522a32af1442d29214e511af"
+    "immutable_schema_canonical_lf_sha256": {
+      "packages/project-orrery-core/src/project_orrery_core/schema/authority-v1.json": "b257d0a51e6536278aff6da098c7a7c2ea25684757836bf0ef9ea6e2d0d4445e",
+      "packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json": "0a3182ed4ff165c158c22f9ab95c4eef5c188a690c5cd7ca225d5bdad6e76b05",
+      "packages/project-orrery-core/src/project_orrery_core/schema/documentation-governance-finding-v1.json": "502ec98c68e9d9af1e531ba8b304cac48757da243d919ed8e417c9666afbc803",
+      "packages/project-orrery-core/src/project_orrery_core/schema/maintenance-v1.json": "3d6a7cf31b989a55035942b321d26cfb55587165e122022b741eadefc0ca38b0",
+      "packages/project-orrery-core/src/project_orrery_core/schema/project-manifest-v1.json": "4c23fca41b5a63ec5a9619b9fda13b6eff43ab978738fe7c7ac598ba8e7d81a3",
+      "packages/project-orrery-core/src/project_orrery_core/schema/team-v1.json": "39906afef0529b3447af0050025653ee9a359166715ac277b180ed03e9eebc98",
+      "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-execution-v1.json": "1ae50d353c51f5e8a863ba68b9bbe797937cd480abcb259169f00507f0f79855",
+      "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relations-v1.json": "c79da60da22d024daa3d4b851a2cc68b480572519dc453ef0a62885e13c8d4d1"
     }
   },
   "historical_facts": {
@@ -146,12 +147,12 @@
       "experiments/**",
       "v0.2.0 tag/Release/ZIP/checksum/frozen manifest/bridge/baseline"
     ],
-    "immutable_sha256": {
+    "immutable_canonical_lf_sha256": {
       "docs/decisions/0015-orrery-brand-and-compatibility-contract.md": "ad13edea32f07907d8e77501ca555e3a3b48dedd15f324eaca7ec7abdb7ce55d",
       "docs/design/orrery-rename-and-compatibility-contract.md": "4ec99f1ac161004b63748b0a064083fb6e1d957955ba486f67e27f66a189876c",
-      "tests/fixtures/platform_neutral_phase0_baseline.json": "1e0e9a38411376394eb37ddd719dc1842c1285c17c5f333db73bf3065bb43f0b",
-      "skills/project-orrery/release-manifest.json": "bf6a274107854a3b20f27411b3f9c82fb28b1750c9b1f70aaccb92f8a3c6197f",
-      "packages/project-orrery-core/src/project_orrery_core/data/release-v0.2.0.json": "4dbbdc71c46316fe0220639105ee782c5acd49e2da957c34f0739ee08b417add"
+      "tests/fixtures/platform_neutral_phase0_baseline.json": "202b42960ff11a91c4ba0b7a0a11f4025f617af2192588dd2306e588d37dc167",
+      "skills/project-orrery/release-manifest.json": "440ae329306245315bd0287b8730d0ba3b5dc601bbf18628a68e3f64fd04d327",
+      "packages/project-orrery-core/src/project_orrery_core/data/release-v0.2.0.json": "1c88d416319fac455db9b19cd1bda280636f484dfec8072ef7971df3d40cf3e0"
     },
     "published_v0_2_0_archive_sha256": "13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394",
     "first_new_release_asset_pattern": "project-orrery-*"
