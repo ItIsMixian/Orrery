@@ -14,7 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
-- [2026-08-29 SC1 Canonical State Closeout](plans/2026-08-29-sc1-canonical-state-closeout.md) — active docs-only reconciliation of current entrances, subsystem State, completed Plan status and CI5 hosted evidence; it performs no product, release or physical cleanup action.
+- [2026-08-29 SC1 Canonical State Closeout](plans/2026-08-29-sc1-canonical-state-closeout.md) — completed docs-only reconciliation; exact `a9369dd` passed Fast/Promotion and entered protected main without product, release or physical cleanup changes.
 - [2026-08-29 CI5 Promotion Throughput Optimization](plans/2026-08-29-ci5-promotion-throughput-optimization.md) — completed no-coverage-loss CI optimization; exact `9ee831f` passed 25/25 hosted jobs and entered Canonical main while preserving 27 logical shards and required checks.
 - [2026-08-28 Orrery Rename and Compatibility R3–R5](plans/2026-08-28-orrery-rename-and-compatibility.md) — active under Accepted ADR-0015; R3 is complete in Canonical main, while R4/R5 remain future independent Workstreams preserving Python identity and frozen v0.2.0 evidence.
 - [2026-08-28 CI3 Fast Validation Dependency Fix](plans/2026-08-28-ci3-fast-validation-dependency-fix.md) — completed and contained in Canonical main; protects fresh-runner dependency order and conditional timing artifact upload without changing Fast or Promotion authority.

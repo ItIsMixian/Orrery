@@ -4,8 +4,9 @@ Updated: 2026-08-29
 
 ## 当前阶段
 
-Orrery v0.2.0 仍是当前公开版本。Canonical source 为
-`origin/main@9ee831f0d6f64306fe821f8c70229df54648d3eb`：它已经包含平台中立
+Orrery v0.2.0 仍是当前公开版本。受保护的 `origin/main` 已包含 SC1 exact
+`a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 只收口文档，产品 source baseline
+`9ee831f0d6f64306fe821f8c70229df54648d3eb` 已经包含平台中立
 Core／CLI／Observatory、四个 Adapter、Broker-only docsite、Authority Meta Model M1／M2、
 W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能力仍为
 `experimental`／`unreleased` 源码，不等于新的公开 Release。
@@ -58,6 +59,5 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 完成 SC1 Canonical 状态收口：入口、State、Plan 与 Validation 对齐 `main@9ee831f`，并只读盘点本机旧 session／worktree。
-2. 对 Canonical W7/W6 做真实 self-host read-only／dry-run，先补 lifecycle／closure 证据再讨论删除或自动化。
-3. 选择 Authority managed consumer，或批准 D2／C2／Claude 其中一条独立线路；不得把多个发布／安全决策绑在一次未经审阅的切换中。
+1. 对 Canonical W7/W6 做真实 self-host read-only／dry-run，先补 lifecycle／closure 证据再讨论删除或自动化。
+2. 选择 Authority managed consumer，或批准 D2／C2／Claude 其中一条独立线路；不得把多个发布／安全决策绑在一次未经审阅的切换中。

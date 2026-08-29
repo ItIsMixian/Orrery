@@ -6,7 +6,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 
 ## 当前事实
 
-- 单一 Git 仓库根为 `D:\coding warehouse\project-orrery`；当前 Canonical source 为 `origin/main@9ee831f0d6f64306fe821f8c70229df54648d3eb`。
+- 单一 Git 仓库根为 `D:\coding warehouse\project-orrery`；protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`，产品 source baseline 为 `9ee831f`。
 - 项目作者权威根为 `AGENTS.md` 与 `docs/`；`.project-orrery.json` 选择 `authority_status: integrated` 和 `authority_model_version: 1`。
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
 - 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。当前版本为 Core 0.1.14、CLI 0.1.18、Observatory 0.1.9，Core API 为 1，组件总状态为 `unreleased`。

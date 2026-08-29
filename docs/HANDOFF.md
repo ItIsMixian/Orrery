@@ -5,12 +5,12 @@ Updated: 2026-08-29
 ## 当前停止点
 
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
-- 当前 Canonical source 为 `origin/main@9ee831f0d6f64306fe821f8c70229df54648d3eb`，本地 main 与 origin/main 对齐。
+- protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
 - CI5 exact `9ee831f` 的 Fast 与 Promotion 已完成：Promotion run `33235992711` 为 25/25 jobs PASS，双平台 required checks 均通过，Windows／Ubuntu 各聚合 390 tests／27 logical shards；同一 SHA 已进入 main。
 - 当前未发布组件为 Core 0.1.14、CLI 0.1.18、Observatory 0.1.9；四个 Adapter 均为 0.1.1 source，支持状态仍为 `experimental`／`unreleased`。
 - W1–W7、Personal／Team Observatory、workspace maintenance、LAN discovery／manual Host switch、relation execution 和只读 Graph 已进入 Canonical source。默认 docsite、公开模板、release manifest 和 v0.2.0 用户能力没有因此切换。
 - R3 已把当前展示面收口为 Orrery；`project-orrery` 继续作为稳定 Skill／package／CLI／schema／协议及历史资产标识。R4/R5 未启动。
-- SC1 只负责把权威入口、State、Plan 状态和 CI5 hosted evidence 对齐；Git-private session 状态不升级为作者事实，物理 worktree／branch 删除不属于本次文档提交。
+- SC1 已把权威入口、State、Plan 状态和 CI5 hosted evidence 对齐；Fast `33256438925`、Promotion `33256558285` 与 main Fast `33256757429` 均通过。Git-private session 状态不升级为作者事实，物理 worktree／branch 删除不属于本次文档提交。
 
 ## 当前可继续的线路
 

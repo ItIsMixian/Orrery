@@ -2,7 +2,7 @@
 
 Date: 2026-08-29
 
-Status: Worktree Candidate local validation PASS; exact-SHA hosted acceptance pending
+Status: PASS; exact-SHA hosted acceptance and protected main integration complete
 
 Fact scope: `codex/sc1-canonical-state-closeout`, based on clean
 `main@9ee831f0d6f64306fe821f8c70229df54648d3eb`.
@@ -46,8 +46,12 @@ Fact scope: `codex/sc1-canonical-state-closeout`, based on clean
 | `tests.test_project_orrery tests.test_ci_validation` | 33 run／31 PASS／2 expected dynamic-dependency skips |
 | `git diff --check` | PASS |
 
-Exact-SHA hosted Fast／Promotion remains pending. The Candidate must not enter main until both required OS checks
-pass on the same non-main exact SHA.
+## Hosted acceptance
+
+- Fast run `33256438925` passed on exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457` for Windows and Ubuntu.
+- Promotion run `33256558285` passed 25/25 jobs on the same exact SHA. Both repository gates and required
+  `smoke-test (windows-latest)`／`smoke-test (ubuntu-latest)` passed; each OS aggregate covered 390 tests／27 shards.
+- The exact SHA was fast-forwarded to protected main; main Fast run `33256757429` passed. No tag or Release was created.
 
 ## Residual boundary
 

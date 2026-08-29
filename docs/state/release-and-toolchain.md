@@ -13,7 +13,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前 Canonical source
 
-- `origin/main@9ee831f0d6f64306fe821f8c70229df54648d3eb` 是当前 Canonical source；它不对应新 tag 或 Release。
+- protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
 - `packages/component-versions.json` 声明 Core 0.1.14、CLI 0.1.18、Observatory 0.1.9，组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
 - Codex、Harness JSON、Claude Code 与 DeepSeek Harness Adapter source 均为 0.1.1、`experimental`／`unreleased`。每个 Adapter 有独立 manifest、归档、生命周期和 runtime evidence，不能互相外推。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。

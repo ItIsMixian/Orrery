@@ -1,6 +1,6 @@
 # Implementation Plan: SC1 Canonical State Closeout
 
-Status: Worktree implementation and local validation complete; exact-SHA hosted acceptance pending
+Status: Completed; exact-SHA Fast／Promotion passed and source integrated into protected main
 
 Date: 2026-08-29
 
@@ -47,3 +47,7 @@ historical ADR／Validation／Snapshot／Pilot evidence.
 
 After Canonical integration, run a fresh read-only Workstream／maintenance inventory. Any physical cleanup remains a
 separate locally confirmed action and must preserve branches／commits unless separately authorized.
+
+SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457` passed Fast `33256438925`, Promotion
+`33256558285` (25/25 jobs) and main Fast `33256757429`, then entered protected main. This completion changes no
+product code, release contract, tag or public release.
