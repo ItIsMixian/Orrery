@@ -9,10 +9,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 单一 Git 仓库根为 `D:\coding warehouse\project-orrery`；protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`，产品 source baseline 为 `9ee831f`。
 - 项目作者权威根为 `AGENTS.md` 与 `docs/`；`.project-orrery.json` 选择 `authority_status: integrated` 和 `authority_model_version: 1`。
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
-- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。当前版本为 Core 0.1.14、CLI 0.1.18、Observatory 0.1.9，Core API 为 1，组件总状态为 `unreleased`。
+- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。U1/U2 integration baseline 为 Core 0.1.14、CLI 0.1.18、Observatory 0.1.10；U2 Worktree Candidate 只把 Observatory 推进到 0.1.11。Core API 为 1，组件总状态为 `unreleased`。
 - 薄平台层位于 `adapters/{codex,harness-json,claude-code,deepseek-harness}/`，当前 source 版本均为 0.1.1、`experimental`／`unreleased`。Adapter 不拥有 canonical 作者模板、State、ADR 或 Authority 规则。
-- 自托管观测台位于根 `scripts/docsite/` 与 `start-docsite.bat`。Personal／Team／Maintenance／Workstream Graph 均为 root-only 或 default-off source consumer，没有进入默认发布模板或 v0.2.0 managed tools。
-- ADR-0016 已接受统一可见入口架构，但生产 Unified Shell 尚未实现；内部 consumer/helper 可以保持独立，只能由未来 supervisor 管理且不得形成第二个用户入口。
+- 自托管观测台位于根 `scripts/docsite/`。U2 Worktree Candidate 新增 `Start Orrery.vbs`／`start-orrery.bat --console`、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 仍为 root-only/default-off consumer，没有进入默认发布模板或 v0.2.0 managed tools。
+- ADR-0016 的生产 Unified Shell 已在 U2 Worktree Candidate 实现：一个用户可见 listener／URL／导航壳，Broker／Coordinator 等内部 capability 由 supervisor 隐藏管理；当前没有公开默认切换，`start-docsite.bat` 保持 whole-shell rollback。
 - W1–W7 协作源码已经进入 main：Git-private Workstream session、Scope/finding、review/integration/cleanup、Personal／Team projection、workspace maintenance、LAN discovery／manual Host switch、stacked lineage、relation event/graph、apply/undo/recovery contract 和只读 Graph consumer 均存在。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
@@ -48,13 +48,14 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `scripts/docsite/`
 - `scripts/ci/`, `.github/workflows/fast-validation.yml`, `.github/workflows/validate.yml`
 - `tests/`
+- [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [W7D Validation](../validation/2026-08-28-w7d-w7-integration-candidate.md)
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 
 ## 已知缺口
 
 - Core／CLI／Observatory 尚无独立公开发行物、多组件 release pipeline 或 manifest v2。
-- 默认 docsite／Skill template 尚未启用 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。
+- 默认 docsite／Skill template 尚未启用 Unified Observatory 或 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。
 - 没有真实双机 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。
 - W7 relation store 没有 self-host native apply 记录；旧 session 到 post-main closure 的兼容收口仍需保守人工流程。
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。

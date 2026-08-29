@@ -141,9 +141,10 @@ TEAM_OBSERVATORY_JS = r"""
     renderOverview(value);renderMembers(value.projection);renderRequests(value.requests||[]);renderLan(value.lan);
   }
   function setSettings(open){const backdrop=q('[data-team-settings-backdrop]'),trigger=q('[data-team-settings-open]');backdrop.classList.toggle('open',open);backdrop.setAttribute('aria-hidden',open?'false':'true');trigger.setAttribute('aria-expanded',open?'true':'false');if(open)q('[data-team-settings-close]').focus();else trigger.focus()}
-  async function refresh(){try{render(await api('/team/api/status'));q('[data-team-notice]').className='to-notice';text(q('[data-team-notice]'),'本机状态已刷新；没有返回凭据或源码内容。')}catch(error){q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),error.message)}}
+  const apiBase='__ORRERY_TEAM_API_BASE__';
+  async function refresh(){try{render(await api(apiBase+'/status'));q('[data-team-notice]').className='to-notice';text(q('[data-team-notice]'),'本机状态已刷新；没有返回凭据或源码内容。')}catch(error){q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),error.message)}}
   page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;if(button.hasAttribute('data-team-settings-open')){setSettings(true);return}if(button.hasAttribute('data-team-settings-close')){setSettings(false);return}let path=null,body={};
-    if(button.dataset.teamAction){path='/team/api/'+button.dataset.teamAction}else if(button.dataset.requestDecision){path='/team/api/request/decision';body={request_id:button.dataset.requestId,decision:button.dataset.requestDecision}}else if(button.dataset.joinRequestId){path='/team/api/join/confirm';body={request_id:button.dataset.joinRequestId}}else{return}
+    if(button.dataset.teamAction){path=apiBase+'/'+button.dataset.teamAction}else if(button.dataset.requestDecision){path=apiBase+'/request/decision';body={request_id:button.dataset.requestId,decision:button.dataset.requestDecision}}else if(button.dataset.joinRequestId){path=apiBase+'/join/confirm';body={request_id:button.dataset.joinRequestId}}else{return}
     button.disabled=true;try{await api(path,body);await refresh()}catch(error){const action=button.dataset.teamAction||button.dataset.requestDecision;const friendly={start:'无法启动本机协作服务。可能存在其他 Team 页面或失效的本机登记，请按上方说明恢复。',disable:'无法退出 Team Mode。请先关闭其他本机 Team 页面后重试。',sync:'同步没有完成；本机待同步状态仍会保留。',accept:'请求尚未确认，请刷新后重试。',reject:'请求尚未拒绝，请刷新后重试。'}[action]||'本机操作没有完成；没有执行远程命令。';q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),friendly);button.disabled=false}});
   q('[data-team-settings-backdrop]').addEventListener('click',event=>{if(event.target===event.currentTarget)setSettings(false)});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&q('[data-team-settings-backdrop]').classList.contains('open'))setSettings(false)});
@@ -189,7 +190,12 @@ def render_team_observatory_panel() -> str:
     )
 
 
-def inject_team_observatory(page: str) -> str:
+def inject_team_observatory(
+    page: str,
+    *,
+    api_base: str = "/team/api",
+    dynamic_control: bool = True,
+) -> str:
     if 'id="team-observatory"' in page:
         raise ValueError("Team Observatory is already present")
     nav_marker = (
@@ -215,8 +221,21 @@ def inject_team_observatory(page: str) -> str:
             '<div class="nav-group">', '<div class="nav-group expanded">', 1
         )
     )
-    result = result.replace(content_marker, render_team_observatory_panel() + content_marker, 1)
-    script = '<script>' + TEAM_OBSERVATORY_JS + '</script>'
+    panel = render_team_observatory_panel()
+    if not dynamic_control:
+        panel = panel.replace("<button ", "<button disabled ")
+        panel = panel.replace(
+            "正在读取本机团队状态…",
+            "Static read-only · Team control Unavailable；未启动 server、cookie、listener 或网络。",
+        )
+    result = result.replace(content_marker, panel + content_marker, 1)
+    if not dynamic_control:
+        return result
+    if not api_base.startswith("/api/") and api_base != "/team/api":
+        raise ValueError("Team API base must be a local API path")
+    script = '<script>' + TEAM_OBSERVATORY_JS.replace(
+        "__ORRERY_TEAM_API_BASE__", api_base.rstrip("/")
+    ) + '</script>'
     return result.replace("</body>", script + "</body>", 1)
 
 

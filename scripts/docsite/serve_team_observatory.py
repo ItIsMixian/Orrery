@@ -211,6 +211,106 @@ class TeamUIState:
         if self.project_root.resolve() == ROOT.resolve():
             self.page = build_team_page(self.project_root).encode("utf-8")
 
+    def perform(
+        self,
+        action: str,
+        body: Mapping[str, Any],
+        *,
+        refresh_legacy_page: bool = True,
+    ) -> Mapping[str, Any]:
+        """Execute one provider-owned Team/Maintenance UI action.
+
+        Unified Shell calls this adapter instead of copying Team policy or
+        Maintenance eligibility rules into its route dispatcher.
+        """
+        root = self.project_root
+        maintenance_action = action.startswith("maintenance/")
+        maintenance_payload: Mapping[str, Any] | None = None
+        if action == "enable":
+            enable_team(root, member_id="local-owner", device_id="local-device", host_id="local-host")
+        elif action == "disable":
+            if self.coordinator is not None:
+                self.stop_coordinator()
+            disable_team(root)
+        elif action == "start":
+            self.start_coordinator()
+        elif action == "stop":
+            self.stop_coordinator()
+        elif action == "heartbeat":
+            config = load_team_config(root)
+            configure_heartbeat(root, enabled=not bool(config.get("heartbeat", {}).get("enabled")))
+        elif action == "sharing":
+            config = load_team_config(root)
+            set_sharing(root, enabled=not bool(config.get("sharing_enabled")))
+        elif action == "capture":
+            envelope = capture_metadata_envelope(root)
+            queue_sync_event(root, envelope, event_kind="workstream-change", immediate=True)
+        elif action == "sync":
+            sync_now(root, endpoint=self.endpoint())
+        elif action == "discovery":
+            self.discovery_probe()
+        elif action == "join/confirm":
+            request_id = str(body["request_id"])
+            if not re.fullmatch(r"join-[0-9a-f]{24}", request_id):
+                raise ValueError("join request is invalid")
+            confirm_join(root, request_id=request_id)
+        elif action == "request-create":
+            envelope = capture_metadata_envelope(root)
+            config = load_team_config(root)
+            send_request(
+                root, endpoint=self.endpoint(), target_member_id=str(config["member_id"]),
+                workstream_id=str(envelope["workstream_id"]), request_kind="pause-workstream",
+                summary="Pause at the next local safe point",
+            )
+        elif action == "maintenance-request":
+            envelope = capture_metadata_envelope(root)
+            config = load_team_config(root)
+            send_request(
+                root, endpoint=self.endpoint(), target_member_id=str(config["member_id"]),
+                workstream_id=str(envelope["workstream_id"]), request_kind="cleanup",
+                summary="Evaluate workspace maintenance on the target member host",
+            )
+        elif action == "request/decision":
+            request_id = str(body["request_id"])
+            decision = str(body["decision"])
+            if not REQUEST_ID.fullmatch(request_id) or decision not in {"accept", "reject"}:
+                raise ValueError("request decision is invalid")
+            selected = next(
+                (item for item in fetch_requests(root, endpoint=self.endpoint())
+                 if item.get("request_id") == request_id), None,
+            )
+            if selected is None:
+                raise ValueError("request is unavailable")
+            decide_request(
+                root, endpoint=self.endpoint(), request_record=selected,
+                decision=decision, reason=f"{decision}ed in Host-local Team Observatory",
+            )
+        elif action == "maintenance/scan":
+            request_background_maintenance_refresh(root, reason="manual")
+        elif action == "maintenance/preflight":
+            maintenance_payload = {
+                "preflight": quick_remove_preflight(root, target_id=str(body["target_id"]))
+            }
+        elif action == "maintenance/quick-remove":
+            maintenance_payload = execute_quick_remove_item(
+                root, item_id=str(body["item_id"]), actor_id="local-owner",
+            )
+        elif action == "maintenance/authorize":
+            authorize_maintenance_item(
+                root, item_id=str(body["item_id"]), action=str(body["action"]),
+                actor_id="local-owner",
+            )
+        elif action == "maintenance/execute":
+            execute_maintenance_authorization(root, authorization_id=str(body["authorization_id"]))
+        else:
+            raise KeyError(action)
+        if maintenance_action and refresh_legacy_page:
+            self.refresh_page()
+        return maintenance_payload or (
+            {"maintenance": maintenance_status(root)}
+            if maintenance_action else self.public_status()
+        )
+
 
 class TeamUIServer(ThreadingHTTPServer):
     daemon_threads = True
@@ -345,102 +445,12 @@ class TeamUIHandler(BaseHTTPRequestHandler):
             elif self.path == "/team/api/maintenance/quick-remove":
                 expected = {"item_id"}
             body = self._body(expected)
-            root = self.server.state.project_root
-            maintenance_action = self.path.startswith("/team/api/maintenance/")
-            maintenance_payload: Mapping[str, Any] | None = None
-            if self.path == "/team/api/enable":
-                enable_team(root, member_id="local-owner", device_id="local-device", host_id="local-host")
-            elif self.path == "/team/api/disable":
-                if self.server.state.coordinator is not None:
-                    self.server.state.stop_coordinator()
-                disable_team(root)
-            elif self.path == "/team/api/start":
-                self.server.state.start_coordinator()
-            elif self.path == "/team/api/stop":
-                self.server.state.stop_coordinator()
-            elif self.path == "/team/api/heartbeat":
-                config = load_team_config(root)
-                configure_heartbeat(root, enabled=not bool(config.get("heartbeat", {}).get("enabled")))
-            elif self.path == "/team/api/sharing":
-                config = load_team_config(root)
-                set_sharing(root, enabled=not bool(config.get("sharing_enabled")))
-            elif self.path == "/team/api/capture":
-                envelope = capture_metadata_envelope(root)
-                queue_sync_event(root, envelope, event_kind="workstream-change", immediate=True)
-            elif self.path == "/team/api/sync":
-                sync_now(root, endpoint=self.server.state.endpoint())
-            elif self.path == "/team/api/discovery":
-                self.server.state.discovery_probe()
-            elif self.path == "/team/api/join/confirm":
-                request_id = str(body["request_id"])
-                if not re.fullmatch(r"join-[0-9a-f]{24}", request_id):
-                    raise ValueError("join request is invalid")
-                confirm_join(root, request_id=request_id)
-            elif self.path == "/team/api/request-create":
-                envelope = capture_metadata_envelope(root)
-                config = load_team_config(root)
-                send_request(
-                    root, endpoint=self.server.state.endpoint(),
-                    target_member_id=str(config["member_id"]),
-                    workstream_id=str(envelope["workstream_id"]),
-                    request_kind="pause-workstream",
-                    summary="Pause at the next local safe point",
-                )
-            elif self.path == "/team/api/maintenance-request":
-                envelope = capture_metadata_envelope(root)
-                config = load_team_config(root)
-                send_request(
-                    root, endpoint=self.server.state.endpoint(),
-                    target_member_id=str(config["member_id"]),
-                    workstream_id=str(envelope["workstream_id"]),
-                    request_kind="cleanup",
-                    summary="Evaluate workspace maintenance on the target member host",
-                )
-            elif self.path == "/team/api/request/decision":
-                request_id = str(body["request_id"])
-                decision = str(body["decision"])
-                if not REQUEST_ID.fullmatch(request_id) or decision not in {"accept", "reject"}:
-                    raise ValueError("request decision is invalid")
-                selected = next(
-                    (item for item in fetch_requests(root, endpoint=self.server.state.endpoint())
-                     if item.get("request_id") == request_id),
-                    None,
-                )
-                if selected is None:
-                    raise ValueError("request is unavailable")
-                decide_request(
-                    root, endpoint=self.server.state.endpoint(), request_record=selected,
-                    decision=decision, reason=f"{decision}ed in Host-local Team Observatory",
-                )
-            elif self.path == "/team/api/maintenance/scan":
-                request_background_maintenance_refresh(root, reason="manual")
-            elif self.path == "/team/api/maintenance/preflight":
-                maintenance_payload = {
-                    "preflight": quick_remove_preflight(root, target_id=str(body["target_id"]))
-                }
-            elif self.path == "/team/api/maintenance/quick-remove":
-                maintenance_payload = execute_quick_remove_item(
-                    root,
-                    item_id=str(body["item_id"]),
-                    actor_id="local-owner",
-                )
-            elif self.path == "/team/api/maintenance/authorize":
-                authorize_maintenance_item(
-                    root,
-                    item_id=str(body["item_id"]),
-                    action=str(body["action"]),
-                    actor_id="local-owner",
-                )
-            elif self.path == "/team/api/maintenance/execute":
-                execute_maintenance_authorization(
-                    root, authorization_id=str(body["authorization_id"])
-                )
-            else:
+            action = self.path.removeprefix("/team/api/")
+            try:
+                payload = self.server.state.perform(action, body)
+            except KeyError:
                 self._json(HTTPStatus.NOT_FOUND, {"error": "not-found"})
                 return
-            if maintenance_action:
-                self.server.state.refresh_page()
-            payload = maintenance_payload or ({"maintenance": maintenance_status(root)} if maintenance_action else self.server.state.public_status())
             self._json(HTTPStatus.OK, payload)
         except PermissionError as error:
             self._error(HTTPStatus.FORBIDDEN, error)
