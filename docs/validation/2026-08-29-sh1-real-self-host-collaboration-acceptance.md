@@ -189,6 +189,24 @@ Synthetic evidence is not used to replace the real findings above.
   2 snapshots, 162 docs, 33 plans and 8 Library entries; output stayed under a system temporary directory;
 - `git diff --check`: PASS.
 
-The exact committed Candidate then reruns Fast／Checkpoint and an integration dry-run. Final branch SHA and those
-post-commit checks are reported in the task handoff to avoid pretending that a document can embed the SHA of the
-commit that contains itself.
+## Exact Candidate checkpoint
+
+Committed Candidate `6c823c4be1342c3e2fcb3ad69f11e156db9cec34` was clean and produced:
+
+- Fast 57/57 PASS in 3.182752s／15s;
+- Checkpoint 81/81 PASS in 32.445651s／90s;
+- CI contract PASS;
+- integrated structure PASS at Authority Model 1／`integrated candidate`;
+- repository gates PASS at 672 paths／365 Markdown／914 local links／0 forbidden artifacts;
+- `git diff --check` PASS and clean `git status`.
+
+`project-orrery integrate --candidate . --target refs/heads/main --strategy merge --dry-run` was also exercised on
+that exact Candidate with the repository-gate validation command. It correctly failed closed at exit 3 with
+`review generation requires a current Git-private Workstream session`: the registered session remained bound to
+the pre-commit `d07e1a` HEAD and SH1 deliberately did not refresh it during this read-only acceptance. No review
+package, disposable merge result or integration-ref update was produced. The first exact error envelope had SHA-256
+`B43D72FCFF3E63476473E83C7ADAA0E9CC5ADEEA3788DC3993BC9193E8CAA707`; one immediate diagnostic repeat returned the
+same error and no writes.
+
+The final docs-only closeout commit and its post-commit checks are reported in the task handoff to avoid pretending
+that a document can embed the SHA of the commit that contains itself.
