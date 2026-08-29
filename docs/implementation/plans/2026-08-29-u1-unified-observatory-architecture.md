@@ -1,6 +1,6 @@
 # 实施计划：U1 Unified Observatory Architecture & Shell Design
 
-Status: Architecture accepted and Phase 1 complete; production implementation not started
+Status: Architecture accepted; root-only production Candidate implemented and integrated; public transition pending
 
 Date: 2026-08-29
 
@@ -50,24 +50,24 @@ docsite rewrite or comprehensive visual redesign; either requires a separate tas
 - [x] maintainer accepted the architecture direction and production docsite inheritance boundary;
 - [x] unique integrator assigned ADR-0016 and promoted the Design to Approved during integration;
 - [x] reconcile committed W6.1/CI6 and A3 Candidate contracts in the U2 integration baseline;
-- [ ] freeze machine-readable shell registration/route fixtures and negative collision/escalation cases;
-- [ ] choose managed Broker topology (in-process or supervised helper) only after parity/security/lifecycle evidence;
-- [ ] decide Team Coordinator/LAN transport topology while preserving Team opt-in and the single public UI URL;
-- [ ] choose final server/supervisor/launcher names, hidden-launch mechanism, debug `--console` compatibility, runtime
+- [x] freeze machine-readable shell registration/route fixtures and negative collision/escalation cases;
+- [x] choose the root-only Candidate Broker/helper topology behind parity/security/lifecycle evidence;
+- [x] keep Team Coordinator/LAN transport supervised while preserving Team opt-in and the single public UI URL;
+- [x] choose Candidate server/supervisor/launcher names, hidden-launch mechanism, debug `--console` compatibility, runtime
   log location and compatibility duration.
 
 ## Phase 3 — root-only implementation (future independent Workstream)
 
-- [ ] add one root-only public Observatory front door, supervisor and explicit consumer/helper registry behind an
+- [x] add one root-only public Observatory front door, supervisor and explicit consumer/helper registry behind an
   opt-in flag; do not assume one process or one internal listener;
-- [ ] wrap/register/adapt the existing `build_docsite.py`／`serve.py` consumers; do not rewrite the docsite from scratch;
-- [ ] compose docs/search/AI/Authority/Personal/Team/Graph/Maintenance without marker ownership conflicts while
+- [x] wrap/register/adapt the existing `build_docsite.py`／`serve.py` consumers; do not rewrite the docsite from scratch;
+- [x] compose docs/search/AI/Authority/Personal/Team/Graph/Maintenance without marker ownership conflicts while
   preserving author information architecture and the recognizable production docsite experience;
-- [ ] centralize common security/lifecycle while preserving provider-specific authorization;
-- [ ] prove normal exit, startup failure and supervisor crash leave no helper process, bound endpoint or stale ready marker;
-- [ ] keep current default `serve.py` and public template byte behavior as rollback;
-- [ ] add focused/adjacent/security/static/dynamic/browser tests and component version changes;
-- [ ] synchronize affected subsystem State/Validation/DEVLOG through the unique integrator.
+- [x] centralize common security/lifecycle while preserving provider-specific authorization;
+- [x] prove normal exit, startup failure and supervisor crash leave no helper process, bound endpoint or stale ready marker;
+- [x] keep current default `serve.py` and public template byte behavior as rollback;
+- [x] add focused/adjacent/security/static/dynamic/browser tests and component version changes;
+- [x] synchronize affected subsystem State/Validation/DEVLOG through the unique integrator.
 
 ## Phase 4 — managed/public transition (future release choice)
 

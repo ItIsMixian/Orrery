@@ -14,14 +14,14 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前 Canonical source
 
 - protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- U1/U2 integration baseline 声明 Core 0.1.14、CLI 0.1.18、Observatory 0.1.10；U2 Worktree Candidate 只把 Observatory source 推进到 0.1.11。组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
+- 当前 integrated Candidate 声明 Core 0.1.16、CLI 0.1.20、Observatory 0.1.11；W7.1 的 archive resolver 推进 Core，CLI 因精确 Core 依赖同步推进，U2 推进 Observatory。组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
 - Codex、Harness JSON、Claude Code 与 DeepSeek Harness Adapter source 均为 0.1.1、`experimental`／`unreleased`。每个 Adapter 有独立 manifest、归档、生命周期和 runtime evidence，不能互相外推。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。
 - Claude Code 2.1.87 只完成 Plugin／Skill 发现与认证前失败关闭；没有成功模型路由。Harness JSON 证明 subprocess JSON 合约，不证明第三方 Agent runtime 兼容。
 - Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 local release-candidate gate 已进入 source；公开 manifest、standalone installer 和默认 managed Observatory 尚未声明或启用模型 1。
 - Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
-- Unified Observatory 在 U2 Worktree Candidate 已有真实 root-only shell、静态 builder、单 URL supervisor 与 headless/debug launcher；没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
+- Unified Observatory 已进入本地 integrated Candidate：真实 root-only shell、静态 builder、单 URL supervisor 与 headless/debug launcher 可供维护者体验；没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
 
 ## CI 与推广门
 

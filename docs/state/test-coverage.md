@@ -21,6 +21,7 @@ Updated: 2026-08-29
 - SC1 开始前本地主工作树 clean；`validate_ci.py --all`、integrated structure、Fast 57/57 与 `git diff --check` 均通过。
 - W6.1／CI6／A3 整合时保留 CI6 schema-5 manifest，并把 A3 七个低成本 Authority consumer tests 登记进 data-only mapping registry；CI contract 与 A3 7/7 专项通过。Hosted exact-SHA Promotion 仍由整合候选单独取得。
 - U2 Unified Observatory focused 11/11 与最终 adjacent 12/12 PASS；CI6 final Fast 根据当前 diff 选择 49 项并 49/49 PASS，final Checkpoint 选择 54 项并 54/54 PASS（evidence-eligible，未超预算）。真实动态单 URL、静态无控制、Host／Origin／cookie／token、Team／Authority／AI／Maintenance 不升级、helper/marker 回收和 desktop/390px browser 均有独立证据。
+- W7.1 的四个 archived-session 安全回归已登记为 `team-lan-core` Promotion-only medium evidence，不进入 Fast／Checkpoint；其分支 focused 19/19、exact Fast 57/57、Checkpoint 85/85 及真实 self-host read-only graph 均通过，最终整合 Candidate 仍需 Promotion 重放。
 
 ## 覆盖面
 
@@ -45,6 +46,7 @@ Updated: 2026-08-29
 
 - [Validation 索引](../validation/README.md)
 - [U2 Unified Observatory Production Integration](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
+- [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
 - [CI5 Promotion Throughput Optimization](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [CI4 opaque token reliability](../validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)
 - [R3 brand-only closeout](../validation/2026-08-28-r3-orrery-brand-only-closeout.md)

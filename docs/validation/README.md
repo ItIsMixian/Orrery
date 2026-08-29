@@ -13,6 +13,8 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-29 W7.1 Archived Session Relation Projection](2026-08-29-w7-1-archived-session-relation-projection.md) — validates bounded Git-private archive recovery, live precedence, conflict/unsafe-input failure closure, zero execution authority and real W5D closed-axis restoration.
+- [2026-08-29 SH1 Real Self-host Collaboration Acceptance](2026-08-29-sh1-real-self-host-collaboration-acceptance.md) — records real self-host read-only/dry-run findings without applying relations or performing deletion.
 - [2026-08-29 U2 Unified Observatory Production Integration](2026-08-29-u2-unified-observatory-production-integration.md) — validates the real root-only/default-off single-URL shell, versioned consumer registry, legacy docsite inheritance, security/lifecycle boundaries and desktop/390px browser behavior without a public/default or release transition.
 - [2026-08-29 U1 Unified Observatory Architecture & Shell](2026-08-29-u1-unified-observatory-architecture.md) — validates the accepted architecture boundary and synthetic interaction study while explicitly recording that production integration and visual redesign did not occur.
 - [2026-08-29 CI6 Local Validation Router & Tier Enforcement](2026-08-29-ci6-local-validation-router-tier-enforcement.md) — validates change-derived tier selection, exact receipts, W6.1 cost separation and fail-closed inventory enforcement.

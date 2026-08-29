@@ -668,3 +668,8 @@
   Chromium 在 1280x720 验证搜索、Maintenance、AI provider 未启用与 Graph Unavailable，在 390x844 验证导航抽屉；两端无横向
   溢出或 console error。Candidate／Promotion、non-main push、main、
   public template、managed tools、installer、tag 与 Release 留给后续唯一整合者。
+## 2026-08-29 — U2／W7.1 local integrated experience Candidate
+
+- 唯一整合分支在 W6.1／CI6／A3／U1 baseline 上合入 U2 `a0e5dbc` 与 W7.1 `903d4ac`。U2 提供真实 root-only 单 URL shell、静态 builder、headless/debug launcher 与版本化 consumer registry；W7.1 恢复 relation 已引用 archived endpoint 的 closed/offline/current/superseded 轴。
+- W7.1 推进 Core 到 0.1.16；CLI 因精确 Core package 依赖同步推进到 0.1.20；U2 Observatory 为 0.1.11。四个 archive 安全回归登记为 `team-lan-core` Promotion-only medium evidence，不进入 Fast／Checkpoint。
+- 当前节点只形成供维护者本机体验的 integrated Candidate。`origin/main`、public template、managed-tool inventory、installer、release manifest、v0.2.0、tag 与 Release 均未改变。

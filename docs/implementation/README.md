@@ -14,6 +14,9 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-29 U2 Unified Observatory Production Integration](plans/2026-08-29-u2-unified-observatory-production-integration.md) — root-only/default-off production Candidate complete and integrated for maintainer experience; public/default transition remains separate.
+- [2026-08-29 W7.1 Archived Session Relation Projection](plans/2026-08-29-w7-1-archived-session-relation-projection.md) — bounded read-only retired-session resolver restores referenced closed Workstream axes without creating discovery or execution authority.
+- [2026-08-29 SH1 Real Self-host Collaboration Acceptance](plans/2026-08-29-sh1-real-self-host-collaboration-acceptance.md) — read-only self-host evidence that motivated W7.1; no real relation apply or destructive action.
 - [2026-08-29 U1 Unified Observatory Architecture & Shell](plans/2026-08-29-u1-unified-observatory-architecture.md) — architecture phase complete under Accepted ADR-0016 and Approved Design; production U2 implementation, default transition and release remain separate work.
 - [2026-08-29 CI6 Local Validation Router & Tier Enforcement](plans/2026-08-29-ci6-local-validation-router-tier-enforcement.md) — adds the repo-local change router, exact test registry, tier receipts and W6.1 cost separation without weakening Promotion coverage.
 - [2026-08-29 W6.1 Incremental Maintenance & Quick Remove](plans/2026-08-29-w6-1-incremental-maintenance-quick-remove.md) — committed maintenance-v2 cache, background refresh and target-scoped Quick Remove Candidate consumed by the U2 integration baseline.

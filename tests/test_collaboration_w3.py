@@ -700,8 +700,8 @@ class CollaborationW3Tests(unittest.TestCase):
             self.assertEqual(integrate.returncode, 0, integrate.stdout + integrate.stderr)
             payload = json.loads(integrate.stdout)
             self.assertEqual(payload["command"], "integrate-dry-run")
-            self.assertEqual(payload["versions"]["core"], "0.1.15")
-            self.assertEqual(payload["versions"]["cli"], "0.1.19")
+            self.assertEqual(payload["versions"]["core"], "0.1.16")
+            self.assertEqual(payload["versions"]["cli"], "0.1.20")
             self.assertFalse(payload["data"]["integration_ref_updated"])
             package_id = payload["data"]["review_package"]["package_id"]
             eligibility = subprocess.run(

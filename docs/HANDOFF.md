@@ -13,7 +13,7 @@ Updated: 2026-08-29
 - SC1 已把权威入口、State、Plan 状态和 CI5 hosted evidence 对齐；Fast `33256438925`、Promotion `33256558285` 与 main Fast `33256757429` 均通过。该 source commit 没有执行物理 cleanup，Git-private session 状态也不升级为作者事实。
 - 后续本机维护已归档并移除六个 `closed/superseded` worktree，只删除工作目录并保留 branch／commit；当前七个 registered worktree 中包含一个并发创建、未触碰的 `github-front-door-redesign`。
 - 维护者已接受 ADR-0016／Unified Observatory Design：目标是一个可见 launcher、URL 与导航壳，内部 helper 可受管独立运行；现有 docsite 阅读、搜索、AI、作者信息架构和可识别视觉体验必须继承，U1 prototype 不是最终 UI。
-- `codex/u1-u2-integration-baseline` 已组合 W6.1／CI6、A3 与 U1，供 U2 以 Candidate lineage 接续；该分支尚不等于 `origin/main`、默认切换或公开发布。
+- `codex/u1-u2-integration-baseline` 已组合 W6.1／CI6、A3、U1、U2 与 W7.1，当前组件为 Core 0.1.16、CLI 0.1.20、Observatory 0.1.11；它是供维护者体验的本地 integrated Candidate，尚不等于 `origin/main`、默认切换或公开发布。
 
 ## 当前可继续的线路
 
@@ -23,12 +23,13 @@ Updated: 2026-08-29
 4. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
 5. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 6. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
-7. **Unified Observatory U2：** 从已组合的 Candidate 基线实现 root-only 单一可见入口、supervisor 与 consumer registry；先提供维护者可体验版本，不切换 public template／managed tools／Release。
+7. **Unified Observatory Candidate：** U2 root-only 单一可见入口、supervisor 与 consumer registry 已实现并整合；下一步先由维护者体验，不切换 public template／managed tools／Release。
 
 ## 不得外推的边界
 
 - Canonical source、runtime-verified scope 与 public release 是三种不同事实；main 上的实现不能写成 v0.2.0 已发布能力。
 - W7B apply／undo 只在隔离 Git fixture 验证；真实 self-host 只有 read-only／dry-run，Graph 没有执行按钮，中央 Team 没有执行权。
+- W7.1 只从有界 Git-common-private archive 恢复 relation 已引用的缺失 endpoint；archive 永不成为 active tip、apply/undo target、Review Ready 或实时执行面。
 - linked worktree 不是 OS 沙箱；越界写入仍依赖 guard、工作目录纪律、Scope/finding 与人工审查。
 - Team Mode 默认关闭；不得同步 Prompt、回答、transcript、源码正文、未 push diff 或成员凭据。Local-only 与 Unknown 必须保留。
 - maintenance 不得凭目录名、年龄或“branch 已进 main”自动删除。没有 current closure／review／Validation evidence 时继续保护；worktree、local branch、remote branch 分别授权。

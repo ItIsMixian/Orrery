@@ -15,7 +15,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7、Personal／Team Observatory、maintenance、relation execution 与只读 Graph 已进入 Canonical source；默认页面仍不启用这些 root-only 控制面 | 先做 self-host read-only／dry-run 与 lifecycle/closure 对账；任何 apply、删除或成员本机执行仍逐次确认 |
-| Unified Observatory | ADR-0016 与 Approved Design 已接受；U1 只完成架构／非权威原型，生产统一入口尚未实现 | 从包含 W6.1／CI6／A3 的独立整合基线启动 U2 root-only 生产实现，保留现有 docsite 体验且不切换公开默认 |
+| Unified Observatory | U2 root-only/default-off 生产实现与 W7.1 archive projection 已进入本地 integrated Candidate；公开默认仍未切换 | 运行整合 Fast／Checkpoint／浏览器门并交付维护者体验；确认后再冻结 exact-SHA Promotion Candidate |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
 | 文档治理 | D1 已冻结只读 finding contract、规则 registry 与 synthetic fixture；当前没有 `docs audit` 产品入口 | 维护者另行决定是否启动 D2 scanner／CLI；不自动改写 Markdown 或启用长度硬门 |
@@ -28,12 +28,12 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - 协作源码已经 Canonical，但真实 self-host relation store 仍缺正式 native event／closure；Graph 的 legacy session 投影与产品能力不能混写。
 - 当前 display brand 为 Orrery；`project-orrery` Skill／distribution／CLI／schema／协议与 v0.2.0 资产继续作为稳定技术或历史标识保留。
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
-- `codex/u1-u2-integration-baseline` 已组合 W6.1／CI6、A3 与 Accepted U1 文档，作为 U2 的 Candidate 基线；它在 exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
+- `codex/u1-u2-integration-baseline` 已组合 W6.1／CI6、A3、Accepted U1、U2 与 W7.1；当前组件为 Core 0.1.16、CLI 0.1.20、Observatory 0.1.11。它在维护者体验、exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
 
 ## 活动计划与待办
 
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
-- [ ] [U1 Unified Observatory Plan](implementation/plans/2026-08-29-u1-unified-observatory-architecture.md)：架构已接受；U2 production shell、launcher、真实 consumer composition 与人工体验尚未完成。
+- [ ] [U1/U2 Unified Observatory Plan](implementation/plans/2026-08-29-u1-unified-observatory-architecture.md)：root-only production shell、launcher 与真实 consumer composition 已完成；人工体验、public/default transition 与 Release 尚未完成。
 - [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：Phase 5 self-host／发布未完成；真实多机、云 relay 与自动选主也不在当前支持范围。
 - [ ] [Workspace Maintenance Plan](implementation/plans/2026-08-27-workspace-maintenance-and-scheduled-cleanup.md)：Phase 0–2 已进入 Canonical source；Phase 3 自动 worktree removal 与 Phase 4 scheduler 未开始。
 - [ ] [Context-routing State](state/context-routing-research.md)：C2／Pilot 010 尚未获批。
@@ -44,6 +44,8 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 最近完成
 
+- [U2 Unified Observatory Production Integration](validation/2026-08-29-u2-unified-observatory-production-integration.md)：真实单 URL shell、headless/debug launcher、consumer registry、安全/lifecycle 与桌面/移动浏览器验收完成，现进入本地整合体验。
+- [W7.1 Archived Session Relation Projection](validation/2026-08-29-w7-1-archived-session-relation-projection.md)：有界只读 archive resolver 恢复 W5D closed/offline/current/superseded 轴，不产生执行权。
 - [SC1 Closed Worktree Removal](validation/2026-08-29-sc1-closed-worktree-removal.md)：归档并移除六个 clean／closed worktree，只删除目录且保留 branch／commit；并发创建的无关 worktree 未触碰。
 - [CI5 Promotion Throughput Optimization](validation/2026-08-29-ci5-promotion-throughput-optimization.md)：`9ee831f` 的 Fast、25-job Promotion、双平台 required checks 与 main fast-forward 已完成。
 - [CI4 opaque CLI token reliability](validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)：`a4b0ed3` Fast 2/2、Promotion 59/59 双平台通过并进入 main。

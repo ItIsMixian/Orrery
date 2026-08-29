@@ -5982,6 +5982,62 @@
       "reason": "low evidence for Team/LAN via collaboration-maintenance"
     },
     {
+      "test_id": "test_workstream_relations.WorkstreamRelationTests.test_archived_relation_endpoint_restores_closed_axes_and_binds_graph_hash",
+      "owner_surface": "Team/LAN",
+      "owner_shard": "team-lan-core",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "collaboration-maintenance"
+      ],
+      "reason": "promotion evidence for bounded archived-session relation recovery"
+    },
+    {
+      "test_id": "test_workstream_relations.WorkstreamRelationTests.test_archived_session_index_is_read_only_zero_network_and_has_no_execution_surface",
+      "owner_surface": "Team/LAN",
+      "owner_shard": "team-lan-core",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "collaboration-maintenance"
+      ],
+      "reason": "promotion evidence for archive zero-write, zero-network and no-execution boundaries"
+    },
+    {
+      "test_id": "test_workstream_relations.WorkstreamRelationTests.test_archived_session_live_precedence_equivalent_duplicates_conflict_and_unreferenced",
+      "owner_surface": "Team/LAN",
+      "owner_shard": "team-lan-core",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "collaboration-maintenance"
+      ],
+      "reason": "promotion evidence for deterministic live/archive precedence and conflict handling"
+    },
+    {
+      "test_id": "test_workstream_relations.WorkstreamRelationTests.test_archived_session_reader_rejects_malformed_unknown_inconsistent_and_unsafe_inputs",
+      "owner_surface": "Team/LAN",
+      "owner_shard": "team-lan-core",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "collaboration-maintenance"
+      ],
+      "reason": "promotion evidence for fail-closed archive schema and filesystem safety"
+    },
+    {
       "test_id": "test_workstream_relations.WorkstreamRelationTests.test_cli_propose_is_explicit_and_graph_plan_are_read_only",
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",

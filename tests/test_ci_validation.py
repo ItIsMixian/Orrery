@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CI_SCRIPTS = ROOT / "scripts" / "ci"
 sys.path.insert(0, str(CI_SCRIPTS))
 
+import _common as ci_common  # noqa: E402
 from _common import (  # noqa: E402
     CIValidationError,
     DEFAULT_MANIFEST,
@@ -260,7 +261,7 @@ class CIValidationTests(unittest.TestCase):
         shard_surfaces = {item["id"]: item["surface"] for item in self.manifest["shards"]}
         unregistered = copy.deepcopy(self.registry)
         unregistered["tests"].pop()
-        with mock.patch("_common.load_mapping_registry", return_value=unregistered), self.assertRaisesRegex(
+        with mock.patch.object(ci_common, "load_mapping_registry", return_value=unregistered), self.assertRaisesRegex(
             CIValidationError, "unregistered.*owner_surface.*dependencies"
         ):
             validate_and_expand_manifest(self.manifest)
@@ -364,7 +365,7 @@ class CIValidationTests(unittest.TestCase):
             **copy.deepcopy(stale["tests"][0]),
             "test_id": "test_missing_module.MissingTests.test_dead_selector_equivalent",
         })
-        with mock.patch("_common.load_mapping_registry", return_value=stale), self.assertRaisesRegex(
+        with mock.patch.object(ci_common, "load_mapping_registry", return_value=stale), self.assertRaisesRegex(
             CIValidationError, "exact test registry differs.*stale="
         ):
             validate_and_expand_manifest(self.manifest)
@@ -399,8 +400,8 @@ class CIValidationTests(unittest.TestCase):
             for entry in registry["tests"]:
                 entry["allowed_stages"] = ["fast", "checkpoint", "promotion"] if entry["test_id"] == test_id else ["promotion"]
             output = directory / "result.json"
-            with mock.patch.dict(os.environ, {"RUNNER_OS": "FixtureOS"}, clear=False), mock.patch(
-                "_common.load_mapping_registry", return_value=registry
+            with mock.patch.dict(os.environ, {"RUNNER_OS": "FixtureOS"}, clear=False), mock.patch.object(
+                ci_common, "load_mapping_registry", return_value=registry
             ), mock.patch("run_test_shard.load_mapping_registry", return_value=registry):
                 payload, successful = run_selected(
                     manifest_path=DEFAULT_MANIFEST, shard=None, profile="fast", output=output
@@ -431,7 +432,7 @@ class CIValidationTests(unittest.TestCase):
             registry["stages"]["fast"]["budget_seconds"] = 0.000001
             for entry in registry["tests"]:
                 entry["allowed_stages"] = ["fast", "checkpoint", "promotion"] if entry["test_id"] == test_id else ["promotion"]
-            with mock.patch("_common.load_mapping_registry", return_value=registry), mock.patch(
+            with mock.patch.object(ci_common, "load_mapping_registry", return_value=registry), mock.patch(
                 "run_test_shard.load_mapping_registry", return_value=registry
             ):
                 payload, successful = run_selected(
