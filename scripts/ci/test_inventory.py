@@ -27,14 +27,15 @@ def build_inventory(manifest_path: Path) -> dict[str, object]:
     lanes = promotion_lane_assignments(manifest)
     routed = machine_inventory(manifest)
     return {
-        "schema_version": 3,
-        "contract_type": "orrery-unittest-inventory-v3",
+        "schema_version": 4,
+        "contract_type": "orrery-unittest-inventory-v4",
         "sha": git_sha(),
         "python": platform.python_version(),
         "manifest_sha256": sha256_json(manifest),
         "test_count": len(test_ids),
         "test_ids": test_ids,
         "inventory_sha256": routed["inventory_sha256"],
+        "mapping_registry_sha256": routed["mapping_registry_sha256"],
         "tests": routed["tests"],
         "fast_test_count": len(fast_ids),
         "fast_test_ids": fast_ids,

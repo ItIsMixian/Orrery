@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "contract_type": "orrery-change-routing-portfolios-v1",
+  "portfolios": [
+    {
+      "id": "docs-only",
+      "stage": "fast",
+      "changed_paths": ["docs/validation/synthetic-change.md"],
+      "subsystems": ["documentation-system"],
+      "expected_writes": ["docs/validation/**"],
+      "expected_mapping_ids": ["documentation"],
+      "required_test_ids": ["test_documentation_governance_contract.DocumentationGovernanceContractTests.test_rule_registry_is_frozen_offline_and_does_not_choose_global_budgets"],
+      "forbidden_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_remove_worktree_executor_preserves_branch_commit_and_receipt"],
+      "max_selected": 20
+    },
+    {
+      "id": "authority-schema-cli",
+      "stage": "fast",
+      "changed_paths": ["packages/project-orrery-core/src/project_orrery_core/schema/authority-model-v1.json", "packages/project-orrery-cli/src/project_orrery_cli/authority_claims.py"],
+      "subsystems": ["authority-meta-model"],
+      "expected_writes": ["packages/project-orrery-core/src/project_orrery_core/schema/authority-*.json"],
+      "expected_mapping_ids": ["authority-core"],
+      "required_test_ids": ["test_authority_meta_model.AuthorityMetaModelFixtureTests.test_claim_dimensions_remain_independent"],
+      "forbidden_test_ids": ["test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_full_topology_cli_apply_receipt_undo_and_legacy_discovery"],
+      "max_selected": 30
+    },
+    {
+      "id": "collaboration-maintenance",
+      "stage": "checkpoint",
+      "changed_paths": ["packages/project-orrery-core/src/project_orrery_core/maintenance.py", "tests/test_workspace_maintenance.py"],
+      "subsystems": ["multi-worktree-collaboration"],
+      "expected_writes": ["packages/project-orrery-core/src/project_orrery_core/maintenance*.py"],
+      "expected_mapping_ids": ["collaboration-maintenance"],
+      "required_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"],
+      "forbidden_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_remove_worktree_executor_preserves_branch_commit_and_receipt"],
+      "max_selected": 70
+    },
+    {
+      "id": "w6-1-regression",
+      "stage": "checkpoint",
+      "changed_paths": ["packages/project-orrery-core/src/project_orrery_core/maintenance.py", "packages/project-orrery-observatory/src/project_orrery_observatory/personal_observatory.py", "scripts/docsite/serve_team_observatory.py"],
+      "subsystems": [],
+      "expected_writes": [],
+      "expected_mapping_ids": ["collaboration-maintenance", "observatory-ui"],
+      "required_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"],
+      "forbidden_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_remove_worktree_executor_preserves_branch_commit_and_receipt"],
+      "max_selected": 70,
+      "regression_test_ids": [
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_scan_is_bounded_zero_network_debounced_single_flight_and_times_out",
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_observatory_catch_up_respects_24_hour_freshness",
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_queue_authorization_is_evidence_bound_and_drift_stales",
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_remove_worktree_executor_preserves_branch_commit_and_receipt",
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_action_surface_rejects_branch_path_shell_url_and_ai_authority",
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_cli_json_policy_schedule_and_invalid_execute_are_stable",
+        "test_personal_observatory.PersonalObservatoryTests.test_health_projection_separates_36_worktree_like_delivery_reconciliation_and_hygiene",
+        "test_personal_observatory.PersonalObservatoryTests.test_projection_reuses_w1_w2_contracts_without_network_or_writes",
+        "test_personal_observatory.PersonalObservatoryTests.test_excluded_worktree_is_listed_but_never_opened",
+        "test_personal_observatory.PersonalObservatoryTests.test_absent_session_and_remote_boundary_stay_unknown",
+        "test_personal_observatory.PersonalObservatoryTests.test_no_review_packages_still_projects_bounded_w3_inventory",
+        "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_consumes_real_core_review_bundle_without_writes",
+        "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_failure_and_old_schema_keep_w4a_fallback",
+        "test_personal_observatory.PersonalObservatoryTests.test_w3_projection_keeps_policy_actions_and_receipts_separate",
+        "test_personal_observatory.PersonalObservatoryTests.test_renderer_has_four_zones_progressive_detail_and_no_actions",
+        "test_personal_observatory.PersonalObservatoryTests.test_renderer_separates_lifecycle_runtime_and_freshness",
+        "test_personal_observatory.PersonalObservatoryTests.test_injection_adds_a_separate_page_and_leaves_dashboard_untouched",
+        "test_personal_observatory.PersonalObservatoryTests.test_root_only_entry_preserves_legacy_bytes_when_disabled",
+        "test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local",
+        "test_personal_observatory.PersonalObservatoryTests.test_unavailable_projection_renders_stable_fallback",
+        "test_team_observatory.TeamObservatoryTests.test_team_page_is_a_sibling_with_graphical_zero_network_onboarding",
+        "test_team_observatory.TeamObservatoryTests.test_root_entry_refuses_another_project",
+        "test_team_observatory.TeamObservatoryTests.test_loopback_ui_controls_core_team_projection_and_redacts_secrets"
+      ]
+    }
+  ],
+  "mutations": [
+    {"id": "unregistered-test", "expected_error": "unregistered", "required_metadata": "exact tests entry"},
+    {"id": "unmapped-path", "expected_error": "unmapped", "required_metadata": "path_mappings"},
+    {"id": "unknown-dependency", "expected_error": "Unknown dependencies", "required_metadata": "path_mappings metadata"}
+  ]
+}

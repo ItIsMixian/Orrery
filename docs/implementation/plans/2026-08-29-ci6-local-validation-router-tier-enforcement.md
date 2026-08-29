@@ -20,14 +20,18 @@ Direct unittest remains available for debugging but is not a Fast/Checkpoint com
 
 ## Implemented architecture
 
-1. Manifest schema 4 keeps complete Promotion discovery, 27 logical shards and ten lanes, and adds versioned routing
-   rules, local stage budgets, claim sets and a conservative reuse contract.
+1. Manifest schema 5 keeps only complete Promotion discovery, 27 logical shards and ten lanes. The separate
+   machine-readable `scripts/ci/change-mapping.json` registry owns generic path/subsystem mappings, exact test
+   ownership, allowed stages, cost classes, dependencies/reasons, stage budgets and the conservative reuse contract.
 2. The router derives changed paths from Git, the exact base from an explicit ref or Git-private Workstream lineage,
    and primary/affected subsystem plus expected-write scope from the private session. Dry-run receipts explain
-   path/scope → rule → surface → final test ID → tier/cost/reason.
+   path/scope → generic mapping → surface → final test ID → tier/cost/reason. Concrete changed or expected-write
+   paths take precedence; Workstream subsystem metadata is the conservative fallback when no path scope exists.
 3. The generated machine inventory gives every discovered final unittest ID exactly one owner surface/shard plus
-   allowed stages, cost class, budget and dependency/adjacency reasons. Dead selectors, duplicate ownership,
-   incomplete Promotion, heavy lower-tier selection and W6.1 claim drift fail statically.
+   allowed stages, cost class, budget and dependency/adjacency reasons. Unregistered or stale IDs, duplicate
+   ownership, unmapped paths, Unknown dependencies, incomplete Promotion and heavy lower-tier selection fail
+   statically. Adding a test normally costs one exact registry entry; Adapter, release and UI surfaces extend by
+   data-only mapping entries without changing router algorithms.
 4. `run_test_shard.py` emits versioned receipts bound to exact HEAD/base, dirty fingerprint, manifest/inventory,
    selected IDs, test source, selector/dependency and relevant-tree hashes, OS/Python/environment, stage/budget,
    per-test outcomes/durations and runner errors. Timeout/interruption/missing result cannot become evidence.
@@ -36,7 +40,17 @@ Direct unittest remains available for debugging but is not a Fast/Checkpoint com
 6. Reuse is intentionally `contract-refusal` v1. It computes the complete conservative key and rejects dirty,
    Unknown, changed-dependency and security-sensitive cases; no cached result is consumed or presented as evidence.
 
-## W6.1 tier split
+## Generic controls
+
+- Production router/config/selector code has no task ID, branch name or fixed change-diff switch. A static mutation
+  test scans every production CI Python/config/guide file for such switches.
+- Synthetic docs-only, Authority/Core schema+CLI and collaboration/maintenance portfolios exercise the same
+  path/subsystem/expected-write algorithm. Unregistered tests, duplicate entries, unmapped paths, Unknown
+  dependencies, stale IDs and heavy lower-stage mutation all refuse formal evidence with missing-metadata guidance.
+- The registry extension guide makes future Adapter/release/UI work a data maintenance operation; router code is
+  changed only when the versioned generic contract itself changes.
+
+## W6.1 regression portfolio
 
 - Fast owns cache/schema/policy/fingerprint and pure maintenance rendering plus zero-network/static compatibility
   contracts. It creates no full maintenance topology.
@@ -44,7 +58,10 @@ Direct unittest remains available for debugging but is not a Fast/Checkpoint com
   target-only Quick Remove preflight. It performs no deletion and keeps the 90-second budget.
 - Promotion uniquely retains the original heavy cache invalidation, real linked-worktree removal, lock/recovery,
   CLI/live server and remaining Personal/Team journeys. Two W3 cleanup adjacency claims are also explicit
-  Promotion-only claim-set members.
+  Promotion-only inventory members.
+
+This split is a test fixture regression portfolio only. No production router, manifest or mapping-registry branch
+names W6.1, its Workstream, or its source branch.
 
 The only W6.1 test-file change is
 `tests/test_workspace_maintenance.py::test_minimal_git_incremental_refresh_and_target_preflight_checkpoint`; it adds a
@@ -54,8 +71,8 @@ tier-friendly helper without changing or deleting any existing assertion.
 
 - W6.1 diff routing selects fewer than the complete original 24 tests at Fast and Checkpoint.
 - Fast is below 15 seconds and Checkpoint below 90 seconds on the local Windows Candidate host.
-- CI contract/mutation tests prove inventory completeness, required-check/workflow stability and Promotion-only claim
-  coverage.
+- CI contract/mutation tests prove generic inventory completeness, data-only extensibility,
+  required-check/workflow stability and Promotion-only regression coverage.
 - Integrated structure, repository link/forbidden-artifact gate and `git diff --check` pass.
 - No local full Promotion is run. Central integration must run the exact pushed Candidate SHA on Windows and Ubuntu
   before any promotion to `main`.

@@ -11,8 +11,8 @@ from _common import (
     DEFAULT_MANIFEST,
     ROOT,
     expand_profile,
-    expand_selectors,
     load_json,
+    load_mapping_registry,
     machine_inventory,
     promotion_lane_assignments,
     validate_and_expand_manifest,
@@ -219,6 +219,7 @@ def validate_all(manifest_path: Path) -> list[str]:
         lanes = promotion_lane_assignments(manifest)
         checkpoint_ids = expand_profile(manifest, "checkpoint", all_ids)
         routed_inventory = machine_inventory(manifest)
+        registry = load_mapping_registry(manifest)
         if len(assignments) < 8:
             errors.append("Promotion manifest must retain meaningful parallel sharding")
         if len(lanes) != 10:
@@ -229,43 +230,18 @@ def validate_all(manifest_path: Path) -> list[str]:
             errors.append("Checkpoint must include every Fast test before adding adjacency")
         if set(checkpoint_ids) == set(all_ids):
             errors.append("Checkpoint must remain a strict subset and cannot masquerade as Promotion")
-        if float(manifest["fast"]["budget_seconds"]) > 15:
-            errors.append("Fast profile budget must remain at or below 15 seconds")
-        if float(manifest["checkpoint"]["budget_seconds"]) > 90:
-            errors.append("Checkpoint profile budget must remain at or below 90 seconds")
-        if float(manifest["routing"]["stages"]["fast"]["budget_seconds"]) > 15:
+        if float(registry["stages"]["fast"]["budget_seconds"]) > 15:
             errors.append("local validation router Fast budget must remain at or below 15 seconds")
-        if float(manifest["routing"]["stages"]["checkpoint"]["budget_seconds"]) > 90:
+        if float(registry["stages"]["checkpoint"]["budget_seconds"]) > 90:
             errors.append("local validation router Checkpoint budget must remain at or below 90 seconds")
         required_inventory_fields = {
             "test_id", "owner_surface", "owner_shard", "allowed_stages", "cost_class",
-            "budget_seconds", "dependency_reasons", "promotion_only_claim",
+            "budget_seconds", "dependencies", "reason",
         }
         for entry in routed_inventory["tests"]:
             if set(entry) != required_inventory_fields:
                 errors.append(f"machine inventory metadata drifted for {entry.get('test_id')}")
                 break
-        try:
-            w6_claim = next(
-                item for item in manifest["routing"]["claim_sets"]
-                if item["id"] == "w6-1-original-24"
-            )
-        except StopIteration:
-            errors.append("W6.1 original 24-test claim set is missing")
-        else:
-            w6_ids = set(expand_selectors(w6_claim["selectors"], all_ids, "W6.1 claim set"))
-            promotion_only = set(
-                expand_selectors(
-                    w6_claim["promotion_only_selectors"], all_ids, "W6.1 Promotion-only claim set"
-                )
-            )
-            if len(w6_ids) != 24:
-                errors.append(f"W6.1 original claim coverage drifted: expected 24, got {len(w6_ids)}")
-            if promotion_only & set(checkpoint_ids):
-                errors.append("W6.1 Promotion-only claim leaked into Checkpoint")
-            assigned = [test_id for values in assignments.values() for test_id in values]
-            if any(assigned.count(test_id) != 1 for test_id in promotion_only):
-                errors.append("W6.1 Promotion-only claims are not owned exactly once")
         router = ROOT / "scripts" / "ci" / "validate_change.py"
         if not router.is_file():
             errors.append("repo-local validate_change.py entry is missing")
@@ -277,6 +253,42 @@ def validate_all(manifest_path: Path) -> list[str]:
             ):
                 if needle not in router_text:
                     errors.append(f"local validation router lost required contract text: {needle}")
+        if not (ROOT / "scripts" / "ci" / "change-mapping.json").is_file():
+            errors.append("machine-readable change mapping registry is missing")
+        if not (ROOT / "scripts" / "ci" / "README.md").is_file():
+            errors.append("change mapping registry extension guide is missing")
+        production_policy_files = list((ROOT / "scripts" / "ci").glob("*.py")) + [
+            ROOT / "scripts" / "ci" / "test-shards.json",
+            ROOT / "scripts" / "ci" / "change-mapping.json",
+            ROOT / "scripts" / "ci" / "README.md",
+        ]
+        task_specific_tokens = (
+            "w6" + "-1", "codex/" + "w6", "incremental-maintenance-" + "quick-remove"
+        )
+        for path in production_policy_files:
+            policy_text = path.read_text(encoding="utf-8").lower()
+            found = [token for token in task_specific_tokens if token in policy_text]
+            if found:
+                errors.append(
+                    f"generic router production policy contains task/branch-specific switch {found}: {path}"
+                )
+        mapping_ids = {item["id"] for item in registry["path_mappings"]}
+        required_extension_surfaces = {"adapters", "release-packaging", "observatory-ui"}
+        if not required_extension_surfaces.issubset(mapping_ids):
+            errors.append(
+                "mapping registry must expose data-only Adapter, release and UI extension surfaces"
+            )
+        portfolio_path = ROOT / "tests" / "fixtures" / "ci-validation" / "change-portfolios-v1.json"
+        if not portfolio_path.is_file():
+            errors.append("generic change-routing portfolio fixture is missing")
+        else:
+            portfolios = load_json(portfolio_path).get("portfolios", [])
+            portfolio_ids = {item.get("id") for item in portfolios if isinstance(item, dict)}
+            required_portfolios = {
+                "docs-only", "authority-schema-cli", "collaboration-maintenance", "w6" + "-1-regression"
+            }
+            if not required_portfolios.issubset(portfolio_ids):
+                errors.append("generic and regression change-routing portfolios are incomplete")
         w7b_shards = [item for item in manifest["shards"] if item["id"] == "team-relations-execution"]
         if len(w7b_shards) != 1:
             errors.append("W7B execution must have one dedicated Promotion shard")

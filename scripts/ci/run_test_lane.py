@@ -16,6 +16,7 @@ from _common import (
     atomic_write_json,
     git_sha,
     load_json,
+    load_mapping_registry,
     promotion_lane_assignments,
     sha256_json,
     validate_and_expand_manifest,
@@ -34,6 +35,7 @@ def run_lane(
     executor: Callable[[list[str]], int] | None = None,
 ) -> tuple[dict[str, object], bool]:
     manifest = load_json(manifest_path)
+    registry = load_mapping_registry(manifest)
     validate_and_expand_manifest(manifest)
     lanes = promotion_lane_assignments(manifest)
     if lane not in lanes:
@@ -100,6 +102,7 @@ def run_lane(
         "python": platform.python_version(),
         "lane": lane,
         "manifest_sha256": sha256_json(manifest),
+        "mapping_registry_sha256": sha256_json(registry),
         "shards": lanes[lane],
         "records": records,
         "successful": all_successful,

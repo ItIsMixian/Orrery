@@ -18,10 +18,10 @@ from _common import (
     ROOT,
     atomic_write_json,
     dirty_fingerprint,
-    expand_selectors,
     git_output,
     git_sha,
     load_json,
+    load_mapping_registry,
     machine_inventory,
     sha256_json,
     validate_and_expand_manifest,
@@ -30,7 +30,14 @@ from _common import (
 
 RUNNER = Path(__file__).with_name("run_test_shard.py")
 RECEIPT_TYPE = "orrery-local-validation-receipt-v1"
+REFUSAL_TYPE = "orrery-local-validation-refusal-v1"
 PLAN_TYPE = "orrery-test-selection-plan-v1"
+
+
+class SelectionRefused(CIValidationError):
+    def __init__(self, message: str, required_metadata: list[str]) -> None:
+        super().__init__(message)
+        self.required_metadata = required_metadata
 
 
 def _resolve_commit(value: str) -> str:
@@ -136,69 +143,92 @@ def build_selection(
     all_ids, _, _ = validate_and_expand_manifest(manifest)
     inventory = machine_inventory(manifest)
     metadata = {item["test_id"]: item for item in inventory["tests"]}
+    registry = load_mapping_registry(manifest)
     paths, dirty = changed_paths(base_sha)
     subsystems, expected_writes = _session_scope(session)
-    selected_rules: list[dict[str, Any]] = []
+    mappings = registry["path_mappings"]
+    path_scoped_mappings: list[dict[str, Any]] = []
+    subsystem_fallback_mappings: list[dict[str, Any]] = []
     path_explain: list[dict[str, Any]] = []
-    for rule in manifest["routing"]["path_rules"]:
-        matched_paths = [path for path in paths if _matches(path, rule["patterns"])]
+    for mapping in mappings:
+        matched_paths = [path for path in paths if _matches(path, mapping["patterns"])]
         matched_expected = [value for value in expected_writes if any(
             fnmatch.fnmatchcase(value, pattern) or fnmatch.fnmatchcase(pattern, value)
-            for pattern in rule["patterns"]
+            for pattern in mapping["patterns"]
         )]
-        matched_subsystems = sorted(subsystems & set(rule["subsystems"]))
-        if matched_paths or matched_expected or matched_subsystems:
-            selected_rules.append(rule)
+        matched_subsystems = sorted(subsystems & set(mapping["subsystems"]))
+        if matched_paths or matched_expected:
+            path_scoped_mappings.append(mapping)
             path_explain.append({
-                "rule_id": rule["id"], "changed_paths": matched_paths,
+                "mapping_id": mapping["id"], "changed_paths": matched_paths,
                 "expected_writes": matched_expected, "subsystems": matched_subsystems,
-                "surfaces": rule["surfaces"], "reason": rule["reason"],
-                "high_risk": rule["high_risk"],
+                "surfaces": mapping["surfaces"], "high_risk": mapping["high_risk"],
             })
+        elif matched_subsystems:
+            subsystem_fallback_mappings.append(mapping)
     unknown_paths = [
         path for path in paths
-        if not any(_matches(path, rule["patterns"]) for rule in manifest["routing"]["path_rules"])
+        if not any(_matches(path, mapping["patterns"]) for mapping in mappings)
     ]
-    selectors = [selector for rule in selected_rules for selector in rule["selectors"][stage]]
-    if not selectors:
-        selectors = list(manifest["fast" if stage == "fast" else "checkpoint"]["selectors"])
-        path_explain.append({
-            "rule_id": "conservative-fallback", "changed_paths": unknown_paths or paths,
-            "expected_writes": expected_writes, "subsystems": sorted(subsystems),
-            "surfaces": ["Unknown"],
-            "reason": "no registered path/scope rule matched; select the complete local stage profile",
-            "high_risk": True,
-        })
-    selected_ids = sorted(set(expand_selectors(selectors, all_ids, f"change router {stage}")))
-    forbidden = [test_id for test_id in selected_ids if stage not in metadata[test_id]["allowed_stages"]]
-    heavy = [test_id for test_id in selected_ids if metadata[test_id]["cost_class"] == "heavy"]
-    if forbidden or heavy:
-        raise CIValidationError(
-            f"router selected disallowed/heavy tests for {stage}: forbidden={forbidden}, heavy={heavy}"
+    unknown_expected = [
+        value for value in expected_writes
+        if not any(any(
+            fnmatch.fnmatchcase(value, pattern) or fnmatch.fnmatchcase(pattern, value)
+            for pattern in mapping["patterns"]
+        ) for mapping in mappings)
+    ]
+    if unknown_paths or unknown_expected:
+        raise SelectionRefused(
+            f"change scope contains unmapped paths/expected writes: paths={unknown_paths}, expected_writes={unknown_expected}",
+            [
+                "Add one generic path_mappings entry with id, patterns, subsystems, surfaces, and high_risk.",
+                "Then reference that mapping id from exact test dependencies; do not add task-ID branches to the router.",
+            ],
+        )
+    selected_mappings = path_scoped_mappings or subsystem_fallback_mappings
+    if not path_scoped_mappings:
+        path_explain.extend({
+            "mapping_id": mapping["id"], "changed_paths": [], "expected_writes": [],
+            "subsystems": sorted(subsystems & set(mapping["subsystems"])),
+            "surfaces": mapping["surfaces"], "high_risk": mapping["high_risk"],
+        } for mapping in subsystem_fallback_mappings)
+    mapping_ids = {mapping["id"] for mapping in selected_mappings}
+    if not mapping_ids:
+        raise SelectionRefused(
+            "no generic mapping was derived from Git diff or Workstream scope",
+            ["Add or correct path_mappings metadata for the changed path/subsystem/expected-write surface."],
+        )
+    selected_ids = sorted(
+        test_id for test_id, entry in metadata.items()
+        if stage in entry["allowed_stages"] and mapping_ids.intersection(entry["dependencies"])
+    )
+    if not selected_ids:
+        raise SelectionRefused(
+            f"no registered {stage} tests depend on mappings {sorted(mapping_ids)}",
+            [
+                "Register at least one exact test entry with owner_surface, owner_shard, allowed_stages, "
+                "cost_class, budget_seconds, dependencies, and reason."
+            ],
         )
     head = git_sha()
     fingerprint = dirty_fingerprint()
-    budget = float(manifest["routing"]["stages"][stage]["budget_seconds"])
+    budget = float(registry["stages"][stage]["budget_seconds"])
     relevant_hash = _hash_working_paths(paths)
     dependency_hash = sha256_json({
-        "rules": path_explain, "selected_test_ids": selected_ids,
-        "manifest": manifest["routing"], "session_subsystems": sorted(subsystems),
+        "mappings": path_explain, "selected_test_ids": selected_ids,
+        "registry_sha256": sha256_json(registry), "session_subsystems": sorted(subsystems),
     })
     environment = {
         name: os.environ.get(name)
-        for name in manifest["routing"]["reuse"]["environment_gates"]
+        for name in registry["reuse"]["environment_gates"]
     }
-    security_paths = manifest["routing"]["reuse"]["security_high_risk_paths"]
-    high_risk = bool(unknown_paths) or any(_matches(path, security_paths) for path in paths) or any(
-        item["high_risk"] for item in path_explain
-    )
+    security_mappings = set(registry["reuse"]["security_high_risk_mappings"])
+    high_risk = bool(mapping_ids & security_mappings)
     reuse_reasons: list[str] = []
     if stage not in {"fast", "checkpoint"}:
         reuse_reasons.append("reuse-is-limited-to-fast-and-checkpoint")
     if dirty:
         reuse_reasons.append("working-tree-is-dirty")
-    if unknown_paths:
-        reuse_reasons.append("unknown-path-dependency")
     if high_risk:
         reuse_reasons.append("security-high-risk-surface")
     reuse_reasons.append("reuse-execution-not-enabled-by-contract-v1")
@@ -207,20 +237,22 @@ def build_selection(
         "selector_dependency_sha256": dependency_hash,
         "relevant_tree_sha256": relevant_hash,
         "python": platform.python_version(), "os": platform.system(),
-        "runner_version": manifest["routing"]["runner_version"],
+        "runner_version": registry["runner_version"],
         "receipt_schema_version": 1, "manifest_sha256": sha256_json(manifest),
+        "mapping_registry_sha256": sha256_json(registry),
         "inventory_sha256": inventory["inventory_sha256"], "environment_gates": environment,
     }
     return {
         "schema_version": 1, "contract_type": PLAN_TYPE, "stage": stage,
-        "role": manifest["routing"]["stages"][stage]["role"],
+        "role": registry["stages"][stage]["role"],
         "head_sha": head, "base_sha": base_sha, "base_source": base_source,
         "dirty": dirty, "dirty_fingerprint": fingerprint,
         "manifest_sha256": sha256_json(manifest),
+        "mapping_registry_sha256": sha256_json(registry),
         "inventory_sha256": inventory["inventory_sha256"],
         "selected_test_ids": selected_ids, "selected_test_count": len(selected_ids),
         "budget_seconds": budget, "changed_paths": paths, "unknown_paths": unknown_paths,
-        "path_explain": path_explain,
+        "mapping_ids": sorted(mapping_ids), "path_explain": path_explain,
         "selected_tests": [metadata[test_id] for test_id in selected_ids],
         "workstream": {
             "session_path": session_path,
@@ -230,8 +262,8 @@ def build_selection(
             "expected_writes": expected_writes,
         },
         "reuse": {
-            "schema_version": manifest["routing"]["reuse"]["schema_version"],
-            "mode": manifest["routing"]["reuse"]["mode"], "decision": "refused",
+            "schema_version": registry["reuse"]["schema_version"],
+            "mode": registry["reuse"]["mode"], "decision": "refused",
             "eligible_inputs": not reuse_reasons[:-1], "reasons": reuse_reasons, "key": reuse_key,
         },
     }
@@ -265,6 +297,8 @@ def main() -> int:
     arguments = parser.parse_args()
     started = time.perf_counter()
     output = arguments.output.resolve() if arguments.output else _default_output(arguments.stage)
+    base_sha: str | None = None
+    base_source: str | None = None
     try:
         manifest_path = arguments.manifest.resolve()
         manifest = load_json(manifest_path)
@@ -319,9 +353,73 @@ def main() -> int:
             print(json.dumps(receipt, ensure_ascii=False, indent=2))
         return 0 if receipt["evidence_eligible"] else 1
     except KeyboardInterrupt:
+        interruption = {
+            "schema_version": 1,
+            "contract_type": REFUSAL_TYPE,
+            "stage": arguments.stage,
+            "head_sha": git_sha(),
+            "base_sha": base_sha,
+            "base_source": base_source,
+            "dirty_fingerprint": dirty_fingerprint(),
+            "outcome": "interrupted",
+            "successful": False,
+            "completed": False,
+            "evidence_eligible": False,
+            "duration_seconds": round(time.perf_counter() - started, 6),
+            "runner_errors": ["validation router was interrupted; no tier evidence is valid"],
+            "required_metadata": [],
+            "os": platform.system(),
+            "python": platform.python_version(),
+        }
+        atomic_write_json(output, interruption)
         print("FAIL validation router: interrupted; no tier evidence is valid", file=sys.stderr)
         return 130
+    except SelectionRefused as exc:
+        refusal = {
+            "schema_version": 1,
+            "contract_type": REFUSAL_TYPE,
+            "stage": arguments.stage,
+            "head_sha": git_sha(),
+            "base_sha": base_sha,
+            "base_source": base_source,
+            "dirty_fingerprint": dirty_fingerprint(),
+            "outcome": "refused",
+            "successful": False,
+            "completed": True,
+            "evidence_eligible": False,
+            "duration_seconds": round(time.perf_counter() - started, 6),
+            "runner_errors": [str(exc)],
+            "required_metadata": exc.required_metadata,
+            "os": platform.system(),
+            "python": platform.python_version(),
+        }
+        atomic_write_json(output, refusal)
+        print(f"REFUSED {arguments.stage}: {exc}", file=sys.stderr)
+        for item in exc.required_metadata:
+            print(f"- required metadata: {item}", file=sys.stderr)
+        return 2
     except (CIValidationError, OSError) as exc:
+        message = str(exc)
+        required = ["Repair the manifest/registry contract reported by runner_errors before requesting tier evidence."]
+        if "unregistered=" in message:
+            required = [
+                "Add one exact tests entry with owner_surface, owner_shard, allowed_stages, cost_class, "
+                "budget_seconds, dependencies, and reason."
+            ]
+        elif "Unknown dependencies" in message:
+            required = [
+                "Add the missing generic path_mappings entry or correct the exact test dependencies list."
+            ]
+        refusal = {
+            "schema_version": 1, "contract_type": REFUSAL_TYPE, "stage": arguments.stage,
+            "head_sha": git_sha(), "base_sha": base_sha, "base_source": base_source,
+            "dirty_fingerprint": dirty_fingerprint(), "outcome": "refused",
+            "successful": False, "completed": True, "evidence_eligible": False,
+            "duration_seconds": round(time.perf_counter() - started, 6),
+            "runner_errors": [message], "required_metadata": required,
+            "os": platform.system(), "python": platform.python_version(),
+        }
+        atomic_write_json(output, refusal)
         print(f"FAIL validation router: {exc}", file=sys.stderr)
         return 2
 

@@ -21,6 +21,7 @@ from _common import (
     flatten_suite,
     git_sha,
     load_json,
+    load_mapping_registry,
     machine_inventory,
     repository_import_path,
     sha256_json,
@@ -103,6 +104,7 @@ def run_selected(
     manifest = load_json(manifest_path)
     all_ids, assignments, _ = validate_and_expand_manifest(manifest)
     inventory = machine_inventory(manifest)
+    registry = load_mapping_registry(manifest)
     head_before = git_sha()
     dirty_before = dirty_fingerprint()
     selection_plan: dict[str, Any] | None = None
@@ -116,6 +118,7 @@ def run_selected(
             ("head_sha", head_before),
             ("dirty_fingerprint", dirty_before),
             ("manifest_sha256", sha256_json(manifest)),
+            ("mapping_registry_sha256", sha256_json(registry)),
             ("inventory_sha256", inventory["inventory_sha256"]),
         ):
             if selection_plan.get(field) != actual:
@@ -143,8 +146,8 @@ def run_selected(
         selected_ids = expand_profile(manifest, profile, all_ids)
         shard_id = profile
         stage = profile
-        role = str(manifest[profile]["role"])
-        budget_seconds: float | None = float(manifest[profile]["budget_seconds"])
+        role = str(registry["stages"][profile]["role"])
+        budget_seconds: float | None = float(registry["stages"][profile]["budget_seconds"])
     else:
         if shard is None:
             raise CIValidationError("select exactly one of --shard, --profile, or --selection-plan")
@@ -218,14 +221,15 @@ def run_selected(
         "python": python_version,
         "shard": shard_id,
         "manifest_sha256": sha256_json(manifest),
+        "mapping_registry_sha256": sha256_json(registry),
         "inventory_sha256": inventory["inventory_sha256"],
         "test_source_sha256": test_source_hash,
         "selector_dependency_sha256": selector_dependency_hash,
         "relevant_tree_sha256": relevant_tree_hash,
-        "runner_version": manifest["routing"]["runner_version"],
+        "runner_version": registry["runner_version"],
         "environment_gates": {
             name: os.environ.get(name)
-            for name in manifest["routing"]["reuse"]["environment_gates"]
+            for name in registry["reuse"]["environment_gates"]
         },
         "orrery_test_build": os.environ.get("ORRERY_TEST_BUILD"),
         "selected_test_count": len(selected_ids),
@@ -284,7 +288,60 @@ def main() -> int:
                 print(f"- {item['test_id']}: {item['duration_seconds']}s", file=sys.stderr)
             print(payload["promotion_only_suggestion"], file=sys.stderr)
         return 0 if successful else 1
-    except CIValidationError as exc:
+    except KeyboardInterrupt:
+        failure = {
+            "schema_version": 2,
+            "contract_type": "orrery-test-shard-result-v2",
+            "role": "non-evidence-runner-failure",
+            "stage": arguments.profile or ("promotion" if arguments.shard else "selection-plan"),
+            "sha": git_sha(),
+            "head_sha": git_sha(),
+            "dirty_fingerprint": dirty_fingerprint(),
+            "shard": arguments.shard or arguments.profile or "selection-plan",
+            "selected_test_count": 0,
+            "selected_test_ids": [],
+            "records": [],
+            "tests_run": 0,
+            "successful": False,
+            "completed": False,
+            "evidence_eligible": False,
+            "outcome": "interrupted",
+            "duration_seconds": 0.0,
+            "timed_out": False,
+            "interrupted": True,
+            "runner_errors": ["shard runner was interrupted; no tier evidence is valid"],
+            "os": os.environ.get("RUNNER_OS", platform.system()),
+            "python": platform.python_version(),
+        }
+        atomic_write_json(arguments.output.resolve(), failure)
+        print("FAIL shard runner: interrupted; no tier evidence is valid", file=sys.stderr)
+        return 130
+    except (CIValidationError, OSError) as exc:
+        failure = {
+            "schema_version": 2,
+            "contract_type": "orrery-test-shard-result-v2",
+            "role": "non-evidence-runner-failure",
+            "stage": arguments.profile or ("promotion" if arguments.shard else "selection-plan"),
+            "sha": git_sha(),
+            "head_sha": git_sha(),
+            "dirty_fingerprint": dirty_fingerprint(),
+            "shard": arguments.shard or arguments.profile or "selection-plan",
+            "selected_test_count": 0,
+            "selected_test_ids": [],
+            "records": [],
+            "tests_run": 0,
+            "successful": False,
+            "completed": False,
+            "evidence_eligible": False,
+            "outcome": "runner-error",
+            "duration_seconds": 0.0,
+            "timed_out": False,
+            "interrupted": False,
+            "runner_errors": [str(exc)],
+            "os": os.environ.get("RUNNER_OS", platform.system()),
+            "python": platform.python_version(),
+        }
+        atomic_write_json(arguments.output.resolve(), failure)
         print(f"FAIL shard runner: {exc}", file=sys.stderr)
         return 2
 

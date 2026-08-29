@@ -44,7 +44,9 @@ def aggregate(
     all_ids, assignments, _ = validate_and_expand_manifest(manifest)
     lanes = promotion_lane_assignments(manifest)
     expected_manifest_hash = sha256_json(manifest)
-    expected_inventory_hash = machine_inventory(manifest)["inventory_sha256"]
+    routed_inventory = machine_inventory(manifest)
+    expected_inventory_hash = routed_inventory["inventory_sha256"]
+    expected_registry_hash = routed_inventory["mapping_registry_sha256"]
     payloads: list[dict[str, Any]] = []
     lane_payloads: list[dict[str, Any]] = []
     for path in sorted(results_dir.rglob("*.json")):
@@ -81,6 +83,8 @@ def aggregate(
             errors.append(f"lane {lane_id} OS mismatch: {payload.get('os')!r}")
         if payload.get("manifest_sha256") != expected_manifest_hash:
             errors.append(f"lane {lane_id} manifest hash mismatch")
+        if payload.get("mapping_registry_sha256") != expected_registry_hash:
+            errors.append(f"lane {lane_id} mapping registry hash mismatch")
         if payload.get("completed") is not True or payload.get("successful") is not True:
             errors.append(f"lane {lane_id} was incomplete or unsuccessful")
         expected_lane_shards = lanes.get(lane_id, [])
@@ -120,6 +124,8 @@ def aggregate(
             errors.append(f"shard {shard_id} OS mismatch: {payload.get('os')!r}")
         if payload.get("manifest_sha256") != expected_manifest_hash:
             errors.append(f"shard {shard_id} manifest hash mismatch")
+        if payload.get("mapping_registry_sha256") != expected_registry_hash:
+            errors.append(f"shard {shard_id} mapping registry hash mismatch")
         if payload.get("inventory_sha256") != expected_inventory_hash:
             errors.append(f"shard {shard_id} inventory hash mismatch")
         if payload.get("orrery_test_build") != "1":
@@ -175,6 +181,7 @@ def aggregate(
         "matrix_result": matrix_result,
         "gate_result": gate_result,
         "manifest_sha256": expected_manifest_hash,
+        "mapping_registry_sha256": expected_registry_hash,
         "inventory_sha256": expected_inventory_hash,
         "expected_shard_count": len(assignments),
         "artifact_shard_count": len(payloads),
