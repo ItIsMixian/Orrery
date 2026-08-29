@@ -1,11 +1,12 @@
 # 发布与工具链 State
 
-Updated: 2026-08-28
+Updated: 2026-08-29
 
 Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md)
 
 ## 当前事实
 
+- CI4 Worktree Candidate 只修复当前 CLI 测试／调用示例对 opaque confirmation token 的 argv 表达：apply 与 undo 使用 `--confirmation-token=<opaque-token>`，避免 `-` 开头值被 argparse 当作新 option。产品 CLI parser、Core token 生成／entropy／hash／storage、schema、confirmation／receipt／transaction 语义、组件版本、R3 brand allowlist、技术 ID、发布清单与 v0.2.0 均未改变；当前非历史调用点审计未发现测试外的分离 argv 用法。最终推广仍要求同一 exact SHA 的独立 Fast Windows／Ubuntu 与 Promotion 59-job Windows／Ubuntu required checks 全绿。
 - [ADR-0015 compatibility contract](../decisions/0015-orrery-brand-and-compatibility-contract.md) 已 Accepted，配套 Design 已 Approved。R3 Worktree Candidate 已将 allowlisted 当前 display name／description 收口为 Orrery；Skill frontmatter `name: project-orrery`、Plugin／Adapter canonical IDs、现有 CLI entrypoint、`project-orrery-*` distributions、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 和 credential/cache/backup namespaces 均未改变。没有增加 alias、复制实现、选择 SemVer、打包或发布；首个新 Release 仍必须使用 `project-orrery-*` asset filename。该 Candidate 尚未进入 `main`、Canonical 或 Release；R4/R5 未开始。
 - CI3 Candidate 只修复 `.github/workflows/fast-validation.yml` 的 fresh-runner setup 和 artifact 失败噪声：Fast 继续是 `non-promotion-feedback`，15 秒预算、51 项既有选择、无 `ORRERY_TEST_BUILD`、无 required smoke 名；Promotion workflow、27 shards、required checks、组件版本、branch protection、tag、Release 与 v0.2.0 均不变。最终推广证据仍要求同一 exact SHA 的独立 Fast Windows/Ubuntu 与 Promotion required Windows/Ubuntu 全绿。
 - Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/ItIsMixian/Orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。

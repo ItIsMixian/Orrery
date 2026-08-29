@@ -1,9 +1,10 @@
 # 跨会话交接
 
-Updated: 2026-08-28
+Updated: 2026-08-29
 
 ## 当前情况
 
+- CI4 Opaque CLI Token Argument Reliability 精确从 R3 `439c40f` 建立。R3 baseline Fast run `33231693802` Windows／Ubuntu 双 PASS；Promotion `33231693777` 仅 Ubuntu `team-relations-execution` 因随机 confirmation token 以 `-` 开头且测试使用分离 argv 而失败。CI4 只把 apply／undo 当前测试调用改为 `--confirmation-token=<opaque-token>`，增加确定性 leading-dash apply→undo 回归；不改产品 parser、token 生成／entropy／hash／storage、schema、protocol、receipt 或 R3 brand/technical/historical contract。本机 inventory 386／27／57／78，leading-dash 1/1、原失败流 1/1、W7B 5/5、W7A 15/15、brand 6/6、Fast 57/57（3.217789s／15s）、validator、integrated/repository（664／358／1002）/diff gates 通过。最终 clean exact SHA 仍须在 `promotion/ci4-opaque-cli-token-reliability` 取得独立 Fast 与 Promotion 59-job Windows／Ubuntu 全绿；hosted 结果只进入任务回执，不追加 docs-only commit。
 - CI3 Fast Validation Dependency Fix 精确从 W7D `e2c049e` 建立。外部停止门确认 Promotion run `33195264226` 在该 SHA 成功且 required Windows／Ubuntu 双 PASS；独立 Fast `33195264316` 双平台在 `validate_ci.py --all` final discovery 因缺 `mistune` 失败，Fast 未启动，随后必然缺失的 artifact 又产生次生错误。CI3 已在 Fast contract 前安装 Promotion 同源依赖、增加机械顺序回归，并仅在 timing JSON 存在时上传；本机 focused 13/13、inventory 379／27／51／72、validator、Fast 51/51（2.324s／15s）通过。Checkpoint 两次 72/72 assertion PASS 但 95.382s／98.320s 超 90s，保持 FAIL且未调预算/选择。最终 clean exact SHA 仍须独立 Fast 与 Promotion Windows／Ubuntu 全绿；hosted run/job/依赖安装/测试耗时只在任务回执报告，避免 docs-only SHA 循环。
 - W7D 唯一整合者精确从 CI2 `8b635b1` 建立非 `main` Candidate，只加法合入 W7C-B `d411fd6`；W7C-A 对应树已被 sibling 字节级吸收而未重复合入。组合版本为 Core 0.1.14／CLI 0.1.18／Observatory 0.1.9，schema-2 inventory 为 377 IDs／27 shards／51 Fast／70 Checkpoint。前三轮 hosted 分别定位并修复 preflight requirements、clean-runner／Authority／Windows path 与 aggregate requirements；exact `28f5fad` 的 run `33194655256` 已 59/59 jobs PASS，Windows／Ubuntu required checks 双 PASS，Candidate ready for maintainer-authorized main fast-forward。W7B 已实现本机 discovery／plan／确认／apply／recovery／receipt／undo，但 self-host apply、默认 UI 执行入口和公开发布未发生；W7C 图继续只读，中央 Team 没有执行权。唯一一次本地 W7B Promotion 的 4/4 断言成功但 311.803 秒超预算并保持 FAIL，未放宽或重跑；hosted W7B 则为 164 秒／23 秒双 PASS。完整证据以 [W7D Validation](validation/2026-08-28-w7d-w7-integration-candidate.md)为准。
 - 根文档系统已依据 ADR-0001 完成自托管集成；`.project-orrery.json` 应保持 `authority_status: integrated`。
@@ -50,6 +51,16 @@ Updated: 2026-08-28
 - W1.1／W1.2／W1.3、D1 与 C1 已按 W1→D1→C1 顺序进入 `origin/main`；本地联合 273 项回归通过，C1 fixture 行尾冻结为 LF。首次远端 `32564000587` 为 Ubuntu PASS／Windows FAIL；修复 session-path 短／长路径断言后，`32564334514` Windows／Ubuntu 双 PASS。没有创建 Pilot 010、tag 或 Release。
 - self-host GitHub main 已启用 Candidate-first branch protection：exact SHA 必须先在非 main 分支通过 Windows／Ubuntu checks，管理员也不能绕过；PR 不强制，main push 不重复运行同一 SHA。首次门禁验证使用 Candidate `e4e4442` 与 run `32566445483`。
 - CI1 已在 Candidate `codex/ci1-tiered-parallel-validation@67a2fe9` 完成本地 Worktree checkpoint：Fast／Promotion 分层、342 个最终 test ID 的 26 路唯一分片、exact-SHA 绑定、fail-closed 聚合器和 8/8 CI 专项均已本地验证。该 Candidate 尚未 push、尚未合入 `main`，也没有 hosted Windows／Ubuntu Promotion 结果；下一步仍是由唯一整合者执行 exact-SHA 远端晋级验证，不能写成 Canonical 已实现或性能目标已达成。
+
+## 未来交接（未启动）
+
+### S1 Orrery Conductor Skill（deferred / not started）
+
+- 独立仓库目标为 `ItIsMixian/orrery-conductor`，不进入 Orrery 仓库；尚未创建仓库、实现或 Release，后续必须另开 S1。
+- 初始布局拟为 `skills/orrery-conductor/SKILL.md`、`agents/openai.yaml` 与 focused references/tests。一个仓库可容纳多个相关 Skill，但首版只做一个。
+- 作用范围拟为中央会话的规划／编号／注册／监控／验收／fast-forward／cleanup；正式开发使用独立任务＋worktree，subagent 仅用于当前任务内部的有界工作。模型策略拟为正式任务 latest frontier high+，实验可使用项目指定经济模型／medium。
+- 责任目标拟将约 75–80% 的机械事实与执行交给 Harness／CLI，Agent 约 20–25% 处理 Unknown／语义／文档；Human 继续保留 ADR、module creation、relation apply、main、发布、删除与迁移权限。
+- 以上仅是未来交接输入：no implementation／no repository／no release yet，不构成 State、ADR、已实现能力或启动授权。
 
 ## 风险与常见陷阱
 

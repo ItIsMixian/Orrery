@@ -20,6 +20,7 @@ from project_orrery_core.workstream_relation_execution import (
     execute_apply_plan,
     inspect_execution_state,
     issue_local_confirmation,
+    issue_local_undo_confirmation,
     load_execution_receipt,
     recover_transaction,
 )
@@ -373,6 +374,99 @@ class WorkstreamRelationExecutionTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "another local project"):
                     issue_local_confirmation(other.root, plan, actor_id="maintainer")
 
+    def test_cli_apply_and_undo_accept_leading_dash_opaque_tokens(self) -> None:
+        with SuccessionGitFixture(topology="minimal") as fixture, tempfile.TemporaryDirectory(
+            prefix="orrery-w7b-leading-dash-token-"
+        ) as temporary:
+            scratch = Path(temporary)
+            plan, _successor = fixture.plan(include_dependency=False)
+            plan_path = scratch / "plan.json"
+            plan_path.write_text(json.dumps(plan), encoding="utf-8")
+            with mock.patch(
+                "project_orrery_core.workstream_relation_execution.secrets.token_urlsafe",
+                return_value="-leading-dash-apply-token",
+            ):
+                confirmation = issue_local_confirmation(
+                    fixture.root, plan, actor_id="maintainer", issued_at=PLAN_AT
+                )
+            self.assertTrue(confirmation["confirmation_token"].startswith("-"))
+
+            apply_stream = io.StringIO()
+            with contextlib.redirect_stdout(apply_stream):
+                self.assertEqual(
+                    relations_cli.main(
+                        [
+                            "apply",
+                            "--target",
+                            str(fixture.root),
+                            "--plan",
+                            str(plan_path),
+                            "--plan-id",
+                            plan["plan_id"],
+                            "--plan-hash",
+                            plan["plan_hash"],
+                            "--confirmation-id",
+                            confirmation["confirmation_id"],
+                            f"--confirmation-token={confirmation['confirmation_token']}",
+                            "--actor-id",
+                            "maintainer",
+                            "--occurred-at",
+                            APPLY_AT,
+                            "--json",
+                        ]
+                    ),
+                    0,
+                )
+            receipt = json.loads(apply_stream.getvalue())["data"]
+            undo_plan = build_execution_undo_plan(
+                fixture.root,
+                receipt,
+                actor_id="maintainer",
+                issued_at=PLAN_AT,
+                expires_at=EXPIRES_AT,
+            )
+            undo_plan_path = scratch / "undo.json"
+            undo_plan_path.write_text(json.dumps(undo_plan), encoding="utf-8")
+            with mock.patch(
+                "project_orrery_core.workstream_relation_execution.secrets.token_urlsafe",
+                return_value="-leading-dash-undo-token",
+            ):
+                undo_confirmation = issue_local_undo_confirmation(
+                    fixture.root, undo_plan, actor_id="maintainer", issued_at=PLAN_AT
+                )
+            self.assertTrue(undo_confirmation["confirmation_token"].startswith("-"))
+
+            undo_stream = io.StringIO()
+            with contextlib.redirect_stdout(undo_stream):
+                self.assertEqual(
+                    relations_cli.main(
+                        [
+                            "undo",
+                            "--target",
+                            str(fixture.root),
+                            "--undo-plan",
+                            str(undo_plan_path),
+                            "--execute",
+                            "--actor-id",
+                            "maintainer",
+                            "--plan-id",
+                            undo_plan["plan_id"],
+                            "--plan-hash",
+                            undo_plan["plan_hash"],
+                            "--confirmation-id",
+                            undo_confirmation["confirmation_id"],
+                            f"--confirmation-token={undo_confirmation['confirmation_token']}",
+                            "--occurred-at",
+                            UNDO_AT,
+                            "--json",
+                        ]
+                    ),
+                    0,
+                )
+            undo_receipt = json.loads(undo_stream.getvalue())["data"]
+            self.assertEqual(undo_receipt["operation"], "undo")
+            self.assertFalse(undo_receipt["history_deleted"])
+
     def test_full_topology_cli_apply_receipt_undo_and_legacy_discovery(self) -> None:
         with SuccessionGitFixture(topology="full") as fixture, tempfile.TemporaryDirectory(
             prefix="orrery-w7b-cli-"
@@ -548,8 +642,7 @@ class WorkstreamRelationExecutionTests(unittest.TestCase):
                             plan["plan_hash"],
                             "--confirmation-id",
                             confirmation["confirmation_id"],
-                            "--confirmation-token",
-                            confirmation["confirmation_token"],
+                            f"--confirmation-token={confirmation['confirmation_token']}",
                             "--actor-id",
                             "maintainer",
                             "--occurred-at",
@@ -653,8 +746,7 @@ class WorkstreamRelationExecutionTests(unittest.TestCase):
                             undo_data["plan"]["plan_hash"],
                             "--confirmation-id",
                             undo_confirmation["confirmation_id"],
-                            "--confirmation-token",
-                            undo_confirmation["confirmation_token"],
+                            f"--confirmation-token={undo_confirmation['confirmation_token']}",
                             "--occurred-at",
                             UNDO_AT,
                             "--json",

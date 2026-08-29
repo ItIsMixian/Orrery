@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-29 — CI4 Opaque CLI Token Argument Reliability Candidate
+
+- 精确从 R3 `439c40fe5347689d8616cc057812d9a6438ca116` 建立 `codex/ci4-opaque-cli-token-argument-reliability`，首次作者写入前注册 Git-private Workstream；primary 为 test-coverage，affected 为 release-and-toolchain、documentation-system、project-structure，并由本轮唯一整合者授权同步根 HANDOFF，不改 PROGRESS。
+- 只在 `tests/test_workstream_relation_execution.py` 的 apply／undo CLI 调用中使用单 argv `--confirmation-token=<opaque-token>`；新增确定性 leading-dash apply→undo 回归，分别固定 `-leading-dash-apply-token` 与 `-leading-dash-undo-token`。没有把 token 正文拼入 shell 命令，也没有修改产品 Core／CLI parser、token 生成／entropy／hash／storage、schema、协议或 receipt 语义。
+- 当前非历史代码／文档审计只发现产品 parser 声明与该测试的调用点；历史 Validation／DEVLOG／Pilot 命令保持原样。R3 brand contract 6/6 验证稳定 Python／CLI／Skill／Adapter ID、schema／历史 hash 与 brand allowlist 未漂移。
+- 本机 leading-dash 1/1、原失败流 1/1、W7B 5/5（501.427s）、W7A 15/15（30.959s）、Fast 57/57（3.217789s／15s）、inventory 386／27／57／78、CI validator、integrated validation、repository gate（664／358／1002）和 diff gate通过。R3 baseline Fast `33231693802` 双 PASS；Promotion `33231693777` 的 Ubuntu `team-relations-execution` 因随机 `-` 开头 token 的分离 argv 失败。CI4 exact-SHA hosted Fast／Promotion 结果在最终任务回执报告，不为其追加 docs-only commit。
+
 ## 2026-08-28 — R3 Orrery Brand-only Closeout Worktree Candidate
 
 - 精确从 clean `main@1e67d4ac7f18e11459417ff4e04eef0ce065b28b` 建立 `codex/r3-orrery-brand-only-closeout`，首次产品写入前注册同名 Git-private Workstream；primary 为 documentation-system，affected 为 project-structure、release-and-toolchain、test-coverage。普通功能分支未修改根 PROGRESS/HANDOFF。

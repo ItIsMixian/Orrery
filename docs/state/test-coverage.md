@@ -1,9 +1,10 @@
 # 测试覆盖 State
 
-Updated: 2026-08-28
+Updated: 2026-08-29
 
 ## 当前事实
 
+- CI4 Worktree Candidate 精确从 R3 `439c40f` 修复 opaque CLI confirmation token 的测试调用可靠性：apply／undo argv 统一使用单参数 `--confirmation-token=<opaque-token>`，并新增确定性 `-` 开头 token 的 apply→undo CLI 回归；没有修改 parser、`secrets.token_urlsafe`、entropy/hash/storage、schema、transaction/receipt 语义或品牌契约。机械 inventory 为 386 IDs／27 shards／57 Fast／78 Checkpoint；本机 leading-dash 1/1、原失败流 1/1、W7B 5/5、W7A 15/15、brand 6/6、Fast 57/57（3.217789s／15s）、CI validator、integrated validation、repository gate（664 paths／358 Markdown／1002 links）与 diff gate 通过。R3 baseline Fast run `33231693802` 双 PASS；Promotion `33231693777` 因 Ubuntu 随机 leading-dash token 的分离 argv 解析失败而红。CI4 final exact-SHA hosted Fast／Promotion 仍待非 `main` ref 验收，hosted 结果只进入任务回执，避免 docs-only SHA 循环。
 - R3 Worktree Candidate 新增 machine-readable brand contract 和 6 项专项断言，机械保护 current brand allowlist、目标项目标题占位符的可定制投影、稳定 Python／CLI／Skill／Adapter identity、8 份 schema hash、ADR／Design／v0.2 frozen evidence hash 和 `project-orrery-*` 首发资产模式。定向产品组合为 64 tests PASS + 2 expected dynamic-dependency skips；Fast inventory 为 385 IDs／27 shards／57 Fast／78 Checkpoint，Fast 57/57（2.980794s／15s）PASS。1280px 与 390×844 的默认站、Personal、Team、Graph 均显示 Orrery、零横向溢出、零 console warning/error，并保持 Personal zero-network、Team derived-read-only、Graph synthetic-non-authoritative／无执行入口。integrated installation、isolated docsite、repository gate（663 paths／357 Markdown／1001 links）和 diff gate 通过；exact-SHA Windows／Ubuntu Promotion 仍待唯一整合者在非 main ref 执行。
 - [R2 文档候选 Validation](../validation/2026-08-28-orrery-rename-decision-contract.md) 在 `main@2037cab` 上重算命名 inventory：655 tracked paths；`Project Orrery` 399/223、`project-orrery` 1,372/298、`project_orrery` 462/147、standalone `Orrery` 242/79（次数/文件）。冻结根为 163/92、528/136、104/53；14 个旧 slug schema `$id` 与 46 个 distinct `contract_type` 作为协议面保留。维护者接受 ADR/Design 后的收口仍是 docs-only：计数验证审计方法，不要求旧词归零，也不构成 R3 或 alias 实现测试。
 - R2 acceptance closeout 的 repository gate 为 660 paths／356 Markdown／998 links，安装结构门通过，`tests.test_project_orrery` 为 16 run／14 pass／2 expected skips，Fast 为 51/51、2.681523s／15s，diff 与 13-path docs-only 边界通过。该证据验证 Accepted ADR/Approved Design 的文档权威链，不是 R3 exact-SHA Promotion 证据。
