@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-orrery-maintenance-v2",
+  "title": "Project Orrery workspace maintenance contracts v2",
+  "type": "object",
+  "oneOf": [
+    {"$ref": "#/$defs/maintenance_policy"},
+    {"$ref": "#/$defs/maintenance_scan"},
+    {"$ref": "#/$defs/maintenance_queue_item"},
+    {"$ref": "#/$defs/maintenance_authorization"},
+    {"$ref": "#/$defs/maintenance_receipt"},
+    {"$ref": "#/$defs/maintenance_cache_entry"},
+    {"$ref": "#/$defs/maintenance_cache_registry_summary"}
+  ],
+  "$defs": {
+    "maintenance_policy": {
+      "type": "object",
+      "required": ["policy_version", "scan_on_observatory_start", "catch_up_after_hours", "worktree_count_threshold", "reclaim_threshold_mb", "integrated_grace_days", "local_branch_reminder_days", "auto_remove_eligible_worktrees", "ignored_allowlist"],
+      "properties": {
+        "policy_version": {"const": 1},
+        "scan_on_observatory_start": {"type": "boolean"},
+        "catch_up_after_hours": {"type": "integer", "minimum": 1},
+        "worktree_count_threshold": {"type": "integer", "minimum": 1},
+        "reclaim_threshold_mb": {"type": "integer", "minimum": 1},
+        "integrated_grace_days": {"type": "integer", "minimum": 0},
+        "local_branch_reminder_days": {"type": "integer", "minimum": 1},
+        "auto_remove_eligible_worktrees": {"const": false},
+        "ignored_allowlist": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "maintenance_scan": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "scan_id", "repository_identity", "integration_ref", "integration_oid", "inventory_schema_version", "inventory_content_hash", "trigger_reason", "started_at", "finished_at", "status", "counts", "writes_performed", "network_performed"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "maintenance-scan"},
+        "scan_id": {"type": "string", "pattern": "^maintenance-scan-[0-9a-f]{24}$"},
+        "repository_identity": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "integration_ref": {"type": "string", "minLength": 1},
+        "integration_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "inventory_schema_version": {"type": "integer", "minimum": 1},
+        "inventory_content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "trigger_reason": {"enum": ["integration-event", "closure-event", "observatory-catch-up", "manual"]},
+        "started_at": {"type": "string", "minLength": 1},
+        "finished_at": {"type": ["string", "null"]},
+        "status": {"enum": ["running", "succeeded", "failed", "timed-out", "interrupted", "debounced", "single-flight"]},
+        "error_category": {"type": ["string", "null"]},
+        "counts": {
+          "type": "object",
+          "properties": {
+            "worktrees": {"type": "integer", "minimum": 0},
+            "suggested": {"type": "integer", "minimum": 0},
+            "stale": {"type": "integer", "minimum": 0},
+            "unknown": {"type": "integer", "minimum": 0},
+            "estimated_reclaim_bytes": {"type": "integer", "minimum": 0},
+            "protected_reason_groups": {"type": "integer", "minimum": 0}
+            ,"cache_hits": {"type": "integer", "minimum": 0}
+            ,"target_provider_scans": {"type": "integer", "minimum": 0}
+            ,"fingerprint_changes": {"type": "integer", "minimum": 0}
+            ,"removed_cache_entries": {"type": "integer", "minimum": 0}
+            ,"integration_only_updates": {"type": "integer", "minimum": 0}
+            ,"duration_ms": {"type": "number", "minimum": 0}
+          },
+          "additionalProperties": false
+        },
+        "writes_performed": {"const": false},
+        "network_performed": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "maintenance_binding": {
+      "type": "object",
+      "required": ["workspace_id", "worktree_identity", "resolved_path", "git_dir", "head", "branch", "dirty_fingerprint", "workstream_id", "session_phase", "integration_oid", "inventory_content_hash", "closure_id", "review_package_id", "review_package_content_hash", "validation_refs_hash", "candidate_head", "tracked_changes", "untracked_paths", "ignored_paths_hash", "allowlisted_ignored_paths", "unique_commits", "evidence_hash"],
+      "properties": {
+        "workspace_id": {"type": "string", "minLength": 1},
+        "worktree_identity": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "resolved_path": {"type": "string", "minLength": 1},
+        "git_dir": {"type": "string", "minLength": 1},
+        "head": {"type": ["string", "null"]},
+        "branch": {"type": ["string", "null"]},
+        "dirty_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "workstream_id": {"type": ["string", "null"]},
+        "session_phase": {"type": ["string", "null"]},
+        "integration_oid": {"type": ["string", "null"]},
+        "inventory_content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "closure_id": {"type": ["string", "null"]},
+        "review_package_id": {"type": ["string", "null"]},
+        "review_package_content_hash": {"type": ["string", "null"]},
+        "validation_refs_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_head": {"type": ["string", "null"]},
+        "tracked_changes": {"type": "array", "items": {"type": "string"}},
+        "untracked_paths": {"type": "array", "items": {"type": "string"}},
+        "ignored_paths_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "allowlisted_ignored_paths": {"type": "array", "items": {"type": "string"}},
+        "unique_commits": {"type": "array", "items": {"type": "string"}},
+        "evidence_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "maintenance_queue_item": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "item_id", "lifecycle", "action", "workspace_id", "workspace_path", "binding", "eligible", "reasons", "unknown", "created_at", "earliest_execute_at", "expiration_conditions", "authority"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "maintenance-queue-item"},
+        "item_id": {"type": "string", "pattern": "^maintenance-item-[0-9a-f]{24}$"},
+        "lifecycle": {"enum": ["suggested", "authorized", "executing", "verified", "failed", "stale"]},
+        "action": {"const": "remove-worktree"},
+        "workspace_id": {"type": "string", "minLength": 1},
+        "workspace_path": {"type": "string", "minLength": 1},
+        "binding": {"$ref": "#/$defs/maintenance_binding"},
+        "eligible": {"type": "boolean"},
+        "reasons": {"type": "array", "items": {"type": "string"}},
+        "unknown": {"type": "array", "items": {"type": "string"}},
+        "created_at": {"type": "string", "minLength": 1},
+        "earliest_execute_at": {"type": "string", "minLength": 1},
+        "expiration_conditions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "authority": {"const": "git-private-suggestion"},
+        "stale_reason": {"type": "string", "minLength": 1},
+        "stale_scan_id": {"type": "string", "pattern": "^maintenance-scan-[0-9a-f]{24}$"}
+      },
+      "additionalProperties": false
+    },
+    "maintenance_authorization": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "authorization_id", "item_id", "action", "actor_id", "actor_kind", "authorized_at", "evidence_hash", "status", "execution_performed"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "maintenance-authorization"},
+        "authorization_id": {"type": "string", "pattern": "^maintenance-authorization-[0-9a-f]{24}$"},
+        "item_id": {"type": "string", "pattern": "^maintenance-item-[0-9a-f]{24}$"},
+        "action": {"const": "remove-worktree"},
+        "actor_id": {"type": "string", "minLength": 1},
+        "actor_kind": {"const": "human"},
+        "authorized_at": {"type": "string", "minLength": 1},
+        "evidence_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "status": {"enum": ["authorized", "executing", "verified", "failed", "stale", "interrupted"]},
+        "execution_performed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "maintenance_receipt": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "receipt_id", "authorization_id", "item_id", "action", "started_at", "finished_at", "outcome", "preflight", "postflight", "execution_performed", "branch_deleted", "remote_branch_deleted", "network_performed"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "maintenance-receipt"},
+        "receipt_id": {"type": "string", "pattern": "^maintenance-receipt-[0-9a-f]{24}$"},
+        "authorization_id": {"type": "string", "minLength": 1},
+        "item_id": {"type": "string", "minLength": 1},
+        "action": {"const": "remove-worktree"},
+        "started_at": {"type": "string", "minLength": 1},
+        "finished_at": {"type": ["string", "null"]},
+        "outcome": {"enum": ["executing", "verified", "failed", "stale", "interrupted", "unknown"]},
+        "preflight": {
+          "type": "object",
+          "properties": {
+            "evidence_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "eligible": {"type": "boolean"},
+            "registered": {"type": "boolean"},
+            "locked_or_process_use": {"type": "boolean"},
+            "path_exists": {"type": "boolean"},
+            "exact_registered_path": {"type": "boolean"},
+            "branch": {"type": ["string", "null"]},
+            "head": {"type": ["string", "null"]},
+            "reasons": {"type": "array", "items": {"type": "string"}},
+            "session_archive": {"type": "object"}
+          },
+          "additionalProperties": false
+        },
+        "postflight": {
+          "type": "object",
+          "properties": {
+            "git_exit_code": {"type": ["integer", "null"]},
+            "path_absent": {"type": "boolean"},
+            "registry_absent": {"type": "boolean"},
+            "branch_retained": {"type": "boolean"},
+            "commit_retained": {"type": "boolean"},
+            "stderr_category": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "execution_performed": {"type": "boolean"},
+        "branch_deleted": {"const": false},
+        "remote_branch_deleted": {"const": false},
+        "network_performed": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "maintenance_cache_entry": {
+      "type": "object",
+      "required": ["cache_schema_version", "contract_type", "repository_identity", "workspace_id", "worktree_identity", "registered_path", "resolved_path", "git_dir", "head", "branch", "fingerprint", "session_hash", "closure_hash", "review_hash", "integration_ref", "integration_oid", "policy_hash", "maintenance_schema_version", "cleanup_schema_version", "tool_version", "scanned_at", "refresh_reason", "integration_sensitive", "cleanup"],
+      "properties": {
+        "cache_schema_version": {"const": 1},
+        "contract_type": {"const": "maintenance-cache-entry"},
+        "repository_identity": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "workspace_id": {"type": "string", "pattern": "^workspace-[0-9a-f]{24}$"},
+        "worktree_identity": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "registered_path": {"type": "string", "minLength": 1},
+        "resolved_path": {"type": "string", "minLength": 1},
+        "git_dir": {"type": "string", "minLength": 1},
+        "head": {"type": ["string", "null"]},
+        "branch": {"type": ["string", "null"]},
+        "fingerprint": {"type": "object"},
+        "session_hash": {"type": ["string", "null"]},
+        "closure_hash": {"type": ["string", "null"]},
+        "review_hash": {"type": ["string", "null"]},
+        "integration_ref": {"type": "string", "minLength": 1},
+        "integration_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "policy_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "maintenance_schema_version": {"type": "integer", "minimum": 1},
+        "cleanup_schema_version": {"type": "integer", "minimum": 1},
+        "tool_version": {"type": "string", "minLength": 1},
+        "scanned_at": {"type": "string", "minLength": 1},
+        "refresh_reason": {"type": "string", "minLength": 1},
+        "integration_sensitive": {"type": "boolean"},
+        "cleanup": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "maintenance_cache_registry_summary": {
+      "type": "object",
+      "required": ["cache_schema_version", "contract_type", "repository_identity", "integration_ref", "integration_oid", "policy_hash", "maintenance_schema_version", "cleanup_schema_version", "tool_version", "generated_at", "registry_hash", "status", "entries", "metrics"],
+      "properties": {
+        "cache_schema_version": {"const": 1},
+        "contract_type": {"const": "maintenance-cache-registry-summary"},
+        "repository_identity": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "integration_ref": {"type": "string", "minLength": 1},
+        "integration_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "policy_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "maintenance_schema_version": {"type": "integer", "minimum": 1},
+        "cleanup_schema_version": {"type": "integer", "minimum": 0},
+        "tool_version": {"type": "string", "minLength": 1},
+        "generated_at": {"type": "string", "minLength": 1},
+        "registry_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "status": {"enum": ["current", "stale-unknown"]},
+        "entries": {"type": "array", "items": {"type": "object"}},
+        "metrics": {"type": "object"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

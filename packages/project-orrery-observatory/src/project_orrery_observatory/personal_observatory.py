@@ -1445,6 +1445,7 @@ MAINTENANCE_OBSERVATORY_CSS = r"""
 .mo-signals{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}.mo-signals>div{padding:14px 18px;background:var(--bg2)}.mo-signals small{display:block;color:var(--mut);font-size:9px}.mo-signals b{display:block;margin-top:5px;font-size:15px}
 .mo-actions{display:flex;flex-wrap:wrap;gap:8px;padding:14px 24px;border-bottom:1px solid var(--line)}.mo-button{appearance:none;border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:var(--fg);padding:9px 12px;font:700 10px/1.2 inherit;cursor:pointer}.mo-button:hover:not(:disabled){border-color:var(--mo-green);color:var(--mo-green)}.mo-button:disabled{opacity:.4;cursor:not-allowed}.mo-button.danger{color:var(--mo-red)}
 .mo-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.75fr)}.mo-main,.mo-side{padding:20px 24px;min-width:0}.mo-side{border-left:1px solid var(--line);background:var(--bg2)}.mo-section+.mo-section{margin-top:22px}.mo-section h3{margin:0 0 9px;font-size:13px}.mo-item{border-top:1px solid var(--line);padding:12px 0}.mo-item-head{display:flex;justify-content:space-between;gap:12px}.mo-item b{font-size:11.5px}.mo-item code{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis}.mo-item p{margin:5px 0;color:var(--mut);font-size:10px}.mo-item-actions{display:flex;gap:7px;margin-top:9px}.mo-reason{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:8px 0;font-size:10px}.mo-policy{display:grid;grid-template-columns:1fr auto;gap:7px;font-size:10px}.mo-policy span{color:var(--mut)}.mo-history>summary{cursor:pointer;font-size:11px}.mo-empty,.mo-notice{color:var(--mut);font-size:10.5px;padding:11px 0}.mo-notice{padding:10px 24px;border-top:1px solid var(--line)}.mo-notice.error{color:var(--mo-red)}
+.mo-cache-state{font:700 9px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}.mo-cache-state.current{color:var(--mo-green)}.mo-cache-state.stale{color:var(--mo-amber)}.mo-cache-state.unknown{color:var(--mo-red)}.mo-progress{height:2px;background:var(--line);overflow:hidden}.mo-progress.running::after{content:"";display:block;width:38%;height:100%;background:var(--mo-green);animation:mo-scan 1.1s ease-in-out infinite alternate}@keyframes mo-scan{from{transform:translateX(-30%)}to{transform:translateX(220%)}}
 .mo-boundaries{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.mo-boundaries>div{padding:13px 18px;background:var(--bg2)}.mo-boundaries b{display:block;font-size:11px}.mo-boundaries span{display:block;margin-top:4px;color:var(--mut);font-size:9.5px}
 @media(max-width:850px){.mo-signals{grid-template-columns:1fr 1fr}.mo-grid{grid-template-columns:1fr}.mo-side{border-left:0;border-top:1px solid var(--line)}}
 @media(max-width:640px){.mo-shell{margin:0 -18px 24px;border-left:0;border-right:0;border-radius:0}.mo-head{grid-template-columns:1fr;padding:18px}.mo-boundary{justify-self:start}.mo-signals>div,.mo-actions,.mo-main,.mo-side,.mo-notice{padding-left:18px;padding-right:18px}.mo-boundaries{grid-template-columns:1fr}.mo-button{min-height:40px}.mo-item-head{display:block}}
@@ -1461,37 +1462,45 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
     queue = [item for item in maintenance.get("queue", []) if isinstance(item, Mapping)]
     authorizations = [item for item in maintenance.get("authorizations", []) if isinstance(item, Mapping)]
     auth_by_item = {str(item.get("item_id")): item for item in authorizations}
+    cache = maintenance.get("cache") if isinstance(maintenance.get("cache"), Mapping) else {}
+    cache_entries = [item for item in cache.get("entries", []) if isinstance(item, Mapping)]
     items = []
-    for item in queue:
-        authorization = auth_by_item.get(str(item.get("item_id")))
-        action = ""
-        if item.get("lifecycle") == "suggested":
-            action = '<label class="mo-select"><input type="checkbox" data-maintenance-select="%s"%s> 选择</label><button class="mo-button" type="button" data-maintenance-authorize="%s"%s>本机确认移除 worktree</button>' % (_esc(item.get("item_id")), "" if control else " disabled", _esc(item.get("item_id")), "" if control else " disabled")
-        elif authorization and authorization.get("status") == "authorized":
-            action = '<button class="mo-button danger" type="button" data-maintenance-execute="%s"%s>执行 remove-worktree</button>' % (_esc(authorization.get("authorization_id")), "" if control else " disabled")
-        items.append(
-            '<div class="mo-item" data-maintenance-item="%s"><div class="mo-item-head"><b>%s</b><span>%s</span></div><code>%s</code><p>最早执行 %s · branch 将保留</p><div class="mo-item-actions">%s</div></div>'
-            % (_esc(item.get("item_id")), _esc(item.get("workspace_id")), _esc(item.get("lifecycle")), _esc(item.get("workspace_path")), _esc(item.get("earliest_execute_at")), action)
+    for entry in cache_entries:
+        state = str(entry.get("cache_state", "unknown"))
+        primary = bool(entry.get("is_primary_worktree"))
+        action = (
+            '<button class="mo-button danger" type="button" data-maintenance-preflight="%s">移除工作区</button>'
+            % _esc(entry.get("workspace_id"))
+            if control and not primary
+            else '<span class="mo-empty">%s</span>' % ("主工作区受保护" if primary else "只读")
         )
-    queue_html = "".join(items) or '<div class="mo-empty">当前没有满足全部门禁与缓冲期的 remove-worktree 建议。</div>'
+        reason = " · ".join(map(str, entry.get("reasons") or entry.get("unknown") or [])) or "last-known evidence available"
+        items.append(
+            '<div class="mo-item" data-maintenance-workspace="%s"><div class="mo-item-head"><b>%s</b><span class="mo-cache-state %s">%s</span></div><code>%s</code><p>%s · 扫描 %s</p><div class="mo-item-actions">%s</div></div>'
+            % (_esc(entry.get("workspace_id")), _esc(entry.get("branch") or entry.get("workspace_id")), _esc(state), _esc(state), _esc(entry.get("registered_path")), _esc(reason), _esc(entry.get("scanned_at") or "Unknown"), action)
+        )
+    queue_html = "".join(items) or '<div class="mo-empty">缓存尚未建立；现有页面保持可用，但所有目标均为 Unknown，先启动后台增量扫描。</div>'
     protected = maintenance.get("protected_reasons") if isinstance(maintenance.get("protected_reasons"), Mapping) else {}
     protected_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(reason), _esc(count)) for reason, count in sorted(protected.items())) or '<div class="mo-empty">没有已记录的受保护原因；未扫描不等于可清理。</div>'
     policy = maintenance.get("policy") if isinstance(maintenance.get("policy"), Mapping) else {}
     policy_html = "".join('<span>%s</span><b>%s</b>' % (_esc(key), _esc(value)) for key, value in policy.items() if key != "ignored_allowlist")
     receipts = [item for item in maintenance.get("receipts", []) if isinstance(item, Mapping)]
     branch_reminders = [item for item in maintenance.get("local_branch_reminders", []) if isinstance(item, Mapping)]
+    background = maintenance.get("background_refresh") if isinstance(maintenance.get("background_refresh"), Mapping) else {}
+    background_status = str(background.get("status", "idle"))
+    api_base = str(maintenance.get("api_base", "/team/api/maintenance"))
     history_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(item.get("receipt_id")), _esc(item.get("outcome"))) for item in receipts[-8:]) or '<div class="mo-empty">尚无执行 receipt。</div>'
     return (
-        '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s">'
+        '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s" data-maintenance-api-base="%s">'
         '<section class="mo-shell"><header class="mo-head"><div><span class="mo-kicker">WORKSPACE MAINTENANCE · LOCAL ONLY</span><h2>工作区维护</h2><p>定时发现不等于自动删除。建议、授权和执行分离；本阶段只支持本机确认后的 remove-worktree。</p></div><span class="mo-boundary">PERSONAL ZERO-NETWORK · BRANCH 保留</span></header>'
-        '<div class="mo-signals"><div><small>最近扫描</small><b data-maintenance-scan-status>%s</b></div><div><small>worktrees</small><b data-maintenance-worktrees>%s</b></div><div><small>需要确认</small><b data-maintenance-suggestions>%s</b></div><div><small>预计空间</small><b data-maintenance-reclaim>%s</b></div></div>'
-        '<div class="mo-actions"><button class="mo-button" type="button" data-maintenance-scan%s>立即只读扫描</button><button class="mo-button" type="button" data-maintenance-authorize-selected%s>批量确认所选（仅授权）</button><span class="mo-empty">24h 启动补查 · single-flight · 无 scheduler</span></div>'
+        '<div class="mo-signals"><div><small>缓存状态</small><b data-maintenance-cache-status>%s</b></div><div><small>worktrees</small><b data-maintenance-worktrees>%s</b></div><div><small>后台刷新</small><b data-maintenance-background>%s</b></div><div><small>预计空间</small><b data-maintenance-reclaim>%s</b></div></div><div class="mo-progress %s" aria-hidden="true"></div>'
+        '<div class="mo-actions"><button class="mo-button" type="button" data-maintenance-scan%s>后台增量扫描</button><span class="mo-empty">请求线程不等待 · target-scoped preflight · 无 scheduler</span></div>'
         '<div class="mo-boundaries"><div><b>worktree</b><span>仅 evidence-bound 本机确认后可移除</span></div><div><b>local branch</b><span>%s 个到期提醒；本阶段不执行删除</span></div><div><b>remote branch</b><span>零网络，不观察、不删除</span></div></div>'
-        '<div class="mo-grid"><main class="mo-main"><section class="mo-section"><h3>需要你确认</h3><div data-maintenance-queue>%s</div></section><section class="mo-section"><h3>受保护／Unknown 原因</h3><div data-maintenance-protected>%s</div></section></main>'
+        '<div class="mo-grid"><main class="mo-main"><section class="mo-section"><h3>已登记 worktree · cache rail</h3><div data-maintenance-queue>%s</div></section><section class="mo-section"><h3>受保护／Unknown 原因</h3><div data-maintenance-protected>%s</div></section></main>'
         '<aside class="mo-side"><section class="mo-section"><h3>策略</h3><div class="mo-policy">%s</div></section><section class="mo-section"><details class="mo-history"><summary>授权与执行历史</summary>%s</details></section></aside></div>'
         '<div class="mo-notice" data-maintenance-notice>%s</div></section></article>'
         % (
-            "true" if control else "false", _esc(last.get("status", maintenance.get("status", "unavailable"))), _esc(counts.get("worktrees", "Unknown")), _esc(counts.get("suggested", len(queue))), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "" if control else " disabled", "" if control and any(item.get("lifecycle") == "suggested" for item in queue) else " disabled", _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；每个动作都将重新验证。" if control else "静态只读视图；请使用 root-only 本机动态入口进行确认。",
+            "true" if control else "false", _esc(api_base), _esc(cache.get("status", "Unknown")), _esc(len(cache_entries) if cache_entries else counts.get("worktrees", "Unknown")), _esc(background_status), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "running" if background_status in {"pending", "running"} else "", "" if control else " disabled", _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；Quick Remove 会先做最新 target preflight，只删除 worktree，保留 branch/commit。" if control else "静态只读视图；请使用 root-only 本机动态入口进行确认。",
         )
     )
 
@@ -1500,16 +1509,36 @@ MAINTENANCE_OBSERVATORY_JS = r"""
 (function(){
  const page=document.getElementById('workspace-maintenance');if(!page||page.dataset.maintenanceControl!=='true')return;
  const notice=page.querySelector('[data-maintenance-notice]');
- async function api(path,body){const response=await fetch(path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(body||{})});const value=await response.json();if(!response.ok)throw new Error(value.error||'本机维护操作失败');return value}
- page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;let operations=[];
-   if(button.hasAttribute('data-maintenance-scan'))operations=[['/team/api/maintenance/scan',{}]];
-   else if(button.hasAttribute('data-maintenance-authorize-selected')){operations=Array.from(page.querySelectorAll('[data-maintenance-select]:checked')).map(input=>['/team/api/maintenance/authorize',{item_id:input.dataset.maintenanceSelect,action:'remove-worktree'}]);if(!operations.length){notice.className='mo-notice error';notice.textContent='请先选择至少一个当前建议。';return}}
-   else if(button.dataset.maintenanceAuthorize)operations=[['/team/api/maintenance/authorize',{item_id:button.dataset.maintenanceAuthorize,action:'remove-worktree'}]];
-   else if(button.dataset.maintenanceExecute){if(!window.confirm('仅移除此 linked worktree；local branch 与 commit 将保留。继续？'))return;operations=[['/team/api/maintenance/execute',{authorization_id:button.dataset.maintenanceExecute}]]}
-   else return;
-   button.disabled=true;notice.className='mo-notice';notice.textContent='正在执行本机维护步骤；不会删除 branch。';try{for(const [path,body] of operations)await api(path,body);notice.textContent='本机维护步骤已完成，正在刷新 evidence-bound 状态。';window.location.reload()}catch(error){notice.className='mo-notice error';notice.textContent=error.message;button.disabled=false}});
+ const base=page.dataset.maintenanceApiBase;
+ async function api(path,body){const response=await fetch(base+path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(body||{})});const value=await response.json();if(!response.ok)throw new Error(value.error||'本机维护操作失败');return value}
+ async function status(){const response=await fetch(base+'/status',{headers:{'Accept':'application/json'}});const value=await response.json();if(!response.ok)throw new Error(value.error||'状态读取失败');return value}
+ async function waitForRefresh(){for(let attempt=0;attempt<120;attempt++){const value=await status();const state=value.maintenance.background_refresh.status;if(!['pending','running'].includes(state))return state;await new Promise(resolve=>setTimeout(resolve,500))}return 'timed-out'}
+ page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;
+   button.disabled=true;notice.className='mo-notice';
+   try{
+    if(button.hasAttribute('data-maintenance-scan')){notice.textContent='后台增量扫描已排队；页面请求线程没有等待全量扫描。';await api('/scan',{});const state=await waitForRefresh();notice.textContent='后台刷新 '+state+'，正在载入最新缓存。';window.location.reload();return}
+    if(button.dataset.maintenancePreflight){notice.textContent='正在对单个已登记目标做最新 preflight；不会扫描其他 worktree。';const value=await api('/preflight',{target_id:button.dataset.maintenancePreflight});const result=value.preflight;if(!result.eligible){throw new Error('目标受保护：'+(result.reasons||result.unknown||['Unknown']).join(' · '))}if(!window.confirm('只删除 worktree，保留 branch/commit。确认移除这个工作区？')){button.disabled=false;notice.textContent='已取消；没有执行删除。';return}notice.textContent='已确认。正在再次验证目标并移除 worktree；branch/commit 将保留。';const removed=await api('/quick-remove',{item_id:result.item.item_id});if(removed.receipt.outcome!=='verified')throw new Error('Quick Remove '+removed.receipt.outcome);notice.textContent='工作区已移除；branch/commit 保留。后台增量刷新已启动。';window.location.reload();return}
+   }catch(error){notice.className='mo-notice error';notice.textContent=error.message;button.disabled=false}});
 })();
 """
+
+
+def render_maintenance_control_document(
+    maintenance: Mapping[str, Any],
+    *,
+    api_base: str = "/control/api/maintenance",
+) -> str:
+    """Render the cache-first root-only Maintenance console without a W3 page scan."""
+    projection = dict(maintenance)
+    projection["control_available"] = True
+    projection["api_base"] = api_base
+    panel = _maintenance_panel({"maintenance": projection})
+    return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orrery · 工作区维护</title><style>
+:root{color-scheme:dark;--bg:#101516;--bg2:#151c1e;--bg3:#1c2527;--fg:#edf4f1;--mut:#91a19c;--line:#2d3a3b;--acc:#63d6cf}
+*{box-sizing:border-box}html,body{margin:0;min-width:0;background:var(--bg);color:var(--fg);font-family:"IBM Plex Sans","Segoe UI",sans-serif}body{padding:28px}.control-mast{max-width:1180px;margin:0 auto 14px;display:flex;justify-content:space-between;gap:18px;align-items:end}.control-mast small{color:var(--acc);font:700 10px/1.3 "Cascadia Code",Consolas,monospace;letter-spacing:.12em}.control-mast h1{margin:5px 0 0;font-size:18px}.control-mast span{color:var(--mut);font-size:10px}.control-wrap{max-width:1180px;margin:auto}.page{display:block!important}.page.wide{max-width:none}.mo-shell{box-shadow:0 18px 55px rgba(0,0,0,.2)}button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}@media(max-width:640px){body{padding:12px}.control-mast{align-items:start;flex-direction:column}.control-wrap{margin:0 -12px}.control-wrap .mo-shell{margin:0}}
+""" + MAINTENANCE_OBSERVATORY_CSS + """</style></head><body><header class="control-mast"><div><small>ORRERY / LOCAL CONTROL</small><h1>Git-private Maintenance Console</h1></div><span>127.0.0.1 · root-only · zero external network</span></header><main class="control-wrap">""" + panel + """</main><script>""" + MAINTENANCE_OBSERVATORY_JS + """</script></body></html>"""
 
 
 def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:

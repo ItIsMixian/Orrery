@@ -56,8 +56,10 @@ from project_orrery_core.team import (
 from project_orrery_core.maintenance import (
     authorize_maintenance_item,
     execute_maintenance_authorization,
+    execute_quick_remove_item,
     maintenance_status,
-    run_maintenance_scan,
+    quick_remove_preflight,
+    request_background_maintenance_refresh,
 )
 from project_orrery_observatory.team_observatory import inject_team_observatory, safe_json
 
@@ -338,9 +340,14 @@ class TeamUIHandler(BaseHTTPRequestHandler):
                 expected = {"item_id", "action"}
             elif self.path == "/team/api/maintenance/execute":
                 expected = {"authorization_id"}
+            elif self.path == "/team/api/maintenance/preflight":
+                expected = {"target_id"}
+            elif self.path == "/team/api/maintenance/quick-remove":
+                expected = {"item_id"}
             body = self._body(expected)
             root = self.server.state.project_root
             maintenance_action = self.path.startswith("/team/api/maintenance/")
+            maintenance_payload: Mapping[str, Any] | None = None
             if self.path == "/team/api/enable":
                 enable_team(root, member_id="local-owner", device_id="local-device", host_id="local-host")
             elif self.path == "/team/api/disable":
@@ -406,9 +413,17 @@ class TeamUIHandler(BaseHTTPRequestHandler):
                     decision=decision, reason=f"{decision}ed in Host-local Team Observatory",
                 )
             elif self.path == "/team/api/maintenance/scan":
-                result = run_maintenance_scan(root, reason="manual")
-                if result["scan"]["status"] not in {"succeeded", "debounced"}:
-                    raise ValueError("maintenance scan did not complete")
+                request_background_maintenance_refresh(root, reason="manual")
+            elif self.path == "/team/api/maintenance/preflight":
+                maintenance_payload = {
+                    "preflight": quick_remove_preflight(root, target_id=str(body["target_id"]))
+                }
+            elif self.path == "/team/api/maintenance/quick-remove":
+                maintenance_payload = execute_quick_remove_item(
+                    root,
+                    item_id=str(body["item_id"]),
+                    actor_id="local-owner",
+                )
             elif self.path == "/team/api/maintenance/authorize":
                 authorize_maintenance_item(
                     root,
@@ -425,7 +440,7 @@ class TeamUIHandler(BaseHTTPRequestHandler):
                 return
             if maintenance_action:
                 self.server.state.refresh_page()
-            payload = {"maintenance": maintenance_status(root)} if maintenance_action else self.server.state.public_status()
+            payload = maintenance_payload or ({"maintenance": maintenance_status(root)} if maintenance_action else self.server.state.public_status())
             self._json(HTTPStatus.OK, payload)
         except PermissionError as error:
             self._error(HTTPStatus.FORBIDDEN, error)

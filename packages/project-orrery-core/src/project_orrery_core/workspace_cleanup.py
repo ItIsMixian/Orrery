@@ -10,7 +10,7 @@ import datetime as dt
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from .collaboration import inspect_worktree_status, resolve_integration_oid, validate_collaboration_contract
+from .collaboration import resolve_integration_oid, validate_collaboration_contract
 from .review import (
     _common_git_dir,
     _directory_size,
@@ -192,6 +192,7 @@ def _git_observation(path: Path, expected_common: Path) -> dict[str, Any]:
             "available": False,
             "same_common_dir": False,
             "toplevel": None,
+            "git_dir": None,
             "common_dir": None,
             "head": None,
             "branch": None,
@@ -199,12 +200,25 @@ def _git_observation(path: Path, expected_common: Path) -> dict[str, Any]:
             "untracked_paths": [],
             "ignored_paths": [],
         }
-    top = _git(path, "rev-parse", "--show-toplevel", check=False)
-    if top.returncode:
+    identity = _git(
+        path,
+        "rev-parse",
+        "--show-toplevel",
+        "--path-format=absolute",
+        "--git-common-dir",
+        "--absolute-git-dir",
+        "HEAD",
+        "--symbolic-full-name",
+        "HEAD",
+        check=False,
+    )
+    identity_lines = str(identity.stdout).splitlines() if not identity.returncode else []
+    if len(identity_lines) != 5:
         return {
             "available": False,
             "same_common_dir": False,
             "toplevel": None,
+            "git_dir": None,
             "common_dir": None,
             "head": None,
             "branch": None,
@@ -212,45 +226,48 @@ def _git_observation(path: Path, expected_common: Path) -> dict[str, Any]:
             "untracked_paths": [],
             "ignored_paths": [],
         }
-    toplevel = Path(str(top.stdout).strip()).absolute()
-    common_result = _git(path, "rev-parse", "--path-format=absolute", "--git-common-dir", check=False)
-    head_result = _git(path, "rev-parse", "HEAD", check=False)
-    branch_result = _git(path, "symbolic-ref", "-q", "HEAD", check=False)
+    toplevel = Path(identity_lines[0]).absolute()
     status_result = _git(
-        path, "status", "--porcelain=v1", "-z", "--untracked-files=all", binary=True, check=False
-    )
-    ignored_result = _git(
-        path, "ls-files", "--others", "-i", "--exclude-standard", "-z", binary=True, check=False
+        path,
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all",
+        "--ignored=matching",
+        binary=True,
+        check=False,
     )
     status_raw = status_result.stdout if isinstance(status_result.stdout, bytes) else b""
     tracked: list[str] = []
     untracked: list[str] = []
+    ignored: list[str] = []
     for item in status_raw.split(b"\0"):
         if not item:
             continue
         decoded = item.decode("utf-8", errors="surrogateescape")
         target = decoded[3:].replace("\\", "/") if len(decoded) >= 3 else decoded
-        if decoded.startswith("?? "):
+        if decoded.startswith("!! "):
+            ignored.append(target)
+        elif decoded.startswith("?? "):
             untracked.append(target)
         else:
             tracked.append(target)
-    ignored_raw = ignored_result.stdout if isinstance(ignored_result.stdout, bytes) else b""
-    ignored = sorted(
-        item.decode("utf-8", errors="surrogateescape").replace("\\", "/")
-        for item in ignored_raw.split(b"\0")
-        if item
-    )
-    common = Path(str(common_result.stdout).strip()).absolute() if not common_result.returncode else None
+    common = Path(identity_lines[1]).absolute()
+    git_dir = Path(identity_lines[2]).absolute()
+    head = identity_lines[3].strip().lower()
+    symbolic_head = identity_lines[4].strip()
+    branch = symbolic_head if symbolic_head.startswith("refs/") else None
     return {
-        "available": not head_result.returncode,
-        "same_common_dir": common is not None and _norm(common) == _norm(expected_common),
+        "available": bool(re.fullmatch(r"[0-9a-f]{40}", head)),
+        "same_common_dir": _norm(common) == _norm(expected_common),
         "toplevel": str(toplevel),
+        "git_dir": str(git_dir) if git_dir is not None else None,
         "common_dir": str(common) if common is not None else None,
-        "head": str(head_result.stdout).strip().lower() if not head_result.returncode else None,
-        "branch": str(branch_result.stdout).strip() if not branch_result.returncode else None,
+        "head": head,
+        "branch": branch,
         "tracked_changes": sorted(set(tracked)),
         "untracked_paths": sorted(set(untracked)),
-        "ignored_paths": ignored,
+        "ignored_paths": sorted(set(ignored)),
     }
 
 
@@ -266,6 +283,7 @@ def inventory_workspaces(
     classifications: Mapping[str, str] | None = None,
     retained_paths: Sequence[str | os.PathLike[str]] = (),
     recovery_paths: Sequence[str | os.PathLike[str]] = (),
+    selected_workspace_ids: Sequence[str] = (),
 ) -> dict[str, Any]:
     """Inventory only bounded Git/config/user paths; never scan sibling prefixes or a whole disk."""
     root = _repository_root(project_root)
@@ -277,7 +295,17 @@ def inventory_workspaces(
     recovery = [*policy["recovery_paths"], *(_absolute(root, item) for item in recovery_paths)]
     credential_cache = list(policy["credential_cache_paths"])
     explicit_classifications = _classification_map(root, classifications)
-    worktrees = _worktree_records(root)
+    all_worktrees = _worktree_records(root)
+    selected_ids = set(selected_workspace_ids)
+    if any(not re.fullmatch(r"workspace-[0-9a-f]{24}", item) for item in selected_ids):
+        raise ValueError("selected workspace ID is invalid")
+    if selected_ids and candidate_paths:
+        raise ValueError("selected workspace inventory does not accept arbitrary candidate paths")
+    by_id = {_entry_id(Path(str(item["path"]))): item for item in all_worktrees}
+    missing_ids = selected_ids - set(by_id)
+    if missing_ids:
+        raise ValueError("selected workspace ID is not a registered worktree")
+    worktrees = [by_id[item] for item in sorted(selected_ids)] if selected_ids else all_worktrees
     closures = _closure_records(root)
     candidates: dict[str, dict[str, Any]] = {}
 
@@ -298,7 +326,11 @@ def inventory_workspaces(
         add(_absolute(root, value), "explicit-user-candidate")
     for closure in closures:
         original = closure.get("original_workspace_path")
-        if isinstance(original, str) and original:
+        if (
+            isinstance(original, str)
+            and original
+            and (not selected_ids or _entry_id(Path(original)) in selected_ids)
+        ):
             add(Path(original), "git-private-closure", closure=closure)
 
     registered_paths = {_norm(Path(str(item["path"]))) for item in worktrees}
@@ -322,13 +354,15 @@ def inventory_workspaces(
         session_state = "absent"
         if git["available"] and git["same_common_dir"] and path.is_dir():
             try:
-                status = inspect_worktree_status(path)
-            except ValueError:
+                session_path = Path(str(git["git_dir"])) / "orrery" / "worktree.json"
+                if session_path.exists():
+                    session = _read_regular_json(session_path, description="Git-private Workstream session")
+                    validate_collaboration_contract(session)
+                    if session.get("contract_type") != "workstream-session":
+                        raise ValueError("Git-private Workstream session has the wrong contract type")
+                    session_state = "current"
+            except (OSError, ValueError):
                 session_state = "unreadable"
-            else:
-                session_state = str(status["session"]["state"])
-                if isinstance(status["session"].get("record"), Mapping):
-                    session = dict(status["session"]["record"])
         if closure is None and session is not None:
             matches = [
                 item for item in closures if item.get("workstream_id") == session.get("workstream_id")
@@ -394,7 +428,7 @@ def inventory_workspaces(
             recommendation = "retain-evidence"
         else:
             recommendation = "evaluate-cleanup-eligibility"
-        estimated = _directory_size(path) if path_safe and path.is_dir() else None
+        estimated = _directory_size(path) if not selected_ids and path_safe and path.is_dir() else None
         entries.append(
             {
                 "workspace_id": _entry_id(path),
@@ -453,6 +487,7 @@ def inventory_workspaces(
             "explicit_workspace_roots": [str(_absolute(root, item)) for item in workspace_roots],
             "explicit_candidate_paths": [str(_absolute(root, item)) for item in candidate_paths],
             "recursive_disk_or_prefix_discovery": False,
+            "selected_registered_workspace_ids": sorted(selected_ids),
         },
         "writes_performed": False,
         "network_performed": False,
@@ -476,7 +511,8 @@ def _authorization_id(
 def compute_workspace_cleanup_eligibility(
     project_root: Path,
     *,
-    workspace_path: str | os.PathLike[str],
+    workspace_path: str | os.PathLike[str] | None = None,
+    workspace_id: str | None = None,
     package: str | Path | None = None,
     workspace_roots: Sequence[str | os.PathLike[str]] = (),
     classifications: Mapping[str, str] | None = None,
@@ -491,15 +527,30 @@ def compute_workspace_cleanup_eligibility(
     if unsupported:
         raise ValueError(f"unsupported cleanup authorization action: {unsupported[0]}")
     root = _repository_root(project_root)
-    selected_path = _absolute(root, workspace_path)
-    inventory = inventory_workspaces(
-        root,
-        workspace_roots=workspace_roots,
-        candidate_paths=[selected_path],
-        classifications=classifications,
-        retained_paths=retained_paths,
-        recovery_paths=recovery_paths,
-    )
+    if (workspace_path is None) == (workspace_id is None):
+        raise ValueError("cleanup eligibility requires exactly one workspace path or registered workspace ID")
+    if workspace_id is not None:
+        inventory = inventory_workspaces(
+            root,
+            workspace_roots=workspace_roots,
+            classifications=classifications,
+            retained_paths=retained_paths,
+            recovery_paths=recovery_paths,
+            selected_workspace_ids=[workspace_id],
+        )
+        if len(inventory["entries"]) != 1:
+            raise ValueError("registered workspace inventory did not produce exactly one selected entry")
+        selected_path = Path(str(inventory["entries"][0]["path"]))
+    else:
+        selected_path = _absolute(root, workspace_path)
+        inventory = inventory_workspaces(
+            root,
+            workspace_roots=workspace_roots,
+            candidate_paths=[selected_path],
+            classifications=classifications,
+            retained_paths=retained_paths,
+            recovery_paths=recovery_paths,
+        )
     matches = [item for item in inventory["entries"] if _norm(Path(item["path"])) == _norm(selected_path)]
     if len(matches) != 1:
         raise ValueError("workspace inventory did not produce exactly one selected entry")
@@ -530,7 +581,13 @@ def compute_workspace_cleanup_eligibility(
         unknown.extend(f"untracked:{item}" for item in git["untracked_paths"])
     ignored = list(git["ignored_paths"])
     allowlisted_ignored = [
-        item for item in ignored if any(_path_matches(item, pattern) for pattern in ignored_allowlist)
+        item
+        for item in ignored
+        if any(
+            _path_matches(item, pattern)
+            or (item.endswith("/") and _path_matches(item + "__orrery_ignored_probe__", pattern))
+            for pattern in ignored_allowlist
+        )
     ]
     sensitive = [item for item in ignored if _sensitive_ignored(item)]
     unknown_ignored = sorted(set(ignored) - set(allowlisted_ignored) | set(sensitive))

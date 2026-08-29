@@ -694,9 +694,12 @@ class PersonalObservatoryTests(unittest.TestCase):
 
         binding = {
             "workspace_id": "workspace-1",
+            "worktree_identity": "0" * 64,
             "resolved_path": "C:/fixture/worktree",
+            "git_dir": "C:/fixture/repo/.git/worktrees/fixture",
             "head": "1" * 40,
             "branch": "refs/heads/codex/fixture",
+            "dirty_fingerprint": "9" * 64,
             "workstream_id": "W6",
             "session_phase": "closed",
             "integration_oid": "2" * 40,
@@ -722,13 +725,39 @@ class PersonalObservatoryTests(unittest.TestCase):
             "protected_reasons": {"primary-worktree": 1, "unknown:reparse": 1},
             "policy": {"integrated_grace_days": 7, "auto_remove_eligible_worktrees": False},
             "receipts": [],
+            "cache": {
+                "status": "current",
+                "entries": [{
+                    "workspace_id": "workspace-1",
+                    "registered_path": "C:/fixture/worktree",
+                    "branch": "refs/heads/codex/fixture",
+                    "cache_state": "current",
+                    "scanned_at": "2026-08-29T00:00:00Z",
+                    "reasons": [],
+                    "unknown": [],
+                    "is_primary_worktree": False,
+                }, {
+                    "workspace_id": "workspace-unknown",
+                    "registered_path": "C:/fixture/unknown",
+                    "branch": "refs/heads/codex/unknown",
+                    "cache_state": "stale",
+                    "scanned_at": "2026-08-28T00:00:00Z",
+                    "reasons": ["target-refresh-failed"],
+                    "unknown": ["cache-corrupt"],
+                    "is_primary_worktree": False,
+                }],
+            },
+            "background_refresh": {"status": "idle"},
         }
         dynamic = inject_personal_observatory(base, _ready_projection(maintenance=maintenance))
         self.assertIn('data-maintenance-control="true"', dynamic)
-        self.assertIn("批量确认所选（仅授权）", dynamic)
-        self.assertIn('data-maintenance-authorize="maintenance-item-', dynamic)
+        self.assertIn("后台增量扫描", dynamic)
+        self.assertIn('data-maintenance-preflight="workspace-1"', dynamic)
+        self.assertIn("cache rail", dynamic)
+        self.assertIn('class="mo-cache-state stale">stale</span>', dynamic)
         self.assertIn("受保护／Unknown 原因", dynamic)
         self.assertIn("window.confirm", dynamic)
+        self.assertIn("只删除 worktree，保留 branch/commit", dynamic)
 
     def test_unavailable_projection_renders_stable_fallback(self):
         projection = unavailable_personal_observatory_projection(
