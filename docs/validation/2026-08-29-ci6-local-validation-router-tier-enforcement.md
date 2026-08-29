@@ -8,7 +8,7 @@ Fact scope: Worktree Candidate `codex/ci6-local-validation-router-tier-enforceme
 ## Generic controls
 
 - Machine inventory: 397 unique exact unittest IDs, 27 complete Promotion shards and ten complete physical lanes;
-  81 global Fast and 89 global Checkpoint IDs. Every entry has owner surface/shard, allowed stages, cost class,
+  81 global Fast and 82 global Checkpoint IDs. Every entry has owner surface/shard, allowed stages, cost class,
   budget, generic dependencies and a reason. The manifest contains no wildcard selector policy.
 - Production `scripts/ci` Python/config/guide files contain no W6.1 task ID, source branch or fixed portfolio switch.
   The only 24-ID W6.1 list is test data in `tests/fixtures/ci-validation/change-portfolios-v1.json`.
@@ -49,6 +49,11 @@ Fact scope: Worktree Candidate `codex/ci6-local-validation-router-tier-enforceme
 Three earlier Checkpoint attempts failed closed inside the new test at 51.601s, 66.457s and 70.636s while aligning
 the test with existing public trigger/signature/return-field contracts. None timed out, removed a worktree or produced
 valid tier evidence. Their failure receipts remain Git-private history; only the final PASS may be cited.
+
+One generic-registry Checkpoint at `dc27c2095926f024a315505bbbc84b3ab75711fa` timed out and failed closed after
+92.134014s because seven unrelated Workstream-relation medium journeys shared the coarse collaboration dependency.
+Their data-only `allowed_stages` metadata was corrected to Promotion; the revised current-diff Checkpoint contains
+exactly one medium test, the minimal-Git incremental refresh plus target-only preflight helper.
 
 ## Receipt and reuse boundary
 

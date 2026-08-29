@@ -5862,8 +5862,6 @@
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",
       "allowed_stages": [
-        "checkpoint",
-        "candidate",
         "promotion"
       ],
       "cost_class": "medium",
@@ -5895,8 +5893,6 @@
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",
       "allowed_stages": [
-        "checkpoint",
-        "candidate",
         "promotion"
       ],
       "cost_class": "medium",
@@ -5911,8 +5907,6 @@
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",
       "allowed_stages": [
-        "checkpoint",
-        "candidate",
         "promotion"
       ],
       "cost_class": "medium",
@@ -5927,8 +5921,6 @@
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",
       "allowed_stages": [
-        "checkpoint",
-        "candidate",
         "promotion"
       ],
       "cost_class": "medium",
@@ -5960,8 +5952,6 @@
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",
       "allowed_stages": [
-        "checkpoint",
-        "candidate",
         "promotion"
       ],
       "cost_class": "medium",
@@ -6027,8 +6017,6 @@
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",
       "allowed_stages": [
-        "checkpoint",
-        "candidate",
         "promotion"
       ],
       "cost_class": "medium",
@@ -6060,8 +6048,6 @@
       "owner_surface": "Team/LAN",
       "owner_shard": "team-lan-core",
       "allowed_stages": [
-        "checkpoint",
-        "candidate",
         "promotion"
       ],
       "cost_class": "medium",
