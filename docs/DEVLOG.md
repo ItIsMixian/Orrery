@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-29 — SC1 Canonical State Closeout
+
+- 只读对账确认 `main = origin/main = 9ee831f`，主工作树 clean；CI5 Fast `33235942078` 与 Promotion `33235992711` 均成功，Promotion 为 25/25 jobs、双平台各 390 tests／27 shards、23.9 lane job-min 和约 40% derived overhead，同一 SHA 已进入 protected main。
+- 从 clean main 建立独立 `codex/sc1-canonical-state-closeout` worktree；本轮只收口 AGENTS、PROGRESS、HANDOFF、四份 subsystem State、相关 Plan 状态、CI5 Validation、DEVLOG 与索引，不修改产品代码、组件版本、release manifest、branch protection、tag 或 Release。
+- PROGRESS／HANDOFF 恢复为当前控制入口，逐次历史继续链接 DEVLOG／Validation；R3、W5C、W5E、W7D、CI3、CI5 不再以等待 Promotion 的 Candidate 表述，W6 明确为 Phase 0–2 Canonical／Phase 3–4 未实现。
+- 本机旧 Workstream session 的 lifecycle 与 Git ancestry 不一致被保留为单独协调问题；Git-private retirement 不冒充 W3 integrated closure，物理 worktree／branch 删除不属于作者文档提交。
+
 ## 2026-08-29 — CI5 Promotion Throughput Optimization Candidate
 
 - 在 CI4 exact `a4b0ed3` Fast 2/2、Promotion 59/59 双平台通过并 fast-forward `origin/main` 后，从该 Canonical 基线建立 D 盘独立 `codex/ci5-promotion-throughput` worktree，登记 Git-private `CI5-promotion-throughput-optimization`；不另开任务，不修改产品组件。

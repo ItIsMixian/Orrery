@@ -71,9 +71,9 @@
 
 **ID**: `multi-worktree-collaboration`
 
-**What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅和干净集成。
-**Truth**: Git branch／HEAD／worktree 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；W1–W3 提供 worktree/session、Scope/finding、review/integration/closure/cleanup；W4 health 把 current blocker、reconciliation 与 workspace hygiene 分离；W5A/W5B 提供显式 opt-in Team foundation 和 root-only loopback Team Observatory。只有 containing ref 为 `main` 时这些候选才是 Canonical；自动发现与真实多机验证尚未实现。
-**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
+**What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅、干净集成、维护和显式接续关系。
+**Truth**: Git branch／HEAD／worktree 与 Git-private 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；W1–W7 已进入 Canonical source，覆盖 session、Scope/finding、review/integration/cleanup、Personal／Team、maintenance、LAN discovery／manual Host switch、relation execution 和只读 Graph。默认 consumer、真实 self-host apply、真实双机、自动选主、云 relay、自动删除和 scheduler 尚未实现或启用。
+**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0014](docs/decisions/0014-dynamic-workstream-succession-contract.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
 
 ## context-routing research
 

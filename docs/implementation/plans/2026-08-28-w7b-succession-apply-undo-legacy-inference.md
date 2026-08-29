@@ -1,6 +1,6 @@
 # 实施计划：W7B Succession Apply／Undo／Legacy Inference
 
-Status: Completed Candidate Plan
+Status: Completed; implementation is contained in Canonical W7/CI5 descendants
 
 Date: 2026-08-28
 

@@ -1,7 +1,7 @@
 # Workspace Maintenance 与定时清理实施计划
 
 Date: 2026-08-27
-Status: Phase 0–2 implemented in `codex/w6-workspace-maintenance` Candidate；Phase 3／4 未开始，Promotion 待中央验证
+Status: Phase 0–2 implemented and contained in Canonical main；Phase 3／4 未开始
 Suggested task code: W6（仅在正式注册实现任务时生效）
 Governing decisions: [ADR-0007](../../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)
 Approved design: [Multi-worktree collaboration protocol — 集成后的保守清理](../../design/multi-worktree-collaboration-protocol.md#集成后的保守清理)

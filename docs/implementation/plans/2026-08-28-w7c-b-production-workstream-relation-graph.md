@@ -1,6 +1,6 @@
 # 实施计划：W7C-B Production Workstream Relation Graph Observatory
 
-Status: Completed Worktree Candidate
+Status: Completed; implementation is contained in Canonical W7/CI5 descendants
 
 Date: 2026-08-28
 

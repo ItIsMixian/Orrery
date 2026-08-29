@@ -2,7 +2,7 @@
 
 Date: 2026-08-29
 
-Status: Worktree Candidate local validation PASS; exact-SHA hosted Fast／Promotion pending
+Status: PASS; exact-SHA hosted Fast／Promotion and Canonical main integration complete
 
 Fact scope: `codex/ci5-promotion-throughput`, based on Canonical
 `main@a4b0ed333b1e1ad001610c74b77f6e09da639301`.
@@ -62,17 +62,16 @@ remains an advisory observation because runner queue and host load are external 
 A complete local Promotion is intentionally not repeated: the new execution topology itself must be accepted by one
 clean exact-SHA hosted Windows／Ubuntu run.
 
-## Hosted acceptance and stop boundary
+## Hosted acceptance
 
-The final clean Candidate must first obtain independent Fast Windows／Ubuntu PASS. It must then be pushed to a frozen
-non-`main` `promotion/**` ref and obtain all 25 expected Promotion jobs, both repository gates and required
-`smoke-test (windows-latest)`／`smoke-test (ubuntu-latest)` PASS on the same exact SHA. Aggregation must still report
-all 27 logical shards and every discovered test exactly once per OS.
+- Candidate Fast run `33235942078` passed on exact `9ee831f0d6f64306fe821f8c70229df54648d3eb`.
+- Frozen ref `promotion/ci5-promotion-throughput-optimization` ran Promotion `33235992711`: 25/25 jobs PASS,
+  both repository gates PASS, `smoke-test (windows-latest)` and `smoke-test (ubuntu-latest)` PASS.
+- Each OS aggregate reported `390 tests across 27 shards`; all ten lane receipts per OS were present and valid.
+- Hosted wall time was 3m56s. Twenty lane jobs consumed 23.9 job-minutes; lane test execution consumed
+  14.352 minutes, so derived orchestration overhead was about 40%. Both advisory targets were met.
+- The exact SHA was fast-forwarded to protected `main`; main Fast run `33236225082` passed. Branch protection
+  remained strict with the same required contexts. No tag, Release, component version or public support claim changed.
 
-Hosted evidence will report wall time, total shard/lane job-minutes, test-step time and overhead in the task receipt;
-it will not create a docs-only successor SHA. Targets are no more than 27 total jobs, less than 30 lane job-minutes
-and less than 45% lane-job overhead. Missing a performance target is evidence for follow-up, not permission to hide
-a test failure, relax a safety budget or rerun until green.
-
-This Workstream does not advance `main`, modify branch protection, select impact-based partial Promotion, publish a
-Release or delete prior branches／worktrees／evidence.
+Earlier local measurements and all failed／superseded runs remain historical evidence. The successful hosted run
+closes CI5 acceptance but does not authorize impact-based partial Promotion or cross-SHA result reuse.

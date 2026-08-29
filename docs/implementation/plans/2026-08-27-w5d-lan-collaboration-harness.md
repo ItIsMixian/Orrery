@@ -1,6 +1,6 @@
 # 实施计划：W5D 局域网协作闭环与验收 Harness
 
-Status: Completed (Candidate checkpoint)
+Status: Completed; implementation is contained in Canonical W7/CI5 descendants
 
 Date: 2026-08-27
 

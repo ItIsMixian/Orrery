@@ -89,7 +89,7 @@ ADR-0013 已选择两个独立平台范围；任何一项完成都不能自动�
 - [x] 经单独授权启动最少显式／隐式候选 turn；真实 runtime init 均发现 Plugin／Skill，但本机无登录态，
   在模型请求前以 `authentication_failed` 停止，0 token／0 cost。
 - [ ] 经单独授权后，以最少真实 turn 验证显式／隐式调用和失败路径。
-- [x] 完整 runtime 证据门通过后，只把精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围标为 `verified`；Adapter 发行仍为 `experimental`／`unreleased`。
+- [ ] 认证可用并完成完整 Claude runtime 证据门后，只把精确 Claude／Windows／组件／模型与生命周期范围标为 `verified`；Adapter 发行仍为 `experimental`／`unreleased`。
 
 ### Phase 4B：DeepSeek Harness Profile Plugin Adapter
 
@@ -101,7 +101,7 @@ ADR-0013 已选择两个独立平台范围；任何一项完成都不能自动�
   `skill-catalog`／`skill-invocation`，隐式候选形成 catalog，但两者因无 API Key 在模型请求处失败。
 - [x] 经单独授权后，以最少 headless turn 验证显式／隐式调用和 CLI 缺失／不兼容失败路径；普通 wheel
   的 source-assets 定位失败随后已修复，并以非 editable wheel 真实复验通过。
-- [ ] 只有完整 runtime 证据门通过后，才把精确范围标为 `verified`。
+- [x] 完整 runtime 证据门通过后，只把精确 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／模型与生命周期范围标为 `verified`；Adapter 发行仍为 `experimental`／`unreleased`。
 
 Stage A 只允许隔离目录、无真实 API Key、无模型调用；Stage B 写真实用户目录、使用真实登录态或发起
 模型 turn 前必须在当前对话取得明确确认。

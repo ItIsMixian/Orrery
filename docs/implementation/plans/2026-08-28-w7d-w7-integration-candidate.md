@@ -1,6 +1,6 @@
 # 实施计划：W7D W7 Integration Candidate
 
-Status: Complete; exact-SHA Windows/Ubuntu Promotion passed; maintainer-authorized main fast-forward remains external
+Status: Completed; exact-SHA Promotion passed and verified descendants are contained in Canonical main
 
 Date: 2026-08-28
 

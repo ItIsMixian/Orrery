@@ -1,7 +1,7 @@
 # W5C Team Observatory 信息架构重构
 
 Date: 2026-08-27
-Status: Active Worktree Plan
+Status: Completed; implementation is contained in Canonical W7/CI5 descendants
 Base: `6266a448a3c45345734478de9e26b7ab15ff52cd`
 Governing decisions: [ADR-0007](../../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)
 Approved design: [Multi-worktree collaboration protocol](../../design/multi-worktree-collaboration-protocol.md)

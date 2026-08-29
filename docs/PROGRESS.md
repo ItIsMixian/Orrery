@@ -4,75 +4,60 @@ Updated: 2026-08-29
 
 ## 当前阶段
 
-Orrery v0.2.0 是当前公开版本；`origin/main@a4b0ed3` 已在其后集成平台中立 Core／CLI／Observatory、Codex／Harness JSON／Claude Code／DeepSeek Harness Adapter、Broker-only docsite、W1–W7 协作 source、Authority Meta Model M1／M2 和 R3 display-brand closeout。所有后续能力仍是 Canonical source、`experimental`／`unreleased` 实现，没有形成新的公开 Release。
-
-当前工作集中在六条相互独立的线路。详细历史进入 [DEVLOG](DEVLOG.md)，可复现证据进入 [Validation](validation/README.md)，这里仅保留当前控制面。
+Orrery v0.2.0 仍是当前公开版本。Canonical source 为
+`origin/main@9ee831f0d6f64306fe821f8c70229df54648d3eb`：它已经包含平台中立
+Core／CLI／Observatory、四个 Adapter、Broker-only docsite、Authority Meta Model M1／M2、
+W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能力仍为
+`experimental`／`unreleased` 源码，不等于新的公开 Release。
 
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
-| Authority Meta Model | 模型 1、Core evaluator、完整内部 CLI claims、root-only opt-in Observatory projection 与本地 release-candidate gate 已进入 Canonical source baseline；默认 production consumer 和公开 release 未切换 | 审阅 managed consumer 的 production switch 与回滚证据，再由维护者选择真实 SemVer／candidate manifest |
-| 多 Workstream 协作 | W1–W7、Personal/Team Observatory、workspace maintenance、relation execution 与只读 Graph 已随 CI4 exact `a4b0ed3` 进入 Canonical source；self-host apply、默认 UI 执行入口和公开发布仍未发生 | 后续先做真实 self-host read-only／dry-run 验收；任何 apply 仍需单独本机确认，中央 Team 不获得执行权 |
-| 验证基础设施 | CI5 Worktree Candidate 保留完整 27-shard／双平台 Promotion，以十个物理 lane/OS 减少约 62% 的重复 setup 开销；本机 Fast 与两次 Checkpoint 已通过 | 冻结一个 clean exact SHA，先取得 Fast 双平台，再运行新 25-job Promotion；只报告真实成本，不为数字调预算或重跑 |
-| Context routing 研究 | C1 Oracle v0.2 无模型静态 controls 已通过；只有 Pilot 010 设计申请 readiness，没有运行授权或 treatment 采纳 | 由维护者决定是否注册 C2 设计任务；不得自动创建／运行 Pilot 010 |
-| 平台与 Adapter | Claude／DeepSeek Adapter 0.1.0 均已实现但未发布；Claude 被认证阻断，DeepSeek 只有 rc.8／Windows／Core 0.1.0／CLI 0.1.1 wheel／指定模型和生命周期范围为 `verified` | Claude 只在另行授权且认证可用时继续；DeepSeek 后续工作转向独立发行与更多 runtime matrix，不外推当前证据 |
-| 文档治理 | D1 已冻结内部只读 finding schema、11 条规则与 11 组正负 fixture；所有 finding 非权威且默认 advisory | 另行设计 D2 scanner／CLI；不自动修复、压缩 HANDOFF 或启用硬门 |
+| Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
+| 多 Workstream 协作 | W1–W7、Personal／Team Observatory、maintenance、relation execution 与只读 Graph 已进入 Canonical source；默认页面仍不启用这些 root-only 控制面 | 先做 self-host read-only／dry-run 与 lifecycle/closure 对账；任何 apply、删除或成员本机执行仍逐次确认 |
+| Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
+| 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
+| 文档治理 | D1 已冻结只读 finding contract、规则 registry 与 synthetic fixture；当前没有 `docs audit` 产品入口 | 维护者另行决定是否启动 D2 scanner／CLI；不自动改写 Markdown 或启用长度硬门 |
 
 ## 当前结论
 
-- 公开事实仍以 v0.2.0 Release 为准；本地 Canonical 实现、runtime-verified 范围与 released 能力必须分别表达。
-- Authority Model 1 已由 self-host 项目显式选择，但公开 v0.2.0 项目仍是 `legacy-unversioned`；普通工具升级不得替用户选择模型。
-- Authority M2 的 `candidate_ready` 不等于 `release_ready`：缺少默认 managed consumer 的 production evidence 和维护者选择的实际发布版本。
-- 多 Agent source 已推进到 W7 并进入 Canonical `main@a4b0ed3`：W7B 在隔离 Git fixture 中实现 discovery／plan／本机人类确认／apply／recovery／receipt／undo，W7C-B 只读图不接执行按钮，中央 Team 仍无执行权。真实 self-host apply、默认 UI 执行入口、真实多机、云 relay、多设备迁移和公开发布均未发生。
-- Context-routing 的 H1、H2、B 和 S 均未通过各自采纳门；发布 Skill 不强制 Agent 生成 Context Manifest、Selected Evidence 或访问回执。
-- Broker-only docsite 已统一模型调用入口，但同一 OS 用户下的本机托管只提供路由、缓存和预算门，不构成 Provider Key 的进程隔离。
-- 文档治理与 Authority Meta Model 分层：治理 finding 只是非权威观察，长度／密度只触发人工审查，不能单独使文档失效或自动改写作者内容。
+- CI5 exact SHA `9ee831f` 已完成 Fast 与 Promotion：Promotion run `33235992711` 为 25/25 jobs PASS，Windows／Ubuntu 均聚合 390 tests／27 logical shards；同一 SHA 已进入受保护 `main`。十 lane 合计 23.9 job-min，测试步骤 14.352 分钟，派生 overhead 约 40%，达到冻结目标。
+- self-host branch protection 继续要求 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`，并对管理员生效。普通 `main` push 只运行 Fast，不重复 Promotion。
+- Authority M2 的 `candidate_ready` 不等于 `release_ready`；公开 v0.2.0 manifest 仍不声明模型 1。
+- 协作源码已经 Canonical，但真实 self-host relation store 仍缺正式 native event／closure；Graph 的 legacy session 投影与产品能力不能混写。
+- 当前 display brand 为 Orrery；`project-orrery` Skill／distribution／CLI／schema／协议与 v0.2.0 资产继续作为稳定技术或历史标识保留。
+- Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
 
 ## 活动计划与待办
 
-- [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：只推进 production consumer 采纳与实际 release 选择；在此之前不导出稳定 Core API，也不发布模型 1 支持声明。
-- [x] [W7D Integration Candidate Plan](implementation/plans/2026-08-28-w7d-w7-integration-candidate.md)：exact-SHA Windows／Ubuntu required checks 已通过，并随 CI4 verified descendant 进入 `main`。
-- [x] [CI3 Fast Validation Dependency Fix](implementation/plans/2026-08-28-ci3-fast-validation-dependency-fix.md)：已随 CI4 exact `a4b0ed3` 的独立 Fast 与 Promotion 双平台全绿进入 `main`。
-- [ ] [CI5 Promotion Throughput Optimization](implementation/plans/2026-08-29-ci5-promotion-throughput-optimization.md)：本机 lane／aggregate／Fast／Checkpoint／repository gates 已通过；仍需 clean exact-SHA hosted Fast 与新 25-job Promotion。
-- [ ] [Context-routing 研究 State](state/context-routing-research.md)：C1 静态 controls 已完成；C2/Pilot 010 设计尚未获批，更没有模型运行授权。
-- [ ] [平台 Phase 4](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)：DeepSeek 的精确 runtime 门已完成；Claude 的成功认证／模型路由仍未完成，两个 Adapter 的独立发行和更广矩阵均未开始。
-- [ ] [文档治理 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)：D1 contract／fixture 已完成；下一步需另行批准 D2 只读 scanner／CLI，HANDOFF 专项压缩仍须人工复核。
-- [ ] 跨平台 byte-for-byte archive 一致性和 benchmark R1 自动脱敏导出继续延期，不阻塞上述近期检查点。
-
-## Blockers / risks
-
-- Authority：M2.2 只有 root-only opt-in 证据；M2.3 不会自动选择版本，`release_ready` 仍为 false。
-- 协作：linked worktree 隔离索引和工作目录，但当前没有 OS 级路径沙箱；越界写入仍依赖工作目录纪律和整合审阅发现。
-- CI5：本机分级结果不能替代 exact-SHA hosted Windows／Ubuntu；十 lane 拓扑必须证明仍汇聚 27 个逻辑 shard 和全部 test ID。墙钟时间受 runner 排队影响，只能作为观测指标。
-- Context routing：Pilot 009 只覆盖三个任务、一个模型和一个 runtime；成本方向不能替代 3/3 质量门。
-- 发布：v0.2.0 ZIP checksum 有效，但 Windows／Linux 从同一 tag 重建仍非 byte-for-byte 一致。
-- 凭据：Broker client token 仍能在模型白名单和预算内产生调用；同用户托管不能宣称秘密隔离。
-- 研究证据：仓库外 raw evidence 已封存但没有自动 R1 导出器；不得把原始运行、凭据或本机路径批量复制进 Git。
+- [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
+- [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：Phase 5 self-host／发布未完成；真实多机、云 relay 与自动选主也不在当前支持范围。
+- [ ] [Workspace Maintenance Plan](implementation/plans/2026-08-27-workspace-maintenance-and-scheduled-cleanup.md)：Phase 0–2 已进入 Canonical source；Phase 3 自动 worktree removal 与 Phase 4 scheduler 未开始。
+- [ ] [Context-routing State](state/context-routing-research.md)：C2／Pilot 010 尚未获批。
+- [ ] [平台 Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)：Claude 成功认证／模型路由和所有组件独立发行仍未完成。
+- [ ] [文档治理 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)：D2 scanner／CLI 尚未批准。
+- [ ] [Rename／Compatibility Plan](implementation/plans/2026-08-28-orrery-rename-and-compatibility.md)：R3 已完成；R4 alias contract 与 R5 optional default transition 尚未启动。
+- [ ] 跨平台 byte-for-byte archive 一致性、benchmark R1 自动脱敏导出与 Brownfield Adoption 研究继续延期。
 
 ## 最近完成
 
-- [CI4 opaque CLI token reliability](validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)：exact `a4b0ed3` 的 Fast 2/2、Promotion 59/59 与 required Windows／Ubuntu 双 PASS，现已进入 `origin/main`；产品 token 协议不变。
-- [R3 Orrery brand-only closeout](validation/2026-08-28-r3-orrery-brand-only-closeout.md)：当前 display name 收口为 Orrery，稳定技术 ID、历史 v0.2.0 和发布资产保持不变。
-- [W7D W7 Integration Candidate](validation/2026-08-28-w7d-w7-integration-candidate.md)：加法整合 CI2/W7B 与 W7C-B，保留 schema-2 分级预算、只读关系图和独立执行边界；exact-SHA hosted 结果与 main 授权边界在 Validation 中逐项记录。
-- [W4 health／W5B Team Observatory 候选](validation/2026-08-27-w4-health-w5b-integration-candidate.md)：修复 36-worktree 健康误导，提供 loopback Team 图形流程；Core 0.1.9／CLI 0.1.13／Observatory 0.1.4，最终 exact-SHA 门仍待完成。
-- [W4／W5A 联合候选](validation/2026-08-23-w4-w5-integration-candidate.md)：Core 0.1.8／CLI 0.1.13／Observatory 0.1.2，动态全仓 316 项通过，候选实现 SHA `2bc6207` 的 Ubuntu／Windows checks 通过；最终入口 SHA 仍须 Candidate-first 验证并等待维护者确认。
-- [W3 Canonical 集成](validation/2026-08-23-w3-canonical-integration.md)：冻结 Core 0.1.7／CLI 0.1.12 的 review、integration、closure、workspace inventory 与 advisory cleanup contract；Promotion 仍以包含本记录的 exact SHA required checks 为准。
-- [W2 Canonical 集成](validation/2026-08-22-w2-canonical-integration.md)：基于最新 main 增量吸收五来源 Scope/finding；exact SHA `21a2e1c` 已在 GitHub Actions `32570545138` 取得 Windows／Ubuntu 双 PASS，并由受保护 main 接受。
-- [Candidate-first main promotion gate](validation/2026-08-22-candidate-first-main-promotion-gate.md)：Candidate `e4e4442` 先通过 Windows／Ubuntu，再由 strict/admin-enforced branch protection 允许快进 main；PR 非必需，main 不重复运行同一 SHA 的矩阵。
-- [W1／D1／C1 Canonical 集成](validation/2026-08-22-w1-d1-c1-canonical-integration.md)：按 W1→D1→C1 吸收三个独立 Candidate，修复 C1 行尾冻结与 Windows session-path 测试别名；联合 273 项回归及 GitHub Actions `32564334514` Windows／Ubuntu 双 PASS。
-- [main 验收与跨平台 CI](validation/2026-08-21-main-acceptance-and-cross-platform-ci.md)：本地 231 项动态回归、integrated build、Authority 投影回滚、链接与发布边界通过；首次 Ubuntu 发现的 Windows 路径夹具已修正，最终 Windows／Ubuntu 双 PASS，未创建新 Release。
-- [DeepSeek wheel runtime 与跨平台 CI](validation/2026-08-22-deepseek-w1-windows-ci-fix.md)：关闭普通 wheel assets 阻塞，精确 runtime 范围进入 `verified`；首次矩阵保留 Windows 失败证据，修复 8.3 路径与 wheel 测试依赖后，GitHub Actions `32554191374` Windows／Ubuntu 双 PASS。
-- [W1 与第二平台 Adapter 本地集成](validation/2026-08-22-w1-and-second-platform-adapters-integration.md)：Phase 0 contract 与 Claude／DeepSeek Adapter 从独立 worktree 经干净整合吸收，旧 Phase 4 ADR-0010 重编号为 ADR-0013；后续 wheel Validation 与 CI 完成了 DeepSeek 精确门。
-- [Authority M2 本地 Canonical 集成](validation/2026-08-21-authority-meta-model-m2-local-canonical-integration.md)：M2.1／M2.2／M2.3 已通过独立 worktree 与干净集成，默认 production 和公开 release 保持不变。
-- [Authority M1 本地 Canonical 集成](validation/2026-08-21-authority-meta-model-canonical-integration.md)：fixture、Core owner、兼容、迁移／恢复、shadow 与 AI non-escalation 已进入本地 baseline。
-- [平台中立 Phase 3](validation/2026-08-21-platform-neutral-phase-3-harness-json.md)：Harness JSON 合约通过 Windows／Ubuntu CI，但仍为未发布参考 Adapter。
-- [ADR-0008 协作 Design 集成](validation/2026-08-20-adr-0008-collaboration-design-integration.md)：Personal-first、Team opt-in 与 Local-only telemetry 边界已形成权威设计，尚无 runtime 实现。
-- [当前状态入口压缩](validation/2026-08-21-current-state-entry-compaction.md)：PROGRESS 与 Authority State 已恢复为当前控制入口，并触发 ADR-0012 的长期治理设计。
+- [CI5 Promotion Throughput Optimization](validation/2026-08-29-ci5-promotion-throughput-optimization.md)：`9ee831f` 的 Fast、25-job Promotion、双平台 required checks 与 main fast-forward 已完成。
+- [CI4 opaque CLI token reliability](validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)：`a4b0ed3` Fast 2/2、Promotion 59/59 双平台通过并进入 main。
+- [R3 Orrery brand-only closeout](validation/2026-08-28-r3-orrery-brand-only-closeout.md)：当前展示面收口为 Orrery，稳定技术 ID 与历史资产保持不变。
+- [W7D W7 Integration Candidate](validation/2026-08-28-w7d-w7-integration-candidate.md)：W7 relation execution 与只读 Graph 经 exact-SHA 双平台门进入后续 Canonical main。
+- [CI3 Fast dependency fix](validation/2026-08-28-ci3-fast-validation-dependency-fix.md)：fresh-runner discovery／aggregate dependency 顺序已由后续 verified SHA 覆盖。
+
+完整演化见 [DEVLOG](DEVLOG.md)，逐次可复现证据见 [Validation](validation/README.md)。
+
+## 风险与阻塞
+
+- linked worktree 提供独立 HEAD／index／目录，但没有 OS 级路径沙箱；越界写入仍依赖 guard、工作目录纪律和审查。
+- 本机旧 Workstream session 缺少统一的 post-main closure 证据；在 closure／review 不完整时，maintenance 必须继续失败关闭，而不能仅凭 branch 已进入 main 自动删除。
+- W7B 的 apply／undo 只在隔离 Git fixture 验证；self-host 真实项目没有 apply 记录，Graph 没有执行按钮，中央 Team 没有执行权。
+- v0.2.0 ZIP checksum 有效，但同一 tag 的 Windows／Linux 重建尚非 byte-for-byte 一致。
+- 仓库外原始研究证据没有自动 R1 脱敏导出器或异地备份；不得批量复制进 Git。
 
 ## 下一里程碑
 
-1. **Authority：** 明确 managed production consumer 的启用／回滚门，再由维护者选择实际 SemVer 和 candidate manifest。
-2. **协作：** 对 Canonical W7 source 做真实 self-host read-only／dry-run 验收；不把隔离事务 fixture、loopback 或只读图证据外推为真实 self-host apply／LAN／中央执行。
-3. **验证：** 完成 CI5 exact-SHA Fast／Promotion，核对 25-job 拓扑是否在不损失 27-shard 证据的情况下显著降低 setup overhead。
-4. **研究：** 决定是否批准 C2 的 Pilot 010 设计冻结；在此之前不运行模型。
-5. **文档治理：** 决定是否批准 D2 只读 scanner／CLI；不实现自动修复或公开模板迁移。
-6. **平台：** 在认证可用且另行授权后决定是否继续 Claude Stage B；DeepSeek 不再重复 rc.8 证据，后续只处理发行或新增 runtime matrix。
+1. 完成 SC1 Canonical 状态收口：入口、State、Plan 与 Validation 对齐 `main@9ee831f`，并只读盘点本机旧 session／worktree。
+2. 对 Canonical W7/W6 做真实 self-host read-only／dry-run，先补 lifecycle／closure 证据再讨论删除或自动化。
+3. 选择 Authority managed consumer，或批准 D2／C2／Claude 其中一条独立线路；不得把多个发布／安全决策绑在一次未经审阅的切换中。

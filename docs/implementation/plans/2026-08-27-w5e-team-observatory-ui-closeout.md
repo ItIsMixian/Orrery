@@ -1,7 +1,7 @@
 # W5E Team Observatory UI 收口
 
 Date: 2026-08-27
-Status: Active Worktree Plan
+Status: Completed; implementation is contained in Canonical W7/CI5 descendants
 Base: `CI1-tiered-parallel-validation@67a2fe90f26ff5ded839c4d60fea23dfcd36ba13`
 Governing decisions: [ADR-0007](../../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)
 Approved design: [Multi-worktree collaboration protocol](../../design/multi-worktree-collaboration-protocol.md)

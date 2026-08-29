@@ -1,6 +1,6 @@
 # 实施计划：CI3 Fast Validation Dependency Fix
 
-Status: Candidate implementation complete; exact-SHA hosted acceptance pending
+Status: Completed; hosted acceptance passed and implementation is contained in Canonical main
 
 Date: 2026-08-28
 

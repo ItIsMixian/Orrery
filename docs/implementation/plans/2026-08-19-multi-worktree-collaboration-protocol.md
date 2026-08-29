@@ -172,8 +172,8 @@ final HEAD、integration OID、review／Validation、分类和 Git-private actio
 - [ ] 按 capability 约束审查、合流、ADR 编号、canonical State 同步、成员和团队设置；验证 Admin／Integrator 也不能直接操作其他成员机器或绕过 L3。
 - [x] 中央同步层拒绝完整 Prompt／回答／transcript 和源文件正文，只接受版本化任务、Git、scope、验证、finding 与 last-seen 元数据。
 - [x] 未 push 工作显示为 `Local-only`；路径级证据不足以判断的语义关系保持 Unknown。已 push 源码继续由 Git 托管权限处理，不复制进 Orrery 协调存储。
-- [ ] 在成员本地指挥台内置局域网 Coordinator Host 的启动、自动发现、成员验证、Host 确认和手工邀请地址回退；发现广播不能包含任务状态或源码元数据。
-- [ ] 实现单 active Host 与手工 Host 切换；Host 离线不影响本地工作，新的 Host 按单调 revision 重新聚合在线成员状态。首版不做自动 leader election。
+- [x] 在成员本地指挥台内置局域网 Coordinator Host 的显式启动、受控发现、成员验证、Host 确认和手工邀请地址回退；发现广播不包含任务状态或源码元数据。当前证据仍是本机受控 transport／双 clone Harness，不是物理双机验收。
+- [x] 实现单 active Host 与手工 Host 切换；Host 离线不影响本地工作，新的 Host 按单调 revision 重新聚合在线成员状态。首版不做自动 leader election。
 - [x] 默认只在 Workstream／Scope、Agent 阶段、Git、验证或 finding 变化时经 debounce 后同步；提供 capture／sync-now，presence heartbeat 默认关闭并允许成员启用／关闭。
 - [x] 对 Offline、Stale／Unknown、Sharing off／Unavailable 分别投影，不把最后快照当成实时事实。
 - [x] 分开展示 Workstream 生命周期、运行状况和证据新鲜度；不能把 Agent 自报的“完成”直接映射为 Review Ready、Integrated 或 Closed。

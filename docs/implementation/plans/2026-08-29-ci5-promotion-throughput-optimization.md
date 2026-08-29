@@ -1,6 +1,6 @@
 # Implementation Plan: CI5 Promotion Throughput Optimization
 
-Status: Worktree implementation complete; exact-SHA hosted acceptance pending
+Status: Completed; exact-SHA hosted acceptance passed and source integrated into Canonical main
 
 Date: 2026-08-29
 
@@ -97,3 +97,11 @@ The first lane is deliberately heavy and isolated. The other nine had estimated 
 
 After implementation, update Test Coverage State, Validation, DEVLOG and indexes on this Workstream. Root
 PROGRESS/HANDOFF remain for the later unique integrator and are not continuously rewritten here.
+
+## Completion
+
+Exact SHA `9ee831f0d6f64306fe821f8c70229df54648d3eb` passed Fast run `33235942078` and
+Promotion run `33235992711`. Promotion completed 25/25 jobs; both required OS aggregates passed with
+390 tests across 27 logical shards. The 20 lane jobs consumed 23.9 job-minutes, with 14.352 minutes in
+lane test execution and about 40% derived overhead. The same SHA was then fast-forwarded to protected
+`main`; main Fast run `33236225082` passed. No tag or Release was created.
