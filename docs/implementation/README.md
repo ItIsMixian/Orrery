@@ -14,6 +14,10 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-29 U1 Unified Observatory Architecture & Shell](plans/2026-08-29-u1-unified-observatory-architecture.md) — architecture phase complete under Accepted ADR-0016 and Approved Design; production U2 implementation, default transition and release remain separate work.
+- [2026-08-29 CI6 Local Validation Router & Tier Enforcement](plans/2026-08-29-ci6-local-validation-router-tier-enforcement.md) — adds the repo-local change router, exact test registry, tier receipts and W6.1 cost separation without weakening Promotion coverage.
+- [2026-08-29 W6.1 Incremental Maintenance & Quick Remove](plans/2026-08-29-w6-1-incremental-maintenance-quick-remove.md) — committed maintenance-v2 cache, background refresh and target-scoped Quick Remove Candidate consumed by the U2 integration baseline.
+- [2026-08-29 A3 Authority Managed Consumer Contract](plans/2026-08-29-a3-authority-managed-consumer-contract.md) — versioned deterministic Authority consumer selection/readiness/rollback contract; no production consumer switch.
 - [2026-08-29 SC1 Canonical State Closeout](plans/2026-08-29-sc1-canonical-state-closeout.md) — completed docs-only reconciliation; exact `a9369dd` passed Fast/Promotion and entered protected main without product, release or physical cleanup changes.
 - [2026-08-29 CI5 Promotion Throughput Optimization](plans/2026-08-29-ci5-promotion-throughput-optimization.md) — completed no-coverage-loss CI optimization; exact `9ee831f` passed 25/25 hosted jobs and entered Canonical main while preserving 27 logical shards and required checks.
 - [2026-08-28 Orrery Rename and Compatibility R3–R5](plans/2026-08-28-orrery-rename-and-compatibility.md) — active under Accepted ADR-0015; R3 is complete in Canonical main, while R4/R5 remain future independent Workstreams preserving Python identity and frozen v0.2.0 evidence.

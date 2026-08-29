@@ -13,6 +13,10 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-29 U1 Unified Observatory Architecture & Shell](2026-08-29-u1-unified-observatory-architecture.md) — validates the accepted architecture boundary and synthetic interaction study while explicitly recording that production integration and visual redesign did not occur.
+- [2026-08-29 CI6 Local Validation Router & Tier Enforcement](2026-08-29-ci6-local-validation-router-tier-enforcement.md) — validates change-derived tier selection, exact receipts, W6.1 cost separation and fail-closed inventory enforcement.
+- [2026-08-29 W6.1 Incremental Maintenance & Quick Remove](2026-08-29-w6-1-incremental-maintenance-quick-remove.md) — validates maintenance-v2 cache, background refresh, target preflight and human-confirmed Quick Remove while preserving branch/commit and fail-closed protection.
+- [2026-08-29 A3 Authority Managed Consumer Contract](2026-08-29-a3-authority-managed-consumer-contract.md) — validates deterministic selection/readiness/rollback plans and read-only CLI output without enabling a production Authority consumer.
 - [2026-08-29 SC1 Closed Worktree Removal](2026-08-29-sc1-closed-worktree-removal.md) — archives six closed Git-private sessions, removes only their clean worktree directories, and verifies all branches/commits remain while an unrelated concurrent worktree is preserved.
 - [2026-08-29 SC1 Canonical State Closeout](2026-08-29-sc1-canonical-state-closeout.md) — reconciles current entrances, subsystem State and completed Plan status; exact `a9369dd` passed Fast/Promotion and entered protected main while preserving release／cleanup boundaries.
 - [2026-08-29 CI5 Promotion Throughput Optimization](2026-08-29-ci5-promotion-throughput-optimization.md) — preserves complete exact-SHA dual-platform coverage while separating 27 logical shards from ten physical lanes; exact `9ee831f` completed 25/25 hosted jobs and entered Canonical main.

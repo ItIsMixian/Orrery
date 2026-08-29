@@ -1,34 +1,22 @@
-# PO-DEC-U1-unified-observatory-shell: Unified Observatory Shell 与单一本地入口
+# ADR-0016: Unified Observatory Shell 与单一本地入口
 
-Status: Proposed
+Status: Accepted
 
 Date: 2026-08-29
 
-Fact scope: Worktree Candidate `codex/u1-unified-observatory-architecture`
+Maintainer acceptance: **accepted on 2026-08-29** for the Unified Shell architecture and the production docsite
+inheritance boundary recorded below.
 
-Formal ADR number: **unassigned**
+Amends: [ADR-0001](0001-project-orrery-self-hosting.md),
+[ADR-0004](0004-platform-neutral-core-and-adapter-boundaries.md),
+[ADR-0006](0006-broker-only-docsite-provider-gateway.md),
+[ADR-0008](0008-local-first-team-coordination-and-cross-machine-metadata.md)
 
-Formal number reserved: **false**
+Preserves: [ADR-0009](0009-authority-meta-model-and-semantic-conformance.md),
+[ADR-0014](0014-dynamic-workstream-succession-contract.md)
 
-Number allocation authority: **unique integrator only**, after maintainer acceptance and integration.
-
-Maintainer direction acceptance: **accepted on 2026-08-29** for the Unified Shell architecture and the production
-docsite inheritance boundary recorded below.
-
-Governance effect: this records maintainer intent in Candidate scope only. Status remains **Proposed**; the formal ADR
-identity/status and Proposed Design → Approved Design promotion remain **integrator-only at integration**.
-
-Amends, if accepted and formally integrated: [ADR-0001](../0001-project-orrery-self-hosting.md),
-[ADR-0004](../0004-platform-neutral-core-and-adapter-boundaries.md),
-[ADR-0006](../0006-broker-only-docsite-provider-gateway.md),
-[ADR-0008](../0008-local-first-team-coordination-and-cross-machine-metadata.md)
-
-Preserves: [ADR-0009](../0009-authority-meta-model-and-semantic-conformance.md),
-[ADR-0014](../0014-dynamic-workstream-succession-contract.md)
-
-> 维护者已接受本 proposal 的架构方向，但它仍只是 Candidate-scope Proposed decision。它没有正式 ADR 编号，
-> 也没有预留连续编号，不改变当前默认 `start-docsite.bat`、`serve.py`、Team server、managed tools、公开
-> v0.2.0 或任何生产开关。正式 Status、ADR 编号和 Approved Design 晋级只由唯一整合者在合流时处理。
+> Accepted 只约束后续设计与实现，不证明统一 Observatory 已经 implemented、validated、默认启用或发布。
+> 当前 `start-docsite.bat`、`serve.py`、Team server、managed tools、公开 v0.2.0 与生产开关保持不变。
 
 ## Context
 
@@ -49,9 +37,8 @@ listener 拓扑是另一维度，可以按隔离需要存在，但不得变成�
 也不是全面视觉重设计提案。
 
 这不是普通导航重排。它改变默认运行入口、HTTP ownership、managed Broker 的默认拓扑、root-only
-consumer 装配和后续 public-template 边界，因此必须先经过正式决策；只修改 README、builder 或启动脚本不足以
-约束跨模块安全与回滚。本 Workstream 只提供稳定临时 identity，正式连续 ADR 编号由唯一整合者在维护者接受并
-合流时分配。
+consumer 装配和后续 public-template 边界，因此必须经过正式决策；只修改 README、builder 或启动脚本不足以
+约束跨模块安全与回滚。
 
 ## Proposed decision
 
@@ -121,12 +108,12 @@ consumer 装配和后续 public-template 边界，因此必须先经过正式决
 - 后续实现以 adapter/front-door integration 连接现有 `build_docsite.py`／`serve.py` consumer；除统一入口必需的
   registration、route/security 与 lifecycle 改造外，不获得重写 docsite 或全面改变其信息架构／视觉体验的授权。
 - consumer 与 shell 需要兼容矩阵和 contract tests；导航 marker 注入最终要迁移为显式 registration。
-- Proposed decision 若被拒绝，现有 default docsite 与各 root-only sibling entry 保持不变；synthetic prototype
-  可直接删除，不产生迁移或作者事实回滚。
+- 在后续生产实现通过独立验收与默认切换前，现有 default docsite 与各 root-only sibling entry 保持不变；
+  synthetic prototype 可直接删除，不产生迁移或作者事实回滚。
 
 ## Mapping
 
-- Proposed-for-approval Design: [Unified Observatory Architecture & Shell](../../design/unified-observatory-architecture-and-shell.md)
-- Implementation Plan: [U1 Unified Observatory Architecture](../../implementation/plans/2026-08-29-u1-unified-observatory-architecture.md)
-- Validation: [U1 architecture and prototype](../../validation/2026-08-29-u1-unified-observatory-architecture.md)
+- Approved Design: [Unified Observatory Architecture & Shell](../design/unified-observatory-architecture-and-shell.md)
+- Implementation Plan: [U1 Unified Observatory Architecture](../implementation/plans/2026-08-29-u1-unified-observatory-architecture.md)
+- Validation: [U1 architecture and prototype](../validation/2026-08-29-u1-unified-observatory-architecture.md)
 - Non-authoritative prototype: `experiments/unified-observatory-shell/`

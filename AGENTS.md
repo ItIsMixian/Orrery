@@ -49,7 +49,7 @@
 
 **What**: 管理权威链、人类／Agent 阅读入口、作者文档生命周期、同步义务和观测台投影。
 **Truth**: `AGENTS.md`, `docs/`, 根 `scripts/docsite/`。
-**Dig**: [文档系统 State](docs/state/documentation-system.md) | [自托管 Design](docs/design/self-hosting-documentation-system.md) | [治理 ADR-0012](docs/decisions/0012-document-governance-and-information-lifecycle.md) | [治理 Design](docs/design/document-governance-and-information-lifecycle.md) | [活动 Plan](docs/implementation/plans/2026-08-21-document-governance-and-audit.md)。
+**Dig**: [文档系统 State](docs/state/documentation-system.md) | [自托管 Design](docs/design/self-hosting-documentation-system.md) | [治理 ADR-0012](docs/decisions/0012-document-governance-and-information-lifecycle.md) | [统一入口 ADR-0016](docs/decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [统一入口 Design](docs/design/unified-observatory-architecture-and-shell.md) | [活动 Plan](docs/implementation/plans/2026-08-21-document-governance-and-audit.md)。
 
 ## authority semantics
 

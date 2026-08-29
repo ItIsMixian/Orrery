@@ -58,7 +58,9 @@
       "patterns": [
         "packages/project-orrery-core/src/project_orrery_core/authority*.py",
         "packages/project-orrery-core/src/project_orrery_core/schema/authority-*.json",
+        "packages/project-orrery-cli/src/project_orrery_cli/__main__.py",
         "packages/project-orrery-cli/src/project_orrery_cli/authority*.py",
+        "tests/fixtures/authority-meta-model/**",
         "tests/test_authority_*.py"
       ],
       "subsystems": [
@@ -103,6 +105,7 @@
       "patterns": [
         "packages/project-orrery-observatory/**",
         "scripts/docsite/**",
+        "experiments/unified-observatory-shell/**",
         "start-*.bat",
         "tests/test_personal_observatory.py",
         "tests/test_team_observatory.py",

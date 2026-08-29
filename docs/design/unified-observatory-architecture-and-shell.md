@@ -1,18 +1,13 @@
 # Unified Observatory Architecture & Shell
 
-Status: Proposed for approval
+Status: Approved
 
 Date: 2026-08-29
 
-Governing proposal: [PO-DEC-U1-unified-observatory-shell](../decisions/proposals/PO-DEC-U1-unified-observatory-shell.md)
+Governing ADR: [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md)
 
-Formal ADR number: **unassigned**; reserved: **false**; allocation is **integrator-only** after maintainer acceptance
-and integration.
-
-Maintainer direction acceptance: **accepted on 2026-08-29**. This Design remains **Proposed for approval** until the
-unique integrator performs formal promotion during integration.
-
-Fact scope: Worktree Candidate `codex/u1-unified-observatory-architecture`
+Maintainer approval: **approved on 2026-08-29**. Approval constrains future implementation but does not claim that the
+production shell, launcher or default transition exists.
 
 ## 1. Product contract
 

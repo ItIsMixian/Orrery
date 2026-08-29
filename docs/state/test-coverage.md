@@ -7,6 +7,7 @@ Updated: 2026-08-29
 - 验证分为 `Fast → Checkpoint → Candidate → Promotion`。Fast 只提供局部反馈；Checkpoint 证明 Workstream checkpoint；Candidate 运行完整本地门；Promotion 绑定 non-main exact SHA、规定 OS 和 required checks。
 - Fast 使用 15 秒预算；Checkpoint 使用 90 秒预算；完整 Promotion 保留每个 final unittest ID、动态 build、结构／docsite／链接／发布包／diff gate 与安全预算。
 - CI5 当前 inventory 为 390 unique unittest IDs、27 logical shards、10 physical lanes/OS、57 Fast、81 Checkpoint。`team-relations-execution` 保持独立 300 秒 Promotion 预算。
+- CI6 新增 repo-local `scripts/ci/validate_change.py`，从 Git diff、Git-private Workstream subsystem／expected writes 与版本化 mapping registry 自动选择 exact test IDs，并生成绑定 HEAD/base/dirty fingerprint/registry 的 tier receipt。直接 `unittest` 仍可调试，但不能声明正式 Fast／Checkpoint 证据。
 - lane runner 为每个 logical shard 启动独立 Python 子进程，保留原 shard result 并生成 lane receipt；失败、缺失、重复、extra、manifest/SHA/OS/order drift 或取消均使 aggregate 失败关闭。
 - required check 名称仍为 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`；main branch protection strict 且 enforce-admins。
 
@@ -18,6 +19,7 @@ Updated: 2026-08-29
 - CI5 hosted wall time 为 3m56s；20 个 lane jobs 共 23.9 job-min，lane 内测试步骤共 14.352 分钟，派生 setup/checkout/install/artifact overhead 约 40%，满足 `<30 lane job-min` 与 `<45%` 的 advisory 目标。
 - 同一 exact SHA 已进入 main，main Fast run `33236225082` 成功。该证据关闭 CI5 hosted acceptance，不创建新 Release。
 - SC1 开始前本地主工作树 clean；`validate_ci.py --all`、integrated structure、Fast 57/57 与 `git diff --check` 均通过。
+- W6.1／CI6／A3 整合时保留 CI6 schema-5 manifest，并把 A3 七个低成本 Authority consumer tests 登记进 data-only mapping registry；CI contract 与 A3 7/7 专项通过。Hosted exact-SHA Promotion 仍由整合候选单独取得。
 
 ## 覆盖面
 
@@ -51,7 +53,7 @@ Updated: 2026-08-29
 ## 已知缺口
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
-- 没有自动影响分析、跨 SHA Promotion evidence reuse 或远端 runner cache contract。
+- CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。
 - Claude 认证后真实模型路由、真实双机 LAN、self-host relation apply、自动 worktree removal 与 OS scheduler 没有验收证据。

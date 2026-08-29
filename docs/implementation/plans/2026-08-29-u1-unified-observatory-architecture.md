@@ -1,6 +1,6 @@
 # 实施计划：U1 Unified Observatory Architecture & Shell Design
 
-Status: Phase 1 complete in Worktree Candidate; production implementation not started
+Status: Architecture accepted and Phase 1 complete; production implementation not started
 
 Date: 2026-08-29
 
@@ -9,12 +9,9 @@ Workstream: `U1-unified-observatory-architecture`
 Branch/base: `codex/u1-unified-observatory-architecture` from protected
 `main@d07e1a15ea8ecd6c46c606b20483a0b058f4f1b2`
 
-Governing proposal: [PO-DEC-U1-unified-observatory-shell](../../decisions/proposals/PO-DEC-U1-unified-observatory-shell.md)
+Governing ADR: [ADR-0016](../../decisions/0016-unified-observatory-shell-and-single-local-entry.md)
 
-Formal ADR number: **unassigned**; reserved: **false**; allocation is **integrator-only** after maintainer acceptance
-and integration.
-
-Proposed Design: [Unified Observatory Architecture & Shell](../../design/unified-observatory-architecture-and-shell.md)
+Approved Design: [Unified Observatory Architecture & Shell](../../design/unified-observatory-architecture-and-shell.md)
 
 ## Goal and boundary
 
@@ -50,11 +47,9 @@ docsite rewrite or comprehensive visual redesign; either requires a separate tas
 
 ## Phase 2 — decision review and contract fixture (future)
 
-- [x] maintainer accepts the architecture direction and production docsite inheritance boundary recorded by
-  `PO-DEC-U1-unified-observatory-shell`;
-- [ ] at integration, the unique integrator alone assigns the then-next formal ADR number, updates formal Status and
-  promotes/revises the Proposed Design without treating Candidate acceptance as canonical integration;
-- [ ] reconcile concurrent W6.1 and A3 exact Candidate contracts after they are committed and reviewed;
+- [x] maintainer accepted the architecture direction and production docsite inheritance boundary;
+- [x] unique integrator assigned ADR-0016 and promoted the Design to Approved during integration;
+- [x] reconcile committed W6.1/CI6 and A3 Candidate contracts in the U2 integration baseline;
 - [ ] freeze machine-readable shell registration/route fixtures and negative collision/escalation cases;
 - [ ] choose managed Broker topology (in-process or supervised helper) only after parity/security/lifecycle evidence;
 - [ ] decide Team Coordinator/LAN transport topology while preserving Team opt-in and the single public UI URL;

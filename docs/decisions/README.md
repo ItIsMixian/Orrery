@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0016: Unified Observatory Shell and single local entry](0016-unified-observatory-shell-and-single-local-entry.md) — Accepted; gives users one visible launcher, URL and navigation shell while allowing supervised hidden helpers, preserving the existing docsite experience and keeping static, Team, Authority and destructive-action boundaries independent.
 - [ADR-0015: Orrery brand and compatibility contract](0015-orrery-brand-and-compatibility-contract.md) — Accepted; separates the Orrery display brand from stable technical/protocol identities, fixes the R4 thin-alias and first-new-release asset defaults, preserves v0.2.0 history and the full 0.3.x compatibility window, and blocks Python `orrery` namespace takeover.
 - [ADR-0014: Dynamic Workstream Succession Contract](0014-dynamic-workstream-succession-contract.md) — Accepted; adds incremental `derived_from`／`depends_on`／`absorbs` relations, append-only Git-common-private evidence, reversible lifecycle and conservative active-tip conflict semantics without creating a scheduler or deletion authority.
 - [ADR-0001: Project Orrery self-hosting](0001-project-orrery-self-hosting.md) — Accepted; establishes this repository's own documentation authority chain.
@@ -33,7 +34,7 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-- No active proposal is awaiting maintainer review; ADR-0015 is Accepted, while implementation evidence remains separate.
+- No active proposal is awaiting maintainer review; ADR-0016 is Accepted, while production implementation evidence remains separate.
 - `PO-DEC-AUTH-002` was integrated as ADR-0011.
 
 Concurrent branches use stable IDs under `docs/decisions/proposals/` until the maintainer accepts a proposal and an integrator allocates the next canonical ADR number.

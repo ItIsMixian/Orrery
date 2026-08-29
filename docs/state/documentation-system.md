@@ -2,7 +2,7 @@
 
 Updated: 2026-08-29
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md)
 
 ## 当前事实
 
@@ -16,6 +16,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - AI Q&A、briefing、roadmap、milestones、radar、Authority projection、Personal／Team／Maintenance 与 Workstream Graph 都是派生视图。它们只能消费受约束输入并保留 source／scope／Unknown，不能创造 State、ADR、批准或 Validation。
 - Authority shadow、diagnostic 与完整 projection 使用彼此独立的显式开关；默认 legacy build 保持。完整 M2.2 projection 仅由 root-only `build_authority_projection.py` 启用，失败关闭回无 claim 的 legacy 页面。
 - Personal／Team／Maintenance／Graph 已作为 root-only/default-off sibling page 进入 Canonical source。页面复用 Core facts：Personal 分离交付／对账／卫生，Team 为 metadata-only/request-only，Maintenance 只显示资格与本机确认，Graph 只读消费 relation graph。
+- ADR-0016 与 Approved Unified Observatory Design 已接受“一个用户入口／URL／导航壳、受管隐藏 helper”的目标，并要求生产实现继承现有 docsite 阅读、搜索、AI、作者信息架构和可识别视觉体验；当前仍没有统一生产 server、launcher 或默认切换，U1 synthetic prototype 不是 UI 规范。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
 - 动态 docsite 的模型调用统一经过 Broker。Provider 配置与凭据按端点绑定，同源 POST、body gate、预算、缓存和错误脱敏已实现；同用户本机 Broker 不宣称秘密隔离。
 - 当前展示品牌为 Orrery；目标项目标题仍由模板 token 定制。历史 `Project Orrery` 与稳定 `project-orrery` 技术标识按 ADR-0015 保留。
@@ -50,5 +51,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 完整国际化未实施，当前 Observatory 主要为中文界面。
 - Authority 没有稳定公共 parser/domain API、默认 production projection 或公开模型 1 release。
 - Personal／Team／Maintenance／Graph 尚未接入默认 docsite、Skill template 或公开 release。
+- Unified Observatory 生产实现尚未开始；现有 `start-docsite.bat`、`serve.py` 与 sibling root-only entries 仍是当前运行入口。
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

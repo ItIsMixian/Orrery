@@ -9,11 +9,9 @@ Status: PASS — Windows Worktree Candidate; no production switch or hosted Prom
 - Branch: `codex/u1-unified-observatory-architecture`.
 - Base: protected `main@d07e1a15ea8ecd6c46c606b20483a0b058f4f1b2`.
 - Git-private session: `U1-unified-observatory-architecture`, registered before authored writes.
-- Outputs: Proposed `PO-DEC-U1-unified-observatory-shell`, Proposed-for-approval Design, independent Plan/Validation
-  and synthetic experiment only. Its formal ADR number is **unassigned**, reserved is **false**, and allocation is
-  **integrator-only** after maintainer acceptance and integration.
-- Maintainer accepted the architecture direction and production docsite inheritance boundary on 2026-08-29. This is
-  Candidate-scope direction acceptance, not formal ADR/Design promotion; those remain integrator-only at integration.
+- Outputs: accepted [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), Approved Design,
+  independent Plan/Validation and synthetic experiment only. The unique integrator performed formal identity and
+  Design promotion after maintainer acceptance on 2026-08-29.
 - Explicitly unchanged: production servers/builders/UI modules, start scripts, public template, managed tools, release
   manifest, v0.2.0, root README/assets, root PROGRESS/HANDOFF and shared State/DEVLOG/indexes.
 
@@ -152,13 +150,11 @@ prototype only; it does not validate a unified production server that has not be
 
 ## Remaining boundaries
 
-- Maintainer accepted the U1 architecture direction on 2026-08-29, but
-  `PO-DEC-U1-unified-observatory-shell` remains Proposed; its formal ADR number is unassigned and not reserved. Only the
-  unique integrator may allocate a formal number/update formal Status at integration. The Design remains Proposed for
-  approval until integrator promotion.
-- A3 currently provides only an uncommitted Worktree Plan; its machine contract remains unavailable.
-- W6.1 current files are uncommitted Worktree State; its schema and provisional `/control/` routes are not U1 public
-  contracts.
+- ADR-0016 is Accepted and the Design is Approved, but accepted architecture does not prove production implementation.
+- A3 provides a versioned managed-consumer Candidate contract in the current integration line; it does not enable a
+  production Authority consumer by itself.
+- W6.1 provides a committed maintenance-v2/cache/Quick Remove Candidate contract in the current integration line;
+  its provisional `/control/` routes are not U1 public contracts.
 - No production server/supervisor/helper implementation, default launcher switch, component version bump, public
   template transition, hosted CI, push, main integration, tag or Release occurs in U1. Internal Broker/Team topology
   remains an implementation choice behind parity, security and lifecycle gates.

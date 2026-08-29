@@ -642,3 +642,9 @@
 - 精确从 `codex/w7d-w7-integration-candidate@e2c049e` 建立 `codex/ci3-fast-validation-dependency-fix`，首次产品写入前注册 Git-private Workstream。基线 Promotion `33195264226` 双 required checks PASS；独立 Fast `33195264316` 双平台在 final discovery 因缺 `mistune` 失败，Fast 未启动且无条件 artifact 上传形成次生错误。
 - Fast 复用 Promotion 已验证的 wheel＋版本化 docsite requirements 安装和 pip cache，并在 `validate_ci.py --all` 前执行；validator 与 mutation regression 机械保护命令和顺序。结果文件先由跨平台 setup Python 检测，存在才上传；真实 Fast failure 仍保持红色且结果存在时继续上传。
 - CI focused 13/13、inventory 379／27／51／72、validator 与 Fast 51/51（2.324s／15s）通过。Checkpoint 两次均为 72/72 assertion PASS，但以 95.382s、98.320s 超 90s 保持 FAIL；预算、selector、W7B/W7C 和 Promotion 未修改，本地 Promotion 未运行。最终 hosted Fast＋Promotion 将绑定一个 clean exact SHA，并只在任务回执报告以避免 docs-only SHA 循环。
+## 2026-08-29 — U1 acceptance and U2 integration baseline
+
+- 维护者接受 Unified Observatory 架构与 production docsite inheritance boundary；唯一整合者把临时 U1 proposal 晋级为 ADR-0016，把 Design 晋级为 Approved，同时继续明确 `accepted != implemented`。
+- 一个独立 integration baseline 合并 W6.1／CI6、A3 与 U1。A3 与 CI6 只在 `scripts/ci/test-shards.json` 发生预期冲突；整合保留 CI6 schema-5/data-only registry，并登记 A3 七个低成本 Authority consumer tests，CI contract 与 A3 7/7 专项通过。
+- U1 synthetic prototype 仍只是 architecture interaction study。U2 必须优先适配现有 `build_docsite.py`／`serve.py` 文档、搜索、AI、作者信息架构和可识别视觉体验；全面视觉重设计没有获得授权。
+- 本节点只建立 Candidate baseline，不宣称 `origin/main`、production Unified Shell、默认 launcher、public template、managed tools、tag 或 Release 已改变。

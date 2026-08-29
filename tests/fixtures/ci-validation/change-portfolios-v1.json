@@ -22,7 +22,7 @@
       "expected_mapping_ids": ["authority-core"],
       "required_test_ids": ["test_authority_meta_model.AuthorityMetaModelFixtureTests.test_claim_dimensions_remain_independent"],
       "forbidden_test_ids": ["test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_full_topology_cli_apply_receipt_undo_and_legacy_discovery"],
-      "max_selected": 30
+      "max_selected": 31
     },
     {
       "id": "collaboration-maintenance",

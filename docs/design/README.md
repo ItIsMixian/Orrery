@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Unified Observatory Architecture & Shell](unified-observatory-architecture-and-shell.md) — one visible launcher/URL/navigation identity with explicit consumer registration, supervised internal helpers, inherited docsite experience, static fallback, failure isolation and staged rollback under ADR-0016.
 - [Orrery Rename and Compatibility Contract](orrery-rename-and-compatibility-contract.md) — approved under ADR-0015; maps brand, stable identifiers, explicit opt-in CLI thin alias, host-specific display/alias behavior, brownfield migration, first-release asset naming, privacy, rollback and R3–R5 gates without claiming implementation.
 - [Dynamic Workstream Succession Contract](dynamic-workstream-succession-contract.md) — provider-neutral relation events, exact Git evidence, append-only common-private storage, active-tip conflict-pair policy and W7B/W7C consumer boundaries governed by ADR-0014.
 - [Self-hosting documentation system](self-hosting-documentation-system.md) — the reader paths, storage boundaries, and synchronization rules governed by ADR-0001.
