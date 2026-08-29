@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-29 SC1 Closed Worktree Removal](2026-08-29-sc1-closed-worktree-removal.md) — archives six closed Git-private sessions, removes only their clean worktree directories, and verifies all branches/commits remain while an unrelated concurrent worktree is preserved.
 - [2026-08-29 SC1 Canonical State Closeout](2026-08-29-sc1-canonical-state-closeout.md) — reconciles current entrances, subsystem State and completed Plan status; exact `a9369dd` passed Fast/Promotion and entered protected main while preserving release／cleanup boundaries.
 - [2026-08-29 CI5 Promotion Throughput Optimization](2026-08-29-ci5-promotion-throughput-optimization.md) — preserves complete exact-SHA dual-platform coverage while separating 27 logical shards from ten physical lanes; exact `9ee831f` completed 25/25 hosted jobs and entered Canonical main.
 - [2026-08-29 CI4 opaque CLI token argument reliability](2026-08-29-ci4-opaque-cli-token-argument-reliability.md) — replaces split apply／undo token argv with the opaque-safe equals form, adds deterministic leading-dash apply/undo coverage, records the exact R3 hosted failure and local gates, and leaves the final same-SHA hosted Fast／Promotion evidence to the task receipt.

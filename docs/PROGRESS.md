@@ -41,6 +41,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 最近完成
 
+- [SC1 Closed Worktree Removal](validation/2026-08-29-sc1-closed-worktree-removal.md)：归档并移除六个 clean／closed worktree，只删除目录且保留 branch／commit；并发创建的无关 worktree 未触碰。
 - [CI5 Promotion Throughput Optimization](validation/2026-08-29-ci5-promotion-throughput-optimization.md)：`9ee831f` 的 Fast、25-job Promotion、双平台 required checks 与 main fast-forward 已完成。
 - [CI4 opaque CLI token reliability](validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)：`a4b0ed3` Fast 2/2、Promotion 59/59 双平台通过并进入 main。
 - [R3 Orrery brand-only closeout](validation/2026-08-28-r3-orrery-brand-only-closeout.md)：当前展示面收口为 Orrery，稳定技术 ID 与历史资产保持不变。

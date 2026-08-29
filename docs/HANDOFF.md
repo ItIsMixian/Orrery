@@ -10,7 +10,8 @@ Updated: 2026-08-29
 - 当前未发布组件为 Core 0.1.14、CLI 0.1.18、Observatory 0.1.9；四个 Adapter 均为 0.1.1 source，支持状态仍为 `experimental`／`unreleased`。
 - W1–W7、Personal／Team Observatory、workspace maintenance、LAN discovery／manual Host switch、relation execution 和只读 Graph 已进入 Canonical source。默认 docsite、公开模板、release manifest 和 v0.2.0 用户能力没有因此切换。
 - R3 已把当前展示面收口为 Orrery；`project-orrery` 继续作为稳定 Skill／package／CLI／schema／协议及历史资产标识。R4/R5 未启动。
-- SC1 已把权威入口、State、Plan 状态和 CI5 hosted evidence 对齐；Fast `33256438925`、Promotion `33256558285` 与 main Fast `33256757429` 均通过。Git-private session 状态不升级为作者事实，物理 worktree／branch 删除不属于本次文档提交。
+- SC1 已把权威入口、State、Plan 状态和 CI5 hosted evidence 对齐；Fast `33256438925`、Promotion `33256558285` 与 main Fast `33256757429` 均通过。该 source commit 没有执行物理 cleanup，Git-private session 状态也不升级为作者事实。
+- 后续本机维护已归档并移除六个 `closed/superseded` worktree，只删除工作目录并保留 branch／commit；当前七个 registered worktree 中包含一个并发创建、未触碰的 `github-front-door-redesign`。
 
 ## 当前可继续的线路
 

@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-29 — SC1 Closed Worktree Removal
+
+- 经维护者明确确认后，对 W5D、CI4、R1、R2、R3、W6 六个 `closed/superseded` worktree 逐项复核 registered／clean／allowed ignored／branch／commit／session 状态；完整 Git-private `orrery/` 先归档到 `.git/orrery/retired-worktree-sessions/2026-08-29/` 并复核 SHA-256。
+- 使用 exact-path `git worktree remove --force` 只移除六个 worktree 目录及其可重建 generated ignored 内容；所有 local branch、remote ref、commit、作者文档、源码历史和发布事实保持。
+- post-check 为 7 个 registered worktree：清理期间独立 `codex/github-front-door-redesign` worktree 被创建且不在本轮授权范围内，因此完整保留。maintenance 25 秒 bounded scan 先前失败关闭，没有生成自动 queue／authorization／receipt，本操作不冒充自动 cleanup 产品证据。
+
 ## 2026-08-29 — SC1 Canonical State Closeout
 
 - 只读对账确认 `main = origin/main = 9ee831f`，主工作树 clean；CI5 Fast `33235942078` 与 Promotion `33235992711` 均成功，Promotion 为 25/25 jobs、双平台各 390 tests／27 shards、23.9 lane job-min 和约 40% derived overhead，同一 SHA 已进入 protected main。
