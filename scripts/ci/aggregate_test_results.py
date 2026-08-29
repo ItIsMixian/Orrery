@@ -12,6 +12,7 @@ from _common import (
     atomic_write_json,
     git_sha,
     load_json,
+    promotion_lane_assignments,
     sha256_json,
     validate_and_expand_manifest,
 )
@@ -40,9 +41,11 @@ def aggregate(
         errors.append(f"aggregator HEAD {current_sha} does not equal expected SHA {expected_sha}")
     manifest = load_json(manifest_path)
     all_ids, assignments, _ = validate_and_expand_manifest(manifest)
+    lanes = promotion_lane_assignments(manifest)
     expected_manifest_hash = sha256_json(manifest)
     expected_inventory_hash = sha256_json(all_ids)
     payloads: list[dict[str, Any]] = []
+    lane_payloads: list[dict[str, Any]] = []
     for path in sorted(results_dir.rglob("*.json")):
         try:
             payload = load_json(path)
@@ -52,6 +55,46 @@ def aggregate(
         if payload.get("contract_type") == "orrery-test-shard-result-v1":
             payload["_path"] = str(path)
             payloads.append(payload)
+        elif payload.get("contract_type") == "orrery-test-lane-result-v1":
+            payload["_path"] = str(path)
+            lane_payloads.append(payload)
+    by_lane: dict[str, list[dict[str, Any]]] = {}
+    for payload in lane_payloads:
+        by_lane.setdefault(str(payload.get("lane")), []).append(payload)
+    expected_lanes = set(lanes)
+    actual_lanes = set(by_lane)
+    missing_lanes = sorted(expected_lanes - actual_lanes)
+    extra_lanes = sorted(actual_lanes - expected_lanes)
+    if missing_lanes:
+        errors.append(f"missing lane artifacts: {missing_lanes}")
+    if extra_lanes:
+        errors.append(f"unexpected lane artifacts: {extra_lanes}")
+    for lane_id, items in sorted(by_lane.items()):
+        if len(items) != 1:
+            errors.append(f"lane {lane_id} has {len(items)} artifacts; expected exactly one")
+            continue
+        payload = items[0]
+        if payload.get("sha") != expected_sha:
+            errors.append(f"lane {lane_id} SHA mismatch: {payload.get('sha')!r}")
+        if payload.get("os") != expected_os:
+            errors.append(f"lane {lane_id} OS mismatch: {payload.get('os')!r}")
+        if payload.get("manifest_sha256") != expected_manifest_hash:
+            errors.append(f"lane {lane_id} manifest hash mismatch")
+        if payload.get("completed") is not True or payload.get("successful") is not True:
+            errors.append(f"lane {lane_id} was incomplete or unsuccessful")
+        expected_lane_shards = lanes.get(lane_id, [])
+        if payload.get("shards") != expected_lane_shards:
+            errors.append(f"lane {lane_id} shard list differs from the current manifest")
+        records = payload.get("records")
+        record_shards = (
+            [item.get("shard") for item in records if isinstance(item, dict)]
+            if isinstance(records, list)
+            else []
+        )
+        if record_shards != expected_lane_shards:
+            errors.append(f"lane {lane_id} records are missing, duplicated, or reordered")
+        elif any(item.get("successful") is not True for item in records):
+            errors.append(f"lane {lane_id} records a failed logical shard")
     by_shard: dict[str, list[dict[str, Any]]] = {}
     for payload in payloads:
         by_shard.setdefault(str(payload.get("shard")), []).append(payload)
@@ -134,6 +177,8 @@ def aggregate(
         "inventory_sha256": expected_inventory_hash,
         "expected_shard_count": len(assignments),
         "artifact_shard_count": len(payloads),
+        "expected_lane_count": len(lanes),
+        "artifact_lane_count": len(lane_payloads),
         "expected_test_count": len(all_ids),
         "recorded_test_count": len(all_record_ids),
         "complete": not errors,

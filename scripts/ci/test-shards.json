@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "discovery": {
     "start_dir": "tests",
     "pattern": "test_*.py"
@@ -43,7 +43,6 @@
       "test_collaboration_contract.CollaborationContractTests.test_schema_bundle_freezes_all_phase_zero_contracts",
       "test_workstream_relations.*",
       "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_execution_schema_cli_surface_and_no_delete_contract_are_dependency_light",
-      "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_minimal_git_binding_rejections_and_state_axes_checkpoint",
       "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_core_payload_maps_three_lenses_and_independent_axes",
       "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_invalid_provider_store_graph_legacy_and_links_fail_closed",
       "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
@@ -55,6 +54,48 @@
       "test_brand_contract.*"
     ]
   },
+  "promotion_lanes": [
+    {
+      "id": "lane-01",
+      "shards": ["team-relations-execution"]
+    },
+    {
+      "id": "lane-02",
+      "shards": ["context-benchmark", "team-lan-harness"]
+    },
+    {
+      "id": "lane-03",
+      "shards": ["w3-a", "packaging-project"]
+    },
+    {
+      "id": "lane-04",
+      "shards": ["team-lan-core", "workspace-observatory", "workspace-cli"]
+    },
+    {
+      "id": "lane-05",
+      "shards": ["w3-c", "team-ui-server", "release-restore"]
+    },
+    {
+      "id": "lane-06",
+      "shards": ["workspace-queue", "workspace-action", "release-migrate"]
+    },
+    {
+      "id": "lane-07",
+      "shards": ["w3-b", "context-oracle", "workspace-scan"]
+    },
+    {
+      "id": "lane-08",
+      "shards": ["context-harness", "packaging-adapters", "team-personal-b"]
+    },
+    {
+      "id": "lane-09",
+      "shards": ["w1-w2-b", "authority-core", "team-personal-a"]
+    },
+    {
+      "id": "lane-10",
+      "shards": ["w1-w2-a", "workspace-remove", "team-personal-c", "workspace-contract"]
+    }
+  ],
   "shards": [
     {
       "id": "authority-core",

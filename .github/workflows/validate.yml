@@ -23,7 +23,7 @@ jobs:
     name: promotion inventory and exact-SHA preflight
     runs-on: ubuntu-latest
     outputs:
-      shards: ${{ steps.inventory.outputs.shards }}
+      lanes: ${{ steps.inventory.outputs.lanes }}
       candidate_ref: ${{ steps.candidate.outputs.candidate_ref }}
       candidate_sha: ${{ steps.candidate.outputs.candidate_sha }}
     steps:
@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           python scripts/ci/test_inventory.py --output "$RUNNER_TEMP/test-inventory.json"
-          echo "shards=$(python scripts/ci/test_inventory.py --shard-list)" >> "$GITHUB_OUTPUT"
+          echo "lanes=$(python scripts/ci/test_inventory.py --lane-list)" >> "$GITHUB_OUTPUT"
       - name: Upload exact inventory
         uses: actions/upload-artifact@v4
         with:
@@ -61,14 +61,14 @@ jobs:
           path: ${{ runner.temp }}/test-inventory.json
           if-no-files-found: error
 
-  windows-shards:
-    name: promotion shard windows-latest / ${{ matrix.shard }}
+  windows-lanes:
+    name: promotion lane windows-latest / ${{ matrix.lane }}
     needs: preflight
     strategy:
       fail-fast: false
-      max-parallel: 20
+      max-parallel: 10
       matrix:
-        shard: ${{ fromJSON(needs.preflight.outputs.shards) }}
+        lane: ${{ fromJSON(needs.preflight.outputs.lanes) }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
@@ -87,18 +87,18 @@ jobs:
           python scripts/ci/validate_ci.py --bind
           --candidate-ref "${{ needs.preflight.outputs.candidate_ref }}"
           --candidate-sha "${{ needs.preflight.outputs.candidate_sha }}"
-      - name: Run complete Promotion shard
+      - name: Run complete Promotion lane
         env:
           ORRERY_TEST_BUILD: "1"
         run: >-
-          python scripts/ci/run_test_shard.py --shard "${{ matrix.shard }}"
-          --output "${{ runner.temp }}/result-${{ matrix.shard }}.json"
-      - name: Upload shard result
+          python scripts/ci/run_test_lane.py --lane "${{ matrix.lane }}"
+          --output-dir "${{ runner.temp }}/results-${{ matrix.lane }}"
+      - name: Upload lane results
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: promotion-windows-latest-${{ matrix.shard }}
-          path: ${{ runner.temp }}/result-${{ matrix.shard }}.json
+          name: promotion-windows-latest-${{ matrix.lane }}
+          path: ${{ runner.temp }}/results-${{ matrix.lane }}
           if-no-files-found: error
 
   windows-gates:
@@ -133,15 +133,14 @@ jobs:
       - name: Verify clean checkout diff
         run: git diff --check
 
-  ubuntu-shards:
-    name: promotion shard ubuntu-latest / ${{ matrix.shard }}
-    needs: [preflight, windows-shards]
-    if: ${{ always() && needs.preflight.result == 'success' }}
+  ubuntu-lanes:
+    name: promotion lane ubuntu-latest / ${{ matrix.lane }}
+    needs: preflight
     strategy:
       fail-fast: false
-      max-parallel: 20
+      max-parallel: 10
       matrix:
-        shard: ${{ fromJSON(needs.preflight.outputs.shards) }}
+        lane: ${{ fromJSON(needs.preflight.outputs.lanes) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -160,24 +159,23 @@ jobs:
           python scripts/ci/validate_ci.py --bind
           --candidate-ref "${{ needs.preflight.outputs.candidate_ref }}"
           --candidate-sha "${{ needs.preflight.outputs.candidate_sha }}"
-      - name: Run complete Promotion shard
+      - name: Run complete Promotion lane
         env:
           ORRERY_TEST_BUILD: "1"
         run: >-
-          python scripts/ci/run_test_shard.py --shard "${{ matrix.shard }}"
-          --output "${{ runner.temp }}/result-${{ matrix.shard }}.json"
-      - name: Upload shard result
+          python scripts/ci/run_test_lane.py --lane "${{ matrix.lane }}"
+          --output-dir "${{ runner.temp }}/results-${{ matrix.lane }}"
+      - name: Upload lane results
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: promotion-ubuntu-latest-${{ matrix.shard }}
-          path: ${{ runner.temp }}/result-${{ matrix.shard }}.json
+          name: promotion-ubuntu-latest-${{ matrix.lane }}
+          path: ${{ runner.temp }}/results-${{ matrix.lane }}
           if-no-files-found: error
 
   ubuntu-gates:
     name: promotion repository gates / ubuntu-latest
-    needs: [preflight, windows-shards]
-    if: ${{ always() && needs.preflight.result == 'success' }}
+    needs: preflight
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -210,7 +208,7 @@ jobs:
   smoke-test-windows:
     name: smoke-test (windows-latest)
     if: ${{ always() }}
-    needs: [preflight, windows-shards, windows-gates]
+    needs: [preflight, windows-lanes, windows-gates]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
@@ -234,7 +232,7 @@ jobs:
           --results-dir "${{ runner.temp }}/promotion-results"
           --expected-os Windows
           --expected-sha "${{ needs.preflight.outputs.candidate_sha }}"
-          --matrix-result "${{ needs.windows-shards.result }}"
+          --matrix-result "${{ needs.windows-lanes.result }}"
           --gate-result "${{ needs.windows-gates.result }}"
           --output "${{ runner.temp }}/promotion-windows-latest.json"
       - name: Upload aggregate receipt
@@ -248,7 +246,7 @@ jobs:
   smoke-test-ubuntu:
     name: smoke-test (ubuntu-latest)
     if: ${{ always() }}
-    needs: [preflight, ubuntu-shards, ubuntu-gates]
+    needs: [preflight, ubuntu-lanes, ubuntu-gates]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -272,7 +270,7 @@ jobs:
           --results-dir "${{ runner.temp }}/promotion-results"
           --expected-os Linux
           --expected-sha "${{ needs.preflight.outputs.candidate_sha }}"
-          --matrix-result "${{ needs.ubuntu-shards.result }}"
+          --matrix-result "${{ needs.ubuntu-lanes.result }}"
           --gate-result "${{ needs.ubuntu-gates.result }}"
           --output "${{ runner.temp }}/promotion-ubuntu-latest.json"
       - name: Upload aggregate receipt

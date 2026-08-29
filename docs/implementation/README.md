@@ -14,6 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-29 CI5 Promotion Throughput Optimization](plans/2026-08-29-ci5-promotion-throughput-optimization.md) — active no-coverage-loss CI optimization that preserves 27 logical shards and exact-SHA dual-platform gates while packing them into ten physical lanes per OS, restoring Checkpoint headroom and removing cross-OS serialization.
 - [2026-08-28 Orrery Rename and Compatibility R3–R5](plans/2026-08-28-orrery-rename-and-compatibility.md) — active under Accepted ADR-0015 and the Approved Design; R3 is a locally validated Worktree Candidate awaiting exact-SHA Promotion, while R4/R5 remain later independent Workstreams preserving Python identity and frozen v0.2.0 evidence.
 - [2026-08-28 CI3 Fast Validation Dependency Fix](plans/2026-08-28-ci3-fast-validation-dependency-fix.md) — installs real Fast discovery dependencies before contract validation, mechanically protects ordering and conditionally uploads only an existing timing result without changing the 15-second Fast or Promotion contracts.
 - [2026-08-28 W7D W7 Integration Candidate](plans/2026-08-28-w7d-w7-integration-candidate.md) — integrates CI2/W7B and W7C-B additively, preserves tiered budgets and read-only graph authority, and freezes the non-`main` exact-SHA Promotion handoff.

@@ -16,6 +16,7 @@ from typing import Any, Iterable
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = Path(__file__).with_name("test-shards.json")
 SHARD_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+LANE_ID_RE = re.compile(r"^lane-[0-9]{2}$")
 REQUIRED_SURFACES = {
     "Authority/Core",
     "W1-W2",
@@ -82,11 +83,19 @@ def atomic_write_json(path: Path, value: Any) -> None:
 
 
 def validate_manifest_shape(manifest: dict[str, Any]) -> None:
-    if set(manifest) != {"schema_version", "discovery", "fast", "checkpoint", "shards"}:
+    if set(manifest) != {
+        "schema_version",
+        "discovery",
+        "fast",
+        "checkpoint",
+        "promotion_lanes",
+        "shards",
+    }:
         raise CIValidationError(
-            "manifest must contain only schema_version, discovery, fast, checkpoint, and shards"
+            "manifest must contain only schema_version, discovery, fast, checkpoint, "
+            "promotion_lanes, and shards"
         )
-    if manifest["schema_version"] != 2:
+    if manifest["schema_version"] != 3:
         raise CIValidationError("unsupported shard manifest schema_version")
     discovery = manifest["discovery"]
     if not isinstance(discovery, dict) or set(discovery) != {"start_dir", "pattern"}:
@@ -150,6 +159,60 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> None:
     workspace_shards = [item for item in shards if item["surface"] == "Workspace Maintenance"]
     if len(workspace_shards) < 2 or any("test_workspace_maintenance.*" in item["selectors"] for item in workspace_shards):
         raise CIValidationError("Workspace Maintenance must be split by test method across multiple shards")
+    _validate_promotion_lanes(manifest["promotion_lanes"], shard_ids)
+
+
+def _validate_promotion_lanes(lanes: Any, shard_ids: set[str]) -> None:
+    if not isinstance(lanes, list) or not lanes:
+        raise CIValidationError("promotion_lanes must be a non-empty array")
+    if len(lanes) > 20:
+        raise CIValidationError("promotion_lanes must fit the bounded hosted runner concurrency")
+    lane_ids: set[str] = set()
+    owner_by_shard: dict[str, str] = {}
+    for lane in lanes:
+        if not isinstance(lane, dict) or set(lane) != {"id", "shards"}:
+            raise CIValidationError("each Promotion lane must contain exactly id and shards")
+        lane_id = lane["id"]
+        if not isinstance(lane_id, str) or not LANE_ID_RE.fullmatch(lane_id):
+            raise CIValidationError(f"invalid Promotion lane id: {lane_id!r}")
+        if lane_id in lane_ids:
+            raise CIValidationError(f"duplicate Promotion lane id: {lane_id}")
+        lane_ids.add(lane_id)
+        members = lane["shards"]
+        if not isinstance(members, list) or not members:
+            raise CIValidationError(f"Promotion lane {lane_id} must contain at least one shard")
+        if any(not isinstance(item, str) or not item for item in members):
+            raise CIValidationError(f"Promotion lane {lane_id} contains an invalid shard id")
+        if len(members) != len(set(members)):
+            raise CIValidationError(f"Promotion lane {lane_id} contains duplicate shard ids")
+        for shard_id in members:
+            if shard_id not in shard_ids:
+                raise CIValidationError(
+                    f"Promotion lane {lane_id} references unknown shard {shard_id}"
+                )
+            previous = owner_by_shard.get(shard_id)
+            if previous is not None:
+                raise CIValidationError(
+                    f"Promotion shard {shard_id} belongs to multiple lanes: {previous}, {lane_id}"
+                )
+            owner_by_shard[shard_id] = lane_id
+    missing = sorted(shard_ids - set(owner_by_shard))
+    extra = sorted(set(owner_by_shard) - shard_ids)
+    if missing or extra:
+        raise CIValidationError(
+            f"Promotion lane assignment is incomplete; missing={missing}, extra={extra}"
+        )
+    heavy_lane = owner_by_shard.get("team-relations-execution")
+    if heavy_lane is None:
+        raise CIValidationError("team-relations-execution must belong to one Promotion lane")
+    heavy_members = next(lane["shards"] for lane in lanes if lane["id"] == heavy_lane)
+    if heavy_members != ["team-relations-execution"]:
+        raise CIValidationError("team-relations-execution must remain isolated in its Promotion lane")
+
+
+def promotion_lane_assignments(manifest: dict[str, Any]) -> dict[str, list[str]]:
+    validate_manifest_shape(manifest)
+    return {str(lane["id"]): list(lane["shards"]) for lane in manifest["promotion_lanes"]}
 
 
 def _validate_selectors(selectors: Any, owner: str) -> None:

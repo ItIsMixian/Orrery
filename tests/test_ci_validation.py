@@ -23,10 +23,12 @@ from _common import (  # noqa: E402
     expand_profile,
     git_sha,
     load_json,
+    promotion_lane_assignments,
     sha256_json,
     validate_and_expand_manifest,
 )
 from aggregate_test_results import aggregate  # noqa: E402
+from run_test_lane import run_lane  # noqa: E402
 from run_test_shard import TimedTextResult, run_selected  # noqa: E402
 from validate_ci import validate_binding, validate_workflows  # noqa: E402
 
@@ -83,10 +85,39 @@ class CIValidationTests(unittest.TestCase):
     def _write_payloads(self, directory: Path, payloads: dict[str, dict]) -> None:
         for shard, payload in payloads.items():
             atomic_write_json(directory / shard / "result.json", payload)
+        sample = next(iter(payloads.values()))
+        for lane, shards in promotion_lane_assignments(self.manifest).items():
+            atomic_write_json(
+                directory / lane / "lane-result.json",
+                {
+                    "schema_version": 1,
+                    "contract_type": "orrery-test-lane-result-v1",
+                    "sha": sample["sha"],
+                    "os": sample["os"],
+                    "python": sample["python"],
+                    "lane": lane,
+                    "manifest_sha256": sample["manifest_sha256"],
+                    "shards": shards,
+                    "records": [
+                        {
+                            "shard": shard,
+                            "return_code": 0,
+                            "result_file": f"result-{shard}.json",
+                            "result_present": True,
+                            "successful": True,
+                        }
+                        for shard in shards
+                    ],
+                    "successful": True,
+                    "completed": True,
+                    "duration_seconds": 0.01,
+                },
+            )
 
     def test_inventory_assigns_every_final_test_once_and_splits_workspace_methods(self) -> None:
         test_ids, assignments, fast_ids = validate_and_expand_manifest(self.manifest)
         checkpoint_ids = expand_profile(self.manifest, "checkpoint", test_ids)
+        lanes = promotion_lane_assignments(self.manifest)
         assigned = [test_id for selected in assignments.values() for test_id in selected]
         self.assertEqual(sorted(assigned), test_ids)
         self.assertEqual(len(assigned), len(set(assigned)))
@@ -95,6 +126,11 @@ class CIValidationTests(unittest.TestCase):
         self.assertLess(len(checkpoint_ids), len(test_ids))
         self.assertEqual(self.manifest["fast"]["budget_seconds"], 15)
         self.assertEqual(self.manifest["checkpoint"]["budget_seconds"], 90)
+        self.assertEqual(len(lanes), 10)
+        lane_shards = [shard for members in lanes.values() for shard in members]
+        self.assertEqual(sorted(lane_shards), sorted(assignments))
+        self.assertEqual(len(lane_shards), len(set(lane_shards)))
+        self.assertEqual(lanes["lane-01"], ["team-relations-execution"])
         w7b = next(
             shard for shard in self.manifest["shards"] if shard["id"] == "team-relations-execution"
         )
@@ -112,6 +148,71 @@ class CIValidationTests(unittest.TestCase):
         ]
         self.assertGreaterEqual(len(workspace), 4)
         self.assertFalse(any("test_workspace_maintenance.*" in shard["selectors"] for shard in workspace))
+        minimal_git = (
+            "test_workstream_relation_execution.WorkstreamRelationExecutionTests."
+            "test_minimal_git_binding_rejections_and_state_axes_checkpoint"
+        )
+        self.assertNotIn(minimal_git, checkpoint_ids)
+        self.assertIn(minimal_git, assignments["team-relations-execution"])
+
+    def test_lane_contract_rejects_missing_duplicate_unknown_and_heavy_cohabitation(self) -> None:
+        missing = copy.deepcopy(self.manifest)
+        missing["promotion_lanes"][-1]["shards"].remove("workspace-contract")
+        with self.assertRaisesRegex(CIValidationError, "lane assignment is incomplete"):
+            validate_and_expand_manifest(missing)
+
+        duplicate = copy.deepcopy(self.manifest)
+        duplicate["promotion_lanes"][1]["shards"].append("workspace-contract")
+        with self.assertRaisesRegex(CIValidationError, "multiple lanes"):
+            validate_and_expand_manifest(duplicate)
+
+        unknown = copy.deepcopy(self.manifest)
+        unknown["promotion_lanes"][1]["shards"][0] = "unknown-shard"
+        with self.assertRaisesRegex(CIValidationError, "unknown shard"):
+            validate_and_expand_manifest(unknown)
+
+        cohabitation = copy.deepcopy(self.manifest)
+        cohabitation["promotion_lanes"][0]["shards"].append("context-benchmark")
+        cohabitation["promotion_lanes"][1]["shards"].remove("context-benchmark")
+        with self.assertRaisesRegex(CIValidationError, "must remain isolated"):
+            validate_and_expand_manifest(cohabitation)
+
+    def test_lane_runner_preserves_shard_process_isolation_and_continues_after_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output_dir = Path(temporary) / "lane"
+            calls: list[str] = []
+
+            def fake_run(command):
+                shard = command[command.index("--shard") + 1]
+                output = Path(command[command.index("--output") + 1])
+                calls.append(shard)
+                successful = len(calls) > 1
+                atomic_write_json(
+                    output,
+                    {
+                        "contract_type": "orrery-test-shard-result-v1",
+                        "shard": shard,
+                        "successful": successful,
+                        "completed": True,
+                    },
+                )
+                return 0 if successful else 1
+
+            payload, successful = run_lane(
+                manifest_path=DEFAULT_MANIFEST,
+                lane="lane-02",
+                output_dir=output_dir,
+                executor=fake_run,
+            )
+            self.assertFalse(successful)
+            self.assertEqual(calls, ["context-benchmark", "team-lan-harness"])
+            self.assertEqual(payload["shards"], calls)
+            self.assertFalse(payload["records"][0]["successful"])
+            self.assertTrue(payload["records"][1]["successful"])
+            self.assertTrue((output_dir / "result-context-benchmark.json").is_file())
+            self.assertTrue((output_dir / "result-team-lan-harness.json").is_file())
+            receipt = json.loads((output_dir / "lane-result.json").read_text(encoding="utf-8"))
+            self.assertEqual(receipt["contract_type"], "orrery-test-lane-result-v1")
 
     def test_inventory_rejects_missing_duplicate_and_dead_selectors(self) -> None:
         missing = copy.deepcopy(self.manifest)
@@ -206,6 +307,8 @@ class CIValidationTests(unittest.TestCase):
             )
             self.assertTrue(result["complete"], result["errors"])
             self.assertEqual(result["expected_test_count"], result["recorded_test_count"])
+            self.assertEqual(result["expected_lane_count"], 10)
+            self.assertEqual(result["artifact_lane_count"], 10)
 
     def test_aggregate_fails_on_missing_duplicate_failed_or_skipped_jobs(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -235,6 +338,29 @@ class CIValidationTests(unittest.TestCase):
             self.assertIn("skipped", joined)
             self.assertTrue(assignments[removed])
 
+    def test_aggregate_fails_on_missing_or_drifted_lane_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            payloads, _ = self._result_payloads()
+            self._write_payloads(directory, payloads)
+            (directory / "lane-02" / "lane-result.json").unlink()
+            lane_three = directory / "lane-03" / "lane-result.json"
+            drifted = json.loads(lane_three.read_text(encoding="utf-8"))
+            drifted["shards"] = list(reversed(drifted["shards"]))
+            atomic_write_json(lane_three, drifted)
+            result = aggregate(
+                manifest_path=DEFAULT_MANIFEST,
+                results_dir=directory,
+                expected_os="Windows",
+                expected_sha=git_sha(),
+                matrix_result="success",
+                gate_result="success",
+            )
+            self.assertFalse(result["complete"])
+            joined = "\n".join(result["errors"])
+            self.assertIn("missing lane artifacts", joined)
+            self.assertIn("lane lane-03 shard list differs", joined)
+
     def test_workflow_validator_separates_fast_and_promotion_roles(self) -> None:
         self.assertEqual(validate_workflows(), [])
         with tempfile.TemporaryDirectory() as temporary:
@@ -246,6 +372,40 @@ class CIValidationTests(unittest.TestCase):
             promotion.write_text(text.replace("  workflow_dispatch:", "  push:", 1), encoding="utf-8")
             errors = validate_workflows(fast, promotion)
             self.assertTrue(any("workflow_dispatch" in error for error in errors))
+
+    def test_workflows_parallelize_os_lanes_and_cancel_only_superseded_fast(self) -> None:
+        fast_text = (ROOT / ".github/workflows/fast-validation.yml").read_text(encoding="utf-8")
+        promotion_text = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        self.assertIn("cancel-in-progress: true", fast_text)
+        self.assertEqual(promotion_text.count("max-parallel: 10"), 2)
+        self.assertIn("run_test_lane.py --lane", promotion_text)
+        self.assertNotIn("run_test_shard.py --shard", promotion_text)
+        ubuntu_lanes = promotion_text.split("  ubuntu-lanes:", 1)[1].split(
+            "  ubuntu-gates:", 1
+        )[0]
+        ubuntu_gates = promotion_text.split("  ubuntu-gates:", 1)[1].split(
+            "  smoke-test-windows:", 1
+        )[0]
+        self.assertIn("needs: preflight", ubuntu_lanes)
+        self.assertIn("needs: preflight", ubuntu_gates)
+        self.assertNotIn("windows-lanes", ubuntu_lanes)
+        self.assertNotIn("windows-lanes", ubuntu_gates)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            fast = directory / "fast.yml"
+            promotion = directory / "promotion.yml"
+            fast.write_text(fast_text, encoding="utf-8")
+            promotion.write_text(
+                promotion_text.replace(
+                    "  ubuntu-lanes:\n    name:",
+                    "  ubuntu-lanes:\n    needs: [preflight, windows-lanes]\n    name:",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_workflows(fast, promotion)
+            self.assertTrue(any("must not wait for the Windows" in error for error in errors))
 
     def test_promotion_preflight_installs_discovery_dependencies_before_validation(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

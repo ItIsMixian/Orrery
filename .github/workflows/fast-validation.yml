@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: fast-validation-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   fast-validation:
     name: fast-validation (${{ matrix.os }})

@@ -12,6 +12,7 @@ from _common import (
     ROOT,
     expand_profile,
     load_json,
+    promotion_lane_assignments,
     validate_and_expand_manifest,
 )
 
@@ -63,6 +64,13 @@ def validate_workflows(
         errors.append("Fast workflow must not use Promotion required-check names")
     _require(fast, "validate_ci.py --all", errors, "Fast workflow")
     _require(fast, "validate_installation.py --target . --require-integrated", errors, "Fast workflow")
+    _require(
+        fast,
+        "group: fast-validation-${{ github.head_ref || github.ref_name }}",
+        errors,
+        "Fast workflow",
+    )
+    _require(fast, "cancel-in-progress: true", errors, "Fast workflow")
     fast_dependency_step = "- name: Install Fast discovery dependencies"
     fast_dependency_command = (
         'run: python -m pip install "wheel>=0.41,<1" -r '
@@ -102,7 +110,8 @@ def validate_workflows(
         "github.event_name == 'workflow_dispatch' && inputs.candidate_sha || github.sha",
         "validate_ci.py --bind",
         "test_inventory.py",
-        "run_test_shard.py --shard",
+        "test_inventory.py --lane-list",
+        "run_test_lane.py --lane",
         "aggregate_test_results.py",
         "validate_repository_gates.py",
         "validate_installation.py --target . --require-integrated",
@@ -118,7 +127,24 @@ def validate_workflows(
     for required_name in ("name: smoke-test (windows-latest)", "name: smoke-test (ubuntu-latest)"):
         if promotion.count(required_name) != 1:
             errors.append(f"Promotion workflow must define required name exactly once: {required_name}")
-    preflight = promotion.split("  windows-shards:", 1)[0]
+    if "run_test_shard.py --shard" in promotion:
+        errors.append("Promotion workflow must execute physical lanes, not one hosted job per logical shard")
+    if promotion.count("max-parallel: 10") != 2:
+        errors.append("Promotion workflow must bound both OS lane matrices to ten concurrent jobs")
+    try:
+        ubuntu_lanes = promotion.split("  ubuntu-lanes:", 1)[1].split("  ubuntu-gates:", 1)[0]
+        ubuntu_gates = promotion.split("  ubuntu-gates:", 1)[1].split(
+            "  smoke-test-windows:", 1
+        )[0]
+    except IndexError:
+        errors.append("Promotion workflow must define explicit Ubuntu lane and gate jobs")
+    else:
+        for owner, section in (("Ubuntu lanes", ubuntu_lanes), ("Ubuntu gates", ubuntu_gates)):
+            if "needs: preflight" not in section:
+                errors.append(f"{owner} must start independently after preflight")
+            if "windows-lanes" in section or "windows-gates" in section:
+                errors.append(f"{owner} must not wait for the Windows execution wave")
+    preflight = promotion.split("  windows-lanes:", 1)[0]
     dependency_step = "- name: Install preflight discovery dependencies"
     _require(preflight, dependency_step, errors, "Promotion preflight")
     _require(
@@ -186,9 +212,12 @@ def validate_all(manifest_path: Path) -> list[str]:
     try:
         manifest = load_json(manifest_path)
         all_ids, assignments, fast_ids = validate_and_expand_manifest(manifest)
+        lanes = promotion_lane_assignments(manifest)
         checkpoint_ids = expand_profile(manifest, "checkpoint", all_ids)
         if len(assignments) < 8:
             errors.append("Promotion manifest must retain meaningful parallel sharding")
+        if len(lanes) != 10:
+            errors.append("CI5 Promotion manifest must define exactly ten physical lanes")
         if set(fast_ids) == set(all_ids):
             errors.append("Fast profile must remain a strict subset and cannot masquerade as Promotion")
         if not set(fast_ids).issubset(checkpoint_ids):
