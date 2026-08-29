@@ -14,14 +14,14 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前 Canonical source
 
 - protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- `packages/component-versions.json` 声明 Core 0.1.14、CLI 0.1.18、Observatory 0.1.9，组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
+- U1/U2 integration baseline 声明 Core 0.1.14、CLI 0.1.18、Observatory 0.1.10；U2 Worktree Candidate 只把 Observatory source 推进到 0.1.11。组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
 - Codex、Harness JSON、Claude Code 与 DeepSeek Harness Adapter source 均为 0.1.1、`experimental`／`unreleased`。每个 Adapter 有独立 manifest、归档、生命周期和 runtime evidence，不能互相外推。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。
 - Claude Code 2.1.87 只完成 Plugin／Skill 发现与认证前失败关闭；没有成功模型路由。Harness JSON 证明 subprocess JSON 合约，不证明第三方 Agent runtime 兼容。
 - Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 local release-candidate gate 已进入 source；公开 manifest、standalone installer 和默认 managed Observatory 尚未声明或启用模型 1。
 - Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
-- Unified Observatory 只有 Accepted ADR／Approved Design 与非权威原型；没有生产 shell、默认 launcher、managed-tool/public-template transition 或 Release。
+- Unified Observatory 在 U2 Worktree Candidate 已有真实 root-only shell、静态 builder、单 URL supervisor 与 headless/debug launcher；没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
 
 ## CI 与推广门
 
@@ -47,6 +47,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `adapters/`, `scripts/package_*adapter.py`
 - `.github/workflows/fast-validation.yml`, `.github/workflows/validate.yml`
 - `scripts/ci/`, `tests/test_ci_validation.py`
+- `scripts/docsite/build_unified_observatory.py`, `scripts/docsite/serve_orrery.py`
+- [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [Platform-neutral Plan](../implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)
 
@@ -56,5 +58,5 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - 维护者尚未选择下一 SemVer／candidate manifest；Authority `release_ready` 保持 false。
 - Claude 认证后模型路由未完成；其他 Adapter／OS／runtime／模型范围不得继承已有 evidence。
 - v0.2.0 archive 在 Windows／Linux 重建尚非 byte-for-byte 一致。
-- Collaboration／Maintenance／Graph 没有默认 consumer 或 public release；self-host relation apply、真实双机与 scheduler 不受支持。
+- Unified／Collaboration／Maintenance／Graph 没有默认 consumer 或 public release；self-host relation apply、真实双机与 scheduler 不受支持。
 - R4 alias、R5 optional default transition 和最早 0.4.0 cleanup review 均未启动。

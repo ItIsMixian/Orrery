@@ -648,3 +648,23 @@
 - 一个独立 integration baseline 合并 W6.1／CI6、A3 与 U1。A3 与 CI6 只在 `scripts/ci/test-shards.json` 发生预期冲突；整合保留 CI6 schema-5/data-only registry，并登记 A3 七个低成本 Authority consumer tests，CI contract 与 A3 7/7 专项通过。
 - U1 synthetic prototype 仍只是 architecture interaction study。U2 必须优先适配现有 `build_docsite.py`／`serve.py` 文档、搜索、AI、作者信息架构和可识别视觉体验；全面视觉重设计没有获得授权。
 - 本节点只建立 Candidate baseline，不宣称 `origin/main`、production Unified Shell、默认 launcher、public template、managed tools、tag 或 Release 已改变。
+
+## 2026-08-29 — U2 Unified Observatory Production Integration Candidate
+
+- 从 `codex/u1-u2-integration-baseline@12f3bf53dfc768067a5a4048de63437313ed633a` 建立独立
+  `codex/u2-unified-observatory-production-integration`，首次作者写入前注册 Git-private U2 Workstream 并绑定
+  exact task base；parent lineage 保持 `parent-unverified-unknown`，没有表述成 origin/main Canonical。
+- Observatory 0.1.11 新增 versioned consumer registration/capability discovery、静态 root-only builder、单
+  loopback supervisor 和 headless `Start Orrery.vbs`／one-console debug 入口。生产 HTML 直接适配现有 docsite
+  reader/search/AI/信息架构与视觉壳；Authority 消费 A3，Maintenance 消费 W6.1，Team/Graph/Personal 复用现有
+  provider。route/privilege collision 失败关闭，optional consumer 独立 quarantine，required consumer 触发
+  whole-shell rollback。
+- 动态模式只公开一个 URL。Host／Origin／cookie／settings token 与 JSON/body gate 在统一入口收口；Team 仍
+  项目 opt-in/request-only，Authority/AI 不自行启用，Quick Remove 仍由 provider 要求本机 action-specific
+  confirmation＋fresh preflight。最终 diff/browser review 修正 Maintenance legacy action suffix 和旧 Team 页面
+  rebuild 阻塞；Unified 使用 ADR-0016 route 并直接轮询 provider status，不复制 cache/eligibility。ready
+  identity 与 helper ownership 在正常 stop、console interrupt 和 stale recovery 后释放；`start-docsite.bat` 未改。
+- focused 11/11、CI6 Fast 49/49 与最终 Checkpoint 54/54 PASS；静态 artifact 无 Unified dynamic control/Team fetch。真实 in-app
+  Chromium 在 1280x720 验证搜索、Maintenance、AI provider 未启用与 Graph Unavailable，在 390x844 验证导航抽屉；两端无横向
+  溢出或 console error。Candidate／Promotion、non-main push、main、
+  public template、managed tools、installer、tag 与 Release 留给后续唯一整合者。

@@ -50,6 +50,10 @@ def render_personal_site(
     excluded_branches: tuple[str, ...] = (),
     maintenance_control_available: bool = False,
     maintenance_api_base: str = "/team/api/maintenance",
+    maintenance_refresh_path: str = "/scan",
+    maintenance_remove_path: str = "/quick-remove",
+    maintenance_reload_after_action: bool = True,
+    include_local_worktrees: bool = True,
 ):
     """Return the base Observatory unchanged unless explicit W4 opt-in is enabled."""
 
@@ -69,6 +73,9 @@ def render_personal_site(
         maintenance = maintenance_status(root)
         maintenance["control_available"] = maintenance_control_available
         maintenance["api_base"] = maintenance_api_base
+        maintenance["refresh_path"] = maintenance_refresh_path
+        maintenance["remove_path"] = maintenance_remove_path
+        maintenance["reload_after_action"] = maintenance_reload_after_action
     except Exception as error:
         maintenance = {
             "status": "unavailable",
@@ -83,7 +90,7 @@ def render_personal_site(
     try:
         projection = build_personal_observatory_projection(
             root,
-            include_local_worktrees=True,
+            include_local_worktrees=include_local_worktrees,
             excluded_branches=excluded_branches,
             maintenance_projection=maintenance,
         )

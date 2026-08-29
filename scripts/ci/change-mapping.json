@@ -107,8 +107,10 @@
         "scripts/docsite/**",
         "experiments/unified-observatory-shell/**",
         "start-*.bat",
+        "Start Orrery.vbs",
         "tests/test_personal_observatory.py",
         "tests/test_team_observatory.py",
+        "tests/test_unified_observatory.py",
         "tests/test_*graph*.py"
       ],
       "subsystems": [
@@ -6133,6 +6135,180 @@
         "collaboration-maintenance"
       ],
       "reason": "low evidence for Team/LAN via collaboration-maintenance"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_headless_launcher_console_debug_and_legacy_rollback_are_explicit",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "low-cost Unified Observatory launcher and rollback contract"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_stale_identity_recovers_but_live_identity_fails_closed",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "low-cost Unified Observatory crash-recovery identity contract"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRegistrationTests.test_optional_failure_quarantines_only_one_consumer",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "low-cost Unified Observatory quarantine contract"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRegistrationTests.test_route_collision_and_privilege_escalation_fail_closed",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "low-cost route collision and privilege escalation fail-closed evidence"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRegistrationTests.test_static_shell_has_navigation_but_no_dynamic_control_script",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "low-cost static no-server no-cookie no-control evidence"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRegistrationTests.test_versioned_registration_and_capability_discovery_are_sanitized",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "low-cost versioned consumer registration and discovery evidence"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRuntimeTests.test_capabilities_search_and_unavailable_state_are_bounded",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "dynamic Unified Observatory capability, search, and degradation evidence"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRuntimeTests.test_close_reclaims_owned_state_and_bound_port",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "dynamic Unified Observatory helper and listener lifecycle evidence"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRuntimeTests.test_host_origin_cookie_unknown_api_and_token_boundaries",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "dynamic Unified Observatory Host Origin cookie and token boundary evidence"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRuntimeTests.test_one_visible_url_composes_real_consumers_and_existing_docsite_style",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "dynamic one-visible-URL and inherited docsite composition evidence"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedRuntimeTests.test_team_opt_in_authority_ai_and_maintenance_do_not_escalate",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "medium",
+      "budget_seconds": 90.0,
+      "dependencies": [
+        "observatory-ui"
+      ],
+      "reason": "dynamic Team Authority AI and Maintenance non-escalation evidence"
     },
     {
       "test_id": "test_workstream_relations.WorkstreamRelationTests.test_similarity_is_never_evidence_and_unknown_parent_stays_proposed",

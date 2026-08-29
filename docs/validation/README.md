@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-29 U2 Unified Observatory Production Integration](2026-08-29-u2-unified-observatory-production-integration.md) — validates the real root-only/default-off single-URL shell, versioned consumer registry, legacy docsite inheritance, security/lifecycle boundaries and desktop/390px browser behavior without a public/default or release transition.
 - [2026-08-29 U1 Unified Observatory Architecture & Shell](2026-08-29-u1-unified-observatory-architecture.md) — validates the accepted architecture boundary and synthetic interaction study while explicitly recording that production integration and visual redesign did not occur.
 - [2026-08-29 CI6 Local Validation Router & Tier Enforcement](2026-08-29-ci6-local-validation-router-tier-enforcement.md) — validates change-derived tier selection, exact receipts, W6.1 cost separation and fail-closed inventory enforcement.
 - [2026-08-29 W6.1 Incremental Maintenance & Quick Remove](2026-08-29-w6-1-incremental-maintenance-quick-remove.md) — validates maintenance-v2 cache, background refresh, target preflight and human-confirmed Quick Remove while preserving branch/commit and fail-closed protection.

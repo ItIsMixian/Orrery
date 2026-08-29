@@ -1491,7 +1491,7 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
     api_base = str(maintenance.get("api_base", "/team/api/maintenance"))
     history_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(item.get("receipt_id")), _esc(item.get("outcome"))) for item in receipts[-8:]) or '<div class="mo-empty">尚无执行 receipt。</div>'
     return (
-        '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s" data-maintenance-api-base="%s">'
+        '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s" data-maintenance-api-base="%s" data-maintenance-refresh-path="%s" data-maintenance-remove-path="%s" data-maintenance-reload-after-action="%s">'
         '<section class="mo-shell"><header class="mo-head"><div><span class="mo-kicker">WORKSPACE MAINTENANCE · LOCAL ONLY</span><h2>工作区维护</h2><p>定时发现不等于自动删除。建议、授权和执行分离；本阶段只支持本机确认后的 remove-worktree。</p></div><span class="mo-boundary">PERSONAL ZERO-NETWORK · BRANCH 保留</span></header>'
         '<div class="mo-signals"><div><small>缓存状态</small><b data-maintenance-cache-status>%s</b></div><div><small>worktrees</small><b data-maintenance-worktrees>%s</b></div><div><small>后台刷新</small><b data-maintenance-background>%s</b></div><div><small>预计空间</small><b data-maintenance-reclaim>%s</b></div></div><div class="mo-progress %s" aria-hidden="true"></div>'
         '<div class="mo-actions"><button class="mo-button" type="button" data-maintenance-scan%s>后台增量扫描</button><span class="mo-empty">请求线程不等待 · target-scoped preflight · 无 scheduler</span></div>'
@@ -1500,7 +1500,7 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
         '<aside class="mo-side"><section class="mo-section"><h3>策略</h3><div class="mo-policy">%s</div></section><section class="mo-section"><details class="mo-history"><summary>授权与执行历史</summary>%s</details></section></aside></div>'
         '<div class="mo-notice" data-maintenance-notice>%s</div></section></article>'
         % (
-            "true" if control else "false", _esc(api_base), _esc(cache.get("status", "Unknown")), _esc(len(cache_entries) if cache_entries else counts.get("worktrees", "Unknown")), _esc(background_status), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "running" if background_status in {"pending", "running"} else "", "" if control else " disabled", _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；Quick Remove 会先做最新 target preflight，只删除 worktree，保留 branch/commit。" if control else "静态只读视图；请使用 root-only 本机动态入口进行确认。",
+            "true" if control else "false", _esc(api_base), _esc(maintenance.get("refresh_path", "/scan")), _esc(maintenance.get("remove_path", "/quick-remove")), "true" if maintenance.get("reload_after_action", True) else "false", _esc(cache.get("status", "Unknown")), _esc(len(cache_entries) if cache_entries else counts.get("worktrees", "Unknown")), _esc(background_status), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "running" if background_status in {"pending", "running"} else "", "" if control else " disabled", _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；Quick Remove 会先做最新 target preflight，只删除 worktree，保留 branch/commit。" if control else "静态只读视图；请使用 root-only 本机动态入口进行确认。",
         )
     )
 
@@ -1510,14 +1510,17 @@ MAINTENANCE_OBSERVATORY_JS = r"""
  const page=document.getElementById('workspace-maintenance');if(!page||page.dataset.maintenanceControl!=='true')return;
  const notice=page.querySelector('[data-maintenance-notice]');
  const base=page.dataset.maintenanceApiBase;
+ const refreshPath=page.dataset.maintenanceRefreshPath||'/scan';
+ const removePath=page.dataset.maintenanceRemovePath||'/quick-remove';
+ const reloadAfterAction=page.dataset.maintenanceReloadAfterAction!=='false';
  async function api(path,body){const response=await fetch(base+path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(body||{})});const value=await response.json();if(!response.ok)throw new Error(value.error||'本机维护操作失败');return value}
  async function status(){const response=await fetch(base+'/status',{headers:{'Accept':'application/json'}});const value=await response.json();if(!response.ok)throw new Error(value.error||'状态读取失败');return value}
  async function waitForRefresh(){for(let attempt=0;attempt<120;attempt++){const value=await status();const state=value.maintenance.background_refresh.status;if(!['pending','running'].includes(state))return state;await new Promise(resolve=>setTimeout(resolve,500))}return 'timed-out'}
  page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;
    button.disabled=true;notice.className='mo-notice';
    try{
-    if(button.hasAttribute('data-maintenance-scan')){notice.textContent='后台增量扫描已排队；页面请求线程没有等待全量扫描。';await api('/scan',{});const state=await waitForRefresh();notice.textContent='后台刷新 '+state+'，正在载入最新缓存。';window.location.reload();return}
-    if(button.dataset.maintenancePreflight){notice.textContent='正在对单个已登记目标做最新 preflight；不会扫描其他 worktree。';const value=await api('/preflight',{target_id:button.dataset.maintenancePreflight});const result=value.preflight;if(!result.eligible){throw new Error('目标受保护：'+(result.reasons||result.unknown||['Unknown']).join(' · '))}if(!window.confirm('只删除 worktree，保留 branch/commit。确认移除这个工作区？')){button.disabled=false;notice.textContent='已取消；没有执行删除。';return}notice.textContent='已确认。正在再次验证目标并移除 worktree；branch/commit 将保留。';const removed=await api('/quick-remove',{item_id:result.item.item_id});if(removed.receipt.outcome!=='verified')throw new Error('Quick Remove '+removed.receipt.outcome);notice.textContent='工作区已移除；branch/commit 保留。后台增量刷新已启动。';window.location.reload();return}
+    if(button.hasAttribute('data-maintenance-scan')){notice.textContent='后台增量扫描已排队；页面请求线程没有等待全量扫描。';await api(refreshPath,{});const state=await waitForRefresh();notice.textContent='后台刷新 '+state+'；最新状态已从本机 provider 读取。';if(reloadAfterAction){window.location.reload();return}const indicator=page.querySelector('[data-maintenance-background]');if(indicator)indicator.textContent=state;button.disabled=false;return}
+    if(button.dataset.maintenancePreflight){notice.textContent='正在对单个已登记目标做最新 preflight；不会扫描其他 worktree。';const value=await api('/preflight',{target_id:button.dataset.maintenancePreflight});const result=value.preflight;if(!result.eligible){throw new Error('目标受保护：'+(result.reasons||result.unknown||['Unknown']).join(' · '))}if(!window.confirm('只删除 worktree，保留 branch/commit。确认移除这个工作区？')){button.disabled=false;notice.textContent='已取消；没有执行删除。';return}notice.textContent='已确认。正在再次验证目标并移除 worktree；branch/commit 将保留。';const removed=await api(removePath,{item_id:result.item.item_id});if(removed.receipt.outcome!=='verified')throw new Error('Quick Remove '+removed.receipt.outcome);notice.textContent='工作区已移除；branch/commit 保留。后台增量刷新已启动。';if(reloadAfterAction){window.location.reload();return}const row=button.closest('[data-maintenance-workspace]');if(row)row.remove();return}
    }catch(error){notice.className='mo-notice error';notice.textContent=error.message;button.disabled=false}});
 })();
 """

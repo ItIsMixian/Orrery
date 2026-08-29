@@ -6,7 +6,7 @@ Updated: 2026-08-29
 
 - 验证分为 `Fast → Checkpoint → Candidate → Promotion`。Fast 只提供局部反馈；Checkpoint 证明 Workstream checkpoint；Candidate 运行完整本地门；Promotion 绑定 non-main exact SHA、规定 OS 和 required checks。
 - Fast 使用 15 秒预算；Checkpoint 使用 90 秒预算；完整 Promotion 保留每个 final unittest ID、动态 build、结构／docsite／链接／发布包／diff gate 与安全预算。
-- CI5 当前 inventory 为 390 unique unittest IDs、27 logical shards、10 physical lanes/OS、57 Fast、81 Checkpoint。`team-relations-execution` 保持独立 300 秒 Promotion 预算。
+- CI6 integration baseline inventory 为 404 unique unittest IDs、27 logical shards、10 physical lanes/OS、88 Fast、89 Checkpoint；U2 Worktree Candidate 登记 11 个测试后为 415／27／10／90／96。`team-relations-execution` 保持独立 300 秒 Promotion 预算。
 - CI6 新增 repo-local `scripts/ci/validate_change.py`，从 Git diff、Git-private Workstream subsystem／expected writes 与版本化 mapping registry 自动选择 exact test IDs，并生成绑定 HEAD/base/dirty fingerprint/registry 的 tier receipt。直接 `unittest` 仍可调试，但不能声明正式 Fast／Checkpoint 证据。
 - lane runner 为每个 logical shard 启动独立 Python 子进程，保留原 shard result 并生成 lane receipt；失败、缺失、重复、extra、manifest/SHA/OS/order drift 或取消均使 aggregate 失败关闭。
 - required check 名称仍为 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`；main branch protection strict 且 enforce-admins。
@@ -20,6 +20,7 @@ Updated: 2026-08-29
 - 同一 exact SHA 已进入 main，main Fast run `33236225082` 成功。该证据关闭 CI5 hosted acceptance，不创建新 Release。
 - SC1 开始前本地主工作树 clean；`validate_ci.py --all`、integrated structure、Fast 57/57 与 `git diff --check` 均通过。
 - W6.1／CI6／A3 整合时保留 CI6 schema-5 manifest，并把 A3 七个低成本 Authority consumer tests 登记进 data-only mapping registry；CI contract 与 A3 7/7 专项通过。Hosted exact-SHA Promotion 仍由整合候选单独取得。
+- U2 Unified Observatory focused 11/11 与最终 adjacent 12/12 PASS；CI6 final Fast 根据当前 diff 选择 49 项并 49/49 PASS，final Checkpoint 选择 54 项并 54/54 PASS（evidence-eligible，未超预算）。真实动态单 URL、静态无控制、Host／Origin／cookie／token、Team／Authority／AI／Maintenance 不升级、helper/marker 回收和 desktop/390px browser 均有独立证据。
 
 ## 覆盖面
 
@@ -27,6 +28,7 @@ Updated: 2026-08-29
 - Authority suites：fixture/evaluator、compatibility、projection、migration/restore、AI non-escalation 与 release-candidate gate。
 - Adapter suites：Codex、Harness JSON、Claude Code、DeepSeek Harness 的薄层、归档、依赖失败与生命周期。
 - Collaboration suites：W1/W2 session／Scope／finding、W3 review/integration/cleanup、Personal／Team、LAN harness、lineage、maintenance、relation graph 与 apply/undo/recovery contract。
+- Unified Observatory suite：versioned registration/discovery、collision/escalation fail-closed、quarantine、static boundary、single-URL runtime、HTTP security、consumer non-escalation、helper lifecycle 与 legacy rollback。
 - Documentation governance suite：provider-neutral finding schema、11 类正负 synthetic fixture、soft-budget advisory 与零写入／零网络边界。
 - Context-routing suites：24-task corpus、Pilot 002–009 frozen control packages、读取代理、JSONL audit、retention、Oracle v0.2 与 contamination/failure controls。
 - Repository gates：integrated installation、isolated docsite、Markdown links、forbidden artifacts、release dry build、workflow/static contract、secret boundary 与 `git diff --check`。
@@ -42,6 +44,7 @@ Updated: 2026-08-29
 ## 验证证据入口
 
 - [Validation 索引](../validation/README.md)
+- [U2 Unified Observatory Production Integration](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [CI5 Promotion Throughput Optimization](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [CI4 opaque token reliability](../validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)
 - [R3 brand-only closeout](../validation/2026-08-28-r3-orrery-brand-only-closeout.md)
@@ -57,4 +60,4 @@ Updated: 2026-08-29
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。
 - Claude 认证后真实模型路由、真实双机 LAN、self-host relation apply、自动 worktree removal 与 OS scheduler 没有验收证据。
-- Authority 没有默认 production consumer 或公开 release evidence；Documentation D2 scanner／CLI 尚未实现。
+- Unified Observatory／Authority 没有默认 production consumer 或公开 release evidence；Documentation D2 scanner／CLI 尚未实现。
