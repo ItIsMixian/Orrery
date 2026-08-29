@@ -1,0 +1,67 @@
+{
+  "fixture_format": 1,
+  "contract_type": "authority-managed-consumer-v1",
+  "expected_versions": {
+    "collector": "cli-authority-observations-v1",
+    "evaluator": "core-authority-evaluator-v1",
+    "projection": "observatory-authority-projection-v1"
+  },
+  "healthy_input": {
+    "requested_selection": "enabled",
+    "selection_authority": "maintainer-explicit",
+    "authority_model_version": 1,
+    "evaluator_model_id": "amm-fixture-v1",
+    "model_status": "supported",
+    "repository_snapshot": "fixture-repository-snapshot",
+    "fact_scope": "canonical",
+    "evidence_visibility": [
+      "revision-content",
+      "human-or-agent-assertion"
+    ],
+    "component_health": {
+      "collector": "ready",
+      "evaluator": "ready",
+      "projection": "ready"
+    },
+    "source_hashes": {
+      "expected": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "observed": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "reconciliation_hashes": {
+      "expected": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "observed": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    "render_status": "complete",
+    "safety": {
+      "unknown_preserved": true,
+      "local_only_preserved": true,
+      "ai_non_escalation": true,
+      "coordinator_cannot_select": true,
+      "partial_claims_exposed": false
+    }
+  },
+  "cases": [
+    {"id": "legacy-default", "set": {"requested_selection": "legacy", "selection_authority": "system-default"}, "effective": "legacy", "active_consumer": "legacy", "blockers": []},
+    {"id": "shadow", "set": {"requested_selection": "shadow"}, "effective": "shadow", "active_consumer": "legacy", "blockers": []},
+    {"id": "candidate-projection", "set": {"requested_selection": "candidate-projection", "fact_scope": "candidate"}, "effective": "candidate-projection", "active_consumer": "legacy", "blockers": []},
+    {"id": "enabled", "set": {}, "effective": "enabled", "active_consumer": "legacy", "blockers": []},
+    {"id": "explicit-rollback", "set": {"requested_selection": "rollback"}, "effective": "rollback", "active_consumer": "legacy", "blockers": []},
+    {"id": "unsupported-model", "set": {"model_status": "unsupported-newer", "authority_model_version": 2, "evaluator_model_id": null}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["authority-model-unavailable"]},
+    {"id": "collector-failure", "set": {"component_health.collector": "failed"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["collector-unavailable"]},
+    {"id": "evaluator-failure", "set": {"component_health.evaluator": "failed"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["evaluator-unavailable"]},
+    {"id": "projection-failure", "set": {"component_health.projection": "failed", "render_status": "failed"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["projection-unavailable", "render-unavailable"]},
+    {"id": "collector-version-drift", "set": {"observed_versions.collector": "cli-authority-observations-v2"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["collector-version-drift"]},
+    {"id": "evaluator-version-drift", "set": {"observed_versions.evaluator": "core-authority-evaluator-v2"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["evaluator-version-drift"]},
+    {"id": "projection-version-drift", "set": {"observed_versions.projection": "observatory-authority-projection-v2"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["projection-version-drift"]},
+    {"id": "source-drift", "set": {"source_hashes.observed": "sha256:3333333333333333333333333333333333333333333333333333333333333333"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["source-drift"]},
+    {"id": "reconciliation-drift", "set": {"reconciliation_hashes.observed": "sha256:4444444444444444444444444444444444444444444444444444444444444444"}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["reconciliation-drift"]},
+    {"id": "partial-render", "set": {"render_status": "partial", "safety.partial_claims_exposed": true}, "effective": "rollback", "active_consumer": "legacy", "blockers": ["partial-render", "partial-claims-exposed"]},
+    {"id": "ai-selection", "set": {"selection_authority": "ai"}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["selection-authority-forbidden"]},
+    {"id": "coordinator-selection", "set": {"selection_authority": "coordinator"}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["selection-authority-forbidden"]},
+    {"id": "unknown-scope", "set": {"fact_scope": "unknown"}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["fact-scope-not-enablable"]},
+    {"id": "local-only-scope", "set": {"fact_scope": "local-only"}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["fact-scope-not-enablable"]},
+    {"id": "unknown-escalation", "set": {"safety.unknown_preserved": false}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["unknown-escalation"]},
+    {"id": "local-only-escalation", "set": {"safety.local_only_preserved": false}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["local-only-escalation"]},
+    {"id": "ai-escalation", "set": {"safety.ai_non_escalation": false}, "effective": "unavailable", "active_consumer": "legacy", "blockers": ["ai-escalation"]}
+  ]
+}

@@ -9,6 +9,7 @@
     "budget_seconds": 15,
     "selectors": [
       "test_authority_meta_model.*",
+      "test_authority_managed_consumer.*",
       "test_authority_model_compatibility.*",
       "test_documentation_governance_contract.*",
       "test_collaboration_contract.CollaborationContractTests.test_schema_bundle_freezes_all_phase_zero_contracts",
@@ -37,6 +38,7 @@
     "budget_seconds": 90,
     "selectors": [
       "test_authority_meta_model.*",
+      "test_authority_managed_consumer.*",
       "test_authority_model_compatibility.*",
       "test_documentation_governance_contract.*",
       "test_ci_validation.*",
@@ -106,6 +108,7 @@
         "test_authority_cli_compatibility.*",
         "test_authority_cli_shadow.*",
         "test_authority_meta_model.*",
+        "test_authority_managed_consumer.*",
         "test_authority_model_compatibility.*",
         "test_authority_model_projection.*",
         "test_authority_observatory_managed_shadow.*",
