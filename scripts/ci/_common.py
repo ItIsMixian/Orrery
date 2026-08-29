@@ -4,6 +4,7 @@ import fnmatch
 import hashlib
 import json
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -85,6 +86,7 @@ def atomic_write_json(path: Path, value: Any) -> None:
 def validate_manifest_shape(manifest: dict[str, Any]) -> None:
     if set(manifest) != {
         "schema_version",
+        "routing",
         "discovery",
         "fast",
         "checkpoint",
@@ -92,11 +94,12 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> None:
         "shards",
     }:
         raise CIValidationError(
-            "manifest must contain only schema_version, discovery, fast, checkpoint, "
+            "manifest must contain only schema_version, routing, discovery, fast, checkpoint, "
             "promotion_lanes, and shards"
         )
-    if manifest["schema_version"] != 3:
+    if manifest["schema_version"] != 4:
         raise CIValidationError("unsupported shard manifest schema_version")
+    _validate_routing_shape(manifest["routing"])
     discovery = manifest["discovery"]
     if not isinstance(discovery, dict) or set(discovery) != {"start_dir", "pattern"}:
         raise CIValidationError("discovery must contain exactly start_dir and pattern")
@@ -160,6 +163,84 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> None:
     if len(workspace_shards) < 2 or any("test_workspace_maintenance.*" in item["selectors"] for item in workspace_shards):
         raise CIValidationError("Workspace Maintenance must be split by test method across multiple shards")
     _validate_promotion_lanes(manifest["promotion_lanes"], shard_ids)
+
+
+def _validate_routing_shape(routing: Any) -> None:
+    expected = {
+        "schema_version", "runner_version", "stages", "path_rules", "claim_sets", "reuse"
+    }
+    if not isinstance(routing, dict) or set(routing) != expected:
+        raise CIValidationError(f"routing must contain exactly {sorted(expected)}")
+    if routing["schema_version"] != 1 or routing["runner_version"] != "ci6-v1":
+        raise CIValidationError("unsupported validation routing or runner version")
+    stages = routing["stages"]
+    if not isinstance(stages, dict) or set(stages) != {"fast", "checkpoint", "candidate"}:
+        raise CIValidationError("routing stages must be exactly fast, checkpoint, and candidate")
+    for stage, value in stages.items():
+        if not isinstance(value, dict) or set(value) != {"role", "budget_seconds"}:
+            raise CIValidationError(f"routing stage {stage} must contain role and budget_seconds")
+        if not isinstance(value["role"], str) or not value["role"]:
+            raise CIValidationError(f"routing stage {stage} has an invalid role")
+        if (
+            not isinstance(value["budget_seconds"], (int, float))
+            or isinstance(value["budget_seconds"], bool)
+            or value["budget_seconds"] <= 0
+        ):
+            raise CIValidationError(f"routing stage {stage} budget_seconds must be positive")
+    rules = routing["path_rules"]
+    if not isinstance(rules, list) or not rules:
+        raise CIValidationError("routing path_rules must be a non-empty array")
+    rule_ids: set[str] = set()
+    for rule in rules:
+        required = {"id", "patterns", "subsystems", "surfaces", "selectors", "reason", "high_risk"}
+        if not isinstance(rule, dict) or set(rule) != required:
+            raise CIValidationError(f"routing path rule must contain exactly {sorted(required)}")
+        rule_id = rule["id"]
+        if not isinstance(rule_id, str) or not SHARD_ID_RE.fullmatch(rule_id):
+            raise CIValidationError(f"invalid routing rule id: {rule_id!r}")
+        if rule_id in rule_ids:
+            raise CIValidationError(f"duplicate routing rule id: {rule_id}")
+        rule_ids.add(rule_id)
+        for field in ("patterns", "subsystems", "surfaces"):
+            values = rule[field]
+            if not isinstance(values, list) or not values or any(not isinstance(item, str) or not item for item in values):
+                raise CIValidationError(f"routing rule {rule_id} has invalid {field}")
+        selectors = rule["selectors"]
+        if not isinstance(selectors, dict) or set(selectors) != {"fast", "checkpoint", "candidate"}:
+            raise CIValidationError(f"routing rule {rule_id} selectors must cover all local stages")
+        for stage, values in selectors.items():
+            _validate_selectors(values, f"routing rule {rule_id} {stage}")
+        if not isinstance(rule["reason"], str) or not rule["reason"]:
+            raise CIValidationError(f"routing rule {rule_id} requires a dependency/adjacency reason")
+        if not isinstance(rule["high_risk"], bool):
+            raise CIValidationError(f"routing rule {rule_id} high_risk must be boolean")
+    claims = routing["claim_sets"]
+    if not isinstance(claims, list) or not claims:
+        raise CIValidationError("routing claim_sets must be a non-empty array")
+    claim_ids: set[str] = set()
+    for claim in claims:
+        required = {"id", "selectors", "promotion_only_selectors", "reason"}
+        if not isinstance(claim, dict) or set(claim) != required:
+            raise CIValidationError(f"routing claim set must contain exactly {sorted(required)}")
+        claim_id = claim["id"]
+        if not isinstance(claim_id, str) or not SHARD_ID_RE.fullmatch(claim_id) or claim_id in claim_ids:
+            raise CIValidationError(f"invalid or duplicate routing claim set id: {claim_id!r}")
+        claim_ids.add(claim_id)
+        _validate_selectors(claim["selectors"], f"claim set {claim_id}")
+        _validate_selectors(claim["promotion_only_selectors"], f"claim set {claim_id} Promotion-only")
+        if not isinstance(claim["reason"], str) or not claim["reason"]:
+            raise CIValidationError(f"claim set {claim_id} requires a reason")
+    reuse = routing["reuse"]
+    required_reuse = {"schema_version", "mode", "environment_gates", "security_high_risk_paths"}
+    if not isinstance(reuse, dict) or set(reuse) != required_reuse:
+        raise CIValidationError(f"routing reuse must contain exactly {sorted(required_reuse)}")
+    if reuse["schema_version"] != 1 or reuse["mode"] != "contract-refusal":
+        raise CIValidationError("CI6 reuse must remain the versioned contract-refusal mode")
+    for field in ("environment_gates", "security_high_risk_paths"):
+        if not isinstance(reuse[field], list) or not reuse[field] or any(
+            not isinstance(item, str) or not item for item in reuse[field]
+        ):
+            raise CIValidationError(f"routing reuse {field} must be a non-empty string array")
 
 
 def _validate_promotion_lanes(lanes: Any, shard_ids: set[str]) -> None:
@@ -283,6 +364,39 @@ def validate_and_expand_manifest(
     if missing or extra:
         raise CIValidationError(f"promotion assignment is incomplete; missing={missing}, extra={extra}")
     fast_ids = expand_selectors(manifest["fast"]["selectors"], test_ids, "fast profile")
+    checkpoint_ids = expand_selectors(
+        manifest["checkpoint"]["selectors"], test_ids, "checkpoint profile"
+    )
+    if not set(fast_ids).issubset(checkpoint_ids):
+        raise CIValidationError("Checkpoint must include every Fast test")
+    allowed_by_stage = {
+        "fast": set(fast_ids),
+        "checkpoint": set(checkpoint_ids),
+        "candidate": set(checkpoint_ids),
+    }
+    for rule in manifest["routing"]["path_rules"]:
+        for stage, selectors in rule["selectors"].items():
+            selected = expand_selectors(selectors, test_ids, f"routing rule {rule['id']} {stage}")
+            forbidden = sorted(set(selected) - allowed_by_stage[stage])
+            if forbidden:
+                raise CIValidationError(
+                    f"heavy or disallowed test entered {stage} through routing rule {rule['id']}: {forbidden}"
+                )
+    lower_ids = set(checkpoint_ids)
+    for claim in manifest["routing"]["claim_sets"]:
+        claimed = set(expand_selectors(claim["selectors"], test_ids, f"claim set {claim['id']}"))
+        promotion_only = set(
+            expand_selectors(
+                claim["promotion_only_selectors"], test_ids, f"claim set {claim['id']} Promotion-only"
+            )
+        )
+        if not promotion_only.issubset(claimed):
+            raise CIValidationError(f"claim set {claim['id']} Promotion-only IDs escape its claim set")
+        leaked = sorted(promotion_only & lower_ids)
+        if leaked:
+            raise CIValidationError(
+                f"Promotion-only claim entered Fast/Checkpoint for {claim['id']}: {leaked}"
+            )
     return test_ids, assignments, fast_ids
 
 
@@ -303,3 +417,95 @@ def git_sha(root: Path = ROOT) -> str:
     if not re.fullmatch(r"[0-9a-f]{40}", value):
         raise CIValidationError(f"git HEAD is not a full SHA: {value!r}")
     return value
+
+
+def git_output(arguments: list[str], root: Path = ROOT, *, text: bool = True) -> str | bytes:
+    result = subprocess.run(["git", *arguments], cwd=root, text=text, capture_output=True, check=False)
+    if result.returncode != 0:
+        stderr = result.stderr.strip() if text else result.stderr.decode("utf-8", errors="replace").strip()
+        raise CIValidationError(f"git {' '.join(arguments)} failed: {stderr}")
+    return result.stdout
+
+
+def dirty_fingerprint(root: Path = ROOT) -> str:
+    status = git_output(["status", "--porcelain=v2", "-z", "--untracked-files=all"], root, text=False)
+    assert isinstance(status, bytes)
+    digest = hashlib.sha256(status)
+    paths = git_output(
+        ["ls-files", "--modified", "--deleted", "--others", "--exclude-standard", "-z"],
+        root,
+        text=False,
+    )
+    assert isinstance(paths, bytes)
+    for raw in sorted(item for item in paths.split(b"\0") if item):
+        digest.update(raw + b"\0")
+        path = root / raw.decode("utf-8", errors="surrogateescape")
+        if path.is_file():
+            try:
+                digest.update(path.read_bytes())
+            except OSError as exc:
+                digest.update(f"unreadable:{exc}".encode("utf-8", errors="replace"))
+        else:
+            digest.update(b"missing")
+    return digest.hexdigest()
+
+
+def machine_inventory(manifest: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
+    test_ids, assignments, fast_ids = validate_and_expand_manifest(manifest, root)
+    checkpoint_ids = expand_profile(manifest, "checkpoint", test_ids)
+    fast = set(fast_ids)
+    checkpoint = set(checkpoint_ids)
+    owner_by_test = {
+        test_id: (shard["id"], shard["surface"], shard.get("budget_seconds"))
+        for shard in manifest["shards"]
+        for test_id in assignments[shard["id"]]
+    }
+    reasons_by_test: dict[str, set[str]] = {test_id: set() for test_id in test_ids}
+    for rule in manifest["routing"]["path_rules"]:
+        for stage, selectors in rule["selectors"].items():
+            for test_id in expand_selectors(selectors, test_ids, f"routing rule {rule['id']} {stage}"):
+                reasons_by_test[test_id].add(f"{stage}:{rule['id']}:{rule['reason']}")
+    promotion_only_claims: set[str] = set()
+    for claim in manifest["routing"]["claim_sets"]:
+        for test_id in expand_selectors(
+            claim["promotion_only_selectors"], test_ids, f"claim set {claim['id']} Promotion-only"
+        ):
+            promotion_only_claims.add(test_id)
+            reasons_by_test[test_id].add(f"promotion:{claim['id']}:{claim['reason']}")
+    entries: list[dict[str, Any]] = []
+    for test_id in test_ids:
+        shard_id, surface, shard_budget = owner_by_test[test_id]
+        if test_id in fast:
+            allowed_stages = ["fast", "checkpoint", "candidate", "promotion"]
+            cost_class = "low"
+            budget = float(manifest["fast"]["budget_seconds"])
+        elif test_id in checkpoint:
+            allowed_stages = ["checkpoint", "candidate", "promotion"]
+            cost_class = "medium"
+            budget = float(manifest["checkpoint"]["budget_seconds"])
+        else:
+            allowed_stages = ["promotion"]
+            cost_class = "heavy"
+            budget = float(shard_budget or 600)
+        reasons = sorted(reasons_by_test[test_id]) or [
+            f"promotion:{shard_id}:complete final discovery ownership for {surface}"
+        ]
+        entries.append({
+            "test_id": test_id,
+            "owner_surface": surface,
+            "owner_shard": shard_id,
+            "allowed_stages": allowed_stages,
+            "cost_class": cost_class,
+            "budget_seconds": budget,
+            "dependency_reasons": reasons,
+            "promotion_only_claim": test_id in promotion_only_claims,
+        })
+    return {
+        "schema_version": 3,
+        "contract_type": "orrery-unittest-inventory-v3",
+        "manifest_sha256": sha256_json(manifest),
+        "inventory_sha256": sha256_json(entries),
+        "test_count": len(entries),
+        "tests": entries,
+        "generated_on": {"os": platform.system(), "python": platform.python_version()},
+    }

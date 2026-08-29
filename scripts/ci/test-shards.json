@@ -1,5 +1,101 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
+  "routing": {
+    "schema_version": 1,
+    "runner_version": "ci6-v1",
+    "stages": {
+      "fast": {"role": "local-fast-evidence", "budget_seconds": 15},
+      "checkpoint": {"role": "local-checkpoint-evidence", "budget_seconds": 90},
+      "candidate": {"role": "local-candidate-evidence", "budget_seconds": 180}
+    },
+    "path_rules": [
+      {
+        "id": "ci-validation-control",
+        "patterns": ["scripts/ci/**", "tests/test_ci_validation.py", "tests/fixtures/ci-validation/**", ".github/workflows/**"],
+        "subsystems": ["test-coverage", "release-and-toolchain"],
+        "surfaces": ["CI contract", "Promotion completeness", "receipt integrity"],
+        "selectors": {
+          "fast": ["test_ci_validation.*"],
+          "checkpoint": ["test_ci_validation.*"],
+          "candidate": ["test_ci_validation.*"]
+        },
+        "reason": "CI selector, budget, receipt, workflow, and Promotion completeness contracts are direct dependencies",
+        "high_risk": true
+      },
+      {
+        "id": "workspace-maintenance-core",
+        "patterns": ["packages/project-orrery-core/src/project_orrery_core/maintenance*.py", "packages/project-orrery-core/src/project_orrery_core/workspace_cleanup.py", "packages/project-orrery-core/src/project_orrery_core/schema/maintenance-*.json", "packages/project-orrery-cli/src/project_orrery_cli/maintenance.py", "tests/test_workspace_maintenance.py", "tests/fixtures/workspace-maintenance/**"],
+        "subsystems": ["multi-worktree-collaboration"],
+        "surfaces": ["Workspace Maintenance", "cache/schema/fingerprint", "target-only preflight"],
+        "selectors": {
+          "fast": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed"],
+          "checkpoint": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"],
+          "candidate": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"]
+        },
+        "reason": "schema/fail-closed input checks are direct; one bounded real-Git cache refresh plus target-only preflight is the sole local adjacency journey",
+        "high_risk": true
+      },
+      {
+        "id": "personal-maintenance-rendering",
+        "patterns": ["packages/project-orrery-observatory/src/project_orrery_observatory/personal_observatory.py", "scripts/docsite/build_personal_observatory.py", "scripts/docsite/serve_orrery_control.py", "start-orrery-control.bat", "tests/test_personal_observatory.py"],
+        "subsystems": ["multi-worktree-collaboration"],
+        "surfaces": ["Personal Observatory", "pure maintenance rendering", "root-only security"],
+        "selectors": {
+          "fast": ["test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local"],
+          "checkpoint": ["test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local"],
+          "candidate": ["test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local"]
+        },
+        "reason": "pure rendering is the cheapest adequate local evidence; live server and full Personal journeys remain Promotion adjacency",
+        "high_risk": true
+      },
+      {
+        "id": "team-local-boundary",
+        "patterns": ["scripts/docsite/serve_team_observatory.py", "tests/test_team_observatory.py"],
+        "subsystems": ["multi-worktree-collaboration"],
+        "surfaces": ["Team/LAN", "Personal zero-network boundary"],
+        "selectors": {
+          "fast": ["test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network"],
+          "checkpoint": ["test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network"],
+          "candidate": ["test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network"]
+        },
+        "reason": "the zero-network authority boundary is direct while live Team server journeys are Promotion adjacency",
+        "high_risk": true
+      },
+      {
+        "id": "packaging-contract",
+        "patterns": ["packages/component-versions.json", "packages/*/pyproject.toml", "packages/*/src/*/__init__.py", "packages/*/src/*/component.json", "docs/**"],
+        "subsystems": ["release-and-toolchain", "documentation-system"],
+        "surfaces": ["Packaging/Adapters/docsite", "repository documentation"],
+        "selectors": {
+          "fast": ["test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved", "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"],
+          "checkpoint": ["test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved", "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"],
+          "candidate": ["test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved", "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"]
+        },
+        "reason": "component and documentation paths require stable package/compatibility projection checks without invoking release builds locally",
+        "high_risk": false
+      }
+    ],
+    "claim_sets": [
+      {
+        "id": "w6-1-original-24",
+        "selectors": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_scan_is_bounded_zero_network_debounced_single_flight_and_times_out", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_observatory_catch_up_respects_24_hour_freshness", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_queue_authorization_is_evidence_bound_and_drift_stales", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_remove_worktree_executor_preserves_branch_commit_and_receipt", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_action_surface_rejects_branch_path_shell_url_and_ai_authority", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_cli_json_policy_schedule_and_invalid_execute_are_stable", "test_personal_observatory.*", "test_team_observatory.*"],
+        "promotion_only_selectors": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_scan_is_bounded_zero_network_debounced_single_flight_and_times_out", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_observatory_catch_up_respects_24_hour_freshness", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_queue_authorization_is_evidence_bound_and_drift_stales", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_remove_worktree_executor_preserves_branch_commit_and_receipt", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_action_surface_rejects_branch_path_shell_url_and_ai_authority", "test_workspace_maintenance.WorkspaceMaintenanceTests.test_cli_json_policy_schedule_and_invalid_execute_are_stable", "test_personal_observatory.PersonalObservatoryTests.test_health_projection_separates_36_worktree_like_delivery_reconciliation_and_hygiene", "test_personal_observatory.PersonalObservatoryTests.test_projection_reuses_w1_w2_contracts_without_network_or_writes", "test_personal_observatory.PersonalObservatoryTests.test_excluded_worktree_is_listed_but_never_opened", "test_personal_observatory.PersonalObservatoryTests.test_absent_session_and_remote_boundary_stay_unknown", "test_personal_observatory.PersonalObservatoryTests.test_no_review_packages_still_projects_bounded_w3_inventory", "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_consumes_real_core_review_bundle_without_writes", "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_failure_and_old_schema_keep_w4a_fallback", "test_personal_observatory.PersonalObservatoryTests.test_w3_projection_keeps_policy_actions_and_receipts_separate", "test_personal_observatory.PersonalObservatoryTests.test_renderer_has_four_zones_progressive_detail_and_no_actions", "test_personal_observatory.PersonalObservatoryTests.test_renderer_separates_lifecycle_runtime_and_freshness", "test_personal_observatory.PersonalObservatoryTests.test_injection_adds_a_separate_page_and_leaves_dashboard_untouched", "test_personal_observatory.PersonalObservatoryTests.test_root_only_entry_preserves_legacy_bytes_when_disabled", "test_personal_observatory.PersonalObservatoryTests.test_unavailable_projection_renders_stable_fallback", "test_team_observatory.*"],
+        "reason": "full cache invalidation, deletion/lock/recovery, W3/Personal/Team adjacency, and live-server claims require Promotion topology"
+      },
+      {
+        "id": "w6-1-w3-adjacency",
+        "selectors": ["test_collaboration_w3.CollaborationW3Tests.test_active_benchmark_recovery_and_path_escape_are_retained_or_blocked", "test_collaboration_w3.CollaborationW3Tests.test_unique_commit_unknown_files_and_sensitive_ignored_paths_block_cleanup"],
+        "promotion_only_selectors": ["test_collaboration_w3.CollaborationW3Tests.test_active_benchmark_recovery_and_path_escape_are_retained_or_blocked", "test_collaboration_w3.CollaborationW3Tests.test_unique_commit_unknown_files_and_sensitive_ignored_paths_block_cleanup"],
+        "reason": "reparse/recovery, unique commit, and ignored-path cleanup gates remain full W3 Promotion adjacency"
+      }
+    ],
+    "reuse": {
+      "schema_version": 1,
+      "mode": "contract-refusal",
+      "environment_gates": ["ORRERY_TEST_BUILD", "PYTHONHASHSEED"],
+      "security_high_risk_paths": [".github/workflows/**", "scripts/ci/**", "packages/project-orrery-core/src/project_orrery_core/schema/**", "packages/project-orrery-core/src/project_orrery_core/maintenance*.py", "scripts/docsite/serve_orrery_control.py"]
+    }
+  },
   "discovery": {
     "start_dir": "tests",
     "pattern": "test_*.py"
@@ -8,6 +104,7 @@
     "role": "non-promotion-feedback",
     "budget_seconds": 15,
     "selectors": [
+      "test_ci_validation.*",
       "test_authority_meta_model.*",
       "test_authority_model_compatibility.*",
       "test_documentation_governance_contract.*",
@@ -25,6 +122,7 @@
       "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_execution_schema_cli_surface_and_no_delete_contract_are_dependency_light",
       "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
       "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
+      "test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes",
       "test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved",
@@ -47,6 +145,8 @@
       "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_invalid_provider_store_graph_legacy_and_links_fail_closed",
       "test_collaboration_team.TeamFoundationTests.test_team_schema_and_personal_default_are_zero_network",
       "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
+      "test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint",
+      "test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes",
       "test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved",
@@ -298,7 +398,8 @@
       "id": "workspace-contract",
       "surface": "Workspace Maintenance",
       "selectors": [
-        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed"
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed",
+        "test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"
       ]
     },
     {

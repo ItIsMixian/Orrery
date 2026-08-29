@@ -12,6 +12,7 @@ from _common import (
     atomic_write_json,
     git_sha,
     load_json,
+    machine_inventory,
     promotion_lane_assignments,
     sha256_json,
     validate_and_expand_manifest,
@@ -43,7 +44,7 @@ def aggregate(
     all_ids, assignments, _ = validate_and_expand_manifest(manifest)
     lanes = promotion_lane_assignments(manifest)
     expected_manifest_hash = sha256_json(manifest)
-    expected_inventory_hash = sha256_json(all_ids)
+    expected_inventory_hash = machine_inventory(manifest)["inventory_sha256"]
     payloads: list[dict[str, Any]] = []
     lane_payloads: list[dict[str, Any]] = []
     for path in sorted(results_dir.rglob("*.json")):
@@ -52,7 +53,7 @@ def aggregate(
         except CIValidationError as exc:
             errors.append(str(exc))
             continue
-        if payload.get("contract_type") == "orrery-test-shard-result-v1":
+        if payload.get("contract_type") == "orrery-test-shard-result-v2":
             payload["_path"] = str(path)
             payloads.append(payload)
         elif payload.get("contract_type") == "orrery-test-lane-result-v1":

@@ -23,6 +23,7 @@ from _common import (  # noqa: E402
     expand_profile,
     git_sha,
     load_json,
+    machine_inventory,
     promotion_lane_assignments,
     sha256_json,
     validate_and_expand_manifest,
@@ -30,6 +31,7 @@ from _common import (  # noqa: E402
 from aggregate_test_results import aggregate  # noqa: E402
 from run_test_lane import run_lane  # noqa: E402
 from run_test_shard import TimedTextResult, run_selected  # noqa: E402
+from validate_change import build_selection  # noqa: E402
 from validate_ci import validate_binding, validate_workflows  # noqa: E402
 
 
@@ -45,13 +47,13 @@ class CIValidationTests(unittest.TestCase):
     def _result_payloads(self, expected_os: str = "Windows") -> tuple[dict, dict[str, list[str]]]:
         test_ids, assignments, _ = validate_and_expand_manifest(self.manifest)
         manifest_hash = sha256_json(self.manifest)
-        inventory_hash = sha256_json(test_ids)
+        inventory_hash = machine_inventory(self.manifest)["inventory_sha256"]
         head = git_sha()
         payloads = {}
         for shard, selected in assignments.items():
             payloads[shard] = {
-                "schema_version": 1,
-                "contract_type": "orrery-test-shard-result-v1",
+                "schema_version": 2,
+                "contract_type": "orrery-test-shard-result-v2",
                 "role": "promotion-shard",
                 "sha": head,
                 "os": expected_os,
@@ -155,6 +157,88 @@ class CIValidationTests(unittest.TestCase):
         self.assertNotIn(minimal_git, checkpoint_ids)
         self.assertIn(minimal_git, assignments["team-relations-execution"])
 
+    def test_machine_inventory_gives_every_test_owner_stage_cost_budget_and_reason(self) -> None:
+        inventory = machine_inventory(self.manifest)
+        self.assertEqual(inventory["test_count"], len(inventory["tests"]))
+        self.assertEqual(
+            {item["test_id"] for item in inventory["tests"]},
+            set(validate_and_expand_manifest(self.manifest)[0]),
+        )
+        for item in inventory["tests"]:
+            self.assertTrue(item["owner_surface"])
+            self.assertTrue(item["owner_shard"])
+            self.assertTrue(item["allowed_stages"])
+            self.assertIn(item["cost_class"], {"low", "medium", "heavy"})
+            self.assertGreater(item["budget_seconds"], 0)
+            self.assertTrue(item["dependency_reasons"])
+        claims = self.manifest["routing"]["claim_sets"]
+        w6 = next(item for item in claims if item["id"] == "w6-1-original-24")
+        all_ids = validate_and_expand_manifest(self.manifest)[0]
+        claimed = expand_profile(self.manifest, "checkpoint", all_ids)
+        w6_ids = set()
+        for selector in w6["selectors"]:
+            from _common import expand_selectors
+            w6_ids.update(expand_selectors([selector], all_ids, "fixture w6 claim"))
+        self.assertEqual(len(w6_ids), 24)
+        self.assertLess(len(w6_ids & set(claimed)), 24)
+
+    def test_router_derives_w6_fast_and_checkpoint_without_full_24(self) -> None:
+        maintenance_path = "packages/project-orrery-core/src/project_orrery_core/maintenance.py"
+        with mock.patch("validate_change.changed_paths", return_value=([maintenance_path], False)), mock.patch(
+            "validate_change.dirty_fingerprint", return_value="1" * 64
+        ):
+            fast = build_selection(self.manifest, "fast", git_sha(), "fixture", None, None)
+            checkpoint = build_selection(
+                self.manifest, "checkpoint", git_sha(), "fixture", None, None
+            )
+        contract = (
+            "test_workspace_maintenance.WorkspaceMaintenanceTests."
+            "test_versioned_contract_policy_and_synthetic_corpus_are_fail_closed"
+        )
+        minimal = (
+            "test_workspace_maintenance.WorkspaceMaintenanceTests."
+            "test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"
+        )
+        heavy = (
+            "test_workspace_maintenance.WorkspaceMaintenanceTests."
+            "test_remove_worktree_executor_preserves_branch_commit_and_receipt"
+        )
+        self.assertEqual(fast["selected_test_ids"], [contract])
+        self.assertEqual(checkpoint["selected_test_ids"], sorted([contract, minimal]))
+        self.assertNotIn(heavy, checkpoint["selected_test_ids"])
+        self.assertLess(checkpoint["selected_test_count"], 24)
+        self.assertEqual(checkpoint["reuse"]["decision"], "refused")
+        self.assertIn("security-high-risk-surface", checkpoint["reuse"]["reasons"])
+
+    def test_router_mutations_reject_dead_and_heavy_lower_stage_selectors(self) -> None:
+        dead = copy.deepcopy(self.manifest)
+        dead["routing"]["path_rules"][0]["selectors"]["fast"] = ["test_missing_ci6.*"]
+        with self.assertRaisesRegex(CIValidationError, "matched no final unittest ID"):
+            validate_and_expand_manifest(dead)
+        heavy = copy.deepcopy(self.manifest)
+        heavy["routing"]["path_rules"][0]["selectors"]["checkpoint"] = [
+            "test_workspace_maintenance.WorkspaceMaintenanceTests."
+            "test_remove_worktree_executor_preserves_branch_commit_and_receipt"
+        ]
+        with self.assertRaisesRegex(CIValidationError, "heavy or disallowed test entered checkpoint"):
+            validate_and_expand_manifest(heavy)
+
+    def test_w6_promotion_only_claims_are_complete_once_only_and_absent_below_promotion(self) -> None:
+        all_ids, assignments, _ = validate_and_expand_manifest(self.manifest)
+        checkpoint = set(expand_profile(self.manifest, "checkpoint", all_ids))
+        claim = next(
+            item for item in self.manifest["routing"]["claim_sets"]
+            if item["id"] == "w6-1-original-24"
+        )
+        from _common import expand_selectors
+        promotion_only = set(
+            expand_selectors(claim["promotion_only_selectors"], all_ids, "fixture promotion-only")
+        )
+        assigned = [test_id for values in assignments.values() for test_id in values]
+        self.assertTrue(promotion_only)
+        self.assertFalse(promotion_only & checkpoint)
+        self.assertTrue(all(assigned.count(test_id) == 1 for test_id in promotion_only))
+
     def test_lane_contract_rejects_missing_duplicate_unknown_and_heavy_cohabitation(self) -> None:
         missing = copy.deepcopy(self.manifest)
         missing["promotion_lanes"][-1]["shards"].remove("workspace-contract")
@@ -190,7 +274,7 @@ class CIValidationTests(unittest.TestCase):
                 atomic_write_json(
                     output,
                     {
-                        "contract_type": "orrery-test-shard-result-v1",
+                        "contract_type": "orrery-test-shard-result-v2",
                         "shard": shard,
                         "successful": successful,
                         "completed": True,
@@ -253,6 +337,8 @@ class CIValidationTests(unittest.TestCase):
             manifest["fast"]["selectors"] = [
                 "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes"
             ]
+            for rule in manifest["routing"]["path_rules"]:
+                rule["selectors"]["fast"] = list(manifest["fast"]["selectors"])
             manifest_path = self._write_manifest(directory, manifest)
             output = directory / "result.json"
             with mock.patch.dict(os.environ, {"RUNNER_OS": "FixtureOS"}, clear=False):
@@ -281,6 +367,8 @@ class CIValidationTests(unittest.TestCase):
             manifest["fast"]["selectors"] = [
                 "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes"
             ]
+            for rule in manifest["routing"]["path_rules"]:
+                rule["selectors"]["fast"] = list(manifest["fast"]["selectors"])
             manifest_path = self._write_manifest(directory, manifest)
             payload, successful = run_selected(
                 manifest_path=manifest_path,

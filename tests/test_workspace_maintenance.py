@@ -170,6 +170,33 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
                 }
             )
 
+    def test_minimal_git_incremental_refresh_and_target_preflight_checkpoint(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            self._closed(fixture)
+            initial = run_maintenance_scan(
+                fixture.repository, reason="manual", now="2026-08-27T12:00:00Z"
+            )
+            self.assertEqual(initial["scan"]["status"], "succeeded")
+            changed = fixture.worktree_a / "checkpoint-untracked.txt"
+            changed.write_text("bounded incremental refresh\n", encoding="utf-8")
+            incremental = run_maintenance_scan(
+                fixture.repository, reason="manual", now="2026-08-27T12:00:01Z"
+            )
+            self.assertEqual(incremental["scan"]["counts"]["target_provider_scans"], 1)
+            self.assertGreaterEqual(incremental["scan"]["counts"]["cache_hits"], 1)
+            item = next(
+                value
+                for value in list_maintenance_queue(fixture.repository)["items"]
+                if _same_workspace_path(value["workspace_path"], fixture.worktree_b)
+            )
+            preflight = quick_remove_preflight(
+                fixture.repository, target_id=item["workspace_id"]
+            )
+            self.assertTrue(preflight["eligible"], preflight["reasons"])
+            self.assertEqual(preflight["cache_metrics"]["target_provider_scans"], 1)
+            self.assertFalse(preflight["network_performed"])
+            self.assertFalse(preflight["workspace_writes_performed"])
+
     def test_scan_is_bounded_zero_network_debounced_single_flight_and_times_out(self) -> None:
         with CollaborationGitFixture() as fixture:
             with mock.patch.object(socket, "socket", side_effect=AssertionError("network socket opened")), mock.patch.object(socket, "create_connection", side_effect=AssertionError("network connection opened")):

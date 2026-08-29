@@ -72,7 +72,7 @@ def run_lane(
                 shard_successful = (
                     return_code == 0
                     and shard_payload.get("contract_type")
-                    == "orrery-test-shard-result-v1"
+                    == "orrery-test-shard-result-v2"
                     and shard_payload.get("shard") == shard
                     and shard_payload.get("successful") is True
                     and shard_payload.get("completed") is True

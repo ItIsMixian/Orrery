@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import os
 import platform
+import subprocess
 import sys
 import time
 import unittest
@@ -14,10 +16,12 @@ from _common import (
     DEFAULT_MANIFEST,
     ROOT,
     atomic_write_json,
+    dirty_fingerprint,
     expand_profile,
     flatten_suite,
     git_sha,
     load_json,
+    machine_inventory,
     repository_import_path,
     sha256_json,
     validate_and_expand_manifest,
@@ -93,22 +97,62 @@ def _load_selected_tests(test_ids: list[str]) -> unittest.TestSuite:
 
 
 def run_selected(
-    *, manifest_path: Path, shard: str | None, profile: str | None, output: Path
+    *, manifest_path: Path, shard: str | None, profile: str | None, output: Path,
+    selection_plan_path: Path | None = None,
 ) -> tuple[dict[str, object], bool]:
     manifest = load_json(manifest_path)
     all_ids, assignments, _ = validate_and_expand_manifest(manifest)
-    if (shard is None) == (profile is None):
-        raise CIValidationError("select exactly one of --shard or --profile")
-    if profile is not None:
+    inventory = machine_inventory(manifest)
+    head_before = git_sha()
+    dirty_before = dirty_fingerprint()
+    selection_plan: dict[str, Any] | None = None
+    if selection_plan_path is not None:
+        if shard is not None or profile is not None:
+            raise CIValidationError("selection plan cannot be combined with --shard or --profile")
+        selection_plan = load_json(selection_plan_path)
+        if selection_plan.get("contract_type") != "orrery-test-selection-plan-v1":
+            raise CIValidationError("unsupported local validation selection plan")
+        for field, actual in (
+            ("head_sha", head_before),
+            ("dirty_fingerprint", dirty_before),
+            ("manifest_sha256", sha256_json(manifest)),
+            ("inventory_sha256", inventory["inventory_sha256"]),
+        ):
+            if selection_plan.get(field) != actual:
+                raise CIValidationError(f"selection plan {field} drifted before runner start")
+        selected_ids = selection_plan.get("selected_test_ids")
+        if not isinstance(selected_ids, list) or not selected_ids or any(
+            not isinstance(item, str) or item not in all_ids for item in selected_ids
+        ):
+            raise CIValidationError("selection plan contains invalid or unknown test IDs")
+        if selected_ids != sorted(set(selected_ids)):
+            raise CIValidationError("selection plan test IDs must be sorted and unique")
+        stage = str(selection_plan.get("stage"))
+        if stage not in {"fast", "checkpoint", "candidate"}:
+            raise CIValidationError(f"selection plan has invalid stage: {stage}")
+        shard_id = stage
+        role = str(selection_plan.get("role"))
+        budget_seconds = float(selection_plan.get("budget_seconds"))
+        base_sha = str(selection_plan.get("base_sha"))
+        relevant_tree_hash = str(selection_plan["reuse"]["key"]["relevant_tree_sha256"])
+        test_source_hash = str(selection_plan["reuse"]["key"]["test_source_sha256"])
+        selector_dependency_hash = str(
+            selection_plan["reuse"]["key"]["selector_dependency_sha256"]
+        )
+    elif profile is not None:
         selected_ids = expand_profile(manifest, profile, all_ids)
         shard_id = profile
+        stage = profile
         role = str(manifest[profile]["role"])
         budget_seconds: float | None = float(manifest[profile]["budget_seconds"])
     else:
+        if shard is None:
+            raise CIValidationError("select exactly one of --shard, --profile, or --selection-plan")
         if shard not in assignments:
             raise CIValidationError(f"unknown shard: {shard}")
         selected_ids = assignments[shard]
         shard_id = str(shard)
+        stage = "promotion"
         role = "promotion-shard"
         shard_config = next(item for item in manifest["shards"] if item["id"] == shard)
         budget_seconds = (
@@ -116,12 +160,33 @@ def run_selected(
             if "budget_seconds" in shard_config
             else None
         )
+    if selection_plan is None:
+        main = subprocess.run(
+            ["git", "merge-base", "HEAD", "main"], cwd=ROOT, text=True,
+            capture_output=True, check=False,
+        )
+        base_sha = main.stdout.strip().lower() if main.returncode == 0 else head_before
+        source_digest = hashlib.sha256()
+        for module in sorted({test_id.split(".", 1)[0] for test_id in selected_ids}):
+            path = ROOT / "tests" / f"{module}.py"
+            source_digest.update(module.encode() + b"\0")
+            source_digest.update(path.read_bytes() if path.is_file() else b"missing")
+        test_source_hash = source_digest.hexdigest()
+        selector_dependency_hash = sha256_json(selected_ids)
+        tree = subprocess.run(
+            ["git", "rev-parse", "HEAD^{tree}"], cwd=ROOT, text=True,
+            capture_output=True, check=False,
+        )
+        relevant_tree_hash = (
+            tree.stdout.strip().lower() if tree.returncode == 0 else sha256_json([head_before, dirty_before])
+        )
     suite = _load_selected_tests(selected_ids)
     started = time.perf_counter()
     with repository_import_path(ROOT):
         result = unittest.TextTestRunner(verbosity=2, resultclass=TimedTextResult).run(suite)
     duration = max(0.0, time.perf_counter() - started)
     sha = git_sha()
+    dirty_after = dirty_fingerprint()
     runner_os = os.environ.get("RUNNER_OS", platform.system())
     python_version = platform.python_version()
     records = sorted(result.records, key=lambda item: str(item["test_id"]))
@@ -129,17 +194,39 @@ def run_selected(
         record.update({"sha": sha, "os": runner_os, "python": python_version, "shard": shard_id})
     record_ids = [str(item["test_id"]) for item in records]
     budget_exceeded = budget_seconds is not None and duration > budget_seconds
-    successful = result.wasSuccessful() and record_ids == selected_ids and not budget_exceeded
+    runner_errors = [test.id() for test, _ in result.errors if test.id() not in selected_ids]
+    if sha != head_before:
+        runner_errors.append("HEAD changed during validation")
+    if dirty_after != dirty_before:
+        runner_errors.append("dirty fingerprint changed during validation")
+    successful = (
+        result.wasSuccessful() and record_ids == selected_ids and not budget_exceeded
+        and not runner_errors
+    )
+    slowest = sorted(records, key=lambda item: float(item["duration_seconds"]), reverse=True)[:5]
+    outcome = "passed" if successful else ("budget-exceeded" if budget_exceeded else "failed")
     payload: dict[str, object] = {
-        "schema_version": 1,
-        "contract_type": "orrery-test-shard-result-v1",
+        "schema_version": 2,
+        "contract_type": "orrery-test-shard-result-v2",
         "role": role,
+        "stage": stage,
         "sha": sha,
+        "head_sha": sha,
+        "base_sha": base_sha,
+        "dirty_fingerprint": dirty_after,
         "os": runner_os,
         "python": python_version,
         "shard": shard_id,
         "manifest_sha256": sha256_json(manifest),
-        "inventory_sha256": sha256_json(all_ids),
+        "inventory_sha256": inventory["inventory_sha256"],
+        "test_source_sha256": test_source_hash,
+        "selector_dependency_sha256": selector_dependency_hash,
+        "relevant_tree_sha256": relevant_tree_hash,
+        "runner_version": manifest["routing"]["runner_version"],
+        "environment_gates": {
+            name: os.environ.get(name)
+            for name in manifest["routing"]["reuse"]["environment_gates"]
+        },
         "orrery_test_build": os.environ.get("ORRERY_TEST_BUILD"),
         "selected_test_count": len(selected_ids),
         "selected_test_ids": selected_ids,
@@ -147,10 +234,22 @@ def run_selected(
         "tests_run": result.testsRun,
         "successful": successful,
         "completed": True,
+        "evidence_eligible": successful,
+        "outcome": outcome,
         "duration_seconds": round(duration, 6),
         "budget_seconds": budget_seconds,
         "budget_exceeded": budget_exceeded,
-        "runner_errors": [test.id() for test, _ in result.errors if test.id() not in selected_ids],
+        "timed_out": False,
+        "interrupted": False,
+        "runner_errors": runner_errors,
+        "slowest_tests": [
+            {"test_id": item["test_id"], "duration_seconds": item["duration_seconds"]}
+            for item in slowest
+        ],
+        "promotion_only_suggestion": (
+            "Move only inventory-declared heavy journeys to Promotion; do not record this over-budget run as tier evidence."
+            if budget_exceeded else None
+        ),
     }
     atomic_write_json(output, payload)
     return payload, successful
@@ -162,6 +261,7 @@ def main() -> int:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--shard")
     group.add_argument("--profile", choices=("fast", "checkpoint"))
+    group.add_argument("--selection-plan", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
     try:
@@ -170,11 +270,19 @@ def main() -> int:
             shard=arguments.shard,
             profile=arguments.profile,
             output=arguments.output.resolve(),
+            selection_plan_path=(
+                arguments.selection_plan.resolve() if arguments.selection_plan is not None else None
+            ),
         )
         print(
             f"{'PASS' if successful else 'FAIL'} {payload['role']} {payload['shard']}: "
             f"{payload['tests_run']}/{payload['selected_test_count']} tests in {payload['duration_seconds']}s"
         )
+        if payload["budget_exceeded"]:
+            print("Slowest tests:", file=sys.stderr)
+            for item in payload["slowest_tests"]:
+                print(f"- {item['test_id']}: {item['duration_seconds']}s", file=sys.stderr)
+            print(payload["promotion_only_suggestion"], file=sys.stderr)
         return 0 if successful else 1
     except CIValidationError as exc:
         print(f"FAIL shard runner: {exc}", file=sys.stderr)
