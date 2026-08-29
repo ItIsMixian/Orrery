@@ -32,8 +32,9 @@ removed.
   receipts with exact SHA／OS／manifest／ordered-shard bindings.
 - Windows and Ubuntu lane/gate waves independently depend on the same preflight. Ten lanes per OS allow at most 20
   concurrent lane jobs. Required check names and OS-specific aggregate ownership are unchanged.
-- Superseded Fast runs on the same source branch may cancel each other. Promotion runs are never cancellation-based
-  reusable evidence.
+- Superseded Fast runs on the same source branch may cancel each other, and frozen `promotion/**` pushes do not start
+  a redundant Fast copy after ordinary-branch evidence. Promotion runs are never cancellation-based reusable evidence
+  and still execute the complete inventory.
 - No product, component, Adapter, Authority, protocol, branch-protection, tag or Release behavior changed.
 
 ## Local evidence

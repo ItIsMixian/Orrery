@@ -4,7 +4,7 @@
 
 - 在 CI4 exact `a4b0ed3` Fast 2/2、Promotion 59/59 双平台通过并 fast-forward `origin/main` 后，从该 Canonical 基线建立 D 盘独立 `codex/ci5-promotion-throughput` worktree，登记 Git-private `CI5-promotion-throughput-optimization`；不另开任务，不修改产品组件。
 - 四次成功 Promotion 的 54 shard jobs 稳定只有约 15 分钟测试、约 24–26 分钟环境开销；CI5 保留 27 个逻辑 shard／全部测试／原预算与 required checks，新增十个 fail-closed physical lane，每个 shard 继续用独立 Python 子进程和独立 result，aggregate 另验十份 lane receipt。
-- Windows／Ubuntu lane 与 repository gate 改为共同 preflight 后并行；Fast 只取消同分支 superseded feedback，Promotion 不复用／取消。真实 `lane-05` 生成 3 shard＋1 lane receipt 并 3/3 PASS；本机波动保持原样，不作为放宽预算或重跑依据。
+- Windows／Ubuntu lane 与 repository gate 改为共同 preflight 后并行；Fast 只取消同分支 superseded feedback，并忽略已由普通分支 Fast 检查过的冻结 `promotion/**` push；Promotion 不复用／取消且完整执行。真实 `lane-05` 生成 3 shard＋1 lane receipt 并 3/3 PASS；本机波动保持原样，不作为放宽预算或重跑依据。
 - CI4 Checkpoint baseline 78/78 assertion PASS 但 164.741828s 超 90s，其中单个最小 Git journey 为 120.961576s。该 journey 只移出 Checkpoint、仍完整存在于 W7B Promotion；阶段反馈随后为 80/80 41.697448s，最终 81/81 两次为 42.806990s／43.071302s，预算未调高。
 - CI contract 17/17、inventory 390／27／10／57／81、最终 Fast 57/57 3.235952s、integrated validation、2,040 KB／157-doc 隔离站、repository gate（667／360／1010）、release dry build、workflow YAML、compile/diff 门通过；exact-SHA hosted Fast/Promotion 留给 Candidate closeout。
 

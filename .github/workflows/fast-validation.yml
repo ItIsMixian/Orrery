@@ -2,6 +2,8 @@ name: Fast validation
 
 on:
   push:
+    branches-ignore:
+      - "promotion/**"
   pull_request:
 
 permissions:

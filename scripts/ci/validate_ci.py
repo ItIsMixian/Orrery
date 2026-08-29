@@ -56,6 +56,8 @@ def validate_workflows(
         return [str(exc)]
     if "  push:" not in fast_triggers or "  pull_request:" not in fast_triggers:
         errors.append("Fast workflow must run for push and pull_request")
+    if '      - "promotion/**"' not in fast_triggers or "branches-ignore:" not in fast_triggers:
+        errors.append("Fast workflow must avoid duplicating frozen promotion/** execution")
     if "--profile fast" not in fast:
         errors.append("Fast workflow must invoke the explicit non-promotion Fast profile")
     if "ORRERY_TEST_BUILD" in fast:

@@ -377,6 +377,7 @@ class CIValidationTests(unittest.TestCase):
         fast_text = (ROOT / ".github/workflows/fast-validation.yml").read_text(encoding="utf-8")
         promotion_text = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
         self.assertIn("cancel-in-progress: true", fast_text)
+        self.assertIn("branches-ignore:\n      - \"promotion/**\"", fast_text)
         self.assertEqual(promotion_text.count("max-parallel: 10"), 2)
         self.assertIn("run_test_lane.py --lane", promotion_text)
         self.assertNotIn("run_test_shard.py --shard", promotion_text)
@@ -395,7 +396,10 @@ class CIValidationTests(unittest.TestCase):
             directory = Path(temporary)
             fast = directory / "fast.yml"
             promotion = directory / "promotion.yml"
-            fast.write_text(fast_text, encoding="utf-8")
+            fast.write_text(
+                fast_text.replace('    branches-ignore:\n      - "promotion/**"\n', "", 1),
+                encoding="utf-8",
+            )
             promotion.write_text(
                 promotion_text.replace(
                     "  ubuntu-lanes:\n    name:",
@@ -405,6 +409,7 @@ class CIValidationTests(unittest.TestCase):
                 encoding="utf-8",
             )
             errors = validate_workflows(fast, promotion)
+            self.assertTrue(any("duplicating frozen promotion" in error for error in errors))
             self.assertTrue(any("must not wait for the Windows" in error for error in errors))
 
     def test_promotion_preflight_installs_discovery_dependencies_before_validation(self) -> None:

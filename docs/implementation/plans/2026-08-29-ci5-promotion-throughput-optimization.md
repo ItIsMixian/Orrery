@@ -57,8 +57,9 @@ decision after this no-coverage-loss optimization is measured.
    logical-shard/test-ID level.
 4. Allow Windows and Ubuntu lanes and repository gates to start independently after the same successful preflight.
    Their required aggregate jobs remain OS-specific and unchanged in name.
-5. Add cancellation only for superseded non-Promotion Fast runs on the same source branch. Promotion runs remain
-   uncancelled evidence attempts.
+5. Add cancellation only for superseded non-Promotion Fast runs on the same source branch, and exclude frozen
+   `promotion/**` pushes after the same SHA has passed ordinary-branch Fast. Promotion runs remain uncancelled evidence
+   attempts and execute the complete inventory.
 6. Remove only
    `test_minimal_git_binding_rejections_and_state_axes_checkpoint` from the Checkpoint selector. It remains in the
    dedicated complete Promotion shard. Do not change the Checkpoint budget.
