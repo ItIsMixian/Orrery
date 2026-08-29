@@ -675,7 +675,7 @@ class PersonalObservatoryTests(unittest.TestCase):
             with mock.patch.dict(os.environ, {}, clear=False):
                 os.environ.pop("ORRERY_PERSONAL_OBSERVATORY_VIEW", None)
                 result = builder.render_personal_site(
-                    ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Project Orrery"
+                    ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Atlas Control"
                 )
         self.assertEqual(result, (sentinel[0], sentinel[1], None, None))
 

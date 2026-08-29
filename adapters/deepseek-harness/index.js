@@ -9,7 +9,7 @@ const RESOURCE_BASE = {
   path: fileURLToPath(new URL('./', import.meta.url)),
 }
 const INVOCATION = { modelInvocable: true, userInvocable: true }
-const DESCRIPTION = 'Route Project Orrery documentation-system work through the platform-neutral Project Orrery CLI while preserving the target repository canonical AGENTS.md authority chain. Use when asked to scaffold, validate, audit, update, or maintain Project Orrery documentation.'
+const DESCRIPTION = 'Route Orrery documentation-system work through the platform-neutral Orrery CLI while preserving the target repository canonical AGENTS.md authority chain. Use when asked to scaffold, validate, audit, update, or maintain Orrery documentation.'
 const CANDIDATE = {
   name: 'project-orrery',
   description: DESCRIPTION,

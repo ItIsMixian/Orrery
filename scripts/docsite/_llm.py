@@ -22,7 +22,7 @@ in any repo. Config is resolved from several sources, **highest priority first**
 
 Provider/baseUrl/model are not secret and come from env or JSON. A saved config
 must include an enabled flag and a fingerprint derived from Provider + Base URL;
-otherwise startup fails closed. Project Orrery never writes ``apiKey`` to JSON.
+otherwise startup fails closed. Orrery never writes ``apiKey`` to JSON.
     {
       "provider": "deepseek",
       "baseUrl": "https://api.deepseek.com",

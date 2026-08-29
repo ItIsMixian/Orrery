@@ -28,7 +28,8 @@
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes",
       "test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved",
-      "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"
+      "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection",
+      "test_brand_contract.*"
     ]
   },
   "checkpoint": {
@@ -50,7 +51,8 @@
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_fixture_and_policy_freeze_candidate_not_release_semantics",
       "test_authority_release_candidate_gate.AuthorityReleaseCandidateGateTests.test_historical_v020_inputs_match_frozen_hashes",
       "test_project_orrery.ProjectOrreryTests.test_phase0_published_contract_inventory_is_preserved",
-      "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"
+      "test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection",
+      "test_brand_contract.*"
     ]
   },
   "shards": [
@@ -283,6 +285,7 @@
       "id": "packaging-project",
       "surface": "Packaging/Adapters/docsite",
       "selectors": [
+        "test_brand_contract.*",
         "test_project_orrery.*"
       ]
     },

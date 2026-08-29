@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the experimental Project Orrery Codex adapter archive and checksum."""
+"""Build the experimental Orrery Codex adapter archive and checksum."""
 from __future__ import annotations
 
 import argparse
@@ -18,7 +18,7 @@ EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Package the Project Orrery Codex adapter")
+    parser = argparse.ArgumentParser(description="Package the Orrery Codex adapter")
     parser.add_argument("--output-dir", type=Path, default=REPOSITORY_ROOT / "dist")
     parser.add_argument("--check-adapter-version", help="fail unless this equals the adapter version")
     return parser.parse_args()
@@ -79,4 +79,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

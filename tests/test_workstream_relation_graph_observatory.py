@@ -260,7 +260,7 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         ), mock.patch.dict(os.environ, {}, clear=False):
             os.environ.pop("ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW", None)
             result = self.builder.render_workstream_relation_graph_site(
-                ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Project Orrery"
+                ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Atlas Control"
             )
         self.assertEqual(result, (*sentinel, None))
 

@@ -1,8 +1,8 @@
-# Project Orrery DeepSeek Harness Adapter
+# Orrery DeepSeek Harness Adapter
 
 This is a thin packaged Skill. It requires the separately installed
 `project-orrery` CLI declared in `adapter-manifest.json`; it does not contain
-Project Orrery templates, schema, compatibility rules, or project facts.
+Orrery templates, schema, compatibility rules, or project facts.
 
 ## Route the task
 

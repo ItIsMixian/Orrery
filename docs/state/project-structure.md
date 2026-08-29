@@ -5,7 +5,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 
 ## 当前事实
 
-- 当前 R2 Worktree Candidate `codex/r2-orrery-rename-decision-contract` 精确从 clean `main@2037cab7a46ae048147115c3c317f8d542a8cee9` 建立并注册 Git-private session。维护者已接受 ADR-0015 并批准配套 Design，R3 的决策／设计门已解除，但 R3/R4/R5 均未实现。该 Candidate 仍只修改 Library/ADR/Design/Plan/State/Validation/DEVLOG 和索引，没有执行全仓改名，也没有修改 package/schema/CLI/Skill/Adapter/remote/tag/Release。外部 product brand/repository 已是 Orrery，当前本地 root 与稳定技术标识仍使用 `project-orrery`。
+- 当前 R3 Worktree Candidate `codex/r3-orrery-brand-only-closeout` 精确从 clean `main@1e67d4ac7f18e11459417ff4e04eef0ce065b28b` 建立，并登记 Git-private session。改动限于显式 brand allowlist：当前 README／文档入口、self-host display surfaces、薄 Adapter／Skill 的安全 display metadata、对应 UI/golden tests 和权威同步；它没有执行全仓字符串替换，也没有迁移本地 root、Codex Saved Project 或 Codex data root。`project-orrery` 路径和所有稳定技术／协议标识继续保留。该事实只属于 Worktree Candidate，尚未进入 `main`、Canonical 或 Release。
 - 当前 CI3 Worktree Candidate `codex/ci3-fast-validation-dependency-fix` 精确从 W7D `e2c049ebd6c6476eac8b9555e00edc046d673199` 建立；Git-private session 以 `test-coverage` 为 primary，声明 release/documentation/project affected surfaces。作者树改动限于独立 Fast workflow、CI validator/tests 与权威链同步；Promotion topology、产品包、组件版本、main/tag/Release 均未改。
 - 单一 Git 仓库根：`D:\coding warehouse\project-orrery`。
 - 并发协作当前人工采用“一个 Workstream = 一个分支 + 一个独立 linked worktree 或 clone”；一个平台会话可以在该 Workstream 中完成多个相关 Change Set。主 worktree 只供维护者集成。2026-08-20 已用独立 integration worktree 恢复并拆分三个共享工作目录任务，随后为 context-routing、platform／adapters 和 docsite／broker 分配三个干净 linked worktree，证明人工隔离与干净集成路径可行。

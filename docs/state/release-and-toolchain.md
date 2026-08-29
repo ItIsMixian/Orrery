@@ -6,7 +6,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前事实
 
-- [ADR-0015 compatibility contract](../decisions/0015-orrery-brand-and-compatibility-contract.md) 已 Accepted，配套 Design 已 Approved：公开品牌为 Orrery；现有 Skill/CLI/Adapter IDs、`project-orrery-*` distributions、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 和 credential/cache/backup namespaces 当前均未改变。R4 默认采用显式 opt-in、collision-checked thin CLI launcher，各宿主默认只改 display name；首个新 Release 保持 `project-orrery-*` asset filename。PyPI `orrery` 仍被无关项目占用，因此不新增该 distribution/import。R3 已解除决策门但尚未开始，R4/R5 也未开始。
+- [ADR-0015 compatibility contract](../decisions/0015-orrery-brand-and-compatibility-contract.md) 已 Accepted，配套 Design 已 Approved。R3 Worktree Candidate 已将 allowlisted 当前 display name／description 收口为 Orrery；Skill frontmatter `name: project-orrery`、Plugin／Adapter canonical IDs、现有 CLI entrypoint、`project-orrery-*` distributions、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 和 credential/cache/backup namespaces 均未改变。没有增加 alias、复制实现、选择 SemVer、打包或发布；首个新 Release 仍必须使用 `project-orrery-*` asset filename。该 Candidate 尚未进入 `main`、Canonical 或 Release；R4/R5 未开始。
 - CI3 Candidate 只修复 `.github/workflows/fast-validation.yml` 的 fresh-runner setup 和 artifact 失败噪声：Fast 继续是 `non-promotion-feedback`，15 秒预算、51 项既有选择、无 `ORRERY_TEST_BUILD`、无 required smoke 名；Promotion workflow、27 shards、required checks、组件版本、branch protection、tag、Release 与 v0.2.0 均不变。最终推广证据仍要求同一 exact SHA 的独立 Fast Windows/Ubuntu 与 Promotion required Windows/Ubuntu 全绿。
 - Project Orrery v0.2.0 已通过 annotated tag 和 [GitHub Release](https://github.com/ItIsMixian/Orrery/releases/tag/v0.2.0)公开发布；tag 指向 `20fc95b`。
 - 外部当前展示名和仓库入口已改为 Orrery／`ItIsMixian/Orrery`。Candidate 当前只同步根 README、

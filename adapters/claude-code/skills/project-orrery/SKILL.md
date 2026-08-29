@@ -1,13 +1,13 @@
 ---
 name: project-orrery
-description: Route Project Orrery documentation-system work through the platform-neutral Project Orrery CLI while preserving the target repository's canonical AGENTS.md authority chain. Use when asked to scaffold, validate, audit, update, or maintain Project Orrery documentation.
+description: Route Orrery documentation-system work through the platform-neutral Orrery CLI while preserving the target repository's canonical AGENTS.md authority chain. Use when asked to scaffold, validate, audit, update, or maintain Orrery documentation.
 ---
 
-# Project Orrery Claude Code Adapter
+# Orrery Claude Code Adapter
 
 This is a thin Claude Code Plugin Skill. It requires the separately installed
 `project-orrery` CLI declared in `adapter-manifest.json`; it does not contain
-Project Orrery templates, schema, compatibility rules, or project facts.
+Orrery templates, schema, compatibility rules, or project facts.
 
 ## Route the task
 

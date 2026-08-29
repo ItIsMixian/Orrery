@@ -2,7 +2,7 @@
   "manifest_format": 1,
   "adapter": {
     "id": "project-orrery-deepseek-harness",
-    "name": "Project Orrery DeepSeek Harness Adapter",
+    "name": "Orrery DeepSeek Harness Adapter",
     "platform": "deepseek-harness",
     "distribution": "project-orrery-deepseek-harness-adapter",
     "version": "0.1.1",

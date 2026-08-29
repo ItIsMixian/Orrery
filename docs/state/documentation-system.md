@@ -5,13 +5,13 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 ## 当前事实
 
-- R2 Candidate 以未合入的 [R1 Library audit refresh](../library/2026-08-28-orrery-rename-migration-audit.zh-CN.md) 为 provenance，在 current main 重新机械统计后加法建立 [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md)、[Approved Design](../design/orrery-rename-and-compatibility-contract.md) 和 [Implementation Plan](../implementation/plans/2026-08-28-orrery-rename-and-compatibility.md)。维护者已接受 ADR 并批准 Design，R3 可另立 Workstream，但尚未实现；R4/R5 仍是后续独立任务。本功能分支只同步已接受的权威边界，根 PROGRESS/HANDOFF 未改写。
+- R3 Worktree Candidate `codex/r3-orrery-brand-only-closeout` 精确从 clean `main@1e67d4ac7f18e11459417ff4e04eef0ce065b28b` 建立，并在首次产品写入前登记 Git-private `R3-orrery-brand-only-closeout`。它依据 [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) 和 Approved Design，只把 machine-readable allowlist 内的当前人类品牌面收口为 Orrery；历史文档、协议和稳定技术 ID 由 denylist／hash fixture 保护。该实现仍是 Worktree Candidate，尚未进入 `main`、Canonical 或 Release；R4/R5 未启动，根 PROGRESS/HANDOFF 未改写。
 - CI3 Candidate 将 fresh-runner dependency order 与 conditional artifact upload 作为可机械验证的 CI contract，并让 Plan／Validation／State／DEVLOG／全局入口与实现同行。为避免记录 hosted run 再产生未验证 docs-only successor，最终同 SHA hosted job/run 证据由任务回执精确报告；这不把回执升级为项目 Authority，也不改写 W7D 历史 Validation。
-- Project Orrery 已在本仓库正式采纳自身权威链。
+- Orrery 已在本仓库正式采纳自身权威链。
 - Agent 入口是根 `AGENTS.md`；维护者入口是本目录 `README.md`、`PROGRESS.md` 与本地观测台。
 - Seed、ADR、Approved Design、Implementation Plan、State、Validation 和 Snapshot 已各有独立职责。
 - Proposed ADR 与 Proposed-for-approval Design 不进入 effective decision／Approved Design 集合。ADR-0015 已进入 effective decision，配套 Design 已进入 Approved 集合；这只解除 R3 的启动门，不产生实现事实。Library 命名计数和外部网页观察始终只是研究/Validation 输入。
-- ADR-0009 已把这些职责、各对象 lifecycle、独立 Decision／Implementation／Validation claim dimensions、fact scopes、evidence categories 和 derived-view constraints 正式定义为 Authority Meta Model；`docs/core/principles.md` 明确只是 Project Orrery Product Seed。
+- ADR-0009 已把这些职责、各对象 lifecycle、独立 Decision／Implementation／Validation claim dimensions、fact scopes、evidence categories 和 derived-view constraints 正式定义为 Authority Meta Model；`docs/core/principles.md` 明确只是 Orrery Product Seed。
 - 文档事实现在显式区分 Canonical（integration ref 已集成）、Candidate（功能分支 HEAD）和 Worktree（本地未提交）三个作用域；分支 State 只能陈述候选事实，不能冒充 canonical 当前状态。
 - 根 `PROGRESS.md` 与 `HANDOFF.md` 是集成视角入口，不是历史总账：PROGRESS 只保留当前线路、未完成事项、阻塞和近期里程碑，完整演化与逐次证据分别进入 DEVLOG／Validation。普通功能分支应让代码、测试和 subsystem State 同行，并在合流时由唯一整合者同步全局入口，避免多个 Agent 持续争写同一份全局状态。
 - ADR-0012 已进入本地 Canonical，并建立独立于 Authority Meta Model 的 Documentation Governance Policy：它按文档角色规定当前／历史边界、事件驱动同步、责任式拆分、soft review budget 和人工审查闭环。它不是新的作者文档类型，也不授权自动改写。

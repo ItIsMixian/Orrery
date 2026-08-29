@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the public Project Orrery Skill archive and checksum."""
+"""Build the public Orrery Skill archive and checksum."""
 from __future__ import annotations
 
 import argparse
@@ -19,7 +19,7 @@ EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Package the Project Orrery Skill release")
+    parser = argparse.ArgumentParser(description="Package the Orrery Skill release")
     parser.add_argument("--output-dir", type=Path, default=REPOSITORY_ROOT / "dist")
     parser.add_argument("--check-tag", help="Fail unless this tag equals v<release version>")
     return parser.parse_args()

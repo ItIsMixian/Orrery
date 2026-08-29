@@ -716,7 +716,7 @@ def command_serve(args: argparse.Namespace) -> int:
     data = state.config
     server = build_server(state, args.port)
     port = int(server.server_address[1])
-    print("Project Orrery Broker: http://127.0.0.1:%d/v1" % port, flush=True)
+    print("Orrery Broker: http://127.0.0.1:%d/v1" % port, flush=True)
     print(
         "Provider=%s | Base=%s | models=%s"
         % (data["provider"], data["baseUrl"], ",".join(data["allowedModels"])),
@@ -733,7 +733,7 @@ def command_serve(args: argparse.Namespace) -> int:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Project Orrery deterministic local LLM broker"
+        description="Orrery deterministic local LLM broker"
     )
     sub = parser.add_subparsers(dest="command", required=True)
     configure = sub.add_parser(

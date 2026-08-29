@@ -1087,7 +1087,15 @@ a.chip:hover{color:var(--fg);text-decoration:none;border-color:var(--acc)}
 .tile.graph.full{position:fixed;inset:14px;z-index:300;margin:0;box-shadow:0 20px 60px rgba(0,0,0,.55)}
 .tile.graph.full .gwrap{height:calc(100% - 36px)}
 @media(max-width:1000px){.kpi{grid-template-columns:repeat(2,1fr)} .dash-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.kpi{grid-template-columns:1fr}}
+@media(max-width:640px){
+ .kpi{grid-template-columns:1fr}
+ header.top{gap:8px;padding:0 10px}
+ .top .sub{display:none}
+ .rightgrp{min-width:0;gap:6px}
+ .searchwrap{min-width:0}
+ #q{width:min(230px,36vw)}
+ #results{position:fixed;left:10px;right:10px;top:calc(var(--hh) - 2px);width:auto}
+}
 
 @media(max-width:1150px){.toc{display:none}}
 @media(max-width:820px){.sidebar,.sidebar-resizer{display:none}}
@@ -1442,7 +1450,7 @@ def build_page(title, sidebar, pages_html, graph_json, search_json):
 # main
 # ---------------------------------------------------------------------------
 
-def render_site(docs_dir: Path, agents_file: Path, root: Path, title="Project Orrery · Documentation"):
+def render_site(docs_dir: Path, agents_file: Path, root: Path, title="Orrery · Documentation"):
     """Parse all docs and return (html_string, stats). Reused by serve.py."""
     adrs = parse_adrs(docs_dir / "decisions")
     state_docs = parse_state_docs(docs_dir / "state")
@@ -1672,7 +1680,7 @@ def main():
     ap.add_argument("--docs", default=str(root / "docs"))
     ap.add_argument("--agents", default=str(root / "AGENTS.md"))
     ap.add_argument("--out", default=str(root / "docs" / "_site" / "index.html"))
-    ap.add_argument("--title", default="Project Orrery · Documentation")
+    ap.add_argument("--title", default="Orrery · Documentation")
     args = ap.parse_args()
 
     page, stats, authority_report = _render_site_for_runtime(

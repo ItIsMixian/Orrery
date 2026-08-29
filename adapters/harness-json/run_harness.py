@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal subprocess Adapter for the Project Orrery CLI JSON contract."""
+"""Minimal subprocess Adapter for the Orrery CLI JSON contract."""
 from __future__ import annotations
 
 import argparse
@@ -88,7 +88,7 @@ class RequestError(ValueError):
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Invoke the Project Orrery CLI through JSON only.")
+    parser = argparse.ArgumentParser(description="Invoke the Orrery CLI through JSON only.")
     parser.add_argument("--request", type=Path, help="JSON request file; stdin is used when omitted")
     parser.add_argument("--python", default=sys.executable, help="Python interpreter containing project_orrery_cli")
     parser.add_argument("--python-path", action="append", default=[], help="Explicit source root for checkout tests")

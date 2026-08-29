@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "project-orrery-core"
 version = "0.1.14"
-description = "Platform-neutral schemas, manifests, compatibility rules, and authority templates for Project Orrery"
+description = "Platform-neutral schemas, manifests, compatibility rules, and authority templates for Orrery"
 requires-python = ">=3.10"
 
 [tool.setuptools.package-data]

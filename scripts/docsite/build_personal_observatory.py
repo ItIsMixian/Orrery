@@ -105,7 +105,7 @@ def main() -> None:
     parser.add_argument("--docs", default=str(root / "docs"))
     parser.add_argument("--agents", default=str(root / "AGENTS.md"))
     parser.add_argument("--out", default=str(root / "docs" / "_site" / "index.html"))
-    parser.add_argument("--title", default="Project Orrery · Documentation")
+    parser.add_argument("--title", default="Orrery · Documentation")
     parser.add_argument("--enable", action="store_true")
     parser.add_argument("--exclude-branch", action="append", default=[])
     parser.add_argument("--snapshot-out", type=Path)

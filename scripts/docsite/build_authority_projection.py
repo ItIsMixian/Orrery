@@ -265,7 +265,7 @@ def main() -> None:
     parser.add_argument("--docs", default=str(root / "docs"))
     parser.add_argument("--agents", default=str(root / "AGENTS.md"))
     parser.add_argument("--out", default=str(root / "docs" / "_site" / "index.html"))
-    parser.add_argument("--title", default="Project Orrery · Documentation")
+    parser.add_argument("--title", default="Orrery · Documentation")
     args = parser.parse_args()
 
     page, stats, projection = render_candidate_site(

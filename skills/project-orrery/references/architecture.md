@@ -1,4 +1,4 @@
-# Project Orrery architecture
+# Orrery architecture
 
 ## Authority chain
 
@@ -35,7 +35,7 @@ The primary chain is:
 
 ## Release and compatibility surfaces
 
-The authority chain and the distributed tooling evolve at different speeds. Project Orrery therefore records four version surfaces instead of treating a single package version as proof that a target repository is current:
+The authority chain and the distributed tooling evolve at different speeds. Orrery therefore records four version surfaces instead of treating a single package version as proof that a target repository is current:
 
 `tagged Skill -> compatible target toolchain -> supported project manifest -> deliberate document migration`
 

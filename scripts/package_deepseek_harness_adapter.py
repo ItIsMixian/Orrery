@@ -20,7 +20,7 @@ EXCLUDED_SUFFIXES = {".pyc", ".pyo", ".tgz"}
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Package the Project Orrery DeepSeek Harness adapter")
+    parser = argparse.ArgumentParser(description="Package the Orrery DeepSeek Harness adapter")
     parser.add_argument("--output-dir", type=Path, default=REPOSITORY_ROOT / "dist")
     parser.add_argument("--check-adapter-version")
     return parser.parse_args()

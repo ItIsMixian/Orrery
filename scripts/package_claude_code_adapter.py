@@ -18,7 +18,7 @@ EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Package the Project Orrery Claude Code adapter")
+    parser = argparse.ArgumentParser(description="Package the Orrery Claude Code adapter")
     parser.add_argument("--output-dir", type=Path, default=REPOSITORY_ROOT / "dist")
     parser.add_argument("--check-adapter-version")
     return parser.parse_args()

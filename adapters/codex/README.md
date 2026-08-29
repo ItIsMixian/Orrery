@@ -1,4 +1,4 @@
-# Project Orrery Codex Adapter
+# Orrery Codex Adapter
 
 Status: `experimental` and unreleased as an Adapter distribution;
 runtime-`verified` only for the exact Codex/Windows scope recorded in
@@ -6,7 +6,7 @@ runtime-`verified` only for the exact Codex/Windows scope recorded in
 
 This directory is an independently packageable Codex Skill adapter. It carries
 Codex discovery metadata and invocation guidance only. It does not bundle the
-Project Orrery Core, CLI, canonical templates, Observatory, or compatibility
+Orrery Core, CLI, canonical templates, Observatory, or compatibility
 rules.
 
 ## Prerequisite

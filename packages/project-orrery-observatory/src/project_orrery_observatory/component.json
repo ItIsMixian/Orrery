@@ -6,10 +6,10 @@
   "legacy_toolchain_version": "0.2.0",
   "template_projection": {
     "scripts/docsite/build_docsite.py": {
-      "Project Orrery · Documentation": "{{PROJECT_TITLE_PY}} · Documentation"
+      "Orrery · Documentation": "{{PROJECT_TITLE_PY}} · Documentation"
     },
     "scripts/docsite/serve.py": {
-      "Project Orrery · Documentation": "{{PROJECT_TITLE_PY}} · Documentation"
+      "Orrery · Documentation": "{{PROJECT_TITLE_PY}} · Documentation"
     }
   },
   "managed_tools": [

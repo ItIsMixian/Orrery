@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install, upgrade, or recoverably uninstall the Project Orrery Codex adapter."""
+"""Install, upgrade, or recoverably uninstall the Orrery Codex adapter."""
 from __future__ import annotations
 
 import argparse
@@ -21,7 +21,7 @@ EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Install the Project Orrery Codex adapter")
+    parser = argparse.ArgumentParser(description="Install the Orrery Codex adapter")
     parser.add_argument(
         "--source",
         type=Path,

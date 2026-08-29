@@ -1087,7 +1087,15 @@ a.chip:hover{color:var(--fg);text-decoration:none;border-color:var(--acc)}
 .tile.graph.full{position:fixed;inset:14px;z-index:300;margin:0;box-shadow:0 20px 60px rgba(0,0,0,.55)}
 .tile.graph.full .gwrap{height:calc(100% - 36px)}
 @media(max-width:1000px){.kpi{grid-template-columns:repeat(2,1fr)} .dash-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.kpi{grid-template-columns:1fr}}
+@media(max-width:640px){
+ .kpi{grid-template-columns:1fr}
+ header.top{gap:8px;padding:0 10px}
+ .top .sub{display:none}
+ .rightgrp{min-width:0;gap:6px}
+ .searchwrap{min-width:0}
+ #q{width:min(230px,36vw)}
+ #results{position:fixed;left:10px;right:10px;top:calc(var(--hh) - 2px);width:auto}
+}
 
 @media(max-width:1150px){.toc{display:none}}
 @media(max-width:820px){.sidebar,.sidebar-resizer{display:none}}

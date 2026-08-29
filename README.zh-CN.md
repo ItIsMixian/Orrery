@@ -16,6 +16,8 @@ Orrery 是一套平台中立、同时面向人类与软件 Agent 的仓库级项
 
 它的权威模型、Markdown 结构、命令行工具和本地阅读器都面向任何 Agent 或 Harness 平台。特定平台的集成只是可选的交付层，不是 Orrery 的身份或边界。
 
+**Orrery** 是当前产品品牌。`project-orrery`、`project_orrery_*` 与 `.project-orrery.json` 等面向机器的标识继续作为稳定兼容契约；v0.2.0 的历史资产与证据保留原名。
+
 ## 为什么需要 Orrery
 
 Orrery 经历了两个阶段，最初都来自一种非常具体的感受：在个人项目中，Agent 不断生成源码和文档，但这些文件的用途、权威性和相互关系越来越难以判断，最终让维护者对自己的代码库产生强烈的失控感。
@@ -110,7 +112,7 @@ Adapter 目录，并通过可恢复的备份或回收目录完成。
 第一次结构验证不需要安装第三方依赖：
 
 ```bash
-python project-orrery/skills/project-orrery/scripts/validate_installation.py \
+python Orrery/skills/project-orrery/scripts/validate_installation.py \
   --target /path/to/project
 ```
 
@@ -151,7 +153,7 @@ python scripts/docsite/llm_broker.py serve
 如需同时验证静态阅读器构建：
 
 ```bash
-python project-orrery/skills/project-orrery/scripts/validate_installation.py \
+python Orrery/skills/project-orrery/scripts/validate_installation.py \
   --target /path/to/project \
   --build
 ```

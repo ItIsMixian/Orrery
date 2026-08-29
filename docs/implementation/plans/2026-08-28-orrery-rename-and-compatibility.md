@@ -1,6 +1,6 @@
 # 实施计划：Orrery Rename and Compatibility R3–R5
 
-Status: Active; R3 ready to start, R4/R5 remain future independent Workstreams
+Status: Active; R3 Worktree Candidate complete and awaiting Promotion, R4/R5 remain future independent Workstreams
 
 Date: 2026-08-28
 
@@ -11,11 +11,11 @@ Approved Design: [Orrery Rename and Compatibility Contract](../../design/orrery-
 ## Goal and current stop
 
 在不改写历史、不抢占 PyPI `orrery`、不破坏已安装用户的前提下，分三项后续 Workstream 完成品牌收口、
-兼容 alias 和可选默认入口评审。本 R2 只建立决策/设计/计划/证据，不执行 R3，不修改 package/schema/
-CLI/Skill/Adapter/remote/tag/Release。
+兼容 alias 和可选默认入口评审。R3 已在独立 Workstream 中完成本地 Candidate 实现与验收；它只改变
+allowlisted 当前 display surfaces，不修改稳定 package/schema/CLI/Skill/Adapter identity、remote/tag/Release。
 
-ADR/Design 门已经解除，R3 可以另行注册并启动；截至本 Plan 更新，R3 尚未实现。R4、R5 不随 R3 自动
-启动，必须分别建立后续独立 Workstream。
+R3 仍待 exact Candidate SHA 在非 main ref 取得 Windows／Ubuntu required checks，并由唯一整合者推广；
+因此尚未成为 Canonical 或 Release。R4、R5 不随 R3 自动启动，必须分别建立后续独立 Workstream。
 
 ## R3 — Brand-only closeout
 
@@ -39,6 +39,14 @@ ADR/Design 门已经解除，R3 可以另行注册并启动；截至本 Plan 更
 - frozen denylist `git diff --exit-code`，v0.2 hashes 与 Release assets 只读核验不变；
 - focused golden/UI tests、Fast、structure/build、links、forbidden artifact、`git diff --check` 通过；
 - exact Candidate SHA 在非 main ref 取得 Windows/Ubuntu required checks。
+
+### Current R3 progress
+
+- `tests/fixtures/brand/orrery-brand-contract-v1.json` 已机械冻结 current-brand allowlist、stable/protocol/history denylist、8 份 schema 与 v0.2 frozen hashes；
+- 当前 README／文档入口、默认 self-host docsite、Personal／Team／Graph、Broker 和安全 display metadata 已统一显示 Orrery，目标项目 title token 仍可定制；
+- 本地 focused／Fast／integrated installation／isolated docsite／repository gates／links／diff 与 1280px、390×844 Browser 验收已通过，证据见 [R3 Validation](../../validation/2026-08-28-r3-orrery-brand-only-closeout.md)；
+- remote description 只读核验，未修改 GitHub settings；未 push、合并 `main`、打 tag／Release、选择 SemVer 或迁移任何本地目录／Codex 数据；
+- 剩余 acceptance 只有 exact Candidate SHA 的非 main Windows／Ubuntu required checks 与后续维护者 Promotion。R4/R5 未开始。
 
 ### Rollback
 

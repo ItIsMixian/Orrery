@@ -1,6 +1,6 @@
-# Project Orrery：Agent 状态索引
+# Orrery：Agent 状态索引
 
-这是新会话或上下文重置后的强制入口。Project Orrery 正在用自身权威模型管理发布 Skill、文档观测台和上下文路由研究。
+这是新会话或上下文重置后的强制入口。Orrery 正在用自身权威模型管理发布 Skill、文档观测台和上下文路由研究。
 
 ## 接触文件前必须阅读
 

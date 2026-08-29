@@ -1,8 +1,8 @@
-# Project Orrery adapters
+# Orrery adapters
 
 Platform adapters contain only runtime discovery, invocation guidance, and
 adapter lifecycle tooling. They depend on the platform-neutral Core and CLI;
-they do not own or copy Project Orrery's canonical templates, compatibility
+they do not own or copy Orrery's canonical templates, compatibility
 rules, or project facts.
 
 Current adapters:
@@ -13,6 +13,6 @@ Current adapters:
 - `claude-code/`: experimental native Claude Code Plugin adapter with a bundled
   local marketplace for isolated lifecycle validation.
 - `deepseek-harness/`: experimental DeepSeek Harness profile Plugin Bundle that
-  registers one packaged Project Orrery Skill.
+  registers one packaged Orrery Skill.
 - `harness-json/`: experimental reference subprocess JSON Adapter. It validates
   the Core／CLI machine contract, not a third-party Agent runtime.

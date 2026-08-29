@@ -2,7 +2,7 @@
   "manifest_format": 1,
   "adapter": {
     "id": "project-orrery-claude-code",
-    "name": "Project Orrery Claude Code Adapter",
+    "name": "Orrery Claude Code Adapter",
     "platform": "claude-code",
     "version": "0.1.1",
     "api_version": 1,

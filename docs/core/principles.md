@@ -1,6 +1,6 @@
-# Seed：Project Orrery 核心原则
+# Seed：Orrery 核心原则
 
-这些原则是 **Project Orrery Product Seed**：约束这个产品的目标与决策，但不冒充当前实现状态，也不等同于所有项目通用的 Authority Meta Model。通用角色、claim、scope 与 evidence 解释以 [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md)和[Approved Design](../design/authority-meta-model.md)为准；文字重叠不改变两者职责。
+这些原则是 **Orrery Product Seed**：约束这个产品的目标与决策，但不冒充当前实现状态，也不等同于所有项目通用的 Authority Meta Model。通用角色、claim、scope 与 evidence 解释以 [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md)和[Approved Design](../design/authority-meta-model.md)为准；文字重叠不改变两者职责。
 
 1. **维护者必须保持控制感。** Agent 生成更多文件不能以牺牲项目可理解性、作者意图或决策历史为代价。
 2. **不同读者可以有不同入口，但只能共享一套事实。** Agent 导航与人类总览最终必须回到同一组 Seed、有效 ADR、实现、State 和 Validation。

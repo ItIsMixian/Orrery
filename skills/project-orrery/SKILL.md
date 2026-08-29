@@ -1,15 +1,15 @@
 ---
 name: project-orrery
-description: Install, migrate, audit, and maintain a traceable Markdown project documentation system with Seed principles, ADRs, approved Design, Implementation Plans, State Docs, Validation, Snapshots, handoff/progress records, a local static reader, optional AI Q&A, and GitHub trend radar. Use when a user asks to create or upgrade a project docs architecture, package a living documentation portal, distinguish decisions from current implementation facts, repair a drifting ADR/state/plan system, or add the Project Orrery observatory to an existing repository.
+description: Install, migrate, audit, and maintain the Orrery traceable Markdown project documentation system with Seed principles, ADRs, approved Design, Implementation Plans, State Docs, Validation, Snapshots, handoff/progress records, a local static reader, optional AI Q&A, and GitHub trend radar. Use when a user asks to create or upgrade a project docs architecture, package a living documentation portal, distinguish decisions from current implementation facts, repair a drifting ADR/state/plan system, or add the Orrery observatory to an existing repository.
 ---
 
-# Project Orrery
+# Orrery
 
 Build a living project observatory without confusing ideas, decisions, plans, implementation, and evidence.
 
 ## Select the operation
 
-- **New repository or missing docs system:** scaffold Project Orrery.
+- **New repository or missing docs system:** scaffold Orrery.
 - **Existing docs system:** audit local instructions and map existing files before installing anything.
 - **Viewer-only refresh:** use the managed tool upgrade; do not replace authored docs.
 - **Documentation maintenance:** follow the target repository's `AGENTS.md`, then update the correct authority layer.

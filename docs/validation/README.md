@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-28 R3 Orrery brand-only closeout](2026-08-28-r3-orrery-brand-only-closeout.md) — validates the machine-readable brand allowlist and technical/protocol/history denylist, current Orrery display surfaces, customizable target title, immutable v0.2/schema evidence, product/Fast/repository gates and real desktop/mobile Browser behavior without alias, identity, remote, release or local-path migration.
 - [2026-08-28 Orrery rename decision contract](2026-08-28-orrery-rename-decision-contract.md) — validates the exact current-main naming inventory, R1 additive provenance, maintainer acceptance closeout, ADR/Design/Plan/State/index links and documentation gates without claiming R3 or changing any package, schema, CLI, Skill, Adapter or remote state.
 - [2026-08-28 CI3 Fast Validation Dependency Fix](2026-08-28-ci3-fast-validation-dependency-fix.md) — fixes fresh-runner Fast discovery dependencies, adds mechanical ordering and missing-artifact-noise regressions, records local Fast plus retained Checkpoint budget failures, and leaves same-SHA hosted Fast/Promotion evidence to the task receipt.
 - [2026-08-28 W7D W7 Integration Candidate](2026-08-28-w7d-w7-integration-candidate.md) — additively integrates CI2/W7B and W7C-B, mechanically freezes the schema-2 profile inventory and budgets, validates the read-only graph on desktop/mobile and records exact-SHA local/hosted Promotion without advancing `main`.

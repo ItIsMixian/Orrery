@@ -1,4 +1,4 @@
-# Project Orrery Harness JSON Adapter
+# Orrery Harness JSON Adapter
 
 This unreleased reference Adapter proves the platform-neutral CLI boundary without loading an Agent Skill or runtime.
 It accepts a versioned JSON request, invokes `project_orrery_cli` as a subprocess with `--json`, validates the common

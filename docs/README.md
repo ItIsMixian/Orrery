@@ -1,6 +1,6 @@
-# Project Orrery 开发文档
+# Orrery 开发文档
 
-本目录是 Project Orrery 仓库自身的文档权威根。
+本目录是 Orrery 仓库自身的文档权威根。
 
 ```text
 产品意图 → Seed → 有效 ADR → 已批准 Design → 实际实现 → State Docs → Validation → Snapshot

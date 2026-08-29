@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-28 — R3 Orrery Brand-only Closeout Worktree Candidate
+
+- 精确从 clean `main@1e67d4ac7f18e11459417ff4e04eef0ce065b28b` 建立 `codex/r3-orrery-brand-only-closeout`，首次产品写入前注册同名 Git-private Workstream；primary 为 documentation-system，affected 为 project-structure、release-and-toolchain、test-coverage。普通功能分支未修改根 PROGRESS/HANDOFF。
+- 新增 machine-readable brand contract，先将候选写入分类为 current brand、stable technical ID、protocol ID 或 historical fact，再只更新 allowlisted 当前 README／文档入口、默认 self-host surfaces、Broker 和安全的 Skill／Adapter display metadata。目标项目 title token 继续可定制；未增加 alias、复制实现或改变 discovery／upgrade／uninstall identity。
+- 冻结并复核 8 份 schema、ADR-0015、Approved Design、phase-0 baseline、v0.2 manifest／Core data 和公开 ZIP hash；`project-orrery-*` distributions/assets、`project_orrery_*` imports、CLI／Skill／Adapter IDs、`.project-orrery.json`、环境变量／header／credential namespaces 均保持不变。历史页面保留原事实，不以旧字符串归零为目标。
+- 浏览器在 1280px 与 390×844 验收默认站、Personal、Team 和 Graph：当前品牌均为 Orrery、零横向溢出、零 console warning/error；Personal／Team／Graph 的 zero-network、derived-read-only、synthetic-non-authoritative／无执行入口边界保持。专项组合 64 tests PASS + 2 expected skips，Fast 57/57，integrated installation、isolated docsite、repository／links／diff gates 通过。完整命令与限制见 [R3 Validation](validation/2026-08-28-r3-orrery-brand-only-closeout.md)。
+- 本 Candidate 未 push、合并 main、修改 GitHub settings、tag／Release、选择 SemVer 或迁移本地 root／Codex Saved Project／Codex data root。R4/R5 未启动；exact-SHA 双平台 required checks 与 Promotion 留给唯一整合者。
+
 ## 2026-08-28 — R2 Orrery decision acceptance closeout
 
 - 维护者接受 ADR-0015 并批准 Orrery Rename and Compatibility Design；R3 的 ADR/Design 门已解除，可另立 Workstream 启动，但本次仍未实现 R3，R4/R5 继续是后续独立 Workstream。

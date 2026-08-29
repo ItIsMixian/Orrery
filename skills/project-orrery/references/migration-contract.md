@@ -24,7 +24,7 @@ Install Orrery in the documentation authority root. State Docs may link to imple
 
 ## Release and compatibility contract
 
-Project Orrery versions four related surfaces independently:
+Orrery versions four related surfaces independently:
 
 | Surface | Recorded in | Meaning |
 |---|---|---|

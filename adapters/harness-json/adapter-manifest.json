@@ -1,7 +1,7 @@
 {
   "manifest_format": 1,
   "adapter": {
-    "name": "Project Orrery Harness JSON Adapter",
+    "name": "Orrery Harness JSON Adapter",
     "distribution": "project-orrery-harness-json-adapter",
     "version": "0.1.1",
     "adapter_api_version": 1,

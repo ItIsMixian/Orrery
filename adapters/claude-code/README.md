@@ -1,10 +1,10 @@
-# Project Orrery Claude Code Adapter
+# Orrery Claude Code Adapter
 
 Status: `experimental` and unreleased. No Claude model-call range is currently
 `verified`.
 
 This directory is a native Claude Code Plugin. It contains one thin
-`project-orrery` Skill and no Project Orrery templates, schema, migration rules,
+`project-orrery` Skill and no Orrery templates, schema, migration rules,
 Observatory implementation, or project facts.
 
 ## Prerequisites

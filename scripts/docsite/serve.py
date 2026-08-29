@@ -363,7 +363,7 @@ _page, _stats, _authority_shadow_report = bd._render_site_for_runtime(
     DOCS,
     AGENTS,
     _ROOT,
-    os.environ.get("DOCSITE_TITLE", "Project Orrery · Documentation"),
+    os.environ.get("DOCSITE_TITLE", "Orrery · Documentation"),
 )
 HTML = inject_qa(_page).encode("utf-8")
 print("  pages: %(adrs)d ADR / %(states)d state / %(snaps)d snap / %(documents)d classified docs" % _stats, flush=True)

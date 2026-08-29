@@ -16,6 +16,8 @@ Orrery is platform-neutral, repository-scale project memory for humans and softw
 
 Its authority model, Markdown schema, command-line toolchain, and local viewer are designed for use with any Agent or Harness platform. Platform-specific integrations are optional delivery layers, not the identity or boundary of the project.
 
+**Orrery** is the current product brand. Machine-facing identifiers such as `project-orrery`, `project_orrery_*`, and `.project-orrery.json` remain stable compatibility contracts; historical v0.2.0 assets and evidence keep their original names.
+
 ## Why Orrery
 
 Orrery grew in two stages from a specific feeling: losing control of a personal codebase because an agent could keep producing source files and documentation faster than their purpose, authority, and relationships could be understood.
@@ -111,7 +113,7 @@ with recoverable backup or trash moves.
 The first validation has no third-party dependencies:
 
 ```bash
-python project-orrery/skills/project-orrery/scripts/validate_installation.py \
+python Orrery/skills/project-orrery/scripts/validate_installation.py \
   --target /path/to/project
 ```
 
@@ -152,7 +154,7 @@ Select **External isolated Broker** in docsite and enter the loopback Broker URL
 To validate the static reader as well:
 
 ```bash
-python project-orrery/skills/project-orrery/scripts/validate_installation.py \
+python Orrery/skills/project-orrery/scripts/validate_installation.py \
   --target /path/to/project \
   --build
 ```

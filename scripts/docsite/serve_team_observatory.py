@@ -74,7 +74,7 @@ def build_team_page(project_root: Path) -> str:
     os.environ["ORRERY_PERSONAL_OBSERVATORY_VIEW"] = "1"
     try:
         page, _stats, _authority, _personal = build_personal_observatory.render_personal_site(
-            ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Project Orrery · Documentation",
+            ROOT / "docs", ROOT / "AGENTS.md", ROOT, "Orrery · Documentation",
             maintenance_control_available=True,
         )
     finally:
