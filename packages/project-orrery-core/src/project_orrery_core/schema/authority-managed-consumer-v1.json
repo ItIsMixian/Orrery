@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.invalid/schema/authority-managed-consumer-v1.json",
+  "title": "Orrery Authority managed consumer contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract_type",
+    "selection",
+    "readiness",
+    "binding",
+    "binding_hash",
+    "component_health",
+    "render_status",
+    "safety",
+    "rollout_plan",
+    "rollback_plan",
+    "guarantees",
+    "contract_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_type": {"const": "authority-managed-consumer-v1"},
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current", "requested", "authority", "effective", "active_consumer", "target_consumer", "rollout_ready", "switch_authorized", "maintainer_enable_decision", "default_selection", "production_behavior_switched"],
+      "properties": {
+        "current": {"const": "legacy"},
+        "requested": {"enum": ["legacy", "shadow", "candidate-projection", "enabled", "rollback"]},
+        "authority": {"type": "string", "minLength": 1},
+        "effective": {"enum": ["legacy", "shadow", "candidate-projection", "enabled", "rollback", "unavailable"]},
+        "active_consumer": {"const": "legacy"},
+        "target_consumer": {"enum": ["legacy", "managed-authority-projection"]},
+        "rollout_ready": {"type": "boolean"},
+        "switch_authorized": {"const": false},
+        "maintainer_enable_decision": {"const": "pending"},
+        "default_selection": {"const": "legacy"},
+        "production_behavior_switched": {"const": false}
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "ready", "blockers"],
+      "properties": {
+        "status": {"enum": ["ready", "blocked", "unavailable"]},
+        "ready": {"type": "boolean"},
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "category", "component", "detail"],
+            "properties": {
+              "code": {"type": "string", "minLength": 1},
+              "category": {"enum": ["unavailable", "runtime-failure"]},
+              "component": {"type": "string", "minLength": 1},
+              "detail": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_model_version", "evaluator_model_id", "repository_snapshot", "fact_scope", "evidence_visibility", "versions", "source_hashes", "reconciliation_hashes"],
+      "properties": {
+        "authority_model_version": {"type": ["integer", "null"], "minimum": 1},
+        "evaluator_model_id": {"type": ["string", "null"], "minLength": 1},
+        "repository_snapshot": {"type": "string", "minLength": 1},
+        "fact_scope": {"enum": ["canonical", "candidate", "worktree", "local-only", "historical", "unknown"]},
+        "evidence_visibility": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "versions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["expected", "observed"],
+          "properties": {
+            "expected": {"$ref": "#/$defs/versions"},
+            "observed": {"$ref": "#/$defs/versions"}
+          }
+        },
+        "source_hashes": {"$ref": "#/$defs/hashPair"},
+        "reconciliation_hashes": {"$ref": "#/$defs/hashPair"}
+      }
+    },
+    "binding_hash": {"$ref": "#/$defs/hash"},
+    "component_health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collector", "evaluator", "projection"],
+      "properties": {
+        "collector": {"$ref": "#/$defs/health"},
+        "evaluator": {"$ref": "#/$defs/health"},
+        "projection": {"$ref": "#/$defs/health"}
+      }
+    },
+    "render_status": {"enum": ["complete", "partial", "failed", "unavailable"]},
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unknown_preserved", "local_only_preserved", "ai_non_escalation", "coordinator_cannot_select", "partial_claims_exposed"],
+      "properties": {
+        "unknown_preserved": {"type": "boolean"},
+        "local_only_preserved": {"type": "boolean"},
+        "ai_non_escalation": {"type": "boolean"},
+        "coordinator_cannot_select": {"type": "boolean"},
+        "partial_claims_exposed": {"type": "boolean"}
+      }
+    },
+    "rollout_plan": {"$ref": "#/$defs/plan"},
+    "rollback_plan": {"$ref": "#/$defs/plan"},
+    "guarantees": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomic_page_transition", "partial_claim_page_allowed", "fallback_consumer", "writes_author_documents", "network_required", "modifies_release", "ai_may_select", "coordinator_may_select"],
+      "properties": {
+        "atomic_page_transition": {"const": true},
+        "partial_claim_page_allowed": {"const": false},
+        "fallback_consumer": {"const": "legacy"},
+        "writes_author_documents": {"const": false},
+        "network_required": {"const": false},
+        "modifies_release": {"const": false},
+        "ai_may_select": {"const": false},
+        "coordinator_may_select": {"const": false}
+      }
+    },
+    "inspection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["writes_performed", "normalized_observations_exposed", "collection_failure"],
+      "properties": {
+        "writes_performed": {"const": false},
+        "normalized_observations_exposed": {"const": false},
+        "collection_failure": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["type", "message"],
+              "properties": {
+                "type": {"type": "string", "minLength": 1},
+                "message": {"type": "string"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "contract_hash": {"$ref": "#/$defs/hash"}
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "hashPair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected", "observed"],
+      "properties": {
+        "expected": {"oneOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]},
+        "observed": {"oneOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]}
+      }
+    },
+    "health": {"enum": ["ready", "failed", "unavailable"]},
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collector", "evaluator", "projection"],
+      "properties": {
+        "collector": {"type": "string", "minLength": 1},
+        "evaluator": {"type": "string", "minLength": 1},
+        "projection": {"type": "string", "minLength": 1}
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "kind", "selection", "binding_hash", "steps", "atomicity", "failure_consumer", "writes_author_documents", "network_required", "modifies_release", "plan_hash", "plan_id"],
+      "properties": {
+        "contract": {"const": "authority-managed-consumer-v1"},
+        "kind": {"enum": ["rollout", "rollback"]},
+        "selection": {"enum": ["legacy", "shadow", "candidate-projection", "enabled", "rollback", "unavailable"]},
+        "binding_hash": {"$ref": "#/$defs/hash"},
+        "steps": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "atomicity": {"const": "complete-page-or-legacy"},
+        "failure_consumer": {"const": "legacy"},
+        "writes_author_documents": {"const": false},
+        "network_required": {"const": false},
+        "modifies_release": {"const": false},
+        "plan_hash": {"$ref": "#/$defs/hash"},
+        "plan_id": {"type": "string", "pattern": "^authority-(rollout|rollback)-[0-9a-f]{24}$"}
+      }
+    }
+  }
+}

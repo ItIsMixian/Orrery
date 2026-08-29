@@ -554,6 +554,125 @@
       "reason": "heavy evidence for Authority/Core via authority-core"
     },
     {
+      "test_id": "test_authority_managed_consumer.AuthorityManagedConsumerTests.test_ai_readiness_request_cannot_override_selection",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "authority-core"
+      ],
+      "reason": "low-cost managed consumer contract evidence for Authority/Core"
+    },
+    {
+      "test_id": "test_authority_managed_consumer.AuthorityManagedConsumerTests.test_cli_inspect_is_read_only_offline_and_hides_normalized_observations",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "authority-core"
+      ],
+      "reason": "low-cost managed consumer contract evidence for Authority/Core"
+    },
+    {
+      "test_id": "test_authority_managed_consumer.AuthorityManagedConsumerTests.test_rollback_is_atomic_offline_and_does_not_mutate_author_or_release",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "authority-core"
+      ],
+      "reason": "low-cost managed consumer contract evidence for Authority/Core"
+    },
+    {
+      "test_id": "test_authority_managed_consumer.AuthorityManagedConsumerTests.test_same_input_contract_and_plans_are_deterministic",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "authority-core"
+      ],
+      "reason": "low-cost managed consumer contract evidence for Authority/Core"
+    },
+    {
+      "test_id": "test_authority_managed_consumer.AuthorityManagedConsumerTests.test_schema_tracks_the_exact_top_level_contract",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "authority-core"
+      ],
+      "reason": "low-cost managed consumer contract evidence for Authority/Core"
+    },
+    {
+      "test_id": "test_authority_managed_consumer.AuthorityManagedConsumerTests.test_unified_cli_outputs_machine_readable_inspect_and_readiness",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "authority-core"
+      ],
+      "reason": "low-cost managed consumer contract evidence for Authority/Core"
+    },
+    {
+      "test_id": "test_authority_managed_consumer.AuthorityManagedConsumerTests.test_versioned_fixture_covers_every_selection_and_failure_boundary",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "authority-core"
+      ],
+      "reason": "low-cost managed consumer contract evidence for Authority/Core"
+    },
+    {
       "test_id": "test_authority_meta_model.AuthorityMetaModelFixtureTests.test_all_fact_scopes_are_covered_without_coordinator_scope",
       "owner_surface": "Authority/Core",
       "owner_shard": "authority-core",

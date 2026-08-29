@@ -4,6 +4,7 @@ from __future__ import annotations
 import sys
 
 from . import (
+    authority_consumer,
     authority_migrate,
     authority_restore,
     collaboration_contract,
@@ -24,12 +25,13 @@ def main(argv: list[str] | None = None) -> int:
     if not arguments or arguments[0] in {"-h", "--help"}:
         print(
             "usage: project-orrery "
-            "{scaffold|validate|check-update|migrate-authority-model|"
+            "{scaffold|validate|check-update|authority-consumer|migrate-authority-model|"
             "restore-authority-model|collaboration-contract|worktree|relations|integrate|review|team|maintenance} [options]"
         )
         return 0
     command = arguments.pop(0)
     commands = {
+        "authority-consumer": authority_consumer.main,
         "scaffold": scaffold.main,
         "validate": validate.main,
         "check-update": update.main,
