@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import contextlib
 import copy
+import hashlib
 import io
 import json
 import os
+import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -23,7 +26,13 @@ for source in (
     sys.path.insert(0, str(source))
 
 from project_orrery_cli import workstream_relations as relations_cli  # noqa: E402
-from project_orrery_core.collaboration import create_worktree, write_workstream_session  # noqa: E402
+from project_orrery_core import workstream_relations as relation_core  # noqa: E402
+from project_orrery_core.collaboration import (  # noqa: E402
+    _write_private_session,
+    build_workstream_session,
+    create_worktree,
+    write_workstream_session,
+)
 from project_orrery_core.schema import WORKSTREAM_RELATIONS_SCHEMA  # noqa: E402
 from project_orrery_core.workstream_relations import (  # noqa: E402
     _node_from_session,
@@ -36,10 +45,12 @@ from project_orrery_core.workstream_relations import (  # noqa: E402
     build_undo_plan,
     default_relation_evidence,
     discover_relation_candidates,
+    load_archived_session_index,
     load_legacy_session_projection,
     load_relation_graph,
     load_relation_history,
     relation_storage_root,
+    retired_session_archive_root,
     validate_apply_receipt,
     validate_relation_record,
 )
@@ -66,7 +77,35 @@ class LocalGitRepository:
         })
         self.git("init")
         self.git("branch", "-M", "main")
-        self.commit("base.txt", "base\n", "base")
+        (self.root / "base.txt").write_text("base\n", encoding="utf-8")
+        (self.root / ".project-orrery.json").write_text(
+            '{"name":"project-orrery","manifest_format":1}\n', encoding="utf-8"
+        )
+        state_root = self.root / "docs" / "state"
+        state_root.mkdir(parents=True)
+        (state_root / "project-structure.md").write_text("# Project structure State\n", encoding="utf-8")
+        (state_root / "test-coverage.md").write_text("# Test coverage State\n", encoding="utf-8")
+        (state_root / "multi-worktree-collaboration.md").write_text(
+            "# Multi-worktree collaboration State\n", encoding="utf-8"
+        )
+        (self.root / "AGENTS.md").write_text(
+            "# Agent index\n\n"
+            "## project structure\n\n"
+            "**ID**: `project-structure`\n\n"
+            "**Truth**: `.project-orrery.json`.\n\n"
+            "**Dig**: [State](docs/state/project-structure.md).\n\n"
+            "## test coverage\n\n"
+            "**ID**: `test-coverage`\n\n"
+            "**Truth**: `tests/`.\n\n"
+            "**Dig**: [State](docs/state/test-coverage.md).\n\n"
+            "## multi-worktree collaboration\n\n"
+            "**ID**: `multi-worktree-collaboration`\n\n"
+            "**Truth**: `packages/`.\n\n"
+            "**Dig**: [State](docs/state/multi-worktree-collaboration.md).\n",
+            encoding="utf-8",
+        )
+        self.git("add", ".")
+        self.git("commit", "-m", "base")
 
     def close(self) -> None:
         self.temporary.cleanup()
@@ -211,6 +250,115 @@ def node(
 
 
 class WorkstreamRelationTests(unittest.TestCase):
+    def _archived_lineage_fixture(
+        self,
+        repository: LocalGitRepository,
+        *,
+        keep_parent_live: bool = False,
+    ) -> dict[str, object]:
+        parent = Path(repository.temporary.name) / "w5d"
+        parent_head = repository.git("rev-parse", "HEAD").stdout.strip()
+        if keep_parent_live:
+            repository.git("worktree", "add", "-b", "codex/w5d-archived", str(parent), "main")
+        else:
+            repository.git("branch", "codex/w5d-archived", parent_head)
+        child = repository.root
+        child_record = build_workstream_session(
+            child,
+            workstream_id="CI1-tiered-parallel-validation",
+            primary_subsystem_id="test-coverage",
+            affected_subsystem_ids=["multi-worktree-collaboration"],
+            expected_writes=["scripts/ci/"],
+            governing_docs=["docs/decisions/0014-dynamic-workstream-succession-contract.md"],
+            validation_surfaces=["tests.test_ci_validation"],
+            lifecycle_phase="validating",
+            runtime_condition="waiting-for-user",
+            evidence_freshness="current",
+            captured_at=TIMESTAMP,
+        )
+        child_record["lineage"] = {
+            "lineage_schema_version": 1,
+            "status": "current",
+            "base_workstream_id": "W5D-lan-collaboration-harness",
+            "task_base_oid": parent_head,
+            "validated_head": parent_head,
+        }
+        child_write = _write_private_session(child, child_record)
+        if keep_parent_live:
+            parent_record = copy.deepcopy(child_record)
+            parent_git_dir = repository.git(
+                "rev-parse", "--absolute-git-dir", cwd=parent
+            ).stdout.strip()
+            parent_worktree_digest = hashlib.sha256(
+                os.path.normcase(os.path.realpath(parent_git_dir)).encode("utf-8")
+            ).hexdigest()[:24]
+            parent_record.update({
+                "workstream_id": "W5D-lan-collaboration-harness",
+                "worktree_id": f"local-{parent_worktree_digest}",
+                "branch": "refs/heads/codex/w5d-archived",
+                "lifecycle_phase": "closed",
+                "runtime_condition": "offline",
+                "closure_reason": "superseded",
+                "primary_subsystem_id": "multi-worktree-collaboration",
+                "affected_subsystem_ids": ["test-coverage"],
+                "expected_writes": ["packages/project-orrery-core/", "tests/"],
+                "validation_surfaces": ["tests.test_workstream_relations"],
+                "lineage": {
+                    "lineage_schema_version": 1,
+                    "status": "legacy-unknown",
+                    "base_workstream_id": None,
+                    "task_base_oid": None,
+                    "validated_head": None,
+                },
+            })
+            parent_write = _write_private_session(parent, parent_record)
+            parent_session = Path(parent_write["session_path"])
+        else:
+            parent_record = copy.deepcopy(child_record)
+            parent_record.update({
+                "workstream_id": "W5D-lan-collaboration-harness",
+                "branch": "refs/heads/codex/w5d-archived",
+                "lifecycle_phase": "closed",
+                "runtime_condition": "offline",
+                "evidence_freshness": "current",
+                "closure_reason": "superseded",
+                "primary_subsystem_id": "multi-worktree-collaboration",
+                "affected_subsystem_ids": ["test-coverage"],
+                "expected_writes": ["packages/project-orrery-core/", "tests/"],
+                "validation_surfaces": ["tests.test_workstream_relations"],
+                "lineage": {
+                    "lineage_schema_version": 1,
+                    "status": "legacy-unknown",
+                    "base_workstream_id": None,
+                    "task_base_oid": None,
+                    "validated_head": None,
+                },
+            })
+            parent_session = Path(repository.temporary.name) / "retired-source-worktree.json"
+            parent_session.write_text(
+                json.dumps(parent_record, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+        child_session = Path(child_write["session_path"])
+        archive_root = retired_session_archive_root(repository.root)
+        archive_file = (
+            archive_root
+            / "2026-08-29"
+            / f"codex-w5d-archived-{parent_head[:12]}"
+            / "worktree.json"
+        )
+        archive_file.parent.mkdir(parents=True)
+        archive_file.write_bytes(parent_session.read_bytes())
+        return {
+            "parent": parent,
+            "child": child,
+            "parent_head": parent_head,
+            "parent_session": parent_session,
+            "child_session": child_session,
+            "archive_root": archive_root,
+            "archive_file": archive_file,
+        }
+
     def test_schema_fixture_active_tips_late_ci_and_no_layout_contract(self) -> None:
         self.assertEqual(WORKSTREAM_RELATIONS_SCHEMA["$defs"]["relation_type"]["enum"], ["derived_from", "depends_on", "absorbs"])
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -514,6 +662,374 @@ class WorkstreamRelationTests(unittest.TestCase):
             self.assertEqual(edge["evidence"]["task_base_oid"], parent_head)
             self.assertFalse(projection["writes_performed"])
             self.assertEqual((parent_session.read_bytes(), child_session.read_bytes()), before)
+
+    def test_archived_relation_endpoint_restores_closed_axes_and_binds_graph_hash(self) -> None:
+        with LocalGitRepository() as repository:
+            fixture = self._archived_lineage_fixture(repository)
+            archive_file = fixture["archive_file"]
+            self.assertIsInstance(archive_file, Path)
+            before_bytes = archive_file.read_bytes()
+            child_session = fixture["child_session"]
+            self.assertIsInstance(child_session, Path)
+            before_child_session = child_session.read_bytes()
+            before_status = repository.git("status", "--short").stdout
+            self.assertFalse(relation_storage_root(repository.root).exists())
+            self.assertFalse(Path(fixture["parent"]).exists())
+            with mock.patch.object(socket.socket, "connect", side_effect=AssertionError("network forbidden")):
+                graph = load_relation_graph(repository.root)
+            archived = next(
+                item for item in graph["nodes"]
+                if item["workstream_id"] == "W5D-lan-collaboration-harness"
+            )
+            self.assertEqual(
+                (
+                    archived["session_state"],
+                    archived["lifecycle_phase"],
+                    archived["runtime_condition"],
+                    archived["evidence_freshness"],
+                    archived["scope_status"],
+                    archived["closure_reason"],
+                ),
+                ("current", "closed", "offline", "current", "current", "superseded"),
+            )
+            self.assertEqual(archived["status"], "completed")
+            self.assertEqual(archived["head_oid"], fixture["parent_head"])
+            archive_index = load_archived_session_index(
+                repository.root,
+                referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+            )
+            archived_endpoint = archive_index["resolved_sessions"][0]
+            self.assertEqual(archived_endpoint["origin"], "retired-session-archive")
+            self.assertEqual(
+                archived_endpoint["session"]["branch"],
+                "refs/heads/codex/w5d-archived",
+            )
+            self.assertEqual(archived["origin"], "legacy-session-projection")
+            self.assertEqual(archived["visibility"], "git-private-local-only")
+            self.assertEqual(archived["observability"], "retired-archive-local")
+            self.assertNotIn(archived["workstream_id"], graph["active_tip_workstream_ids"])
+            self.assertNotEqual(archived["status"], "review-pending")
+            archive_link = archived["source_links"][0]["ref"]
+            self.assertRegex(archive_link, r"^retired-session-archive:sha256:[0-9a-f]{64}$")
+            self.assertNotIn(str(fixture["archive_root"]), json.dumps(graph, sort_keys=True))
+
+            edge = next(
+                item for item in graph["edges"]
+                if item["source_workstream_id"] == "CI1-tiered-parallel-validation"
+                and item["target_workstream_id"] == "W5D-lan-collaboration-harness"
+            )
+            self.assertEqual(edge["evidence"]["target_head_status"], "current")
+            self.assertFalse(edge["effective_active_succession"])
+            self.assertIn("predecessor-lifecycle-not-active-takeover", edge["evidence_reason_codes"])
+            self.assertEqual(build_succession_plan(graph)["suppress_direct_pairs"], [])
+            self.assertEqual(archive_file.read_bytes(), before_bytes)
+            self.assertEqual(child_session.read_bytes(), before_child_session)
+            self.assertEqual(repository.git("status", "--short").stdout, before_status)
+            self.assertFalse(relation_storage_root(repository.root).exists())
+
+            changed = json.loads(archive_file.read_text(encoding="utf-8"))
+            changed["captured_at"] = "2026-08-28T23:59:59Z"
+            archive_file.write_text(json.dumps(changed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            changed_graph = load_relation_graph(repository.root)
+            self.assertNotEqual(changed_graph["graph_hash"], graph["graph_hash"])
+            changed_link = next(
+                item for item in changed_graph["nodes"]
+                if item["workstream_id"] == "W5D-lan-collaboration-harness"
+            )["source_links"][0]["ref"]
+            self.assertNotEqual(changed_link, archive_link)
+
+            discovery = discover_relation_candidates(repository.root)
+            candidate = next(
+                item for item in discovery["candidates"]
+                if item["target_workstream_id"] == "W5D-lan-collaboration-harness"
+            )
+            self.assertEqual(candidate["evidence"]["target_head_status"], "unknown")
+            self.assertNotEqual(candidate["evidence"]["status"], "confirmed")
+
+    def test_archived_session_live_precedence_equivalent_duplicates_conflict_and_unreferenced(self) -> None:
+        with LocalGitRepository() as repository:
+            fixture = self._archived_lineage_fixture(repository, keep_parent_live=True)
+            parent = fixture["parent"]
+            self.assertIsInstance(parent, Path)
+            live_parent_session = fixture["parent_session"]
+            self.assertIsInstance(live_parent_session, Path)
+            live_parent_record = json.loads(live_parent_session.read_text(encoding="utf-8"))
+            live_parent_record.update({
+                "lifecycle_phase": "validating",
+                "runtime_condition": "waiting-for-user",
+                "evidence_freshness": "current",
+                "closure_reason": None,
+                "captured_at": "2026-08-29T01:00:00Z",
+            })
+            _write_private_session(parent, live_parent_record)
+            live_projection = load_legacy_session_projection(repository.root)
+            live_node = next(
+                item for item in live_projection["nodes"]
+                if item["workstream_id"] == "W5D-lan-collaboration-harness"
+            )
+            self.assertEqual(live_node["origin"], "legacy-session-projection")
+            self.assertEqual(live_node["runtime_condition"], "waiting-for-user")
+
+            repository.git("worktree", "remove", str(parent))
+            archive_file = fixture["archive_file"]
+            archive_root = fixture["archive_root"]
+            self.assertIsInstance(archive_file, Path)
+            self.assertIsInstance(archive_root, Path)
+            original = archive_file.read_bytes()
+            entry_name = archive_file.parent.name
+            exact_duplicate = archive_root / "2026-08-30" / entry_name / "worktree.json"
+            exact_duplicate.parent.mkdir(parents=True)
+            exact_duplicate.write_bytes(original)
+            semantic_duplicate = archive_root / "2026-08-31" / entry_name / "worktree.json"
+            semantic_duplicate.parent.mkdir(parents=True)
+            semantic_duplicate.write_text(
+                json.dumps(json.loads(original.decode("utf-8")), separators=(",", ":")),
+                encoding="utf-8",
+            )
+            unrelated = json.loads(original.decode("utf-8"))
+            unrelated["workstream_id"] = "unreferenced-history"
+            unrelated_file = archive_root / "2026-09-01" / entry_name / "worktree.json"
+            unrelated_file.parent.mkdir(parents=True)
+            unrelated_file.write_text(json.dumps(unrelated, sort_keys=True), encoding="utf-8")
+            deduped = load_archived_session_index(
+                repository.root,
+                referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+            )
+            self.assertEqual(deduped["resolved_workstream_ids"], ["W5D-lan-collaboration-harness"])
+            self.assertEqual(deduped["resolved_sessions"][0]["equivalent_copy_count"], 3)
+            self.assertRegex(
+                deduped["resolved_sessions"][0]["evidence_id"],
+                r"^retired-session-archive:sha256:[0-9a-f]{64}$",
+            )
+            self.assertEqual(deduped["unreferenced_archive_count"], 1)
+            append_proposed_relation(
+                repository.root,
+                relation_id="native-ci1-w5d",
+                relation_type="derived_from",
+                source_workstream_id="CI1-tiered-parallel-validation",
+                target_workstream_id="W5D-lan-collaboration-harness",
+                reason="synthetic native precedence",
+                actor_id="maintainer",
+                recorded_at=TIMESTAMP,
+            )
+
+            conflict = json.loads(original.decode("utf-8"))
+            conflict["captured_at"] = "2026-08-29T02:00:00Z"
+            conflict_file = archive_root / "2026-09-02" / entry_name / "worktree.json"
+            conflict_file.parent.mkdir(parents=True)
+            conflict_file.write_text(json.dumps(conflict, sort_keys=True), encoding="utf-8")
+            conflicted = load_relation_graph(repository.root)
+            matching_edges = [
+                item for item in conflicted["edges"]
+                if item["relation_type"] == "derived_from"
+                and item["source_workstream_id"] == "CI1-tiered-parallel-validation"
+                and item["target_workstream_id"] == "W5D-lan-collaboration-harness"
+            ]
+            self.assertEqual(len(matching_edges), 1)
+            self.assertEqual(matching_edges[0]["origin"], "native")
+            conflict_node = next(
+                item for item in conflicted["nodes"]
+                if item["workstream_id"] == "W5D-lan-collaboration-harness"
+            )
+            self.assertNotIn(
+                "unreferenced-history",
+                {item["workstream_id"] for item in conflicted["nodes"]},
+            )
+            self.assertEqual(conflict_node["status"], "unknown")
+            self.assertEqual(conflict_node["origin"], "relation-only")
+            self.assertRegex(
+                conflict_node["source_links"][0]["ref"],
+                r"^retired-session-archive-conflict:sha256:[0-9a-f]{64}$",
+            )
+            self.assertNotIn("W5D-lan-collaboration-harness", conflicted["active_tip_workstream_ids"])
+
+    def test_archived_session_reader_rejects_malformed_unknown_inconsistent_and_unsafe_inputs(self) -> None:
+        with LocalGitRepository() as repository:
+            fixture = self._archived_lineage_fixture(repository)
+            archive_file = fixture["archive_file"]
+            archive_root = fixture["archive_root"]
+            self.assertIsInstance(archive_file, Path)
+            self.assertIsInstance(archive_root, Path)
+            original = archive_file.read_bytes()
+
+            archive_file.write_bytes(b"{not-json")
+            with self.assertRaisesRegex(ValueError, "archive session JSON"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            archive_file.write_bytes(original)
+
+            unknown_schema = json.loads(original.decode("utf-8"))
+            unknown_schema["schema_version"] = 2
+            archive_file.write_text(json.dumps(unknown_schema), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "unsupported archived Workstream session"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            archive_file.write_bytes(original)
+
+            unreferenced_unknown = json.loads(original.decode("utf-8"))
+            unreferenced_unknown.update({"workstream_id": "unreferenced-unknown", "schema_version": 2})
+            unreferenced_unknown_file = (
+                archive_root / "2026-08-30" / archive_file.parent.name / "worktree.json"
+            )
+            unreferenced_unknown_file.parent.mkdir(parents=True)
+            unreferenced_unknown_file.write_text(json.dumps(unreferenced_unknown), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "unsupported archived Workstream session"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            shutil.rmtree(unreferenced_unknown_file.parents[1])
+
+            inconsistent = json.loads(original.decode("utf-8"))
+            inconsistent["branch"] = "refs/heads/codex/missing-archive-branch"
+            archive_file.write_text(json.dumps(inconsistent), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "archive branch"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            archive_file.write_bytes(original)
+
+            wrong_entry = archive_file.parent.with_name("codex-w5d-archived-deadbeef")
+            archive_file.parent.rename(wrong_entry)
+            wrong_file = wrong_entry / "worktree.json"
+            with self.assertRaisesRegex(ValueError, "archive entry identity"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            wrong_entry.rename(archive_file.parent)
+
+            archive_file.write_bytes(b"x" * (relation_core.ARCHIVE_MAX_FILE_BYTES + 1))
+            with self.assertRaisesRegex(ValueError, "size limit"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            archive_file.write_bytes(original)
+
+            extra_depth = archive_file.parent / "nested"
+            extra_depth.mkdir()
+            with self.assertRaisesRegex(ValueError, "exactly one worktree.json"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            extra_depth.rmdir()
+
+            aggregate_duplicate = (
+                archive_root / "2026-08-30" / archive_file.parent.name / "worktree.json"
+            )
+            aggregate_duplicate.parent.mkdir(parents=True)
+            aggregate_duplicate.write_bytes(original)
+            with mock.patch.object(
+                relation_core,
+                "ARCHIVE_MAX_TOTAL_BYTES",
+                len(original) * 2 - 1,
+            ):
+                with self.assertRaisesRegex(ValueError, "aggregate size limit"):
+                    load_archived_session_index(
+                        repository.root,
+                        referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                    )
+            shutil.rmtree(aggregate_duplicate.parents[1])
+
+            unsafe_entry = archive_root / "2026-08-29" / "..unsafe"
+            unsafe_entry.mkdir()
+            (unsafe_entry / "worktree.json").write_bytes(original)
+            with self.assertRaisesRegex(ValueError, "unsafe archive entry"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            shutil.rmtree(unsafe_entry)
+
+            archive_file.unlink()
+            archive_file.mkdir()
+            with self.assertRaisesRegex(ValueError, "regular file"):
+                load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            archive_file.rmdir()
+            archive_file.write_bytes(original)
+
+            original_reparse_check = relation_core._is_reparse_or_symlink
+            with mock.patch.object(
+                relation_core,
+                "_is_reparse_or_symlink",
+                side_effect=lambda path: Path(path) == archive_file or original_reparse_check(Path(path)),
+            ):
+                with self.assertRaisesRegex(ValueError, "symlink or reparse"):
+                    load_archived_session_index(
+                        repository.root,
+                        referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                    )
+
+            symlink_target = Path(repository.temporary.name) / "outside-session.json"
+            symlink_target.write_bytes(original)
+            archive_file.unlink()
+            try:
+                archive_file.symlink_to(symlink_target)
+            except OSError:
+                archive_file.write_bytes(original)
+            else:
+                with self.assertRaisesRegex(ValueError, "symlink or reparse"):
+                    load_archived_session_index(
+                        repository.root,
+                        referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                    )
+                archive_file.unlink()
+                archive_file.write_bytes(original)
+
+            with mock.patch.object(relation_core, "ARCHIVE_MAX_FILES", 3):
+                for offset in range(3):
+                    duplicate = (
+                        archive_root
+                        / f"{2100 + offset:04d}-01-01"
+                        / archive_file.parent.name
+                        / "worktree.json"
+                    )
+                    duplicate.parent.mkdir(parents=True)
+                    duplicate.write_bytes(original)
+                with self.assertRaisesRegex(ValueError, "file count limit"):
+                    load_archived_session_index(
+                        repository.root,
+                        referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                    )
+
+    def test_archived_session_index_is_read_only_zero_network_and_has_no_execution_surface(self) -> None:
+        with LocalGitRepository() as repository:
+            fixture = self._archived_lineage_fixture(repository)
+            archive_file = fixture["archive_file"]
+            archive_root = fixture["archive_root"]
+            self.assertIsInstance(archive_file, Path)
+            self.assertIsInstance(archive_root, Path)
+            before = archive_file.read_bytes()
+            author_status = repository.git("status", "--short").stdout
+            with mock.patch.object(socket.socket, "connect", side_effect=AssertionError("network forbidden")):
+                index = load_archived_session_index(
+                    repository.root,
+                    referenced_workstream_ids=["W5D-lan-collaboration-harness"],
+                )
+            self.assertFalse(index["writes_performed"])
+            self.assertFalse(index["network_performed"])
+            self.assertFalse(index["execution_supported"])
+            self.assertEqual(index["destructive_actions"], [])
+            self.assertEqual(index["resolved_workstream_ids"], ["W5D-lan-collaboration-harness"])
+            self.assertEqual(archive_file.read_bytes(), before)
+            self.assertEqual(repository.git("status", "--short").stdout, author_status)
+            serialized = json.dumps(index, sort_keys=True)
+            self.assertNotIn(str(archive_root), serialized)
+            for forbidden in (
+                "apply", "undo", "review-ready", "write-session", "create-relation",
+                "create-worktree", "online", "active-tip",
+            ):
+                self.assertNotIn(f'"{forbidden}"', serialized)
 
     def test_apply_undo_and_discovery_contracts_bind_session_receipt_and_no_drift(self) -> None:
         candidate = relation("rel-future", "derived_from", "future-ci", "W5E")

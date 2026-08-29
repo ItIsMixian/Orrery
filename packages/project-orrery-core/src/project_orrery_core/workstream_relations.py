@@ -18,6 +18,10 @@ from typing import Any, Mapping, Sequence
 
 
 RELATION_SCHEMA_VERSION = 1
+ARCHIVE_LAYOUT_VERSION = 1
+ARCHIVE_MAX_FILES = 128
+ARCHIVE_MAX_FILE_BYTES = 64 * 1024
+ARCHIVE_MAX_TOTAL_BYTES = 4 * 1024 * 1024
 RELATION_TYPES = ("absorbs", "depends_on", "derived_from")
 RELATION_LIFECYCLES = ("active", "cancelled", "completed", "proposed", "stale")
 EVIDENCE_STATES = ("confirmed", "not-applicable", "rejected", "stale", "unknown")
@@ -70,6 +74,8 @@ EVIDENCE_KEYS = {
 }
 _SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _OID = re.compile(r"^[0-9a-f]{40}$")
+_ARCHIVE_DATE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+_ARCHIVE_ENTRY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,255}-[0-9a-f]{8,40}$")
 _MAX_EVENT_BYTES = 256 * 1024
 _FORBIDDEN_FIELD_NAMES = {
     "answer",
@@ -352,6 +358,16 @@ def relation_storage_root(project_root: Path) -> Path:
     return Path(os.path.realpath(common)) / "orrery" / "workstream-relations"
 
 
+def retired_session_archive_root(project_root: Path) -> Path:
+    """Return the one allowed Git-common-private retired-session archive root."""
+    root = Path(project_root).expanduser().absolute()
+    result = _run_git(root, "rev-parse", "--git-common-dir")
+    common = Path(result.stdout.strip())
+    if not common.is_absolute():
+        common = root / common
+    return Path(os.path.realpath(common)) / "orrery" / "retired-worktree-sessions"
+
+
 def _is_reparse_or_symlink(path: Path) -> bool:
     if path.is_symlink():
         return True
@@ -369,6 +385,302 @@ def _validate_private_storage_ancestors(storage_root: Path) -> None:
     for path in (common_root / "orrery", storage_root):
         if os.path.lexists(path) and (not path.is_dir() or _is_reparse_or_symlink(path)):
             raise ValueError("relation storage ancestors must be real directories")
+
+
+def _validate_archive_storage_ancestors(archive_root: Path) -> None:
+    common_root = archive_root.parent.parent
+    if archive_root != common_root / "orrery" / "retired-worktree-sessions":
+        raise ValueError("retired-session archive escaped the Git common private boundary")
+    for path in (common_root / "orrery", archive_root):
+        if os.path.lexists(path) and (not path.is_dir() or _is_reparse_or_symlink(path)):
+            raise ValueError("retired-session archive ancestors must be real directories without symlink or reparse")
+
+
+def _archive_directory_entries(path: Path, *, label: str) -> list[os.DirEntry[str]]:
+    if not path.is_dir() or _is_reparse_or_symlink(path):
+        raise ValueError(f"{label} must be a real directory without symlink or reparse")
+    try:
+        with os.scandir(path) as iterator:
+            entries = sorted(list(iterator), key=lambda item: item.name)
+    except OSError as exc:
+        raise ValueError(f"cannot inspect {label}: {exc}") from exc
+    if len(entries) > ARCHIVE_MAX_FILES * 4:
+        raise ValueError("retired-session archive directory count limit exceeded")
+    return entries
+
+
+def _read_archive_regular_file(path: Path) -> bytes:
+    if _is_reparse_or_symlink(path):
+        raise ValueError("archive worktree.json must not be a symlink or reparse point")
+    try:
+        before = path.lstat()
+    except OSError as exc:
+        raise ValueError(f"cannot inspect archive worktree.json: {exc}") from exc
+    if not stat.S_ISREG(before.st_mode):
+        raise ValueError("archive worktree.json must be a regular file")
+    if before.st_size > ARCHIVE_MAX_FILE_BYTES:
+        raise ValueError("archive worktree.json exceeds the size limit")
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
+    descriptor: int | None = None
+    try:
+        descriptor = os.open(path, flags)
+        opened = os.fstat(descriptor)
+        if not stat.S_ISREG(opened.st_mode):
+            raise ValueError("archive worktree.json must be a regular file")
+        if opened.st_size > ARCHIVE_MAX_FILE_BYTES:
+            raise ValueError("archive worktree.json exceeds the size limit")
+        chunks: list[bytes] = []
+        remaining = ARCHIVE_MAX_FILE_BYTES + 1
+        while remaining:
+            chunk = os.read(descriptor, min(remaining, 64 * 1024))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        content = b"".join(chunks)
+        if len(content) > ARCHIVE_MAX_FILE_BYTES:
+            raise ValueError("archive worktree.json exceeds the size limit")
+        after = path.lstat()
+        if (
+            not stat.S_ISREG(after.st_mode)
+            or after.st_size != opened.st_size
+            or getattr(after, "st_ino", 0) != getattr(before, "st_ino", 0)
+            or getattr(after, "st_dev", 0) != getattr(before, "st_dev", 0)
+        ):
+            raise ValueError("archive worktree.json changed while being read")
+        return content
+    except OSError as exc:
+        raise ValueError(f"cannot read archive worktree.json safely: {exc}") from exc
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def _archive_session_files(project_root: Path) -> list[tuple[str, str, Path, bytes]]:
+    archive_root = retired_session_archive_root(project_root)
+    _validate_archive_storage_ancestors(archive_root)
+    if not archive_root.exists():
+        return []
+    files: list[tuple[str, str, Path, bytes]] = []
+    total_bytes = 0
+    directory_count = 0
+    for date_entry in _archive_directory_entries(archive_root, label="retired-session archive root"):
+        date_path = Path(date_entry.path)
+        if date_entry.is_symlink() or _is_reparse_or_symlink(date_path):
+            raise ValueError("archive date entry must not be a symlink or reparse point")
+        if not date_entry.is_dir(follow_symlinks=False) or not _ARCHIVE_DATE.fullmatch(date_entry.name):
+            raise ValueError("retired-session archive contains an unsafe dated layout entry")
+        try:
+            dt.date.fromisoformat(date_entry.name)
+        except ValueError as exc:
+            raise ValueError("retired-session archive date entry is invalid") from exc
+        directory_count += 1
+        for session_entry in _archive_directory_entries(date_path, label="archive date directory"):
+            session_path = Path(session_entry.path)
+            if session_entry.is_symlink() or _is_reparse_or_symlink(session_path):
+                raise ValueError("archive session entry must not be a symlink or reparse point")
+            if (
+                not session_entry.is_dir(follow_symlinks=False)
+                or not _ARCHIVE_ENTRY.fullmatch(session_entry.name)
+            ):
+                raise ValueError("retired-session archive contains an unsafe archive entry")
+            directory_count += 1
+            children = _archive_directory_entries(session_path, label="archive session directory")
+            if len(children) != 1 or children[0].name != "worktree.json":
+                raise ValueError("archive session directory must contain exactly one worktree.json regular file")
+            worktree_entry = children[0]
+            worktree_path = Path(worktree_entry.path)
+            if worktree_entry.is_symlink() or _is_reparse_or_symlink(worktree_path):
+                raise ValueError("archive worktree.json must not be a symlink or reparse point")
+            if not worktree_entry.is_file(follow_symlinks=False):
+                raise ValueError("archive worktree.json must be a regular file")
+            if len(files) >= ARCHIVE_MAX_FILES:
+                raise ValueError("retired-session archive file count limit exceeded")
+            content = _read_archive_regular_file(worktree_path)
+            total_bytes += len(content)
+            if total_bytes > ARCHIVE_MAX_TOTAL_BYTES:
+                raise ValueError("retired-session archive aggregate size limit exceeded")
+            files.append((date_entry.name, session_entry.name, worktree_path, content))
+            if directory_count > ARCHIVE_MAX_FILES * 3:
+                raise ValueError("retired-session archive directory count limit exceeded")
+    return files
+
+
+def _archive_branch_slug(branch_ref: str, *, separator: str) -> str:
+    short = branch_ref.removeprefix("refs/heads/")
+    return short.replace("/", separator)
+
+
+def _decode_archive_session(content: bytes) -> dict[str, Any]:
+    try:
+        payload = json.loads(content.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot decode archive session JSON: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("archive session JSON must contain an object")
+    if payload.get("schema_version") != 1 or payload.get("contract_type") != "workstream-session":
+        raise ValueError("unsupported archived Workstream session schema or contract")
+    try:
+        from .collaboration import validate_collaboration_contract
+
+        validate_collaboration_contract(payload)
+    except (ImportError, ValueError) as exc:
+        raise ValueError(f"malformed archived Workstream session: {exc}") from exc
+    return payload
+
+
+def _parse_archive_session(
+    project_root: Path,
+    *,
+    entry_name: str,
+    content: bytes,
+    payload: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    payload = dict(payload) if payload is not None else _decode_archive_session(content)
+    workstream_id = _validate_identifier(payload.get("workstream_id"), "archived workstream_id")
+    head = _validate_oid(payload.get("head"), "archived session HEAD")
+    if head is None or not _exact_commit(project_root, head):
+        raise ValueError("archived session HEAD does not resolve to an exact local commit")
+    branch_ref = payload.get("branch")
+    if (
+        not isinstance(branch_ref, str)
+        or not branch_ref.startswith("refs/heads/")
+        or len(branch_ref) > 512
+        or any(character in branch_ref for character in "\r\n\0")
+    ):
+        raise ValueError("archive branch must be a bounded local branch ref")
+    branch_result = _run_git(
+        project_root,
+        "rev-parse",
+        "--verify",
+        "--end-of-options",
+        f"{branch_ref}^{{commit}}",
+        check=False,
+    )
+    if branch_result.returncode != 0 or branch_result.stdout.strip().lower() != head:
+        raise ValueError("archive branch does not resolve to the archived session HEAD")
+    entry_slug, separator, head_prefix = entry_name.rpartition("-")
+    if (
+        not separator
+        or len(head_prefix) < 8
+        or len(head_prefix) > 40
+        or not head.startswith(head_prefix)
+        or entry_slug not in {
+            _archive_branch_slug(branch_ref, separator="-"),
+            _archive_branch_slug(branch_ref, separator="_"),
+        }
+    ):
+        raise ValueError("archive entry identity does not match the archived branch and HEAD")
+    lineage = payload.get("lineage")
+    if isinstance(lineage, Mapping) and lineage.get("status") != "legacy-unknown":
+        if lineage.get("validated_head") != head:
+            raise ValueError("archived Workstream lineage HEAD is inconsistent with the session HEAD")
+    semantic_hash = _digest(payload)
+    eligible = (
+        payload.get("lifecycle_phase") == "closed"
+        and payload.get("runtime_condition") == "offline"
+        and payload.get("evidence_freshness") == "current"
+        and payload.get("closure_reason") == "superseded"
+    )
+    return {
+        "workstream_id": workstream_id,
+        "session": payload,
+        "semantic_hash": semantic_hash,
+        "byte_hash": hashlib.sha256(content).hexdigest(),
+        "evidence_id": f"retired-session-archive:sha256:{semantic_hash}",
+        "eligible": eligible,
+    }
+
+
+def load_archived_session_index(
+    project_root: Path,
+    *,
+    referenced_workstream_ids: Sequence[str],
+) -> dict[str, Any]:
+    """Resolve only referenced, live-missing retired sessions without writing or networking."""
+    repository = Path(project_root).expanduser().absolute()
+    referenced = sorted({
+        _validate_identifier(item, "referenced archived workstream_id")
+        for item in referenced_workstream_ids
+    })
+    referenced_set = set(referenced)
+    candidates: dict[str, list[dict[str, Any]]] = {}
+    unreferenced_archive_count = 0
+    for _date_name, _entry_name, _path, content in _archive_session_files(repository):
+        candidate_header = _decode_archive_session(content)
+        candidate_workstream_id = _validate_identifier(
+            candidate_header.get("workstream_id"),
+            "archived workstream_id",
+        )
+        if candidate_workstream_id not in referenced_set:
+            unreferenced_archive_count += 1
+            continue
+        parsed = _parse_archive_session(
+            repository,
+            entry_name=_entry_name,
+            content=content,
+            payload=candidate_header,
+        )
+        candidates.setdefault(parsed["workstream_id"], []).append(parsed)
+    resolved: list[dict[str, Any]] = []
+    conflicts: list[dict[str, str]] = []
+    unresolved: list[dict[str, str]] = []
+    for workstream_id in referenced:
+        entries = candidates.get(workstream_id, [])
+        if not entries:
+            continue
+        eligible = [entry for entry in entries if entry["eligible"]]
+        semantic_hashes = sorted({entry["semantic_hash"] for entry in entries})
+        if len(semantic_hashes) == 1 and eligible:
+            selected = min(
+                (entry for entry in eligible if entry["semantic_hash"] == semantic_hashes[0]),
+                key=lambda item: (item["byte_hash"], item["evidence_id"]),
+            )
+            resolved.append({
+                "workstream_id": workstream_id,
+                "session": dict(selected["session"]),
+                "origin": "retired-session-archive",
+                "visibility": "git-private-local-only",
+                "observability": "retired-archive-local",
+                "evidence_id": selected["evidence_id"],
+                "evidence_hash": selected["semantic_hash"],
+                "equivalent_copy_count": len(eligible),
+            })
+            continue
+        evidence_hash = _digest({
+            "workstream_id": workstream_id,
+            "semantic_hashes": semantic_hashes,
+        })
+        evidence_id = (
+            f"retired-session-archive-conflict:sha256:{evidence_hash}"
+            if len(semantic_hashes) > 1
+            else f"retired-session-archive-unresolved:sha256:{evidence_hash}"
+        )
+        target = conflicts if len(semantic_hashes) > 1 else unresolved
+        target.append({
+            "workstream_id": workstream_id,
+            "evidence_id": evidence_id,
+            "evidence_hash": evidence_hash,
+        })
+    return {
+        "schema_version": ARCHIVE_LAYOUT_VERSION,
+        "contract_type": "retired-workstream-session-index",
+        "storage": "git-common-private-read-only",
+        "storage_ref": "git-common:orrery/retired-worktree-sessions:dated-entry-v1",
+        "referenced_workstream_ids": referenced,
+        "resolved_workstream_ids": [item["workstream_id"] for item in resolved],
+        "conflicting_workstream_ids": [item["workstream_id"] for item in conflicts],
+        "unresolved_workstream_ids": [item["workstream_id"] for item in unresolved],
+        "resolved_sessions": resolved,
+        "conflicts": conflicts,
+        "unresolved": unresolved,
+        "unreferenced_archive_count": unreferenced_archive_count,
+        "read_only": True,
+        "writes_performed": False,
+        "network_performed": False,
+        "execution_supported": False,
+        "destructive_actions": [],
+    }
 
 
 def load_relation_history(project_root: Path) -> dict[str, Any]:
@@ -586,11 +898,47 @@ def _worktree_paths(project_root: Path) -> list[Path]:
     return sorted(paths, key=lambda path: os.path.normcase(os.path.realpath(path)))
 
 
-def load_legacy_session_projection(project_root: Path) -> dict[str, Any]:
+def _archived_node_from_session(session: Mapping[str, Any], evidence_id: str) -> dict[str, Any]:
+    node = _node_from_session(session, "current")
+    node.update({
+        "visibility": "git-private-local-only",
+        "observability": "retired-archive-local",
+        "source_links": [{"kind": "workstream-session", "ref": evidence_id}],
+        "origin": "legacy-session-projection",
+    })
+    return node
+
+
+def _unresolved_archive_node(workstream_id: str, evidence_id: str) -> dict[str, Any]:
+    return {
+        "workstream_id": workstream_id,
+        "status": "unknown",
+        "session_state": "unknown",
+        "lifecycle_phase": "unknown",
+        "runtime_condition": "unknown",
+        "evidence_freshness": "unknown",
+        "head_oid": None,
+        "scope_status": "unknown",
+        "closure_reason": None,
+        "primary_subsystem_id": "unknown",
+        "affected_subsystem_ids": [],
+        "visibility": "git-private-local-only",
+        "observability": "retired-archive-conflict-unknown",
+        "source_links": [{"kind": "other", "ref": evidence_id}],
+        "origin": "relation-only",
+    }
+
+
+def load_legacy_session_projection(
+    project_root: Path,
+    *,
+    additional_referenced_workstream_ids: Sequence[str] = (),
+    include_archived: bool = True,
+) -> dict[str, Any]:
     """Project W5D lineage sessions read-only; never writes relation storage or sessions."""
     from .collaboration import inspect_worktree_status
 
-    sessions: dict[str, tuple[dict[str, Any], str]] = {}
+    live_sessions: dict[str, tuple[dict[str, Any], str]] = {}
     for worktree in _worktree_paths(project_root):
         if not worktree.is_dir():
             continue
@@ -601,10 +949,46 @@ def load_legacy_session_projection(project_root: Path) -> dict[str, Any]:
         session = status.get("session", {})
         record = session.get("record")
         if isinstance(record, dict) and isinstance(record.get("workstream_id"), str):
-            sessions[record["workstream_id"]] = (record, str(session.get("state", "stale")))
-    nodes = [_node_from_session(record, state) for record, state in sessions.values()]
+            live_sessions[record["workstream_id"]] = (record, str(session.get("state", "stale")))
+    referenced = {
+        _validate_identifier(item, "additional referenced workstream_id")
+        for item in additional_referenced_workstream_ids
+    }
+    for record, _state in live_sessions.values():
+        lineage = record.get("lineage")
+        if isinstance(lineage, Mapping) and lineage.get("base_workstream_id") is not None:
+            referenced.add(_validate_identifier(lineage["base_workstream_id"], "legacy parent workstream"))
+    missing_referenced = sorted(referenced - set(live_sessions))
+    sessions = dict(live_sessions)
+    archived_node_map: dict[str, dict[str, Any]] = {}
+    archive_resolution: dict[str, Any] | None = None
+    if include_archived and missing_referenced:
+        archive_resolution = load_archived_session_index(
+            project_root,
+            referenced_workstream_ids=missing_referenced,
+        )
+        for item in archive_resolution["resolved_sessions"]:
+            session_record = dict(item["session"])
+            workstream_id = str(item["workstream_id"])
+            sessions[workstream_id] = (session_record, "current")
+            archived_node_map[workstream_id] = _archived_node_from_session(
+                session_record,
+                str(item["evidence_id"]),
+            )
+        for item in [*archive_resolution["conflicts"], *archive_resolution["unresolved"]]:
+            archived_node_map[str(item["workstream_id"])] = _unresolved_archive_node(
+                str(item["workstream_id"]),
+                str(item["evidence_id"]),
+            )
+    nodes = [
+        archived_node_map.get(workstream_id, _node_from_session(record, state))
+        for workstream_id, (record, state) in sessions.items()
+    ]
+    for workstream_id, node in archived_node_map.items():
+        if workstream_id not in sessions:
+            nodes.append(node)
     relations: list[dict[str, Any]] = []
-    for record, state in sessions.values():
+    for record, state in live_sessions.values():
         lineage = record.get("lineage")
         if not isinstance(lineage, Mapping) or lineage.get("base_workstream_id") is None:
             continue
@@ -816,7 +1200,7 @@ def _normalize_node(node: Mapping[str, Any]) -> dict[str, Any]:
     origin = node.get("origin", "relation-only")
     if origin not in {"native", "legacy-session-projection", "relation-only", "discovery"}:
         raise ValueError("unsupported node origin")
-    return {
+    normalized = {
         "workstream_id": workstream_id,
         "status": status,
         "session_state": session_state,
@@ -833,6 +1217,7 @@ def _normalize_node(node: Mapping[str, Any]) -> dict[str, Any]:
         "source_links": _normalize_source_links(node.get("source_links", [])),
         "origin": origin,
     }
+    return normalized
 
 
 def _graph_diagnostics(
@@ -1056,7 +1441,16 @@ def load_relation_graph(
     records = list(native["current_records"])
     nodes: list[dict[str, Any]] = []
     if include_legacy:
-        legacy = load_legacy_session_projection(project_root)
+        native_endpoints = sorted({
+            workstream_id
+            for record in records
+            for workstream_id in (record["source_workstream_id"], record["target_workstream_id"])
+        })
+        legacy = load_legacy_session_projection(
+            project_root,
+            additional_referenced_workstream_ids=native_endpoints,
+            include_archived=True,
+        )
         native_triples = {
             (record["relation_type"], record["source_workstream_id"], record["target_workstream_id"])
             for record in records
@@ -1273,7 +1667,7 @@ def discover_relation_candidates(
     similarity_hints: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     """Discover only explicit legacy lineage; similarity hints remain rejected Unknown."""
-    legacy = load_legacy_session_projection(project_root)
+    legacy = load_legacy_session_projection(project_root, include_archived=False)
     graph = build_relation_graph(legacy["records"], nodes=legacy["nodes"])
     rejected: list[dict[str, Any]] = []
     for hint in similarity_hints:
@@ -1745,6 +2139,10 @@ def build_undo_plan(*, apply_receipt: Mapping[str, Any]) -> dict[str, Any]:
 
 
 __all__ = [
+    "ARCHIVE_LAYOUT_VERSION",
+    "ARCHIVE_MAX_FILE_BYTES",
+    "ARCHIVE_MAX_FILES",
+    "ARCHIVE_MAX_TOTAL_BYTES",
     "RELATION_SCHEMA_VERSION",
     "RELATION_LIFECYCLES",
     "RELATION_TYPES",
@@ -1758,11 +2156,13 @@ __all__ = [
     "build_undo_plan",
     "default_relation_evidence",
     "discover_relation_candidates",
+    "load_archived_session_index",
     "load_legacy_session_projection",
     "load_relation_graph",
     "load_relation_history",
     "project_legacy_session_relation",
     "relation_storage_root",
+    "retired_session_archive_root",
     "validate_apply_receipt",
     "validate_relation_record",
 ]
