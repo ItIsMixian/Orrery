@@ -395,6 +395,9 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("从 ", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("→ 到 ", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("marker-end", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("markerUnits:'userSpaceOnUse'", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("markerWidth:10,markerHeight:10", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn(".wg-edge.lens-conflict{stroke:var(--wg-red);stroke-width:4", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertNotIn("wg-edge-label-bg", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("wg-edge-label", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("lineEncoding", graph_ui.WORKSTREAM_GRAPH_JS)
@@ -420,6 +423,13 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertNotIn("data-wg-apply", page)
         self.assertNotIn("data-wg-delete", page)
         self.assertNotRegex(page, r'<(script|link)[^>]+https?://')
+
+        docsite_source = (ROOT / "scripts" / "docsite" / "build_docsite.py").read_text(encoding="utf-8")
+        self.assertIn("--scroll-thumb-hover:", docsite_source)
+        self.assertIn("html:has(body.light)", docsite_source)
+        self.assertIn("scrollbar-color:var(--scroll-thumb) var(--scroll-track)", docsite_source)
+        self.assertIn("*::-webkit-scrollbar-thumb", docsite_source)
+        self.assertIn("*::-webkit-scrollbar-button{display:none", docsite_source)
 
     def test_root_only_default_off_personal_team_adjacency_and_zero_network(self) -> None:
         sentinel = (_base_page(), {"adrs": 0}, None, None)
@@ -451,8 +461,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
         mapping = json.loads((ROOT / "scripts" / "ci" / "change-mapping.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.14")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.14")
+        self.assertEqual(component["version"], "0.1.15")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.15")
         test_ids = [item["test_id"] for item in mapping["tests"]]
         self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
         self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))

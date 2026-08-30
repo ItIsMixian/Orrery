@@ -1,6 +1,6 @@
 # W7.2 Workstream Graph Readability & Progressive Disclosure
 
-Status: W7.2 complete; W7.2.1 implementation complete, local Checkpoint budget blocked
+Status: W7.2 complete; W7.2.1/W7.2.2 implementation complete, local Checkpoint budget blocked
 
 Date: 2026-08-29
 
@@ -98,3 +98,18 @@ surface-level folding and the lack of canvas-native zoom. The correction is regi
 - [x] keep the dependency lens facts-first: no explicit `depends_on` evidence means an explanatory zero-node empty
   state, not synthetic disconnected tasks;
 - [x] move the inspector to a bounded in-canvas drawer and retain Escape, close-button and keyboard selection.
+
+## W7.2.2 arrow and scrollbar visual integration
+
+The maintainer's second real-page review found that SVG marker sizing was multiplying the conflict stroke width into
+an oversized arrow and that native white scrollbars visually broke the dark analyst workspace. The correction is
+registered as Git-private `W7.2.2-graph-arrow-scrollbar-visual-integration` from exact task base
+`bff8ce6de1eed9b51e83a2e7cd92abc1297dddbe` and remains presentation-only.
+
+- [x] render all relationship markers with fixed `userSpaceOnUse` 10×10 geometry instead of the SVG default
+  stroke-width multiplier;
+- [x] rebalance engineering routes to 3px default and 4px compound conflict lines without changing relation facts;
+- [x] add shared low-contrast rounded scrollbar tokens for the document, sidebar, graph viewport and inspector;
+- [x] give light mode its own root and descendant scrollbar palette, including the document-element scrollbar;
+- [x] retain mobile ledger substitution, keyboard/ARIA semantics, read-only behavior and zero page-level horizontal
+  overflow.

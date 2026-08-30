@@ -2,7 +2,7 @@
 
 Date: 2026-08-29, corrected 2026-08-30
 
-Status: W7.2 PASS; W7.2.1 implementation/browser/Fast PASS, local Checkpoint budget timeout
+Status: W7.2 PASS; W7.2.1/W7.2.2 implementation/browser/Fast PASS, local Checkpoint budget timeout
 
 ## Scope and baseline
 
@@ -21,8 +21,11 @@ Status: W7.2 PASS; W7.2.1 implementation/browser/Fast PASS, local Checkpoint bud
 - W7.2.1 exact task base: `5523e6dcd8bac9eadc61fab95f7c85325bfcd383`. Its refreshed Git-private
   scope records the exact task base while lineage remains honestly `parent-unverified-unknown`; no sibling state was
   rewritten.
+- W7.2.2 exact task base: `bff8ce6de1eed9b51e83a2e7cd92abc1297dddbe`; its Git-private scope adds only
+  Graph presentation, shared docsite scrollbar CSS, owner regression, component version and the existing W7.2
+  documentation surfaces.
 - Presentation-only boundary: Core 0.1.17 relation schema/facts and CLI 0.1.21 are byte-unchanged by this task;
-  Observatory advances from 0.1.12 through W7.2 0.1.13 to corrected unreleased 0.1.14.
+  Observatory advances from 0.1.12 through W7.2 0.1.13 and corrections 0.1.14/0.1.15.
 
 ## Layout and disclosure evidence
 
@@ -162,6 +165,44 @@ drawer behavior. Local screenshots outside Git:
 No Provider key, external network, real Team join, relation apply/undo, worktree deletion, merge or remote execution
 was used. The local supervised service remains intentionally open at `127.0.0.1:8765` for the maintainer's requested
 interactive review; the global stop control remains the explicit cleanup path.
+
+## W7.2.2 visual correction evidence
+
+The live self-host page confirmed the original defect: a 9×9 SVG marker with implicit `markerUnits=strokeWidth`
+became roughly 45px on the 5px conflict route. Observatory 0.1.15 uses fixed 10×10 `userSpaceOnUse` markers, 3px
+default routes and a 4px compound conflict route. Shared theme variables now style the document scrollbar, author
+sidebar, graph viewport and bounded inspector with a 10px rounded low-contrast track/thumb; light mode has a separate
+root/descendant palette.
+
+```text
+python -X utf8 -m pytest -q tests/test_workstream_relation_graph_observatory.py tests/test_unified_observatory.py
+PASS — 18/18 in 25.25s
+
+python -X utf8 -c "...WORKSTREAM_GRAPH_JS..." | node --check -
+PASS
+
+python -X utf8 scripts/ci/validate_change.py --stage fast --base bff8ce6d... --dry-run --explain
+PASS routing — 38 mapped tests, 0 unknown paths; dry-run is not evidence-eligible
+
+python -X utf8 scripts/ci/validate_change.py --stage fast --base bff8ce6d...
+PASS — 38/38 in 3.170866s on the synchronized final diff, evidence-eligible
+```
+
+Live Chromium assertions at 1280×800 and 1440×900 confirmed `markerUnits=userSpaceOnUse`, marker width 10, conflict
+stroke 4px, matching themed scrollbars on root/sidebar/canvas and zero document horizontal overflow. At 390×844 the
+SVG remains hidden, the relation ledger remains visible with zero document horizontal overflow, and the outer
+scrollbar uses the same theme tokens. Dark/light palettes were both computed from the live page; console logs were
+empty. Screenshots remain local-only:
+
+- `C:/Users/1/.codex/visualizations/2026/08/30/01a04fb7-0d1c-7c62-8ff3-c98cf4316b83/w7-2-2/1280-conflict-scrollbars.jpg`
+- `C:/Users/1/.codex/visualizations/2026/08/30/01a04fb7-0d1c-7c62-8ff3-c98cf4316b83/w7-2-2/1440-conflict-scrollbars.jpg`
+- `C:/Users/1/.codex/visualizations/2026/08/30/01a04fb7-0d1c-7c62-8ff3-c98cf4316b83/w7-2-2/390-conflict-ledger-scrollbar.jpg`
+
+W7.2.2 does not change the Maintenance test that caused the inherited W7.2.1 Checkpoint outer-budget timeout. On the
+synchronized authored diff, Checkpoint dry-run selected 44 tests with 0 unknown paths. The formal run again reached
+the fixed 90.0-second outer timeout while
+`test_minimal_git_incremental_refresh_and_target_preflight_checkpoint` was still running; no evidence-eligible
+Checkpoint PASS is claimed.
 
 ## Remaining boundary and integration order
 

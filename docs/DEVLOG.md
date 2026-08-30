@@ -695,3 +695,9 @@
 - Observatory 0.1.14 去掉线路标签盒，以实线青／虚线黄／复合红线和明显箭头编码关系；焦点沿真实路径显示，画布支持 55%–160% 锚点式 `Ctrl + 滚轮`，Reset 恢复 100% 和原点。connected component 使用稳定水平行，展开后的每条上游链可独立收起，技术详情为画布内可关闭 drawer。
 - dependency 继续严格消费真实 `depends_on`：self-host 无显式依赖边时显示“当前没有已登记的依赖关系”与 0 节点，不复制接续边或填充孤立任务。Core relation schema/facts、archive 只读与所有执行安全边界均未改变。
 - focused Graph＋Unified 18/18、JS syntax、CI6 Fast 38/38 和真实浏览器三档验收通过。CI6 Checkpoint 路由为 44 tests／0 unknown path，但本机固定 90 秒外层预算在既有 Maintenance 增量 fixture 尚运行时超时；该 slow test 独立 1/1 通过（约 68–71 秒），因此本修正不伪称 evidence-eligible Checkpoint PASS，发布与中央整合仍需补齐该门。
+
+## 2026-08-30 — W7.2.2 Graph Arrow & Scrollbar Visual Integration
+
+- 维护者在真实深色页面指出冲突箭头比例失衡、页面／作者侧栏／图画布原生白色滚动条突兀；从 exact clean `bff8ce6` 登记 Git-private `W7.2.2-graph-arrow-scrollbar-visual-integration` 后写入，根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.15 将 SVG marker 从隐式 `strokeWidth` 倍增改为固定 10×10 `userSpaceOnUse`，默认／冲突路线收敛为 3px／4px；关系事实、lens、方向、折叠语义和执行边界均未改变。
+- docsite 根 CSS 新增深浅主题 scrollbar token：页面、侧栏、图画布和技术详情共享 10px 低对比圆角轨道／滑块，去掉原生按钮；390px ledger 和屏幕阅读语义保持。focused 18/18、JS syntax、CI6 Fast 38/38 与三档真实浏览器验收通过，详情见 W7.2 Validation。
