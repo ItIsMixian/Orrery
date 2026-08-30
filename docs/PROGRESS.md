@@ -15,7 +15,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7、Personal／Team Observatory、maintenance、relation execution 与只读 Graph 已进入 Canonical source；ADR-0017 已接受 relation capture／confirmation authority，但 W7.3 尚未实现 | 完成当前 Unified Candidate 后另立 W7.3：auto `derived_from`、gate-aware `depends_on`、human integrator／`absorbs` 与只读 relation inbox；任何 apply、删除或成员本机执行仍逐次确认 |
-| Unified Observatory | W7.2.3 与 U2.2 已按 Graph → shell/Maintenance 顺序进入本地联合验收 Candidate：单一连续侧栏、密集工作区队列和可读分层 Graph 已组合；公开默认仍未切换 | 维护者体验当前联合页面；接受后才冻结 non-main exact-SHA Promotion Candidate |
+| Unified Observatory | A4/U2.3 已加入 W7.2.3/U2.2 本地 integration line：七入口导航、只读帮助/规则、轻量活动任务、密集维护和只读 Graph 已组合；公开默认仍未切换 | 等 W7.3 合流后做最终整页体验，再冻结 non-main exact-SHA Promotion Candidate |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
 | 文档治理 | D1 已冻结只读 finding contract、规则 registry 与 synthetic fixture；当前没有 `docs audit` 产品入口 | 维护者另行决定是否启动 D2 scanner／CLI；不自动改写 Markdown 或启用长度硬门 |
@@ -29,16 +29,17 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - 当前 display brand 为 Orrery；`project-orrery` Skill／distribution／CLI／schema／协议与 v0.2.0 资产继续作为稳定技术或历史标识保留。
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
 - `codex/u1-u2-integration-baseline` 已吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；联合 feature merge 为 `0eaad30`，当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它在维护者接受、exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
-- ADR-0018 已接受 authority-first Workstream dispatch：任务创建或中途实质变更必须先提交权威文档，随后只按 exact SHA／paths 通知 Agent。U2.3 与 W7.3 已暂停扩展，等待本 authority baseline 的 scope-revision acknowledgment；自动 receipt／first-write enforcement 尚未实现。
-- S0 `orrery-dispatch` 两文件 source Candidate `9294902` 已进入本地 integration line：标准 Skill 校验、generic routing 44/44 Fast、repository/integrated-installation/CI/release-boundary gates 通过。它未安装、未发布，也不是 S1 Conductor 或宿主级 first-write enforcement。
-- PO1 source Candidate `93ddfb7` 已进入本地 integration line：dispatch Skill 强制非整合任务使用 `PO-DEC-*`，repository gate 拒绝同树重复正式 ADR 编号；A4→ADR-0019 仍等待 U2.3/A4 最终集成。
+- ADR-0018 已接受 authority-first Workstream dispatch：U2.3 已按两次任务说明版本完成并本地集成，W7.3 也已确认其 scope revision；自动 receipt／first-write enforcement 尚未实现。
+- S0 `orrery-dispatch` 两文件 source 与 PO enforcement 已进入本地 integration line并安装到当前本机 Codex home；标准 Skill 校验、generic routing 与本地门通过。它未发布，也不是 S1 Conductor 或宿主级 first-write enforcement。
+- PO1 source Candidate `93ddfb7` 已进入本地 integration line：dispatch Skill 强制非整合任务使用 `PO-DEC-*`，repository gate 拒绝同树重复正式 ADR 编号；A4 已规范化为 ADR-0019。
+- A4/U2.3 local integration 现为 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18、Harness JSON 0.1.2；Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25 和 390px Browser 通过，仍不等于 public/default/release。
 
 ## 活动计划与待办
 
-- [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill 与 duplicate-number gate 已本地集成；A4/U2.3 最终集成时仍须把 A4 `ADR-0018` 规范化为 `ADR-0019`。
+- [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
 - [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 与 PO enforcement 已本地集成，并只安装到当前本机 Codex home；未进入发布包，S1 Conductor 仍是独立后续事项。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
-- [ ] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航／help 收口与轻量全活动任务投影的权威范围已冻结；Agent 确认本 authority baseline 后恢复实现。
+- [x] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航/help、轻量全活动任务、“问文档”说明和中央移动复验已完成并本地集成；Promotion/public/default 仍未发生。
 - [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：ADR-0017 与 Approved Design 已接受；任务系列、状态 taxonomy、comparison／conflict amendment 已写入 Plan，Agent 确认本 authority baseline 后恢复实现。Agent／Harness／Conductor 只可建议，任务 owner／human integrator 按 gate 确认。
 - [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：拆分 Observatory 影响面并增加非权威总成本诊断；不改变层级证据、15/90 秒预算或 main 推广门。
 - [ ] [U2.2／W7.2 联合验收](validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)：本地联合 Candidate 已就绪；等待维护者真实体验，之后再决定 exact-SHA Promotion。

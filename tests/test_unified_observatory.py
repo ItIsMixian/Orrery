@@ -49,7 +49,7 @@ class FakeIdentity:
 class UnifiedRegistrationTests(unittest.TestCase):
     def test_versioned_registration_and_capability_discovery_are_sanitized(self) -> None:
         registrations = build_unified_observatory.default_registrations(mode="dynamic")
-        self.assertEqual(len(registrations), 8)
+        self.assertEqual(len(registrations), 9)
         document = capability_document(registrations, mode="dynamic")
         self.assertEqual(document["contract_type"], "unified-observatory-shell-v1")
         self.assertTrue(document["single_visible_url"])
@@ -59,7 +59,7 @@ class UnifiedRegistrationTests(unittest.TestCase):
         self.assertNotIn("api_key", encoded.lower())
         self.assertEqual(
             {item["navigation"]["identity"] for item in document["consumers"]},
-            {"overview", "docs", "ask", "authority", "personal", "team", "workstreams", "maintenance"},
+            {"overview", "docs", "ask", "authority", "personal", "team", "workstreams", "maintenance", "trends"},
         )
 
     def test_route_collision_and_privilege_escalation_fail_closed(self) -> None:
@@ -109,6 +109,14 @@ class UnifiedRegistrationTests(unittest.TestCase):
         self.assertNotIn("/api/v1/shell/stop", page)
         self.assertNotIn("Set-Cookie", page)
         self.assertIn("@media(max-width:820px)", page)
+        self.assertNotIn('data-nav-identity="ask"', page)
+        self.assertNotIn('data-nav-identity="authority"', page)
+        self.assertEqual(page.count('data-nav-identity="trends"'), 1)
+        self.assertIn('data-uo-help-panel role="dialog"', page)
+        self.assertIn('data-uo-help-close aria-label="关闭帮助与系统状态"', page)
+        self.assertIn('aria-expanded="false">? 帮助</button>', page)
+        self.assertIn("prefers-reduced-motion:reduce", page)
+        self.assertIn("left:0;right:0;top:var(--hh);bottom:0;width:100vw;max-width:none;box-sizing:border-box", page)
 
 
 class UnifiedRuntimeTests(unittest.TestCase):
@@ -127,13 +135,14 @@ class UnifiedRuntimeTests(unittest.TestCase):
             "core_relation_provider",
             return_value=synthetic_graph,
         ):
-            page, _stats, registrations, authority, graph_payload = build_unified_observatory.render_unified_site(
+            page, _stats, registrations, authority, graph_payload, fact_rules_projection = build_unified_observatory.render_unified_site(
                 ROOT, mode="dynamic",
             )
         cls.rendered_page = page
         state = serve_orrery.UnifiedState(
             page=page, registrations=registrations, authority_status=authority,
             graph_provider_payload=graph_payload,
+            fact_rules_projection=fact_rules_projection,
             identity=cls.identity, logger=cls.logger,
         )
         cls.server = serve_orrery.UnifiedServer(("127.0.0.1", 0), state)
@@ -181,7 +190,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertEqual(status, 200)
         text = body.decode("utf-8")
         for marker in (
-            'id="dashboard"', 'id="authority"', 'id="personal-observatory"',
+            'id="dashboard"', 'id="personal-observatory"',
             'id="team-observatory"', 'id="workstream-relation-graph"',
             'id="workspace-maintenance"', 'id="q"', 'id="qa-panel"',
         ):
@@ -192,10 +201,32 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertEqual(text.count('data-project-document-tree'), 1)
         self.assertNotIn('.uo-doc-tree{overflow', text)
         self.assertIn("data-nav-identity=\"overview\"", text)
-        targets = {"overview": "overview", "personal": "personal-observatory", "team": "team-observatory", "workstreams": "workstream-relation-graph", "maintenance": "workspace-maintenance"}
+        self.assertNotIn('data-nav-identity="authority"', text)
+        self.assertNotIn('data-nav-identity="ask"', text)
+        self.assertNotIn('data-nav-identity="operating-rules"', text)
+        self.assertEqual(text.count('id="qa-fab"'), 1)
+        ask_label = '<p class="uo-ask-note" data-ask-docs-label><strong>问文档</strong> · 入口位于右下角</p>'
+        self.assertEqual(text.count(ask_label), 1)
+        self.assertNotIn('<button class="uo-ask-note"', text)
+        self.assertNotIn('<a class="uo-ask-note"', text)
+        self.assertEqual(text.count('data-uo-help-panel'), 2)  # CSS/JS selector plus the one element
+        self.assertEqual(text.count('<section class="uo-help-panel"'), 1)
+        self.assertIn('role="dialog" aria-modal="false"', text)
+        self.assertIn('data-uo-help-close aria-label="关闭帮助与系统状态"', text)
+        self.assertIn("事实与规则", text)
+        self.assertIn("项目原则", text)
+        self.assertIn("Orrery 工作规则", text)
+        self.assertIn("事实解释状态", text)
+        self.assertIn("来源：项目文档", text)
+        self.assertIn("来源：工具版本", text)
+        self.assertNotIn("编辑规则", text)
+        self.assertNotIn("批准规则", text)
+        self.assertNotIn("启用规则", text)
+        targets = {"overview": "overview", "docs": "dashboard", "personal": "personal-observatory", "team": "team-observatory", "workstreams": "workstream-relation-graph", "maintenance": "workspace-maintenance", "trends": "trends"}
         for identity, label in {
-            "overview": "项目总览", "personal": "个人工作台", "team": "团队协作",
-            "workstreams": "任务关系", "maintenance": "工作区维护",
+            "overview": "项目总览", "docs": "文档与搜索", "personal": "个人工作台",
+            "team": "团队协作", "workstreams": "任务关系",
+            "maintenance": "工作区维护", "trends": "路线与趋势",
         }.items():
             self.assertEqual(text.count(f'data-nav-identity="{identity}"'), 1)
             self.assertEqual(text.count(f'data-target="{targets[identity]}"'), 1)
@@ -213,6 +244,11 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertIn('data-maintenance-refresh-path="/refresh"', text)
         self.assertIn('data-maintenance-remove-path="/remove-worktree"', text)
         self.assertIn('data-maintenance-reload-after-action="false"', text)
+        rail_start = text.index('data-unified-navigation')
+        tree_start = text.index('data-project-document-tree')
+        for identity in ("overview", "docs", "personal", "team", "workstreams", "maintenance", "trends"):
+            self.assertLess(text.index(f'data-nav-identity="{identity}"'), tree_start)
+        self.assertLess(rail_start, tree_start)
         maintenance_start = text.index('id="workspace-maintenance"')
         maintenance_header_end = text.index('</header>', maintenance_start)
         self.assertLess(text.index('data-maintenance-scan', maintenance_start), maintenance_header_end)
@@ -275,6 +311,21 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertFalse(authority["selection"]["production_behavior_switched"])
         self.assertFalse(authority["guarantees"]["ai_may_select"])
 
+        status, _headers, body = self.request("GET", "/api/v1/authority/operating-rules")
+        facts_rules = json.loads(body)
+        self.assertEqual(status, 200)
+        self.assertEqual(facts_rules["contract_type"], "authority-facts-and-rules-projection-v1")
+        self.assertTrue(facts_rules["read_only"])
+        self.assertFalse(facts_rules["creates_project_facts"])
+        self.assertFalse(facts_rules["writes_target_project"])
+        self.assertFalse(facts_rules["layer_boundary"]["merged"])
+        rules = facts_rules["orrery_operating_rules"]
+        if rules["status"] == "available":
+            self.assertEqual(rules["inventory_id"], "orrery-operating-rules-v1")
+        else:
+            self.assertTrue(rules["read_only"])
+            self.assertTrue(rules["reason"])
+
         self.assertIn("window.confirm('只删除工作区，保留分支和提交。确认移除这个工作区？')", self.rendered_page)
         cookie = self.cookie()
         status, _headers, _body = self.request(
@@ -300,7 +351,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
         status, _headers, body = self.request("GET", "/api/v1/capabilities")
         capabilities = json.loads(body)
         self.assertEqual(status, 200)
-        self.assertEqual(len(capabilities["consumers"]), 8)
+        self.assertEqual(len(capabilities["consumers"]), 9)
         self.assertNotIn(str(ROOT), body.decode("utf-8"))
         self.assertTrue(all(item["status"] in {"available", "unavailable"} for item in capabilities["consumers"]))
         status, _headers, body = self.request("GET", "/api/v1/docs/search?q=Unified%20Observatory")
@@ -314,6 +365,35 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertEqual(value["dynamic_delivery"], "startup-cached-projection")
         self.assertEqual(value["graph"]["graph_hash"], expected_hash)
 
+        def projection(revision: str, workstream_id: str):
+            return {
+                "status": "ready", "contract_type": "orrery-active-task-projection-v1",
+                "captured_at": "2026-08-30T13:00:00Z", "revision": revision,
+                "counts": {"registry_worktrees": 1, "current": 1, "history": 0, "primary": 0, "refresh_needed": 1},
+                "tasks": [{
+                    "task_id": revision, "workstream_id": workstream_id,
+                    "task_code": workstream_id.split("-", 1)[0], "display_name": workstream_id,
+                    "branch": "codex/fixture", "phase": "implementing",
+                    "runtime_condition": "active", "primary_subsystem_id": "documentation-system",
+                    "affected_subsystem_ids": [], "evidence_freshness": "refresh-needed",
+                    "workspace_state": "registered-active", "category": "current",
+                    "technical_detail_available": False,
+                }],
+                "maintenance": {}, "read_boundary": {"startup_full_scan": False},
+            }
+        with mock.patch.object(
+            serve_orrery, "build_active_task_projection",
+            side_effect=[projection("r1", "A4.1-first"), projection("r2", "NEW-second")],
+        ):
+            first_status, _headers, first_body = self.request("GET", "/api/v1/personal/tasks")
+            second_status, _headers, second_body = self.request("GET", "/api/v1/personal/tasks")
+        first, second = json.loads(first_body), json.loads(second_body)
+        self.assertEqual((first_status, second_status), (200, 200))
+        self.assertEqual(first["projection"]["revision"], "r1")
+        self.assertEqual(second["projection"]["revision"], "r2")
+        self.assertIn("NEW-second", second["fragment"])
+        self.assertNotIn(str(ROOT), second_body.decode("utf-8"))
+
     def test_close_reclaims_owned_state_and_bound_port(self) -> None:
         with tempfile.TemporaryDirectory(prefix="orrery-unified-close-") as temporary:
             identity = FakeIdentity(Path(temporary))
@@ -325,6 +405,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
                 registrations=self.server.state.registrations,
                 authority_status=self.server.state.authority_status,
                 graph_provider_payload=self.server.state.graph_provider_payload,
+                fact_rules_projection=self.server.state.fact_rules_projection,
                 identity=identity,
                 logger=logger,
             )

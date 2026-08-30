@@ -1,6 +1,6 @@
 # PO1 Provisional Decision Allocation Enforcement
 
-Status: Enforcement implemented as a local Candidate; A4 renumber pending integration
+Status: Complete in the local integration Candidate
 
 Date: 2026-08-30
 
@@ -36,11 +36,11 @@ duplicate-number gate. Branch isolation made the violation invisible until integ
 
 ## A4 collision closeout
 
-- [ ] Keep authority-first dispatch as canonical local `ADR-0018`, because it is already on the integration line and
+- [x] Keep authority-first dispatch as canonical local `ADR-0018`, because it is already on the integration line and
   is referenced by U2.3/W7.3 task-description versions.
-- [ ] When A4/U2.3 enters the integration worktree, rename A4 portable operating rules to `ADR-0019`, update every
+- [x] When A4/U2.3 enters the integration worktree, rename A4 portable operating rules to `ADR-0019`, update every
   filename/link/index/governing reference atomically, and preserve A4 Candidate SHA `3d298a5c...` as provenance.
-- [ ] Confirm the A4 decision content/status/semantics are byte-equivalent apart from identifier/link normalization.
+- [x] Confirm the A4 decision content/status/semantics are unchanged apart from identifier/link/digest normalization.
 
 ## Validation
 

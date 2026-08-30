@@ -1736,6 +1736,13 @@ def render_maintenance_control_document(
 
 
 def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
+    if projection.get("contract_type") == "orrery-active-task-projection-v1":
+        from .active_task_projection import render_active_task_panel
+
+        return render_active_task_panel(
+            projection,
+            dynamic=projection.get("dynamic") is True,
+        )
     if projection.get("status") != "ready":
         error = projection.get("error", {})
         return (
@@ -2054,8 +2061,15 @@ def inject_personal_observatory(page: str, projection: Mapping[str, Any]) -> str
         raise ValueError("Observatory content marker not found")
     if "</style>" not in page:
         raise ValueError("document style marker not found")
+    active_css = ""
+    active_js = ""
+    if projection.get("contract_type") == "orrery-active-task-projection-v1":
+        from .active_task_projection import ACTIVE_TASK_CSS, ACTIVE_TASK_JS
+
+        active_css = ACTIVE_TASK_CSS
+        active_js = ACTIVE_TASK_JS
     result = page.replace(
-        "</style>", PERSONAL_OBSERVATORY_CSS + MAINTENANCE_OBSERVATORY_CSS + "</style>", 1
+        "</style>", PERSONAL_OBSERVATORY_CSS + MAINTENANCE_OBSERVATORY_CSS + active_css + "</style>", 1
     )
     nav_item = (
         '<a class="nav-item" data-target="personal-observatory">'
@@ -2074,7 +2088,7 @@ def inject_personal_observatory(page: str, projection: Mapping[str, Any]) -> str
         1,
     )
     return result.replace(
-        "</body>", "<script>" + MAINTENANCE_OBSERVATORY_JS + "</script></body>", 1
+        "</body>", "<script>" + MAINTENANCE_OBSERVATORY_JS + active_js + "</script></body>", 1
     )
 
 

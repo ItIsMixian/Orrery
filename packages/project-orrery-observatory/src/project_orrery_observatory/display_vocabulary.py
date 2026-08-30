@@ -11,11 +11,12 @@ NAVIGATION_LABELS = {
     "overview": "项目总览",
     "docs": "文档与搜索",
     "ask": "文档问答",
-    "authority": "权威状态",
+    "authority": "事实与规则",
     "personal": "个人工作台",
     "team": "团队协作",
     "workstreams": "任务关系",
     "maintenance": "工作区维护",
+    "trends": "路线与趋势",
 }
 
 STATUS_LABELS = {

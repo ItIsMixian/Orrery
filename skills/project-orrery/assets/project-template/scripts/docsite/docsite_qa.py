@@ -90,10 +90,12 @@ def build_corpus(docs_dir: Path, agents_file: Path):
     corpus = []
     for a in adrs:
         corpus.append({"id": a["anchor"], "kind": "ADR", "num": a["num"], "date": a["date"],
+                       "path": "docs/decisions/" + a["file"],
                        "title": "ADR-%s %s [%s]" % (a["num"], a["title"], a["status"]),
                        "text": a["body_md"]})
     for name, d in state_docs.items():
         corpus.append({"id": "state-" + name, "kind": "state",
+                       "path": "docs/state/" + d["file"],
                        "title": "state/%s — %s" % (name, d["title"]), "text": d["body_md"]})
     corpus.extend(_parse_seed_chunks(docs_dir))
     for s in snaps:
@@ -123,6 +125,78 @@ def get_provider(*, require_broker=True):
 # ---------------------------------------------------------------------------
 # Authority-derived view boundary
 # ---------------------------------------------------------------------------
+
+_ROUTE_PREFLIGHT = None
+
+
+def configure_authority_route_preflight(callback=None):
+    """Install a host-owned deterministic preflight; ``None`` keeps Skill advisory.
+
+    A plain SKILL.md cannot enforce a pre-model hook.  The root Unified
+    Observatory configures this callback to the CLI/Core collector, while
+    copied project templates remain honest best-effort consumers.
+    """
+
+    global _ROUTE_PREFLIGHT
+    if callback is not None and not callable(callback):
+        raise TypeError("authority route preflight must be callable or None")
+    _ROUTE_PREFLIGHT = callback
+
+
+def _authority_route_receipt(question: str):
+    if _ROUTE_PREFLIGHT is None:
+        return None
+    try:
+        value = _ROUTE_PREFLIGHT(question)
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "schema_version": 1,
+            "contract_type": "authority-route-preflight-v1",
+            "selection": {"concept_ids": [], "subsystem_ids": [], "ambiguous": True},
+            "selected_governing_sources": [],
+            "claim_dimensions": {},
+            "novelty_absence_gate": {
+                "status": "unknown", "absence_claim_allowed": False,
+                "reason": "route-preflight-unavailable",
+            },
+            "negative_evidence": {"complete": False, "unresolved_targets": [str(exc)[:240]]},
+        }
+    return value if isinstance(value, dict) else None
+
+
+def _route_selected_ids(receipt, by_id, maximum=6):
+    if not isinstance(receipt, dict):
+        return []
+    by_path = {str(item.get("path", "")).replace("\\", "/"): item["id"] for item in by_id.values()}
+    selected = []
+    for source in receipt.get("selected_governing_sources", []):
+        if not isinstance(source, dict):
+            continue
+        candidate = by_path.get(str(source.get("path", "")).replace("\\", "/"))
+        if candidate and candidate not in selected:
+            selected.append(candidate)
+        if len(selected) == maximum:
+            break
+    return selected
+
+
+def _route_system(system: str, route_receipt=None) -> str:
+    if not isinstance(route_receipt, dict):
+        return system
+    bounded = {
+        "contract_type": route_receipt.get("contract_type"),
+        "query_class": (route_receipt.get("query") or {}).get("query_class"),
+        "concept_ids": (route_receipt.get("selection") or {}).get("concept_ids", []),
+        "claim_dimensions": route_receipt.get("claim_dimensions", {}),
+        "novelty_absence_gate": route_receipt.get("novelty_absence_gate", {}),
+    }
+    return (
+        system
+        + "\n\n# Authority Route Preflight（Core/CLI 机械输入）\n"
+        + json.dumps(bounded, ensure_ascii=False, sort_keys=True)
+        + "\n四轴必须分别表达。distribution/public 为 absent 不等于 semantic 不存在；"
+        "Accepted 不等于 implemented。absence_claim_allowed 不是 true 时，不得声称能力、规则或决定是新的／不存在；证据不足写 Unknown。"
+    )
 
 _AUTHORITY_DIMENSIONS = (
     "effective",
@@ -296,17 +370,19 @@ def _derived_receipt(authority_context=None) -> dict:
     }
 
 
-def _attach_derived_receipt(payload: dict, authority_context=None) -> dict:
+def _attach_derived_receipt(payload: dict, authority_context=None, route_receipt=None) -> dict:
     result = dict(payload)
     result["_authority"] = _derived_receipt(authority_context)
+    if isinstance(route_receipt, dict):
+        result["_route"] = route_receipt
     return result
 
 
-def _derived_failure(error: str, authority_context=None, detail=None) -> dict:
+def _derived_failure(error: str, authority_context=None, detail=None, route_receipt=None) -> dict:
     payload = {"error": error}
     if detail is not None:
         payload["detail"] = detail
-    return _attach_derived_receipt(payload, authority_context)
+    return _attach_derived_receipt(payload, authority_context, route_receipt)
 
 
 # ---------------------------------------------------------------------------
@@ -345,6 +421,8 @@ def ask(
     from _llm import LLMRequest
 
     by_id = {c["id"]: c for c in corpus}
+    route_receipt = _authority_route_receipt(question)
+    route_ids = _route_selected_ids(route_receipt, by_id)
     catalog = "\n".join("- %s [%s] %s :: %s" % (c["id"], c["kind"], c["title"], c["summary"])
                         for c in corpus)
     sel = provider.complete(LLMRequest(
@@ -352,8 +430,10 @@ def ask(
         user="问题:%s\n\n# 文档目录\n%s" % (question, catalog),
         json_schema=SEL_SCHEMA, model_kind="intent", max_tokens=2500))
     if sel.get("parse_error") or sel.get("_provider_disabled"):
-        return _derived_failure("retrieve failed", authority_context, sel)
-    ids = [i for i in sel.get("ids", []) if i in by_id][:6]
+        return _derived_failure("retrieve failed", authority_context, sel, route_receipt)
+    ids = list(route_ids)
+    ids.extend(i for i in sel.get("ids", []) if i in by_id and i not in ids)
+    ids = ids[:6]
     if not ids:
         ids = [c["id"] for c in corpus[:4]]  # fallback
     if verbose:
@@ -362,11 +442,11 @@ def ask(
     refs = "\n\n".join("## [%s] %s\n%s" % (i, by_id[i]["title"], by_id[i]["text"][:per_doc_chars])
                        for i in ids)
     ans = provider.complete(LLMRequest(
-        system=_authority_system(ANS_SYS, authority_context),
+        system=_route_system(_authority_system(ANS_SYS, authority_context), route_receipt),
         user="问题:%s\n\n# 参考文档\n%s" % (question, refs),
         json_schema=ANS_SCHEMA, model_kind="audit", max_tokens=4000))
     if ans.get("parse_error") or ans.get("_provider_disabled"):
-        return _derived_failure("answer failed", authority_context, ans)
+        return _derived_failure("answer failed", authority_context, ans, route_receipt)
     raw = [c for c in ans.get("citations", []) if c in by_id] or ids
     cites, seen = [], set()
     for c in raw:
@@ -382,6 +462,7 @@ def ask(
             "retrieved": ids,
         },
         authority_context,
+        route_receipt,
     )
 
 
@@ -403,12 +484,16 @@ def ask_stream(provider, corpus, question, per_doc_chars=4000, authority_context
     (claude / ollama / rules)."""
     from _llm import LLMRequest
     by_id = {c["id"]: c for c in corpus}
+    route_receipt = _authority_route_receipt(question)
+    route_ids = _route_selected_ids(route_receipt, by_id)
     catalog = "\n".join("- %s [%s] %s :: %s" % (c["id"], c["kind"], c["title"], c["summary"])
                         for c in corpus)
     sel = provider.complete(LLMRequest(
         system=SEL_SYS, user="问题：%s\n\n# 文档目录\n%s" % (question, catalog),
         json_schema=SEL_SCHEMA, model_kind="intent", max_tokens=2500))
-    ids = [i for i in (sel.get("ids", []) if isinstance(sel, dict) else []) if i in by_id][:6]
+    ids = list(route_ids)
+    ids.extend(i for i in (sel.get("ids", []) if isinstance(sel, dict) else []) if i in by_id and i not in ids)
+    ids = ids[:6]
     if not ids:
         ids = [c["id"] for c in corpus[:4]]
     refs = "\n\n".join("## [%s] %s\n%s" % (i, by_id[i]["title"], by_id[i]["text"][:per_doc_chars])
@@ -434,7 +519,7 @@ def ask_stream(provider, corpus, question, per_doc_chars=4000, authority_context
     try:
         stream = client.chat.completions.create(
             model=model, max_tokens=4000, stream=True,
-            messages=[{"role": "system", "content": _authority_system(ANS_STREAM_SYS, authority_context)},
+            messages=[{"role": "system", "content": _route_system(_authority_system(ANS_STREAM_SYS, authority_context), route_receipt)},
                       {"role": "user", "content": user}])
         for ch in stream:
             try:

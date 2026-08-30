@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schemas/orrery-operating-rules-v1.json",
+  "title": "Orrery portable operating rules inventory v1",
+  "type": "object",
+  "required": [
+    "schema_version", "contract_type", "inventory_id", "inventory_version",
+    "authority_model_version", "deterministic_owner", "status",
+    "project_fact_boundary", "compatibility", "source_policy", "routing", "rules"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_type": {"const": "orrery-operating-rules"},
+    "inventory_id": {"const": "orrery-operating-rules-v1"},
+    "inventory_version": {"const": 1},
+    "authority_model_version": {"const": 1},
+    "deterministic_owner": {"const": "project-orrery-core"},
+    "status": {"const": "unreleased-candidate"},
+    "project_fact_boundary": {
+      "type": "object",
+      "required": ["classification", "declares_target_project_facts", "is_target_project_seed"],
+      "properties": {
+        "classification": {"const": "not-target-project-fact-or-seed"},
+        "declares_target_project_facts": {"const": false},
+        "is_target_project_seed": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "compatibility": {
+      "type": "object",
+      "required": ["supported_inventory_versions", "missing_inventory", "unknown_version", "tamper"],
+      "properties": {
+        "supported_inventory_versions": {"const": [1]},
+        "missing_inventory": {"const": "read-only-unknown"},
+        "unknown_version": {"const": "read-only-unknown-no-latest-fallback"},
+        "tamper": {"const": "read-only-unknown"}
+      },
+      "additionalProperties": false
+    },
+    "source_policy": {"type": "object"},
+    "routing": {
+      "type": "object",
+      "required": ["contract", "portable_concepts"],
+      "properties": {
+        "contract": {"const": "authority-route-preflight-v1"},
+        "portable_concepts": {"type": "array", "items": {"$ref": "#/$defs/concept"}}
+      },
+      "additionalProperties": false
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/rule"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "localized": {
+      "type": "object",
+      "required": ["zh-CN", "en"],
+      "properties": {"zh-CN": {"type": "string"}, "en": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": ["path", "authority_role", "locator"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "authority_role": {"enum": ["product-seed", "agent-index", "adr", "approved-design", "skill-contract"]},
+        "locator": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "concept": {
+      "type": "object",
+      "required": ["concept_id", "subsystem_id", "aliases", "minimum_governing_sources", "conclusion_code"],
+      "properties": {
+        "concept_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]+$"},
+        "subsystem_id": {"type": "string"},
+        "aliases": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+        "minimum_governing_sources": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+        "conditional_governing_sources": {"type": "array", "items": {"type": "string"}},
+        "conclusion_code": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "rule": {
+      "type": "object",
+      "required": [
+        "rule_id", "rule_version", "message_key", "summary", "applies_to",
+        "sources", "strength", "mechanical_enforcement", "failure_behavior",
+        "unknown_behavior", "project_fact_boundary"
+      ],
+      "properties": {
+        "rule_id": {"type": "string", "pattern": "^ORR-OP-[0-9]{3}$"},
+        "rule_version": {"const": 1},
+        "message_key": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]+$"},
+        "summary": {"$ref": "#/$defs/localized"},
+        "applies_to": {
+          "type": "object",
+          "required": ["stages", "consumers"],
+          "properties": {
+            "stages": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+            "consumers": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+          },
+          "additionalProperties": false
+        },
+        "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+        "strength": {"enum": ["must", "must-not", "should"]},
+        "mechanical_enforcement": {"enum": ["enforceable", "partially-enforceable", "human-judgment"]},
+        "failure_behavior": {"enum": ["block-write", "fail-closed-read-only", "warn-without-escalation"]},
+        "unknown_behavior": {"enum": ["preserve-unknown", "read-only-unavailable"]},
+        "project_fact_boundary": {"const": "not-target-project-fact-or-seed"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

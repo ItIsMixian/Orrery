@@ -22,7 +22,12 @@ if str(HERE.parent) not in sys.path:
 import build_personal_observatory  # noqa: E402
 import build_workstream_relation_graph  # noqa: E402
 from project_orrery_cli.authority_consumer import inspect_managed_consumer  # noqa: E402
+from project_orrery_core import inspect_operating_rules  # noqa: E402
 from project_orrery_observatory.display_vocabulary import NAVIGATION_LABELS  # noqa: E402
+from project_orrery_observatory.fact_rules_projection import (  # noqa: E402
+    build_fact_rules_projection,
+    project_project_principles,
+)
 from project_orrery_observatory.team_observatory import inject_team_observatory  # noqa: E402
 from project_orrery_observatory.unified_observatory import (  # noqa: E402
     ConsumerRegistration,
@@ -125,6 +130,10 @@ def default_registrations(
             status="available" if dynamic else "unavailable",
             reason=None if dynamic else "静态文件没有本机操作权限。",
         ),
+        _registration(
+            "routes-and-trends", "trends", NAVIGATION_LABELS["trends"], 90, None,
+            ("read-derived-view",), "read-only", "build-docsite", "legacy-reader-v1",
+        ),
     )
     return validate_registrations(registrations)
 
@@ -150,6 +159,7 @@ def render_unified_site(
     tuple[ConsumerRegistration, ...],
     dict[str, Any] | None,
     dict[str, Any] | None,
+    dict[str, Any],
 ]:
     root = Path(project_root).resolve()
     if root != ROOT.resolve():
@@ -169,7 +179,7 @@ def render_unified_site(
             maintenance_refresh_path="/refresh",
             maintenance_remove_path="/remove-worktree",
             maintenance_reload_after_action=False,
-            include_local_worktrees=False,
+            lightweight_active_tasks=True,
         )
     finally:
         if previous_personal is None:
@@ -215,6 +225,10 @@ def render_unified_site(
 
     authority_status: dict[str, Any] | None = None
     authority_reason: str | None = None
+    fact_rules_projection = build_fact_rules_projection(
+        project_principles=project_project_principles(root / "docs" / "core" / "principles.md"),
+        operating_rules_capability=inspect_operating_rules(),
+    )
     authority_item = next(value for value in registrations if value.consumer_id == "authority-managed")
     try:
         authority_status = inspect_managed_consumer(
@@ -233,8 +247,9 @@ def render_unified_site(
     page = inject_unified_shell(
         page, registrations, mode=mode,
         authority_status=authority_status, authority_reason=authority_reason,
+        fact_rules_projection=fact_rules_projection,
     )
-    return page, stats, tuple(registrations), authority_status, graph_provider_payload
+    return page, stats, tuple(registrations), authority_status, graph_provider_payload, fact_rules_projection
 
 
 def main() -> None:
@@ -245,7 +260,7 @@ def main() -> None:
     arguments = parser.parse_args()
     if not arguments.enable:
         raise SystemExit("Unified Observatory is root-only/default-off; pass --enable explicitly")
-    page, stats, registrations, _authority, _graph = render_unified_site(
+    page, stats, registrations, _authority, _graph, _facts_rules = render_unified_site(
         ROOT, mode="static", title=arguments.title,
     )
     output = Path(arguments.out)

@@ -26,6 +26,14 @@
   "additionalProperties": false,
   "allOf": [
     {
+      "if": {"properties": {"command": {"const": "operating-rules-inspect"}}},
+      "then": {"properties": {"data": {"$ref": "#/$defs/operating_rules_data"}}}
+    },
+    {
+      "if": {"properties": {"command": {"const": "authority-route-preflight"}}},
+      "then": {"properties": {"data": {"$ref": "#/$defs/authority_route_data"}}}
+    },
+    {
       "if": {"properties": {"command": {"const": "scaffold"}}},
       "then": {"properties": {"data": {"$ref": "#/$defs/scaffold_data"}}}
     },
@@ -39,6 +47,51 @@
     }
   ],
   "$defs": {
+    "operating_rules_data": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "requested_inventory_version",
+        "supported_inventory_versions", "status", "read_only", "unknown",
+        "reason", "inventory", "guarantees"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "orrery-operating-rules-capability-v1"},
+        "requested_inventory_version": {"type": "integer"},
+        "supported_inventory_versions": {"type": "array", "items": {"type": "integer"}},
+        "status": {"enum": ["supported", "unavailable"]},
+        "read_only": {"const": true},
+        "unknown": {"type": "boolean"},
+        "reason": {"type": ["string", "null"]},
+        "inventory": {"type": ["object", "null"]},
+        "guarantees": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "authority_route_data": {
+      "type": "object",
+      "required": [
+        "schema_version", "contract_type", "registry", "query", "selection",
+        "selected_governing_sources", "excluded_lower_authority_sources",
+        "claim_dimensions", "negative_evidence", "novelty_absence_gate",
+        "guarantees", "receipt_hash"
+      ],
+      "properties": {
+        "schema_version": {"const": 1},
+        "contract_type": {"const": "authority-route-preflight-v1"},
+        "registry": {"type": "object"},
+        "query": {"type": "object"},
+        "selection": {"type": "object"},
+        "selected_governing_sources": {"type": "array"},
+        "excluded_lower_authority_sources": {"type": "array"},
+        "claim_dimensions": {"type": "object"},
+        "negative_evidence": {"type": "object"},
+        "novelty_absence_gate": {"type": "object"},
+        "guarantees": {"type": "object"},
+        "receipt_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    },
     "issue": {
       "type": "object",
       "required": ["code", "message"],

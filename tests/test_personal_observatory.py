@@ -5,6 +5,7 @@ import importlib.util
 import os
 import socket
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -35,6 +36,11 @@ from project_orrery_observatory.personal_observatory import (
     inject_personal_observatory,
     render_personal_observatory_panel,
     unavailable_personal_observatory_projection,
+)
+from project_orrery_observatory.active_task_projection import (
+    build_active_task_projection,
+    collect_active_task_detail,
+    render_active_task_panel,
 )
 from tests.fixtures.collaboration.git_fixture import CollaborationGitFixture
 
@@ -197,6 +203,102 @@ def _w3_bundle(**overrides):
 
 
 class PersonalObservatoryTests(unittest.TestCase):
+    def _assert_lightweight_active_task_contract(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-active-task-") as temporary:
+            root = Path(temporary)
+            common = root / "git-common"
+            common.mkdir()
+            records = []
+            active = {
+                1: "A4.1-strict-evidence-collector",
+                2: "W7.3-workstream-relation-capture",
+                3: "CI7-validation-routing-precision",
+                4: "REL3-release-scope-default-matrix",
+            }
+
+            def write_session(record, workstream_id, phase="implementing", revision=1):
+                Path(record["session_path"]).write_text(json.dumps({
+                    "schema_version": 1, "contract_type": "workstream-session",
+                    "workstream_id": workstream_id, "branch": record["branch"],
+                    "head": record["HEAD"], "lifecycle_phase": phase,
+                    "runtime_condition": "active", "evidence_freshness": "current",
+                    "lifecycle_revision": revision, "scope_revision": revision,
+                    "primary_subsystem_id": "documentation-system",
+                    "affected_subsystem_ids": ["test-coverage"],
+                    "captured_at": f"2026-08-30T12:00:{revision:02d}Z",
+                }), encoding="utf-8")
+
+            for index in range(20):
+                worktree = root / f"worktree-{index:02d}"
+                if index != 7:
+                    worktree.mkdir()
+                admin = common if index == 0 else common / "worktrees" / f"wt-{index:02d}"
+                session_path = admin / "orrery" / "worktree.json"
+                session_path.parent.mkdir(parents=True, exist_ok=True)
+                record = {
+                    "worktree": str(worktree),
+                    "branch": f"refs/heads/codex/fixture-{index:02d}",
+                    "HEAD": f"{index + 1:040x}", "is_primary": index == 0,
+                    "worktree_exists": index != 7, "session_path": str(session_path),
+                }
+                records.append(record)
+                if index in active:
+                    write_session(record, active[index])
+                elif index == 0:
+                    write_session(record, "PRIMARY-integration-root", revision=3)
+                elif index == 6:
+                    session_path.write_text("{broken", encoding="utf-8")
+                elif index == 7:
+                    write_session(record, "MISS-missing-worktree", phase="validating", revision=2)
+                elif index in {8, 9}:
+                    write_session(record, f"HIST-finished-{index}", phase="closed", revision=4)
+
+            registry = lambda _root: {"common_dir": common, "records": records, "registry_calls": 2}
+            maintenance = lambda _root: {"status": "ready", "cache": {
+                "summary_state": "stale", "summary": {"entries": [{
+                    "registered_path": record["worktree"],
+                    "classification": "registered-active", "cache_state": "stale",
+                    "scanned_at": "2026-08-29T23:00:00Z",
+                } for record in records]}}}
+            with mock.patch(
+                "project_orrery_core.collaboration.inspect_worktree_status",
+                side_effect=AssertionError("startup must not inspect each worktree"),
+            ):
+                first = build_active_task_projection(
+                    root, registry_provider=registry, maintenance_loader=maintenance,
+                    captured_at="2026-08-30T13:00:00Z",
+                )
+            self.assertEqual(first["counts"]["registry_worktrees"], 20)
+            current_ids = {item["workstream_id"] for item in first["tasks"] if item["category"] == "current"}
+            self.assertTrue(set(active.values()).issubset(current_ids))
+            self.assertTrue(all(item["evidence_freshness"] == "refresh-needed" for item in first["tasks"]))
+            self.assertEqual(next(item for item in first["tasks"] if item["branch"].endswith("fixture-06"))["session_status"], "broken")
+            self.assertEqual(next(item for item in first["tasks"] if item["workstream_id"] == "MISS-missing-worktree")["worktree_presence"], "missing")
+            self.assertEqual(next(item for item in first["tasks"] if item["is_primary"])["category"], "primary")
+            boundary = first["read_boundary"]
+            self.assertEqual((boundary["worktree_source_files_read"], boundary["scope_observations"], boundary["diff_reads"]), (0, 0, 0))
+            self.assertFalse(boundary["startup_full_scan"])
+
+            write_session(records[10], "NEW-dynamic-session")
+            second = build_active_task_projection(root, registry_provider=registry, maintenance_loader=maintenance)
+            self.assertNotEqual(first["revision"], second["revision"])
+            self.assertIn("NEW-dynamic-session", {item["workstream_id"] for item in second["tasks"]})
+            target = next(item for item in second["tasks"] if item["workstream_id"].startswith("A4.1-"))
+            status_provider = mock.Mock(return_value={
+                "identity": {"branch": records[1]["branch"], "head": "a" * 40, "ahead": 2,
+                             "behind": 0, "dirty": False, "dirty_entry_count": 0, "untracked_count": 0},
+                "session": {"state": "current"},
+            })
+            detail = collect_active_task_detail(
+                root, target["task_id"], registry_provider=registry, status_provider=status_provider,
+            )
+            status_provider.assert_called_once_with(Path(records[1]["worktree"]))
+            self.assertTrue(detail["target_only"])
+            self.assertFalse(detail["source_content_read"])
+            panel = render_active_task_panel(second, dynamic=True)
+            self.assertNotIn(str(root), panel)
+            self.assertIn("状态待刷新", panel)
+
 
     def test_health_projection_separates_36_worktree_like_delivery_reconciliation_and_hygiene(self):
         def card(workstream_id, *, phase="implementing", freshness="current", session=True,
@@ -338,6 +440,7 @@ class PersonalObservatoryTests(unittest.TestCase):
         self.assertEqual(projection["health"]["delivery_now"]["current_blocker_count"], 0)
         self.assertGreaterEqual(projection["health"]["reconciliation"]["finding_count"], 1)
         self.assertEqual(projection["remote_observability"]["status"], "unknown")
+        self._assert_lightweight_active_task_contract()
 
     def test_excluded_worktree_is_listed_but_never_opened(self):
         import project_orrery_core.collaboration as collaboration

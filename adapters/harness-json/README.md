@@ -4,7 +4,7 @@ This unreleased reference Adapter proves the platform-neutral CLI boundary witho
 It accepts a versioned JSON request, invokes `project_orrery_cli` as a subprocess with `--json`, validates the common
 response envelope, and returns the CLI exit code unchanged.
 
-Supported commands are `scaffold`, `validate`, and `check-update`. Requests cannot provide arbitrary CLI arguments;
+Supported commands are `operating-rules-inspect`, `authority-route-preflight`, `scaffold`, `validate`, and `check-update`. The first two are bounded read-only Authority Meta Model consumption surfaces: they cannot write target files, promote Authority status, select a release, or turn missing evidence into absence. Requests cannot provide arbitrary CLI arguments;
 each command has a fixed allowlist in `schemas/request-v1.schema.json`. Responses follow
 `schemas/response-v1.schema.json` and always contain the schema version, command, Core/CLI versions, result category,
 exit code, command data, warnings, and errors.

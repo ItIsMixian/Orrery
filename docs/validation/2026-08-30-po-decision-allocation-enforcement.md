@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS — enforcement Candidate; A4 integration closeout still pending
+Status: PASS — enforcement and A4 integration allocation complete locally
 
 Authority source: [PO1 Plan](../implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)
 
@@ -40,4 +40,5 @@ python -X utf8 skills/project-orrery/scripts/validate_installation.py --target .
 PASS integrated Candidate / Authority Model 1 supported
 ```
 
-A4→ADR-0019 remains pending until A4/U2.3 integration and is not claimed by this enforcement Candidate.
+A4/U2.3 local integration preserves authority-first as ADR-0018 and allocates portable operating rules as ADR-0019.
+The old A4 Candidate SHA remains provenance; current-tree duplicate-number and link gates validate the integrated form.

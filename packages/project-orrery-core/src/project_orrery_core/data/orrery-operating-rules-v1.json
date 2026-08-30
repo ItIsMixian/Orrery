@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "contract_type": "orrery-operating-rules",
+  "inventory_id": "orrery-operating-rules-v1",
+  "inventory_version": 1,
+  "authority_model_version": 1,
+  "deterministic_owner": "project-orrery-core",
+  "status": "unreleased-candidate",
+  "project_fact_boundary": {
+    "classification": "not-target-project-fact-or-seed",
+    "declares_target_project_facts": false,
+    "is_target_project_seed": false
+  },
+  "compatibility": {
+    "supported_inventory_versions": [1],
+    "missing_inventory": "read-only-unknown",
+    "unknown_version": "read-only-unknown-no-latest-fallback",
+    "tamper": "read-only-unknown"
+  },
+  "source_policy": {
+    "distillation_only": true,
+    "allowed_authority_roles": ["product-seed", "agent-index", "adr", "approved-design", "skill-contract"],
+    "excluded_content": [
+      "target-project-facts", "target-project-seed", "orrery-current-state",
+      "component-or-release-version-facts", "experiment-conclusions"
+    ]
+  },
+  "routing": {
+    "contract": "authority-route-preflight-v1",
+    "portable_concepts": [
+      {
+        "concept_id": "authority-meta-model",
+        "subsystem_id": "authority-meta-model",
+        "aliases": [
+          "跨项目通用原则", "元规则层", "元规则", "通用原则", "运行契约", "可移植规则",
+          "为什么 Skill 用户看不到当前 Seed State 中的规则",
+          "为什么已有的规则没有出现在普通用户入口",
+          "meta rules", "portable rules", "operating rules", "operating contract",
+          "why skill users cannot see rules already recorded in seed or state",
+          "where are the existing cross-project authority semantics delivered"
+        ],
+        "minimum_governing_sources": [
+          "docs/state/authority-meta-model.md",
+          "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md"
+        ],
+        "conditional_governing_sources": [
+          "docs/decisions/0011-authority-model-version-and-compatibility.md",
+          "docs/decisions/0012-document-governance-and-information-lifecycle.md",
+          "docs/decisions/0019-portable-operating-rules-and-authority-route-preflight.md"
+        ],
+        "conclusion_code": "existing-meta-model-consumer-wiring-gap"
+      }
+    ]
+  },
+  "rules": [
+    {
+      "rule_id": "ORR-OP-001",
+      "rule_version": 1,
+      "message_key": "authority.claim-dimensions-stay-independent",
+      "summary": {
+        "zh-CN": "决定、实现、验证与发布是独立事实；Accepted 不等于 Implemented 或 Validated。",
+        "en": "Decision, implementation, validation, and release are independent facts; Accepted is not Implemented or Validated."
+      },
+      "applies_to": {"stages": ["bootstrap", "decision", "implementation", "validation", "release"], "consumers": ["agent", "cli", "harness", "observatory", "adapter"]},
+      "sources": [
+        {"path": "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md", "authority_role": "adr", "locator": "Decision 2"},
+        {"path": "docs/core/principles.md", "authority_role": "product-seed", "locator": "Principle 3"}
+      ],
+      "strength": "must",
+      "mechanical_enforcement": "enforceable",
+      "failure_behavior": "fail-closed-read-only",
+      "unknown_behavior": "preserve-unknown",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-002",
+      "rule_version": 1,
+      "message_key": "authority.scope-evidence-and-unknown-are-explicit",
+      "summary": {
+        "zh-CN": "任何当前事实判断都携带 scope、来源与证据可见性；证据不足时保留 Unknown。",
+        "en": "Every current-fact judgment carries scope, source, and evidence visibility; insufficient evidence stays Unknown."
+      },
+      "applies_to": {"stages": ["bootstrap", "audit", "implementation", "validation", "integration", "release"], "consumers": ["agent", "cli", "harness", "observatory", "adapter"]},
+      "sources": [
+        {"path": "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md", "authority_role": "adr", "locator": "Decision 3"},
+        {"path": "AGENTS.md", "authority_role": "agent-index", "locator": "Authority and hard boundaries"}
+      ],
+      "strength": "must",
+      "mechanical_enforcement": "enforceable",
+      "failure_behavior": "fail-closed-read-only",
+      "unknown_behavior": "preserve-unknown",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-003",
+      "rule_version": 1,
+      "message_key": "authority.derived-views-never-create-facts",
+      "summary": {
+        "zh-CN": "仪表盘、AI、摘要、路由 receipt 与其他派生视图不能创建、批准或升级项目事实。",
+        "en": "Dashboards, AI, summaries, route receipts, and other derived views cannot create, approve, or promote project facts."
+      },
+      "applies_to": {"stages": ["bootstrap", "audit", "validation", "release"], "consumers": ["agent", "cli", "harness", "observatory", "adapter"]},
+      "sources": [
+        {"path": "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md", "authority_role": "adr", "locator": "Decision 3"},
+        {"path": "docs/core/principles.md", "authority_role": "product-seed", "locator": "Principle 6"}
+      ],
+      "strength": "must-not",
+      "mechanical_enforcement": "partially-enforceable",
+      "failure_behavior": "fail-closed-read-only",
+      "unknown_behavior": "preserve-unknown",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-004",
+      "rule_version": 1,
+      "message_key": "bootstrap.meta-rules-before-project-instance",
+      "summary": {
+        "zh-CN": "先消费同版本 Orrery 工作规则，再读取目标项目自己的 AGENTS、Seed、State 与实际实现。",
+        "en": "Consume the same-version Orrery operating rules before the target project's AGENTS, Seed, State, and implementation."
+      },
+      "applies_to": {"stages": ["bootstrap", "scaffold", "audit", "maintenance"], "consumers": ["agent", "cli", "harness", "adapter"]},
+      "sources": [
+        {"path": "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md", "authority_role": "adr", "locator": "Decision 7"},
+        {"path": "AGENTS.md", "authority_role": "agent-index", "locator": "Read order"}
+      ],
+      "strength": "must",
+      "mechanical_enforcement": "partially-enforceable",
+      "failure_behavior": "fail-closed-read-only",
+      "unknown_behavior": "read-only-unavailable",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-005",
+      "rule_version": 1,
+      "message_key": "migration.authored-documents-are-create-only",
+      "summary": {
+        "zh-CN": "默认安装 create-only；现有作者 AGENTS、Seed、State 与其他 docs 不被自动覆盖。",
+        "en": "Default installation is create-only; existing authored AGENTS, Seed, State, and other docs are never overwritten automatically."
+      },
+      "applies_to": {"stages": ["scaffold", "audit", "maintenance"], "consumers": ["agent", "cli", "harness", "installer", "adapter"]},
+      "sources": [
+        {"path": "skills/project-orrery/references/migration-contract.md", "authority_role": "skill-contract", "locator": "Default scaffold"},
+        {"path": "docs/core/principles.md", "authority_role": "product-seed", "locator": "Principle 10"}
+      ],
+      "strength": "must-not",
+      "mechanical_enforcement": "enforceable",
+      "failure_behavior": "block-write",
+      "unknown_behavior": "read-only-unavailable",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-006",
+      "rule_version": 1,
+      "message_key": "migration.install-adopt-integrate-release-stay-separate",
+      "summary": {
+        "zh-CN": "scaffold、Authority migration、integrated、consumer wiring 与 public release 必须分开表达。",
+        "en": "Scaffold, Authority migration, integrated status, consumer wiring, and public release remain separate claims."
+      },
+      "applies_to": {"stages": ["scaffold", "audit", "maintenance", "integration", "release"], "consumers": ["agent", "cli", "harness", "observatory", "installer", "adapter"]},
+      "sources": [
+        {"path": "docs/decisions/0011-authority-model-version-and-compatibility.md", "authority_role": "adr", "locator": "Decision 4"},
+        {"path": "skills/project-orrery/references/migration-contract.md", "authority_role": "skill-contract", "locator": "Installation states"}
+      ],
+      "strength": "must",
+      "mechanical_enforcement": "enforceable",
+      "failure_behavior": "fail-closed-read-only",
+      "unknown_behavior": "preserve-unknown",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-007",
+      "rule_version": 1,
+      "message_key": "documentation.roles-and-lifecycle-stay-separated",
+      "summary": {
+        "zh-CN": "State 只写当前事实，ADR 保存决定原因，Plan 保存意图，Validation 保存可复现证据。",
+        "en": "State records current facts, ADRs preserve decisions and reasons, Plans preserve intent, and Validation preserves reproducible evidence."
+      },
+      "applies_to": {"stages": ["bootstrap", "decision", "implementation", "validation", "maintenance"], "consumers": ["agent", "cli", "harness", "observatory"]},
+      "sources": [
+        {"path": "docs/decisions/0012-document-governance-and-information-lifecycle.md", "authority_role": "adr", "locator": "Decision 2"},
+        {"path": "AGENTS.md", "authority_role": "agent-index", "locator": "Authority rules"}
+      ],
+      "strength": "must",
+      "mechanical_enforcement": "partially-enforceable",
+      "failure_behavior": "warn-without-escalation",
+      "unknown_behavior": "preserve-unknown",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-008",
+      "rule_version": 1,
+      "message_key": "documentation.durable-constraints-use-new-adrs",
+      "summary": {
+        "zh-CN": "修改发布契约、文档架构或跨模块安全边界时新增 amends/supersedes ADR，不重写已接受历史。",
+        "en": "Changes to release contracts, documentation architecture, or cross-module safety boundaries require an amending/superseding ADR, never rewritten accepted history."
+      },
+      "applies_to": {"stages": ["decision", "implementation", "integration", "release"], "consumers": ["agent", "cli", "harness"]},
+      "sources": [
+        {"path": "docs/core/principles.md", "authority_role": "product-seed", "locator": "Principle 5"},
+        {"path": "AGENTS.md", "authority_role": "agent-index", "locator": "Hard boundaries"}
+      ],
+      "strength": "must",
+      "mechanical_enforcement": "human-judgment",
+      "failure_behavior": "block-write",
+      "unknown_behavior": "preserve-unknown",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-009",
+      "rule_version": 1,
+      "message_key": "validation.stage-and-risk-match-evidence",
+      "summary": {
+        "zh-CN": "验证强度匹配阶段与风险；低层测试不能冒充高层验收或 exact-SHA release evidence。",
+        "en": "Validation strength matches stage and risk; lower-tier tests cannot impersonate higher-tier acceptance or exact-SHA release evidence."
+      },
+      "applies_to": {"stages": ["implementation", "validation", "integration", "release"], "consumers": ["agent", "cli", "harness", "adapter"]},
+      "sources": [
+        {"path": "docs/core/principles.md", "authority_role": "product-seed", "locator": "Principle 11"},
+        {"path": "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md", "authority_role": "adr", "locator": "Evidence semantics"}
+      ],
+      "strength": "must",
+      "mechanical_enforcement": "partially-enforceable",
+      "failure_behavior": "fail-closed-read-only",
+      "unknown_behavior": "preserve-unknown",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-010",
+      "rule_version": 1,
+      "message_key": "security.secrets-caches-and-generated-artifacts-stay-out",
+      "summary": {
+        "zh-CN": "API Key、AI 配置、keyring、缓存、Git-private 状态与生成站点不得进入发布包。",
+        "en": "API keys, AI configuration, keyrings, caches, Git-private state, and generated sites never enter release packages."
+      },
+      "applies_to": {"stages": ["scaffold", "maintenance", "integration", "release"], "consumers": ["agent", "cli", "harness", "installer", "adapter"]},
+      "sources": [
+        {"path": "AGENTS.md", "authority_role": "agent-index", "locator": "Hard boundaries"},
+        {"path": "skills/project-orrery/references/migration-contract.md", "authority_role": "skill-contract", "locator": "Secrets and generated files"}
+      ],
+      "strength": "must-not",
+      "mechanical_enforcement": "enforceable",
+      "failure_behavior": "block-write",
+      "unknown_behavior": "read-only-unavailable",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    },
+    {
+      "rule_id": "ORR-OP-011",
+      "rule_version": 1,
+      "message_key": "compatibility.unknown-versions-never-fallback-to-latest",
+      "summary": {
+        "zh-CN": "未知/不支持的语义或规则版本只允许只读/Unknown，不得静默回退或采用最新版。",
+        "en": "Unknown or unsupported semantic/rule versions are read-only/Unknown and never silently fall back to or adopt the latest version."
+      },
+      "applies_to": {"stages": ["bootstrap", "scaffold", "audit", "maintenance", "release"], "consumers": ["agent", "cli", "harness", "observatory", "installer", "adapter"]},
+      "sources": [
+        {"path": "docs/decisions/0011-authority-model-version-and-compatibility.md", "authority_role": "adr", "locator": "Decision 3"},
+        {"path": "docs/decisions/0009-authority-meta-model-and-semantic-conformance.md", "authority_role": "adr", "locator": "Versioned semantics"}
+      ],
+      "strength": "must-not",
+      "mechanical_enforcement": "enforceable",
+      "failure_behavior": "fail-closed-read-only",
+      "unknown_behavior": "read-only-unavailable",
+      "project_fact_boundary": "not-target-project-fact-or-seed"
+    }
+  ]
+}

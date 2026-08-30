@@ -2,9 +2,9 @@
 
 Status: Approved
 
-Governing ADRs: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../decisions/0010-core-owned-authority-evaluator.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md)
+Governing ADRs: [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0010](../decisions/0010-core-owned-authority-evaluator.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md)
 
-Updated: 2026-08-21
+Updated: 2026-08-30
 
 ## 目的
 
@@ -176,6 +176,95 @@ Authority Meta Model 必须可版本识别。ADR-0011 将公开版本与内部 f
 ## Self-hosting 边界
 
 Project Orrery Product Seed 可以启发 Meta Model，但两者职责不同。`docs/core/principles.md` 约束 Project Orrery 产品；ADR-0009 与本 Design 定义通用解释规则。文字重叠不把 Product Seed 自动变成 domain schema，也不把 Project Orrery 偏好注入用户 Seed。
+
+## Portable Operating Rules 与 Authority Route Preflight
+
+ADR-0019 不新增 Meta Model 层，而是在本 Design 已定义的同一语义层中增加两个普通消费者此前缺失的确定性消费面。
+
+### A4a：`orrery-operating-rules-v1`
+
+Core package 中只有一份 canonical JSON inventory。Schema 与 dependency-free parser 固定如下层次：
+
+| 层 | 必需内容 | 边界 |
+| --- | --- | --- |
+| inventory envelope | contract/schema/inventory/version、Authority Model 版本、owner、hash domain、compatibility/failure policy | 未知/缺失/tamper 只返回 read-only/Unknown |
+| portable rule | stable ID、rule version、message key、zh/en summary、stages、consumers、sources、strength、mechanical class、failure/Unknown、project-fact boundary | 不携带目标项目事实、Seed 或 Orrery 当前 State |
+| portable concept seed | stable concept ID、aliases、authority source kinds 与 route hint | 只提供通用 bootstrap concept；不复制 self-host subsystem State |
+| projection metadata | canonical digest、projection kind、writes/release/authority flags | Skill/CLI/Observatory 不可修改 owner 或升级状态 |
+
+首版 inventory 从 Product Seed、AGENTS、ADR-0009/0011/0012 和 Skill migration/safety contract 中做有界提炼。跨项目规则包括：独立 claim dimensions、Unknown/作用域保留、派生视图非权威、create-only/no-overwrite、安装/迁移/集成/发布分离、持久决定经 ADR、证据与阶段匹配、秘密/生成物排除、未知版本失败关闭，以及 collaboration consumer 启用时的 Candidate/Canonical 隔离。组件版本、公开版本、当前工作流状态和实验结论不得进入 inventory。
+
+Skill-only 投影可以打包与 canonical inventory 逐字节一致的 JSON。该副本由 drift test 证明为 exact projection；`SKILL.md` 不再手写另一份规则清单。
+
+### A4b：`authority-route-preflight-v1`
+
+Core 只接受 normalized concept registry、authority links、source observations 和 query intent；Markdown/AGENTS/Git/release 收集仍属于 CLI Adapter 边界。确定性路由顺序为：
+
+```text
+query intent
+  -> alias entry / concept IDs (uncertain => bounded fan-out)
+  -> AGENTS index link
+  -> relevant State
+  -> governing effective ADR / Approved Design
+  -> requested implementation / Validation / distribution / release evidence
+  -> four-axis claims + Unknown + novelty/absence decision
+```
+
+Concept registry 的每个 entry 至少包含 stable ID、subsystem ID、zh/en aliases、AGENTS/State links、governing ADR/Design links、implementation/distribution/release evidence hints 和 lifecycle。别名只负责召回；同名不同 concept 由 stable IDs、subsystem 与 authority link 区分。分类分数不足或并列时 fan-out，直到权威 source 收敛；低权威模板/README/Agent assertion 不可使搜索提前终止。
+
+Route receipt 的 canonical shape 为：
+
+```text
+contract/schema/registry version + receipt hash
+query class + normalized intent
+selected concept IDs + ambiguity/fan-out
+selected governing sources (authority order)
+excluded lower-authority sources + reasons
+claim dimensions:
+  semantic_decision / implementation / distribution_consumer / public_default_release
+negative-evidence scope + unresolved targets
+novelty_absence_gate: allowed / rejected / unknown
+writes=false / authority_promotion=false / release_promotion=false
+```
+
+每个 claim dimension 是 `present|absent|unknown`，并绑定 source IDs、fact scope 和 reason codes。一个轴的 evidence 不向另一个轴传播。State 过期、ADR 断链、unindexed concept、未知 schema 或伪造 Agent assertion都保留 Unknown/需补索引；模板缺失只会成为 excluded observation。
+
+### Collector、Core 与消费者边界
+
+| 路径 | 机械保证 | 不保证 |
+| --- | --- | --- |
+| Core inventory/route API | schema/hash/version、route precedence、receipt shape、four-axis non-escalation、absence gate | Markdown/Git 内容已被完整发现 |
+| CLI/Harness | bounded project collector、Core invocation、JSON receipt、zero-write | Agent 一定使用 receipt |
+| Unified Observatory | 同一 projection、Ask Docs preflight、只读页面和 Unknown guard | 模型自由文本绝不出错 |
+| Skill | bootstrap 顺序与 exact inventory projection | 无 host hook 时不能阻止 Agent 跳过 |
+| Host Adapter | 只有 runtime-verified pre-model hook 才能声称 enforced | discovery/install 本身不等于 pre-model enforcement |
+
+### Bootstrap 顺序
+
+支持 A4 的 Agent 在 scaffold、audit、maintenance 或 authority existence 查询前：
+
+1. 读取 Skill 指向的 exact `orrery-operating-rules-v1` inventory；
+2. 对 existence/implementation/distribution/release/visibility/novelty 查询运行 Authority Route Preflight；
+3. 再读取目标项目 AGENTS、相关 State、governing ADR/Design 和实际 implementation/evidence；
+4. 分四轴回答并保留 Unknown。
+
+目标项目 Seed 继续由目标作者维护。新 scaffold 的 AGENTS/Seed 只解释两层关系并指向工具 inventory；brownfield upgrade 不改写这些文件。
+
+### Unified Observatory 设计 brief
+
+- Purpose：让维护者在同一个只读 `authority` 视图中区分“Orrery 如何工作”和“本项目相信/当前是什么”。
+- Context：现有 dense analyst workspace，不改变 Unified Observatory 信息架构与视觉系统。
+- Tone：克制、工程化、中文优先；普通说明在主视图，machine IDs/versions/source/enforcement 放入技术详情。
+- Differentiator：不新增导航；把现有“权威状态”重构为普通用户可理解的“事实与规则”组合视图，其中项目原则、Orrery 工作规则和事实解释状态清楚分层，使用可扫描 ledger 而非重复栏目或营销卡片网格。
+- Constraints：root-only/default-off、静态/动态都只读、零新增网络/凭据/执行权、1440×900 与 390×844 无横向溢出、console 无 error/warning、reduced-motion 保持。
+
+现有 `authority` 页面只消费 Core projection，并继续作为唯一 sidebar identity。用户可见标题不直接使用内部术语“元规则”；managed/legacy/readiness 和 rule IDs 默认进入折叠技术详情。动态 `/api/v1/authority/operating-rules` 只返回启动时校验后的只读 payload；Ask Docs preflight 也消费相同 Core receipt，不能由模型生成或修改 route result。
+
+### Conformance corpus
+
+Corpus 以 normalized registries/observations 验证路由，不把自托管当前事实放入 portable inventory。至少包含 A4 真实失败及八个跨 subsystem 场景：design-only、implemented/unreleased、old public/new Candidate、template missing/Core present、State Unknown、similar names、misleading lower-authority document、zh/en/indirect query、以及 public/default 与 source scope 分离。Mutation cases 去除字面关键词、注入冲突模板/过期 State/断链 ADR/unindexed concept/unknown schema/forged assertion。
+
+断言固定 selected evidence IDs、excluded sources、four-axis shape、Unknown/reason 与 absence gate，不固定 Agent 最终自然语言。
 
 ## 明确未决定
 

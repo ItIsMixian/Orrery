@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "contract_type": "authority-route-preflight-conformance-corpus-v1",
+  "description": "Provider-neutral claim-shape fixtures. Tests assert selected evidence and four independent axes, never fixed natural-language answers.",
+  "cases": [
+    {
+      "case_id": "a4-real-consumer-wiring-failure",
+      "subsystem_id": "authority-meta-model",
+      "concept_id": "authority-meta-model",
+      "aliases": ["跨项目权威语义", "existing authority semantics"],
+      "query": "为什么已有的跨项目权威语义没有出现在普通 Skill 用户入口？",
+      "query_class": "visibility",
+      "facts": {"semantic_decision": "present", "implementation": "present", "distribution_consumer": "absent", "public_default_release": "absent"},
+      "expected_gate": "rejected",
+      "expected_conclusion": "existing-meta-model-consumer-wiring-gap"
+    },
+    {
+      "case_id": "design-accepted-not-implemented",
+      "subsystem_id": "documentation-governance",
+      "concept_id": "document-lifecycle-governance",
+      "aliases": ["文档生命周期职责", "document lifecycle roles"],
+      "query": "文档生命周期职责是否已经实现并交付？",
+      "query_class": "visibility",
+      "facts": {"semantic_decision": "present", "implementation": "absent", "distribution_consumer": "absent", "public_default_release": "absent"},
+      "expected_gate": "rejected"
+    },
+    {
+      "case_id": "implemented-not-public",
+      "subsystem_id": "unified-observatory",
+      "concept_id": "unified-observatory-shell",
+      "aliases": ["统一观测台", "single observatory shell"],
+      "query": "统一观测台已经实现了吗，为什么默认用户还看不到？",
+      "query_class": "visibility",
+      "facts": {"semantic_decision": "present", "implementation": "present", "distribution_consumer": "present", "public_default_release": "absent"},
+      "expected_gate": "rejected"
+    },
+    {
+      "case_id": "old-release-new-candidate",
+      "subsystem_id": "release-toolchain",
+      "concept_id": "release-candidate-contract",
+      "aliases": ["候选发布契约", "candidate release contract"],
+      "query": "旧版本已经公开，但新的候选发布契约是什么状态？",
+      "query_class": "release",
+      "facts": {"semantic_decision": "present", "implementation": "unknown", "distribution_consumer": "present", "public_default_release": "absent"},
+      "expected_gate": "rejected"
+    },
+    {
+      "case_id": "template-missing-core-present",
+      "subsystem_id": "platform-core",
+      "concept_id": "platform-neutral-evaluator",
+      "aliases": ["平台中立求值器", "platform neutral evaluator"],
+      "query": "模板里没写平台中立求值器，是否说明它不存在？",
+      "query_class": "novelty-absence",
+      "facts": {"semantic_decision": "present", "implementation": "present", "distribution_consumer": "absent", "public_default_release": "unknown"},
+      "expected_gate": "rejected"
+    },
+    {
+      "case_id": "state-explicit-unknown",
+      "subsystem_id": "multi-worktree-collaboration",
+      "concept_id": "automatic-worktree-cleanup",
+      "aliases": ["自动清理工作区", "automatic worktree cleanup"],
+      "query": "自动清理工作区能力现在是否存在并启用？",
+      "query_class": "visibility",
+      "facts": {"semantic_decision": "unknown", "implementation": "unknown", "distribution_consumer": "unknown", "public_default_release": "unknown"},
+      "expected_gate": "unknown"
+    },
+    {
+      "case_id": "similar-name-distinct-concept",
+      "subsystem_id": "team-coordination",
+      "concept_id": "relation-execution-authority",
+      "aliases": ["关系执行权", "relation execution authority"],
+      "distractor": {"concept_id": "document-authority", "aliases": ["文档权威", "document authority"]},
+      "query": "关系执行权是否已经向团队模式开放？",
+      "query_class": "visibility",
+      "facts": {"semantic_decision": "present", "implementation": "present", "distribution_consumer": "absent", "public_default_release": "absent"},
+      "expected_gate": "rejected"
+    },
+    {
+      "case_id": "misleading-low-authority-template",
+      "subsystem_id": "test-coverage",
+      "concept_id": "exact-sha-release-gates",
+      "aliases": ["精确提交发布门", "exact sha release gates"],
+      "query": "README 说测试通过，精确提交发布门是否已经公开？",
+      "query_class": "release",
+      "facts": {"semantic_decision": "present", "implementation": "unknown", "distribution_consumer": "present", "public_default_release": "absent"},
+      "expected_gate": "rejected",
+      "expect_lower_authority_exclusion": true
+    },
+    {
+      "case_id": "indirect-bilingual-adapter-question",
+      "subsystem_id": "adapter-runtime",
+      "concept_id": "host-pre-model-hook",
+      "aliases": ["宿主模型前置钩子", "host pre model hook", "receipt before inference"],
+      "query": "Can the receipt always arrive before inference on every host?",
+      "query_class": "distribution",
+      "facts": {"semantic_decision": "present", "implementation": "present", "distribution_consumer": "unknown", "public_default_release": "unknown"},
+      "expected_gate": "rejected"
+    },
+    {
+      "case_id": "research-not-adopted",
+      "subsystem_id": "context-routing-research",
+      "concept_id": "context-aperture-policy",
+      "aliases": ["上下文孔径策略", "context aperture policy"],
+      "query": "研究中出现的上下文孔径策略已经成为默认工作规则了吗？",
+      "query_class": "visibility",
+      "facts": {"semantic_decision": "absent", "implementation": "absent", "distribution_consumer": "absent", "public_default_release": "absent"},
+      "expected_gate": "allowed"
+    }
+  ],
+  "mutations": [
+    "semantic-paraphrase-without-exact-keyword",
+    "conflicting-template",
+    "stale-state",
+    "broken-adr-link",
+    "unindexed-concept",
+    "unknown-registry-schema",
+    "forged-agent-assertion",
+    "unknown-operating-rules-version",
+    "tampered-operating-rules-inventory"
+  ]
+}

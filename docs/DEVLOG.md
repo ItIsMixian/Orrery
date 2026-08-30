@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-30 — A4/U2.3 Central Integration & ADR-0019 Allocation
+
+- 唯一整合者在本地 integration worktree 合入 U2.3 `4981d8b`（包含 A4 `3d298a5c`），保留 authority-first 为 ADR-0018，并把 A4 portable operating rules 原 Candidate 编号机械规范化为 ADR-0019；文件、标题、State/Design/Plan/index 与 inventory source links 同步，decision status/semantics 不变。
+- portable inventory hash domain 改为 LF canonical bytes，新 digest `f786c4f2...eb7dd`；Windows CRLF/LF checkout 等价，extra-byte tamper 仍失败关闭。集成回归修复文档 corpus 导致的 Ask Docs marker 假计数、`available` 状态断言和 stop cleanup 竞态。
+- A4/Adapter/wheel 15/15、Unified/Personal 25/25、正式 Fast 84/84（9.470s/15s）与 Checkpoint 89/89（17.312s/90s）通过。独立 60414 服务的 390×844 in-app Browser 复验为 help x=0/width=390、document overflow 0、说明标签为非交互 P、唯一 qa-fab、0 console warning/error；临时服务已停止，中央 60393 未触碰。
+- 本合流仍是本地 Candidate；未 push、Promotion、main、public/default switch、tag 或 Release。W7.3、CI7、REL3 继续独立集成。
+
 ## 2026-08-30 — Orrery Dispatch Local-only Install
 
 - 维护者选择仅本机安装，不进入 0.3.0 或其他公共分发。中央在 PO1 local integration `8b73f26` 后，只复制 `SKILL.md`／`agents/openai.yaml` 到 `C:\Users\1\.codex\skills\orrery-dispatch`。
@@ -36,6 +43,12 @@
 - 维护者指出中央此前先用长 follow-up Prompt 追加 U2.3／W7.3 范围、再让 Agent 补写 Plan，颠倒了 Orrery 权威链并会丢失关键记录。中央立即只发送 stop，不再通过 transcript 追加实现要求。
 - 新增 Accepted ADR-0018、Approved Design 与人工 adoption Plan：任务创建或实质范围变化先提交 ADR／Design／Plan amendment／Pending Validation，再只把 exact authority SHA／paths 发给 Agent；Agent 在首次／恢复产品写入前确认并登记 scope revision。Prompt、Agent 回执和 task summary 只保留为非权威 provenance。
 - U2.3 的导航/help/live-task 范围与 W7.3 的 task-series/status/comparison-conflict amendment 已进入作者文档和 Pending Validation；两 Agent 在读取本提交前保持暂停。本轮不修改产品代码、组件版本、public Skill、release manifest 或远端状态；自动 Git-private receipt、CLI acknowledgment 与 first-write enforcement 仍是未来产品工作。
+## 2026-08-30 — U2.3 Unified Navigation & Live Task Visibility Candidate
+
+- Resumed only after verifying authority commit `6315415075fb78b61d9a5bb835725bced0bc9ce1` and registering Git-private scope revision 3 against exact base `3d298a5c`; root PROGRESS/HANDOFF and all A4.1/W7.3/CI7/REL3-owned surfaces remain untouched.
+- Observatory 0.1.18 now has one seven-entry app rail, one floating Ask Docs entry, a top-right read-only help/status surface, and a lightweight Personal task projection from the Git registry, bounded session metadata and Maintenance cache. Startup performs no per-worktree source/Scope/diff/status scan; detail is target-only.
+- Focused 25/25, integrated installation, repository gates, release dry build/private exclusion and diff checks pass. Real projection found 22 worktrees in 834.872 ms with 104,370 session bytes and zero source reads. Browser covered 1440×900, 1280×800 and 390×844 with zero document overflow/console warnings; a final mobile help border-box fix is mechanically covered but needs one central Browser replay because Browser policy blocked the rebuilt local tab.
+- Formal Fast/Checkpoint remain ineligible only on the inherited A4 operating-rules CRLF/hash baseline (Checkpoint 99/102 in 54.589s). A4.1 must merge first; U2.3 then replays gates/browser before W7.3 is assessed against the final shell. No Promotion, push, main, release, network, Team join or delete occurred.
 
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
@@ -761,3 +774,12 @@
 - 维护者在真实浅色页面指出少量节点仍被 disconnected component 的整行空白过度拉开；从 exact clean `4e62dba` 登记 Git-private `W7.2.3-workstream-graph-density-correction` 后写入，根 PROGRESS/HANDOFF 未修改。
 - Observatory 0.1.16 保持 248×104px 卡片与可读字号，将 rank 通道从 112px 收至 88px，并用 44px 显式 component gap 替代额外 138px synthetic row；canvas 高度改由最后一个真实节点决定。
 - 真实 self-host 14 节点／7 边桌面测量为 component gap 44px、rank gap 88px、0 node overlap、0 route/card crossing；390px 继续显示同事实 ledger，console 为空。Core facts、折叠语义、只读与所有执行安全边界未改变。
+
+## 2026-08-30 — A4 Portable Operating Rules & Authority Route Preflight Candidate
+
+- 从 exact `codex/u1-u2-integration-baseline@3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3` 建立独立 A4 worktree，并在首次作者／产品写入前登记 Git-private `A4-portable-meta-rules-bootstrap-contract`。ADR-0018 明确 amends/extends ADR-0009；本任务扩展既有 Authority Meta Model 的 portable inventory 与 consumer wiring，不创建第二元层或第二 evaluator owner。
+- Core 0.1.18 冻结 `orrery-operating-rules-v1` dependency-free inventory/schema/read-only projection，并新增 provider-neutral `authority-route-preflight-v1`、四轴 claim 与 Novelty/Absence Gate。CLI 0.1.22 和 Harness JSON 0.1.2 只读输出 versioned receipts；普通 Skill/bootstrap 先消费同一规则版本再读目标项目 AGENTS/Seed/State，Skill-only 宿主仍诚实标为 advisory。
+- Unified Observatory 0.1.17 不增加第九导航：既有 `authority` 身份重构为“事实与规则”，分列目标项目原则、Orrery 工作规则和默认折叠的事实解释状态。root Ask Docs 在选证据前调用 Core/CLI preflight；静态与动态投影均无编辑、批准、凭据或执行权。
+- 泛化 corpus 覆盖真实 A4 failure 与另外 9 个 subsystem 场景，以及 stale State、断链 ADR、unindexed concept、unknown schema/version、tamper 和伪造 Agent assertion。临时新项目显示两层；brownfield 默认安装和实际 `--upgrade-tools` 逐字节保留作者 AGENTS/Seed/State。
+- focused、wheel install、integrated validator、repository/release dry-build gates、CI6 Fast 84/84 和 Checkpoint 89/89 均通过。真实 in-app 浏览器在 1440×900 与 390×844 验证单一入口、分层、渐进披露、零 Authority controls、无横向溢出和空 warning/error console；独立 `63204` 服务已停止，中央 `63203` 未触碰。
+- public v0.2.0 tag/asset/checksum/manifest、默认 public consumer、main 与 Release 均未改变；跨宿主强制 pre-model receipt 仍需各 Adapter 证明真实 hook，纯 SKILL.md 不能宣称机械保证。根 PROGRESS/HANDOFF 未修改，留给中央整合者收口。

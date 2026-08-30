@@ -54,6 +54,7 @@ def render_personal_site(
     maintenance_remove_path: str = "/quick-remove",
     maintenance_reload_after_action: bool = True,
     include_local_worktrees: bool = True,
+    lightweight_active_tasks: bool = False,
 ):
     """Return the base Observatory unchanged unless explicit W4 opt-in is enabled."""
 
@@ -88,12 +89,23 @@ def render_personal_site(
         }
 
     try:
-        projection = build_personal_observatory_projection(
-            root,
-            include_local_worktrees=include_local_worktrees,
-            excluded_branches=excluded_branches,
-            maintenance_projection=maintenance,
-        )
+        if lightweight_active_tasks:
+            from project_orrery_observatory.active_task_projection import (
+                build_active_task_projection,
+            )
+
+            projection = build_active_task_projection(
+                root,
+                maintenance_loader=lambda _root: maintenance,
+            )
+            projection["dynamic"] = maintenance_control_available
+        else:
+            projection = build_personal_observatory_projection(
+                root,
+                include_local_worktrees=include_local_worktrees,
+                excluded_branches=excluded_branches,
+                maintenance_projection=maintenance,
+            )
         page = inject_personal_observatory(page, projection)
     except Exception as error:
         projection = unavailable_personal_observatory_projection(error)

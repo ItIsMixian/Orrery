@@ -7,7 +7,7 @@ Updated: 2026-08-30
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
 - CI5 exact `9ee831f` 的 Fast 与 Promotion 已完成：Promotion run `33235992711` 为 25/25 jobs PASS，双平台 required checks 均通过，Windows／Ubuntu 各聚合 390 tests／27 logical shards；同一 SHA 已进入 main。
-- 当前本地 integrated Candidate 的未发布组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16；四个 Adapter 均为 0.1.1 source，支持状态仍为 `experimental`／`unreleased`。
+- 当前本地 integrated Candidate 的未发布组件为 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18；Harness JSON 为 0.1.2，其余 Adapter 为 0.1.1，支持状态仍为 `experimental`／`unreleased`。
 - W1–W7、Personal／Team Observatory、workspace maintenance、LAN discovery／manual Host switch、relation execution 和只读 Graph 已进入 Canonical source。默认 docsite、公开模板、release manifest 和 v0.2.0 用户能力没有因此切换。
 - R3 已把当前展示面收口为 Orrery；`project-orrery` 继续作为稳定 Skill／package／CLI／schema／协议及历史资产标识。R4/R5 未启动。
 - SC1 已把权威入口、State、Plan 状态和 CI5 hosted evidence 对齐；Fast `33256438925`、Promotion `33256558285` 与 main Fast `33256757429` 均通过。该 source commit 没有执行物理 cleanup，Git-private session 状态也不升级为作者事实。
@@ -18,12 +18,13 @@ Updated: 2026-08-30
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：Workstream 创建或实质范围追加前，中央先提交 ADR／Design／Plan amendment／Pending Validation；任务消息只引用 exact authority SHA 与 paths。U2.3／W7.3 已在安全边界暂停，待读取本提交并登记 scope revision 后恢复。自动 receipt 与 first-write enforcement 尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
-- A4 Candidate 与中央 authority-first 都曾使用 `ADR-0018`。根因是 ADR-0007 的 PO 规则此前没有进入 dispatch Skill／机械 gate，且中央分配时只看当前树。PO1 `93ddfb7` 已本地集成 enforcement；当前线保留 authority-first `ADR-0018`，A4 在 U2.3 后续集成时规范化为 `ADR-0019`，在此之前不得合入两个同号文件。
+- A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
+- A4/U2.3 已本地合流：LF canonical inventory hash 解决 Windows CRLF 漂移，Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25、A4/Adapter/wheel 15/15 及 390×844 Browser 通过。页面 help x=0/width=390、横向溢出 0、唯一功能 Ask Docs、console 0 warning/error；未 Promotion／push／public switch／release。
 
 ## 当前可继续的线路
 
 1. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
-2. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate 与本机安装已完成。A4→ADR-0019 是后续 U2.3/A4 中央集成步骤，仍未完成。
+2. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
 3. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
 4. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
 5. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。
@@ -32,7 +33,7 @@ Updated: 2026-08-30
 8. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 9. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
 10. **W7.3 relation capture：** 当前为在途 Workstream，已暂停等待 authority amendment acknowledgment；之后实现 exact-base `derived_from`、gate-aware dependency proposal／confirmation、human integrator、task-series metadata、status taxonomy、comparison/conflict 分离与 relation inbox。不得让 Agent／Harness／未来 Conductor 自行确认依赖或吸收关系。
-11. **U2.3 shell closeout：** 当前为在途 Workstream，已暂停等待 authority baseline acknowledgment；之后只按 U2.3 Plan 完成导航/help 整理和轻量 live-task projection，不恢复全 worktree 启动扫描，也不改 Graph/Authority/Quick Remove 权限。
+11. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 
 ## 不得外推的边界
 

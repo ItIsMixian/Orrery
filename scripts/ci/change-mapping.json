@@ -58,10 +58,15 @@
       "patterns": [
         "packages/project-orrery-core/src/project_orrery_core/authority*.py",
         "packages/project-orrery-core/src/project_orrery_core/schema/authority-*.json",
+        "packages/project-orrery-core/src/project_orrery_core/operating_rules.py",
+        "packages/project-orrery-core/src/project_orrery_core/data/orrery-operating-rules-*.json",
+        "packages/project-orrery-core/src/project_orrery_core/schema/orrery-operating-rules-*.json",
         "packages/project-orrery-cli/src/project_orrery_cli/__main__.py",
         "packages/project-orrery-cli/src/project_orrery_cli/authority*.py",
+        "packages/project-orrery-cli/src/project_orrery_cli/operating_rules.py",
         "tests/fixtures/authority-meta-model/**",
-        "tests/test_authority_*.py"
+        "tests/test_authority_*.py",
+        "tests/test_portable_operating_rules_and_authority_route.py"
       ],
       "subsystems": [
         "authority-meta-model"
@@ -147,6 +152,7 @@
         "packages/*/pyproject.toml",
         "packages/*/src/*/__init__.py",
         "packages/*/src/*/component.json",
+        "packages/project-orrery-core/src/project_orrery_core/templates/**",
         "skills/project-orrery/**",
         "skills/orrery-dispatch/**",
         "scripts/package_*.py",
@@ -181,6 +187,86 @@
     }
   ],
   "tests": [
+    {
+      "test_id": "test_portable_operating_rules_and_authority_route.AuthorityRouteConformanceTests.test_ask_docs_calls_preflight_and_pins_governing_evidence_before_model_selection",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": ["authority-core"],
+      "reason": "low deterministic evidence for the root Ask Docs pre-model route callback and governing evidence pinning"
+    },
+    {
+      "test_id": "test_portable_operating_rules_and_authority_route.AuthorityRouteConformanceTests.test_generalized_corpus_selects_governing_sources_and_four_independent_axes",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": ["authority-core"],
+      "reason": "low deterministic evidence for generalized concept routing and four-axis claim shapes"
+    },
+    {
+      "test_id": "test_portable_operating_rules_and_authority_route.AuthorityRouteConformanceTests.test_real_repository_aliases_hit_state_then_adr_and_report_distribution_gap_correctly",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": ["authority-core", "release-packaging"],
+      "reason": "low self-host evidence for multilingual aliases, State/ADR priority and independent distribution/release axes"
+    },
+    {
+      "test_id": "test_portable_operating_rules_and_authority_route.AuthorityRouteConformanceTests.test_route_mutations_fail_closed_instead_of_inventing_a_new_layer",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": ["authority-core"],
+      "reason": "low negative evidence for stale, broken, unindexed, conflicting and forged routing inputs"
+    },
+    {
+      "test_id": "test_portable_operating_rules_and_authority_route.PortableOperatingRulesTests.test_core_inventory_and_skill_projection_have_one_exact_owner",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": ["authority-core", "release-packaging"],
+      "reason": "low drift evidence for the Core-owned inventory and exact Skill projection"
+    },
+    {
+      "test_id": "test_portable_operating_rules_and_authority_route.PortableOperatingRulesTests.test_missing_unknown_and_tampered_inventory_fail_closed_without_latest_fallback",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": ["authority-core"],
+      "reason": "low compatibility evidence for missing, unknown and tampered inventory failure closure"
+    },
+    {
+      "test_id": "test_harness_json_adapter.HarnessJsonAdapterTests.test_new_project_exposes_two_layers_and_brownfield_seed_state_are_byte_preserved",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-adapters",
+      "allowed_stages": ["promotion"],
+      "cost_class": "heavy",
+      "budget_seconds": 600.0,
+      "dependencies": ["adapters", "release-packaging"],
+      "reason": "bounded install evidence for two-layer bootstrap and byte-exact brownfield author preservation"
+    },
+    {
+      "test_id": "test_harness_json_adapter.HarnessJsonAdapterTests.test_operating_rules_and_authority_preflight_are_read_only_harness_commands",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-adapters",
+      "allowed_stages": ["promotion"],
+      "cost_class": "heavy",
+      "budget_seconds": 600.0,
+      "dependencies": ["adapters", "authority-core"],
+      "reason": "bounded Harness JSON evidence for read-only inventory and route receipts"
+    },
     {
       "test_id": "test_authority_ai_derived_view.AuthorityAIDerivedViewTests.test_answer_is_visibly_derived_and_cannot_spoof_receipt",
       "owner_surface": "Authority/Core",

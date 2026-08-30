@@ -28,6 +28,7 @@ Updated: 2026-08-30
 - S0 `orrery-dispatch` 使用 `skill-creator` quick validator 检查 frontmatter、名称与 scaffold placeholder；文件 inventory 固定为 `SKILL.md`／`agents/openai.yaml` 两项。该结构门不证明宿主级 first-write enforcement、实际 task creation 或公开安装兼容性。
 - S0 首轮 Fast dry-run 对未登记的新 Skill 路径失败关闭；任务说明 amendment 后只把 `skills/orrery-dispatch/**` 加入 generic `release-packaging` mapping。最终 dry-run 为 44 tests／0 unknown，正式 Fast 44/44 在 15 秒预算内通过；test IDs、budgets、stage authority 与 Promotion coverage 不变。
 - PO1 扩展 repository gate：当前树 numeric ADR 编号必须唯一，`0000` 模板／历史和 `docs/decisions/proposals/` 不参与正式编号分配。函数级 synthetic fixture 验证 unique/proposal/0000 通过、duplicate `0018` 拒绝；没有新增 unittest ID 或改变 CI tier inventory。
+- A4/U2.3 中央合流把 portable inventory 的 hash domain 固定为 LF canonical bytes，使 Windows CRLF/LF checkout 等价且额外内容仍判 tamper；A4/Adapter/wheel 15/15、Unified/Personal 25/25 通过。正式 routed Fast 84/84（9.470s/15s）与 Checkpoint 89/89（17.312s/90s）均 evidence-eligible；390×844 中央 Browser 为零横向溢出、help x=0/width=390、唯一功能 Ask Docs、0 console warning/error。
 
 ## 覆盖面
 
@@ -37,6 +38,7 @@ Updated: 2026-08-30
 - Collaboration suites：W1/W2 session／Scope／finding、W3 review/integration/cleanup、Personal／Team、LAN harness、lineage、maintenance、relation graph 与 apply/undo/recovery contract。
 - Unified Observatory suite：versioned registration/discovery、collision/escalation fail-closed、quarantine、static boundary、single-URL runtime、HTTP security、consumer non-escalation、helper lifecycle 与 legacy rollback。
 - Documentation governance suite：provider-neutral finding schema、11 类正负 synthetic fixture、soft-budget advisory 与零写入／零网络边界。
+- A4 suite：Core inventory/schema/digest/unknown-version/tamper、Skill/Core/template drift、CLI/Harness receipt、10 个跨 subsystem 四轴 conformance 场景、route mutation/absence gate、Ask Docs preflight、new/brownfield byte preservation 与 Unified Authority static/dynamic projection。
 - Context-routing suites：24-task corpus、Pilot 002–009 frozen control packages、读取代理、JSONL audit、retention、Oracle v0.2 与 contamination/failure controls。
 - Repository gates：integrated installation、isolated docsite、Markdown links、forbidden artifacts、release dry build、workflow/static contract、secret boundary 与 `git diff --check`。
 
@@ -54,6 +56,7 @@ Updated: 2026-08-30
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [S0 Orrery Dispatch Skill](../validation/2026-08-30-s0-orrery-dispatch-skill.md)
 - [PO1 Decision Allocation Enforcement](../validation/2026-08-30-po-decision-allocation-enforcement.md)
+- [U2.3 Navigation & Live Task Visibility](../validation/2026-08-30-u2-3-navigation-live-task-visibility.md)
 - [U2 Unified Observatory Production Integration](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 Unified Observatory UX Acceptance Fixes](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
@@ -75,3 +78,4 @@ Updated: 2026-08-30
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。
 - Claude 认证后真实模型路由、真实双机 LAN、self-host relation apply、自动 worktree removal 与 OS scheduler 没有验收证据。
 - Unified Observatory／Authority 没有默认 production consumer 或公开 release evidence；Documentation D2 scanner／CLI 尚未实现。
+- 纯 Skill 指令仍没有强制 pre-model hook；A4 只机械保证 Core/CLI/Harness 与 root Unified Ask Docs 路径，其他宿主保持 advisory/Unknown。

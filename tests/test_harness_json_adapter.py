@@ -76,8 +76,11 @@ class HarnessJsonAdapterTests(unittest.TestCase):
         self.assertEqual(pyproject["project"]["version"], components["components"]["cli"]["version"])
         self.assertEqual(request_schema["properties"]["schema_version"]["const"], 1)
         self.assertEqual(response_schema["properties"]["schema_version"]["const"], 1)
-        self.assertEqual(set(response_schema["$defs"]), {"issue", "action", "scaffold_data", "validate_data", "update_data"})
-        self.assertEqual(len(response_schema["allOf"]), 3)
+        self.assertEqual(
+            set(response_schema["$defs"]),
+            {"operating_rules_data", "authority_route_data", "issue", "action", "scaffold_data", "validate_data", "update_data"},
+        )
+        self.assertEqual(len(response_schema["allOf"]), 5)
         self.assertEqual(
             set(response_schema["properties"]["exit_code"]["enum"]),
             {int(code) for code in manifest["protocol"]["exit_codes"]},
@@ -103,6 +106,33 @@ class HarnessJsonAdapterTests(unittest.TestCase):
             self.assertGreater(first["data"]["predicted_changes"], 0)
             self.assertIn("create", {item["action"] for item in first["data"]["actions"]})
             self.assertFalse(target.exists())
+
+    def test_operating_rules_and_authority_preflight_are_read_only_harness_commands(self) -> None:
+        inspected = self.assert_response(
+            run_harness({
+                "schema_version": 1,
+                "command": "operating-rules-inspect",
+                "arguments": {"inventory_version": 1},
+            }),
+            0,
+        )
+        self.assertTrue(inspected["data"]["read_only"])
+        self.assertEqual(inspected["data"]["inventory"]["inventory_id"], "orrery-operating-rules-v1")
+        receipt = self.assert_response(
+            run_harness({
+                "schema_version": 1,
+                "command": "authority-route-preflight",
+                "arguments": {
+                    "target": str(REPOSITORY_ROOT),
+                    "query": "Why are existing authority rules absent from the Skill?",
+                    "fact_scope": "candidate",
+                },
+            }),
+            0,
+        )
+        self.assertIn("authority-meta-model", receipt["data"]["selection"]["concept_ids"])
+        self.assertFalse(receipt["data"]["guarantees"]["writes_target_project"])
+        self.assertFalse(receipt["data"]["novelty_absence_gate"]["absence_claim_allowed"])
 
     def test_install_validate_and_preserve_author_files_without_agent_state(self) -> None:
         with tempfile.TemporaryDirectory(prefix="orrery-harness-install-") as temporary:
@@ -165,6 +195,61 @@ class HarnessJsonAdapterTests(unittest.TestCase):
             self.assertEqual(authored.read_text(encoding="utf-8"), "# Author-owned entrance\n")
             self.assertEqual((fake_codex_home / "config.toml").read_text(encoding="utf-8"), 'secret = "must-not-appear"\n')
             self.assertEqual((fake_agents_home / "SKILL.md").read_text(encoding="utf-8"), "must not load\n")
+
+    def test_new_project_exposes_two_layers_and_brownfield_seed_state_are_byte_preserved(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-two-layer-install-") as temporary:
+            root = Path(temporary)
+            new_target = root / "new"
+            installed = self.assert_response(
+                run_harness({
+                    "schema_version": 1, "command": "scaffold",
+                    "arguments": {"target": str(new_target), "title": "Two Layers"},
+                }),
+                0,
+            )
+            self.assertTrue(installed["data"]["changed"])
+            entrance = (new_target / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertIn("Orrery 工作规则", entrance)
+            self.assertIn("项目 Seed", entrance)
+            self.assertIn("两层", entrance)
+
+            brownfield = root / "brownfield"
+            (brownfield / "docs" / "core").mkdir(parents=True)
+            (brownfield / "docs" / "state").mkdir(parents=True)
+            seed_path = brownfield / "docs" / "core" / "principles.md"
+            state_path = brownfield / "docs" / "state" / "custom.md"
+            agents_path = brownfield / "AGENTS.md"
+            seed_bytes = b"# Author Seed\r\n\r\n\xff-owned-by-author\r\n"
+            state_bytes = b"# Author State\r\ncurrent=unknown\r\n"
+            agents_bytes = b"# Author AGENTS\r\n"
+            seed_path.write_bytes(seed_bytes)
+            state_path.write_bytes(state_bytes)
+            agents_path.write_bytes(agents_bytes)
+            first = self.assert_response(
+                run_harness({
+                    "schema_version": 1, "command": "scaffold",
+                    "arguments": {"target": str(brownfield), "title": "Brownfield"},
+                }),
+                0,
+            )
+            self.assertIn("docs/core/principles.md", first["data"]["preserved_authored_paths"])
+            self.assertEqual(seed_path.read_bytes(), seed_bytes)
+            self.assertEqual(state_path.read_bytes(), state_bytes)
+            self.assertEqual(agents_path.read_bytes(), agents_bytes)
+            upgraded = self.assert_response(
+                run_harness({
+                    "schema_version": 1, "command": "scaffold",
+                    "arguments": {
+                        "target": str(brownfield), "title": "Brownfield",
+                        "upgrade_tools": True,
+                    },
+                }),
+                0,
+            )
+            self.assertIn("docs/core/principles.md", upgraded["data"]["preserved_authored_paths"])
+            self.assertEqual(seed_path.read_bytes(), seed_bytes)
+            self.assertEqual(state_path.read_bytes(), state_bytes)
+            self.assertEqual(agents_path.read_bytes(), agents_bytes)
 
     def test_mixed_toolchain_is_a_structured_warning_and_preserved(self) -> None:
         with tempfile.TemporaryDirectory(prefix="orrery-harness-mixed-") as temporary:
