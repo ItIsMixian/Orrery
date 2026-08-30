@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
+
+- 唯一整合者从 clean `codex/u1-u2-integration-baseline@6166d15` 先合入 W7.2.3 exact `30d44ff`，再合入 U2.2 exact `70e6ac9`；两条产品文件集合无直接重叠。中央 CI7／ADR-0017 与 W7.2 的 DEVLOG、State、Validation index 只做加法协调，联合 feature merge 为 `0eaad30`。
+- 联合页面现在使用一个连续中文 sidebar／scroll rail；Maintenance 为 8 行分页密集队列、四类筛选、header refresh 和折叠技术详情；Graph 为最终分层工程线、按链展开／收起、画布缩放、固定箭头／主题 scrollbar 和移动列表。Core relation、Maintenance eligibility／preflight／authorization／receipt、Team/Authority/AI 权限均未改变，未执行删除。
+- 合流 Fast 38/38（3.098898s）与真实 1440×900／390×844 浏览器通过：Maintenance 16／9／0／7，Graph 14 节点／7 边，dependency 0 节点空态，无页面横向溢出或 console warning/error。44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未虚报通过；隔离 U2.2 Checkpoint 40/40 证据保留。当前仅准备维护者本地验收，不 push main、不运行 Promotion、不切换 public/default、不发布。
+
 ## 2026-08-29 — ADR-0017 Workstream Relation Capture Authority
 
 - 维护者接受三项关系捕获规则：同项目且 exact-base／ancestry 可验证的 mechanical `derived_from` 可由 Core 自动写为有效事实；`depends_on` 必须携带 implementation／validation／integration／release gate，并由任务 owner 或 human integrator 按职责确认；`absorbs` 只能由 human integrator 确认。

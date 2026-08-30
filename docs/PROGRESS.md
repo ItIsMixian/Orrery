@@ -15,7 +15,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7、Personal／Team Observatory、maintenance、relation execution 与只读 Graph 已进入 Canonical source；ADR-0017 已接受 relation capture／confirmation authority，但 W7.3 尚未实现 | 完成当前 Unified Candidate 后另立 W7.3：auto `derived_from`、gate-aware `depends_on`、human integrator／`absorbs` 与只读 relation inbox；任何 apply、删除或成员本机执行仍逐次确认 |
-| Unified Observatory | U2.1 已修复首次体验暴露的重复导航、Maintenance/Quick Remove、Graph、Host 发现、关闭服务、Personal 术语和中文显示问题，并进入本地 integrated Candidate；公开默认仍未切换 | 启动修正后的本地 Candidate 供维护者复验；确认后再冻结 exact-SHA Promotion Candidate |
+| Unified Observatory | W7.2.3 与 U2.2 已按 Graph → shell/Maintenance 顺序进入本地联合验收 Candidate：单一连续侧栏、密集工作区队列和可读分层 Graph 已组合；公开默认仍未切换 | 维护者体验当前联合页面；接受后才冻结 non-main exact-SHA Promotion Candidate |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
 | 文档治理 | D1 已冻结只读 finding contract、规则 registry 与 synthetic fixture；当前没有 `docs audit` 产品入口 | 维护者另行决定是否启动 D2 scanner／CLI；不自动改写 Markdown 或启用长度硬门 |
@@ -28,14 +28,15 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - 协作源码已经 Canonical，但真实 self-host relation store 仍缺正式 native event／closure；Graph 的 legacy session 投影与产品能力不能混写。
 - 当前 display brand 为 Orrery；`project-orrery` Skill／distribution／CLI／schema／协议与 v0.2.0 资产继续作为稳定技术或历史标识保留。
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
-- `codex/u1-u2-integration-baseline` 已吸收 U2.1 source `02efa41`；当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.12。它在维护者复验、exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
+- `codex/u1-u2-integration-baseline` 已吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；联合 feature merge 为 `0eaad30`，当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它在维护者接受、exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
 
 ## 活动计划与待办
 
 - [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：ADR-0017 与 Approved Design 已接受；产品实现尚未开始。Agent／Harness／Conductor 只可建议，任务 owner／human integrator 按 gate 确认。
 - [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：拆分 Observatory 影响面并增加非权威总成本诊断；不改变层级证据、15/90 秒预算或 main 推广门。
+- [ ] [U2.2／W7.2 联合验收](validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)：本地联合 Candidate 已就绪；等待维护者真实体验，之后再决定 exact-SHA Promotion。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
-- [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：首次体验返工已实现并验证；维护者复验、public/default transition 与 Release 尚未完成。
+- [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：基础体验返工已进入联合 Candidate；W7.2/U2.2 后的维护者复验、public/default transition 与 Release 尚未完成。
 - [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：Phase 5 self-host／发布未完成；真实多机、云 relay 与自动选主也不在当前支持范围。
 - [ ] [Workspace Maintenance Plan](implementation/plans/2026-08-27-workspace-maintenance-and-scheduled-cleanup.md)：Phase 0–2 已进入 Canonical source；Phase 3 自动 worktree removal 与 Phase 4 scheduler 未开始。
 - [ ] [Context-routing State](state/context-routing-research.md)：C2／Pilot 010 尚未获批。

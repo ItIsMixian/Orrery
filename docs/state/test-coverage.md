@@ -24,6 +24,7 @@ Updated: 2026-08-30
 - U2.1 新增 legacy Maintenance/current refresh、legacy/archive graph/empty refusal、startup-cached graph endpoint 与全局 stop 资源回收四组断言，并折叠进既有 owner test IDs；registry byte-for-byte 不变，不扩大历史 W6.1 `<24` Checkpoint selector。focused 五套 47/47、折叠后 exact methods 5/5、Unified 11/11；最终 CI6 Fast 选择 38 项、Checkpoint 选择 44 项，均 evidence-eligible PASS，详见 U2.1 Validation。
 - W7.1 的四个 archived-session 安全回归已登记为 `team-lan-core` Promotion-only medium evidence，不进入 Fast／Checkpoint；其分支 focused 19/19、exact Fast 57/57、Checkpoint 85/85 及真实 self-host read-only graph 均通过，最终整合 Candidate 仍需 Promotion 重放。
 - W7.2 将布局、折叠、lens 端点、inspector 与 desktop/mobile ledger 断言折叠进既有 Workstream Graph owner IDs，CI inventory／registry 不变。W7.2.1 覆盖 `Ctrl + wheel`、路径焦点、无线路标签、按链收起和 dependency 空态；W7.2.2 增加固定 marker 和全站主题 scrollbar；W7.2.3 固定 88px rank／44px component 间隔并拒绝 synthetic blank row。focused Graph＋Unified 18/18 与 JS syntax PASS；真实 self-host 桌面节点无重叠、边不穿框，390×844 无页面横向溢出，console error/warning 为空。最终 CI6 Fast／Checkpoint receipt 见 W7.2 Validation。
+- U2.2 用既有 owner tests 固定单一连续侧栏、15-entry/8-row Maintenance 队列、四类筛选、eligible/zero-eligible、折叠 policy/history 和移动紧凑行；隔离 Fast 34/34、Checkpoint 40/40 与三档浏览器通过。与 W7.2.3 合流后，联合 Fast 38/38 与真实 1440/390px 页面通过；联合 Checkpoint 的 44 项在既有 Maintenance real-Git fixture 上达到固定 90 秒预算，因此未声明 evidence-eligible PASS。
 
 ## 覆盖面
 
@@ -47,6 +48,7 @@ Updated: 2026-08-30
 ## 验证证据入口
 
 - [Validation 索引](../validation/README.md)
+- [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [U2 Unified Observatory Production Integration](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 Unified Observatory UX Acceptance Fixes](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
