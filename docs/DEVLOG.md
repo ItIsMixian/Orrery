@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-29 — ADR-0017 Workstream Relation Capture Authority
+
+- 维护者接受三项关系捕获规则：同项目且 exact-base／ancestry 可验证的 mechanical `derived_from` 可由 Core 自动写为有效事实；`depends_on` 必须携带 implementation／validation／integration／release gate，并由任务 owner 或 human integrator 按职责确认；`absorbs` 只能由 human integrator 确认。
+- Personal Mode 的项目 owner 默认是唯一 integrator；Team Mode 仍由 owner 默认独任，但可显式增加其他 human integrator。Agent、Harness 与未来 Conductor 只能提出带 provenance／evidence 的建议，中央调度模式不是权限来源。
+- 新增 ADR-0017、Approved Design、W7.3 Plan 与 documentation-contract Validation；保留 v1 relation 可读性，无 gate 的旧 `depends_on` 解释为 unspecified／Unknown，不能自动硬阻断。补齐 ADR-0016/0017 可解析 amendment 元数据与冻结关系测试；routed Fast 48/48、Authority shadow 15/15、repository gate（717／388／1019）通过。本轮没有修改 Core／CLI／Observatory、schema、Git-private relation store 或发布包，W7.3 产品实现尚未开始。
+
 ## 2026-08-29 — SC1 Closed Worktree Removal
 
 - 经维护者明确确认后，对 W5D、CI4、R1、R2、R3、W6 六个 `closed/superseded` worktree 逐项复核 registered／clean／allowed ignored／branch／commit／session 状态；完整 Git-private `orrery/` 先归档到 `.git/orrery/retired-worktree-sessions/2026-08-29/` 并复核 SHA-256。

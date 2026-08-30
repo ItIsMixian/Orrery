@@ -2,7 +2,7 @@
 
 Updated: 2026-08-29
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md)
 
 ## 当前事实
 
@@ -18,6 +18,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Personal／Team／Maintenance／Graph 已作为 root-only/default-off sibling page 进入 Canonical source。U2.1 Candidate 的主视图用“交付／待确认的任务或历史状态／工作区清理建议”表达 Personal；Team 为 metadata-only/request-only，Maintenance 只显示当前资格与本机确认，Graph 只读消费完整且验证有效、hash-bound 的 native 或 legacy/archive relation evidence。
 - ADR-0016 与 Approved Unified Observatory Design 已接受“一个用户入口／URL／导航壳、受管隐藏 helper”的目标。U2.1 Candidate 在现有 docsite 阅读、搜索、AI 与作者文档树上只保留一组中文 app 导航，组合 Authority／Personal／Team／Graph／Maintenance；协议值只在技术详情显示，未暴露半成品语言切换。U1 synthetic prototype 仍不是 UI 规范，公开默认尚未切换。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
+- ADR-0017 已接受 Git-private relation proposal／confirmation 的职责边界：Agent、Harness 与未来 Conductor 只能提出带来源和证据的建议；任务 owner 确认 implementation／validation gate，human integrator 确认 integration／release gate 与 `absorbs`。中央调度只是可选交互形态，不是权限来源；当前产品尚无 relation inbox 或这些确认入口。
 - 动态 docsite 的模型调用统一经过 Broker。Provider 配置与凭据按端点绑定，同源 POST、body gate、预算、缓存和错误脱敏已实现；同用户本机 Broker 不宣称秘密隔离。
 - 当前展示品牌为 Orrery；目标项目标题仍由模板 token 定制。历史 `Project Orrery` 与稳定 `project-orrery` 技术标识按 ADR-0015 保留。
 
@@ -56,4 +57,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Personal／Team／Maintenance／Graph 尚未接入默认 docsite、Skill template 或公开 release。
 - Unified Observatory 仍只是本地 root-only/default-off integrated Candidate；尚未进入默认 docsite、Skill template、managed-tool inventory、installer 或公开 Release。`start-docsite.bat`／`serve.py` 继续作为 legacy rollback 与当前公开兼容入口。
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
+- W7.3 relation capture inbox、gate-aware dependency confirmation、human integrator 管理与自动 mechanical `derived_from` 尚未实现；观测台仍只投影已经存在的关系证据。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

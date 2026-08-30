@@ -73,7 +73,7 @@
 
 **What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅、干净集成、维护和显式接续关系。
 **Truth**: Git branch／HEAD／worktree 与 Git-private 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；W1–W7 已进入 Canonical source，覆盖 session、Scope/finding、review/integration/cleanup、Personal／Team、maintenance、LAN discovery／manual Host switch、relation execution 和只读 Graph。默认 consumer、真实 self-host apply、真实双机、自动选主、云 relay、自动删除和 scheduler 尚未实现或启用。
-**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0014](docs/decisions/0014-dynamic-workstream-succession-contract.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)。
+**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [关系捕获 Design](docs/design/workstream-relation-capture-and-confirmation.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0014](docs/decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0017](docs/decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md) | [W7.3 Plan](docs/implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)。
 
 ## context-routing research
 

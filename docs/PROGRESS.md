@@ -14,7 +14,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
-| 多 Workstream 协作 | W1–W7、Personal／Team Observatory、maintenance、relation execution 与只读 Graph 已进入 Canonical source；默认页面仍不启用这些 root-only 控制面 | 先做 self-host read-only／dry-run 与 lifecycle/closure 对账；任何 apply、删除或成员本机执行仍逐次确认 |
+| 多 Workstream 协作 | W1–W7、Personal／Team Observatory、maintenance、relation execution 与只读 Graph 已进入 Canonical source；ADR-0017 已接受 relation capture／confirmation authority，但 W7.3 尚未实现 | 完成当前 Unified Candidate 后另立 W7.3：auto `derived_from`、gate-aware `depends_on`、human integrator／`absorbs` 与只读 relation inbox；任何 apply、删除或成员本机执行仍逐次确认 |
 | Unified Observatory | U2.1 已修复首次体验暴露的重复导航、Maintenance/Quick Remove、Graph、Host 发现、关闭服务、Personal 术语和中文显示问题，并进入本地 integrated Candidate；公开默认仍未切换 | 启动修正后的本地 Candidate 供维护者复验；确认后再冻结 exact-SHA Promotion Candidate |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
@@ -32,6 +32,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
+- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：ADR-0017 与 Approved Design 已接受；产品实现尚未开始。Agent／Harness／Conductor 只可建议，任务 owner／human integrator 按 gate 确认。
 - [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：拆分 Observatory 影响面并增加非权威总成本诊断；不改变层级证据、15/90 秒预算或 main 推广门。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
 - [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：首次体验返工已实现并验证；维护者复验、public/default transition 与 Release 尚未完成。

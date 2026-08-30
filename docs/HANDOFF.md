@@ -14,6 +14,7 @@ Updated: 2026-08-29
 - 后续本机维护已归档并移除六个 `closed/superseded` worktree，只删除工作目录并保留 branch／commit；当前七个 registered worktree 中包含一个并发创建、未触碰的 `github-front-door-redesign`。
 - 维护者已接受 ADR-0016／Unified Observatory Design：目标是一个可见 launcher、URL 与导航壳，内部 helper 可受管独立运行；现有 docsite 阅读、搜索、AI、作者信息架构和可识别视觉体验必须继承，U1 prototype 不是最终 UI。
 - `codex/u1-u2-integration-baseline` 已吸收 U2.1 source `02efa41`，当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.12；它是供维护者复验的本地 integrated Candidate，尚不等于 `origin/main`、默认切换或公开发布。
+- ADR-0017 与 Approved Relation Capture Design 已接受：mechanical `derived_from` 可自动写入，`depends_on` 必须按 implementation／validation／integration／release gate 由相应人类角色确认，`absorbs` 只由 human integrator 确认。W7.3 尚未实现，不能把这些规则写成当前产品能力。
 
 ## 当前可继续的线路
 
@@ -24,6 +25,7 @@ Updated: 2026-08-29
 5. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 6. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 7. **Unified Observatory Candidate：** U2.1 已关闭首次体验反馈；下一步启动修正后的本地实例供维护者复验，不切换 public template／managed tools／Release。完整英文模式仍未实现，当前统一为中文主界面并把机器字段收进技术详情。
+8. **W7.3 relation capture：** 当前只有 Accepted ADR／Approved Design／Planned implementation。待当前 Unified Candidate 收口后另立独立 Workstream，实现 exact-base `derived_from`、gate-aware dependency proposal／confirmation、human integrator 与 relation inbox；不得让 Agent／Harness／未来 Conductor 自行确认依赖或吸收关系。
 
 ## 不得外推的边界
 

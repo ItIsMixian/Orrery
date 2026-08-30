@@ -2,7 +2,7 @@
 
 Updated: 2026-08-29
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md)
 
 ## 当前事实
 
@@ -16,6 +16,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - U2.1 Worktree Candidate 修复维护者拒绝的集成体验：只保留一个中文 app 导航并保留作者文档树；全页共享显式关闭服务入口；旧 Maintenance last-run 仅作历史警告；完整、valid、hash-bound 的 W7.1 legacy/archive graph 不再被 native root 缺失误挡。它没有创建 relation root、赋予 archive 执行权或放宽 Quick Remove 当前资格。
 - W7.1 integrated Candidate 只为 relation 已引用且 live endpoint 缺失的 Workstream 读取有界 Git-common-private retired-session archive，恢复 closed/offline/current/superseded 轴；archive 不进入 active tip、apply/undo、Review Ready 或执行面。
 - W1–W7 协作源码已经进入 main：Git-private Workstream session、Scope/finding、review/integration/cleanup、Personal／Team projection、workspace maintenance、LAN discovery／manual Host switch、stacked lineage、relation event/graph、apply/undo/recovery contract 和只读 Graph consumer 均存在。
+- ADR-0017 已接受后续 relation capture 规则：只有 exact-base／同项目／ancestry 可验证的 `derived_from` 可由 Core 自动写为有效事实；`depends_on` 必须标注 implementation／validation／integration／release gate，并由任务 owner 或 human integrator 确认；`absorbs` 只能由 human integrator 确认。Personal owner 默认是唯一 integrator，Team owner 可显式增加其他 human integrator。W7.3 尚未实现这些写入、角色与确认入口。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
 - 非权威研究控制面位于 `experiments/context-routing/`；大型原始运行根为 `D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库或发布包。
@@ -62,6 +63,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 默认 docsite／Skill template 尚未启用 Unified Observatory 或 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。
 - 没有真实双机 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。
 - W7 relation store 没有 self-host native apply 记录；旧 session 到 post-main closure 的兼容收口仍需保守人工流程。
+- W7.3 relation capture 尚未实现：当前没有 exact-base `derived_from` 自动写入、gate-aware `depends_on` proposal／confirmation、integrator registry／`absorbs` 确认或 Observatory relation inbox；现有 Graph 只能显示已有证据，因此仍可能稀疏。
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。
 - Claude Code 尚未完成认证后的真实模型路由；DeepSeek 与 Codex evidence 只覆盖各自记录的精确 runtime 范围。
 - 自动 R1 脱敏导出器、跨平台 byte-for-byte archive 与 Brownfield Adoption 研究／Plan 均未实现。

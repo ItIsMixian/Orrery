@@ -7,10 +7,7 @@ Date: 2026-08-29
 Maintainer acceptance: **accepted on 2026-08-29** for the Unified Shell architecture and the production docsite
 inheritance boundary recorded below.
 
-Amends: [ADR-0001](0001-project-orrery-self-hosting.md),
-[ADR-0004](0004-platform-neutral-core-and-adapter-boundaries.md),
-[ADR-0006](0006-broker-only-docsite-provider-gateway.md),
-[ADR-0008](0008-local-first-team-coordination-and-cross-machine-metadata.md)
+Amends: [ADR-0001](0001-project-orrery-self-hosting.md), [ADR-0004](0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0006](0006-broker-only-docsite-provider-gateway.md), [ADR-0008](0008-local-first-team-coordination-and-cross-machine-metadata.md)
 
 Preserves: [ADR-0009](0009-authority-meta-model-and-semantic-conformance.md),
 [ADR-0014](0014-dynamic-workstream-succession-contract.md)
