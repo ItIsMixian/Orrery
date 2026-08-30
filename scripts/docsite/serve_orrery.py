@@ -34,9 +34,15 @@ if str(HERE.parent) not in sys.path:
 
 import build_unified_observatory  # noqa: E402
 import serve as legacy_serve  # noqa: E402
+from project_orrery_cli.operating_rules import preflight_repository_query  # noqa: E402
 from project_orrery_core.maintenance import maintenance_status  # noqa: E402
 from project_orrery_observatory.unified_observatory import capability_document  # noqa: E402
 from serve_team_observatory import TeamUIState  # noqa: E402
+
+
+legacy_serve.docsite_qa.configure_authority_route_preflight(
+    lambda question: preflight_repository_query(ROOT, question, fact_scope="candidate")
+)
 
 
 COOKIE_NAME = "orrery_local_control"
@@ -146,12 +152,14 @@ def _logger(identity: RuntimeIdentity, *, console: bool) -> logging.Logger:
 class UnifiedState:
     def __init__(
         self, *, page: str, registrations, authority_status, graph_provider_payload,
+        fact_rules_projection,
         identity, logger,
     ):
         self.page = legacy_serve.inject_qa(page).encode("utf-8")
         self.registrations = tuple(registrations)
         self.authority_status = authority_status
         self.graph_provider_payload = dict(graph_provider_payload or {})
+        self.fact_rules_projection = dict(fact_rules_projection or {})
         self.identity = identity
         self.logger = logger
         self.control_token = secrets.token_urlsafe(32)
@@ -297,6 +305,9 @@ class UnifiedHandler(legacy_serve.Handler):
             if path == "/api/v1/authority/status":
                 self._send_json(HTTPStatus.OK, self.server.state.authority_status or {"status": "unavailable"})
                 return
+            if path == "/api/v1/authority/operating-rules":
+                self._send_json(HTTPStatus.OK, self.server.state.fact_rules_projection)
+                return
             if path == "/api/v1/personal/status":
                 self._send_json(HTTPStatus.OK, {"status": "available", "authority": "host-local-projection"})
                 return
@@ -436,12 +447,13 @@ def main(argv: list[str] | None = None) -> int:
     server: UnifiedServer | None = None
     try:
         identity.recover()
-        page, _stats, registrations, authority, graph_provider_payload = build_unified_observatory.render_unified_site(
+        page, _stats, registrations, authority, graph_provider_payload, fact_rules_projection = build_unified_observatory.render_unified_site(
             ROOT, mode="dynamic", ai_available=legacy_serve.PROVIDER is not None,
         )
         state = UnifiedState(
             page=page, registrations=registrations, authority_status=authority,
             graph_provider_payload=graph_provider_payload, identity=identity, logger=logger,
+            fact_rules_projection=fact_rules_projection,
         )
         server = _bind_server(state, arguments.port)
         port = int(server.server_address[1])

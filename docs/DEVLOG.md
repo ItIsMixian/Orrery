@@ -724,3 +724,12 @@
 - 维护者在真实浅色页面指出少量节点仍被 disconnected component 的整行空白过度拉开；从 exact clean `4e62dba` 登记 Git-private `W7.2.3-workstream-graph-density-correction` 后写入，根 PROGRESS/HANDOFF 未修改。
 - Observatory 0.1.16 保持 248×104px 卡片与可读字号，将 rank 通道从 112px 收至 88px，并用 44px 显式 component gap 替代额外 138px synthetic row；canvas 高度改由最后一个真实节点决定。
 - 真实 self-host 14 节点／7 边桌面测量为 component gap 44px、rank gap 88px、0 node overlap、0 route/card crossing；390px 继续显示同事实 ledger，console 为空。Core facts、折叠语义、只读与所有执行安全边界未改变。
+
+## 2026-08-30 — A4 Portable Operating Rules & Authority Route Preflight Candidate
+
+- 从 exact `codex/u1-u2-integration-baseline@3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3` 建立独立 A4 worktree，并在首次作者／产品写入前登记 Git-private `A4-portable-meta-rules-bootstrap-contract`。ADR-0018 明确 amends/extends ADR-0009；本任务扩展既有 Authority Meta Model 的 portable inventory 与 consumer wiring，不创建第二元层或第二 evaluator owner。
+- Core 0.1.18 冻结 `orrery-operating-rules-v1` dependency-free inventory/schema/read-only projection，并新增 provider-neutral `authority-route-preflight-v1`、四轴 claim 与 Novelty/Absence Gate。CLI 0.1.22 和 Harness JSON 0.1.2 只读输出 versioned receipts；普通 Skill/bootstrap 先消费同一规则版本再读目标项目 AGENTS/Seed/State，Skill-only 宿主仍诚实标为 advisory。
+- Unified Observatory 0.1.17 不增加第九导航：既有 `authority` 身份重构为“事实与规则”，分列目标项目原则、Orrery 工作规则和默认折叠的事实解释状态。root Ask Docs 在选证据前调用 Core/CLI preflight；静态与动态投影均无编辑、批准、凭据或执行权。
+- 泛化 corpus 覆盖真实 A4 failure 与另外 9 个 subsystem 场景，以及 stale State、断链 ADR、unindexed concept、unknown schema/version、tamper 和伪造 Agent assertion。临时新项目显示两层；brownfield 默认安装和实际 `--upgrade-tools` 逐字节保留作者 AGENTS/Seed/State。
+- focused、wheel install、integrated validator、repository/release dry-build gates、CI6 Fast 84/84 和 Checkpoint 89/89 均通过。真实 in-app 浏览器在 1440×900 与 390×844 验证单一入口、分层、渐进披露、零 Authority controls、无横向溢出和空 warning/error console；独立 `63204` 服务已停止，中央 `63203` 未触碰。
+- public v0.2.0 tag/asset/checksum/manifest、默认 public consumer、main 与 Release 均未改变；跨宿主强制 pre-model receipt 仍需各 Adapter 证明真实 hook，纯 SKILL.md 不能宣称机械保证。根 PROGRESS/HANDOFF 未修改，留给中央整合者收口。

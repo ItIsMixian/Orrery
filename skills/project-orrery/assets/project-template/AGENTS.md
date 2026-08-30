@@ -2,6 +2,8 @@
 
 This file is the mandatory entry point after a new session or context reset. It tells collaborators what to read first, where current facts live, and which boundaries must not be crossed.
 
+Orrery has two distinct layers（两层）: the installed Skill/Core provides versioned **Orrery 工作规则 (Orrery operating rules)**, while `docs/core/principles.md` is this project's author-owned **项目 Seed (Product Seed)**. Operating rules are not project facts or Seed and never replace this project's authority chain. A supporting Agent should consume the matching operating-rules inventory before entering this file; without a verified host hook that bootstrap remains advisory.
+
 ## Read before touching files
 
 1. `AGENTS.md`
@@ -23,6 +25,7 @@ This file is the mandatory entry point after a new session or context reset. It 
 - Update `docs/HANDOFF.md` when pausing, handing off, or discovering a repeatable pitfall.
 - Add an ADR for a durable cross-module constraint; amend or supersede earlier ADRs instead of rewriting accepted history.
 - Never edit `docs/_site/index.html`; it is generated.
+- Keep semantic/decision existence, implementation/validation, distribution/consumer wiring, and public/default/release as separate claims. Missing templates or consumer wiring do not prove a rule or decision is absent.
 
 ## project structure
 

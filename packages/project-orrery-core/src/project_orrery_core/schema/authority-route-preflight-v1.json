@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schemas/authority-route-preflight-v1.json",
+  "title": "Authority Route Preflight receipt v1",
+  "type": "object",
+  "required": [
+    "schema_version", "contract_type", "registry", "query", "selection",
+    "selected_governing_sources", "excluded_lower_authority_sources",
+    "claim_dimensions", "negative_evidence", "novelty_absence_gate",
+    "guarantees", "receipt_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_type": {"const": "authority-route-preflight-v1"},
+    "registry": {"type": "object"},
+    "query": {"type": "object"},
+    "selection": {"type": "object"},
+    "selected_governing_sources": {"type": "array"},
+    "excluded_lower_authority_sources": {"type": "array"},
+    "claim_dimensions": {
+      "type": "object",
+      "required": ["semantic_decision", "implementation", "distribution_consumer", "public_default_release"],
+      "properties": {
+        "semantic_decision": {"$ref": "#/$defs/claim"},
+        "implementation": {"$ref": "#/$defs/claim"},
+        "distribution_consumer": {"$ref": "#/$defs/claim"},
+        "public_default_release": {"$ref": "#/$defs/claim"}
+      },
+      "additionalProperties": false
+    },
+    "negative_evidence": {"type": "object"},
+    "novelty_absence_gate": {"type": "object"},
+    "guarantees": {"type": "object"},
+    "receipt_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "required": ["status", "reason_codes", "source_ids", "fact_scope"],
+      "properties": {
+        "status": {"enum": ["present", "absent", "unknown"]},
+        "reason_codes": {"type": "array", "items": {"type": "string"}},
+        "source_ids": {"type": "array", "items": {"type": "string"}},
+        "fact_scope": {"enum": ["canonical", "candidate", "worktree", "local-only", "historical", "unknown"]},
+        "validation_status": {"enum": ["present", "absent", "unknown"]},
+        "public_status": {"enum": ["present", "absent", "unknown"]},
+        "default_status": {"enum": ["present", "absent", "unknown"]},
+        "release_status": {"enum": ["present", "absent", "unknown"]}
+      },
+      "additionalProperties": false
+    }
+  }
+}

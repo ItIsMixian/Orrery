@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0018: Portable operating rules and Authority Route Preflight](0018-portable-operating-rules-and-authority-route-preflight.md) — Accepted; amends/extends ADR-0009 with a versioned portable-rules inventory, provider-neutral fact-route receipt, four independent claim axes and novelty/absence gate while preserving Core as the sole semantics owner and keeping all consumers read-only/unreleased.
 - [ADR-0017: Workstream relation capture, stage gates and confirmation authority](0017-workstream-relation-capture-and-confirmation-authority.md) — Accepted; permits future automatic recording of mechanically verified `derived_from`, adds four `depends_on` gates with task-owner/integrator confirmation, restricts `absorbs` to human integrators and makes central Conductor proposal-only; W7.3 is not implemented.
 - [ADR-0016: Unified Observatory Shell and single local entry](0016-unified-observatory-shell-and-single-local-entry.md) — Accepted; gives users one visible launcher, URL and navigation shell while allowing supervised hidden helpers, preserving the existing docsite experience and keeping static, Team, Authority and destructive-action boundaries independent.
 - [ADR-0015: Orrery brand and compatibility contract](0015-orrery-brand-and-compatibility-contract.md) — Accepted; separates the Orrery display brand from stable technical/protocol identities, fixes the R4 thin-alias and first-new-release asset defaults, preserves v0.2.0 history and the full 0.3.x compatibility window, and blocks Python `orrery` namespace takeover.
@@ -35,7 +36,7 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-- No active proposal is awaiting maintainer review; ADR-0017 is Accepted, while W7.3 implementation evidence remains separate.
+- No active proposal is awaiting maintainer review; ADR-0018 is Accepted, while A4 implementation/validation/release claims remain separate.
 - `PO-DEC-AUTH-002` was integrated as ADR-0011.
 
 Concurrent branches use stable IDs under `docs/decisions/proposals/` until the maintainer accepts a proposal and an integrator allocates the next canonical ADR number.

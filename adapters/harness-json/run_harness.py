@@ -13,6 +13,16 @@ from typing import Any, Mapping
 
 SCHEMA_VERSION = 1
 COMMAND_ARGUMENTS: dict[str, dict[str, type | tuple[type, ...]]] = {
+    "operating-rules-inspect": {
+        "inventory_version": int,
+        "inventory_file": str,
+    },
+    "authority-route-preflight": {
+        "target": str,
+        "query": str,
+        "query_class": str,
+        "fact_scope": str,
+    },
     "scaffold": {
         "target": str,
         "title": str,
@@ -32,7 +42,13 @@ COMMAND_ARGUMENTS: dict[str, dict[str, type | tuple[type, ...]]] = {
         "cache_hours": (int, float),
     },
 }
-REQUIRED_ARGUMENTS = {"scaffold": {"target"}, "validate": {"target"}, "check-update": set()}
+REQUIRED_ARGUMENTS = {
+    "operating-rules-inspect": set(),
+    "authority-route-preflight": {"target", "query"},
+    "scaffold": {"target"},
+    "validate": {"target"},
+    "check-update": set(),
+}
 SANITIZED_ENVIRONMENT = {
     "CODEX_HOME",
     "CODEX_CONFIG",
@@ -52,6 +68,17 @@ RESPONSE_KEYS = {
     "errors",
 }
 COMMAND_DATA_REQUIRED = {
+    "operating-rules-inspect": {
+        "schema_version", "contract_type", "requested_inventory_version",
+        "supported_inventory_versions", "status", "read_only", "unknown",
+        "reason", "inventory", "guarantees",
+    },
+    "authority-route-preflight": {
+        "schema_version", "contract_type", "registry", "query", "selection",
+        "selected_governing_sources", "excluded_lower_authority_sources",
+        "claim_dimensions", "negative_evidence", "novelty_absence_gate",
+        "guarantees", "receipt_hash",
+    },
     "scaffold": {
         "target",
         "dry_run",
@@ -159,8 +186,15 @@ def load_request(path: Path | None) -> dict[str, Any]:
 def cli_arguments(request: Mapping[str, Any]) -> list[str]:
     command = str(request["command"])
     values = request["arguments"]
-    arguments = [command]
+    if command == "operating-rules-inspect":
+        arguments = ["operating-rules", "inspect"]
+    elif command == "authority-route-preflight":
+        arguments = ["operating-rules", "route"]
+    else:
+        arguments = [command]
     flag_order = {
+        "operating-rules-inspect": ("inventory_version", "inventory_file"),
+        "authority-route-preflight": ("target", "query", "query_class", "fact_scope"),
         "scaffold": ("target", "title", "upgrade_tools", "dry_run"),
         "validate": ("target", "build", "require_integrated"),
         "check-update": ("target", "manifest_url", "manifest_file", "cache_hours", "offline"),

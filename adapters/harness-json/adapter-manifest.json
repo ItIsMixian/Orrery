@@ -3,7 +3,7 @@
   "adapter": {
     "name": "Orrery Harness JSON Adapter",
     "distribution": "project-orrery-harness-json-adapter",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "adapter_api_version": 1,
     "support_status": "experimental"
   },

@@ -173,6 +173,7 @@ SHELL_CSS = r"""
 .uo-stop-global{white-space:nowrap;color:var(--warn)}.uo-disconnected{position:fixed;z-index:400;left:50%;top:calc(var(--hh) + 16px);transform:translateX(-50%);width:min(680px,calc(100vw - 24px));padding:13px 16px;border:1px solid var(--warn);border-radius:10px;background:var(--bg2);box-shadow:0 18px 55px rgba(0,0,0,.45);color:var(--fg);font-size:12px}.uo-disconnected b{display:block;margin-bottom:3px}.uo-disconnected span{color:var(--mut)}
 .uo-boundary{list-style:none;margin:0;padding:0}.uo-boundary li{padding:9px 0;border-bottom:1px solid var(--line);font-size:11.5px}.uo-boundary li:last-child{border-bottom:0}.uo-boundary b{display:block}.uo-boundary span{color:var(--mut)}
 .uo-authority dl{display:grid;grid-template-columns:140px 1fr;gap:7px 12px;margin:14px 0}.uo-authority dt{color:var(--mut);font-size:11px}.uo-authority dd{margin:0;font:12px/1.5 "Cascadia Code",Consolas,monospace;overflow-wrap:anywhere}
+.uo-authority-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:16px}.uo-layer{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:14px;min-width:0}.uo-layer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.uo-layer-head p{font-size:11px}.uo-source{flex:none;color:var(--mut);font:700 9px/1.4 "Cascadia Code",Consolas,monospace;border:1px solid var(--line);border-radius:999px;padding:3px 7px}.uo-principles,.uo-rules{list-style:none;margin:0;padding:0}.uo-principles li,.uo-rule{padding:9px 0;border-top:1px solid var(--line)}.uo-principles li:first-child,.uo-rule:first-child{border-top:0}.uo-principles b,.uo-rule b{display:block;color:var(--strong);font-size:12px}.uo-principles span,.uo-rule p{display:block;color:var(--mut);font-size:11px;margin:3px 0 0}.uo-rule summary{cursor:pointer;list-style:none}.uo-rule summary::-webkit-details-marker{display:none}.uo-rule summary:after{content:'＋';float:right;color:var(--mut)}.uo-rule[open] summary:after{content:'－'}.uo-rule dl{grid-template-columns:105px 1fr;margin:9px 0 0;padding:9px;background:var(--bg2);border-radius:7px}.uo-fact-status{margin-top:14px}.uo-fact-status>summary{cursor:pointer;color:var(--strong);font-weight:700}.uo-layer-note{margin-top:12px!important;padding-top:10px;border-top:1px solid var(--line)}
 .uo-unavailable{border-left:3px solid var(--warn)}
 .toc:empty{display:none}
 .sidebar[data-unified-sidebar]{overscroll-behavior:contain;scrollbar-gutter:stable}.uo-rail{display:block;min-width:0}
@@ -185,7 +186,7 @@ SHELL_CSS = r"""
  .uo-mobile-toggle{display:inline-grid;place-items:center}.sidebar{display:none!important}.sidebar-resizer{display:none!important}
  body.uo-nav-open{overflow:hidden}body.uo-nav-open .sidebar{display:block!important;position:fixed;z-index:180;left:0;top:var(--hh);bottom:0;width:min(330px,88vw);height:auto;box-shadow:20px 0 50px rgba(0,0,0,.45)}
  body.uo-nav-open .uo-backdrop{display:block;position:fixed;z-index:170;inset:var(--hh) 0 0;background:rgba(0,0,0,.55)}
- .content{padding:0 18px}.uo-grid{grid-template-columns:1fr}.uo-caps{grid-template-columns:1fr}.top .sub{display:none}#q{width:min(42vw,190px)}
+ .content{padding:0 18px}.uo-grid,.uo-authority-grid{grid-template-columns:1fr}.uo-caps{grid-template-columns:1fr}.top .sub{display:none}#q{width:min(42vw,190px)}
 }
 @media(max-width:460px){header.top{gap:6px;padding:0 8px}.top h1{max-width:82px;overflow:hidden;text-overflow:ellipsis}.rightgrp{gap:5px}.tbtn{padding:6px 7px}#q{display:none}.uo-stop-global{font-size:10px}.uo-authority dl{grid-template-columns:1fr}.page{padding-top:20px}}
 @media(prefers-reduced-motion:reduce){.uo-panel *,.uo-documents>.nav-title .nav-chev{transition:none!important;scroll-behavior:auto!important}}
@@ -234,9 +235,45 @@ def _status_page(identity: str, label: str, reason: str) -> str:
     )
 
 
-def _authority_page(status: Mapping[str, Any] | None, reason: str | None) -> str:
+def _authority_page(
+    status: Mapping[str, Any] | None,
+    reason: str | None,
+    projection: Mapping[str, Any] | None,
+) -> str:
+    project_layer = projection.get("project_principles", {}) if isinstance(projection, Mapping) else {}
+    rules_layer = projection.get("orrery_operating_rules", {}) if isinstance(projection, Mapping) else {}
+    principles = project_layer.get("items", []) if isinstance(project_layer, Mapping) else []
+    rules = rules_layer.get("rules", []) if isinstance(rules_layer, Mapping) else []
+    principle_items = "".join(
+        '<li><b>%s</b><span>%s</span></li>' % (
+            _esc(item.get("title", "项目原则")), _esc(item.get("summary", "")),
+        )
+        for item in principles if isinstance(item, Mapping)
+    ) or '<li><b>当前暂不可用</b><span>目标项目 Seed 无法安全读取。</span></li>'
+    strength_labels = {"must": "必须", "must-not": "禁止", "should": "建议"}
+    enforcement_labels = {
+        "enforceable": "可机械检查", "partially-enforceable": "部分机械检查",
+        "human-judgment": "需要人工判断",
+    }
+    rule_items = "".join(
+        '<details class="uo-rule"><summary><b>%s</b><p>%s · %s</p></summary><dl>'
+        '<dt>rule ID / version</dt><dd>%s / %s</dd>'
+        '<dt>source</dt><dd>%s</dd>'
+        '<dt>enforcement</dt><dd>%s</dd>'
+        '<dt>failure / Unknown</dt><dd>%s / %s</dd>'
+        '</dl></details>' % (
+            _esc((item.get("summary") or {}).get("zh-CN", item.get("message_key", "工作规则"))),
+            _esc(strength_labels.get(str(item.get("strength")), item.get("strength", "Unknown"))),
+            _esc(enforcement_labels.get(str(item.get("mechanical_enforcement")), item.get("mechanical_enforcement", "Unknown"))),
+            _esc(item.get("rule_id", "Unknown")), _esc(item.get("rule_version", "Unknown")),
+            _esc("；".join(str(source.get("path", "")) for source in item.get("sources", []) if isinstance(source, Mapping))),
+            _esc(item.get("mechanical_enforcement", "Unknown")),
+            _esc(item.get("failure_behavior", "Unknown")), _esc(item.get("unknown_behavior", "Unknown")),
+        )
+        for item in rules if isinstance(item, Mapping)
+    ) or '<div class="uo-rule"><b>当前暂不可用</b><p>工具规则 inventory 缺失或版本不兼容；已保持只读/Unknown。</p></div>'
     if status is None:
-        return _status_page("authority", NAVIGATION_LABELS["authority"], reason or "当前无法读取完整的权威状态。")
+        status = {}
     selection = status.get("selection", {}) if isinstance(status.get("selection"), Mapping) else {}
     readiness = status.get("readiness", {}) if isinstance(status.get("readiness"), Mapping) else {}
     rollout = status.get("rollout_plan", {}) if isinstance(status.get("rollout_plan"), Mapping) else {}
@@ -244,15 +281,21 @@ def _authority_page(status: Mapping[str, Any] | None, reason: str | None) -> str
     return (
         '<article class="page wide" id="authority" data-kind="authority-managed-consumer" '
         'data-authority="derived-read-only" data-contract="authority-managed-consumer-v1">'
-        '<section class="uo-panel uo-authority"><div class="uo-topline"><span class="uo-live static"></span>权威状态 · 只读</div>'
-        '<h2>权威状态</h2><p>这里只呈现受限的当前状态，不会选择、启用或拼接项目权威事实。</p>'
-        f'<p style="margin-top:10px">当前读取器：{_esc(selection.get("active_consumer", "待确认"))}；准备状态：{_esc(display_status(readiness.get("status", "unknown")))}</p>'
+        '<section class="uo-panel uo-authority"><div class="uo-topline"><span class="uo-live static"></span>事实与规则 · 只读投影</div>'
+        '<h2>事实与规则</h2><p>项目自己的原则与 Orrery 工具规则来自不同层；文字相似也不会让工具规则变成项目事实。</p>'
+        '<div class="uo-authority-grid"><section class="uo-layer"><div class="uo-layer-head"><div><h3>项目原则</h3><p>目标项目选择的方向与约束</p></div><span class="uo-source">来源：项目文档</span></div>'
+        f'<ol class="uo-principles">{principle_items}</ol></section>'
+        '<section class="uo-layer"><div class="uo-layer-head"><div><h3>Orrery 工作规则</h3><p>同版本工具在读取、判断与维护时遵循的规则</p></div><span class="uo-source">来源：工具版本</span></div>'
+        f'<div class="uo-rules" data-operating-rules-version="{_esc(rules_layer.get("inventory_version", "Unknown") if isinstance(rules_layer, Mapping) else "Unknown")}">{rule_items}</div>'
+        '<p class="uo-layer-note">这些规则不会写入或批准目标项目的 Seed、State 与发布事实。</p></section></div>'
+        f'<details class="uo-fact-status"><summary>事实解释状态 · {_esc(display_status(readiness.get("status", "unknown")))}</summary>'
+        f'<p style="margin-top:10px">当前读取器：{_esc(selection.get("active_consumer", "待确认"))}；{_esc(reason or "技术状态默认折叠，不影响上方两层来源边界。")}</p>'
         f'<details><summary>{TECHNICAL_DETAILS_LABEL}</summary><dl>'
         f'<dt>requested / effective</dt><dd>{_esc(selection.get("requested", "Unknown"))} / {_esc(selection.get("effective", "Unknown"))}</dd>'
         f'<dt>production switched</dt><dd>{_esc(selection.get("production_behavior_switched", False))}</dd>'
         f'<dt>rollout plan</dt><dd>{_esc(rollout.get("plan_id", "Unavailable"))}</dd>'
         f'<dt>rollback plan</dt><dd>{_esc(rollback.get("plan_id", "Unavailable"))}</dd>'
-        '</dl></details><p>AI 与团队协调服务都没有权威选择权；不完整结果不会进入页面。</p></section></article>'
+        '</dl></details><p>AI、页面与团队协调服务都没有编辑、批准、执行或权威选择权。</p></details></section></article>'
     )
 
 
@@ -296,6 +339,7 @@ def inject_unified_shell(
     mode: str,
     authority_status: Mapping[str, Any] | None = None,
     authority_reason: str | None = None,
+    fact_rules_projection: Mapping[str, Any] | None = None,
 ) -> str:
     if mode not in {"static", "dynamic"}:
         raise ValueError("shell mode must be static or dynamic")
@@ -304,7 +348,7 @@ def inject_unified_shell(
     nav_marker = '<div class="nav-top">'
     if content_marker not in page or nav_marker not in page or "</style>" not in page:
         raise ValueError("base docsite composition markers are missing")
-    pages = [_overview_page(items, mode=mode), _authority_page(authority_status, authority_reason)]
+    pages = [_overview_page(items, mode=mode), _authority_page(authority_status, authority_reason, fact_rules_projection)]
     existing = {marker for marker in ("personal-observatory", "team-observatory", "workstream-relation-graph", "workspace-maintenance") if f'id="{marker}"' in page}
     for item in items:
         target = {

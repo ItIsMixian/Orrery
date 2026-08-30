@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-30 A4 Portable Operating Rules & Authority Route Preflight](2026-08-30-a4-portable-operating-rules-and-authority-route-preflight.md) — validates the existing Meta Model extension across Core inventory/schema, generalized four-axis route/absence receipts, Skill/CLI/Harness/Ask Docs wiring, two-layer install preservation and the existing Authority navigation projection without public/default/release transition.
 - [2026-08-29 U2.2／W7.2 Unified Observatory Joint Acceptance Candidate](2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md) — integrates the final Graph and navigation/Maintenance UX lines, records combined Fast and real desktop/mobile browser PASS, and preserves the combined Checkpoint 90-second budget timeout for maintainer review.
 - [2026-08-29 U2.2 Unified Navigation & Workspace Maintenance UX](2026-08-29-u2-2-unified-navigation-workspace-maintenance-ux.md) — validates one continuous sidebar, dense 15+ worktree maintenance queue, safe removal discoverability, folded technical policy and 1280/1440/390px behavior without changing Core eligibility or performing deletion.
 - [2026-08-29 ADR-0017 Workstream Relation Capture Decision Contract](2026-08-29-w7-3-relation-capture-decision-contract.md) — validates accepted automatic-lineage, gate-aware dependency and human integrator authority semantics at documentation level only; W7.3 implementation has not started.

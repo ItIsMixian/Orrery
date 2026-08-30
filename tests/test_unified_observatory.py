@@ -127,13 +127,14 @@ class UnifiedRuntimeTests(unittest.TestCase):
             "core_relation_provider",
             return_value=synthetic_graph,
         ):
-            page, _stats, registrations, authority, graph_payload = build_unified_observatory.render_unified_site(
+            page, _stats, registrations, authority, graph_payload, fact_rules_projection = build_unified_observatory.render_unified_site(
                 ROOT, mode="dynamic",
             )
         cls.rendered_page = page
         state = serve_orrery.UnifiedState(
             page=page, registrations=registrations, authority_status=authority,
             graph_provider_payload=graph_payload,
+            fact_rules_projection=fact_rules_projection,
             identity=cls.identity, logger=cls.logger,
         )
         cls.server = serve_orrery.UnifiedServer(("127.0.0.1", 0), state)
@@ -192,6 +193,17 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertEqual(text.count('data-project-document-tree'), 1)
         self.assertNotIn('.uo-doc-tree{overflow', text)
         self.assertIn("data-nav-identity=\"overview\"", text)
+        self.assertEqual(text.count('data-nav-identity="authority"'), 1)
+        self.assertNotIn('data-nav-identity="operating-rules"', text)
+        self.assertIn("事实与规则", text)
+        self.assertIn("项目原则", text)
+        self.assertIn("Orrery 工作规则", text)
+        self.assertIn("事实解释状态", text)
+        self.assertIn("来源：项目文档", text)
+        self.assertIn("来源：工具版本", text)
+        self.assertIn("ORR-OP-001", text)
+        self.assertNotIn("编辑规则", text)
+        self.assertNotIn("批准规则", text)
         targets = {"overview": "overview", "personal": "personal-observatory", "team": "team-observatory", "workstreams": "workstream-relation-graph", "maintenance": "workspace-maintenance"}
         for identity, label in {
             "overview": "项目总览", "personal": "个人工作台", "team": "团队协作",
@@ -275,6 +287,16 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertFalse(authority["selection"]["production_behavior_switched"])
         self.assertFalse(authority["guarantees"]["ai_may_select"])
 
+        status, _headers, body = self.request("GET", "/api/v1/authority/operating-rules")
+        facts_rules = json.loads(body)
+        self.assertEqual(status, 200)
+        self.assertEqual(facts_rules["contract_type"], "authority-facts-and-rules-projection-v1")
+        self.assertTrue(facts_rules["read_only"])
+        self.assertFalse(facts_rules["creates_project_facts"])
+        self.assertFalse(facts_rules["writes_target_project"])
+        self.assertFalse(facts_rules["layer_boundary"]["merged"])
+        self.assertEqual(facts_rules["orrery_operating_rules"]["inventory_id"], "orrery-operating-rules-v1")
+
         self.assertIn("window.confirm('只删除工作区，保留分支和提交。确认移除这个工作区？')", self.rendered_page)
         cookie = self.cookie()
         status, _headers, _body = self.request(
@@ -325,6 +347,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
                 registrations=self.server.state.registrations,
                 authority_status=self.server.state.authority_status,
                 graph_provider_payload=self.server.state.graph_provider_payload,
+                fact_rules_projection=self.server.state.fact_rules_projection,
                 identity=identity,
                 logger=logger,
             )

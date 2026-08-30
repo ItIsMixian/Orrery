@@ -34,6 +34,7 @@ Updated: 2026-08-30
 - Collaboration suites：W1/W2 session／Scope／finding、W3 review/integration/cleanup、Personal／Team、LAN harness、lineage、maintenance、relation graph 与 apply/undo/recovery contract。
 - Unified Observatory suite：versioned registration/discovery、collision/escalation fail-closed、quarantine、static boundary、single-URL runtime、HTTP security、consumer non-escalation、helper lifecycle 与 legacy rollback。
 - Documentation governance suite：provider-neutral finding schema、11 类正负 synthetic fixture、soft-budget advisory 与零写入／零网络边界。
+- A4 suite：Core inventory/schema/digest/unknown-version/tamper、Skill/Core/template drift、CLI/Harness receipt、10 个跨 subsystem 四轴 conformance 场景、route mutation/absence gate、Ask Docs preflight、new/brownfield byte preservation 与 Unified Authority static/dynamic projection。
 - Context-routing suites：24-task corpus、Pilot 002–009 frozen control packages、读取代理、JSONL audit、retention、Oracle v0.2 与 contamination/failure controls。
 - Repository gates：integrated installation、isolated docsite、Markdown links、forbidden artifacts、release dry build、workflow/static contract、secret boundary 与 `git diff --check`。
 
@@ -70,3 +71,4 @@ Updated: 2026-08-30
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。
 - Claude 认证后真实模型路由、真实双机 LAN、self-host relation apply、自动 worktree removal 与 OS scheduler 没有验收证据。
 - Unified Observatory／Authority 没有默认 production consumer 或公开 release evidence；Documentation D2 scanner／CLI 尚未实现。
+- 纯 Skill 指令仍没有强制 pre-model hook；A4 只机械保证 Core/CLI/Harness 与 root Unified Ask Docs 路径，其他宿主保持 advisory/Unknown。

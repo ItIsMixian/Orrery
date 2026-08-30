@@ -6,11 +6,44 @@
   "required": ["schema_version", "command", "arguments"],
   "properties": {
     "schema_version": {"const": 1},
-    "command": {"enum": ["scaffold", "validate", "check-update"]},
+    "command": {"enum": ["operating-rules-inspect", "authority-route-preflight", "scaffold", "validate", "check-update"]},
     "arguments": {"type": "object"}
   },
   "additionalProperties": false,
   "allOf": [
+    {
+      "if": {"properties": {"command": {"const": "operating-rules-inspect"}}},
+      "then": {
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "properties": {
+              "inventory_version": {"type": "integer", "minimum": 1},
+              "inventory_file": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"command": {"const": "authority-route-preflight"}}},
+      "then": {
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "required": ["target", "query"],
+            "properties": {
+              "target": {"type": "string", "minLength": 1},
+              "query": {"type": "string", "minLength": 1, "maxLength": 1000},
+              "query_class": {"enum": ["existence", "implementation", "validation", "distribution", "release", "visibility", "novelty-absence", "general-fact"]},
+              "fact_scope": {"enum": ["canonical", "candidate", "worktree", "local-only", "historical", "unknown"]}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
     {
       "if": {"properties": {"command": {"const": "scaffold"}}},
       "then": {

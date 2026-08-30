@@ -1,8 +1,8 @@
 # 发布与工具链 State
 
-Updated: 2026-08-29
+Updated: 2026-08-30
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0018](../decisions/0018-portable-operating-rules-and-authority-route-preflight.md)
 
 ## 当前公开发布
 
@@ -14,14 +14,15 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前 Canonical source
 
 - protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- W7.2.3／U2.2 integrated Candidate 声明 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16；Core／CLI 与关系 schema/facts 不变，Observatory 组合最终 Graph 可读性／交互与单一导航／密集 Maintenance 展示。组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
-- Codex、Harness JSON、Claude Code 与 DeepSeek Harness Adapter source 均为 0.1.1、`experimental`／`unreleased`。每个 Adapter 有独立 manifest、归档、生命周期和 runtime evidence，不能互相外推。
+- A4 Candidate 声明 Core 0.1.18、CLI 0.1.22、Observatory 0.1.17、Harness JSON Adapter 0.1.2；Core API、CLI/Harness JSON schema version 仍为 1，组件总状态为 `unreleased`。
+- Codex、Claude Code 与 DeepSeek Harness Adapter source 为 0.1.1；Harness JSON 因 A4 inspect/route 增至 0.1.2。它们均为 `experimental`／`unreleased`，且 runtime evidence 不能互相外推。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。
 - Claude Code 2.1.87 只完成 Plugin／Skill 发现与认证前失败关闭；没有成功模型路由。Harness JSON 证明 subprocess JSON 合约，不证明第三方 Agent runtime 兼容。
 - Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 local release-candidate gate 已进入 source；公开 manifest、standalone installer 和默认 managed Observatory 尚未声明或启用模型 1。
 - Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
 - Unified Observatory 已有本地 W7.2.3／U2.2 joint acceptance Candidate，提供单一连续中文导航、全局 stop、密集 Maintenance、旧证据降级与 W7.1 legacy/archive graph 的最终展示修正。仍没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
+- 发布源码中的 Skill 已携带 A4 inventory 投影与 bootstrap/preflight 指令，但 `release-manifest.json`、tag、ZIP、checksum 和 phase-0 fixture 未改；因此“source 分发已接线”与“公开 v0.2.0 已发布”分别为 present/absent。
 
 ## CI 与推广门
 

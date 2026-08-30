@@ -14,6 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
+- [2026-08-30 A4 Portable Operating Rules & Authority Route Preflight](plans/2026-08-30-a4-portable-operating-rules-and-authority-route-preflight.md) — active source-only Candidate extending the existing Meta Model with Core inventory/route contracts, Skill/CLI/Harness/Ask Docs consumer wiring and the existing Authority UI projection; public/default/release transition remains separate.
 - [2026-08-29 U2.2 Unified Navigation & Workspace Maintenance UX](plans/2026-08-29-u2-2-unified-navigation-workspace-maintenance-ux.md) — implemented and integrated into the local acceptance Candidate: one continuous rail and dense, safe Maintenance presentation; no Core eligibility or deletion semantics changed.
 - [2026-08-29 W7.2 Workstream Graph Readability & Progressive Disclosure](plans/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md) — W7.2.1–3 implementation integrated into the local acceptance Candidate; readable ranks, engineering routes, chain-local disclosure, canvas interaction and themed scrollbars remain read-only presentation.
 - [2026-08-29 W7.3 Workstream Relation Capture & Confirmation](plans/2026-08-29-w7-3-workstream-relation-capture.md) — planned implementation of automatic exact-base lineage, four dependency gates, role-bound human confirmation, absorbs authority and local relation inbox; not started.

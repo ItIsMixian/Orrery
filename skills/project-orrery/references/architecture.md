@@ -1,5 +1,11 @@
 # Orrery architecture
 
+## Portable operating rules and project content
+
+`orrery-operating-rules-v1` is a versioned projection of the existing Authority Meta Model. It defines cross-project bootstrap and safety behavior, but it is not a new authority layer, a target-project fact, or the target's Seed. Consumers read those rules first, then follow the target project's own AGENTS index, State, governing ADR/Design, implementation and evidence.
+
+Existence, implementation/validation, distribution/consumer wiring, and public/default/release are independent claim axes. A template omission cannot prove a semantic absence. A novelty or absence answer requires a bounded Authority Route Preflight receipt; incomplete routes remain Unknown.
+
 ## Authority chain
 
 The primary chain is:

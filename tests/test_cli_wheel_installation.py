@@ -78,6 +78,22 @@ class CliWheelInstallationTests(unittest.TestCase):
             for relative in component["managed_tools"]:
                 self.assertIn(f"project_orrery_observatory/assets/{relative}", wheel_entries)
 
+            core_wheel = next(wheelhouse.glob("project_orrery_core-*.whl"))
+            with zipfile.ZipFile(core_wheel) as bundle:
+                core_entries = set(bundle.namelist())
+            self.assertIn(
+                "project_orrery_core/data/orrery-operating-rules-v1.json",
+                core_entries,
+            )
+            self.assertIn(
+                "project_orrery_core/schema/orrery-operating-rules-v1.json",
+                core_entries,
+            )
+            self.assertIn(
+                "project_orrery_core/schema/authority-route-preflight-v1.json",
+                core_entries,
+            )
+
             runtime = root / "runtime"
             venv.EnvBuilder(with_pip=True).create(runtime)
             scripts = runtime / ("Scripts" if os.name == "nt" else "bin")
@@ -104,6 +120,15 @@ class CliWheelInstallationTests(unittest.TestCase):
             self.assertNotIn(str(staged_repository).replace("\\", "/").lower(), asset_probe.stdout.replace("\\", "/").lower())
 
             cli = scripts / ("project-orrery.exe" if os.name == "nt" else "project-orrery")
+            operating_rules = run(
+                [str(cli), "operating-rules", "inspect", "--json"],
+                cwd=root,
+                env=environment,
+            )
+            self.assertEqual(operating_rules.returncode, 0, operating_rules.stdout + operating_rules.stderr)
+            capability = json.loads(operating_rules.stdout)
+            self.assertEqual(capability["data"]["inventory"]["inventory_id"], "orrery-operating-rules-v1")
+            self.assertTrue(capability["data"]["read_only"])
             target = root / "target"
             scaffold = run(
                 [str(cli), "scaffold", "--target", str(target), "--title", "Wheel Fixture"],

@@ -15,6 +15,20 @@ Build a living project observatory without confusing ideas, decisions, plans, im
 - **Documentation maintenance:** follow the target repository's `AGENTS.md`, then update the correct authority layer.
 - **Architecture explanation or migration:** read [architecture.md](references/architecture.md) and [migration-contract.md](references/migration-contract.md).
 
+## Consume the existing Meta Model before project facts
+
+Before scaffold, audit, maintenance, migration, or a claim about whether a capability/rule/decision exists, read the complete versioned [Orrery operating-rules inventory](references/orrery-operating-rules-v1.json). It is an exact Skill projection of Core-owned `orrery-operating-rules-v1`; it extends consumption of the existing Authority Meta Model and is not a target-project fact or Seed.
+
+When the platform-neutral CLI is available, run a read-only preflight before answering existence, implementation, validation, distribution/visibility, public/default/release, novelty, or absence questions:
+
+`project-orrery operating-rules route --target <repo> --query "<question>" --fact-scope <scope> --json`
+
+Then read the selected target-project AGENTS index, State, governing effective ADR/Approved Design, implementation and release evidence in receipt order. Keep these four axes separate: semantic/decision existence, implementation (including validation status), distribution/consumer wiring, and public/default/release. A missing template or consumer does not prove the semantics are absent; Accepted does not prove implemented; Candidate source does not prove public release.
+
+For “跨项目通用原则／元规则／通用原则／运行契约／可移植规则” and equivalent English or indirect questions, the minimum governing evidence starts with Authority Meta Model State and ADR-0009, adding ADR-0011/0012 when version compatibility or document governance matters. The correct baseline is that the Meta Model already exists; portable delivery/consumer wiring may still be missing or scoped. Do not describe it as a newly discovered layer.
+
+`SKILL.md` is an advisory bootstrap surface. Without a verified host pre-model hook it cannot mechanically force receipt consumption. Never claim stronger enforcement merely because this Skill or an Adapter is installed.
+
 ## Check the release channel
 
 For an installed target, tell the user that the Skill is checking the stable release manifest, then run the cached checker before maintenance, migration, or viewer upgrades unless the user requested an offline-only workflow:
@@ -36,7 +50,7 @@ To update the installed Skill, fetch the exact tagged release into a temporary l
 
 ## Scaffold safely
 
-1. Inspect the repository root, `AGENTS.md`, existing docs directories, and worktree status.
+1. After consuming the operating-rules inventory and any required route receipt, inspect the repository root, `AGENTS.md`, existing docs directories, and worktree status.
 2. Identify the documentation authority root. In monorepos or two-root projects, do not move implementation merely to fit the template.
 3. Treat the repository's existing `AGENTS.md` and progress source as authoritative throughout migration. Copying Orrery files is not formal adoption.
 4. Preview the operation:

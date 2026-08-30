@@ -833,6 +833,8 @@ CSS = r"""
  --bg:#0f1115; --bg2:#161a22; --bg3:#1d2230; --fg:#dfe3ec; --mut:#98a1b0;
  --line:#2a3142; --acc:#7fb0ff; --code:#0b0e14; --codefg:#cdd6e6;
  --strong:#f2f4f9;
+ --scroll-track:rgba(148,163,183,.055); --scroll-thumb:rgba(148,163,183,.32);
+ --scroll-thumb-hover:rgba(110,231,221,.54);
  --accepted:#3ecf8e; --proposed:#f0b429; --deprecated:#7a8190;
  --superseded:#b083f0; --deferred:#56b6e0; --other:#9aa3b2; --warn:#ff8f6b; --state:#6ea8fe;
 }
@@ -840,10 +842,23 @@ body.light{
  --bg:#e9e3d6; --bg2:#faf7f0; --bg3:#f1ece0; --fg:#322e27; --mut:#6f6857;
  --line:#ddd4c1; --acc:#9a6324; --code:#f0ead9; --codefg:#4a4436;
  --strong:#1d1a15;
+ --scroll-track:rgba(50,46,39,.045); --scroll-thumb:rgba(111,104,87,.30);
+ --scroll-thumb-hover:rgba(154,99,36,.50);
  --accepted:#2f9e6b; --proposed:#9c7508; --deprecated:#8a8475;
  --superseded:#7a52b3; --deferred:#2f7fa8; --other:#8a8475; --warn:#b5562f; --state:#2f6fb0;
 }
-*{box-sizing:border-box}
+html:has(body.light){
+ --scroll-track:rgba(50,46,39,.045); --scroll-thumb:rgba(111,104,87,.30);
+ --scroll-thumb-hover:rgba(154,99,36,.50);
+}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--scroll-thumb) var(--scroll-track)}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:var(--scroll-track)}
+*::-webkit-scrollbar-thumb{min-width:36px;min-height:36px;border:2px solid transparent;border-radius:999px;
+ background:var(--scroll-thumb);background-clip:padding-box}
+*::-webkit-scrollbar-thumb:hover{background:var(--scroll-thumb-hover);background-clip:padding-box}
+*::-webkit-scrollbar-corner{background:transparent}
+*::-webkit-scrollbar-button{display:none;width:0;height:0}
 html,body{margin:0;background:var(--bg);color:var(--fg);
  font:15.5px/1.65 -apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
  transition:background .2s,color .2s}
