@@ -1,5 +1,16 @@
 # 开发日志
 
+## 2026-08-30 — GX2 ELK Layout Evaluation Authorized
+
+- 维护者确认可隔离试用 ELK，并要求不得改变现有前端设计。中央确认当前 Graph 是 Python projection 加两套
+  手写 Python/Browser JS rank/packing/routing/label 算法，没有成熟 layout engine；Fireworks Skill 只作设计
+  参考。当前 W7.3 产品写入保持暂停。
+- 新增 GX2 Plan/Pending Validation：ELK 仅返回 node/container/port/edge/label geometry，Orrery 继续拥有
+  事实筛选、SVG、卡片、字体、颜色、交互与无障碍。试验只写 `experiments/workstream-graph-elk-evaluation/`，
+  使用 pinned local bundle 和 sanitized self-host fixture，不进入产品或 Release。
+- 评测必须直接覆盖 floating label、W compound、Project Structure context 扩成全图和 dependency 孤立节点；
+  只跑语义断言/geometry/Browser，最多一轮修正。产品采用仍需维护者看图接受和新的 ADR。
+
 ## 2026-08-30 — W7.3 Post-pack Coordinate Mutation Rejected
 
 - 维护者拒绝 revision-9 真实页面：底部 W7 task blocks、重复 phase 装饰与 routes 发生实体叠层。中央核对 dirty

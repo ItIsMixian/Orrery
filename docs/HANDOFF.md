@@ -29,6 +29,9 @@ Updated: 2026-08-30
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成；W7.3 已收到立即停止要求，必须
   确认最新 single-pass/module-scoped 任务说明 exact SHA 并刷新 scope revision 10 后才可恢复产品写入。自动
   receipt／first-write enforcement 尚未实现。
+- 维护者已批准 GX2 隔离试用 ELK.js，但未批准产品采用。W7.3 的 Core/capture 与全部 dirty files 保留，产品
+  Graph 写入继续暂停；同一任务只可在 `experiments/workstream-graph-elk-evaluation/` 做 scope revision 11
+  评测。ELK 只计算坐标/ports/路由/标签，Orrery 视觉与事实输入不变；接受后另立采用 ADR。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
@@ -43,23 +46,25 @@ Updated: 2026-08-30
 ## 当前可继续的线路
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
-2. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
-3. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
-4. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
-5. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
-6. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。
-7. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
-8. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
-9. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
-10. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-11. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 与未提交 Graph
-    改动全部保留。最新 scope revision 10 要求 concrete module filter、跨组织 relation component、单次
-    immutable local layout、包含节点/标题/路由预留的 occupied-bounds packing、无 phase 外框与局部短扇出，
-    禁止模块重复全图、W 高塔、post-pack 重排和任何叠层。真实截图未获接受前不得中央集成。
-12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
-13. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
+2. **GX2 ELK layout evaluation：** 在原 W7.3 worktree 的独立 experiment 路径，用本地 pinned ELK 与现有
+   Orrery SVG/card 视觉验证 succession、W compound、Project Structure context 和 dependency 四个 fixture；
+   不触碰产品/release，最多一轮修正，维护者看图后决定是否新增采用 ADR。
+3. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
+4. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
+5. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
+6. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
+7. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。
+8. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
+9. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
+10. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
+11. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
+12. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 与全部 dirty Graph
+    改动保留但产品写入暂停。scope revision 11 只允许 GX2 experiment 路径；ELK 结果获维护者接受并形成采用
+    ADR 前，不继续手写 renderer、产品依赖或中央集成。
+13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
+14. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
     “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。
-14. **v0.3.0 Final RC：** ADR-0021/Approved Design/blocked Plan 已进入中央 authority。依赖完成后创建独立
+15. **v0.3.0 Final RC：** ADR-0021/Approved Design/blocked Plan 已进入中央 authority。依赖完成后创建独立
     Sol-medium RC；只消费 child receipts，运行 integration/package/runtime/Promotion-owned gates，不得提前改
     public manifest、push ref、tag 或 Release。
 
