@@ -11,7 +11,7 @@ from typing import Any, Callable, Mapping, Sequence
 from .display_vocabulary import display_status
 
 
-PROJECTION_SCHEMA_VERSION = 1
+PROJECTION_SCHEMA_VERSION = 2
 PROVIDER_SCHEMA_VERSION = 1
 PROVIDER_ID = "project-orrery-core.workstream-relations"
 GRAPH_CONTRACT = "workstream-relation-graph"
@@ -24,7 +24,7 @@ DOCUMENT_LINK_PREFIXES = {
     "scope": ("docs/state/",),
     "other": ("docs/decisions/", "docs/design/", "docs/implementation/"),
 }
-OPAQUE_LINK_PREFIXES = ("git-private:", "git-common:", "fixture:", "opaque:")
+OPAQUE_LINK_PREFIXES = ("git-private:", "git-private-series:", "git-common:", "fixture:", "opaque:")
 OID = re.compile(r"^[0-9a-f]{40}$")
 HASH = re.compile(r"^[0-9a-f]{64}$")
 SAFE_TOKEN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{0,511}$")
@@ -133,23 +133,63 @@ def _validate_pair(value: Any, node_ids: set[str], *, disposition: str) -> dict[
     reasons = value.get("reason_codes")
     if not isinstance(reasons, list) or not reasons or any(not isinstance(item, str) or not item for item in reasons):
         raise RelationGraphUnavailable("invalid-core-payload", "Core pair reasons are unavailable.")
-    confirmed = any(
-        token in reason.lower()
-        for reason in reasons
-        for token in ("direct", "l3", "exclusive")
-    )
-    certainty = "suppressed" if disposition == "suppress" else ("confirmed" if confirmed else "proposed")
     return {
         "id": f"{disposition}:{left}:{right}",
         "source_workstream_id": left,
         "target_workstream_id": right,
-        "relation_type": "conflict-pair",
-        "lifecycle": certainty,
-        "certainty": certainty,
+        "relation_type": "comparison-suggestion",
+        "lifecycle": "suppressed" if disposition == "suppress" else "proposed",
+        "certainty": "suppressed" if disposition == "suppress" else "review-suggested",
         "reason_codes": sorted(set(reasons)),
         "source_links": [],
         "disposition": disposition,
     }
+
+
+def _explicit_conflict(pair: Mapping[str, Any]) -> dict[str, Any] | None:
+    reasons = [str(item) for item in pair.get("reason_codes", [])]
+    conflict_reasons = [
+        reason for reason in reasons
+        if any(token in reason.lower() for token in (
+            "path-overlap", "module-overlap", "exclusive-resource", "contract-incompatibility",
+            "confirmed-conflict", "direct-validation-surface",
+        ))
+    ]
+    if not conflict_reasons:
+        return None
+    result = dict(pair)
+    result.update({
+        "id": str(pair["id"]).replace("compare:", "conflict:"),
+        "relation_type": "conflict-fact",
+        "lifecycle": "confirmed",
+        "certainty": "confirmed",
+        "reason_codes": sorted(set(conflict_reasons)),
+        "conflict_evidence": {
+            "location": sorted(set(conflict_reasons)),
+            "impact": "这些任务共享明确的受约束表面，集成前必须解决不兼容写入或资源占用。",
+            "source": "Core succession-plan v1 explicit constraint reason_codes",
+        },
+        "disposition": "conflict",
+    })
+    return result
+
+
+def _plain_state(node: Mapping[str, Any]) -> tuple[str, str]:
+    if node.get("runtime_condition") == "waiting-for-user":
+        return "等待人工确认", "human-confirmation-pending"
+    if node.get("status") in {"unregistered", "candidate-unregistered"}:
+        return "未登记", "unregistered"
+    if node.get("session_state") in {"missing", "unavailable"}:
+        return "缺少任务记录", "session-missing"
+    if node.get("lifecycle_phase") in {"closed", "integrated", "historical"} or node.get("status") in {"inactive", "completed", "cancelled"}:
+        return "历史任务", "historical"
+    if node.get("session_state") == "stale" or node.get("evidence_freshness") == "stale" or node.get("scope_status") == "stale":
+        return "状态待刷新／证据过期", "stale-evidence"
+    if node.get("evidence_freshness") == "unknown" or node.get("scope_status") == "unknown" or node.get("status") == "unknown":
+        return "关系证据不足", "relation-evidence-insufficient"
+    if node.get("runtime_condition") == "active":
+        return "正在进行", "in-progress"
+    return "状态待刷新／证据过期", "state-refresh-required"
 
 
 def _node_is_active_tip(node: Mapping[str, Any]) -> bool:
@@ -209,6 +249,7 @@ def _sanitize_node(value: Any, active_tip_ids: set[str]) -> dict[str, Any]:
     }
     if node["is_active_tip"] and not _node_is_active_tip(node):
         raise RelationGraphUnavailable("contradictory-active-tip", "Core active tip contradicts its state axes.")
+    node["plain_status"], node["plain_status_code"] = _plain_state(node)
     return node
 
 
@@ -250,6 +291,43 @@ def _sanitize_edge(value: Any, node_ids: set[str]) -> dict[str, Any]:
         "evidence_reason_codes": sorted(set(reasons)),
         "source_links": _safe_links(value.get("source_links")),
         "origin": str(value.get("origin", "unknown")),
+        "required_for": value.get("required_for"),
+    }
+
+
+def _capture_proposal_edge(value: Any, node_ids: set[str]) -> dict[str, Any]:
+    if not isinstance(value, Mapping) or value.get("contract_type") != "workstream-relation-proposal-event":
+        raise RelationGraphUnavailable("invalid-provider", "Relation capture proposal is malformed.")
+    source = _bounded_identifier(value.get("source_workstream_id"), "capture proposal source")
+    target = _bounded_identifier(value.get("target_workstream_id"), "capture proposal target")
+    if source == target or source not in node_ids or target not in node_ids:
+        raise RelationGraphUnavailable("dangling-node", "Relation capture proposal references a missing Workstream.")
+    relation_type = value.get("relation_type")
+    required_for = value.get("required_for")
+    if relation_type not in {"derived_from", "depends_on", "absorbs"}:
+        raise RelationGraphUnavailable("unsupported-relation", "Capture proposal relation kind is unsupported.")
+    if relation_type == "depends_on" and required_for not in {"implementation", "validation", "integration", "release"}:
+        raise RelationGraphUnavailable("invalid-provider", "Capture dependency proposal has no explicit gate.")
+    evidence = value.get("evidence")
+    if not isinstance(evidence, list):
+        raise RelationGraphUnavailable("invalid-provider", "Capture proposal evidence is malformed.")
+    return {
+        "relation_id": _bounded_identifier(value.get("relation_id"), "capture relation_id"),
+        "proposal_id": _bounded_identifier(value.get("proposal_id"), "capture proposal_id"),
+        "source_workstream_id": source,
+        "target_workstream_id": target,
+        "relation_type": relation_type,
+        "required_for": required_for,
+        "lifecycle": "proposed",
+        "certainty": "proposed",
+        "effective_active_succession": False,
+        "evidence_status": "unknown",
+        "evidence": {"status": "unknown", "capture_revision": value.get("revision")},
+        "evidence_reason_codes": ["human-confirmation-pending"],
+        "source_links": _safe_links([{"kind": item.get("category"), "ref": item.get("ref")} for item in evidence]),
+        "origin": "capture-v2-proposal",
+        "rationale": str(value.get("rationale", "")),
+        "consequence": str(value.get("consequence", "")),
     }
 
 
@@ -304,6 +382,24 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
     if len(node_ids) != len(nodes) or not active_tip_ids.issubset(node_ids):
         raise RelationGraphUnavailable("dangling-node", "Core node identity is duplicate or missing.")
     edges = [_sanitize_edge(item, node_ids) for item in raw_edges]
+    capture_payload = provider_payload.get("relation_capture")
+    capture_gate_by_relation: dict[str, str | None] = {}
+    if capture_payload is not None:
+        if not isinstance(capture_payload, Mapping) or capture_payload.get("schema_version") != 2:
+            raise RelationGraphUnavailable("invalid-provider", "Relation capture projection is malformed.")
+        effective_values = capture_payload.get("effective_relations", [])
+        pending_values = capture_payload.get("pending_proposals", [])
+        if not isinstance(effective_values, list) or not isinstance(pending_values, list):
+            raise RelationGraphUnavailable("invalid-provider", "Relation capture collections are malformed.")
+        for item in effective_values:
+            if not isinstance(item, Mapping) or not isinstance(item.get("current"), Mapping):
+                raise RelationGraphUnavailable("invalid-provider", "Effective capture relation is malformed.")
+            current = item["current"]
+            capture_gate_by_relation[str(current.get("relation_id"))] = current.get("required_for")
+        for edge in edges:
+            if edge["relation_id"] in capture_gate_by_relation:
+                edge["required_for"] = capture_gate_by_relation[edge["relation_id"]]
+        edges.extend(_capture_proposal_edge(item.get("current"), node_ids) for item in pending_values if isinstance(item, Mapping))
     edge_ids = {item["relation_id"] for item in edges}
     if len(edge_ids) != len(edges):
         raise RelationGraphUnavailable("invalid-core-payload", "Core relation identity is duplicated.")
@@ -311,10 +407,24 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
     suppress_values = plan.get("suppress_direct_pairs")
     if not isinstance(compare_values, list) or not isinstance(suppress_values, list):
         raise RelationGraphUnavailable("invalid-core-payload", "Core pair plan collections are invalid.")
-    conflicts = [
-        *(_validate_pair(item, node_ids, disposition="compare") for item in compare_values),
-        *(_validate_pair(item, node_ids, disposition="suppress") for item in suppress_values),
-    ]
+    comparison_suggestions = [_validate_pair(item, node_ids, disposition="compare") for item in compare_values]
+    suppressed_pairs = [_validate_pair(item, node_ids, disposition="suppress") for item in suppress_values]
+    conflicts = [item for item in (_explicit_conflict(pair) for pair in comparison_suggestions) if item is not None]
+    conflict_ids = {item["id"].replace("conflict:", "compare:") for item in conflicts}
+    comparison_suggestions = [item for item in comparison_suggestions if item["id"] not in conflict_ids]
+    series_payload = provider_payload.get("task_series", {"items": []})
+    if not isinstance(series_payload, Mapping) or not isinstance(series_payload.get("items", []), list):
+        raise RelationGraphUnavailable("invalid-provider", "Task series metadata is malformed.")
+    series_by_workstream: dict[str, Mapping[str, Any]] = {}
+    for item in series_payload.get("items", []):
+        if not isinstance(item, Mapping) or item.get("workstream_id") not in node_ids:
+            continue
+        series_by_workstream[str(item["workstream_id"])] = item
+    for node in nodes:
+        series = series_by_workstream.get(node["workstream_id"])
+        node["series_id"] = str(series["series_id"]) if series else None
+        node["task_code"] = str(series["task_code"]) if series else None
+        node["series_order"] = int(series["series_order"]) if series else None
     unknown_values = plan.get("unknown_workstream_ids")
     if not isinstance(unknown_values, list) or any(item not in node_ids for item in unknown_values):
         raise RelationGraphUnavailable("dangling-node", "Core Unknown node list is invalid.")
@@ -357,6 +467,9 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         "nodes": sorted(nodes, key=lambda item: item["workstream_id"]),
         "edges": sorted(edges, key=lambda item: (item["relation_type"], item["source_workstream_id"], item["target_workstream_id"], item["relation_id"])),
         "conflicts": sorted(conflicts, key=lambda item: item["id"]),
+        "comparison_suggestions": sorted(comparison_suggestions, key=lambda item: item["id"]),
+        "suppressed_pairs": sorted(suppressed_pairs, key=lambda item: item["id"]),
+        "task_series": sorted({str(item["series_id"]) for item in series_by_workstream.values()}),
         "active_tip_workstream_ids": sorted(active_tip_ids),
         "unknown_workstream_ids": sorted(unknown_values),
         "history_candidate_ids": historical,
@@ -388,7 +501,7 @@ def unavailable_relation_graph_projection(error: Exception) -> dict[str, Any]:
         "provider_id": PROVIDER_ID,
         "provider_schema_version": PROVIDER_SCHEMA_VERSION,
         "error": {"code": code, "message": messages.get(code, "当前无法读取完整的任务关系，未生成不完整关系图。")},
-        "nodes": [], "edges": [], "conflicts": [], "active_tip_workstream_ids": [],
+        "nodes": [], "edges": [], "conflicts": [], "comparison_suggestions": [], "suppressed_pairs": [], "task_series": [], "active_tip_workstream_ids": [],
         "unknown_workstream_ids": [], "history_candidate_ids": [], "blocking_dependencies": [],
         "read_only": True, "writes_performed": False, "network_performed": False,
         "execution_capability": False, "available_actions": [],
@@ -759,12 +872,27 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
             % html.escape(str(error.get("message", "当前无法读取完整的任务关系。")))
         )
     payload = _canonical_json(dict(projection)).replace("<", "\\u003c")
+    series_groups: dict[str, list[Mapping[str, Any]]] = {}
+    for node in projection.get("nodes", []):
+        if isinstance(node, Mapping) and node.get("series_id"):
+            series_groups.setdefault(str(node["series_id"]), []).append(node)
+    series_html = "".join(
+        '<div class="wg-series-lane"><b>%s 系列</b><span>%s</span></div>' % (
+            html.escape(series_id),
+            " · ".join(
+                html.escape(str(item.get("task_code") or item.get("workstream_id")))
+                for item in sorted(values, key=lambda value: (value.get("series_order") is None, value.get("series_order") or 0, value.get("workstream_id")))
+            ),
+        )
+        for series_id, values in sorted(series_groups.items())
+    ) or '<div class="wg-series-empty">当前没有显式任务系列元数据；不会从任务名称推断。</div>'
     return (
         '<article class="page wide" id="workstream-relation-graph" data-kind="workstream-relation-graph" '
         'data-title="任务关系" data-authority="%s" data-read-only="true">'
         '<section class="wg-shell"><header class="wg-mast"><div><p class="wg-kicker">任务关系图 · 只读</p>'
         '<h2>任务关系</h2><p>从左到右阅读：更早历史 → 直接前置／依赖 → 当前任务。每条链可独立展开，本页不会执行任何操作。</p></div>'
-        '<div class="wg-seal %s">%s · 技术结构版本 1</div></header>%s'
+        '<div class="wg-seal %s">%s · 技术结构版本 2</div></header>%s'
+        '<section class="wg-series" aria-label="显式任务系列"><div><h3>任务系列</h3><p>仅作结构化展示分组，不表示因果或依赖边。</p></div><div class="wg-series-lanes">%s</div></section>'
         '<section class="wg-controls" aria-label="任务关系控制"><div class="wg-lenses" role="group" aria-label="关系类型">'
         '<button class="wg-lens" type="button" data-wg-lens="succession" aria-pressed="true"><span>01</span><b>接续关系</b></button>'
         '<button class="wg-lens" type="button" data-wg-lens="dependency" aria-pressed="false"><span>02</span><b>依赖关系</b></button>'
@@ -782,9 +910,10 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<div class="wg-frame"><div class="wg-viewport" data-wg-viewport tabindex="0" aria-label="可滚动任务关系画布"><div class="wg-canvas"><svg data-wg-svg role="group" aria-label="从左到右的分层任务关系图"></svg></div></div><div class="wg-empty" data-wg-empty hidden><b>没有匹配的关系事实</b></div>'
         '<aside class="wg-inspector" hidden aria-hidden="true" role="dialog" aria-modal="false" aria-label="任务关系技术详情" data-wg-inspector-shell><div class="wg-inspector-head"><span>技术详情 / 核心证据 · 只读</span><button class="wg-inspector-close" type="button" data-wg-inspector-close aria-label="关闭技术详情">×</button></div><div data-wg-inspector></div><div class="wg-readonly">不提供应用、撤销、关闭、删除、合并或远程执行</div></aside></div></div></section>'
         '<section class="wg-ledger" aria-labelledby="wg-ledger-title"><h3 id="wg-ledger-title">任务关系列表</h3><p class="wg-ledger-intro">按层级与链阅读；每条关系明确显示“从谁 → 到谁”，历史折叠与桌面保持一致。</p><div class="wg-ledger-list" data-wg-ledger></div></section>'
+        '<section class="wg-comparisons" aria-labelledby="wg-comparison-title"><h3 id="wg-comparison-title">需要比较／证据待刷新</h3><p>黄色建议不属于冲突事实，不会画成红线。</p><div data-wg-comparisons></div></section>'
         '<p class="wg-sr" aria-live="polite" data-wg-live></p><script type="application/json" data-wg-payload>%s</script>'
         '</section></article>'
-        % (html.escape(authority, quote=True), status, html.escape(display_status(status)), failure, payload)
+        % (html.escape(authority, quote=True), status, html.escape(display_status(status)), failure, series_html, payload)
     )
 
 

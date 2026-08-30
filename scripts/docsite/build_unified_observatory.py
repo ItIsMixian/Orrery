@@ -7,7 +7,7 @@ import os
 import sys
 from dataclasses import replace
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 
 HERE = Path(__file__).resolve()
@@ -23,6 +23,7 @@ import build_personal_observatory  # noqa: E402
 import build_workstream_relation_graph  # noqa: E402
 from project_orrery_cli.authority_consumer import inspect_managed_consumer  # noqa: E402
 from project_orrery_observatory.display_vocabulary import NAVIGATION_LABELS  # noqa: E402
+from project_orrery_observatory.relation_inbox import inject_relation_inbox  # noqa: E402
 from project_orrery_observatory.team_observatory import inject_team_observatory  # noqa: E402
 from project_orrery_observatory.unified_observatory import (  # noqa: E402
     ConsumerRegistration,
@@ -105,7 +106,8 @@ def default_registrations(
         ),
         _registration(
             "personal-observatory", "personal", NAVIGATION_LABELS["personal"], 50, "/api/v1/personal",
-            ("read-status",), "read-only", "personal-observatory-projection", "v1",
+            (("read-status", "inspect-relations", "confirm-local-relation") if dynamic else ("read-status", "inspect-relations")),
+            "host-local-action-specific" if dynamic else "read-only", "personal-observatory-projection", "v1",
         ),
         _registration(
             "team-observatory", "team", NAVIGATION_LABELS["team"], 60, "/api/v1/team",
@@ -116,7 +118,7 @@ def default_registrations(
         ),
         _registration(
             "workstream-graph", "workstreams", NAVIGATION_LABELS["workstreams"], 70, "/api/v1/workstreams",
-            ("read-graph",), "read-only", "project-orrery-core.workstream-relations", "provider-schema-1",
+            ("read-graph", "inspect-relations"), "read-only", "project-orrery-core.workstream-relations", "provider-schema-2",
         ),
         _registration(
             "workspace-maintenance", "maintenance", NAVIGATION_LABELS["maintenance"], 80, "/api/v1/maintenance",
@@ -136,6 +138,27 @@ def _replace_registration(
 ) -> None:
     index = next(i for i, item in enumerate(registrations) if item.consumer_id == consumer_id)
     registrations[index] = value
+
+
+def relation_capture_payload(root: Path) -> dict[str, Any]:
+    from project_orrery_core.workstream_relation_capture import inspect_relation_capture
+
+    capture = inspect_relation_capture(root)
+    pending = []
+    for item in capture.get("pending_proposals", []):
+        projected = dict(item)
+        if not isinstance(projected.get("local_confirmation"), Mapping):
+            projected["local_confirmation"] = {
+                "allowed": False,
+                "reason_code": "local-human-authority-unavailable",
+                "read_only": True,
+                "writes_performed": False,
+            }
+        pending.append(projected)
+    capture["pending_proposals"] = pending
+    capture["local_actions_require_same_origin_cookie"] = True
+    capture["central_request_only"] = True
+    return capture
 
 
 def render_unified_site(
@@ -191,12 +214,22 @@ def render_unified_site(
     except Exception as error:
         _replace_registration(registrations, team_item.consumer_id, quarantine(team_item, error))
 
+    capture_payload: dict[str, Any] | None = None
+    try:
+        capture_payload = relation_capture_payload(root)
+        page = inject_relation_inbox(page, capture_payload, dynamic=dynamic)
+    except Exception as error:
+        personal_item = next(value for value in registrations if value.consumer_id == "personal-observatory")
+        _replace_registration(registrations, personal_item.consumer_id, quarantine(personal_item, error))
+
     graph_item = next(value for value in registrations if value.consumer_id == "workstream-graph")
     graph_provider_payload: dict[str, Any] | None = None
     previous_graph = os.environ.get("ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW")
     os.environ["ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW"] = "1"
     try:
         graph_provider_payload = build_workstream_relation_graph.core_relation_provider(root)
+        if capture_payload is not None:
+            graph_provider_payload["relation_capture"] = capture_payload
         page, graph = build_workstream_relation_graph.inject_enabled_relation_graph(
             page, root, provider=lambda: graph_provider_payload or {},
         )

@@ -45,19 +45,28 @@ def core_relation_provider(project_root: Path) -> dict[str, Any]:
         load_relation_graph,
         relation_storage_root,
     )
+    from project_orrery_core.workstream_relation_capture import (
+        capture_storage_root,
+        inspect_relation_capture,
+        inspect_task_series,
+    )
 
     root = Path(project_root).resolve()
     relation_root_present = relation_storage_root(root).is_dir()
     graph = load_relation_graph(root, include_legacy=True)
     plan = build_succession_plan(graph)
-    return {
+    payload = {
         "provider_schema_version": 1,
         "provider_id": "project-orrery-core.workstream-relations",
         "relation_root_present": relation_root_present,
         "authority": "derived-read-only",
         "graph": graph,
         "succession_plan": plan,
+        "task_series": inspect_task_series(root),
     }
+    if capture_storage_root(root).is_dir():
+        payload["relation_capture"] = inspect_relation_capture(root)
+    return payload
 
 
 def synthetic_browser_provider() -> dict[str, Any]:
@@ -159,6 +168,17 @@ def synthetic_browser_provider() -> dict[str, Any]:
         "authority": "synthetic-non-authoritative",
         "graph": graph,
         "succession_plan": plan,
+        "task_series": {
+            "schema_version": 2,
+            "contract_type": "workstream-task-series-inspection",
+            "items": [
+                {"workstream_id": "CI1", "series_id": "CI", "task_code": "CI1", "series_order": 1},
+                {"workstream_id": "CI2-late", "series_id": "CI", "task_code": "CI2", "series_order": 2},
+            ],
+            "read_only": True,
+            "writes_performed": False,
+            "name_inference_performed": False,
+        },
     }
 
 

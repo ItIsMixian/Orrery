@@ -46,6 +46,44 @@ class FakeIdentity:
         self.cleaned = True
 
 
+def _bounded_docsite() -> tuple[str, dict, None]:
+    """Small composition fixture; doc rendering has separate owner tests."""
+    page = (
+        '<!doctype html><html><head><title>Orrery · Documentation</title>'
+        '<style>:root{--bg:#0f1115}.app{display:flex}</style></head><body>'
+        '<header class="top"><h1>Orrery · Documentation</h1>'
+        '<span class="sub">doc viewer · 源自 markdown</span><div class="rightgrp"></div></header>'
+        '<div class="app"><aside class="sidebar"><div class="nav-top"></div>'
+        '<div class="nav-group"><a class="nav-item" data-target="trends">'
+        '<span class="dot proposed"></span><span class="lbl">🔭 路线与趋势</span></a></div>'
+        '<div class="doc-tree"><a data-target="dashboard">AGENTS</a></div></aside>'
+        '<main class="content"><article class="page" id="dashboard">authoritative docs</article>'
+        '</main><aside class="toc" id="toc"></aside></div><input id="q"><div id="qa-panel"></div></body></html>'
+    )
+    return page, {"adrs": 0, "states": 0, "subs": 0, "documents": 1}, None
+
+
+def _bounded_personal_site(*_args, **_kwargs):
+    from project_orrery_observatory.personal_observatory import (
+        inject_personal_observatory,
+        unavailable_personal_observatory_projection,
+    )
+
+    page, stats, authority = _bounded_docsite()
+    projection = unavailable_personal_observatory_projection(RuntimeError("bounded fixture"))
+    projection["status"] = "ready"
+    projection.pop("error", None)
+    projection["maintenance"].update({
+        "status": "ready",
+        "control_available": True,
+        "api_base": "/api/v1/maintenance",
+        "refresh_path": "/refresh",
+        "remove_path": "/remove-worktree",
+        "reload_after_action": False,
+    })
+    return inject_personal_observatory(page, projection), stats, authority, projection
+
+
 class UnifiedRegistrationTests(unittest.TestCase):
     def test_versioned_registration_and_capability_discovery_are_sanitized(self) -> None:
         registrations = build_unified_observatory.default_registrations(mode="dynamic")
@@ -122,10 +160,62 @@ class UnifiedRuntimeTests(unittest.TestCase):
         cls.logger.addHandler(logging.FileHandler(cls.identity.log_path, encoding="utf-8"))
         cls.logger.setLevel(logging.INFO)
         synthetic_graph = build_unified_observatory.build_workstream_relation_graph.synthetic_browser_provider()
-        with mock.patch.object(
-            build_unified_observatory.build_workstream_relation_graph,
-            "core_relation_provider",
-            return_value=synthetic_graph,
+        synthetic_capture = {
+            "schema_version": 2,
+            "privacy": {"prompt": False, "answer": False, "source": False, "diff": False, "credentials": False},
+            "pending_proposals": [
+                {
+                    "current": {
+                        "proposal_id": "proposal-a4-a3",
+                        "revision": 1,
+                        "relation_type": "depends_on",
+                        "source_workstream_id": "a4",
+                        "target_workstream_id": "a3",
+                        "required_for": "integration",
+                        "consequence": "A4 在集成前需要核对 A3 的权威边界。",
+                        "rationale": "显式任务系列 predecessor 修复建议。",
+                        "evidence": [{"category": "git", "ref": "bounded:a4-a3", "fact_scope": "candidate"}],
+                    },
+                    "local_confirmation": {"allowed": True, "read_only": False, "writes_performed": False},
+                },
+                {
+                    "current": {
+                        "proposal_id": "proposal-ci7-ci6",
+                        "revision": 1,
+                        "relation_type": "depends_on",
+                        "source_workstream_id": "ci7",
+                        "target_workstream_id": "ci6",
+                        "required_for": "integration",
+                        "consequence": "CI7 在集成前需要核对 CI6 的检查结果。",
+                        "rationale": "显式任务系列 predecessor 修复建议。",
+                        "evidence": [{"category": "git", "ref": "bounded:ci7-ci6", "fact_scope": "candidate"}],
+                    },
+                    "local_confirmation": {"allowed": False, "read_only": True, "writes_performed": False},
+                },
+            ],
+            "effective_relations": [],
+            "stale_confirmations": [],
+            "writes_performed": False,
+            "network_performed": False,
+            "local_actions_require_same_origin_cookie": True,
+            "central_request_only": True,
+        }
+        with (
+            mock.patch.object(
+                build_unified_observatory.build_personal_observatory,
+                "render_personal_site",
+                side_effect=_bounded_personal_site,
+            ),
+            mock.patch.object(
+                build_unified_observatory.build_workstream_relation_graph,
+                "core_relation_provider",
+                return_value=synthetic_graph,
+            ),
+            mock.patch.object(
+                build_unified_observatory,
+                "relation_capture_payload",
+                return_value=synthetic_capture,
+            ),
         ):
             page, _stats, registrations, authority, graph_payload = build_unified_observatory.render_unified_site(
                 ROOT, mode="dynamic",
@@ -210,6 +300,12 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertNotIn("beforeunload", text)
         self.assertNotIn("unload", text)
         self.assertIn("/api/v1/team", text)
+        self.assertEqual(text.count('<section class="ri-shell" data-relation-inbox'), 2)
+        self.assertIn('data-request-only="true"', text)
+        self.assertIn("关系待确认", text)
+        graph_start = text.index('id="workstream-relation-graph"')
+        graph_end = text.index("</article>", graph_start)
+        self.assertNotIn("/relations/accept", text[graph_start:graph_end])
         self.assertIn('data-maintenance-refresh-path="/refresh"', text)
         self.assertIn('data-maintenance-remove-path="/remove-worktree"', text)
         self.assertIn('data-maintenance-reload-after-action="false"', text)
@@ -258,6 +354,23 @@ class UnifiedRuntimeTests(unittest.TestCase):
             "POST", "/api/v1/ai/settings", body={}, cookie=cookie, origin=True
         )
         self.assertEqual(status, 403)  # legacy per-start settings token remains required
+
+        status, _headers, body = self.request("GET", "/api/v1/workstreams/relations")
+        self.assertEqual(status, 200)
+        relation_capture = json.loads(body)
+        self.assertTrue(relation_capture["privacy"]["prompt"] is False)
+        self.assertTrue(relation_capture["local_actions_require_same_origin_cookie"])
+        status, _headers, _body = self.request(
+            "POST", "/api/v1/workstreams/relations/accept",
+            body={"proposal_id": "not-real", "expected_revision": 1},
+        )
+        self.assertEqual(status, 403)
+        status, _headers, _body = self.request(
+            "POST", "/api/v1/workstreams/relations/accept",
+            body={"proposal_id": "not-real", "expected_revision": 1},
+            cookie=cookie, origin=True,
+        )
+        self.assertEqual(status, 400)
 
     def test_team_opt_in_authority_ai_and_maintenance_do_not_escalate(self) -> None:
         before = self.server.state.team.public_status()

@@ -6,7 +6,7 @@
   "required": ["schema_version", "command", "arguments"],
   "properties": {
     "schema_version": {"const": 1},
-    "command": {"enum": ["scaffold", "validate", "check-update"]},
+    "command": {"enum": ["scaffold", "validate", "check-update", "relations-suggest", "relations-inspect", "relations-accept", "relations-change-gate", "relations-defer", "relations-reject"]},
     "arguments": {"type": "object"}
   },
   "additionalProperties": false,
@@ -63,6 +63,50 @@
           }
         }
       }
+    },
+    {
+      "if": {"properties": {"command": {"const": "relations-suggest"}}},
+      "then": {
+        "properties": {
+          "arguments": {
+            "type": "object",
+            "required": ["target", "proposal_id", "relation_type", "source_workstream_id", "target_workstream_id", "required_for", "rationale", "consequence", "proposer_id"],
+            "properties": {
+              "target": {"type": "string", "minLength": 1},
+              "proposal_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+              "relation_type": {"const": "depends_on"},
+              "source_workstream_id": {"type": "string", "minLength": 1, "maxLength": 128},
+              "target_workstream_id": {"type": "string", "minLength": 1, "maxLength": 128},
+              "required_for": {"enum": ["implementation", "validation", "integration", "release"]},
+              "rationale": {"type": "string", "minLength": 1, "maxLength": 2048},
+              "consequence": {"type": "string", "minLength": 1, "maxLength": 2048},
+              "proposer_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+              "platform_session_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+              "evidence_category": {"enum": ["closure", "git-ancestry", "harness", "human-or-agent-assertion", "plan", "scope", "validation", "workstream-session"]},
+              "evidence_fact_scope": {"enum": ["canonical", "candidate", "worktree", "local-only", "historical", "unknown"]},
+              "evidence_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "evidence_ref": {"type": "string", "minLength": 1, "maxLength": 512}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"command": {"const": "relations-inspect"}}},
+      "then": {"properties": {"arguments": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string", "minLength": 1}}, "additionalProperties": false}}}
+    },
+    {
+      "if": {"properties": {"command": {"const": "relations-accept"}}},
+      "then": {"properties": {"arguments": {"type": "object", "required": ["target", "proposal_id", "expected_revision", "confirmer_id", "confirmer_role"], "properties": {"target": {"type": "string", "minLength": 1}, "proposal_id": {"type": "string", "minLength": 1}, "expected_revision": {"type": "integer", "minimum": 1}, "confirmer_id": {"type": "string", "minLength": 1}, "confirmer_role": {"enum": ["task-owner", "integrator"]}}, "additionalProperties": false}}}
+    },
+    {
+      "if": {"properties": {"command": {"const": "relations-change-gate"}}},
+      "then": {"properties": {"arguments": {"type": "object", "required": ["target", "proposal_id", "expected_revision", "required_for", "actor_id", "reason"], "properties": {"target": {"type": "string", "minLength": 1}, "proposal_id": {"type": "string", "minLength": 1}, "expected_revision": {"type": "integer", "minimum": 1}, "required_for": {"enum": ["implementation", "validation", "integration", "release"]}, "actor_id": {"type": "string", "minLength": 1}, "reason": {"type": "string", "minLength": 1, "maxLength": 2048}}, "additionalProperties": false}}}
+    },
+    {
+      "if": {"properties": {"command": {"enum": ["relations-defer", "relations-reject"]}}},
+      "then": {"properties": {"arguments": {"type": "object", "required": ["target", "proposal_id", "expected_revision", "actor_id", "reason"], "properties": {"target": {"type": "string", "minLength": 1}, "proposal_id": {"type": "string", "minLength": 1}, "expected_revision": {"type": "integer", "minimum": 1}, "actor_id": {"type": "string", "minLength": 1}, "reason": {"type": "string", "minLength": 1, "maxLength": 2048}}, "additionalProperties": false}}}
     }
   ]
 }

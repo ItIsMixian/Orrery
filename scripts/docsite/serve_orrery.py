@@ -35,6 +35,13 @@ if str(HERE.parent) not in sys.path:
 import build_unified_observatory  # noqa: E402
 import serve as legacy_serve  # noqa: E402
 from project_orrery_core.maintenance import maintenance_status  # noqa: E402
+from project_orrery_core.workstream_relation_capture import (  # noqa: E402
+    accept_proposal,
+    change_proposal_gate,
+    defer_proposal,
+    local_confirmation_capability,
+    reject_proposal,
+)
 from project_orrery_observatory.unified_observatory import capability_document  # noqa: E402
 from serve_team_observatory import TeamUIState  # noqa: E402
 
@@ -152,6 +159,18 @@ class UnifiedState:
         self.registrations = tuple(registrations)
         self.authority_status = authority_status
         self.graph_provider_payload = dict(graph_provider_payload or {})
+        cached_capture = self.graph_provider_payload.get("relation_capture")
+        self.relation_capture_payload = dict(cached_capture) if isinstance(cached_capture, dict) else {
+            "schema_version": 2,
+            "contract_type": "workstream-relation-capture-inspection",
+            "pending_proposals": [],
+            "read_only": True,
+            "writes_performed": False,
+            "network_performed": False,
+            "status": "unavailable",
+        }
+        self.relation_capture_payload["local_actions_require_same_origin_cookie"] = True
+        self.relation_capture_payload["central_request_only"] = True
         self.identity = identity
         self.logger = logger
         self.control_token = secrets.token_urlsafe(32)
@@ -309,6 +328,9 @@ class UnifiedHandler(legacy_serve.Handler):
                     "dynamic_delivery": "startup-cached-projection",
                 })
                 return
+            if path == "/api/v1/workstreams/relations":
+                self._send_json(HTTPStatus.OK, dict(self.server.state.relation_capture_payload))
+                return
             if path == "/api/v1/maintenance/status":
                 self._send_json(HTTPStatus.OK, {"maintenance": maintenance_status(ROOT)})
                 return
@@ -364,6 +386,48 @@ class UnifiedHandler(legacy_serve.Handler):
                 except KeyError:
                     self._send_json(HTTPStatus.NOT_FOUND, {"error": "not-found"})
                     return
+                self._send_json(HTTPStatus.OK, dict(payload))
+                return
+            relation_actions = {
+                "/api/v1/workstreams/relations/accept": ("accept", {"proposal_id", "expected_revision"}),
+                "/api/v1/workstreams/relations/change-gate": ("change-gate", {"proposal_id", "expected_revision", "required_for"}),
+                "/api/v1/workstreams/relations/defer": ("defer", {"proposal_id", "expected_revision"}),
+                "/api/v1/workstreams/relations/reject": ("reject", {"proposal_id", "expected_revision"}),
+            }
+            if path in relation_actions:
+                action, expected = relation_actions[path]
+                body = self._exact_body(expected)
+                proposal_id = str(body["proposal_id"])
+                revision = body["expected_revision"]
+                if not isinstance(revision, int) or isinstance(revision, bool):
+                    raise ValueError("expected_revision must be an integer")
+                capability = local_confirmation_capability(ROOT, proposal_id)
+                if capability["allowed"] is not True:
+                    raise PermissionError("current local human lacks the required relation authority")
+                actor_id = str(capability["member_id"])
+                if action == "accept":
+                    payload = accept_proposal(
+                        ROOT, proposal_id, expected_revision=revision,
+                        confirmer_id=actor_id, confirmer_role=str(capability["required_role"]),
+                        caller_kind="human", caller_context="local", local_confirmation=True,
+                    )
+                elif action == "change-gate":
+                    payload = change_proposal_gate(
+                        ROOT, proposal_id, expected_revision=revision,
+                        required_for=str(body["required_for"]), actor_id=actor_id,
+                        reason="本机维护者在关系 inbox 中明确调整阻塞阶段",
+                    )
+                elif action == "defer":
+                    payload = defer_proposal(
+                        ROOT, proposal_id, expected_revision=revision, actor_id=actor_id,
+                        reason="本机维护者要求等待更多关系证据",
+                    )
+                else:
+                    payload = reject_proposal(
+                        ROOT, proposal_id, expected_revision=revision, actor_id=actor_id,
+                        reason="本机维护者拒绝当前关系建议",
+                    )
+                self.server.state.relation_capture_payload = build_unified_observatory.relation_capture_payload(ROOT)
                 self._send_json(HTTPStatus.OK, dict(payload))
                 return
             maintenance_actions = {

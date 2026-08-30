@@ -25,6 +25,7 @@ SHELL_API_VERSION = 1
 PRIVILEGE_CAPABILITIES = {
     "read-only": {
         "read-docs", "search-docs", "read-status", "read-graph", "read-derived-view",
+        "inspect-relations",
     },
     "provider-opt-in": {
         "read-derived-view", "configure-provider", "ask-provider", "refresh-derived-view",
@@ -35,6 +36,7 @@ PRIVILEGE_CAPABILITIES = {
     },
     "host-local-action-specific": {
         "read-status", "background-refresh", "target-preflight", "local-remove-worktree",
+        "inspect-relations", "confirm-local-relation",
     },
 }
 

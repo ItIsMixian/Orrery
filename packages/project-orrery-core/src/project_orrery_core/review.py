@@ -776,6 +776,11 @@ def generate_review_package(
     validations_passed = bool(validation_details) and all(
         item["result"] == "passed" for item in validation_details
     )
+    from .workstream_relation_capture import relation_gate_eligibility
+
+    validation_relation_gate = relation_gate_eligibility(
+        root, source_workstream_id=str(session["workstream_id"]), required_for="validation"
+    )
     ready = all(
         (
             integration_clean,
@@ -786,6 +791,7 @@ def generate_review_package(
             not target_drifted,
             author_unchanged,
             cleanup_error is None,
+            validation_relation_gate["eligible"],
         )
     )
     report = {
@@ -843,6 +849,8 @@ def generate_review_package(
     ]
     if cleanup_error:
         unknown_boundaries.append(f"temporary integration worktree cleanup error: {cleanup_error}")
+    if not validation_relation_gate["eligible"]:
+        unknown_boundaries.append("effective validation dependency remains incomplete")
     package: dict[str, Any] = {
         "schema_version": COLLABORATION_SCHEMA_VERSION,
         "contract_type": "review-package",
@@ -921,6 +929,7 @@ def generate_review_package(
         "writes_performed": True,
         "write_targets": ["git-private-review-package", "git-private-validation-evidence"],
         "network_performed": False,
+        "relation_gate_eligibility": validation_relation_gate,
     }
 
 
@@ -1161,6 +1170,13 @@ def compute_integration_eligibility(project_root: Path, package: str | Path) -> 
     if not gate_passed:
         reasons.append("speculative-integration-gate-not-passed")
     reasons.extend(policy["reasons"])
+    from .workstream_relation_capture import relation_gate_eligibility
+
+    relation_gate = relation_gate_eligibility(
+        Path(project_root), source_workstream_id=str(review["workstream_id"]), required_for="integration"
+    )
+    if not relation_gate["eligible"]:
+        reasons.append("effective-integration-dependency-incomplete")
     reasons = list(dict.fromkeys(reasons))
     return {
         "eligibility_schema_version": 1,
@@ -1173,6 +1189,7 @@ def compute_integration_eligibility(project_root: Path, package: str | Path) -> 
         "integration_ref_updated": False,
         "writes_performed": False,
         "network_performed": False,
+        "relation_gate_eligibility": relation_gate,
     }
 
 
@@ -1187,6 +1204,13 @@ def write_closure_record(
 ) -> dict[str, Any]:
     root = _repository_root(project_root)
     review = load_review_package(root, package)
+    from .workstream_relation_capture import relation_gate_eligibility
+
+    relation_gate = relation_gate_eligibility(
+        root, source_workstream_id=str(review["workstream_id"]), required_for="integration"
+    )
+    if not relation_gate["eligible"]:
+        raise ValueError("effective integration dependency blocks integration closure")
     capabilities = list(dict.fromkeys(actor_capabilities))
     if actor_id == review["author_member_id"] and not capabilities:
         capabilities = list(CAPABILITIES)

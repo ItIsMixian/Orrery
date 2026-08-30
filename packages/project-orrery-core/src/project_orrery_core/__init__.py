@@ -4,7 +4,7 @@ from .manifests import ReleaseContract, build_project_manifest, default_release_
 from .schema import DOCUMENT_SCHEMA, PROJECT_MANIFEST_FORMAT, REQUIRED_SCAFFOLD_FILES
 from .templates import authority_template_root, iter_authority_assets, rendered_bytes, rendered_content
 
-__version__ = "0.1.17"
+__version__ = "0.1.18"
 CORE_API_VERSION = 1
 
 __all__ = [

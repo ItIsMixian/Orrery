@@ -4,18 +4,18 @@
   "components": {
     "core": {
       "distribution": "project-orrery-core",
-      "version": "0.1.17",
+      "version": "0.1.18",
       "api_version": 1
     },
     "cli": {
       "distribution": "project-orrery-cli",
-      "version": "0.1.21",
+      "version": "0.1.22",
       "core_api": 1,
       "json_schema_version": 1
     },
     "observatory": {
       "distribution": "project-orrery-observatory",
-      "version": "0.1.16",
+      "version": "0.1.17",
       "inventory_format": 1
     }
   },
@@ -102,7 +102,7 @@
     },
     "harness-json": {
       "distribution": "project-orrery-harness-json-adapter",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "adapter_api_version": 1,
       "support_status": "experimental",
       "core_api": 1,

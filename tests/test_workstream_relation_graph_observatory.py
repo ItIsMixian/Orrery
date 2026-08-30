@@ -89,9 +89,24 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         cls.provider = cls.builder.synthetic_browser_provider()
         cls.projection = graph_ui.build_relation_graph_projection(cls.provider)
 
+    def test_plain_chinese_status_taxonomy_has_no_generic_pending_fallback(self) -> None:
+        cases = (
+            ({"runtime_condition": "active"}, ("正在进行", "in-progress")),
+            ({"runtime_condition": "waiting-for-user"}, ("等待人工确认", "human-confirmation-pending")),
+            ({"session_state": "stale"}, ("状态待刷新／证据过期", "stale-evidence")),
+            ({"lifecycle_phase": "historical"}, ("历史任务", "historical")),
+            ({"session_state": "missing"}, ("缺少任务记录", "session-missing")),
+            ({"status": "unregistered"}, ("未登记", "unregistered")),
+            ({"evidence_freshness": "unknown"}, ("关系证据不足", "relation-evidence-insufficient")),
+        )
+        for axes, expected in cases:
+            with self.subTest(axes=axes):
+                self.assertEqual(graph_ui._plain_state(axes), expected)
+
     def test_core_payload_maps_three_lenses_and_independent_axes(self) -> None:
         projection = self.projection
         self.assertEqual(projection["status"], "ready")
+        self.assertEqual(projection["projection_schema_version"], 2)
         self.assertEqual(projection["authority"], "synthetic-non-authoritative")
         self.assertEqual(projection["graph_contract"], "workstream-relation-graph")
         self.assertEqual(projection["plan_contract"], "workstream-succession-plan")
@@ -123,12 +138,28 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertTrue(any(item["certainty"] == "stale" for item in projection["edges"]))
         self.assertIn("offline-unknown", projection["unknown_workstream_ids"])
         self.assertGreaterEqual(len(projection["history_candidate_ids"]), 2)
+        self.assertEqual(nodes["CI1"]["series_id"], "CI")
+        self.assertEqual(nodes["CI2-late"]["task_code"], "CI2")
+        self.assertEqual(nodes["waiting-task"]["plain_status"], "等待人工确认")
+        self.assertEqual(nodes["offline-unknown"]["plain_status"], "关系证据不足")
 
-        compare = [item for item in projection["conflicts"] if item["disposition"] == "compare"]
-        suppress = [item for item in projection["conflicts"] if item["disposition"] == "suppress"]
-        self.assertTrue(any(item["certainty"] == "confirmed" for item in compare))
-        self.assertTrue(any(item["certainty"] == "proposed" for item in compare))
-        self.assertTrue(suppress)
+        self.assertTrue(projection["conflicts"])
+        self.assertTrue(all(item["relation_type"] == "conflict-fact" for item in projection["conflicts"]))
+        self.assertTrue(all(item["conflict_evidence"]["location"] for item in projection["conflicts"]))
+        self.assertTrue(all(item["conflict_evidence"]["impact"] for item in projection["conflicts"]))
+        self.assertTrue(all(item["conflict_evidence"]["source"] for item in projection["conflicts"]))
+        self.assertTrue(projection["comparison_suggestions"])
+        self.assertTrue(all(item["relation_type"] == "comparison-suggestion" for item in projection["comparison_suggestions"]))
+        self.assertTrue(projection["suppressed_pairs"])
+        conflict_pairs = {
+            frozenset((item["source_workstream_id"], item["target_workstream_id"]))
+            for item in projection["conflicts"]
+        }
+        comparison_pairs = {
+            frozenset((item["source_workstream_id"], item["target_workstream_id"]))
+            for item in projection["comparison_suggestions"]
+        }
+        self.assertTrue(conflict_pairs.isdisjoint(comparison_pairs))
         safe = next(
             link for node in projection["nodes"] for link in node["source_links"] if link["href"]
         )
@@ -148,7 +179,7 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         lens_types = {
             "succession": {"derived_from", "absorbs"},
             "dependency": {"depends_on"},
-            "conflict": {"conflict-pair"},
+            "conflict": {"conflict-fact"},
         }
         for lens, allowed in lens_types.items():
             with self.subTest(lens=lens):
@@ -465,8 +496,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
         mapping = json.loads((ROOT / "scripts" / "ci" / "change-mapping.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.16")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.16")
+        self.assertEqual(component["version"], "0.1.17")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.17")
         test_ids = [item["test_id"] for item in mapping["tests"]]
         self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
         self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))
