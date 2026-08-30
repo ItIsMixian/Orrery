@@ -1,5 +1,17 @@
 # 开发日志
 
+## 2026-08-30 — CI7 Exact-SHA Evidence Correction
+
+- clean `290482f` 上唯一 amended Fast 对 42-test plan 在加载测试前以
+  `fast-selected-count-exceeds-20` predictive refusal，保持 non-green、未重试且未由 Checkpoint 替代；同一
+  fingerprint 的唯一 Checkpoint 42/42 PASS（16.417209s/90s，evidence-eligible）。
+- 审校后修复 plan-known refusal diagnostics：保留机械 selected count、change volume、rerun count 与空 slow
+  IDs，runtime、runner setup/build 和宿主 usage 继续为 `Unknown`。负向断言折叠进既有 CI7 final ID，不扩大
+  421-ID inventory，也不追写 immutable `290482f` receipt。
+- 此 follow-up 只运行 focused CI contract；不重跑正式 Fast/Checkpoint 或 Promotion。新 Candidate 因 SHA／
+  fingerprint 已变化，必须由中央基于最终 actual diff 处理 over-selection 并取得 fresh tier evidence。定向
+  refusal／mapping contracts 3/3 与 CI contract PASS。
+
 ## 2026-08-30 — CI7 Composable Acceptance Gates & Validation Leases Amendment
 
 - 维护者以 task-description commit `a67b8c6` 扩展既有 CI7；分支从 clean retained Candidate `a520ebc` 继续，
@@ -13,8 +25,8 @@
   human override 可重跑。iterating focused、Fast/Checkpoint predictive headroom、valid-receipt timing summaries 与
   router+runner setup/build total cost 均失败关闭，不改变 15／90 秒或 stage authority。
 - 新 assertions 合并进既有 CI7 final unittest ID，保持 421-ID Promotion inventory。Focused policy/lease/p95/
-  no-repeat 正负 contract 已通过；唯一 amended Fast/Checkpoint、clean Candidate gates 与 final commit evidence
-  在稳定后记录。本分支不 push/main/release，完整 Promotion 留给中央 exact-SHA acceptance。
+  no-repeat stable sweep 16/16 PASS；唯一 amended Fast/Checkpoint 与 clean Candidate gates 的实际结果由上方
+  evidence correction 记录。本分支不 push/main/release，完整 Promotion 留给中央 exact-SHA acceptance。
 
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
@@ -752,5 +764,6 @@
   fixture；U2.2 Maintenance 22 项继续保留 real-Git/Quick Remove 门；Unified security 为 4 项有界 adjacency。
 - receipt 追加非权威 cost/over-budget diagnostics、一次 feature triage 与第二独立 Workstream recurrence
   advisory。宿主 usage 不可得时写 `Unknown`，不估 token；expected future runs/break-even 永不升级为 gate。
-  focused 5/5、CI contract、完整 CI suite 25/25、最终开发树 Fast 42/42（8.057895s）与 Checkpoint 42/42
-  （7.526136s）通过。完整 Promotion 不作开发循环；clean exact-SHA hosted checks 留给中央整合。
+  原始 `a520ebc` focused 5/5、CI contract、完整 CI suite 25/25、pre-amendment 开发树 Fast 42/42
+  （8.057895s）与 Checkpoint 42/42（7.526136s）通过；这些不替代上方 amendment exact-SHA non-green Fast
+  事实。完整 Promotion 不作开发循环；新 final fingerprint 的 hosted checks 留给中央整合。

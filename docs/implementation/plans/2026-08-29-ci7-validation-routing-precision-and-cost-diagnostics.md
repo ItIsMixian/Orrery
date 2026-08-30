@@ -1,6 +1,6 @@
 # 实施计划：CI7 Validation Routing Precision & Total-Cost Diagnostics
 
-Status: Original `a520ebc` Candidate retained; acceptance-gate/lease amendment implemented, final local receipts pending
+Status: Amendment implemented; `290482f` Fast non-green / Checkpoint PASS recorded; diagnostic follow-up requires fresh central evidence
 
 Date: 2026-08-29
 
@@ -138,8 +138,9 @@ activation 仍不在授权内。
 
 - [x] focused contract 覆盖 legacy shadow、human/mechanical authority、mixed all-of、five kinds、freshness、Team
   privacy、lease lifecycle/no-repeat/override、predictive limits、95 秒 Maintenance、integration replay 与 guard。
-- [ ] policy 稳定后只运行一次 routed Fast 和一次 routed Checkpoint；不得以 unchanged fingerprint 重试。
-- [ ] clean Candidate 的 repository/static/diff gates 与 Promotion inventory/lane/required-check 等价需记录到
+- [x] policy 稳定后只运行一次 routed Fast 和一次 routed Checkpoint；Fast 对 42>20 在 test loading 前 refusal，
+  Checkpoint 42/42 PASS；同 fingerprint 未重试，Checkpoint 未替代 Fast。
+- [x] clean Candidate 的 repository/static/diff gates 与 Promotion inventory/lane/required-check 等价已记录到
   Validation；完整 Promotion 不作为本地开发循环。
 - [ ] hosted/public enforcement 继续为独立维护者决定；中央整合后 push exact non-main SHA 并取得 Windows／
   Ubuntu required checks，根 PROGRESS/HANDOFF 只由唯一整合者更新。

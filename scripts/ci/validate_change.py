@@ -208,7 +208,7 @@ def _change_volume(base_sha: str, paths: list[str]) -> dict[str, int]:
 
 def _cost_diagnostics(
     plan: dict[str, Any], *, test_runtime: float | str, slow_ids: list[str],
-    runner_setup_build_wall_seconds: float = 0.0,
+    runner_setup_build_wall_seconds: float | str = 0.0,
 ) -> dict[str, Any]:
     inputs = plan["cost_diagnostic_inputs"]
     baseline = inputs["baseline_test_runtime_seconds"]
@@ -235,16 +235,24 @@ def _cost_diagnostics(
                 round(saving * future_runs - investment, 6) if future_runs is not None else "Unknown"
             ),
         })
+    runner_setup = (
+        round(runner_setup_build_wall_seconds, 6)
+        if isinstance(runner_setup_build_wall_seconds, (int, float))
+        else "Unknown"
+    )
+    total_setup = (
+        round(inputs["router_setup_wall_seconds"] + runner_setup_build_wall_seconds, 6)
+        if isinstance(runner_setup_build_wall_seconds, (int, float))
+        else "Unknown"
+    )
     return {
         "schema_version": COST_DIAGNOSTICS_VERSION,
         "authority": "non-authoritative-advisory",
         "selected_test_count": plan["selected_test_count"],
         "test_runtime_seconds": test_runtime,
         "router_setup_wall_seconds": inputs["router_setup_wall_seconds"],
-        "runner_setup_build_wall_seconds": round(runner_setup_build_wall_seconds, 6),
-        "total_setup_build_wall_seconds": round(
-            inputs["router_setup_wall_seconds"] + runner_setup_build_wall_seconds, 6
-        ),
+        "runner_setup_build_wall_seconds": runner_setup,
+        "total_setup_build_wall_seconds": total_setup,
         "rerun_count": inputs["rerun_count"],
         "slow_test_ids": slow_ids,
         "change_volume": inputs["change_volume"],
@@ -679,6 +687,7 @@ def main() -> int:
     output = arguments.output.resolve() if arguments.output else _default_output(arguments.stage)
     base_sha: str | None = None
     base_source: str | None = None
+    plan: dict[str, Any] | None = None
     try:
         manifest_path = arguments.manifest.resolve()
         manifest = load_json(manifest_path)
@@ -850,18 +859,24 @@ def main() -> int:
             "os": platform.system(),
             "python": platform.python_version(),
         }
-        refusal["cost_diagnostics"] = {
-            "schema_version": 1, "authority": "non-authoritative-advisory",
-            "selected_test_count": "Unknown", "test_runtime_seconds": "Unknown",
-            "router_setup_wall_seconds": round(time.perf_counter() - started, 6),
-            "runner_setup_build_wall_seconds": "Unknown",
-            "total_setup_build_wall_seconds": "Unknown",
-            "rerun_count": "Unknown", "slow_test_ids": [],
-            "change_volume": "Unknown", "independent_optimization_workstream": arguments.independent_optimization_workstream,
-            "host_usage": {"status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown"},
-            "expected_future_runs": arguments.expected_future_runs or "Unknown",
-            "break_even": {"status": "insufficient-input"}, "gate_effect": "none",
-        }
+        if plan is not None and isinstance(plan.get("cost_diagnostic_inputs"), dict):
+            refusal["cost_diagnostics"] = _cost_diagnostics(
+                plan, test_runtime="Unknown", slow_ids=[],
+                runner_setup_build_wall_seconds="Unknown",
+            )
+        else:
+            refusal["cost_diagnostics"] = {
+                "schema_version": 1, "authority": "non-authoritative-advisory",
+                "selected_test_count": "Unknown", "test_runtime_seconds": "Unknown",
+                "router_setup_wall_seconds": round(time.perf_counter() - started, 6),
+                "runner_setup_build_wall_seconds": "Unknown",
+                "total_setup_build_wall_seconds": "Unknown",
+                "rerun_count": "Unknown", "slow_test_ids": [],
+                "change_volume": "Unknown", "independent_optimization_workstream": arguments.independent_optimization_workstream,
+                "host_usage": {"status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown"},
+                "expected_future_runs": arguments.expected_future_runs or "Unknown",
+                "break_even": {"status": "insufficient-input"}, "gate_effect": "none",
+            }
         atomic_write_json(output, refusal)
         print(f"REFUSED {arguments.stage}: {exc}", file=sys.stderr)
         for item in exc.required_metadata:
@@ -888,18 +903,24 @@ def main() -> int:
             "runner_errors": [message], "required_metadata": required,
             "os": platform.system(), "python": platform.python_version(),
         }
-        refusal["cost_diagnostics"] = {
-            "schema_version": 1, "authority": "non-authoritative-advisory",
-            "selected_test_count": "Unknown", "test_runtime_seconds": "Unknown",
-            "router_setup_wall_seconds": round(time.perf_counter() - started, 6),
-            "runner_setup_build_wall_seconds": "Unknown",
-            "total_setup_build_wall_seconds": "Unknown",
-            "rerun_count": "Unknown", "slow_test_ids": [],
-            "change_volume": "Unknown", "independent_optimization_workstream": arguments.independent_optimization_workstream,
-            "host_usage": {"status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown"},
-            "expected_future_runs": arguments.expected_future_runs or "Unknown",
-            "break_even": {"status": "insufficient-input"}, "gate_effect": "none",
-        }
+        if plan is not None and isinstance(plan.get("cost_diagnostic_inputs"), dict):
+            refusal["cost_diagnostics"] = _cost_diagnostics(
+                plan, test_runtime="Unknown", slow_ids=[],
+                runner_setup_build_wall_seconds="Unknown",
+            )
+        else:
+            refusal["cost_diagnostics"] = {
+                "schema_version": 1, "authority": "non-authoritative-advisory",
+                "selected_test_count": "Unknown", "test_runtime_seconds": "Unknown",
+                "router_setup_wall_seconds": round(time.perf_counter() - started, 6),
+                "runner_setup_build_wall_seconds": "Unknown",
+                "total_setup_build_wall_seconds": "Unknown",
+                "rerun_count": "Unknown", "slow_test_ids": [],
+                "change_volume": "Unknown", "independent_optimization_workstream": arguments.independent_optimization_workstream,
+                "host_usage": {"status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown"},
+                "expected_future_runs": arguments.expected_future_runs or "Unknown",
+                "break_even": {"status": "insufficient-input"}, "gate_effect": "none",
+            }
         atomic_write_json(output, refusal)
         print(f"FAIL validation router: {exc}", file=sys.stderr)
         return 2

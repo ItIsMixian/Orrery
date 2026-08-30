@@ -486,6 +486,7 @@ class CIValidationTests(unittest.TestCase):
         self._assert_acceptance_policy_all_of_authority_freshness_and_team_projection()
         self._assert_validation_lease_is_one_run_idempotent_and_failure_requires_human_override()
         self._assert_predictive_p95_and_iterating_caps_refuse_before_execution()
+        self._assert_predictive_refusal_preserves_known_plan_cost_diagnostics()
         self._assert_formal_selection_plan_without_lease_refuses_before_test_loading()
 
     def _assert_acceptance_policy_all_of_authority_freshness_and_team_projection(self) -> None:
@@ -875,6 +876,56 @@ class CIValidationTests(unittest.TestCase):
                     scope_revision=2, surface_fingerprint=focused_plan["surface_fingerprint"],
                     receipt_inputs=[], task_phase="iterating",
                 )
+
+    def _assert_predictive_refusal_preserves_known_plan_cost_diagnostics(self) -> None:
+        session = {
+            "workstream_id": "predictive-refusal-fixture",
+            "scope_revision": 2,
+            "primary_subsystem_id": "test-coverage",
+            "affected_subsystem_ids": [],
+            "expected_writes": [],
+        }
+        known_volume = {
+            "test_changed_files": 1,
+            "test_changed_lines": 17,
+            "ci_changed_files": 1,
+            "ci_changed_lines": 23,
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "predictive-refusal.json"
+            argv = [
+                "validate_change.py", "--stage", "fast", "--base", git_sha(),
+                "--output", str(output),
+            ]
+            with mock.patch("sys.argv", argv), mock.patch(
+                "validate_change.resolve_base",
+                return_value=(git_sha(), "explicit", session, "fixture-session.json"),
+            ), mock.patch(
+                "validate_change.changed_paths",
+                return_value=(["scripts/ci/validate_change.py", "tests/test_ci_validation.py"], False),
+            ), mock.patch(
+                "validate_change._change_volume", return_value=known_volume,
+            ), mock.patch(
+                "validate_change._prepare_acceptance",
+                side_effect=CIValidationError(
+                    "predictive budget refusal: fast-selected-count-exceeds-20"
+                ),
+            ):
+                return_code = validate_change_main()
+            receipt = load_json(output)
+        self.assertNotEqual(return_code, 0)
+        self.assertEqual(receipt["outcome"], "refused")
+        self.assertFalse(receipt["evidence_eligible"])
+        self.assertIn("fast-selected-count-exceeds-20", receipt["runner_errors"][0])
+        diagnostics = receipt["cost_diagnostics"]
+        self.assertGreater(diagnostics["selected_test_count"], 20)
+        self.assertEqual(diagnostics["change_volume"], known_volume)
+        self.assertEqual(diagnostics["rerun_count"], 0)
+        self.assertEqual(diagnostics["slow_test_ids"], [])
+        self.assertEqual(diagnostics["test_runtime_seconds"], "Unknown")
+        self.assertEqual(diagnostics["runner_setup_build_wall_seconds"], "Unknown")
+        self.assertEqual(diagnostics["total_setup_build_wall_seconds"], "Unknown")
+        self.assertEqual(diagnostics["host_usage"]["status"], "Unknown")
 
     def _assert_formal_selection_plan_without_lease_refuses_before_test_loading(self) -> None:
         portfolio = next(
