@@ -36,7 +36,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 ## 活动计划与待办
 
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill 与 duplicate-number gate 已本地集成；A4/U2.3 最终集成时仍须把 A4 `ADR-0018` 规范化为 `ADR-0019`。
-- [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 已本地集成；使用“任务说明版本”、默认不轮询，并经 amendment 只补 generic `release-packaging` mapping。安装／发布与 S1 Conductor 仍是独立后续事项。
+- [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 与 PO enforcement 已本地集成，并只安装到当前本机 Codex home；未进入发布包，S1 Conductor 仍是独立后续事项。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
 - [ ] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航／help 收口与轻量全活动任务投影的权威范围已冻结；Agent 确认本 authority baseline 后恢复实现。
 - [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：ADR-0017 与 Approved Design 已接受；任务系列、状态 taxonomy、comparison／conflict amendment 已写入 Plan，Agent 确认本 authority baseline 后恢复实现。Agent／Harness／Conductor 只可建议，任务 owner／human integrator 按 gate 确认。

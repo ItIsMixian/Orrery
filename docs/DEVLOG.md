@@ -1,5 +1,10 @@
 # 开发日志
 
+## 2026-08-30 — Orrery Dispatch Local-only Install
+
+- 维护者选择仅本机安装，不进入 0.3.0 或其他公共分发。中央在 PO1 local integration `8b73f26` 后，只复制 `SKILL.md`／`agents/openai.yaml` 到 `C:\Users\1\.codex\skills\orrery-dispatch`。
+- 标准 Skill 校验通过；source/installed SHA-256 分别一致为 `CE5589CF...8EB67` 与 `2B15E4A9...7029`。没有修改 release manifest、package、tag、remote ref、GitHub Release 或 v0.2.0 冻结资产。
+
 ## 2026-08-30 — PO1 Decision Allocation Enforcement Candidate
 
 - 从任务说明版本 `da348b9` 建立独立 PO1 worktree 与 Git-private Scope。`orrery-dispatch` 现要求非显式唯一 integration worktree 使用 `PO-DEC-*` Proposed 文件，并明确 branch name／局部“next number”不产生正式编号权限。

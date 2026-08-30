@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS — unreleased source Candidate only
+Status: PASS — local-only installed Candidate; unreleased
 
 Authority source: [S0 Plan](../implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)
 
@@ -65,9 +65,13 @@ Structural and repository validation do not prove host-level first-write enforce
 The source Candidate is not installed, published or part of Orrery v0.3.0. It does not modify the current
 `project-orrery` Skill or implement the future S1 Conductor.
 
-## Pending local-only closeout
+## Local-only closeout
 
-- update the source Skill with ADR-0007 PO allocation behavior;
-- integrate and validate the updated source;
-- copy only `SKILL.md` and `agents/openai.yaml` to the current local Codex skills directory;
-- verify source/installed hashes and keep every release/public surface unchanged.
+- Updated PO enforcement entered local integration commit `8b73f2664dd756024028a98750918e0a26bab9e8`.
+- Installed only `SKILL.md` and `agents/openai.yaml` under
+  `C:\Users\1\.codex\skills\orrery-dispatch`; standard Skill validation passed.
+- Source and installed SHA-256 matched:
+  - `SKILL.md`: `CE5589CF5AE7A909CC4F3B98BA6AA648F127B862676F09BBBF7DBD967FE8EB67`;
+  - `agents/openai.yaml`: `2B15E4A978280FFB9A2F2590E6DD318D0C3FE3DF783A13BCC06D9C6776177029`.
+- No release manifest, package, tag, remote ref or public distribution changed. The local Skill becomes discoverable by
+  Codex on the next turn/session refresh.

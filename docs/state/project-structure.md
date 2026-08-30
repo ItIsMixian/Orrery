@@ -12,6 +12,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
 - `skills/orrery-dispatch/` 是 S0 独立两文件 source Candidate；它与安装／迁移／审计用的 `skills/project-orrery/` 分开，也不是未来独立 S1 Conductor repository。
 - PO1 在不增加文件角色或号码服务的前提下，把 decision proposal/number allocation 边界投影进 dispatch Skill，并在 repository gate 检查当前树 numeric ADR 唯一性；它不扫描或锁定 peer Candidate 编号。
+- 当前本机 Codex home 有一份从 local integration `8b73f26` 复制的 `orrery-dispatch` 两文件安装；该外部本机副本不属于 Git tree 或发布资产。
 - 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。W7.2.3／U2.2 integrated Candidate 声明 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16；Core API 为 1，组件总状态为 `unreleased`。
 - 薄平台层位于 `adapters/{codex,harness-json,claude-code,deepseek-harness}/`，当前 source 版本均为 0.1.1、`experimental`／`unreleased`。Adapter 不拥有 canonical 作者模板、State、ADR 或 Authority 规则。
 - 自托管观测台位于根 `scripts/docsite/`。integrated Candidate 新增 `Start Orrery.vbs`／`start-orrery.bat --console`、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 仍为 root-only/default-off consumer，没有进入默认发布模板或 v0.2.0 managed tools。
@@ -74,7 +75,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - W7 relation store 没有 self-host native apply 记录；旧 session 到 post-main closure 的兼容收口仍需保守人工流程。
 - W7.3 relation capture 尚未实现：当前没有 exact-base `derived_from` 自动写入、gate-aware `depends_on` proposal／confirmation、integrator registry／`absorbs` 确认或 Observatory relation inbox；现有 Graph 只能显示已有证据，因此仍可能稀疏。
 - ADR-0018 的自动 dispatch receipt、scope revision CAS、Adapter acknowledgment evidence 和 first-write enforcement 尚未实现。
-- S0 Skill 未安装、未发布，也没有任务状态聚合、scheduler、relation confirmation 或执行权限。
+- S0 Skill 仅在当前本机安装、未发布，也没有任务状态聚合、scheduler、relation confirmation 或执行权限。
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。
 - Claude Code 尚未完成认证后的真实模型路由；DeepSeek 与 Codex evidence 只覆盖各自记录的精确 runtime 范围。
 - 自动 R1 脱敏导出器、跨平台 byte-for-byte archive 与 Brownfield Adoption 研究／Plan 均未实现。
