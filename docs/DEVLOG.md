@@ -692,3 +692,29 @@
 - 维护者确认“最终测试更快”不能单独证明整体效率提高；Agent token、调试、重跑和后续维护也属于验证成本。
 - 新增 CI7 Plan，优先把宽 Observatory mapping 拆成 Graph／Maintenance／Shell／Team-Personal 数据面，并让 feature task 在超预算后停止扩张，由中央按 exact diff 重路由或另立 CI task。
 - CI7 只增加非权威 cost diagnostics，不改变 Fast／Checkpoint／Candidate／Promotion 的证明含义、15／90 秒预算、required checks 或 exact-SHA main 推广门；因此本轮不新增 ADR。
+
+## 2026-08-29 — W7.2 Workstream Graph Readability & Progressive Disclosure Candidate
+
+- 维护者拒绝 integrated Graph 的卡片比例、长 ID、箭头层级和伪展开体验；U2.1 worktree 从 clean `02efa41` 以 `--ff-only` 接续唯一中央 baseline `ad9f094`，并在首次 W7.2 作者写入前登记 Git-private Workstream。根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.13 将 Graph 改为固定 248×104px 卡片、单一从左到右 rank lane、正交高对比箭头与不透明关系标签；每条链拥有自己的更早历史 cluster，Reset 恢复默认折叠／100%／关闭 inspector。桌面 inspector 为 overlay，390px 用同一事实集合的任务关系列表，桌面重复 ledger 只保留 screen-reader 语义。
+- succession／dependency／conflict 三 lens 不再共享 active-tip 填充：dependency 无 edge 时为 0 节点中文空态，单边 fixture 为 2 端点＋1 箭头；conflict 只显示真实 pair 端点。Core relation schema／facts、W7.1 archive hash/source evidence 与零执行权均未改。
+- focused Graph＋Unified 18/18、JS syntax、真实 self-host 1280×800／1440×900／390×844 交互与 frontend visual checks 通过；无页面横向溢出或 console warning/error。CI6 Fast／Checkpoint 与 exact clean Candidate 记录在 W7.2 Validation；不运行完整 Promotion、不 push main、不发布。
+
+## 2026-08-30 — W7.2.1 Workstream Graph Interaction Correction
+
+- 维护者在真实网页复查中指出画布缺少 `Ctrl + 滚轮`、SVG 边焦点出现巨大黑框、线路标签压在线上、折叠无法按链收回，以及依赖空态缺乏解释。修正从 exact W7.2 Candidate `5523e6d` 登记 Git-private `W7.2.1-workstream-graph-interaction-correction` 后写入，根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.14 去掉线路标签盒，以实线青／虚线黄／复合红线和明显箭头编码关系；焦点沿真实路径显示，画布支持 55%–160% 锚点式 `Ctrl + 滚轮`，Reset 恢复 100% 和原点。connected component 使用稳定水平行，展开后的每条上游链可独立收起，技术详情为画布内可关闭 drawer。
+- dependency 继续严格消费真实 `depends_on`：self-host 无显式依赖边时显示“当前没有已登记的依赖关系”与 0 节点，不复制接续边或填充孤立任务。Core relation schema/facts、archive 只读与所有执行安全边界均未改变。
+- focused Graph＋Unified 18/18、JS syntax、CI6 Fast 38/38 和真实浏览器三档验收通过。CI6 Checkpoint 路由为 44 tests／0 unknown path，但本机固定 90 秒外层预算在既有 Maintenance 增量 fixture 尚运行时超时；该 slow test 独立 1/1 通过（约 68–71 秒），因此本修正不伪称 evidence-eligible Checkpoint PASS，发布与中央整合仍需补齐该门。
+
+## 2026-08-30 — W7.2.2 Graph Arrow & Scrollbar Visual Integration
+
+- 维护者在真实深色页面指出冲突箭头比例失衡、页面／作者侧栏／图画布原生白色滚动条突兀；从 exact clean `bff8ce6` 登记 Git-private `W7.2.2-graph-arrow-scrollbar-visual-integration` 后写入，根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.15 将 SVG marker 从隐式 `strokeWidth` 倍增改为固定 10×10 `userSpaceOnUse`，默认／冲突路线收敛为 3px／4px；关系事实、lens、方向、折叠语义和执行边界均未改变。
+- docsite 根 CSS 新增深浅主题 scrollbar token：页面、侧栏、图画布和技术详情共享 10px 低对比圆角轨道／滑块，去掉原生按钮；390px ledger 和屏幕阅读语义保持。focused 18/18、JS syntax、CI6 Fast 38/38 与三档真实浏览器验收通过，详情见 W7.2 Validation。
+
+## 2026-08-30 — W7.2.3 Workstream Graph Density Correction
+
+- 维护者在真实浅色页面指出少量节点仍被 disconnected component 的整行空白过度拉开；从 exact clean `4e62dba` 登记 Git-private `W7.2.3-workstream-graph-density-correction` 后写入，根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.16 保持 248×104px 卡片与可读字号，将 rank 通道从 112px 收至 88px，并用 44px 显式 component gap 替代额外 138px synthetic row；canvas 高度改由最后一个真实节点决定。
+- 真实 self-host 14 节点／7 边桌面测量为 component gap 44px、rank gap 88px、0 node overlap、0 route/card crossing；390px 继续显示同事实 ledger，console 为空。Core facts、折叠语义、只读与所有执行安全边界未改变。

@@ -14,7 +14,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前 Canonical source
 
 - protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- U2.1 Worktree Candidate 声明 Core 0.1.17、CLI 0.1.21、Observatory 0.1.12；Core 增加 Maintenance 旧 last-run 兼容读取，CLI 因精确 Core 依赖同步推进，Observatory 修复统一 UX／graph provider gate／runtime cache。组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
+- W7.2.3 Worktree Candidate 声明 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16；Core／CLI 与关系 schema/facts 不变，Observatory 依次推进 Graph 可读性、渐进展开、画布交互、固定箭头／主题滚动条与紧凑组件间距。组件总状态为 `unreleased`，Core API／CLI JSON schema 仍为 1。
 - Codex、Harness JSON、Claude Code 与 DeepSeek Harness Adapter source 均为 0.1.1、`experimental`／`unreleased`。每个 Adapter 有独立 manifest、归档、生命周期和 runtime evidence，不能互相外推。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。
@@ -50,6 +50,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `scripts/docsite/build_unified_observatory.py`, `scripts/docsite/serve_orrery.py`
 - [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 UX Acceptance Fixes Validation](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
+- [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [Platform-neutral Plan](../implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)
 

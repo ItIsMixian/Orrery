@@ -30,6 +30,26 @@ HASH = re.compile(r"^[0-9a-f]{64}$")
 SAFE_TOKEN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{0,511}$")
 ACTIVE_NODE_STATUSES = {"active", "review-pending"}
 ENDED_PHASES = {"closed", "integrated", "unknown"}
+NODE_WIDTH = 248
+NODE_HEIGHT = 104
+RANK_GAP = 112
+ROW_GAP = 34
+
+DISPLAY_WORDS = {
+    "active": "当前", "acceptance": "验收", "architecture": "架构", "archived": "归档",
+    "authority": "权威", "baseline": "基线", "canonical": "权威", "ci": "持续集成",
+    "closeout": "收口", "collaboration": "协作", "consumer": "消费者", "contract": "契约",
+    "disclosure": "展开", "front": "前端", "graph": "关系图", "harness": "验证",
+    "host": "托管", "incremental": "增量", "integration": "整合", "lan": "局域网",
+    "local": "本地", "maintenance": "维护", "managed": "受管", "observatory": "观测台",
+    "optimization": "优化", "parallel": "并行", "production": "生产", "progressive": "渐进",
+    "promotion": "推广", "quick": "快速", "readability": "可读性", "real": "真实",
+    "relation": "关系", "remove": "删除", "router": "路由", "security": "安全",
+    "self": "自", "session": "会话", "state": "状态", "team": "团队", "throughput": "吞吐",
+    "tiered": "分层", "ui": "界面", "unified": "统一", "ux": "体验", "validation": "验证",
+    "workstream": "任务流", "fixes": "修复", "execution": "执行", "dynamic": "动态",
+    "succession": "接续", "projection": "投影", "infrastructure": "基础设施",
+}
 
 
 class RelationGraphUnavailable(ValueError):
@@ -143,6 +163,15 @@ def _node_is_active_tip(node: Mapping[str, Any]) -> bool:
     )
 
 
+def _display_identity(workstream_id: str) -> tuple[str, str]:
+    """Return a short task prefix and Chinese-first display name without changing the fact ID."""
+    parts = [part for part in workstream_id.split("-") if part]
+    prefix = parts[0] if parts and re.fullmatch(r"[A-Za-z]+[0-9][A-Za-z0-9.]*", parts[0]) else "任务"
+    translated = [DISPLAY_WORDS[item.lower()] for item in parts[1:] if item.lower() in DISPLAY_WORDS]
+    name = " · ".join(translated[:5]) if translated else "任务记录"
+    return prefix, name
+
+
 def _sanitize_node(value: Any, active_tip_ids: set[str]) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         raise RelationGraphUnavailable("invalid-core-payload", "Core node is invalid.")
@@ -157,8 +186,11 @@ def _sanitize_node(value: Any, active_tip_ids: set[str]) -> dict[str, Any]:
     affected = value.get("affected_subsystem_ids")
     if not isinstance(affected, list) or any(not isinstance(item, str) or not item for item in affected):
         raise RelationGraphUnavailable("invalid-core-payload", "Core subsystem axes are invalid.")
+    display_prefix, display_name = _display_identity(workstream_id)
     node = {
         "workstream_id": workstream_id,
+        "display_prefix": display_prefix,
+        "display_name": display_name,
         "status": str(value.get("status")),
         "session_state": str(value.get("session_state")),
         "lifecycle_phase": str(value.get("lifecycle_phase")),
@@ -370,6 +402,299 @@ def project_core_relation_graph(provider: Callable[[], Mapping[str, Any]]) -> di
         return unavailable_relation_graph_projection(error)
 
 
+def _lens_edges(projection: Mapping[str, Any], lens: str) -> list[dict[str, Any]]:
+    if lens == "conflict":
+        values = projection.get("conflicts", [])
+    else:
+        allowed = {"derived_from", "absorbs"} if lens == "succession" else {"depends_on"}
+        values = [
+            item for item in projection.get("edges", [])
+            if item.get("relation_type") in allowed and item.get("lifecycle") != "cancelled"
+        ]
+    result: list[dict[str, Any]] = []
+    for index, item in enumerate(values):
+        edge = dict(item)
+        if lens == "conflict":
+            left, right = sorted((str(item["source_workstream_id"]), str(item["target_workstream_id"])))
+            edge["display_from_id"], edge["display_to_id"] = left, right
+        else:
+            # Core records source=successor/dependent and target=predecessor/dependency.
+            edge["display_from_id"] = str(item["target_workstream_id"])
+            edge["display_to_id"] = str(item["source_workstream_id"])
+        edge["display_edge_id"] = str(item.get("relation_id") or item.get("id") or f"edge-{index}")
+        result.append(edge)
+    return result
+
+
+def _ordered_ancestors(tip: str, incoming: Mapping[str, set[str]]) -> list[str]:
+    """Return a stable oldest-to-newest traversal for one visible tip."""
+    found: set[str] = set()
+    ordered: list[str] = []
+
+    def visit(workstream_id: str) -> None:
+        for item in sorted(incoming.get(workstream_id, set())):
+            if item in found:
+                continue
+            found.add(item)
+            visit(item)
+            ordered.append(item)
+
+    visit(tip)
+    return ordered
+
+
+def build_readability_layout(
+    projection: Mapping[str, Any],
+    *,
+    lens: str = "succession",
+    expanded_chain_ids: Sequence[str] = (),
+) -> dict[str, Any]:
+    """Build a deterministic presentation-only layout for mechanical and browser parity checks."""
+    if lens not in {"succession", "dependency", "conflict"}:
+        raise ValueError("lens must be succession, dependency, or conflict")
+    nodes_by_id = {str(item["workstream_id"]): dict(item) for item in projection.get("nodes", [])}
+    edges = _lens_edges(projection, lens)
+    endpoint_ids = {
+        endpoint for item in edges
+        for endpoint in (item["display_from_id"], item["display_to_id"])
+    }
+    if lens == "succession":
+        endpoint_ids.update(str(item) for item in projection.get("active_tip_workstream_ids", []))
+    incoming: dict[str, set[str]] = {item: set() for item in endpoint_ids}
+    outgoing: dict[str, set[str]] = {item: set() for item in endpoint_ids}
+    for item in edges:
+        source, target = item["display_from_id"], item["display_to_id"]
+        outgoing.setdefault(source, set()).add(target)
+        incoming.setdefault(target, set()).add(source)
+
+    expanded = set(expanded_chain_ids)
+    visible_ids: set[str] = set()
+    chains: list[dict[str, Any]] = []
+    claimed_history: set[str] = set()
+    if lens == "conflict":
+        visible_ids.update(endpoint_ids)
+    else:
+        tips = sorted(item for item in endpoint_ids if not outgoing.get(item))
+        if lens == "succession":
+            tips = sorted(set(tips) | set(str(item) for item in projection.get("active_tip_workstream_ids", [])))
+        for tip in tips:
+            chain_id = "chain:" + tip
+            direct = set(incoming.get(tip, set()))
+            siblings = {sibling for predecessor in direct for sibling in outgoing.get(predecessor, set())}
+            default_ids = {tip, *direct, *siblings}
+            older = [
+                item for item in _ordered_ancestors(tip, incoming)
+                if item not in default_ids and item not in claimed_history
+            ]
+            claimed_history.update(older)
+            visible_ids.update(default_ids)
+            if chain_id in expanded:
+                visible_ids.update(older)
+            chains.append({
+                "chain_id": chain_id,
+                "tip_id": tip,
+                "direct_ids": sorted(direct),
+                "history_ids": older,
+                "expanded": chain_id in expanded,
+            })
+
+    visible_nodes = [nodes_by_id[item] for item in sorted(visible_ids) if item in nodes_by_id]
+    for chain in chains:
+        if not chain["expanded"] or not chain["history_ids"]:
+            continue
+        toggle_node = next(
+            (
+                item for item in visible_nodes
+                if item["workstream_id"] == chain["history_ids"][0]
+            ),
+            None,
+        )
+        if toggle_node is not None:
+            toggle_node["collapse_chain_id"] = chain["chain_id"]
+            toggle_node["expanded_history_count"] = len(chain["history_ids"])
+    cluster_nodes: list[dict[str, Any]] = []
+    cluster_edges: list[dict[str, Any]] = []
+    hidden_owner: dict[str, str] = {}
+    for chain in chains:
+        if chain["expanded"] or not chain["history_ids"]:
+            continue
+        cluster_id = "history:" + chain["tip_id"]
+        for item in chain["history_ids"]:
+            hidden_owner[item] = cluster_id
+        cluster_nodes.append({
+            "workstream_id": cluster_id,
+            "display_prefix": f"+{len(chain['history_ids'])}",
+            "display_name": "折叠的上游链",
+            "status": "inactive",
+            "runtime_condition": "collapsed",
+            "lifecycle_phase": "historical",
+            "evidence_freshness": "historical",
+            "scope_status": "historical",
+            "primary_subsystem_id": "历史任务",
+            "source_links": [],
+            "is_cluster": True,
+            "chain_id": chain["chain_id"],
+            "cluster_ids": list(chain["history_ids"]),
+            "cluster_first_id": chain["history_ids"][0],
+            "cluster_last_id": chain["history_ids"][-1],
+            "cluster_tip_id": chain["tip_id"],
+        })
+    visible_nodes.extend(cluster_nodes)
+
+    display_edges: list[dict[str, Any]] = []
+    seen_clusters: set[tuple[str, str, str]] = set()
+    for edge in edges:
+        source, target = edge["display_from_id"], edge["display_to_id"]
+        mapped_source, mapped_target = hidden_owner.get(source, source), hidden_owner.get(target, target)
+        if mapped_source == mapped_target:
+            continue
+        if mapped_source in {item["workstream_id"] for item in visible_nodes} and mapped_target in {
+            item["workstream_id"] for item in visible_nodes
+        }:
+            key = (mapped_source, mapped_target, str(edge.get("relation_type")))
+            if key in seen_clusters:
+                continue
+            seen_clusters.add(key)
+            item = dict(edge)
+            item["display_from_id"], item["display_to_id"] = mapped_source, mapped_target
+            item["collapsed_history_edge"] = mapped_source != source or mapped_target != target
+            display_edges.append(item)
+
+    node_ids = {item["workstream_id"] for item in visible_nodes}
+    indegree = {item: 0 for item in node_ids}
+    adjacency = {item: set() for item in node_ids}
+    for edge in display_edges:
+        source, target = edge["display_from_id"], edge["display_to_id"]
+        if target not in adjacency[source]:
+            adjacency[source].add(target)
+            indegree[target] += 1
+    rank = {item: 0 for item in node_ids}
+    queue = sorted(item for item, degree in indegree.items() if degree == 0)
+    visited: list[str] = []
+    while queue:
+        item = queue.pop(0)
+        visited.append(item)
+        for target in sorted(adjacency[item]):
+            rank[target] = max(rank[target], rank[item] + 1)
+            indegree[target] -= 1
+            if indegree[target] == 0:
+                queue.append(target)
+                queue.sort()
+    for item in sorted(node_ids - set(visited)):
+        rank[item] = 1 if lens == "conflict" else 0
+
+    groups: dict[int, list[dict[str, Any]]] = {}
+    for node in visible_nodes:
+        groups.setdefault(rank[node["workstream_id"]], []).append(node)
+    for values in groups.values():
+        values.sort(key=lambda item: (not bool(item.get("is_cluster")), str(item["workstream_id"])))
+    # Connected components own horizontal bands.  A simple chain therefore
+    # stays on one row and reads like an engineering diagram instead of a set
+    # of unrelated cards joined through a label shelf.
+    undirected = {item: set() for item in node_ids}
+    for edge in display_edges:
+        source, target = edge["display_from_id"], edge["display_to_id"]
+        undirected[source].add(target)
+        undirected[target].add(source)
+    components: list[list[str]] = []
+    assigned: set[str] = set()
+    for seed in sorted(node_ids):
+        if seed in assigned:
+            continue
+        members: list[str] = []
+        pending = [seed]
+        assigned.add(seed)
+        while pending:
+            item = pending.pop(0)
+            members.append(item)
+            for sibling in sorted(undirected[item]):
+                if sibling not in assigned:
+                    assigned.add(sibling)
+                    pending.append(sibling)
+        components.append(sorted(members))
+
+    node_top = 112
+    positions: dict[str, dict[str, int]] = {}
+    row_cursor = 0
+    for component_index, members in enumerate(sorted(components, key=lambda item: item[0])):
+        member_ids = set(members)
+        by_rank = {
+            rank_value: [node for node in values if node["workstream_id"] in member_ids]
+            for rank_value, values in sorted(groups.items())
+        }
+        by_rank = {rank_value: values for rank_value, values in by_rank.items() if values}
+        component_rows = max((len(values) for values in by_rank.values()), default=1)
+        for rank_value, values in by_rank.items():
+            for local_row, node in enumerate(values):
+                positions[node["workstream_id"]] = {
+                    "x": 36 + rank_value * (NODE_WIDTH + RANK_GAP),
+                    "y": node_top + (row_cursor + local_row) * (NODE_HEIGHT + ROW_GAP),
+                    "width": NODE_WIDTH,
+                    "height": NODE_HEIGHT,
+                    "rank": rank_value,
+                    "row": row_cursor + local_row,
+                    "component": component_index,
+                }
+        row_cursor += component_rows + 1
+    max_rows = max(1, row_cursor - 1 if row_cursor else 1)
+    routes: list[dict[str, Any]] = []
+    for index, edge in enumerate(display_edges):
+        source = positions[edge["display_from_id"]]
+        target = positions[edge["display_to_id"]]
+        start = (source["x"] + source["width"], source["y"] + source["height"] // 2)
+        end = (target["x"], target["y"] + target["height"] // 2)
+        rank_span = max(1, target["rank"] - source["rank"])
+        if start[1] == end[1] and rank_span == 1:
+            points = [start, end]
+        elif rank_span == 1:
+            middle = (start[0] + end[0]) // 2
+            points = [start, (middle, start[1]), (middle, end[1]), end]
+        else:
+            start_channel = start[0] + 22
+            end_channel = end[0] - 22
+            track_y = max(88, min(source["y"], target["y"]) - 20 - (index % 4) * 8)
+            points = [
+                start, (start_channel, start[1]), (start_channel, track_y),
+                (end_channel, track_y), (end_channel, end[1]), end,
+            ]
+        routes.append({
+            "edge_id": edge["display_edge_id"], "points": points,
+            "has_arrow": True, "has_label": False,
+            "line_encoding": (
+                "dashed" if lens == "dependency" else
+                "compound" if lens == "conflict" else "solid"
+            ),
+        })
+    max_rank = max(groups, default=-1)
+    lane_titles = []
+    for rank_value in range(max_rank + 1):
+        values = groups.get(rank_value, [])
+        if any(item.get("is_cluster") for item in values):
+            title = "更早历史"
+        elif any(item.get("is_active_tip") for item in values):
+            title = "当前任务"
+        elif rank_value == max_rank:
+            title = "当前／后续任务"
+        else:
+            title = "直接前置／依赖"
+        lane_titles.append({"rank": rank_value, "title": title})
+    return {
+        "lens": lens,
+        "nodes": visible_nodes,
+        "edges": display_edges,
+        "chains": chains,
+        "positions": positions,
+        "routes": routes,
+        "lanes": lane_titles,
+        "width": (
+            72 + (max_rank + 1) * NODE_WIDTH + max_rank * RANK_GAP
+            if node_ids else 1
+        ),
+        "height": node_top + max_rows * (NODE_HEIGHT + ROW_GAP) + 34 if node_ids else 1,
+        "visible_fact_ids": sorted(item for item in visible_ids if item in nodes_by_id),
+    }
+
+
 WORKSTREAM_GRAPH_CSS = r"""
 .wg-shell{--wg-cyan:#5fcfc7;--wg-amber:#efb759;--wg-red:#f07467;--wg-ink:#d8e1ee;--wg-dim:#8490a3;margin:0 0 24px;border:1px solid var(--line);border-radius:15px;overflow:hidden;background:linear-gradient(180deg,rgba(95,207,199,.055),transparent 210px),var(--bg)}
 .wg-shell *{box-sizing:border-box}.wg-mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;padding:22px 24px 17px;border-bottom:1px solid var(--line)}.wg-kicker,.wg-panel-index{margin:0;color:var(--wg-cyan);font:700 10px/1.3 "Cascadia Code",Consolas,monospace;letter-spacing:.13em;text-transform:uppercase}.wg-mast h2{margin:4px 0;font-size:26px;letter-spacing:-.025em}.wg-mast p{margin:0;color:var(--mut);font-size:12.5px}.wg-seal{align-self:start;padding:7px 10px;border:1px solid var(--line);border-radius:6px;color:var(--wg-dim);font:700 10px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.08em}.wg-seal.ready::before{content:"◇ ";color:var(--wg-cyan)}.wg-seal.unavailable::before{content:"? ";color:var(--wg-amber)}
@@ -412,6 +737,16 @@ function install(){svg.querySelectorAll('.wg-edge-hit').forEach(path=>{path.remo
 let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;observer.disconnect();install();observer.observe(svg,{childList:true,subtree:true})})});install();observer.observe(svg,{childList:true,subtree:true});})();
 """
 
+# W7.2 keeps the previous bytes above only as an internal rollback reference while the shipped
+# presentation is owned by a focused module. Core/provider contracts remain untouched.
+from .workstream_graph_presentation import (  # noqa: E402
+    WORKSTREAM_GRAPH_CSS as _PROGRESSIVE_WORKSTREAM_GRAPH_CSS,
+    WORKSTREAM_GRAPH_JS as _PROGRESSIVE_WORKSTREAM_GRAPH_JS,
+)
+
+WORKSTREAM_GRAPH_CSS = _PROGRESSIVE_WORKSTREAM_GRAPH_CSS
+WORKSTREAM_GRAPH_JS = _PROGRESSIVE_WORKSTREAM_GRAPH_JS
+
 
 def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str:
     status = str(projection.get("status", "unavailable"))
@@ -428,7 +763,7 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<article class="page wide" id="workstream-relation-graph" data-kind="workstream-relation-graph" '
         'data-title="任务关系" data-authority="%s" data-read-only="true">'
         '<section class="wg-shell"><header class="wg-mast"><div><p class="wg-kicker">任务关系图 · 只读</p>'
-        '<h2>任务关系</h2><p>同一组核心事实提供三种查看方式；证据不足会保留为待确认，本页不会执行任何操作。</p></div>'
+        '<h2>任务关系</h2><p>从左到右阅读：更早历史 → 直接前置／依赖 → 当前任务。每条链可独立展开，本页不会执行任何操作。</p></div>'
         '<div class="wg-seal %s">%s · 技术结构版本 1</div></header>%s'
         '<section class="wg-controls" aria-label="任务关系控制"><div class="wg-lenses" role="group" aria-label="关系类型">'
         '<button class="wg-lens" type="button" data-wg-lens="succession" aria-pressed="true"><span>01</span><b>接续关系</b></button>'
@@ -436,13 +771,17 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<button class="wg-lens" type="button" data-wg-lens="conflict" aria-pressed="false"><span>03</span><b>冲突关系</b></button></div>'
         '<div class="wg-filterbar"><label>项目模块<select data-wg-subsystem><option value="all">全部模块</option></select></label>'
         '<label>运行状态<select data-wg-runtime><option value="all">全部状态</option></select></label>'
-        '<button class="wg-button" type="button" data-wg-history aria-pressed="false">展开历史记录</button>'
-        '<button class="wg-button" type="button" data-wg-reset>重置视图</button></div></section>'
-        '<section class="wg-grid"><div class="wg-graph-panel"><div class="wg-panel-head"><div><p class="wg-panel-index">关系图 / 已验证核心数据</p><h3>关系拓扑</h3></div>'
-        '<div class="wg-legend"><span><i></i>已确认</span><span><i class="broken"></i>待确认／建议</span><span><i class="conflict"></i>已确认冲突</span></div></div>'
-        '<div class="wg-frame"><svg data-wg-svg role="img" aria-label="交互式任务关系图"></svg><div class="wg-empty" data-wg-empty hidden><b>没有匹配的关系事实</b></div></div></div>'
-        '<aside class="wg-inspector"><div class="wg-inspector-head"><span>技术详情 / 核心证据</span><span>只读</span></div><div data-wg-inspector></div><div class="wg-readonly">不提供应用、撤销、关闭、删除、合并或远程执行</div></aside></section>'
-        '<section class="wg-ledger" aria-labelledby="wg-ledger-title"><h3 id="wg-ledger-title">无障碍关系清单</h3><div class="wg-ledger-list" data-wg-ledger></div></section>'
+        '<button class="wg-button" type="button" data-wg-expand-all>展开全部历史</button>'
+        '<button class="wg-button" type="button" data-wg-collapse-all>收起全部历史</button>'
+        '<button class="wg-button" type="button" data-wg-reset>重置布局</button></div>'
+        '<div class="wg-viewbar" role="toolbar" aria-label="关系图视图工具"><span class="wg-viewbar-note">默认保持 100%% 可读；画布内按住 Ctrl＋滚轮缩放，空白处拖动平移。</span>'
+        '<button class="wg-button" type="button" data-wg-zoom-out aria-label="缩小关系图">−</button><span class="wg-zoom-readout" data-wg-zoom-readout>100%%</span>'
+        '<button class="wg-button" type="button" data-wg-zoom-in aria-label="放大关系图">＋</button><button class="wg-button" type="button" data-wg-fit>适合窗口</button></div></section>'
+        '<section class="wg-grid"><div class="wg-graph-panel"><div class="wg-panel-head"><div><p class="wg-panel-index">关系图 / 已验证核心数据</p><h3>分层关系拓扑</h3></div>'
+        '<div class="wg-legend" aria-label="关系图例"><span><i></i>接续：实线青</span><span><i class="dependency"></i>依赖：虚线黄</span><span><i class="conflict"></i>冲突：复合红线</span></div></div>'
+        '<div class="wg-frame"><div class="wg-viewport" data-wg-viewport tabindex="0" aria-label="可滚动任务关系画布"><div class="wg-canvas"><svg data-wg-svg role="group" aria-label="从左到右的分层任务关系图"></svg></div></div><div class="wg-empty" data-wg-empty hidden><b>没有匹配的关系事实</b></div>'
+        '<aside class="wg-inspector" hidden aria-hidden="true" role="dialog" aria-modal="false" aria-label="任务关系技术详情" data-wg-inspector-shell><div class="wg-inspector-head"><span>技术详情 / 核心证据 · 只读</span><button class="wg-inspector-close" type="button" data-wg-inspector-close aria-label="关闭技术详情">×</button></div><div data-wg-inspector></div><div class="wg-readonly">不提供应用、撤销、关闭、删除、合并或远程执行</div></aside></div></div></section>'
+        '<section class="wg-ledger" aria-labelledby="wg-ledger-title"><h3 id="wg-ledger-title">任务关系列表</h3><p class="wg-ledger-intro">按层级与链阅读；每条关系明确显示“从谁 → 到谁”，历史折叠与桌面保持一致。</p><div class="wg-ledger-list" data-wg-ledger></div></section>'
         '<p class="wg-sr" aria-live="polite" data-wg-live></p><script type="application/json" data-wg-payload>%s</script>'
         '</section></article>'
         % (html.escape(authority, quote=True), status, html.escape(display_status(status)), failure, payload)
@@ -471,7 +810,7 @@ def inject_workstream_relation_graph(page: str, projection: Mapping[str, Any]) -
     if group_index >= 0:
         result = result[:group_index] + result[group_index:].replace('<div class="nav-group">', '<div class="nav-group expanded">', 1)
     result = result.replace(content_marker, render_workstream_relation_graph_panel(projection) + content_marker, 1)
-    scripts = "<script>" + WORKSTREAM_GRAPH_JS + "</script><script>" + WORKSTREAM_GRAPH_EDGE_TARGET_JS + "</script>"
+    scripts = "<script>" + WORKSTREAM_GRAPH_JS + "</script>"
     return result.replace("</body>", scripts + "</body>", 1)
 
 
@@ -483,6 +822,7 @@ __all__ = [
     "PROJECTION_SCHEMA_VERSION", "PROVIDER_SCHEMA_VERSION", "PROVIDER_ID",
     "RelationGraphUnavailable", "build_relation_graph_projection",
     "project_core_relation_graph", "unavailable_relation_graph_projection",
+    "build_readability_layout", "NODE_WIDTH", "NODE_HEIGHT",
     "render_workstream_relation_graph_panel", "inject_workstream_relation_graph",
     "write_projection_json",
 ]

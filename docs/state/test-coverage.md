@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-29
+Updated: 2026-08-30
 
 ## 当前验证体系
 
@@ -23,6 +23,7 @@ Updated: 2026-08-29
 - U2 Unified Observatory focused 11/11 与最终 adjacent 12/12 PASS；CI6 final Fast 根据当前 diff 选择 49 项并 49/49 PASS，final Checkpoint 选择 54 项并 54/54 PASS（evidence-eligible，未超预算）。真实动态单 URL、静态无控制、Host／Origin／cookie／token、Team／Authority／AI／Maintenance 不升级、helper/marker 回收和 desktop/390px browser 均有独立证据。
 - U2.1 新增 legacy Maintenance/current refresh、legacy/archive graph/empty refusal、startup-cached graph endpoint 与全局 stop 资源回收四组断言，并折叠进既有 owner test IDs；registry byte-for-byte 不变，不扩大历史 W6.1 `<24` Checkpoint selector。focused 五套 47/47、折叠后 exact methods 5/5、Unified 11/11；最终 CI6 Fast 选择 38 项、Checkpoint 选择 44 项，均 evidence-eligible PASS，详见 U2.1 Validation。
 - W7.1 的四个 archived-session 安全回归已登记为 `team-lan-core` Promotion-only medium evidence，不进入 Fast／Checkpoint；其分支 focused 19/19、exact Fast 57/57、Checkpoint 85/85 及真实 self-host read-only graph 均通过，最终整合 Candidate 仍需 Promotion 重放。
+- W7.2 将布局、折叠、lens 端点、inspector 与 desktop/mobile ledger 断言折叠进既有 Workstream Graph owner IDs，CI inventory／registry 不变。W7.2.1 覆盖 `Ctrl + wheel`、路径焦点、无线路标签、按链收起和 dependency 空态；W7.2.2 增加固定 marker 和全站主题 scrollbar；W7.2.3 固定 88px rank／44px component 间隔并拒绝 synthetic blank row。focused Graph＋Unified 18/18 与 JS syntax PASS；真实 self-host 桌面节点无重叠、边不穿框，390×844 无页面横向溢出，console error/warning 为空。最终 CI6 Fast／Checkpoint receipt 见 W7.2 Validation。
 
 ## 覆盖面
 
@@ -49,6 +50,7 @@ Updated: 2026-08-29
 - [U2 Unified Observatory Production Integration](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 Unified Observatory UX Acceptance Fixes](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
+- [W7.2 Workstream Graph Readability](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [CI5 Promotion Throughput Optimization](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [CI4 opaque token reliability](../validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)
 - [R3 brand-only closeout](../validation/2026-08-28-r3-orrery-brand-only-closeout.md)
