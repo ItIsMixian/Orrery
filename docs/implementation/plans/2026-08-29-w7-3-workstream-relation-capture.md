@@ -451,3 +451,74 @@ Continue the same W7.3 task/worktree and preserve all current uncommitted change
 revision 7 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium. Make the
 smallest layout/routing correction needed; do not rerun routed Fast/Checkpoint before screenshot acceptance and do not
 create W7.4, discard current work, integrate another branch, push, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Correction — Module-scoped Graph Projection
+
+The maintainer observed that selecting Documentation System, Context Routing Research, Authority Model or
+Multi-worktree Collaboration still showed nearly the same task population. A module selector that only changes a
+label, highlight or layout emphasis is not a module view. This correction uses ADR-0020's existing derived-view
+filter permission and adds no authority or relation semantics.
+
+### Strict module visibility
+
+- [ ] `全部模块` is the only default option that projects the complete eligible graph. Selecting a concrete module
+  applies a strict visibility predicate before history folding, component partition, rank or routing.
+- [ ] A full task card is in scope only when the selected stable module ID equals its explicit primary subsystem or
+  appears in its explicit affected-subsystem set. Display labels, task codes, branch/title text, series/program
+  membership and relation proximity cannot infer module membership.
+- [ ] Missing, Unknown or unregistered module metadata belongs to a separate `未归属` view. Unknown tasks must not be
+  copied into every concrete module view.
+- [ ] Module and runtime/status filters intersect. Selecting a module plus a status means `module AND status`, never a
+  union that restores unrelated tasks.
+
+### Cross-module context without graph flooding
+
+- [ ] When an in-scope task has a visible relation to an out-of-scope task, retain the relation as a compact boundary
+  endpoint/stub labelled with the external module and task identity. Do not render the out-of-scope task's full card,
+  series lane, phase contents or unrelated neighbors.
+- [ ] A group/series/program/phase container appears only when it contains at least one in-scope full task card. It
+  projects only visible members plus required boundary stubs; container membership cannot pull every member into the
+  selected module.
+- [ ] An explicit `显示关联上下文` action may expand one-hop external full cards for inspection, but it is off by
+  default, visibly marked as context, bounded to one hop and reset whenever the selected module changes.
+- [ ] Boundary stubs preserve exact underlying edge identity and inspector evidence. They do not change relation
+  counts, module facts, active tips, gates, history eligibility or execution authority.
+
+### Pipeline and interaction
+
+Apply module projection before layout:
+
+```text
+eligible task/relation facts
+→ selected-module full-card predicate
+→ bounded cross-module boundary stubs
+→ eligible history folding
+→ relation-connected component partition
+→ component-local rank and local layout
+→ two-dimensional block packing
+→ block-pair bundle routing
+```
+
+- [ ] Changing modules recomputes visible nodes, containers, components, bounds and fit target while keeping reset at
+  100%. It must not retain hidden-module nodes as layout obstacles or invisible route endpoints.
+- [ ] The empty state names the selected module and says that no matching task evidence is available. It must not
+  silently fall back to all modules.
+- [ ] Visible counts and any summary/legend describe full cards separately from external boundary stubs.
+
+### Acceptance and dispatch
+
+- [ ] A fixture with disjoint Authority, Documentation, Context Routing and Multi-worktree tasks proves distinct node
+  sets for all four concrete selections; a deliberately multi-module task appears only in its explicitly listed
+  modules.
+- [ ] A cross-module relation fixture shows one full in-scope endpoint plus one compact external boundary stub by
+  default, and only the explicit one-hop action may reveal the external full card.
+- [ ] Browser screenshots for the four real self-host module selections visibly differ in task count and topology;
+  none repeats the all-module graph, and module+status intersection, empty state and module switching remain stable at
+  1440px, 1280px and 390px.
+- [ ] Focused tests assert exact visible Workstream IDs, boundary-stub IDs, container membership and zero hidden-node
+  influence on component/rank/bundle geometry; they do not rely only on dropdown text or CSS visibility.
+
+Continue the same W7.3 task/worktree and preserve all current uncommitted changes. Refresh Git-private scope to
+revision 8 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and
+apply it together with revision 7's layout correction. Do not rerun routed Fast/Checkpoint before maintainer visual
+acceptance; do not create W7.4, discard work, push, publish or change public/default behavior.

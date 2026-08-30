@@ -143,3 +143,27 @@ The global-rank interpretation is rejected. Required evidence now additionally p
 The prior partial-order, history eligibility, 30%–200% semantic invariance and visual-acceptance requirements remain
 in force. Focused layout tests may support iteration; routed Fast/Checkpoint remain blocked until maintainer screenshot
 acceptance.
+
+## 2026-08-30 module-scoped projection correction
+
+Required evidence additionally proves:
+
+- `全部模块` alone projects the complete eligible graph; each concrete module applies an exact stable-ID predicate to
+  explicit primary/affected subsystem facts before folding and layout;
+- Unknown/unregistered module facts appear only in `未归属` and are never broadcast into all concrete module views;
+- module and runtime/status selections use intersection semantics;
+- an out-of-scope endpoint connected to an in-scope task is a compact typed boundary stub by default, not a full task
+  card or a reason to import its series/program neighbors;
+- group/series/program/phase containers include only in-scope full cards plus required boundary stubs;
+- optional one-hop external context is explicit, default-off, bounded and cleared on module change;
+- module switching recomputes visible IDs, components, bounds, rank and bundles; hidden nodes cannot remain as layout
+  obstacles or invisible route endpoints, and an empty module never falls back to all tasks;
+- focused fixtures assert exact full-card and boundary-stub ID sets for Authority, Documentation, Context Routing and
+  Multi-worktree views, including one explicitly multi-module task and one cross-module edge;
+- real 1440px/1280px/390px screenshots show visibly different task counts/topologies across the four module views,
+  correct module+status intersection and a named empty state;
+- exact corrected task-description acknowledgment and Git-private scope revision 8 precede resumed product writes.
+
+This remains a derived read-only projection. It changes no module fact, relation, lifecycle, gate, history eligibility,
+confirmation authority or execution capability. Routed Fast/Checkpoint remain blocked until maintainer screenshot
+acceptance.

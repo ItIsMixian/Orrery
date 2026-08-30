@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Module-view Projection Correction
+
+- 维护者指出 Documentation／Context Routing／Authority／Multi-worktree 等具体模块选择仍显示近似同一批任务；
+  revision 7 只修正 rank/packing/routing，未覆盖该输入过滤问题。本轮明确记录此前遗漏，不把布局变化冒充模块
+  筛选已实现。
+- Plan/Validation 现要求 concrete module 在 folding/layout 前按 explicit primary/affected stable ID 严格裁剪
+  full cards；Unknown 进入“未归属”，跨模块关系默认只保留可检查的 boundary stub，one-hop context 显式开启。
+- 继续原 W7.3 dirty work／GPT-5.6 Sol medium／scope revision 8；四个真实模块视角必须呈现不同节点集合，
+  视觉接受前仍不运行 routed Fast/Checkpoint。
+
 ## 2026-08-30 — W7.3 Global-rank Layout Correction
 
 - 中央先前把“互不可达任务同 rank”写成了可被全图执行的规则，W7.3 因而把大量独立 component 根节点压入
