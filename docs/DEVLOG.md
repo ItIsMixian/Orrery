@@ -1,5 +1,16 @@
 # 开发日志
 
+## 2026-08-30 — GX2 Direction Accepted; W7.3 Product Wiring Authorized
+
+- 维护者查看中央监督后的 GX2 页面并回复“感觉好像还不错，接线看看”，正式接受 ELK 0.11.0、W5/W6/W7
+  phase small multiples、typed external stubs、primary-only/独立 context 与现有 Orrery 视觉方向进入产品接线；
+  这不是产品页面或测试验收。
+- GX2 Validation 记为 isolated visual direction PASS，冻结 bundle/package hash 与 EPL-2.0 provenance。W7.3
+  Plan/Validation scope revision 16 允许 product/vendor/component inventory 与本机预览写入，同时保留
+  frozen/manual/visibly-labelled legacy engine 和 zero-network/no-silent-fallback 边界。
+- 接线后必须先交真实 Unified Observatory 1440/1280/390 页面给维护者；在其再次确认前，unittest/pytest/
+  focused/geometry/repository/Fast/Checkpoint/Promotion/release 流程继续全部禁止。
+
 ## 2026-08-30 — GX2 W Phase Small-multiple Correction
 
 - 中央实际操作 revision-14 本地页面：succession、dependency、Project Structure primary-only 与

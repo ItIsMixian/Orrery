@@ -269,3 +269,25 @@ Current evidence gate:
 Future product acceptance must additionally prove one shared semantic input for ELK and legacy engines, explicit
 local engine selection, persistent `旧版兼容布局` labeling, ledger-first ELK failure, no silent fallback and bounded
 legacy rendering without fact divergence. These future checks do not authorize product writes in revision 13.
+
+## 2026-08-30 product ELK wiring preview gate
+
+GX2 visual direction is accepted, so scope revision 16 may create a product Candidate. Before any test workflow, the
+real Observatory must demonstrate:
+
+- exact local `elkjs@0.11.0` bundle/license/provenance hashes and zero runtime network;
+- one shared semantic projection and equal input IDs for ELK and frozen legacy engines;
+- primary-only module full cards, independent affected/semantic context and bounded `+N`;
+- dependency endpoints only and no isolated membership task;
+- W5/W6/W7 phase small multiples with typed external stubs and no duplicated/fabricated edges;
+- existing Orrery shell/cards/type/colors/controls/selection/inspector preserved; GX2 shell absent;
+- desktop default 100%, explicit fit, clipped card text and closed-by-default inspector;
+- ELK failure is ledger-first with explicit retry/manual legacy action; legacy is persistently labelled and never
+  automatic;
+- 1440×900, 1280×800 and 390×844 product screenshots plus central browser interaction for all listed states;
+- zero unittest/pytest/focused/geometry/repository/Fast/Checkpoint/Promotion/release commands before maintainer visual
+  acceptance;
+- exact task-description acknowledgment and Git-private scope revision 16 before product writes.
+
+This is a Pending preview gate. A later maintainer response and task-description version are required before tests or
+integration can resume.

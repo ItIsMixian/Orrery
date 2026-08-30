@@ -781,3 +781,67 @@ Continue the same W7.3 task/worktree and preserve all dirty files. Refresh Git-p
 reading ADR-0023, its Approved Design, this amendment and the matching Validation section. Use GPT-5.6 Sol medium.
 Revision 13 authorizes experiment files only; it explicitly withdraws revision 12 product-write permission. Do not
 run routed Fast/Checkpoint/Promotion, push, publish or change main/default.
+
+## 2026-08-30 Maintainer Amendment — Product ELK Wiring Candidate
+
+Governing decisions:
+
+- [ADR-0022](../../decisions/0022-elkjs-workstream-graph-layout-engine.md)
+- [ADR-0023](../../decisions/0023-explicit-legacy-graph-layout-fallback.md)
+
+Approved designs:
+
+- [ELK.js Workstream Graph Layout and Orrery Rendering](../../design/elkjs-workstream-graph-layout-and-rendering.md)
+- [ELK Cutover and Explicit Legacy Fallback](../../design/elkjs-cutover-and-explicit-legacy-fallback.md)
+
+Accepted experiment: [GX2 Validation](../../validation/2026-08-30-gx2-elk-layout-engine-evaluation.md)
+
+The maintainer has accepted the isolated GX2 visual direction and authorized product wiring for another visual review.
+This restores product-write permission under a new scope, but keeps every test workflow blocked until the maintainer
+accepts the real product page.
+
+### Exact dependency and retained engines
+
+- [ ] Vendor the GX2-reviewed `elkjs@0.11.0` browser runtime, EPL-2.0 license and provenance under the Observatory
+  package. Bind bundle SHA-256 `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8` and
+  package tarball SHA-256 `559188be5aba91ce22457c1e2f4693135af43e68cf9a71b53b129b762de9d52d`.
+- [ ] Preserve current handwritten geometry as a named frozen `LegacyLayoutEngine`; do not delete its source or Git
+  history. It consumes the shared semantic input, remains local/manual/visibly labelled and never activates silently.
+- [ ] Add one engine adapter/result contract with stable input hash/revision/IDs. ELK and legacy may differ in geometry
+  but cannot differ in admitted facts.
+
+### Product semantic projection
+
+- [ ] Extract module/lens/history/context/group selection ahead of both engines. Default concrete module full cards are
+  primary-only; affected and one-hop semantic context are independent, bounded and default-off.
+- [ ] Dependency admits only scoped `depends_on` endpoints; series/program/active-tip facts cannot introduce isolated
+  cards. Succession/conflict preserve accepted semantics.
+- [ ] W view implements the accepted phase small multiples: W5/W6/W7 panels independently use ELK for W members,
+  intra-phase relations and typed external boundary stubs. Only a real direct cross-phase W relation connects panels.
+- [ ] Flat edge-free affected context uses bounded box packing and `+N`; mobile uses the same-fact ledger.
+
+### Existing Orrery frontend and runtime
+
+- [ ] Integrate into the real Unified Observatory Graph surface, retaining its navigation, controls, Chinese display
+  vocabulary, card typography/colors/status borders, legend, zoom/pan, selection and inspector. Do not ship the GX2
+  experiment shell or generated HTML.
+- [ ] Local Candidate starts Graph with ELK at 100%; `适合窗口` remains explicit. Add engine selection only in the
+  technical/help surface. Legacy mode shows `旧版兼容布局` persistently.
+- [ ] ELK failure shows the same-fact ledger and explicit retry/legacy actions. No automatic fallback, CDN, external
+  request, stale-result display or layout-owned fact changes.
+- [ ] Clip/truncate card text inside its rect while preserving full title/ARIA/inspector values. Inspector starts closed
+  and does not change layout footprint.
+
+### Preview-only gate before tests
+
+- [ ] Build and serve the real W7.3 product page with local assets, then capture 1440×900, 1280×800 and 390×844 views
+  for succession, W, Project Structure primary/semantic/affected, dependency, ELK failure and explicit legacy mode.
+- [ ] Central performs browser interaction and may request focused visual corrections. Do not run unittest/pytest,
+  focused tests, geometry tests, repository gates, Fast, Checkpoint, Promotion or release validation before the
+  maintainer accepts this product page.
+- [ ] Product code, vendor bytes, component/package inventory and local preview may change; public manifest, main,
+  default migration, tag and Release remain forbidden.
+
+Continue the same W7.3 task/worktree and preserve all retained Core/capture/authority/inbox and rejected-geometry
+evidence. Refresh Git-private scope to revision 16 after reading this amendment and the matching Validation section.
+Use GPT-5.6 Sol medium. Produce the real product preview and stop for central/maintainer review; no test workflow.

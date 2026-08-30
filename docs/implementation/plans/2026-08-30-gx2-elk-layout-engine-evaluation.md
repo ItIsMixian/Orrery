@@ -189,3 +189,10 @@ fresh 1440×900, 1280×800 and 390×844 screenshots for W and affected-only plus
 other views. Do not run any test command/workflow. Refresh Git-private scope to revision 15 after reading this section
 and the matching Validation gate. This is one further render-only coordinator correction; product/legacy files remain
 untouched.
+
+## Maintainer visual direction accepted for product wiring
+
+The maintainer reviewed the supervised GX2 page and chose “接线看看”. This accepts the ELK visual direction and W phase
+small-multiple composition for a product Candidate; it does not accept or validate the future product page. GX2 remains
+the source of exact `elkjs@0.11.0` provenance and frozen visual/semantic inputs. Further changes now belong to the W7.3
+product-integration amendment, not this experiment.

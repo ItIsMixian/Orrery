@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — ADR-0022 selects layout-only adoption; exact artifact/capability evidence still required
+Status: PASS — isolated ELK visual direction accepted for product wiring; product implementation/validation separate
 
 Authority source: [GX2 Plan](../implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)
 
@@ -72,3 +72,18 @@ Central Browser review additionally requires:
 - exact task-description acknowledgment and Git-private scope revision 15 precede the correction.
 
 The coordinator, not W7.3, decides whether the resulting view is ready to show the maintainer.
+
+## Accepted isolated result
+
+- Maintainer response: “感觉好像还不错，接线看看”.
+- Accepted direction: existing Orrery visual tokens and interactions, ELK 0.11.0 geometry, W5/W6/W7 phase small
+  multiples, typed external boundary stubs, primary-only module view, independent affected/semantic context,
+  dependency endpoints only and mobile same-fact ledger.
+- Exact provenance remains `elkjs@0.11.0`, bundle SHA-256
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`, EPL-2.0.
+- Central browser inspection covered succession, W, Project Structure primary/semantic/affected, dependency and mobile;
+  revision-15 passive diagnostics report zero W crossings, route-through-card and label/card overlap.
+- No test command/workflow and no product/vendor/package/default write occurred during the accepted experiment.
+
+This PASS approves product wiring only. It is not W7.3 product acceptance, Fast/Checkpoint evidence, Canonical
+integration, default switch or release readiness.
