@@ -34,6 +34,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
+- [ ] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：ADR-0007 的 PO 规则此前只有文档约定，未进入 dispatch Skill／机械 gate；先补 enforcement，A4/U2.3 最终集成时再把 A4 `ADR-0018` 规范化为 `ADR-0019`。
 - [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 已本地集成；使用“任务说明版本”、默认不轮询，并经 amendment 只补 generic `release-packaging` mapping。安装／发布与 S1 Conductor 仍是独立后续事项。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
 - [ ] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航／help 收口与轻量全活动任务投影的权威范围已冻结；Agent 确认本 authority baseline 后恢复实现。

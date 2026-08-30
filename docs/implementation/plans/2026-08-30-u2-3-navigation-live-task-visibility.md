@@ -53,3 +53,15 @@ active Workstream without restoring a full scan of all worktrees at startup.
 
 Implementation updates affected State, independent Validation and DEVLOG/index only. Root PROGRESS/HANDOFF are owned
 by central integration.
+
+## 2026-08-30 Maintainer Scope Amendment — Overview Ask Docs Label
+
+- [ ] Project Overview may display a non-interactive text line such as “问文档 · 入口位于右下角”.
+- [ ] The text has no link, button, route, click handler or capability action and cannot look like a second Ask Docs
+  entry.
+- [ ] The floating lower-right “问文档” control remains the only functional Q&A entry; standalone navigation and
+  Overview capability buttons remain forbidden.
+- [ ] Add a mechanical assertion for one functional Ask Docs entry plus the optional informational label.
+
+This amendment changes only wording/presentation inside the accepted navigation model. It does not change AI provider,
+network, permission, route or release boundaries and requires no new ADR.

@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-30 — PO1 Decision Allocation Failure & Authority Amendments
+
+- 只读核对确认 ADR-0007／Approved Collaboration Design 已明确要求并发非集成分支使用 `PO-DEC-*`，但该规则没有进入任务分发 Skill，也没有 merged-tree duplicate numeric gate。A4 因此在隔离 Candidate 中直接分配 `ADR-0018`；中央随后只检查当前 integration tree，又把同号分配给 authority-first dispatch。
+- 维护者接受修正方向：中央保留已传播到 U2.3/W7.3 的 authority-first `ADR-0018`；A4 在最终集成时机械规范化为 `ADR-0019`，保持内容／状态／语义不变。先建立 PO1 Plan/Pending Validation，再实现 Skill enforcement 与 duplicate-number gate。
+- U2.3 另获最小 wording amendment：Overview 可显示不可交互的“问文档 · 入口位于右下角”，但浮动控件仍是唯一功能入口。S0 更新后只安装到当前本机，不进入 release manifest、public package、tag 或 v0.3.0。
+
 ## 2026-08-30 — S0 Orrery Dispatch Skill Candidate
 
 - 从任务说明版本 `8bb7e1f` 建立独立 `codex/s0-orrery-dispatch-skill` worktree，并在首次 Skill 写入前登记 Git-private Scope。实现严格限于 `SKILL.md` 与 `agents/openai.yaml`，没有 script／reference／asset／service／schema／network。

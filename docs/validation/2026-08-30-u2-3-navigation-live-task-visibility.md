@@ -11,6 +11,8 @@ Authority source: [U2.3 Plan](../implementation/plans/2026-08-30-u2-3-navigation
 - exact code base, authority amendment commit and Git-private scope revision acknowledgment;
 - lightweight registry/session/cache read boundaries and measured startup behavior;
 - navigation/help/Ask Docs/Trends mechanical assertions;
+- Overview may contain one non-interactive Ask Docs location label while the floating control remains the sole
+  functional entry;
 - active task identity remains visible under stale cache and new session revision;
 - desktop/mobile real browser evidence;
 - Fast/Checkpoint and repository/release/security/diff results.

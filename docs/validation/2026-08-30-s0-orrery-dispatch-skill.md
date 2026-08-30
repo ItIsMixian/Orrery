@@ -64,3 +64,10 @@ Structural and repository validation do not prove host-level first-write enforce
 
 The source Candidate is not installed, published or part of Orrery v0.3.0. It does not modify the current
 `project-orrery` Skill or implement the future S1 Conductor.
+
+## Pending local-only closeout
+
+- update the source Skill with ADR-0007 PO allocation behavior;
+- integrate and validate the updated source;
+- copy only `SKILL.md` and `agents/openai.yaml` to the current local Codex skills directory;
+- verify source/installed hashes and keep every release/public surface unchanged.

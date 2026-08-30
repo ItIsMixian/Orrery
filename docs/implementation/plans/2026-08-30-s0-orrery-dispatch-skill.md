@@ -76,3 +76,13 @@ version `b5bc33c3265733d13d2bc227a9777b07c615668d` was read from the central aut
 
 This is validation metadata for an existing release/toolchain surface. It does not add a third Skill resource, change
 the Skill behavior, authorize packaging or require a new ADR.
+
+## 2026-08-30 Maintainer Scope Amendment — PO Decisions & Local-only Installation
+
+- [ ] For decision-bearing non-integration tasks, require stable `PO-DEC-<task-id>-<slug>` proposals; numeric ADR
+  allocation belongs only to the explicitly identified unique integration worktree under ADR-0007.
+- [ ] Do not treat a branch name, task title or “next free number” observed in an isolated Candidate as allocation
+  authority.
+- [ ] After source integration and validation, install this two-file Skill only into the current local Codex home.
+- [ ] Validate the installed copy and record its source commit/hash. Do not change release manifests, public packages,
+  tags, GitHub Release or v0.3.0 scope.
