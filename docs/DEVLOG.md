@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-30 — ADR-0018 Authority-first Workstream Dispatch
+
+- 维护者指出中央此前先用长 follow-up Prompt 追加 U2.3／W7.3 范围、再让 Agent 补写 Plan，颠倒了 Orrery 权威链并会丢失关键记录。中央立即只发送 stop，不再通过 transcript 追加实现要求。
+- 新增 Accepted ADR-0018、Approved Design 与人工 adoption Plan：任务创建或实质范围变化先提交 ADR／Design／Plan amendment／Pending Validation，再只把 exact authority SHA／paths 发给 Agent；Agent 在首次／恢复产品写入前确认并登记 scope revision。Prompt、Agent 回执和 task summary 只保留为非权威 provenance。
+- U2.3 的导航/help/live-task 范围与 W7.3 的 task-series/status/comparison-conflict amendment 已进入作者文档和 Pending Validation；两 Agent 在读取本提交前保持暂停。本轮不修改产品代码、组件版本、public Skill、release manifest 或远端状态；自动 Git-private receipt、CLI acknowledgment 与 first-write enforcement 仍是未来产品工作。
+
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
 - 唯一整合者从 clean `codex/u1-u2-integration-baseline@6166d15` 先合入 W7.2.3 exact `30d44ff`，再合入 U2.2 exact `70e6ac9`；两条产品文件集合无直接重叠。中央 CI7／ADR-0017 与 W7.2 的 DEVLOG、State、Validation index 只做加法协调，联合 feature merge 为 `0eaad30`。

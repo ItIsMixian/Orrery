@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Authority-first Workstream Dispatch](authority-first-workstream-dispatch.md) — authority commit before initial dispatch or mid-flight scope amendment, SHA/path-only task notices, pre-write Agent acknowledgment and non-authoritative transcripts under ADR-0018.
 - [Workstream Relation Capture & Confirmation](workstream-relation-capture-and-confirmation.md) — automatic mechanical lineage, gate-aware dependency proposals, human task-owner/integrator authority, local-first inbox and optional proposal-only Conductor under ADR-0017.
 - [Unified Observatory Architecture & Shell](unified-observatory-architecture-and-shell.md) — one visible launcher/URL/navigation identity with explicit consumer registration, supervised internal helpers, inherited docsite experience, static fallback, failure isolation and staged rollback under ADR-0016.
 - [Orrery Rename and Compatibility Contract](orrery-rename-and-compatibility-contract.md) — approved under ADR-0015; maps brand, stable identifiers, explicit opt-in CLI thin alias, host-specific display/alias behavior, brownfield migration, first-release asset naming, privacy, rollback and R3–R5 gates without claiming implementation.

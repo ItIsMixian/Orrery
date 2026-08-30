@@ -1,12 +1,14 @@
 # 实施计划：W7.3 Workstream Relation Capture & Confirmation
 
-Status: Planned; implementation not started
+Status: Active; paused for authority amendment acknowledgment
 
 Date: 2026-08-29
 
 Governing ADR: [ADR-0017](../../decisions/0017-workstream-relation-capture-and-confirmation-authority.md)
 
 Approved Design: [Workstream relation capture and confirmation](../../design/workstream-relation-capture-and-confirmation.md)
+
+Dispatch governance: [ADR-0018](../../decisions/0018-authority-first-workstream-dispatch.md)
 
 ## Goal
 
@@ -62,3 +64,49 @@ Approved Design: [Workstream relation capture and confirmation](../../design/wor
 实现后同步 Project Structure／Documentation System／Test Coverage State、独立 Validation、DEVLOG 和索引；
 根 PROGRESS/HANDOFF 由唯一整合者维护。任何自动确认语义 dependency、多人投票或远程 confirmation 都不在
 W7.3 范围。
+
+## 2026-08-30 Maintainer Scope Amendment — Task Series, Status Taxonomy, Comparison vs Conflict
+
+This amendment was authored centrally before W7.3 resumes the added implementation scope. It does not change
+ADR-0017's human authority, relation types, DAG or privacy boundary. Series is display metadata; a semantic
+predecessor creates only a proposal under the existing confirmation rules. Core comparison suggestions remain
+derived/read-only and are no longer presented as confirmed conflicts.
+
+### Task series and predecessor proposals
+
+- [ ] Add versioned explicit `series_id`, `task_code`, `series_order` and optional
+  `series_predecessor_workstream_id` (or versioned equivalent); never
+  infer facts from `A3/A4`, `CI6/CI7` name prefixes.
+- [ ] Keep series grouping visually distinct from `derived_from`／`depends_on`／`absorbs` edges.
+- [ ] Explicit predecessor registration creates a proposal with suggested gate/evidence, never an effective edge.
+- [ ] Produce read-only self-host repair proposals for A3→A4 and CI6→CI7; maintainer confirmation selects the exact
+  relation/gate before any effective event.
+
+### User-facing status taxonomy
+
+- [ ] Replace the generic “待确认” collapse with deterministic Chinese states for active, human-confirmation pending,
+  evidence/scope stale, historical, session missing/relation-only, unregistered and genuinely Unknown.
+- [ ] Keep raw lifecycle/runtime/evidence/scope axes in technical details; only actual human decision pending uses
+  “等待人工确认”.
+
+### Comparison versus conflict
+
+- [ ] Preserve conservative Core `compare_pairs` semantics but project them as amber comparison/review suggestions,
+  not red conflicts.
+- [ ] Conflict lens contains only evidence-backed conflict facts (path/module/exclusive-resource/contract or explicit
+  human finding), with location, impact and source.
+- [ ] No confirmed conflicts produces “当前没有已确认的任务冲突”.
+- [ ] Translate stale/unconfirmed/independent/post-fork reason codes into ordinary Chinese in a separate comparison
+  queue; they must not create red Graph edges.
+- [ ] Version any changed projection/schema contract without rewriting v1 history.
+
+### Acceptance
+
+- [ ] Real self-host shows A and CI series while unconfirmed predecessor links remain proposals.
+- [ ] Current compare suggestions and confirmed conflicts are completely separated.
+- [ ] 1440px/390px Graph and ledger preserve facts, keyboard/ARIA, zero overflow and read-only canvas.
+- [ ] Graph never confirms relations; local relation inbox remains the only confirmation UI.
+
+Expected affected surfaces include relation capture Core/schema, registration/CLI/Harness, relation inbox,
+presentation projection and their focused tests. If implementation requires a new relation kind or changes
+confirmation authority, W7.3 must stop for a new ADR rather than expanding this Plan.

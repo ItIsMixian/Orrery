@@ -2,11 +2,12 @@
 
 Updated: 2026-08-30
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md)
 
 ## 当前事实
 
 - Orrery 已用自身权威链管理本仓库。Agent 入口为根 `AGENTS.md`；维护者入口为 `docs/PROGRESS.md`、`docs/HANDOFF.md` 与本地 Observatory。
+- ADR-0018 已把 authority-first 分发纳入权威链：首次任务和中途实质变更都必须先形成并提交 Plan／dated amendment 与 Pending Validation，必要时先完成 ADR／Approved Design；task transcript 只传 exact SHA／路径并不承担作者文档职责。U2.3 与 W7.3 是第一批按此规则补录的在途任务。
 - Seed、ADR、Approved Design、Implementation Plan、State、Validation、Snapshot、Library 与派生视图职责分离。Authority Meta Model 定义角色与语义；Product Seed 只约束 Orrery 自身目标。
 - 文档事实显式区分 Canonical、Candidate、Worktree、Local-only、Historical 与 Unknown。普通功能分支只同步受影响 subsystem State／Plan／Validation／DEVLOG；根 PROGRESS／HANDOFF 由唯一整合者在合流阶段维护。
 - PROGRESS 与 HANDOFF 是当前控制入口，不是历史总账。SC1 已把 CI5、R3、W7D 等 post-main 事实从 Candidate／pending 表述收口为 Canonical，并把历史运行细节留在 DEVLOG／Validation。
@@ -25,6 +26,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 ## 同步与生命周期规则
 
+- 新建 Workstream 或追加实质范围前，先提交 authority baseline；Agent 必须在首次／恢复产品写入前读取 exact paths、确认 source revision 并更新 Git-private Scope。只有紧急 stop 可以先发送，后续实现方向仍须等待文档提交。
 - 实现或验证完成后，同步受影响 State、Validation 与 DEVLOG；停止点或风险变化时同步 HANDOFF；当前线路改变时同步 PROGRESS。
 - Accepted ADR、Approved Design、Plan checklist、Agent 回执或 Git commit 都不能单独证明 implemented／validated／released。
 - State 只保留当前事实与缺口；逐次命令、失败轮、性能数字和 exact SHA 进入 Validation／DEVLOG。
@@ -52,6 +54,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - [W7.2 Graph Readability Plan](../implementation/plans/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
+- [Authority-first Dispatch Plan](../implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)
+- [Authority-first Dispatch Contract](../validation/2026-08-30-authority-first-workstream-dispatch.md)
 
 ## 已知缺口
 
@@ -63,4 +67,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Unified Observatory 仍只是本地 root-only/default-off integrated Candidate；尚未进入默认 docsite、Skill template、managed-tool inventory、installer 或公开 Release。`start-docsite.bat`／`serve.py` 继续作为 legacy rollback 与当前公开兼容入口。
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
 - W7.3 relation capture inbox、gate-aware dependency confirmation、human integrator 管理与自动 mechanical `derived_from` 尚未实现；观测台仍只投影已经存在的关系证据。
+- authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

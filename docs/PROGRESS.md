@@ -1,6 +1,6 @@
 # 当前进度
 
-Updated: 2026-08-29
+Updated: 2026-08-30
 
 ## 当前阶段
 
@@ -29,10 +29,13 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - 当前 display brand 为 Orrery；`project-orrery` Skill／distribution／CLI／schema／协议与 v0.2.0 资产继续作为稳定技术或历史标识保留。
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
 - `codex/u1-u2-integration-baseline` 已吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；联合 feature merge 为 `0eaad30`，当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它在维护者接受、exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
+- ADR-0018 已接受 authority-first Workstream dispatch：任务创建或中途实质变更必须先提交权威文档，随后只按 exact SHA／paths 通知 Agent。U2.3 与 W7.3 已暂停扩展，等待本 authority baseline 的 scope-revision acknowledgment；自动 receipt／first-write enforcement 尚未实现。
 
 ## 活动计划与待办
 
-- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：ADR-0017 与 Approved Design 已接受；产品实现尚未开始。Agent／Harness／Conductor 只可建议，任务 owner／human integrator 按 gate 确认。
+- [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
+- [ ] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航／help 收口与轻量全活动任务投影的权威范围已冻结；Agent 确认本 authority baseline 后恢复实现。
+- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：ADR-0017 与 Approved Design 已接受；任务系列、状态 taxonomy、comparison／conflict amendment 已写入 Plan，Agent 确认本 authority baseline 后恢复实现。Agent／Harness／Conductor 只可建议，任务 owner／human integrator 按 gate 确认。
 - [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：拆分 Observatory 影响面并增加非权威总成本诊断；不改变层级证据、15/90 秒预算或 main 推广门。
 - [ ] [U2.2／W7.2 联合验收](validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)：本地联合 Candidate 已就绪；等待维护者真实体验，之后再决定 exact-SHA Promotion。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。

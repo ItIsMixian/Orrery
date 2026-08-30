@@ -1,6 +1,6 @@
 # 跨会话交接
 
-Updated: 2026-08-29
+Updated: 2026-08-30
 
 ## 当前停止点
 
@@ -15,6 +15,7 @@ Updated: 2026-08-29
 - 维护者已接受 ADR-0016／Unified Observatory Design：目标是一个可见 launcher、URL 与导航壳，内部 helper 可受管独立运行；现有 docsite 阅读、搜索、AI、作者信息架构和可识别视觉体验必须继承，U1 prototype 不是最终 UI。
 - `codex/u1-u2-integration-baseline` 已按 W7.2.3 `30d44ff` → U2.2 `70e6ac9` 合流，联合 feature merge `0eaad30` 是供维护者复验的本地 integrated Candidate。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未虚报通过。它尚不等于 `origin/main`、默认切换或公开发布。
 - ADR-0017 与 Approved Relation Capture Design 已接受：mechanical `derived_from` 可自动写入，`depends_on` 必须按 implementation／validation／integration／release gate 由相应人类角色确认，`absorbs` 只由 human integrator 确认。W7.3 尚未实现，不能把这些规则写成当前产品能力。
+- ADR-0018 与 Approved Authority-first Dispatch Design 已接受：Workstream 创建或实质范围追加前，中央先提交 ADR／Design／Plan amendment／Pending Validation；任务消息只引用 exact authority SHA 与 paths。U2.3／W7.3 已在安全边界暂停，待读取本提交并登记 scope revision 后恢复。自动 receipt 与 first-write enforcement 尚未实现。
 
 ## 当前可继续的线路
 
@@ -25,7 +26,8 @@ Updated: 2026-08-29
 5. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 6. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 7. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-8. **W7.3 relation capture：** 当前只有 Accepted ADR／Approved Design／Planned implementation。待当前 Unified Candidate 收口后另立独立 Workstream，实现 exact-base `derived_from`、gate-aware dependency proposal／confirmation、human integrator 与 relation inbox；不得让 Agent／Harness／未来 Conductor 自行确认依赖或吸收关系。
+8. **W7.3 relation capture：** 当前为在途 Workstream，已暂停等待 authority amendment acknowledgment；之后实现 exact-base `derived_from`、gate-aware dependency proposal／confirmation、human integrator、task-series metadata、status taxonomy、comparison/conflict 分离与 relation inbox。不得让 Agent／Harness／未来 Conductor 自行确认依赖或吸收关系。
+9. **U2.3 shell closeout：** 当前为在途 Workstream，已暂停等待 authority baseline acknowledgment；之后只按 U2.3 Plan 完成导航/help 整理和轻量 live-task projection，不恢复全 worktree 启动扫描，也不改 Graph/Authority/Quick Remove 权限。
 
 ## 不得外推的边界
 
@@ -62,9 +64,10 @@ Updated: 2026-08-29
 ## 安全接续顺序
 
 1. 读取 `AGENTS.md`、`PROGRESS.md`、任务相关 State 与活动 Plan。
-2. 先运行 `git status`、`git worktree list` 和目标命令的只读 inspect；Git-private 快照不能替代作者 State。
-3. 功能任务使用独立 branch＋worktree；主 worktree 只做唯一整合。
-4. Candidate 先完成 Fast／Checkpoint／本地门，再把 exact SHA 推到非 main ref；只有 Windows／Ubuntu required checks 都通过后才能推广同一 SHA。
-5. 发布、真实 relation apply、删除、凭据迁移、远端设置和模型实验都需要维护者分别授权。
+2. 新建任务或追加实质范围时，先提交 ADR／Design／Plan amendment／Pending Validation 的 exact authority baseline；任务消息只传 SHA／paths，Agent 确认 scope revision 后才写产品。
+3. 先运行 `git status`、`git worktree list` 和目标命令的只读 inspect；Git-private 快照不能替代作者 State。
+4. 功能任务使用独立 branch＋worktree；主 worktree 只做唯一整合。
+5. Candidate 先完成 Fast／Checkpoint／本地门，再把 exact SHA 推到非 main ref；只有 Windows／Ubuntu required checks 都通过后才能推广同一 SHA。
+6. 发布、真实 relation apply、删除、凭据迁移、远端设置和模型实验都需要维护者分别授权。
 
 详细历史见 [DEVLOG](DEVLOG.md)，逐次证据见 [Validation](validation/README.md)，研究结论见 [Context-routing State](state/context-routing-research.md)。

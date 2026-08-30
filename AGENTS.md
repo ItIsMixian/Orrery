@@ -29,6 +29,7 @@
 - Git 只证明写入；Agent 回执只属于自述。没有 Harness／工具边界证据时，不得宣称已精确审计模型读取内容。
 - 大型原始实验根 `D:\coding warehouse\project-orrery-benchmark` 不自动进入 Git；可发布结论必须提炼到 `experiments/context-routing/results/`。
 - 修改发布契约、文档架构或跨模块安全边界时必须新增 ADR，不得只改 README。
+- 创建 Workstream 任务或追加实质范围前，唯一协调者必须先提交对应 ADR／Approved Design／Plan（含 dated scope amendment）与 Pending Validation；任务消息只传 exact authority SHA、路径、执行配置与安全边界。Agent 在首次或恢复产品写入前必须读取并登记该 scope revision；Prompt／transcript 不得成为需求、批准或验证事实。
 - 并发 Workstream 必须各自使用独立分支和 linked worktree／clone；主 worktree 只用于集成。不得让两个 Agent 共享同一工作目录或把 Candidate／Worktree State 表述为 canonical。
 - 普通功能分支不持续改写根 `docs/PROGRESS.md` 与 `docs/HANDOFF.md`；受影响的 subsystem State、实现和验证在分支同行，由唯一整合者在干净 integration worktree 中同步全局入口。
 - 推广到 `main` 前，必须先把 exact Candidate SHA 推到非 main 分支，并取得 GitHub `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)` 双 PASS；main 保护规则必须拒绝未经这两个检查的 SHA。该规则不强制 PR，但禁止先推 main 再等待验证。
@@ -49,7 +50,7 @@
 
 **What**: 管理权威链、人类／Agent 阅读入口、作者文档生命周期、同步义务和观测台投影。
 **Truth**: `AGENTS.md`, `docs/`, 根 `scripts/docsite/`。
-**Dig**: [文档系统 State](docs/state/documentation-system.md) | [自托管 Design](docs/design/self-hosting-documentation-system.md) | [治理 ADR-0012](docs/decisions/0012-document-governance-and-information-lifecycle.md) | [统一入口 ADR-0016](docs/decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [统一入口 Design](docs/design/unified-observatory-architecture-and-shell.md) | [活动 Plan](docs/implementation/plans/2026-08-21-document-governance-and-audit.md)。
+**Dig**: [文档系统 State](docs/state/documentation-system.md) | [自托管 Design](docs/design/self-hosting-documentation-system.md) | [治理 ADR-0012](docs/decisions/0012-document-governance-and-information-lifecycle.md) | [权威优先分发 ADR-0018](docs/decisions/0018-authority-first-workstream-dispatch.md) | [权威优先分发 Design](docs/design/authority-first-workstream-dispatch.md) | [统一入口 ADR-0016](docs/decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [统一入口 Design](docs/design/unified-observatory-architecture-and-shell.md) | [活动 Plan](docs/implementation/plans/2026-08-21-document-governance-and-audit.md)。
 
 ## authority semantics
 
@@ -73,7 +74,7 @@
 
 **What**: 管理并发 Agent 的分支／worktree 隔离、Canonical／Candidate／Worktree 事实作用域、重叠审阅、干净集成、维护和显式接续关系。
 **Truth**: Git branch／HEAD／worktree 与 Git-private 状态、`docs/state/project-structure.md`、`docs/state/documentation-system.md`；W1–W7 已进入 Canonical source，覆盖 session、Scope/finding、review/integration/cleanup、Personal／Team、maintenance、LAN discovery／manual Host switch、relation execution 和只读 Graph。默认 consumer、真实 self-host apply、真实双机、自动选主、云 relay、自动删除和 scheduler 尚未实现或启用。
-**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [关系捕获 Design](docs/design/workstream-relation-capture-and-confirmation.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0014](docs/decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0017](docs/decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md) | [W7.3 Plan](docs/implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)。
+**Dig**: [项目结构 State](docs/state/project-structure.md) | [协作协议](docs/design/multi-worktree-collaboration-protocol.md) | [关系捕获 Design](docs/design/workstream-relation-capture-and-confirmation.md) | [ADR-0007](docs/decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](docs/decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0014](docs/decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0017](docs/decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](docs/decisions/0018-authority-first-workstream-dispatch.md) | [权威优先分发 Plan](docs/implementation/plans/2026-08-30-authority-first-workstream-dispatch.md) | [活动 Plan](docs/implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md) | [W7.3 Plan](docs/implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)。
 
 ## context-routing research
 
