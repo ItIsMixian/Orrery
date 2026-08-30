@@ -96,3 +96,25 @@ Required evidence:
 
 No previous Graph screenshot or Candidate closes this scope. Group hierarchy and route bundles are not relation facts,
 execution authority or public/release adoption.
+
+## 2026-08-30 partial-order and history-folding acceptance contract
+
+Required evidence:
+
+- horizontal rank uses only effective current `derived_from`, confirmed succession and explicit series order;
+- dependency, absorbs, program membership, names/branches and timestamps cannot create left/right chronology;
+- incomparable tasks share one x-rank and stack vertically with stable in-rank ordering;
+- cluster eligibility requires closed/superseded/historical, non-tip, current evidence/scope, no pending/Unknown/stale/
+  conflict and no retained responsibility;
+- completed W5/W6 phase clusters and contiguous-chain clusters pass, while mixed/branched/ineligible collections fail;
+- clusters preserve member/endpoint/status/external-edge summaries and redirect typed external edges without losing
+  inspector identity;
+- expand restores exact members/edges near the clicked anchor without global recenter/rescale;
+- pipeline mechanically proves membership → folding → rank → placement → bundle → labels/selection;
+- 30%/100%/200% render the same information model; zoom never conditionally removes semantic content;
+- desktop/mobile Browser screenshots show default folded and expanded W phases, zero overflow/error and no fabricated
+  temporal order;
+- exact new task-description acknowledgment and Git-private scope revision 6 before resumed writes.
+
+This gate remains visual/Pending until the maintainer accepts the real page. Focused tests may support iteration; no
+routed Fast/Checkpoint may run before that acceptance.

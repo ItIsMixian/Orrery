@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Partial-order Reading & History Folding
+
+- 维护者澄清 Graph “缩略”指 eligible old task 的结构折叠，不是低倍率隐藏文字；右侧“更新”是 confirmed
+  predecessor→successor 偏序，不是全局时间轴。depends_on／absorbs／program／名称／时间戳不得制造左右顺序，
+  互不可达任务保持同 x-rank 并纵向堆叠。
+- Plan/Validation 固定严格折叠资格：closed/superseded/historical、非 tip、evidence/scope current、无 pending/
+  Unknown/stale/conflict、无未移交责任且属于连续链或完整 phase。cluster 保留端点/状态/外部边摘要并原位展开。
+- 布局流水线固定 membership→fold→rank→placement→bundle→label/selection；zoom 保持 30%–200%、reset 100%，
+  不按倍率删语义。继续原 W7.3 dirty work／Sol medium／scope revision 6，截图接受前禁 Fast/Checkpoint。
+
 ## 2026-08-30 — ADR-0021 Orrery v0.3.0 Release Contract Accepted
 
 - 维护者接受 REL3 `ec2b09b` 的六项选择：新项目 Unified/Model 1/Rules 1，旧 0.2/brownfield legacy until

@@ -19,6 +19,9 @@ Updated: 2026-08-30
 - ADR-0020 与 Program/Bundle Design 已接受：W 是 program、W5/W6/W7 是 phase，membership 不是 series 或
   semantic edge；同类同向且共端点的 relation 可受控束线。W7.3 当前三个未提交文件须保留并在 scope revision
   5 下继续，尚无实现/验收事实。
+- W7.3 最新 layout clarification 规定 relation-backed partial order、同 rank 独立任务纵向堆叠、严格
+  history eligibility、外部边重定向和 membership→fold→rank→bundle pipeline；scope revision 6 后继续，zoom
+  30%–200% 不再隐藏信息，视觉接受前仍禁 Fast/Checkpoint。
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成；W7.3 已收到立即停止要求，必须
   确认新的 readable-topology 任务说明版本并刷新 scope revision 4 后才可恢复产品写入。自动 receipt／
   first-write enforcement 尚未实现。

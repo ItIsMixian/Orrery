@@ -312,3 +312,68 @@ uncommitted changes to the two Graph modules and focused test file. Refresh Git-
 acknowledging the new task-description version. Use GPT-5.6 Sol medium. Do not run routed Fast/Checkpoint before the
 maintainer accepts the new visual direction; do not create W7.4, integrate CI7/REL3, modify feature-branch root
 PROGRESS/HANDOFF, push main, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Scope Amendment — Partial-order Reading & Evidence-qualified History Folding
+
+The maintainer clarified that “缩略” means structural folding of eligible old tasks, not low-zoom semantic hiding.
+The invariant “right is newer” must be restored as a relation-backed partial-order reading contract rather than an
+invented global timeline. This section refines ADR-0020 presentation only and does not add authority semantics.
+
+### Horizontal ordering
+
+- [ ] Interpret horizontal direction as **confirmed predecessor/history on the left → confirmed successor/current on
+  the right**, not calendar time. Canvas/help text must say that unrelated tasks do not imply time order.
+- [ ] Only effective/current `derived_from`, confirmed succession and explicit series predecessor/order may increase
+  horizontal rank. `depends_on`, `absorbs`, program/phase membership, task code, display prefix, branch/title and
+  filesystem timestamps cannot define old/new rank.
+- [ ] Mutually unreachable/incomparable tasks occupy the same horizontal rank and stack vertically. Stable sorting is
+  allowed only inside that rank; it cannot move an independent task into a later x-column and fabricate chronology.
+- [ ] A current/rightmost tip is shown only when endpoint, scope and evidence are current. Unknown/stale records remain
+  visibly non-current and cannot be forced right merely because they are active in memory.
+
+### History eligibility and cluster semantics
+
+- [ ] Default folding requires all of: closed/superseded/historical lifecycle; not active tip; current evidence and
+  scope; no pending human confirmation; no Unknown/stale/conflict; no untransferred responsibility; and membership in
+  one contiguous historical chain or a wholly completed phase.
+- [ ] W5/W6 may collapse as completed phase clusters only when every included member meets eligibility. Branches that
+  do not form one contiguous phase/chain remain separate clusters; age or left position alone cannot collect them.
+- [ ] Cluster summary shows phase/chain label, member count, first/last endpoints, status summary and inbound/outbound
+  external relation counts. Internal edges may hide, but every external edge redirects to a typed cluster boundary
+  port and remains inspectable.
+- [ ] Expanding a cluster restores exact member nodes/edges in place and preserves an anchor near the clicked cluster;
+  it cannot recenter or globally rescale the canvas. Collapse/expand changes structure only, not facts or zoom.
+- [ ] Tasks with pending confirmation, unresolved conflict, Unknown/stale evidence, active responsibility or current
+  blocking role are never folded even if another task considers them historical.
+
+### Deterministic layout pipeline
+
+Apply exactly this order:
+
+```text
+accepted program/phase membership
+→ history eligibility and contiguous cluster folding
+→ confirmed partial-order rank
+→ node placement
+→ declared same-semantics route bundling
+→ labels, arrowheads and selection projection
+```
+
+Bundling before folding or rank is invalid because it can create orphan trunks or routes through clusters.
+
+### Zoom and acceptance
+
+- [ ] Keep explicit zoom at 30%–200% and reset at 100%. Do not hide labels, evidence or nodes because of zoom level;
+  a user-chosen 30% may be physically small but must represent the same facts.
+- [ ] Space reduction comes from eligible history/phase folding and focused selection, never conditional semantic
+  removal tied to scale.
+- [ ] Tests cover independent same-rank tasks, false order from dependency/absorbs, stale/pending/non-transferred
+  no-fold cases, contiguous versus branched clusters, external-edge redirection, anchor-preserving expansion and
+  folding-before-bundling order.
+- [ ] Browser evidence shows default folded W5/W6 plus expanded views at 100%, 30% and 200%, with identical fact
+  counts after expansion, no overflow/console errors and no fabricated horizontal order.
+
+Continue the current W7.3 implementation and preserve all current uncommitted changes. Refresh Git-private scope to
+revision 6 after reading only this Plan amendment and its Validation section; do not reread older Skill/authority
+materials. Use focused Graph/Core tests only, and keep routed Fast/Checkpoint blocked until maintainer screenshot
+acceptance.
