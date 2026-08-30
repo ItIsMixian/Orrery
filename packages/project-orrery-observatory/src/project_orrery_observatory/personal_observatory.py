@@ -1445,18 +1445,132 @@ PERSONAL_OBSERVATORY_CSS = r"""
 
 
 MAINTENANCE_OBSERVATORY_CSS = r"""
-.mo-shell{--mo-green:#63d6cf;--mo-amber:#f2ba5e;--mo-red:#ff786b;margin:0 0 24px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg)}
-.mo-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;padding:22px 24px;background:linear-gradient(90deg,rgba(99,214,207,.09),transparent 65%);border-bottom:1px solid var(--line)}
-.mo-kicker{color:var(--mo-green);font:700 10px/1.3 "Cascadia Code",Consolas,monospace;letter-spacing:.14em}.mo-head h2{margin:5px 0;font-size:27px}.mo-head p{margin:0;color:var(--mut);font-size:12px;max-width:760px}.mo-boundary{align-self:start;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--mut);font-size:10px}
-.mo-signals{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}.mo-signals>div{padding:14px 18px;background:var(--bg2)}.mo-signals small{display:block;color:var(--mut);font-size:9px}.mo-signals b{display:block;margin-top:5px;font-size:15px}
-.mo-actions{display:flex;flex-wrap:wrap;gap:8px;padding:14px 24px;border-bottom:1px solid var(--line)}.mo-button{appearance:none;border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:var(--fg);padding:9px 12px;font:700 10px/1.2 inherit;cursor:pointer}.mo-button:hover:not(:disabled){border-color:var(--mo-green);color:var(--mo-green)}.mo-button:disabled{opacity:.4;cursor:not-allowed}.mo-button.danger{color:var(--mo-red)}
-.mo-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.75fr)}.mo-main,.mo-side{padding:20px 24px;min-width:0}.mo-side{border-left:1px solid var(--line);background:var(--bg2)}.mo-section+.mo-section{margin-top:22px}.mo-section h3{margin:0 0 9px;font-size:13px}.mo-item{border-top:1px solid var(--line);padding:12px 0}.mo-item-head{display:flex;justify-content:space-between;gap:12px}.mo-item b{font-size:11.5px}.mo-item code{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis}.mo-item p{margin:5px 0;color:var(--mut);font-size:10px}.mo-item-actions{display:flex;gap:7px;margin-top:9px}.mo-reason{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:8px 0;font-size:10px}.mo-policy{display:grid;grid-template-columns:1fr auto;gap:7px;font-size:10px}.mo-policy span{color:var(--mut)}.mo-history>summary{cursor:pointer;font-size:11px}.mo-empty,.mo-notice{color:var(--mut);font-size:10.5px;padding:11px 0}.mo-notice{padding:10px 24px;border-top:1px solid var(--line)}.mo-notice.error{color:var(--mo-red)}
-.mo-cache-state{font:700 9px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}.mo-cache-state.current{color:var(--mo-green)}.mo-cache-state.stale{color:var(--mo-amber)}.mo-cache-state.unknown{color:var(--mo-red)}.mo-progress{height:2px;background:var(--line);overflow:hidden}.mo-progress.running::after{content:"";display:block;width:38%;height:100%;background:var(--mo-green);animation:mo-scan 1.1s ease-in-out infinite alternate}@keyframes mo-scan{from{transform:translateX(-30%)}to{transform:translateX(220%)}}
-.mo-boundaries{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.mo-boundaries>div{padding:13px 18px;background:var(--bg2)}.mo-boundaries b{display:block;font-size:11px}.mo-boundaries span{display:block;margin-top:4px;color:var(--mut);font-size:9.5px}
-.mo-warning{margin:14px 24px 0;padding:11px 13px;border:1px dashed var(--mo-amber);border-radius:8px;color:var(--mut);font-size:10.5px}.mo-warning b{display:block;color:var(--mo-amber);margin-bottom:3px}.mo-quick{padding:18px 24px;border-bottom:1px solid var(--line)}.mo-quick-head{display:flex;justify-content:space-between;gap:12px;align-items:end}.mo-quick h3{margin:0}.mo-quick-count{color:var(--mo-green);font-weight:800}.mo-quick-empty{margin-top:9px;color:var(--mut);font-size:11px}.mo-item details{margin-top:6px}.mo-item summary{cursor:pointer;color:var(--mut);font-size:10px}.mo-item details code{white-space:normal;overflow-wrap:anywhere}
-@media(max-width:850px){.mo-signals{grid-template-columns:1fr 1fr}.mo-grid{grid-template-columns:1fr}.mo-side{border-left:0;border-top:1px solid var(--line)}}
-@media(max-width:640px){.mo-shell{margin:0 -18px 24px;border-left:0;border-right:0;border-radius:0}.mo-head{grid-template-columns:1fr;padding:18px}.mo-boundary{justify-self:start}.mo-signals>div,.mo-actions,.mo-main,.mo-side,.mo-notice{padding-left:18px;padding-right:18px}.mo-boundaries{grid-template-columns:1fr}.mo-button{min-height:40px}.mo-item-head{display:block}}
+.mo-shell{--mo-green:#63d6cf;--mo-amber:#f2ba5e;--mo-red:#ff786b;margin:0 0 24px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg);min-width:0}
+.mo-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,auto);gap:22px;align-items:start;padding:18px 22px;background:linear-gradient(90deg,rgba(99,214,207,.08),transparent 68%);border-bottom:1px solid var(--line)}
+.mo-kicker{color:var(--mo-green);font:700 9px/1.3 "Cascadia Code",Consolas,monospace;letter-spacing:.13em}.mo-head h2{margin:4px 0;font-size:25px;letter-spacing:-.025em}.mo-head p{margin:0;color:var(--mut);font-size:11.5px;max-width:720px}
+.mo-head-actions{display:grid;justify-items:end;gap:9px;min-width:0}.mo-boundary{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;color:var(--mut);font-size:9.5px}.mo-boundary span{border:1px solid var(--line);border-radius:999px;padding:4px 7px;white-space:nowrap}.mo-boundary .current{color:var(--mo-green)}
+.mo-refresh-control{display:flex;align-items:center;justify-content:flex-end;gap:9px;min-width:0}.mo-refresh-state{display:block;width:128px;min-height:13px;color:var(--mut);font-size:9.5px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mo-refresh-state.error{color:var(--mo-red)}
+.mo-button{appearance:none;border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:var(--fg);padding:8px 11px;font:700 10px/1.2 inherit;cursor:pointer;white-space:nowrap}.mo-button:hover:not(:disabled){border-color:var(--mo-green);color:var(--mo-green)}.mo-button:focus-visible,.mo-filter:focus-visible,.mo-pager button:focus-visible,.mo-row details>summary:focus-visible{outline:2px solid var(--mo-green);outline-offset:2px}.mo-button:disabled{opacity:.45;cursor:not-allowed}.mo-button.danger{color:var(--mo-red)}
+.mo-progress{height:2px;background:var(--line);overflow:hidden}.mo-progress.running::after{content:"";display:block;width:32%;height:100%;background:var(--mo-green);animation:mo-scan 1.1s ease-in-out infinite alternate}@keyframes mo-scan{from{transform:translateX(-35%)}to{transform:translateX(280%)}}
+.mo-signals{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}.mo-signals>div{padding:11px 16px;background:var(--bg2)}.mo-signals small{display:block;color:var(--mut);font-size:9px}.mo-signals b{display:block;margin-top:3px;font-size:17px}.mo-signals .safe b{color:var(--mo-green)}.mo-signals .attention b{color:var(--mo-amber)}
+.mo-warning{margin:10px 20px 0;padding:7px 10px;border:1px dashed color-mix(in srgb,var(--mo-amber) 70%,var(--line));border-radius:7px;color:var(--mut);font-size:9.5px}.mo-warning summary{cursor:pointer;color:var(--mo-amber);font-weight:700}.mo-warning p{margin:5px 0 0}.mo-warning code{display:block;margin-top:5px;white-space:normal;overflow-wrap:anywhere}
+.mo-main{padding:16px 20px 18px;min-width:0}.mo-queue-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:9px}.mo-queue-head h3{margin:0;font-size:13px}.mo-queue-head p{margin:3px 0 0;color:var(--mut);font-size:10px}.mo-safe-note{color:var(--mut);font-size:10px;text-align:right}.mo-safe-note b{color:var(--mo-green)}
+.mo-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}.mo-filters{display:flex;flex-wrap:wrap;gap:5px}.mo-filter{border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);padding:6px 9px;font:700 9.5px/1 inherit;cursor:pointer}.mo-filter:hover,.mo-filter[aria-pressed="true"]{border-color:var(--mo-green);color:var(--fg);background:rgba(99,214,207,.08)}
+.mo-pager{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:9.5px;white-space:nowrap}.mo-pager button{width:28px;height:28px;border:1px solid var(--line);border-radius:6px;background:var(--bg3);color:var(--fg);cursor:pointer}.mo-pager button:disabled{opacity:.35;cursor:not-allowed}
+.mo-table{border:1px solid var(--line);border-radius:9px;overflow:hidden;min-width:0}.mo-table-head,.mo-row-grid{display:grid;grid-template-columns:minmax(170px,1.15fr) minmax(95px,.62fr) minmax(220px,1.35fr) minmax(118px,.75fr) minmax(92px,auto);gap:12px;align-items:center}.mo-table-head{padding:7px 11px;background:var(--bg3);color:var(--mut);font-size:8.5px;text-transform:uppercase;letter-spacing:.07em}.mo-row{border-top:1px solid var(--line);background:var(--bg2);min-width:0}.mo-row:first-of-type{border-top:0}.mo-row-grid{padding:9px 11px;min-height:58px}.mo-cell{min-width:0}.mo-cell b,.mo-cell span,.mo-cell time{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mo-cell b{font-size:11px}.mo-cell span,.mo-cell time{color:var(--mut);font-size:9.5px}.mo-cell .mo-sub{margin-top:3px}.mo-row-state{width:max-content;max-width:100%;border-radius:999px;padding:4px 7px;border:1px solid var(--line);font:700 9px/1 "Cascadia Code",Consolas,monospace}.mo-row[data-maintenance-view-state="eligible"] .mo-row-state{color:var(--mo-green);border-color:color-mix(in srgb,var(--mo-green) 45%,var(--line))}.mo-row[data-maintenance-view-state="attention"] .mo-row-state{color:var(--mo-amber);border-color:color-mix(in srgb,var(--mo-amber) 45%,var(--line))}.mo-row-action{justify-self:end}.mo-row-action .mo-button{padding:7px 9px}.mo-row details{grid-column:1/-1;min-width:0}.mo-row details>summary{width:max-content;cursor:pointer;color:var(--mut);font-size:9.5px}.mo-row-detail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;margin-top:8px;padding:9px 10px;background:var(--bg);border-radius:7px}.mo-row-detail div{min-width:0}.mo-row-detail dt{color:var(--mut);font-size:8.5px}.mo-row-detail dd{margin:2px 0 0;font:9.5px/1.45 "Cascadia Code",Consolas,monospace;overflow-wrap:anywhere}.mo-row-detail .wide{grid-column:1/-1}
+.mo-empty{padding:16px;color:var(--mut);font-size:10.5px}.mo-table-empty{border:1px dashed var(--line);border-radius:8px;text-align:center}.mo-reason{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:7px 0;font-size:9.5px}.mo-policy{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;font-size:9.5px}.mo-policy span{color:var(--mut)}
+.mo-technical{margin:0 20px 18px;border-top:1px solid var(--line);padding-top:10px}.mo-technical>summary{cursor:pointer;color:var(--mut);font-size:10.5px;font-weight:700}.mo-technical-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:12px}.mo-technical h4{margin:0 0 7px;font-size:10px}.mo-history>summary{cursor:pointer;font-size:9.5px}.mo-boundaries{display:grid;gap:7px}.mo-boundaries div{padding-left:8px;border-left:2px solid var(--line)}.mo-boundaries b{display:block;font-size:9.5px}.mo-boundaries span{display:block;margin-top:2px;color:var(--mut);font-size:9px}
+@media(max-width:980px){.mo-table-head,.mo-row-grid{grid-template-columns:minmax(150px,1.05fr) 90px minmax(170px,1.2fr) 105px auto}.mo-technical-body{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.mo-head{grid-template-columns:1fr}.mo-head-actions{justify-items:start}.mo-boundary,.mo-refresh-control{justify-content:flex-start}.mo-signals{grid-template-columns:1fr 1fr}.mo-table-head{display:none}.mo-row-grid{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:9px 11px}.mo-cell.workspace{grid-column:1/2;grid-row:1}.mo-cell.state{grid-column:2/3;grid-row:1;justify-self:end}.mo-cell.reason{grid-column:1/-1;grid-row:2;border-top:1px solid var(--line);padding-top:6px}.mo-cell.reason .mo-sub{display:none}.mo-cell.activity{grid-column:1/2;grid-row:3}.mo-row-action{grid-column:2/3;grid-row:3;align-self:end}.mo-row details{grid-column:1/-1;grid-row:4}.mo-toolbar{align-items:flex-start;flex-direction:column}.mo-pager{align-self:stretch;justify-content:flex-end}.mo-technical-body{grid-template-columns:1fr}}
+@media(max-width:640px){.mo-shell{margin:0 -18px 24px;border-left:0;border-right:0;border-radius:0}.mo-head,.mo-main{padding-left:14px;padding-right:14px}.mo-head{gap:13px}.mo-head h2{font-size:22px}.mo-head-actions{width:100%}.mo-boundary{gap:4px}.mo-refresh-control{width:100%;justify-content:space-between}.mo-refresh-state{width:auto;flex:1;text-align:left}.mo-signals>div{padding:10px 12px}.mo-signals b{font-size:15px}.mo-warning{margin-left:14px;margin-right:14px}.mo-queue-head{display:block}.mo-safe-note{text-align:left;margin-top:5px}.mo-filter{min-height:34px}.mo-row-action .mo-button{min-height:36px}.mo-technical{margin-left:14px;margin-right:14px}.mo-row-detail{grid-template-columns:1fr}.mo-row-detail .wide{grid-column:auto}}
+@media(prefers-reduced-motion:reduce){.mo-shell *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 """
+
+
+MAINTENANCE_PAGE_SIZE = 8
+
+
+def _maintenance_view_state(entry: Mapping[str, Any]) -> str:
+    """Map Core-owned status to a display bucket without changing eligibility."""
+
+    if (
+        bool(entry.get("remove_worktree_eligible"))
+        and str(entry.get("cache_state")) == "current"
+        and not bool(entry.get("is_primary_worktree"))
+    ):
+        return "eligible"
+    if str(entry.get("cache_state", "unknown")) != "current" or str(
+        entry.get("classification", "unknown")
+    ) in {"legacy-unmanaged", "review-integration-pending"}:
+        return "attention"
+    return "protected"
+
+
+def _maintenance_workspace_label(entry: Mapping[str, Any]) -> tuple[str, str]:
+    if bool(entry.get("is_primary_worktree")):
+        return "主工作区", workspace_classification(entry.get("classification"))
+    branch = _branch_label(entry.get("branch"))
+    task = branch.removeprefix("codex/")
+    if task and task != "detached":
+        return task, workspace_classification(entry.get("classification"))
+    path = Path(str(entry.get("registered_path") or ""))
+    return path.name or "待确认的工作区", workspace_classification(entry.get("classification"))
+
+
+def _maintenance_activity_label(value: object) -> str:
+    text = str(value or "")
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return "最近证据待确认"
+    return parsed.strftime("最近检查 %m月%d日 %H:%M")
+
+
+def _maintenance_row(entry: Mapping[str, Any], *, hidden: bool, control: bool) -> str:
+    view_state = _maintenance_view_state(entry)
+    state_label = {
+        "attention": "需要处理",
+        "eligible": "可安全删除",
+        "protected": "受保护",
+    }[view_state]
+    title, subtitle = _maintenance_workspace_label(entry)
+    reasons = [str(value) for value in entry.get("reasons", [])]
+    unknown = [str(value) for value in entry.get("unknown", [])]
+    eligible = view_state == "eligible"
+    primary_reason = maintenance_reason(reasons[0]) if reasons else (
+        "证据仍需确认" if unknown else (
+            "已满足当前安全删除条件" if eligible else "当前证据没有给出可安全删除结论"
+        )
+    )
+    action = (
+        '<button class="mo-button danger" type="button" data-maintenance-preflight="%s">安全删除</button>'
+        % _esc(entry.get("workspace_id"))
+        if eligible and control
+        else '<span class="mo-sub">%s</span>' % (
+            "主工作区保留" if bool(entry.get("is_primary_worktree")) else (
+                "请使用本机动态入口" if eligible else "暂无删除操作"
+            )
+        )
+    )
+    technical_reasons = " · ".join(reasons) or "no-machine-reason"
+    technical_unknown = " · ".join(unknown) or "none"
+    return (
+        '<div class="mo-row" role="row" data-maintenance-workspace="%s" '
+        'data-maintenance-view-state="%s"%s><div class="mo-row-grid">'
+        '<div class="mo-cell workspace" role="cell"><b>%s</b><span class="mo-sub">%s</span></div>'
+        '<div class="mo-cell state" role="cell"><span class="mo-row-state">%s</span></div>'
+        '<div class="mo-cell reason" role="cell"><b>%s</b><span class="mo-sub">%s</span></div>'
+        '<div class="mo-cell activity" role="cell"><time>%s</time><span class="mo-sub">%s</span></div>'
+        '<div class="mo-cell mo-row-action" role="cell">%s</div>'
+        '<details><summary>%s</summary><dl class="mo-row-detail">'
+        '<div><dt>workspace_id</dt><dd>%s</dd></div><div><dt>branch</dt><dd>%s</dd></div>'
+        '<div class="wide"><dt>registered_path</dt><dd>%s</dd></div>'
+        '<div><dt>HEAD</dt><dd>%s</dd></div><div><dt>cache_state</dt><dd>%s</dd></div>'
+        '<div class="wide"><dt>reasons</dt><dd>%s</dd></div>'
+        '<div class="wide"><dt>unknown / secondary evidence</dt><dd>%s</dd></div>'
+        '</dl></details></div></div>'
+        % (
+            _esc(entry.get("workspace_id")),
+            view_state,
+            " hidden" if hidden else "",
+            _esc(title),
+            _esc(subtitle),
+            state_label,
+            _esc(primary_reason),
+            "最新资格来自 Maintenance Core" if eligible else "完整原因见行内详情",
+            _esc(_maintenance_activity_label(entry.get("scanned_at"))),
+            _esc(display_status(entry.get("cache_state", "unknown"))),
+            action,
+            TECHNICAL_DETAILS_LABEL,
+            _esc(entry.get("workspace_id")),
+            _esc(entry.get("branch") or "detached"),
+            _esc(entry.get("registered_path")),
+            _esc(entry.get("head") or "Unknown"),
+            _esc(entry.get("cache_state", "unknown")),
+            _esc(technical_reasons),
+            _esc(technical_unknown),
+        )
+    )
 
 
 def _maintenance_panel(projection: Mapping[str, Any]) -> str:
@@ -1466,9 +1580,6 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
     control = bool(maintenance.get("control_available"))
     last = maintenance.get("last_run") if isinstance(maintenance.get("last_run"), Mapping) else {}
     counts = last.get("counts") if isinstance(last.get("counts"), Mapping) else {}
-    queue = [item for item in maintenance.get("queue", []) if isinstance(item, Mapping)]
-    authorizations = [item for item in maintenance.get("authorizations", []) if isinstance(item, Mapping)]
-    auth_by_item = {str(item.get("item_id")): item for item in authorizations}
     cache = maintenance.get("cache") if isinstance(maintenance.get("cache"), Mapping) else {}
     cache_entries = [item for item in cache.get("entries", []) if isinstance(item, Mapping)]
     eligible_entries = [
@@ -1477,27 +1588,30 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
         and str(entry.get("cache_state")) == "current"
         and not bool(entry.get("is_primary_worktree"))
     ]
-    items = []
-    for entry in cache_entries:
-        state = str(entry.get("cache_state", "unknown"))
-        primary = bool(entry.get("is_primary_worktree"))
-        eligible = entry in eligible_entries
-        action = (
-            '<button class="mo-button danger" type="button" data-maintenance-preflight="%s">重新检查并安全移除</button>'
-            % _esc(entry.get("workspace_id"))
-            if control and eligible
-            else '<span class="mo-empty">%s</span>' % (
-                "主工作区受保护" if primary else "当前不符合安全移除条件"
-            )
-        )
-        raw_reasons = list(entry.get("reasons") or entry.get("unknown") or [])
-        reason = " · ".join(maintenance_reason(value) for value in raw_reasons) or "当前证据没有给出可安全删除结论"
-        raw_reason_detail = " · ".join(map(str, raw_reasons)) or "no-machine-reason"
-        items.append(
-            '<div class="mo-item" data-maintenance-workspace="%s"><div class="mo-item-head"><b>%s</b><span class="mo-cache-state %s">%s</span></div><p>%s</p><details><summary>%s</summary><code>%s</code><code>%s</code><code>%s</code><code>%s</code></details><div class="mo-item-actions">%s</div></div>'
-            % (_esc(entry.get("workspace_id")), _esc(workspace_classification(entry.get("classification"))), _esc(state), _esc(display_status(state)), _esc(reason), TECHNICAL_DETAILS_LABEL, _esc(entry.get("branch") or "Unknown branch"), _esc(entry.get("registered_path")), _esc(entry.get("scanned_at") or "Unknown"), _esc(raw_reason_detail), action)
-        )
-    queue_html = "".join(items) or '<div class="mo-empty">缓存尚未建立；页面仍可使用，但需要先刷新才能判断各工作区状态。</div>'
+    view_counts = Counter(_maintenance_view_state(entry) for entry in cache_entries)
+    default_filter = (
+        "attention" if view_counts["attention"] else
+        "eligible" if view_counts["eligible"] else
+        "protected"
+    )
+    state_order = {"attention": 0, "eligible": 1, "protected": 2}
+    ordered_entries = sorted(
+        cache_entries,
+        key=lambda entry: (
+            state_order[_maintenance_view_state(entry)],
+            _maintenance_workspace_label(entry)[0].casefold(),
+            str(entry.get("workspace_id", "")),
+        ),
+    )
+    initial_index = 0
+    rows = []
+    for entry in ordered_entries:
+        matches_default = _maintenance_view_state(entry) == default_filter
+        hidden = not matches_default or initial_index >= MAINTENANCE_PAGE_SIZE
+        rows.append(_maintenance_row(entry, hidden=hidden, control=control))
+        if matches_default:
+            initial_index += 1
+    queue_html = "".join(rows) or '<div class="mo-empty mo-table-empty">缓存尚未建立；刷新后才会显示工作区状态。</div>'
     protected = maintenance.get("protected_reasons") if isinstance(maintenance.get("protected_reasons"), Mapping) else {}
     protected_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b><details><summary>%s</summary><code>%s</code></details></div>' % (_esc(maintenance_reason(reason)), _esc(count), TECHNICAL_DETAILS_LABEL, _esc(reason)) for reason, count in sorted(protected.items())) or '<div class="mo-empty">没有已记录的受保护原因；未扫描不等于可清理。</div>'
     policy = maintenance.get("policy") if isinstance(maintenance.get("policy"), Mapping) else {}
@@ -1513,31 +1627,52 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
         if isinstance(item, Mapping)
     ]
     historical_warning = (
-        '<div class="mo-warning" data-maintenance-historical-warning><b>历史维护记录无法按当前格式读取</b>'
-        '旧记录已原样保留，并仅降级为“历史／待确认”；它不会阻止当前刷新，也不会放宽当前安全移除条件。'
-        '<details><summary>%s</summary><code>%s</code></details></div>'
-        % (TECHNICAL_DETAILS_LABEL, _esc(" · ".join(str(item.get("message")) for item in warnings)))
+        '<details class="mo-warning" data-maintenance-historical-warning><summary>历史记录需要确认 · 展开技术详情</summary>'
+        '<p>旧记录已原样保留为历史证据；不阻止当前刷新，也不放宽当前安全删除条件。</p>'
+        '<code>%s</code></details>'
+        % _esc(" · ".join(str(item.get("message")) for item in warnings))
         if warnings else ""
     )
     leading_reasons = "、".join(maintenance_reason(reason) for reason in list(sorted(protected))[:3])
-    quick_empty = (
-        '<div class="mo-quick-empty" data-maintenance-quick-empty>目前没有可安全删除项。%s</div>'
+    safe_note = (
+        '<span data-maintenance-quick-empty>目前没有可安全删除项。%s</span>'
         % ("主要保护原因：" + _esc(leading_reasons) + "。" if leading_reasons else "尚未取得足够的当前证据。")
         if not eligible_entries else
-        '<div class="mo-quick-empty" data-maintenance-quick-empty>只有下方标记为可安全移除的行会提供操作按钮；点击后仍会执行最新预检和二次确认。</div>'
+        '<span data-maintenance-quick-empty>只有合格行提供“安全删除”；点击后仍执行最新预检与二次确认。</span>'
     )
+    default_count = int(view_counts[default_filter])
+    default_pages = max(1, (default_count + MAINTENANCE_PAGE_SIZE - 1) // MAINTENANCE_PAGE_SIZE)
     return (
-        '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s" data-maintenance-api-base="%s" data-maintenance-refresh-path="%s" data-maintenance-remove-path="%s" data-maintenance-reload-after-action="%s">'
-        '<section class="mo-shell"><header class="mo-head"><div><span class="mo-kicker">工作区维护 · 仅限本机</span><h2>工作区维护</h2><p>发现建议不会自动删除。只有证据完整的候选工作区，才会在本机二次确认后移除；分支与提交始终保留。</p></div><span class="mo-boundary">个人模式零网络 · 分支保留</span></header>%s'
-        '<div class="mo-signals"><div><small>缓存状态</small><b data-maintenance-cache-status>%s</b></div><div><small>已登记工作区</small><b data-maintenance-worktrees>%s</b></div><div><small>后台刷新</small><b data-maintenance-background>%s</b></div><div><small>预计可回收空间</small><b data-maintenance-reclaim>%s</b></div></div><div class="mo-progress %s" aria-hidden="true"></div>'
-        '<div class="mo-actions"><button class="mo-button" type="button" data-maintenance-scan%s>后台增量扫描</button><span class="mo-empty">页面不会等待完整扫描 · 仅重新检查目标 · 无定时任务</span></div>'
-        '<section class="mo-quick" data-maintenance-quick-remove><div class="mo-quick-head"><h3>快速删除</h3><span><b class="mo-quick-count" data-maintenance-eligible-count>%s</b> 项可安全删除</span></div>%s</section>'
-        '<div class="mo-boundaries"><div><b>工作区</b><span>仅在证据绑定且本机确认后可移除</span></div><div><b>本地分支</b><span>%s 个到期提醒；本阶段不执行删除</span></div><div><b>远端分支</b><span>零网络，不观察、不删除</span></div></div>'
-        '<div class="mo-grid"><main class="mo-main"><section class="mo-section"><h3>已登记工作区</h3><div data-maintenance-queue>%s</div></section><section class="mo-section"><h3>主要保护原因</h3><div data-maintenance-protected>%s</div></section></main>'
-        '<aside class="mo-side"><section class="mo-section"><details><summary>技术策略详情</summary><div class="mo-policy">%s</div></details></section><section class="mo-section"><details class="mo-history"><summary>授权与执行历史</summary>%s</details></section></aside></div>'
-        '<div class="mo-notice" data-maintenance-notice>%s</div></section></article>'
+        '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s" data-maintenance-api-base="%s" data-maintenance-refresh-path="%s" data-maintenance-remove-path="%s" data-maintenance-reload-after-action="%s" data-maintenance-page-size="%s" data-maintenance-default-filter="%s">'
+        '<section class="mo-shell"><header class="mo-head"><div><span class="mo-kicker">工作区维护 · 仅限本机</span><h2>工作区维护</h2><p>先看需要处理、可以安全删除和仍受保护的工作区；发现建议不会自动执行。</p></div>'
+        '<div class="mo-head-actions"><div class="mo-boundary" aria-label="运行边界"><span class="current">当前证据</span><span>零外部网络</span><span>分支保留</span></div>'
+        '<div class="mo-refresh-control"><span class="mo-refresh-state" role="status" aria-live="polite" data-maintenance-notice>%s</span><button class="mo-button" type="button" data-maintenance-scan%s>刷新工作区状态</button></div></div></header>'
+        '<div class="mo-progress %s" aria-hidden="true"></div>'
+        '<div class="mo-signals"><div><small>全部工作区</small><b data-maintenance-worktrees>%s</b></div><div class="attention"><small>需要处理</small><b data-maintenance-attention-count>%s</b></div><div class="safe"><small>可安全删除</small><b data-maintenance-eligible-count>%s</b></div><div><small>受保护</small><b data-maintenance-protected-count>%s</b></div></div>%s'
+        '<main class="mo-main"><div class="mo-queue-head"><div><h3>工作区队列</h3><p>稳定分组 · 每页最多 %s 项 · 点击“详情”查看完整技术证据</p></div><div class="mo-safe-note"><b>可安全删除 %s 项</b><br>%s</div></div>'
+        '<div class="mo-toolbar"><div class="mo-filters" role="group" aria-label="工作区状态筛选">'
+        '<button class="mo-filter" type="button" data-maintenance-filter="attention" aria-pressed="%s">需要处理 %s</button>'
+        '<button class="mo-filter" type="button" data-maintenance-filter="eligible" aria-pressed="%s">可安全删除 %s</button>'
+        '<button class="mo-filter" type="button" data-maintenance-filter="protected" aria-pressed="%s">受保护 %s</button>'
+        '<button class="mo-filter" type="button" data-maintenance-filter="all" aria-pressed="%s">全部 %s</button></div>'
+        '<div class="mo-pager" aria-label="工作区分页"><button type="button" data-maintenance-page="previous" aria-label="上一页" disabled>‹</button><span data-maintenance-page-status>第 1 / %s 页</span><button type="button" data-maintenance-page="next" aria-label="下一页"%s>›</button></div></div>'
+        '<div class="mo-table" role="table" aria-label="工作区维护列表"><div class="mo-table-head" role="row"><span>工作区 / 关联任务</span><span>状态</span><span>主要原因</span><span>最近证据</span><span>操作</span></div><div data-maintenance-queue>%s</div><div class="mo-empty mo-table-empty" data-maintenance-filter-empty hidden>当前筛选没有工作区。</div></div></main>'
+        '<details class="mo-technical"><summary>技术策略详情</summary><div class="mo-technical-body">'
+        '<section><h4>策略与阈值</h4><div class="mo-policy">%s</div></section>'
+        '<section><h4>主要保护原因</h4><div data-maintenance-protected>%s</div></section>'
+        '<section><h4>本机操作边界</h4><div class="mo-boundaries"><div><b>工作区</b><span>仅在证据绑定、本机确认后移除</span></div><div><b>本地分支</b><span>%s 个到期提醒；当前不删除</span></div><div><b>远端分支</b><span>个人模式不观察、不删除</span></div><div><b>定时刷新</b><span>无定时任务；页面关闭后不会运行</span></div></div><details class="mo-history"><summary>授权与执行历史</summary>%s</details></section>'
+        '</div></details></section></article>'
         % (
-            "true" if control else "false", _esc(api_base), _esc(maintenance.get("refresh_path", "/scan")), _esc(maintenance.get("remove_path", "/quick-remove")), "true" if maintenance.get("reload_after_action", True) else "false", historical_warning, _esc(display_status(cache.get("status", "unknown"))), _esc(len(cache_entries) if cache_entries else counts.get("worktrees", "待确认")), _esc(display_status(background_status)), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "running" if background_status in {"pending", "running"} else "", "" if control else " disabled", _esc(len(eligible_entries)), quick_empty, _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；快速删除会先重新检查目标，只删除工作区，保留分支和提交。" if control else "静态只读视图；请使用本机动态入口进行确认。",
+            "true" if control else "false", _esc(api_base), _esc(maintenance.get("refresh_path", "/scan")), _esc(maintenance.get("remove_path", "/quick-remove")), "true" if maintenance.get("reload_after_action", True) else "false", MAINTENANCE_PAGE_SIZE, default_filter,
+            _esc(display_status(background_status)), "" if control else " disabled",
+            "running" if background_status in {"pending", "running"} else "",
+            _esc(len(cache_entries) if cache_entries else counts.get("worktrees", "待确认")), _esc(view_counts["attention"]), _esc(view_counts["eligible"]), _esc(view_counts["protected"]), historical_warning,
+            MAINTENANCE_PAGE_SIZE, _esc(len(eligible_entries)), safe_note,
+            "true" if default_filter == "attention" else "false", _esc(view_counts["attention"]),
+            "true" if default_filter == "eligible" else "false", _esc(view_counts["eligible"]),
+            "true" if default_filter == "protected" else "false", _esc(view_counts["protected"]),
+            "false", _esc(len(cache_entries)), default_pages, " disabled" if default_pages <= 1 else "",
+            queue_html, policy_html, protected_html, _esc(len(branch_reminders)), history_html,
         )
     )
 
@@ -1550,18 +1685,34 @@ MAINTENANCE_OBSERVATORY_JS = r"""
  const refreshPath=page.dataset.maintenanceRefreshPath||'/scan';
  const removePath=page.dataset.maintenanceRemovePath||'/quick-remove';
  const reloadAfterAction=page.dataset.maintenanceReloadAfterAction!=='false';
+ const pageSize=Number(page.dataset.maintenancePageSize)||8;
+ let activeFilter=page.dataset.maintenanceDefaultFilter||'attention',currentPage=1;
  const reasonLabel=(value)=>({'workspace-path-not-found':'工作区路径不存在','workspace-path-boundary-not-safe':'工作区路径不在安全边界内','legacy-or-unknown-workspace-requires-explicit-adoption':'历史或待确认工作区尚未明确接管','workstream-is-active':'任务仍在进行','review-or-integration-is-pending':'审查或集成尚未完成','workspace-is-protected-or-retained':'工作区受保护或已明确保留','git-identity-or-common-dir-not-verified':'Git 身份或公共目录尚未验证','tracked-worktree-changes-present':'存在已跟踪但未提交的改动','unknown-untracked-paths-present':'存在待确认的未跟踪文件','unknown-or-sensitive-ignored-paths-present':'存在待确认或敏感的忽略文件','git-private-closure-record-missing':'缺少 Git 私有区关闭记录','review-package-evidence-missing':'缺少审查包证据','passed-validation-evidence-missing':'缺少已通过的验证证据','review-decision-evidence-missing':'缺少审查决定证据','closure-validation-references-missing':'关闭记录缺少验证引用','unique-commit-check-failed':'无法确认是否存在独有提交','workspace-has-commits-not-reachable-from-integration-oid':'工作区仍有未进入集成目标的提交','workstream-session-is-not-integrated-or-closed':'任务尚未集成并关闭','integrated-grace-period-active':'集成后的保护期尚未结束'}[value]||'其他保护原因（见技术详情）');
  async function api(path,body){const response=await fetch(base+path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(body||{})});const value=await response.json();if(!response.ok)throw new Error(value.error||'本机维护操作失败');return value}
  async function status(){const response=await fetch(base+'/status',{headers:{'Accept':'application/json'}});const value=await response.json();if(!response.ok)throw new Error(value.error||'状态读取失败');return value}
  const shownState=(value)=>({current:'当前',stale:'历史状态',unknown:'待确认',idle:'空闲',pending:'等待刷新',running:'正在刷新',succeeded:'刷新完成',failed:'刷新失败','timed-out':'刷新超时'}[value]||value||'待确认');
- function renderMaintenance(maintenance){const cache=maintenance.cache||{},entries=cache.entries||[],eligible=entries.filter(entry=>entry.remove_worktree_eligible&&entry.cache_state==='current'&&!entry.is_primary_worktree);const count=page.querySelector('[data-maintenance-eligible-count]');if(count)count.textContent=eligible.length;const worktrees=page.querySelector('[data-maintenance-worktrees]');if(worktrees)worktrees.textContent=entries.length;const cacheStatus=page.querySelector('[data-maintenance-cache-status]');if(cacheStatus)cacheStatus.textContent=shownState(cache.status);const root=page.querySelector('[data-maintenance-queue]');if(root){root.replaceChildren();entries.forEach(entry=>{const row=document.createElement('div');row.className='mo-item';row.dataset.maintenanceWorkspace=entry.workspace_id;const head=document.createElement('div');head.className='mo-item-head';const title=document.createElement('b');title.textContent=entry.classification==='integrated-closed'?'已集成并关闭的候选工作区':entry.is_primary_worktree?'主工作区':'待确认的工作区';const state=document.createElement('span');state.className='mo-cache-state '+entry.cache_state;state.textContent=shownState(entry.cache_state);head.append(title,state);row.append(head);const rawReasons=entry.reasons||entry.unknown||[];const reason=document.createElement('p');reason.textContent=rawReasons.length?rawReasons.map(reasonLabel).join(' · '):'当前证据没有给出可安全删除结论';row.append(reason);const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='技术详情';const branch=document.createElement('code');branch.textContent=entry.branch||'Unknown branch';const path=document.createElement('code');path.textContent=entry.registered_path||'';const codes=document.createElement('code');codes.textContent=rawReasons.join(' · ')||'no-machine-reason';details.append(summary,branch,path,codes);row.append(details);const actions=document.createElement('div');actions.className='mo-item-actions';if(entry.remove_worktree_eligible&&entry.cache_state==='current'&&!entry.is_primary_worktree){const button=document.createElement('button');button.className='mo-button danger';button.type='button';button.dataset.maintenancePreflight=entry.workspace_id;button.textContent='重新检查并安全移除';actions.append(button)}else{const protectedText=document.createElement('span');protectedText.className='mo-empty';protectedText.textContent=entry.is_primary_worktree?'主工作区受保护':'当前不符合安全移除条件';actions.append(protectedText)}row.append(actions);root.append(row)});if(!entries.length){const empty=document.createElement('div');empty.className='mo-empty';empty.textContent='刷新完成，但没有可显示的已登记工作区。';root.append(empty)}}const empty=page.querySelector('[data-maintenance-quick-empty]');if(empty)empty.textContent=eligible.length?'只有标记为可安全移除的行会提供操作按钮；点击后仍会执行最新预检和二次确认。':'目前没有可安全删除项。主要保护原因见下方列表。'}
+ const classificationLabel=(value)=>({'registered-active':'进行中的工作区','review-integration-pending':'等待审查或集成','integrated-closed':'已集成并关闭','legacy-unmanaged':'历史或待接管','protected-retained':'明确保留','primary-worktree':'主工作区'}[value]||'状态待确认');
+ const viewState=(entry)=>entry.remove_worktree_eligible&&entry.cache_state==='current'&&!entry.is_primary_worktree?'eligible':(entry.cache_state!=='current'||['legacy-unmanaged','review-integration-pending'].includes(entry.classification)?'attention':'protected');
+ const workspaceLabel=(entry)=>{if(entry.is_primary_worktree)return'主工作区';const branch=String(entry.branch||'').replace(/^refs\/heads\//,'').replace(/^codex\//,'');if(branch)return branch;const parts=String(entry.registered_path||'').split(/[\\/]/);return parts.pop()||'待确认的工作区'};
+ const activityLabel=(value)=>{const date=new Date(value);return Number.isNaN(date.getTime())?'最近证据待确认':'最近检查 '+new Intl.DateTimeFormat('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(date)};
+ function textCell(kind,strong,sub){const cell=document.createElement('div');cell.className='mo-cell '+kind;cell.setAttribute('role','cell');const first=document.createElement(strong?'b':'span');first.textContent=strong||sub||'';cell.append(first);if(strong&&sub){const second=document.createElement('span');second.className='mo-sub';second.textContent=sub;cell.append(second)}return cell}
+ function detailItem(term,value,wide=false){const wrap=document.createElement('div');if(wide)wrap.className='wide';const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=term;dd.textContent=value;wrap.append(dt,dd);return wrap}
+ function buildRow(entry){const state=viewState(entry),reasons=entry.reasons||[],unknown=entry.unknown||[];const row=document.createElement('div');row.className='mo-row';row.setAttribute('role','row');row.dataset.maintenanceWorkspace=entry.workspace_id;row.dataset.maintenanceViewState=state;const grid=document.createElement('div');grid.className='mo-row-grid';grid.append(textCell('workspace',workspaceLabel(entry),classificationLabel(entry.classification)));const statusCell=textCell('state',null,null),pill=document.createElement('span');pill.className='mo-row-state';pill.textContent={attention:'需要处理',eligible:'可安全删除',protected:'受保护'}[state];statusCell.append(pill);grid.append(statusCell);const primary=reasons.length?reasonLabel(reasons[0]):(unknown.length?'证据仍需确认':(state==='eligible'?'已满足当前安全删除条件':'当前证据没有给出可安全删除结论'));grid.append(textCell('reason',primary,state==='eligible'?'最新资格来自 Maintenance Core':'完整原因见行内详情'));grid.append(textCell('activity',activityLabel(entry.scanned_at),shownState(entry.cache_state)));const action=document.createElement('div');action.className='mo-cell mo-row-action';action.setAttribute('role','cell');if(state==='eligible'){const button=document.createElement('button');button.className='mo-button danger';button.type='button';button.dataset.maintenancePreflight=entry.workspace_id;button.textContent='安全删除';action.append(button)}else{const label=document.createElement('span');label.className='mo-sub';label.textContent=entry.is_primary_worktree?'主工作区保留':'暂无删除操作';action.append(label)}grid.append(action);const details=document.createElement('details'),summary=document.createElement('summary'),dl=document.createElement('dl');summary.textContent='技术详情';dl.className='mo-row-detail';dl.append(detailItem('workspace_id',entry.workspace_id||''),detailItem('branch',entry.branch||'detached'),detailItem('registered_path',entry.registered_path||'',true),detailItem('HEAD',entry.head||'Unknown'),detailItem('cache_state',entry.cache_state||'unknown'),detailItem('reasons',reasons.join(' · ')||'no-machine-reason',true),detailItem('unknown / secondary evidence',unknown.join(' · ')||'none',true));details.append(summary,dl);grid.append(details);row.append(grid);return row}
+ function rows(){return Array.from(page.querySelectorAll('[data-maintenance-queue] .mo-row'))}
+ function refreshSummary(){const values=rows(),counts={attention:0,eligible:0,protected:0};values.forEach(row=>counts[row.dataset.maintenanceViewState]++);const set=(selector,value)=>{const node=page.querySelector(selector);if(node)node.textContent=value};set('[data-maintenance-worktrees]',values.length);set('[data-maintenance-attention-count]',counts.attention);set('[data-maintenance-eligible-count]',counts.eligible);set('[data-maintenance-protected-count]',counts.protected);page.querySelectorAll('[data-maintenance-filter]').forEach(button=>{const key=button.dataset.maintenanceFilter,labels={attention:'需要处理',eligible:'可安全删除',protected:'受保护',all:'全部'};button.textContent=labels[key]+' '+(key==='all'?values.length:counts[key])});const quick=page.querySelector('[data-maintenance-quick-empty]');if(quick)quick.textContent=counts.eligible?'只有合格行提供“安全删除”；点击后仍执行最新预检与二次确认。':'目前没有可安全删除项。主要保护原因见技术详情。'}
+ function applyTable(reset=false){if(reset)currentPage=1;const values=rows(),matches=values.filter(row=>activeFilter==='all'||row.dataset.maintenanceViewState===activeFilter),pages=Math.max(1,Math.ceil(matches.length/pageSize));currentPage=Math.min(Math.max(1,currentPage),pages);values.forEach(row=>row.hidden=true);matches.slice((currentPage-1)*pageSize,currentPage*pageSize).forEach(row=>row.hidden=false);page.querySelectorAll('[data-maintenance-filter]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.maintenanceFilter===activeFilter?'true':'false'));const statusNode=page.querySelector('[data-maintenance-page-status]');if(statusNode)statusNode.textContent='第 '+currentPage+' / '+pages+' 页';const previous=page.querySelector('[data-maintenance-page="previous"]'),next=page.querySelector('[data-maintenance-page="next"]');if(previous)previous.disabled=currentPage<=1;if(next)next.disabled=currentPage>=pages;const empty=page.querySelector('[data-maintenance-filter-empty]');if(empty)empty.hidden=matches.length!==0}
+ function renderMaintenance(maintenance){const entries=(maintenance.cache||{}).entries||[],root=page.querySelector('[data-maintenance-queue]');if(root){root.replaceChildren();entries.sort((left,right)=>{const order={attention:0,eligible:1,protected:2};return order[viewState(left)]-order[viewState(right)]||workspaceLabel(left).localeCompare(workspaceLabel(right),'zh-CN')}).forEach(entry=>root.append(buildRow(entry)))}refreshSummary();applyTable(true)}
  async function waitForRefresh(){for(let attempt=0;attempt<120;attempt++){const value=await status();const state=value.maintenance.background_refresh.status;if(!['pending','running'].includes(state))return value.maintenance;await new Promise(resolve=>setTimeout(resolve,500))}return{background_refresh:{status:'timed-out'},cache:{entries:[]}}}
  page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;
-   button.disabled=true;notice.className='mo-notice';
+   if(button.dataset.maintenanceFilter){activeFilter=button.dataset.maintenanceFilter;applyTable(true);return}
+   if(button.dataset.maintenancePage){currentPage+=button.dataset.maintenancePage==='next'?1:-1;applyTable();return}
+   if(!button.hasAttribute('data-maintenance-scan')&&!button.dataset.maintenancePreflight)return;
+   button.disabled=true;notice.className='mo-refresh-state';
    try{
-    if(button.hasAttribute('data-maintenance-scan')){notice.textContent='后台增量扫描已排队；页面请求线程没有等待全量扫描。';await api(refreshPath,{});const maintenance=await waitForRefresh();const state=maintenance.background_refresh.status;notice.textContent='后台刷新：'+shownState(state)+'。已显示最新的工作区保护与候选状态。';if(reloadAfterAction){window.location.reload();return}renderMaintenance(maintenance);const indicator=page.querySelector('[data-maintenance-background]');if(indicator)indicator.textContent=shownState(state);button.disabled=false;return}
-    if(button.dataset.maintenancePreflight){notice.textContent='正在重新检查单个已登记目标；不会扫描其他工作区。';const value=await api('/preflight',{target_id:button.dataset.maintenancePreflight});const result=value.preflight;if(!result.eligible){throw new Error('目标受保护：'+(result.reasons||result.unknown||['证据不足']).join(' · '))}if(!window.confirm('只删除工作区，保留分支和提交。确认移除这个工作区？')){button.disabled=false;notice.textContent='已取消；没有执行删除。';return}notice.textContent='已确认。正在再次验证目标并移除工作区；分支和提交将保留。';const removed=await api(removePath,{item_id:result.item.item_id});if(removed.receipt.outcome!=='verified')throw new Error('快速删除未完成：'+removed.receipt.outcome);notice.textContent='工作区已移除；分支和提交保留。后台增量刷新已启动。';if(reloadAfterAction){window.location.reload();return}const row=button.closest('[data-maintenance-workspace]');if(row)row.remove();return}
-   }catch(error){notice.className='mo-notice error';notice.textContent=error.message;button.disabled=false}});
+    if(button.hasAttribute('data-maintenance-scan')){const progress=page.querySelector('.mo-progress');if(progress)progress.classList.add('running');notice.textContent='正在刷新…';await api(refreshPath,{});const maintenance=await waitForRefresh();const state=maintenance.background_refresh.status;notice.textContent=shownState(state);if(progress)progress.classList.remove('running');if(reloadAfterAction){window.location.reload();return}renderMaintenance(maintenance);button.disabled=false;return}
+    if(button.dataset.maintenancePreflight){notice.textContent='正在最新预检…';const value=await api('/preflight',{target_id:button.dataset.maintenancePreflight});const result=value.preflight;if(!result.eligible){throw new Error('目标受保护：'+(result.reasons||result.unknown||['证据不足']).map(reasonLabel).join(' · '))}if(!window.confirm('只删除工作区，保留分支和提交。确认移除这个工作区？')){button.disabled=false;notice.textContent='已取消';return}notice.textContent='正在安全删除…';const removed=await api(removePath,{item_id:result.item.item_id});if(removed.receipt.outcome!=='verified')throw new Error('安全删除未完成：'+removed.receipt.outcome);notice.textContent='已删除工作区；分支已保留';if(reloadAfterAction){window.location.reload();return}const row=button.closest('[data-maintenance-workspace]');if(row)row.remove();refreshSummary();applyTable();return}
+   }catch(error){const progress=page.querySelector('.mo-progress');if(progress)progress.classList.remove('running');notice.className='mo-refresh-state error';notice.textContent=error.message;button.disabled=false}});
+ refreshSummary();applyTable();
 })();
 """
 
