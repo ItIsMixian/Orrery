@@ -1,5 +1,17 @@
 # 开发日志
 
+## 2026-08-30 — ADR-0022 ELK.js Layout-only Adoption Accepted
+
+- 维护者在确认 ELK 不负责渲染、不会改变现有 Orrery 前端设计后，选择正式采用该方向。中央分配并接受
+  ADR-0022，新增 Approved Design，并把 W7.3 scope 提升到 revision 12；Accepted 仍不证明 GX2、vendor、产品
+  集成、页面或 Release 已完成。
+- Orrery 保留 module/lens/history/group 事实选择、SVG/card/字体/颜色/交互与 ledger；ELK 唯一负责
+  compound bounds、node/port coordinates、orthogonal sections 与 edge-label positions。dependency 改为实际
+  depends_on endpoints，module 默认 primary-only，W 用 compound hierarchy。
+- GX2 必须先锁定 exact release/ref/hash/size/license；随后 W7.3 保存 rejected geometry evidence、保留
+  Core/capture、删除 Python/Browser 双手写 layout/router。vendor 仅本地打包、zero-network、失败回同事实 ledger；
+  新页面接受前仍禁 routed Fast/Checkpoint。
+
 ## 2026-08-30 — GX2 ELK Layout Evaluation Authorized
 
 - 维护者确认可隔离试用 ELK，并要求不得改变现有前端设计。中央确认当前 Graph 是 Python projection 加两套

@@ -2,7 +2,7 @@
 
 Updated: 2026-08-30
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md)
 
 ## 当前事实
 
@@ -26,6 +26,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - ADR-0017 已接受 relation capture 规则。W7.3 Worktree Candidate `5fee848` 已实现写入、角色与确认入口，但尚未进入本地 integration／Canonical；维护者保留 Core/capture 证据并拒绝 detached-series/comparison Graph UX，修正版未完成前不得集成。
 - ADR-0020 已接受 Workstream program/phase hierarchy：W 是真实 program，W5/W6/W7 是 phase；membership 与
   series/causal relation/gate 分离且由 human integrator 确认。当前 Core/CLI/Graph 尚未实现，W7.3 只获实施范围。
+- ADR-0022 已接受 ELK.js 作为 Workstream Graph 唯一 product geometry engine；Orrery 继续拥有事实筛选与
+  现有 SVG/frontend。GX2 尚在锁定 exact vendor provenance，W7.3 product integration 尚未实现，手写 Graph
+  geometry 仍是被拒绝的 Worktree diff。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
 - 非权威研究控制面位于 `experiments/context-routing/`；大型原始运行根为 `D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库或发布包。
@@ -78,7 +81,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 默认 docsite／Skill template 尚未启用 Unified Observatory 或 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。
 - 没有真实双机 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。
 - W7 relation store 没有 self-host native apply 记录；旧 session 到 post-main closure 的兼容收口仍需保守人工流程。
-- 当前本地 integration 尚无 W7.3 relation capture 产品能力。Worktree Candidate 的 Graph UX 需要 graph-native series/dependency connectors、折叠 comparison 和 separated conflict routing 后重新验收。
+- 当前本地 integration 尚无 W7.3 relation capture 产品能力。Worktree Candidate 保留 Core/capture，但 Graph
+  必须按 ADR-0022 用 pinned local ELK 替换双手写 geometry，并在真实页面重新验收。
 - ADR-0018 的自动 dispatch receipt、scope revision CAS、Adapter acknowledgment evidence 和 first-write enforcement 尚未实现。
 - S0 Skill 仅在当前本机安装、未发布，也没有任务状态聚合、scheduler、relation confirmation 或执行权限。
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。

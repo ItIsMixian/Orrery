@@ -2,7 +2,7 @@
 
 Updated: 2026-08-30
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md)
 
 ## 当前事实
 
@@ -27,6 +27,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - ADR-0017 已接受 Git-private relation proposal／confirmation 的职责边界：Agent、Harness 与未来 Conductor 只能提出带来源和证据的建议；任务 owner 确认 implementation／validation gate，human integrator 确认 integration／release gate 与 `absorbs`。中央调度只是可选交互形态，不是权限来源；当前产品尚无 relation inbox 或这些确认入口。
 - ADR-0020 把 program/phase membership 纳入版本化权威链并与 series/relation 分离；当前只有 Accepted
   decision/Approved Design/Plan，不能把 W7.3 worktree 的未提交布局表述为已实现层级。
+- ADR-0022 已接受 ELK.js 仅替换 Graph layout/routing；Orrery 的事实选择、现有 SVG/card 视觉、交互与 ledger
+  不变。exact vendor provenance 与产品实现仍 Pending，不能把架构选择写成页面已经修复。
 - 动态 docsite 的模型调用统一经过 Broker。Provider 配置与凭据按端点绑定，同源 POST、body gate、预算、缓存和错误脱敏已实现；同用户本机 Broker 不宣称秘密隔离。
 - 当前展示品牌为 Orrery；目标项目标题仍由模板 token 定制。历史 `Project Orrery` 与稳定 `project-orrery` 技术标识按 ADR-0015 保留。
 - A4 local integrated Candidate 不增加第九个一级导航；既有 `authority` 身份显示“事实与规则”，分栏投影目标项目 Seed 与 Core-owned Orrery 工作规则，legacy/managed/readiness 技术状态默认折叠。Ask Docs 在 root Unified 宿主中先消费 route receipt；Skill template 只能 advisory。
@@ -77,7 +79,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Personal／Team／Maintenance／Graph 尚未接入默认 docsite、Skill template 或公开 release。
 - Unified Observatory 仍只是本地 root-only/default-off integrated Candidate；尚未进入默认 docsite、Skill template、managed-tool inventory、installer 或公开 Release。`start-docsite.bat`／`serve.py` 继续作为 legacy rollback 与当前公开兼容入口。
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
-- W7.3 relation capture/inbox/confirmation 只存在于未集成 Worktree Candidate；其 Graph UX 被维护者拒绝，当前中央观测台仍只投影已有关系证据。修正版必须把 series/dependency 画入 topology，而不是用图外卡片代替。
+- W7.3 relation capture/inbox/confirmation 只存在于未集成 Worktree Candidate；其手写 Graph UX 被维护者
+  拒绝。修正版必须按 ADR-0022 使用 pinned local ELK geometry，同时保留现有 Orrery UI 和只读事实边界。
 - authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
 - `orrery-dispatch` 已在当前本机安装但未发布；它只能指导宿主遵守流程，不能机械阻断绕过 Skill 的写入，也不能外推为其他主机可用。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

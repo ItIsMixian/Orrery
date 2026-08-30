@@ -102,3 +102,10 @@ bounded architecture study. Production adoption requires a new ADR that defines 
 single-source layout tests, fallback behavior, release/SBOM/license boundary and migration from the rejected custom
 geometry path.
 
+## 2026-08-30 maintainer adoption direction
+
+[ADR-0022](../../decisions/0022-elkjs-workstream-graph-layout-engine.md) now selects ELK layout/routing-only adoption
+while preserving the Orrery frontend. This supersedes the open decision menu above but does not waive GX2 evidence.
+GX2 must pin and validate the exact release/ref/hash/size/license and four fixtures before W7.3 product dependency
+writes. A failed capability or provenance gate blocks implementation and is reported as a conflict with ADR-0022;
+the evaluator cannot silently choose a different engine or artifact.

@@ -679,3 +679,74 @@ Continue the same W7.3 task/worktree and preserve every dirty file. Refresh Git-
 reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and retain revisions 8/9.
 Implement the single immutable layout pipeline and mechanical postconditions before rebuilding the preview. Do not
 create W7.4, discard work, push, publish or run routed Fast/Checkpoint before maintainer visual acceptance.
+
+## 2026-08-30 Maintainer Adoption Amendment — ELK.js Layout-only Integration
+
+Governing decision: [ADR-0022](../../decisions/0022-elkjs-workstream-graph-layout-engine.md)
+
+Approved Design: [ELK.js Workstream Graph Layout and Orrery Rendering](../../design/elkjs-workstream-graph-layout-and-rendering.md)
+
+The maintainer has ended the custom-layout correction loop and selected ELK.js for product layout/routing while
+preserving the Orrery frontend. Revisions 7–10 remain rejection evidence and semantic requirements; their handwritten
+geometry implementation is not a base to keep extending.
+
+### Phase A — close GX2 provenance before product dependency writes
+
+- [ ] Finish the isolated GX2 report and identify the exact released ELK.js artifact/ref/version/SHA-256/size/license.
+  If local loading, compound cross-hierarchy layout or the four target fixtures fail, stop and report the conflict with
+  ADR-0022 rather than choosing a different dependency silently.
+- [ ] Freeze one sanitized self-host input plus exact succession/W compound/Project Structure/dependency ID sets. ELK
+  geometry must preserve those sets exactly.
+- [ ] Keep all evaluation files under the experiment path until the product provenance and selected bytes are reviewed.
+
+### Phase B — preserve retained W7.3 work and replace geometry only
+
+- [ ] Save the current rejected Graph geometry diff in recoverable Git-private evidence. Do not reset the worktree or
+  lose retained Core/schema/capture/confirmation/inbox changes.
+- [ ] Separate semantic projection from geometry in the affected Graph modules. Keep accepted relation/group contracts,
+  but remove both handwritten Python and Browser rank/pack/router/label implementations and their parity assertions.
+- [ ] Do not cherry-pick generated GX2 HTML/SVG into product. Reuse only the pinned dependency provenance, frozen
+  semantic fixtures and validated ELK adapter configuration.
+
+### Phase C — local pinned engine and package boundary
+
+- [ ] Vendor the minimal reviewed ELK.js runtime bytes plus license/provenance inside the Observatory package, update
+  package-data/component inventory and bind exact hashes. No npm/CDN/build-time download is required by users.
+- [ ] Load only local bytes in static/dynamic Observatory modes. Network instrumentation must remain zero; dependency
+  failure produces `布局不可用` plus the accessible same-fact ledger, never the old renderer.
+- [ ] Include the vendor asset/license in the v0.3.0 self-contained ZIP and deterministic Windows/Ubuntu entry receipt.
+  Public/default/release transition remains owned by the Final RC task.
+
+### Phase D — Orrery semantic adapter
+
+- [ ] Implement the Approved Design's primary-only module cards, separate affected/context layers, bounded one-hop
+  semantic context and `未归属` behavior before creating ELK JSON.
+- [ ] Dependency admits only `depends_on` endpoints; series may connect admitted endpoints but cannot add nodes.
+  Succession/conflict retain their accepted contracts.
+- [ ] Encode W/W5/W6/W7 as compound parents/children and preserve real CI/SH/U cross-hierarchy edges without
+  membership-as-edge.
+- [ ] Hash the immutable LayoutInput and require the asynchronous LayoutResult to repeat the same node/edge IDs and
+  input revision before display. Stale results are discarded.
+
+### Phase E — existing Orrery renderer
+
+- [ ] Map ELK node/container/port/section/label geometry into the existing SVG cards, status styles, legend, selection,
+  inspector, zoom/pan and themes. No React Flow/Sprotty/generic editor UI and no card/typography redesign.
+- [ ] Use ELK label positions only. Missing/invalid positions become inspector-only labels, never arbitrary fallbacks.
+- [ ] Mobile preserves the same facts through the accepted compact ledger/focused-chain behavior rather than shrinking
+  the desktop compound graph.
+
+### Validation and dispatch
+
+- [ ] Focused semantic tests assert exact pre-layout ID sets. Actual Browser/ELK output supplies geometry evidence;
+  Python does not reproduce ELK coordinates.
+- [ ] Validate local-only load, timeout/exception/stale-result failure, input/output identity, compound containment,
+  route/node/label bounds and unchanged representative Orrery UI snapshots.
+- [ ] Present 1440×900, 1280×800 and 390×844 real self-host pages covering all four rejected scenarios. The maintainer
+  accepts the page before one routed Fast and one Checkpoint; no repeated full-suite loop.
+
+Continue the same W7.3 task/worktree, preserve every dirty file and finish any in-progress GX2-only write first.
+Refresh Git-private scope to revision 12 after reading ADR-0022, the Approved Design, this amendment and the matching
+Validation section. Use GPT-5.6 Sol medium. Product writes may begin only after GX2 pins valid provenance. Do not create
+W7.4, push, publish, change main/default, run Promotion or run routed Fast/Checkpoint before maintainer visual
+acceptance.

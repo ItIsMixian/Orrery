@@ -2,7 +2,7 @@
 
 Updated: 2026-08-30
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md)
 
 ## 当前公开发布
 
@@ -13,6 +13,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - ADR-0021 已接受 0.3.0 release/default/distribution contract：新项目 Unified/Model 1/Rules 1，旧项目 legacy
   until explicit migration，单一 self-contained ZIP + checksum，Codex final runtime blocker，tag/Release 分权。
   W7.3/CI7 与最终网页尚未完成，Final RC 未注册，public manifest/tag/assets 均仍为 0.2.0。
+- ADR-0022 已接受 W7.3 Graph 使用 pinned local ELK.js layout-only engine，并要求 vendor/license/provenance
+  进入同一 self-contained ZIP 与 deterministic receipt；exact artifact 与产品接线尚未完成，公开资产未变。
 
 ## 当前 Canonical source
 
@@ -73,3 +75,5 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Unified／Collaboration／Maintenance／Graph 没有默认 consumer 或 public release；self-host relation apply、真实双机与 scheduler 不受支持。
 - R4 alias、R5 optional default transition 和最早 0.4.0 cleanup review 均未启动。
 - `orrery-dispatch` 只在当前本机安装，尚未打包或发布；未来是否进入任何公开版本必须由独立 release Plan/Validation 决定。
+- ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 仍未进入产品 source；在
+  GX2/W7.3 evidence 完成前不得写成 v0.3.0 已包含。

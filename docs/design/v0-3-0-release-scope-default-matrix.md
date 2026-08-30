@@ -35,6 +35,8 @@ Unknown selectors fail before managed writes. Migration and restore bind exact b
 - Archive root remains `project-orrery/`; display brand is Orrery; stable CLI/package/import/protocol IDs remain
   `project-orrery`／`project_orrery_*`.
 - Core/CLI/Observatory are embedded tracked source with exact component versions, not independent releases.
+- The W7.3 Observatory Graph embeds the exact ADR-0022/GX2-reviewed local ELK.js runtime and license/provenance as
+  tracked package input. No CDN, npm install or build-time download is part of installation or runtime.
 - Candidate manifest records project manifest format, document schema, Authority Model and Rules as four orthogonal
   default values with discrete support sets; it also binds exact source SHA, components, Adapters, cohorts, assets,
   URLs and release date.
@@ -50,6 +52,9 @@ Entry receipt records path/OID/mode/size/hash plus archive hash.
 
 Windows and Ubuntu Promotion compare source SHA, manifest hash, builder contract, entry receipt, ZIP and checksum. A
 waiver is valid only with matching entries and explicit maintainer acceptance naming one exact Ubuntu run.
+
+The entry receipt separately binds every vendored ELK runtime/license/provenance path and hash. Missing, extra,
+untracked or hash-mismatched layout assets fail before archive creation.
 
 ## Runtime and upgrade portfolios
 

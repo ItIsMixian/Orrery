@@ -219,3 +219,34 @@ The revision-9 preview's overlapping nodes/decorations/routes is rejected. Requi
 
 Revisions 8 and 9 remain effective. This correction changes no facts, relations, group authority, privacy, execution
 boundary or release state; routed Fast/Checkpoint remain blocked until maintainer screenshot acceptance.
+
+## 2026-08-30 ELK.js layout-only adoption contract
+
+Governing sources:
+
+- [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md)
+- [Approved ELK Graph Design](../design/elkjs-workstream-graph-layout-and-rendering.md)
+- [GX2 Evaluation](2026-08-30-gx2-elk-layout-engine-evaluation.md)
+
+Required evidence:
+
+- completed GX2 exact artifact/ref/version/SHA-256/size/license and local compound/cross-hierarchy capability;
+- recoverable preservation of rejected Graph geometry plus retained W7.3 Core/schema/capture/authority/inbox work;
+- no handwritten Python or Browser node placement, packing, edge routing or label-placement fallback remains active;
+- one immutable Orrery LayoutInput and pinned ELK LayoutResult with exact node/edge ID and input-hash equality;
+- primary-only concrete module full cards, separate affected/context layers, bounded non-series one-hop context and
+  `未归属`;
+- dependency full nodes equal scoped `depends_on` endpoints, with zero program/series/active-tip singleton;
+- W/W5/W6/W7 compound containment and real CI/SH/U cross-hierarchy edges without membership-as-edge;
+- existing SVG card/control typography, tokens, semantic states, selection, inspector and themes preserved;
+- ELK edge-label coordinates or inspector-only fallback, with zero floating component-corner text;
+- local pinned asset, license/provenance/package-data inventory, zero runtime network and failure-to-ledger behavior;
+- actual ELK Browser output proves finite/in-bounds geometry, containment, zero card/container/label overlap and no
+  edge-through-node for self-host and stress fixtures;
+- 1440×900, 1280×800 and 390×844 screenshots cover succession, W compound, Project Structure and dependency plus
+  filter/select/inspector/reset/failure interactions;
+- maintainer visual acceptance before exactly one routed Fast and one Checkpoint;
+- exact task-description acknowledgment and Git-private scope revision 12 before product writes.
+
+ADR acceptance does not mark any implementation or release item PASS. W7.3 remains Pending until reproducible product
+and Browser evidence is recorded.

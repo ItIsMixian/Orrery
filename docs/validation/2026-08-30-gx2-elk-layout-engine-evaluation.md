@@ -2,9 +2,11 @@
 
 Date: 2026-08-30
 
-Status: PENDING — isolated evaluation authorized; no production adoption
+Status: PENDING — ADR-0022 selects layout-only adoption; exact artifact/capability evidence still required
 
 Authority source: [GX2 Plan](../implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)
+
+Adoption decision: [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md)
 
 ## Required evidence
 
@@ -29,4 +31,3 @@ Authority source: [GX2 Plan](../implementation/plans/2026-08-30-gx2-elk-layout-e
 
 No experiment artifact, dependency or result enters product source, State, release package or public/default behavior.
 Only later maintainer acceptance plus a new ADR can authorize production adoption.
-
