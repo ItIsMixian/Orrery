@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-30 S0 Orrery Dispatch Skill](2026-08-30-s0-orrery-dispatch-skill.md) — Pending acceptance contract for the two-file authority handoff Skill; no implementation, installation or release claim yet.
 - [2026-08-30 Authority-first Workstream Dispatch Decision Contract](2026-08-30-authority-first-workstream-dispatch.md) — docs/process PASS for ADR-0018 and existing author roles; automated receipts and first-write enforcement are not implemented.
 - [2026-08-30 U2.3 Navigation & Live Task Visibility](2026-08-30-u2-3-navigation-live-task-visibility.md) — Pending acceptance contract authored before resumed implementation; no U2.3 behavior is yet claimed.
 - [2026-08-30 W7.3 Relation Capture & Confirmation](2026-08-30-w7-3-workstream-relation-capture-confirmation.md) — Pending implementation evidence for capture, series repair, status taxonomy and comparison/conflict separation; the ADR-0017 docs contract remains separate.

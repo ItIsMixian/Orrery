@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-30 — S0 Orrery Dispatch Skill Authority Baseline
+
+- 维护者批准先做极简调度 Skill，并接受面向用户使用“任务说明版本”、只在技术详情保留完整 Git SHA。S0 由 ADR-0018／ADR-0017 与既有 Approved Design 约束，不新增权限决策。
+- 冻结两文件实现范围：`skills/orrery-dispatch/SKILL.md` 与 `agents/openai.yaml`；无 script／reference／asset／service／schema／network。它只完成 authority handoff，不修改现有安装 Skill，也不冒充未来独立 S1 Conductor。
+- Pending Validation 在产品写入前创建；后续实现必须从本 authority commit 建立独立 Workstream，并在完成后同步受影响 State／Validation／DEVLOG／index。本基线不证明 Skill 已实现、安装或发布。
+
 ## 2026-08-30 — ADR-0018 Authority-first Workstream Dispatch
 
 - 维护者指出中央此前先用长 follow-up Prompt 追加 U2.3／W7.3 范围、再让 Agent 补写 Plan，颠倒了 Orrery 权威链并会丢失关键记录。中央立即只发送 stop，不再通过 transcript 追加实现要求。

@@ -19,15 +19,16 @@ Updated: 2026-08-30
 
 ## 当前可继续的线路
 
-1. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
-2. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
-3. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。
-4. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
-5. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
-6. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
-7. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-8. **W7.3 relation capture：** 当前为在途 Workstream，已暂停等待 authority amendment acknowledgment；之后实现 exact-base `derived_from`、gate-aware dependency proposal／confirmation、human integrator、task-series metadata、status taxonomy、comparison/conflict 分离与 relation inbox。不得让 Agent／Harness／未来 Conductor 自行确认依赖或吸收关系。
-9. **U2.3 shell closeout：** 当前为在途 Workstream，已暂停等待 authority baseline acknowledgment；之后只按 U2.3 Plan 完成导航/help 整理和轻量 live-task projection，不恢复全 worktree 启动扫描，也不改 Graph/Authority/Quick Remove 权限。
+1. **S0 Orrery Dispatch Skill：** 已冻结两文件 Plan／Pending Validation；下一步从本任务说明版本建立独立 Workstream，只实现 authority handoff，不实现 S1 Conductor、自动 receipt 或首次写入阻断。
+2. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
+3. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
+4. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。
+5. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
+6. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
+7. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
+8. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
+9. **W7.3 relation capture：** 当前为在途 Workstream，已暂停等待 authority amendment acknowledgment；之后实现 exact-base `derived_from`、gate-aware dependency proposal／confirmation、human integrator、task-series metadata、status taxonomy、comparison/conflict 分离与 relation inbox。不得让 Agent／Harness／未来 Conductor 自行确认依赖或吸收关系。
+10. **U2.3 shell closeout：** 当前为在途 Workstream，已暂停等待 authority baseline acknowledgment；之后只按 U2.3 Plan 完成导航/help 整理和轻量 live-task projection，不恢复全 worktree 启动扫描，也不改 Graph/Authority/Quick Remove 权限。
 
 ## 不得外推的边界
 
