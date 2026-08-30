@@ -1,6 +1,6 @@
 # 实施计划：CI7 Validation Routing Precision & Total-Cost Diagnostics
 
-Status: Planned; implementation not started
+Status: Original Candidate `a520ebc` retained; reopened for maintainer-approved acceptance gates and validation leases
 
 Date: 2026-08-29
 
@@ -80,3 +80,99 @@ CI6 已阻止 feature task 直接把任意 unittest 套件冒充层级证据，�
 和 exact-SHA hosted Promotion。回滚只恢复 CI7 registry／diagnostic字段；CI6 runner、现有预算、Promotion 与
 required checks 继续可用。实现后同步 [Test Coverage State](../../state/test-coverage.md)、独立 Validation、
 DEVLOG 与索引；根 PROGRESS/HANDOFF 由唯一整合者维护。
+
+## 2026-08-30 Maintainer Scope Amendment — Composable Acceptance Gates & Validation Leases
+
+The original CI7 Candidate `a520ebc74a0846c148e73312ea2fbf2a32b4b08b` successfully split broad Observatory
+surfaces and added total-cost diagnostics, but real W7.3 iteration still spent most of a 53-minute task on repeated
+cross-module tests, full builds and unchanged-source retries before the maintainer accepted the UI. The maintainer
+therefore approves mechanical phase/gate enforcement. This amendment preserves what Fast／Checkpoint／Candidate／
+Promotion prove, their 15／90 second budgets, exact-SHA Promotion and required checks; it controls when a stage may
+start and which evidence unlocks it.
+
+This remains CI7 rather than a new ADR because it reuses current Workstream lifecycle, human authority, Git-private
+receipts and CI6 stage semantics. If implementation needs Agent self-acceptance, remote authorization, stage
+substitution, budget waiver or a change to release authority, stop for a new ADR.
+
+### Acceptance policy v1
+
+- [ ] Add an additive, versioned `acceptance_policy` with a composable `acceptance_gates` array. Do not use one
+  mutually exclusive `acceptance_mode`; mixed tasks may require several gates.
+- [ ] Each gate includes stable `id`, `kind`, `required_before`, `authority_role`, exact `contract_ref` path + blob OID,
+  relevant surface IDs, status, evidence requirements and receipt reference. Initial kinds are
+  `human_experience`, `contract`, `measurement`, `operation_authorization` and `platform_matrix`.
+- [ ] Multiple gates use `all_of` only in v1. `any_of`, weighted voting and Agent-selected gate omission are not
+  supported. Unknown kind/status remains Unknown and cannot unlock the requested stage.
+- [ ] Gate status taxonomy is `proposed`／`ready`／`accepted`／`rejected`／`stale`／`unknown`. Human-experience and
+  operation gates require the declared human role; Agent/session receipts cannot satisfy them. Contract,
+  measurement and matrix gates may close mechanically only against a previously human-approved exact contract.
+- [ ] Reuse the existing actor/role/revision/CAS/receipt envelope where compatible; do not create a second authority
+  system or let validation receipts become ADR/State facts.
+
+### Compatibility and receipt freshness
+
+- [ ] Existing sessions without policy project as `legacy-unclassified` and retain current readable behavior during
+  shadow rollout; no history bytes are rewritten and no bulk inference is allowed.
+- [ ] New Workstreams created after opt-in enforcement must declare at least one gate. Migrating an active legacy
+  task requires human-reviewed mapping; Agent suggestions remain non-authoritative.
+- [ ] Bind acceptance to `surface_fingerprint`, not whole repository HEAD. The fingerprint covers exact contract blob,
+  mapping registry version and relevant source/test paths; DEVLOG/Validation wording outside that surface cannot
+  invalidate product acceptance.
+- [ ] A relevant surface change, contract blob change, scope revision change or authority-role revocation makes the
+  receipt stale. Unrelated branch commits do not.
+- [ ] Personal remains zero-network and Team remains request-only. Team may project bounded gate metadata but cannot
+  transmit Prompt, transcript, source, diff, credentials or raw private evidence.
+
+### Validation lease and no-repeat enforcement
+
+- [ ] `validate_change.py` issues a Git-private `validation_lease` only when required gates for the requested stage
+  are satisfied. The lease binds Workstream ID, scope revision, stage, exact relevant fingerprint, allowed test IDs,
+  selected count, predicted p95 cost, budget, receipt inputs and one run identity.
+- [ ] Formal shard/lane runners refuse missing, stale, forged, stage-mismatched or over-budget leases before starting
+  tests. Direct unittest remains local debugging only and cannot emit formal tier evidence.
+- [ ] Same Workstream + surface fingerprint + stage may execute formally once. A previous receipt is returned for an
+  unchanged request. Timeout/failure moves that stage to `validation-cost-blocked`; unchanged-source rerun requires a
+  human-authorized override receipt, not a free-form Agent reason.
+- [ ] In `iterating`, only mapping-owned focused tests are permitted: ≤20 selected tests, ≤20 seconds/run and ≤120
+  cumulative seconds per scope revision before a new human review/contract transition. Human-experience tasks cannot
+  run routed Fast/Checkpoint before an accepted experience receipt.
+- [ ] Contract tasks may proceed without a second subjective pause when the exact contract was accepted before
+  implementation and all machine evidence matches; operation gates still require action-time human authorization.
+
+### Predictive budget refusal
+
+- [ ] Maintain local, versioned timing summaries from valid receipts keyed by final test ID/environment. Unknown
+  history is reported honestly and uses conservative selection; no model estimate becomes evidence.
+- [ ] Refuse Fast before execution when selected count >20 or predicted p95 >10 seconds, preserving five seconds of
+  budget headroom. Refuse Checkpoint when one test p95 >30 seconds or total predicted p95 >60 seconds; move such work
+  to Candidate/Promotion or require a separate CI optimization decision instead of retrying.
+- [ ] Router/setup/build time is included in prediction and cumulative Workstream cost. A test saving cannot be
+  reported without the optimization, retry and setup cost already required by original CI7 diagnostics.
+- [ ] Full docsite, real-Git multi-repository fixtures, package/release builds and cross-platform matrices are not part
+  of UI/product iteration unless the accepted gate contract explicitly owns them.
+
+### Profiles and review packages
+
+- [ ] Provide versioned examples for UI experience, deterministic Core/CLI contract, measured performance, migration/
+  deletion/release operation and platform matrix tasks. Profiles are data, never task-ID/branch switches.
+- [ ] Each review package is bounded: user-visible purpose, invariants, 3–5 representative input/output or screenshots,
+  negative cases, known gaps, exact contract/fingerprint and reproduction reference. Hundreds of raw test lines do
+  not substitute for human-readable acceptance.
+- [ ] Integration Workstream consumes valid child receipts and reruns only integration-owned gates. It cannot replay
+  every child suite merely because aggregation occurred.
+
+### Validation and rollout
+
+- Shadow portfolios: legacy tasks unchanged; new policy emits diagnostics but no block.
+- Enforced portfolios: visual task before/after human acceptance; pre-accepted Core contract; benchmark threshold;
+  destructive operation authorization; Windows/Ubuntu matrix; mixed all-of task; unknown kind; stale receipt.
+- Negative tests: Agent self-accept, missing role, forged contract/blob/fingerprint, unrelated doc change, relevant
+  source change, duplicate run, timeout rerun, expired lease, direct heavy-run evidence claim and guard removal.
+- Prove W7.3-style UI iteration selects only focused Graph tests before acceptance, then permits one Fast and one
+  Checkpoint after the receipt. Prove a 95-second Maintenance fixture cannot enter a 90-second Checkpoint.
+- Rollout order: shadow → new Workstreams required → explicit legacy adoption. Public/default/release activation and
+  hosted enforcement remain separate maintainer decisions.
+
+Continue the existing CI7 task/branch from clean `a520ebc74a0846c148e73312ea2fbf2a32b4b08b` using GPT-5.6 Sol
+medium. Do not modify W7.3, CI7's root PROGRESS/HANDOFF, public release manifests, required check names or budgets.
+During implementation use focused CI contract tests; run routed Fast/Checkpoint once only after the policy is stable.

@@ -1,5 +1,16 @@
 # 开发日志
 
+## 2026-08-30 — CI7 Acceptance Gates & Validation Leases Authorized
+
+- 维护者确认 W7.3 的 53 分钟真实任务中开发只占少数，Core/capture、Maintenance、Fast/Checkpoint 重跑、
+  full build 和等待侵入视觉迭代；单靠 Prompt/Plan 不能保证 Agent 停止叠加测试。
+- 中央保留 CI7 `a520ebc` 的 routing precision／total-cost Candidate，并在原 CI7 Plan 新增 additive acceptance
+  policy v1：`human_experience`／`contract`／`measurement`／`operation_authorization`／`platform_matrix` 可组合
+  all-of gates，使用 exact contract blob、surface fingerprint、现有 human role/CAS/receipt 与 legacy shadow。
+- validation lease 在正式测试启动前绑定 stage/fingerprint/test IDs/p95/budget/receipt；同指纹同 stage 只运行
+  一次，timeout 进入 cost-blocked。Fast >20 tests／p95>10s、Checkpoint 单项>30s／总 p95>60s 均执行前拒绝，
+  不修改 15/90 秒预算或把 refusal 冒充 PASS。继续原 CI7／Sol medium，不创建新 ADR，不触碰 W7.3/release。
+
 ## 2026-08-30 — W7.3 Readable Topology Re-layout Authorized
 
 - 维护者在真实 `05c83b` 页面再次拒绝 W7.3 Graph：默认缩放为 55%，多条关系合并成共享竖直总线，标签压在

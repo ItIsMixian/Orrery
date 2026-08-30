@@ -2,6 +2,8 @@
 
 Validation records reproducible evidence for implementation and documentation claims.
 
+- [2026-08-30 CI7 Validation Routing Precision & Total-Cost Diagnostics](2026-08-30-ci7-validation-routing-precision-total-cost.md) — prior routing/cost Candidate retained; acceptance gates, validation leases, predictive refusal and no-repeat enforcement remain Pending.
+
 For each validation, record:
 
 - Scope and expected behavior

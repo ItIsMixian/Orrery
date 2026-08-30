@@ -42,7 +42,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
 - [x] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航/help、轻量全活动任务、“问文档”说明和中央移动复验已完成并本地集成；Promotion/public/default 仍未发生。
 - [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：Core/capture 保留；`05c83b` 第二版 Graph 仍被拒绝。原任务按 GX1 辅助门重做可读布局、独立线路、默认 inspector 与移动 topology，真实截图获维护者接受前不得完成。
-- [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：拆分 Observatory 影响面并增加非权威总成本诊断；不改变层级证据、15/90 秒预算或 main 推广门。
+- [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：保留 `a520ebc` routing/cost Candidate；新增组合 acceptance gates、surface receipt、validation lease、predictive refusal 和 no-repeat 强制，仍不改变层级证据、15/90 秒预算或 main 推广门。
 - [ ] [U2.2／W7.2 联合验收](validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)：本地联合 Candidate 已就绪；等待维护者真实体验，之后再决定 exact-SHA Promotion。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
 - [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：基础体验返工已进入联合 Candidate；W7.2/U2.2 后的维护者复验、public/default transition 与 Release 尚未完成。

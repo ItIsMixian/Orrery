@@ -23,6 +23,9 @@ Updated: 2026-08-30
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
 - A4/U2.3 已本地合流：LF canonical inventory hash 解决 Windows CRLF 漂移，Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25、A4/Adapter/wheel 15/15 及 390×844 Browser 通过。页面 help x=0/width=390、横向溢出 0、唯一功能 Ask Docs、console 0 warning/error；未 Promotion／push／public switch／release。
+- CI7 原 Candidate `a520ebc` 已完成 mapping 精度与 total-cost diagnostics；维护者现批准在原任务追加
+  acceptance policy v1。任务必须从该 clean Candidate 确认新任务说明版本，使用 Sol medium；实现组合 gates、
+  surface-bound receipt、validation lease 和 no-repeat/predictive refusal，不修改 15/90 预算或发布 Authority。
 
 ## 当前可继续的线路
 
@@ -40,6 +43,8 @@ Updated: 2026-08-30
     仍不可读。原任务须按 readable-topology amendment 从节点布局重做，使用独立 corridor、按 lens 降噪、
     closed-by-default inspector 与专用移动 topology；真实截图未获维护者接受前不得中央集成。
 12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
+13. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
+    “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。
 
 ## 不得外推的边界
 

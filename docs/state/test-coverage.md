@@ -33,6 +33,10 @@ Updated: 2026-08-30
   维护者仍拒绝其 55% 默认缩放、共享关系总线、线标签重叠和常驻 inspector 挤压。后续门固定 100% readable
   reset、按 lens 分边、pairwise coincident/crossing/bend/stretch/segment/gap/label-clearance 几何指标、专用 390px
   topology 和真实截图人工验收；旧 PASS 不足以关闭 UI gate。GX1 `f5fd5af` 的 8/12 结果只提供几何参考。
+- CI7 原 Candidate `a520ebc` 已缩窄 Observatory routing 并增加 total-cost diagnostics，但尚未阻止 Agent 在
+  人类接受前运行正式层级或对同一 fingerprint 原样重跑。维护者已批准 additive acceptance policy v1：组合
+  gates、surface fingerprint、Git-private validation lease、focused iteration 累计预算、predictive refusal 与
+  timeout cost-blocked；15／90 秒预算和各层证据含义不变，产品实现仍 Pending。
 
 ## 覆盖面
 
