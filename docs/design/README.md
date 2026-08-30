@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Orrery v0.3.0 Release Scope and Default Matrix](v0-3-0-release-scope-default-matrix.md) — new/legacy cohort defaults, single self-contained ZIP, final runtime, deterministic packaging and split publication authority under ADR-0021.
 - [Workstream Program Hierarchy & Graph Bundling](workstream-program-hierarchy-and-graph-bundling.md) — explicit program/phase membership, self-host W/W5/W6/W7 repair fixture and same-semantics route bundles under ADR-0020 without inventing relation edges.
 - [Authority-first Workstream Dispatch](authority-first-workstream-dispatch.md) — authority commit before initial dispatch or mid-flight scope amendment, SHA/path-only task notices, pre-write Agent acknowledgment and non-authoritative transcripts under ADR-0018.
 - [Workstream Relation Capture & Confirmation](workstream-relation-capture-and-confirmation.md) — automatic mechanical lineage, gate-aware dependency proposals, human task-owner/integrator authority, local-first inbox and optional proposal-only Conductor under ADR-0017.

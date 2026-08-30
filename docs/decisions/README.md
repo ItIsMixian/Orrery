@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0021: Orrery v0.3.0 Release Scope, Defaults and Publication Authority](0021-v0-3-0-release-scope-default-matrix.md) — Accepted; selects the 0.3.0 feature/default/distribution matrix, one self-contained ZIP, exact-SHA deterministic Promotion and separate main/tag/Release authority while deferring DSH/alias/scheduler to 0.3.1.
 - [ADR-0020: Workstream Program and Phase Hierarchy](0020-workstream-program-and-phase-hierarchy.md) — Accepted; adds explicit human-confirmed program/phase membership separate from series and causal relations, plus presentation-only controlled route bundling without gate or execution effects.
 - [ADR-0019: Portable operating rules and Authority Route Preflight](0019-portable-operating-rules-and-authority-route-preflight.md) — Accepted; amends/extends ADR-0009 with a versioned portable-rules inventory, provider-neutral fact-route receipt, four independent claim axes and novelty/absence gate while preserving Core as the sole semantics owner and keeping all consumers read-only/unreleased.
 - [ADR-0018: Authority-first Workstream Dispatch](0018-authority-first-workstream-dispatch.md) — Accepted; requires the authority commit to precede task creation or material scope amendment, reduces task messages to exact SHA/path references and makes transcript-only requirements non-authoritative.
@@ -38,7 +39,8 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-- No active proposal is awaiting maintainer review; ADR-0018/0019 are Accepted, while dispatch automation, W7.3 evidence and every public/default/release transition remain separate.
+- No active proposal is awaiting maintainer review; ADR-0018–0021 are Accepted, while implementation evidence and every main/tag/asset/Release transition remain separate.
 - `PO-DEC-AUTH-002` was integrated as ADR-0011.
+- `PO-DEC-REL-003` at REL3 exact `ec2b09b` was accepted and normalized into ADR-0021 plus the current Approved Design/blocked Final RC Plan.
 
 Concurrent branches use stable IDs under `docs/decisions/proposals/` until the maintainer accepts a proposal and an integrator allocates the next canonical ADR number.

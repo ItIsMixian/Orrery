@@ -2,6 +2,7 @@
 
 Validation records reproducible evidence for implementation and documentation claims.
 
+- [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — ADR-0021 is accepted, while W7.3/CI7 integration, final webpage, manifest, packaging, runtime, Promotion, main, tag and Release evidence remain Pending.
 - [2026-08-30 CI7 Validation Routing Precision & Total-Cost Diagnostics](2026-08-30-ci7-validation-routing-precision-total-cost.md) — prior routing/cost Candidate retained; acceptance gates, validation leases, predictive refusal and no-repeat enforcement remain Pending.
 
 For each validation, record:

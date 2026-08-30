@@ -40,6 +40,9 @@ Updated: 2026-08-30
 - ADR-0020/W7.3 新门要求 program/phase schema、explicit self-host W repair、prefix negative controls、membership
   non-escalation、same-source/target bundle 与 mixed-semantics refusal、branch/trunk hit testing、semantic selection
   以及桌面/移动视觉验收；未通过前不得把 W grouping 或 route bundle 写成产品事实。
+- ADR-0021 Final RC 只消费 current child receipts 并运行 integration/release-owned gates；默认手工重放全部
+  A4/W7.3/CI7 suites 被禁止。RC 专属门是 manifest、migration/restore、deterministic package、final runtime、
+  dual-platform Promotion 与 publication identity，且同 fingerprint 遵守 CI7 no-repeat。
 
 ## 覆盖面
 

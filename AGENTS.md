@@ -66,7 +66,7 @@
 
 **What**: 平台中立 Core／CLI／Observatory、Codex Skill 兼容入口和发布兼容契约。
 **Truth**: `packages/`, `adapters/codex/`, `skills/project-orrery/`, `scripts/package_release.py`, `scripts/package_codex_adapter.py`, `.github/workflows/`。
-**Dig**: [发布与工具链 State](docs/state/release-and-toolchain.md) | [ADR-0004](docs/decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0013](docs/decisions/0013-claude-code-and-deepseek-harness-adapters.md) | [Approved Design](docs/design/platform-neutral-core-and-adapter-architecture.md)。
+**Dig**: [发布与工具链 State](docs/state/release-and-toolchain.md) | [ADR-0004](docs/decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0013](docs/decisions/0013-claude-code-and-deepseek-harness-adapters.md) | [ADR-0021](docs/decisions/0021-v0-3-0-release-scope-default-matrix.md) | [Platform Design](docs/design/platform-neutral-core-and-adapter-architecture.md) | [v0.3.0 Release Design](docs/design/v0-3-0-release-scope-default-matrix.md) | [Final RC Plan](docs/implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)。
 
 ## multi-worktree collaboration
 

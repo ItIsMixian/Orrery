@@ -29,6 +29,9 @@ Updated: 2026-08-30
 - CI7 原 Candidate `a520ebc` 已完成 mapping 精度与 total-cost diagnostics；维护者现批准在原任务追加
   acceptance policy v1。任务必须从该 clean Candidate 确认新任务说明版本，使用 Sol medium；实现组合 gates、
   surface-bound receipt、validation lease 和 no-repeat/predictive refusal，不修改 15/90 预算或发布 Authority。
+- ADR-0021 已接受 REL3 六项选择并纳入最新 W7.3/CI7 scope：0.3.0 使用单一 self-contained ZIP，新项目
+  Unified/Model 1/Rules 1，旧项目显式迁移，Codex final runtime blocker，byte-identical 默认门，main/tag/Release
+  分权。Final RC 尚未注册，等待 W7.3/CI7 和最终网页验收；DSH/alias/scheduler 明确延期 0.3.1。
 
 ## 当前可继续的线路
 
@@ -48,6 +51,9 @@ Updated: 2026-08-30
 12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 13. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
     “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。
+14. **v0.3.0 Final RC：** ADR-0021/Approved Design/blocked Plan 已进入中央 authority。依赖完成后创建独立
+    Sol-medium RC；只消费 child receipts，运行 integration/package/runtime/Promotion-owned gates，不得提前改
+    public manifest、push ref、tag 或 Release。
 
 ## 不得外推的边界
 

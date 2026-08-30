@@ -1,5 +1,17 @@
 # 开发日志
 
+## 2026-08-30 — ADR-0021 Orrery v0.3.0 Release Contract Accepted
+
+- 维护者接受 REL3 `ec2b09b` 的六项选择：新项目 Unified/Model 1/Rules 1，旧 0.2/brownfield legacy until
+  explicit migration，单一 embedded-source ZIP，无独立 wheels/Adapter assets/PyPI，Codex final runtime blocker，
+  Windows/Ubuntu byte-identical 默认门及显式 waiver fallback，main/tag/GitHub Release 分权。
+- 中央分配 ADR-0021，新增 Approved Design、blocked Final RC Plan 与 Pending Validation；W7.3 ADR-0020 和 CI7
+  acceptance-gate/lease 成为最新 entry gates。DSH Store、CLI alias、scheduler 延期到 0.3.1；auto delete、D2/C2、
+  PyPI/独立 Adapter release 不阻塞 0.3.0。
+- Final RC 测试策略按 CI7 修正：消费 current child receipts，只运行 central integration、manifest、migration/
+  restore、deterministic package、final runtime、dual-platform Promotion 和 publication identity；REL3 Draft 中
+  手工重放全部子任务 unittest 的命令被废止。依赖与最终网页未接受前不注册 RC、不改 manifest、不发布。
+
 ## 2026-08-30 — ADR-0020 Workstream Program Hierarchy & Graph Bundling
 
 - 维护者澄清 W 不是无意义前缀或单一线性 series，而是真实开发 program；W5/W6/W7 是 phase，局部真实链可
