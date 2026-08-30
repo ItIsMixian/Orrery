@@ -171,7 +171,11 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
                 edge_by_id = {item["display_edge_id"]: item for item in layout["edges"]}
                 for route in layout["routes"]:
                     self.assertTrue(route["has_arrow"])
-                    self.assertTrue(route["has_label"])
+                    self.assertFalse(route["has_label"])
+                    self.assertEqual(
+                        route["line_encoding"],
+                        {"succession": "solid", "dependency": "dashed", "conflict": "compound"}[lens],
+                    )
                     edge = edge_by_id[route["edge_id"]]
                     for node_id, rect in boxes:
                         if node_id in {edge["display_from_id"], edge["display_to_id"]}:
@@ -188,12 +192,21 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         chain = history_chains[0]
         cluster = next(item for item in collapsed["nodes"] if item.get("chain_id") == chain["chain_id"])
         self.assertEqual(len(cluster["cluster_ids"]), len(chain["history_ids"]))
+        self.assertEqual(cluster["cluster_ids"], chain["history_ids"])
+        self.assertEqual(cluster["cluster_first_id"], chain["history_ids"][0])
+        self.assertEqual(cluster["cluster_last_id"], chain["history_ids"][-1])
+        self.assertEqual(cluster["cluster_tip_id"], chain["tip_id"])
         expanded = graph_ui.build_readability_layout(
             projection, lens="succession", expanded_chain_ids=[chain["chain_id"]]
         )
         self.assertFalse(any(item.get("chain_id") == chain["chain_id"] for item in expanded["nodes"]))
         self.assertTrue(set(chain["history_ids"]).issubset(expanded["visible_fact_ids"]))
         self.assertGreater(len(expanded["visible_fact_ids"]), len(collapsed["visible_fact_ids"]))
+        collapse_control = next(
+            item for item in expanded["nodes"] if item.get("collapse_chain_id") == chain["chain_id"]
+        )
+        self.assertEqual(collapse_control["workstream_id"], chain["history_ids"][0])
+        self.assertEqual(collapse_control["expanded_history_count"], len(chain["history_ids"]))
 
         no_dependency = copy.deepcopy(projection)
         no_dependency["edges"] = [
@@ -203,6 +216,9 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertEqual(dependency_empty["nodes"], [])
         self.assertEqual(dependency_empty["edges"], [])
         self.assertEqual(dependency_empty["routes"], [])
+        self.assertEqual(dependency_empty["lanes"], [])
+        self.assertEqual(dependency_empty["width"], 1)
+        self.assertEqual(dependency_empty["height"], 1)
 
         one_dependency = copy.deepcopy(projection)
         dependency_edge = next(
@@ -355,6 +371,11 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("event.key==='Enter'", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("event.key===' '", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("function keyboardActivate", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("addEventListener('wheel'", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("if(!event.ctrlKey)return", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("{passive:false}", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("MIN_ZOOM=.55,MAX_ZOOM=1.6", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("Math.max(1,Math.min(1.15", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("expandedChains:new Set()", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("data-wg-expand-all", page)
         self.assertIn("data-wg-collapse-all", page)
@@ -374,11 +395,18 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("从 ", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("→ 到 ", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("marker-end", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("wg-edge-label-bg", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("wg-edge-label-bg", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("wg-edge-label", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("lineEncoding", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("0 条依赖边 · 0 个孤立节点", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("点击展开，仅影响这条上游链", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("收起本链", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("H${", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("--wg-node-width:248px;--wg-node-height:104px", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-graph-panel{min-width:0;width:100%", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-inspector[hidden]{display:none!important}", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn(".wg-edge-hit:focus-visible{stroke:", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertNotIn(".wg-edge-hit:focus-visible,.wg-inspector", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-ledger{position:absolute;width:1px", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-graph-panel{display:none}", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-ledger{position:static;width:auto", graph_ui.WORKSTREAM_GRAPH_CSS)
@@ -423,8 +451,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
         mapping = json.loads((ROOT / "scripts" / "ci" / "change-mapping.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.13")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.13")
+        self.assertEqual(component["version"], "0.1.14")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.14")
         test_ids = [item["test_id"] for item in mapping["tests"]]
         self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
         self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))

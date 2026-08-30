@@ -1,6 +1,6 @@
 # W7.2 Workstream Graph Readability & Progressive Disclosure
 
-Status: Complete
+Status: W7.2 complete; W7.2.1 implementation complete, local Checkpoint budget blocked
 
 Date: 2026-08-29
 
@@ -79,3 +79,22 @@ git diff --check
 
 Full Promotion, hosted Windows/Ubuntu checks, main integration, root PROGRESS/HANDOFF reconciliation and release remain
 later work for the unique integrator.
+
+## W7.2.1 maintainer correction
+
+The maintainer's real-page review rejected line labels placed over routes, browser-focus rectangles around SVG paths,
+surface-level folding and the lack of canvas-native zoom. The correction is registered as Git-private
+`W7.2.1-workstream-graph-interaction-correction` from exact task base
+`5523e6dcd8bac9eadc61fab95f7c85325bfcd383` and keeps the same presentation-only boundary.
+
+- [x] remove text boxes from edge routes and encode relation class only through engineering line patterns plus arrows:
+  solid cyan succession, dashed amber dependency and compound red conflict;
+- [x] replace SVG path bounding-box focus with a focus treatment that follows the real route;
+- [x] add viewport-anchored `Ctrl + wheel` zoom from 55% to 160%, while Reset returns to readable 100% and the canvas
+  origin;
+- [x] make every expanded upstream chain locally collapsible again in both the desktop graph and mobile ledger;
+- [x] align connected components into stable left-to-right rows and reserve compact orthogonal routing only where a
+  row change or longer span requires it;
+- [x] keep the dependency lens facts-first: no explicit `depends_on` evidence means an explanatory zero-node empty
+  state, not synthetic disconnected tasks;
+- [x] move the inspector to a bounded in-canvas drawer and retain Escape, close-button and keyboard selection.

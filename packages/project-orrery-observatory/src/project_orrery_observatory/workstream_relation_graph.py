@@ -426,16 +426,21 @@ def _lens_edges(projection: Mapping[str, Any], lens: str) -> list[dict[str, Any]
     return result
 
 
-def _ancestors(tip: str, incoming: Mapping[str, set[str]]) -> set[str]:
+def _ordered_ancestors(tip: str, incoming: Mapping[str, set[str]]) -> list[str]:
+    """Return a stable oldest-to-newest traversal for one visible tip."""
     found: set[str] = set()
-    pending = list(incoming.get(tip, set()))
-    while pending:
-        item = pending.pop()
-        if item in found:
-            continue
-        found.add(item)
-        pending.extend(incoming.get(item, set()))
-    return found
+    ordered: list[str] = []
+
+    def visit(workstream_id: str) -> None:
+        for item in sorted(incoming.get(workstream_id, set())):
+            if item in found:
+                continue
+            found.add(item)
+            visit(item)
+            ordered.append(item)
+
+    visit(tip)
+    return ordered
 
 
 def build_readability_layout(
@@ -477,7 +482,10 @@ def build_readability_layout(
             direct = set(incoming.get(tip, set()))
             siblings = {sibling for predecessor in direct for sibling in outgoing.get(predecessor, set())}
             default_ids = {tip, *direct, *siblings}
-            older = _ancestors(tip, incoming) - default_ids - claimed_history
+            older = [
+                item for item in _ordered_ancestors(tip, incoming)
+                if item not in default_ids and item not in claimed_history
+            ]
             claimed_history.update(older)
             visible_ids.update(default_ids)
             if chain_id in expanded:
@@ -486,11 +494,24 @@ def build_readability_layout(
                 "chain_id": chain_id,
                 "tip_id": tip,
                 "direct_ids": sorted(direct),
-                "history_ids": sorted(older),
+                "history_ids": older,
                 "expanded": chain_id in expanded,
             })
 
     visible_nodes = [nodes_by_id[item] for item in sorted(visible_ids) if item in nodes_by_id]
+    for chain in chains:
+        if not chain["expanded"] or not chain["history_ids"]:
+            continue
+        toggle_node = next(
+            (
+                item for item in visible_nodes
+                if item["workstream_id"] == chain["history_ids"][0]
+            ),
+            None,
+        )
+        if toggle_node is not None:
+            toggle_node["collapse_chain_id"] = chain["chain_id"]
+            toggle_node["expanded_history_count"] = len(chain["history_ids"])
     cluster_nodes: list[dict[str, Any]] = []
     cluster_edges: list[dict[str, Any]] = []
     hidden_owner: dict[str, str] = {}
@@ -502,8 +523,8 @@ def build_readability_layout(
             hidden_owner[item] = cluster_id
         cluster_nodes.append({
             "workstream_id": cluster_id,
-            "display_prefix": "历史",
-            "display_name": f"更早历史 {len(chain['history_ids'])} 项",
+            "display_prefix": f"+{len(chain['history_ids'])}",
+            "display_name": "折叠的上游链",
             "status": "inactive",
             "runtime_condition": "collapsed",
             "lifecycle_phase": "historical",
@@ -514,6 +535,9 @@ def build_readability_layout(
             "is_cluster": True,
             "chain_id": chain["chain_id"],
             "cluster_ids": list(chain["history_ids"]),
+            "cluster_first_id": chain["history_ids"][0],
+            "cluster_last_id": chain["history_ids"][-1],
+            "cluster_tip_id": chain["tip_id"],
         })
     visible_nodes.extend(cluster_nodes)
 
@@ -564,40 +588,84 @@ def build_readability_layout(
         groups.setdefault(rank[node["workstream_id"]], []).append(node)
     for values in groups.values():
         values.sort(key=lambda item: (not bool(item.get("is_cluster")), str(item["workstream_id"])))
-    # Each edge owns a 30 px label track above the first node row.  The prior
-    # 13 px packing passed intersection checks but made 20 px labels overlap in
-    # the real six-edge self-host graph.
-    edge_band_height = 42 + max(1, len(display_edges)) * 30
-    node_top = 58 + edge_band_height
+    # Connected components own horizontal bands.  A simple chain therefore
+    # stays on one row and reads like an engineering diagram instead of a set
+    # of unrelated cards joined through a label shelf.
+    undirected = {item: set() for item in node_ids}
+    for edge in display_edges:
+        source, target = edge["display_from_id"], edge["display_to_id"]
+        undirected[source].add(target)
+        undirected[target].add(source)
+    components: list[list[str]] = []
+    assigned: set[str] = set()
+    for seed in sorted(node_ids):
+        if seed in assigned:
+            continue
+        members: list[str] = []
+        pending = [seed]
+        assigned.add(seed)
+        while pending:
+            item = pending.pop(0)
+            members.append(item)
+            for sibling in sorted(undirected[item]):
+                if sibling not in assigned:
+                    assigned.add(sibling)
+                    pending.append(sibling)
+        components.append(sorted(members))
+
+    node_top = 112
     positions: dict[str, dict[str, int]] = {}
-    max_rows = 1
-    for rank_value, values in sorted(groups.items()):
-        max_rows = max(max_rows, len(values))
-        for row, node in enumerate(values):
-            positions[node["workstream_id"]] = {
-                "x": 36 + rank_value * (NODE_WIDTH + RANK_GAP),
-                "y": node_top + row * (NODE_HEIGHT + ROW_GAP),
-                "width": NODE_WIDTH,
-                "height": NODE_HEIGHT,
-                "rank": rank_value,
-                "row": row,
-            }
+    row_cursor = 0
+    for component_index, members in enumerate(sorted(components, key=lambda item: item[0])):
+        member_ids = set(members)
+        by_rank = {
+            rank_value: [node for node in values if node["workstream_id"] in member_ids]
+            for rank_value, values in sorted(groups.items())
+        }
+        by_rank = {rank_value: values for rank_value, values in by_rank.items() if values}
+        component_rows = max((len(values) for values in by_rank.values()), default=1)
+        for rank_value, values in by_rank.items():
+            for local_row, node in enumerate(values):
+                positions[node["workstream_id"]] = {
+                    "x": 36 + rank_value * (NODE_WIDTH + RANK_GAP),
+                    "y": node_top + (row_cursor + local_row) * (NODE_HEIGHT + ROW_GAP),
+                    "width": NODE_WIDTH,
+                    "height": NODE_HEIGHT,
+                    "rank": rank_value,
+                    "row": row_cursor + local_row,
+                    "component": component_index,
+                }
+        row_cursor += component_rows + 1
+    max_rows = max(1, row_cursor - 1 if row_cursor else 1)
     routes: list[dict[str, Any]] = []
     for index, edge in enumerate(display_edges):
         source = positions[edge["display_from_id"]]
         target = positions[edge["display_to_id"]]
         start = (source["x"] + source["width"], source["y"] + source["height"] // 2)
         end = (target["x"], target["y"] + target["height"] // 2)
-        start_channel = start[0] + 24
-        end_channel = end[0] - 24
-        track_y = 76 + index * 30
-        points = [start, (start_channel, start[1]), (start_channel, track_y), (end_channel, track_y), (end_channel, end[1]), end]
+        rank_span = max(1, target["rank"] - source["rank"])
+        if start[1] == end[1] and rank_span == 1:
+            points = [start, end]
+        elif rank_span == 1:
+            middle = (start[0] + end[0]) // 2
+            points = [start, (middle, start[1]), (middle, end[1]), end]
+        else:
+            start_channel = start[0] + 22
+            end_channel = end[0] - 22
+            track_y = max(88, min(source["y"], target["y"]) - 20 - (index % 4) * 8)
+            points = [
+                start, (start_channel, start[1]), (start_channel, track_y),
+                (end_channel, track_y), (end_channel, end[1]), end,
+            ]
         routes.append({
             "edge_id": edge["display_edge_id"], "points": points,
-            "label_x": (start_channel + end_channel) // 2, "label_y": track_y - 5,
-            "has_arrow": True, "has_label": True,
+            "has_arrow": True, "has_label": False,
+            "line_encoding": (
+                "dashed" if lens == "dependency" else
+                "compound" if lens == "conflict" else "solid"
+            ),
         })
-    max_rank = max(groups, default=0)
+    max_rank = max(groups, default=-1)
     lane_titles = []
     for rank_value in range(max_rank + 1):
         values = groups.get(rank_value, [])
@@ -618,8 +686,11 @@ def build_readability_layout(
         "positions": positions,
         "routes": routes,
         "lanes": lane_titles,
-        "width": 72 + (max_rank + 1) * NODE_WIDTH + max_rank * RANK_GAP,
-        "height": node_top + max_rows * (NODE_HEIGHT + ROW_GAP) + 34,
+        "width": (
+            72 + (max_rank + 1) * NODE_WIDTH + max_rank * RANK_GAP
+            if node_ids else 1
+        ),
+        "height": node_top + max_rows * (NODE_HEIGHT + ROW_GAP) + 34 if node_ids else 1,
         "visible_fact_ids": sorted(item for item in visible_ids if item in nodes_by_id),
     }
 
@@ -703,13 +774,13 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<button class="wg-button" type="button" data-wg-expand-all>展开全部历史</button>'
         '<button class="wg-button" type="button" data-wg-collapse-all>收起全部历史</button>'
         '<button class="wg-button" type="button" data-wg-reset>重置布局</button></div>'
-        '<div class="wg-viewbar" role="toolbar" aria-label="关系图视图工具"><span class="wg-viewbar-note">默认保持 100%% 可读；空间不足时可滚动或拖动画布。</span>'
+        '<div class="wg-viewbar" role="toolbar" aria-label="关系图视图工具"><span class="wg-viewbar-note">默认保持 100%% 可读；画布内按住 Ctrl＋滚轮缩放，空白处拖动平移。</span>'
         '<button class="wg-button" type="button" data-wg-zoom-out aria-label="缩小关系图">−</button><span class="wg-zoom-readout" data-wg-zoom-readout>100%%</span>'
         '<button class="wg-button" type="button" data-wg-zoom-in aria-label="放大关系图">＋</button><button class="wg-button" type="button" data-wg-fit>适合窗口</button></div></section>'
         '<section class="wg-grid"><div class="wg-graph-panel"><div class="wg-panel-head"><div><p class="wg-panel-index">关系图 / 已验证核心数据</p><h3>分层关系拓扑</h3></div>'
-        '<div class="wg-legend" aria-label="关系图例"><span><i></i>接续：实线青</span><span><i class="dependency"></i>依赖：虚线黄</span><span><i class="conflict"></i>冲突：实线红</span></div></div>'
-        '<div class="wg-frame"><div class="wg-viewport" data-wg-viewport tabindex="0" aria-label="可滚动任务关系画布"><div class="wg-canvas"><svg data-wg-svg role="group" aria-label="从左到右的分层任务关系图"></svg></div></div><div class="wg-empty" data-wg-empty hidden><b>没有匹配的关系事实</b></div></div></div></section>'
-        '<aside class="wg-inspector" hidden aria-hidden="true" role="dialog" aria-modal="false" aria-label="任务关系技术详情" data-wg-inspector-shell><div class="wg-inspector-head"><span>技术详情 / 核心证据 · 只读</span><button class="wg-inspector-close" type="button" data-wg-inspector-close aria-label="关闭技术详情">×</button></div><div data-wg-inspector></div><div class="wg-readonly">不提供应用、撤销、关闭、删除、合并或远程执行</div></aside>'
+        '<div class="wg-legend" aria-label="关系图例"><span><i></i>接续：实线青</span><span><i class="dependency"></i>依赖：虚线黄</span><span><i class="conflict"></i>冲突：复合红线</span></div></div>'
+        '<div class="wg-frame"><div class="wg-viewport" data-wg-viewport tabindex="0" aria-label="可滚动任务关系画布"><div class="wg-canvas"><svg data-wg-svg role="group" aria-label="从左到右的分层任务关系图"></svg></div></div><div class="wg-empty" data-wg-empty hidden><b>没有匹配的关系事实</b></div>'
+        '<aside class="wg-inspector" hidden aria-hidden="true" role="dialog" aria-modal="false" aria-label="任务关系技术详情" data-wg-inspector-shell><div class="wg-inspector-head"><span>技术详情 / 核心证据 · 只读</span><button class="wg-inspector-close" type="button" data-wg-inspector-close aria-label="关闭技术详情">×</button></div><div data-wg-inspector></div><div class="wg-readonly">不提供应用、撤销、关闭、删除、合并或远程执行</div></aside></div></div></section>'
         '<section class="wg-ledger" aria-labelledby="wg-ledger-title"><h3 id="wg-ledger-title">任务关系列表</h3><p class="wg-ledger-intro">按层级与链阅读；每条关系明确显示“从谁 → 到谁”，历史折叠与桌面保持一致。</p><div class="wg-ledger-list" data-wg-ledger></div></section>'
         '<p class="wg-sr" aria-live="polite" data-wg-live></p><script type="application/json" data-wg-payload>%s</script>'
         '</section></article>'

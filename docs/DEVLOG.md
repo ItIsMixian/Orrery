@@ -688,3 +688,10 @@
 - Observatory 0.1.13 将 Graph 改为固定 248×104px 卡片、单一从左到右 rank lane、正交高对比箭头与不透明关系标签；每条链拥有自己的更早历史 cluster，Reset 恢复默认折叠／100%／关闭 inspector。桌面 inspector 为 overlay，390px 用同一事实集合的任务关系列表，桌面重复 ledger 只保留 screen-reader 语义。
 - succession／dependency／conflict 三 lens 不再共享 active-tip 填充：dependency 无 edge 时为 0 节点中文空态，单边 fixture 为 2 端点＋1 箭头；conflict 只显示真实 pair 端点。Core relation schema／facts、W7.1 archive hash/source evidence 与零执行权均未改。
 - focused Graph＋Unified 18/18、JS syntax、真实 self-host 1280×800／1440×900／390×844 交互与 frontend visual checks 通过；无页面横向溢出或 console warning/error。CI6 Fast／Checkpoint 与 exact clean Candidate 记录在 W7.2 Validation；不运行完整 Promotion、不 push main、不发布。
+
+## 2026-08-30 — W7.2.1 Workstream Graph Interaction Correction
+
+- 维护者在真实网页复查中指出画布缺少 `Ctrl + 滚轮`、SVG 边焦点出现巨大黑框、线路标签压在线上、折叠无法按链收回，以及依赖空态缺乏解释。修正从 exact W7.2 Candidate `5523e6d` 登记 Git-private `W7.2.1-workstream-graph-interaction-correction` 后写入，根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.14 去掉线路标签盒，以实线青／虚线黄／复合红线和明显箭头编码关系；焦点沿真实路径显示，画布支持 55%–160% 锚点式 `Ctrl + 滚轮`，Reset 恢复 100% 和原点。connected component 使用稳定水平行，展开后的每条上游链可独立收起，技术详情为画布内可关闭 drawer。
+- dependency 继续严格消费真实 `depends_on`：self-host 无显式依赖边时显示“当前没有已登记的依赖关系”与 0 节点，不复制接续边或填充孤立任务。Core relation schema/facts、archive 只读与所有执行安全边界均未改变。
+- focused Graph＋Unified 18/18、JS syntax、CI6 Fast 38/38 和真实浏览器三档验收通过。CI6 Checkpoint 路由为 44 tests／0 unknown path，但本机固定 90 秒外层预算在既有 Maintenance 增量 fixture 尚运行时超时；该 slow test 独立 1/1 通过（约 68–71 秒），因此本修正不伪称 evidence-eligible Checkpoint PASS，发布与中央整合仍需补齐该门。
