@@ -1,5 +1,16 @@
 # 开发日志
 
+## 2026-08-30 — GX2 Maintainer-supervised Render-only Iteration
+
+- 维护者明确要求中央监督 W7.3，直到中央认为视图可读才通知，并要求其确认视图前不得启动测试流程。中央
+  查看 GX2 首版四组桌面/移动截图与报告后未通过：succession/dependency 明显改善，但 W compound 自动 fit
+  40%、Project Structure affected+semantic 同开后 fit 30%，W 仍有 1 crossing/2 stretched routes，修正配置 crash。
+- GX2 Plan/Validation scope revision 14 允许至多两次中央审阅的 experiment-only 预览修正：desktop 默认
+  100%，W 外部端点默认 boundary stub，inspector 默认关闭，Project Structure context/affected 独立截图；
+  succession/dependency/mobile 不回退。
+- 维护者确认前禁止 unittest/pytest/focused/geometry tests、Fast、Checkpoint、Promotion 和 release gates；
+  只允许 artifact generation、local preview、screenshots 与人工 Browser review，产品/legacy files 全部保留。
+
 ## 2026-08-30 — ADR-0023 Legacy Layout Retention & Preview-first Gate
 
 - 维护者纠正 ADR-0022 的删除策略：手写 layout 应保留为后手，并要求先看 GX2 ELK 实际页面。中央立即撤回

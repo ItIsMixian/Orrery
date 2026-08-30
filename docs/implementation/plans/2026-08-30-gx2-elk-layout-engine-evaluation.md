@@ -114,3 +114,42 @@ the evaluator cannot silently choose a different engine or artifact.
 must stop after presenting its offline page and evidence. The existing handwritten renderer remains untouched during
 the experiment and is retained as a future explicit legacy recovery engine. No product integration may begin from the
 GX2 task without a later maintainer acceptance and new exact task-description version.
+
+## 2026-08-30 maintainer-supervised preview correction
+
+The maintainer explicitly asked the coordinator to supervise GX2 until it produces a reasonably readable view, while
+forbidding all test workflows before the maintainer confirms the view. The first artifact is not accepted: flat
+succession/dependency are promising, but W compound auto-fits to 40%, Project Structure context auto-fits to 30% with
+affected and semantic layers combined, the W layout retains one crossing/two stretched routes, and the correction
+configuration crashes ELK 0.11.0.
+
+### Render-only correction scope
+
+- [ ] Allow up to two coordinator-reviewed preview iterations. Each iteration may edit only GX2 experiment HTML/CSS/JS,
+  frozen fixture/provenance and screenshots. It cannot modify product files or select a new ELK artifact/version.
+- [ ] Do not run `unittest`, `pytest`, focused test commands, geometry test scripts, Fast, Checkpoint, Promotion,
+  release gates or any test workflow. Passive diagnostics calculated while the page renders may be displayed/read, but
+  the iteration is driven by browser inspection rather than a test run.
+- [ ] Default every desktop tab to 100%. `适合窗口` remains explicit; screenshots cannot auto-fit text to 80/40/30%.
+  Scrollable canvas is preferable to unreadable scaling.
+- [ ] W compound default full cards are W members inside W/W5/W6/W7 containers. CI/SH/U cross-hierarchy endpoints use
+  compact typed boundary stubs by default and preserve exact relation identity; full external cards require an explicit
+  context action. This must reduce long routes without deleting or inventing edges.
+- [ ] W compound opens with inspector closed. Phase containers and cards are readable at 100%; no unmarked crossing,
+  route-through-node, floating label or multi-screen route remains in the coordinator screenshot.
+- [ ] Project Structure default remains primary-only. Produce a separate **semantic-context-only** screenshot with
+  affected context off; the two checkboxes never activate one another. Affected context, when shown separately, stays
+  bounded and uses a `+N` summary rather than forcing auto-fit.
+- [ ] Dependency continues to contain only scoped `depends_on` endpoints, with no program/series/active-tip singleton.
+  Succession and dependency must not regress while correcting W/context.
+- [ ] Mobile continues using the readable same-fact ledger; no desktop canvas thumbnail.
+
+### Supervision handoff
+
+After each preview, report the local URL and fresh 1440×900, 1280×800 and 390×844 screenshots without claiming PASS.
+The coordinator inspects them and either sends one focused correction or declares the view ready for the maintainer.
+Do not notify the maintainer directly from W7.3 and do not begin product integration.
+
+Continue the same task/worktree, preserve all existing dirty/product/legacy files and refresh Git-private scope to
+revision 14 after reading this amendment plus the matching Validation section. Use GPT-5.6 Sol medium. The no-test and
+experiment-only boundaries override earlier GX2 validation commands until the maintainer confirms the view.

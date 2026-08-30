@@ -35,3 +35,22 @@ Only later maintainer acceptance plus a new ADR can authorize production adoptio
 ADR-0023 now preserves the handwritten renderer as a future explicit legacy recovery engine and keeps product writes
 blocked until the maintainer sees this GX2 page. This evaluation must stop at the preview/evidence handoff; it cannot
 perform product integration under the GX2 scope.
+
+## 2026-08-30 supervised preview acceptance gate
+
+Before the coordinator may notify the maintainer, browser inspection—not a test workflow—must show:
+
+- every desktop tab starts at 100%; no screenshot is auto-fit to 80/40/30%;
+- W/W5/W6/W7 compound cards remain readable, inspector starts closed and external CI/SH/U endpoints are compact typed
+  boundary stubs unless explicit context is requested;
+- W compound has no visible crossing, floating label, edge-through-card or multi-screen detour;
+- Project Structure primary-only, semantic-context-only and affected-only states are distinct; toggles are independent,
+  bounded and never reproduce the all-node graph;
+- dependency contains only `depends_on` endpoints and no isolated membership node;
+- succession and dependency retain readable labels/routes;
+- 390px uses the same-fact ledger rather than a scaled desktop graph;
+- fresh 1440×900, 1280×800 and 390×844 screenshots plus local URL are returned to the coordinator;
+- zero test commands/workflows and zero product/vendor/package/default writes occurred;
+- exact task-description acknowledgment and Git-private scope revision 14 precede corrections.
+
+This is a visual readiness gate only. It does not mark GX2, W7.3 or any product/release validation PASS.
