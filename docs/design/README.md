@@ -6,6 +6,8 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [ELK Cutover and Explicit Legacy Fallback](elkjs-cutover-and-explicit-legacy-fallback.md) — preview-first cutover, one shared semantic projection, frozen/manual/visibly-labelled legacy recovery and no silent fallback under ADR-0023.
+- [ELK.js Workstream Graph Layout and Orrery Rendering](elkjs-workstream-graph-layout-and-rendering.md) — pinned local ELK compound/orthogonal geometry with Orrery-owned facts, SVG/frontend, zero-network packaging and ledger failure path under ADR-0022, amended by ADR-0023.
 - [Orrery v0.3.0 Release Scope and Default Matrix](v0-3-0-release-scope-default-matrix.md) — new/legacy cohort defaults, single self-contained ZIP, final runtime, deterministic packaging and split publication authority under ADR-0021.
 - [Workstream Program Hierarchy & Graph Bundling](workstream-program-hierarchy-and-graph-bundling.md) — explicit program/phase membership, self-host W/W5/W6/W7 repair fixture and same-semantics route bundles under ADR-0020 without inventing relation edges.
 - [Authority-first Workstream Dispatch](authority-first-workstream-dispatch.md) — authority commit before initial dispatch or mid-flight scope amendment, SHA/path-only task notices, pre-write Agent acknowledgment and non-authoritative transcripts under ADR-0018.

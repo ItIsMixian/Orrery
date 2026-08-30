@@ -109,3 +109,8 @@ while preserving the Orrery frontend. This supersedes the open decision menu abo
 GX2 must pin and validate the exact release/ref/hash/size/license and four fixtures before W7.3 product dependency
 writes. A failed capability or provenance gate blocks implementation and is reported as a conflict with ADR-0022;
 the evaluator cannot silently choose a different engine or artifact.
+
+[ADR-0023](../../decisions/0023-explicit-legacy-graph-layout-fallback.md) further requires preview-first cutover: GX2
+must stop after presenting its offline page and evidence. The existing handwritten renderer remains untouched during
+the experiment and is retained as a future explicit legacy recovery engine. No product integration may begin from the
+GX2 task without a later maintainer acceptance and new exact task-description version.

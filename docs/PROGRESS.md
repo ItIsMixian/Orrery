@@ -14,7 +14,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
-| 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；ADR-0020 hierarchy 与 ADR-0022 ELK layout-only adoption 已接受；W7.3 Core/capture 保留而 Graph 待替换 | GX2 锁定 exact local ELK provenance 后，原 W7.3 删除双手写 geometry，以 ELK compound/orthogonal geometry 接入现有 Orrery SVG；任何确认/apply/删除仍逐次本机授权 |
+| 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；ADR-0020 hierarchy、ADR-0022 ELK layout-only 与 ADR-0023 explicit legacy fallback 已接受；W7.3 Core/capture 保留 | 只完成 GX2 并先让维护者看图；未接受前不接产品。未来 ELK 为候选正常引擎，手写 geometry 冻结为显式/带标签后手，禁止自动回退 |
 | Unified Observatory | A4/U2.3 已加入 W7.2.3/U2.2 本地 integration line：七入口导航、只读帮助/规则、轻量活动任务、密集维护和只读 Graph 已组合；公开默认仍未切换 | 等 W7.3 合流后做最终整页体验，再冻结 non-main exact-SHA Promotion Candidate |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
@@ -32,6 +32,8 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - ADR-0018 已接受 authority-first Workstream dispatch：U2.3 已按两次任务说明版本完成并本地集成，W7.3 也已确认其 scope revision；自动 receipt／first-write enforcement 尚未实现。
 - ADR-0022 已接受 ELK.js 作为 Workstream Graph 唯一 layout/routing engine；它不改变现有 Orrery 前端或
   事实选择。GX2 exact asset/provenance 与 W7.3 产品接线仍未完成，不能冒充页面已修复或 Release 已包含。
+- ADR-0023 修正删除/切换策略：手写 renderer 保留为 frozen、manual、visibly-labelled legacy engine；当前
+  仅允许 GX2 预览，维护者看图接受前 scope revision 12 的产品写入权限已撤回。
 - S0 `orrery-dispatch` 两文件 source 与 PO enforcement 已进入本地 integration line并安装到当前本机 Codex home；标准 Skill 校验、generic routing 与本地门通过。它未发布，也不是 S1 Conductor 或宿主级 first-write enforcement。
 - PO1 source Candidate `93ddfb7` 已进入本地 integration line：dispatch Skill 强制非整合任务使用 `PO-DEC-*`，repository gate 拒绝同树重复正式 ADR 编号；A4 已规范化为 ADR-0019。
 - A4/U2.3 local integration 现为 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18、Harness JSON 0.1.2；Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25 和 390px Browser 通过，仍不等于 public/default/release。
@@ -40,12 +42,12 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 - [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：ADR-0021 已接受；等待含 ADR-0022 pinned local ELK 的 W7.3、CI7 Canonical integration 与最终网页验收后才注册 RC，随后完成 manifest、self-contained ZIP、runtime、双平台 Promotion、main/tag/Release 分权流程。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
-- [ ] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者已选择采用 layout-only 方向；评测仍须锁定 exact release/hash/license/size 并证明四个真实缺陷。ADR-0022 不豁免 provenance 或视觉证据。
+- [ ] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：当前唯一获准动作；锁定 exact release/hash/license/size、证明四个真实缺陷并把离线页面交给维护者。看图后另发产品任务说明。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
 - [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 与 PO enforcement 已本地集成，并只安装到当前本机 Codex home；未进入发布包，S1 Conductor 仍是独立后续事项。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
 - [x] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航/help、轻量全活动任务、“问文档”说明和中央移动复验已完成并本地集成；Promotion/public/default 仍未发生。
-- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：Core/capture 保留；ADR-0022/Approved Design 已选择 pinned local ELK，仅替换 layout/routing 并保留 Orrery SVG/frontend。GX2 provenance 后按 scope revision 12 实现，真实截图接受前禁 Fast/Checkpoint。
+- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：Core/capture 与手写 layout 都保留；scope revision 13 只准 GX2 experiment。未来产品用 shared GraphProjection + ELK candidate + frozen/manual legacy fallback，但必须等维护者先接受 GX2 并提交新的任务说明。
 - [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：保留 `a520ebc` routing/cost Candidate；新增组合 acceptance gates、surface receipt、validation lease、predictive refusal 和 no-repeat 强制，仍不改变层级证据、15/90 秒预算或 main 推广门。
 - [ ] [U2.2／W7.2 联合验收](validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)：本地联合 Candidate 已就绪；等待维护者真实体验，之后再决定 exact-SHA Promotion。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。

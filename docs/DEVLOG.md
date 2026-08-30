@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-30 — ADR-0023 Legacy Layout Retention & Preview-first Gate
+
+- 维护者纠正 ADR-0022 的删除策略：手写 layout 应保留为后手，并要求先看 GX2 ELK 实际页面。中央立即撤回
+  scope revision 12 的产品接线时序，向 W7.3 发送 stop；现有 dirty/product/legacy files 均未被删除。
+- 新增并接受 ADR-0023 与 Approved Design：ELK 与 frozen legacy 将来共用一份 Orrery GraphProjection；legacy
+  只能通过本地显式动作启用且持续标记“旧版兼容布局”。ELK 失败先显示 same-fact ledger，可提供手动切换，
+  禁止 silent fallback。
+- W7.3 scope revision 13 当前只授权 GX2 experiment/provenance/HTML/geometry/screenshots；维护者接受预览、
+  中央再提交新任务说明前，不得 product/vendor/package/default 写入，也不运行 Fast/Checkpoint。
+
 ## 2026-08-30 — ADR-0022 ELK.js Layout-only Adoption Accepted
 
 - 维护者在确认 ELK 不负责渲染、不会改变现有 Orrery 前端设计后，选择正式采用该方向。中央分配并接受

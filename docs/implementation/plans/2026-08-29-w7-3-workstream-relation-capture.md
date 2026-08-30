@@ -750,3 +750,34 @@ Refresh Git-private scope to revision 12 after reading ADR-0022, the Approved De
 Validation section. Use GPT-5.6 Sol medium. Product writes may begin only after GX2 pins valid provenance. Do not create
 W7.4, push, publish, change main/default, run Promotion or run routed Fast/Checkpoint before maintainer visual
 acceptance.
+
+## 2026-08-30 Maintainer Amendment — GX2 Preview First & Frozen Legacy Recovery
+
+Governing decision: [ADR-0023](../../decisions/0023-explicit-legacy-graph-layout-fallback.md)
+
+Approved Design: [ELK Cutover and Explicit Legacy Fallback](../../design/elkjs-cutover-and-explicit-legacy-fallback.md)
+
+This amendment supersedes revision 12's permission to begin product integration immediately after provenance. The
+maintainer first wants to inspect the isolated ELK page and requires the handwritten renderer to remain as an explicit
+recovery path.
+
+### Current authorized work
+
+- [ ] Complete GX2 only under `experiments/workstream-graph-elk-evaluation/`: provenance, four semantic fixtures,
+  offline interactive HTML, geometry report and 1440/1280/390 screenshots.
+- [ ] Preserve every W7.3 dirty product file. Do not vendor ELK into `packages/`, refactor product Graph modules,
+  extract/delete/move legacy code, change manifests or alter defaults during this scope.
+- [ ] Present the GX2 Browser URL/screenshots and exact geometry/provenance result to the maintainer, then stop.
+
+### Future product boundary after a separate acceptance
+
+- [ ] A later exact task-description version is required before product integration. It will implement one shared
+  Orrery GraphProjection plus `ElkLayoutEngine` and frozen `LegacyLayoutEngine` adapters.
+- [ ] The legacy engine remains manual local opt-in and visibly labelled. ELK failure is ledger-first and can offer an
+  explicit legacy action; no exception/timer silently switches engines.
+- [ ] ELK may become the normal engine only after the maintainer accepts both GX2 and the later product Candidate.
+
+Continue the same W7.3 task/worktree and preserve all dirty files. Refresh Git-private scope to revision 13 after
+reading ADR-0023, its Approved Design, this amendment and the matching Validation section. Use GPT-5.6 Sol medium.
+Revision 13 authorizes experiment files only; it explicitly withdraws revision 12 product-write permission. Do not
+run routed Fast/Checkpoint/Promotion, push, publish or change main/default.

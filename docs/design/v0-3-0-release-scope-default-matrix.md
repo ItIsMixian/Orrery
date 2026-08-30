@@ -37,6 +37,8 @@ Unknown selectors fail before managed writes. Migration and restore bind exact b
 - Core/CLI/Observatory are embedded tracked source with exact component versions, not independent releases.
 - The W7.3 Observatory Graph embeds the exact ADR-0022/GX2-reviewed local ELK.js runtime and license/provenance as
   tracked package input. No CDN, npm install or build-time download is part of installation or runtime.
+- ADR-0023 retains the frozen handwritten geometry as an explicit local legacy engine. It shares Orrery's semantic
+  input, is visibly labelled/manual-only and cannot activate automatically when ELK fails.
 - Candidate manifest records project manifest format, document schema, Authority Model and Rules as four orthogonal
   default values with discrete support sets; it also binds exact source SHA, components, Adapters, cohorts, assets,
   URLs and release date.

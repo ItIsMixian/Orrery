@@ -10,8 +10,9 @@ Approved Design: [v0.3.0 Release Scope and Default Matrix](../../design/v0-3-0-r
 
 ## Entry gates
 
-- [ ] W7.3 includes ADR-0020 hierarchy plus ADR-0022 pinned local ELK layout-only integration, has integrated
-  State/Validation, reviewed vendor/license/provenance inventory and maintainer-approved final page.
+- [ ] W7.3 includes ADR-0020 hierarchy, ADR-0022 pinned local ELK layout-only integration and ADR-0023 explicit frozen
+  legacy recovery, has integrated State/Validation, reviewed vendor/license/provenance inventory and
+  maintainer-approved final page; no silent engine fallback exists.
 - [ ] CI7 acceptance gates/validation lease/no-repeat/predictive refusal has integrated State/Validation.
 - [ ] A4/U2.3 current central source and component versions are reconciled against final W7.3/CI7.
 - [ ] Child receipts are current for exact integrated surfaces; stale/missing evidence is returned to the owning task.

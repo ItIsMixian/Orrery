@@ -19,13 +19,13 @@ Updated: 2026-08-30
 - ADR-0020 与 Program/Bundle Design 已接受：W 是 program、W5/W6/W7 是 phase，membership 不是 series 或
   semantic edge；同类同向且共端点的 relation 只能在同一 block pair 内受控束线。W7.3 当前未提交文件须
   保留；旧 scope revision 5/6 已被最新 layout correction supersede，尚无实现/验收事实。
-- W7.3 revisions 7–10 的全局 rank、hard/soft program grouping、手写 packing/routing/label 实现均已被真实页面
-  拒绝，只保留为失败证据。维护者已选择采用 ELK.js layout-only；ADR-0022/Approved Design 已接受，Orrery
-  继续拥有事实选择与现有 SVG/frontend。
-- ADR-0018 authority-first 继续生效：同一 W7.3 task 先完成 GX2 scope revision 11 的 exact
-  version/ref/hash/size/license；随后确认最新任务说明 SHA 并刷新 scope revision 12，才可保存 rejected geometry
-  evidence、删除双手写 geometry 并接入同一 pinned engine。没有 GX2 provenance 前不得产品依赖写入；真实
-  页面接受前仍禁 Fast/Checkpoint。自动 receipt／first-write enforcement 尚未实现。
+- W7.3 revisions 7–10 的全局 rank、hard/soft program grouping、手写 packing/routing/label 页面均已被拒绝。
+  ADR-0022 选择 ELK layout-only；ADR-0023 又保留手写 geometry 为 frozen/manual/visibly-labelled legacy 后手，
+  禁止自动回退。Orrery 继续拥有事实选择与现有 SVG/frontend。
+- ADR-0018 authority-first 继续生效：同一 W7.3 task 刷新 scope revision 13 后只完成 GX2 exact
+  version/ref/hash/size/license/页面并停止。维护者看图接受、中央提交下一任务说明前，禁止 product/vendor/
+  package/default 写入或移动/删除 legacy code；仍禁 Fast/Checkpoint。自动 receipt／first-write enforcement
+  尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
@@ -40,9 +40,8 @@ Updated: 2026-08-30
 ## 当前可继续的线路
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
-2. **GX2 ELK layout evaluation：** 在原 W7.3 worktree 的独立 experiment 路径完成 pinned asset provenance
-   与四个 fixture。维护者已选 adopt-layout-only，但评测仍决定 exact bytes/options；失败必须停止并报告与
-   ADR-0022 的冲突，不能静默换依赖。
+2. **GX2 ELK layout evaluation：** 当前唯一获准动作；在原 W7.3 worktree 的 experiment 路径完成 pinned
+   provenance、四个 fixture、offline HTML/geometry/screenshots，然后把真实页面交给维护者并停止。
 3. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
 4. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
 5. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
@@ -52,9 +51,9 @@ Updated: 2026-08-30
 9. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 10. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 11. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-12. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 与全部 dirty files
-    保留。GX2 后按 ADR-0022/scope revision 12 保存 rejected geometry evidence、移除 Python/Browser 双手写
-    layout/router，使用 pinned local ELK 并复用现有 SVG/card UI；真实截图未接受前不得 Fast/Checkpoint/集成。
+12. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence、手写 geometry 与全部
+    dirty files 保留。scope revision 13 只准 GX2；未来 ELK product integration 与 explicit legacy mode 需在
+    维护者接受预览后另交 exact task-description，不能从本 scope 直接继续。
 13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 14. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
     “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。

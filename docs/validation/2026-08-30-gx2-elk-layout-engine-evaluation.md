@@ -31,3 +31,7 @@ Adoption decision: [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-en
 
 No experiment artifact, dependency or result enters product source, State, release package or public/default behavior.
 Only later maintainer acceptance plus a new ADR can authorize production adoption.
+
+ADR-0023 now preserves the handwritten renderer as a future explicit legacy recovery engine and keeps product writes
+blocked until the maintainer sees this GX2 page. This evaluation must stop at the preview/evidence handoff; it cannot
+perform product integration under the GX2 scope.

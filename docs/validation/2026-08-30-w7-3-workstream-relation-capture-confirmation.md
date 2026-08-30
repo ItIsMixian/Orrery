@@ -250,3 +250,22 @@ Required evidence:
 
 ADR acceptance does not mark any implementation or release item PASS. W7.3 remains Pending until reproducible product
 and Browser evidence is recorded.
+
+## 2026-08-30 preview-first and legacy-recovery contract
+
+Governing sources:
+
+- [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md)
+- [Approved Fallback Design](../design/elkjs-cutover-and-explicit-legacy-fallback.md)
+
+Current evidence gate:
+
+- GX2 alone may write; product/vendor/package/default changes remain zero;
+- all existing W7.3 dirty files and handwritten layout code remain present and recoverable;
+- GX2 provides actual offline ELK HTML, geometry report, exact provenance and 1440/1280/390 screenshots;
+- the maintainer reviews the ELK result before any later product task-description version exists;
+- exact task-description acknowledgment and Git-private scope revision 13 precede continued experiment writes.
+
+Future product acceptance must additionally prove one shared semantic input for ELK and legacy engines, explicit
+local engine selection, persistent `旧版兼容布局` labeling, ledger-first ELK failure, no silent fallback and bounded
+legacy rendering without fact divergence. These future checks do not authorize product writes in revision 13.
