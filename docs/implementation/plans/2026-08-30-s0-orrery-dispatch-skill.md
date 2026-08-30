@@ -1,6 +1,6 @@
 # S0 Orrery Dispatch Skill
 
-Status: Planned; authority scope frozen before implementation
+Status: Implemented as an unreleased source Candidate
 
 Date: 2026-08-30
 
@@ -20,25 +20,25 @@ source and not the future full Orrery Conductor.
 
 ## Deliverables
 
-- [ ] `skills/orrery-dispatch/SKILL.md` with a narrow trigger for starting, splitting, assigning or materially
+- [x] `skills/orrery-dispatch/SKILL.md` with a narrow trigger for starting, splitting, assigning or materially
   rescoping an Orrery-managed task.
-- [ ] `skills/orrery-dispatch/agents/openai.yaml` with concise UI metadata and implicit invocation enabled.
-- [ ] No scripts, references, assets, service, database, schema or network dependency in S0.
+- [x] `skills/orrery-dispatch/agents/openai.yaml` with concise UI metadata and implicit invocation enabled.
+- [x] No scripts, references, assets, service, database, schema or network dependency in S0.
 
 ## Required workflow
 
-- [ ] Read the target repository's `AGENTS.md`, current control entrances, relevant State and active Plan before
+- [x] Read the target repository's `AGENTS.md`, current control entrances, relevant State and active Plan before
   dispatch work.
-- [ ] Require explicit user intent before creating a new task; discussion or an idea alone does not authorize it.
-- [ ] For a new task, author and commit the effective ADR／Approved Design／Plan／Pending Validation before task
+- [x] Require explicit user intent before creating a new task; discussion or an idea alone does not authorize it.
+- [x] For a new task, author and commit the effective ADR／Approved Design／Plan／Pending Validation before task
   creation. For a material mid-flight change, send stop-only first, then commit a dated Plan amendment and Pending
   Validation before sending new direction.
-- [ ] Present the authority commit to users as **任务说明版本**. Preserve the full Git commit SHA only in technical
+- [x] Present the authority commit to users as **任务说明版本**. Preserve the full Git commit SHA only in technical
   details and Agent-facing references.
-- [ ] Send the implementation Agent only task identity, code base, task-description version, exact authority paths,
+- [x] Send the implementation Agent only task identity, code base, task-description version, exact authority paths,
   execution configuration and hard safety boundary. Do not duplicate the requirements in the task message.
-- [ ] Require source-version acknowledgment and Git-private scope revision before first/resumed product writes.
-- [ ] Do not continuously wait, poll or reread the implementation task unless the user explicitly asks for monitoring.
+- [x] Require source-version acknowledgment and Git-private scope revision before first/resumed product writes.
+- [x] Do not continuously wait, poll or reread the implementation task unless the user explicitly asks for monitoring.
 
 ## Hard boundaries
 
@@ -57,7 +57,22 @@ source and not the future full Orrery Conductor.
 - Manual scenarios cover new task, mid-flight amendment, idea-only refusal, missing authority commit, dirty worktree,
   prompt/Plan mismatch and user-requested versus unsolicited monitoring.
 - Repository, integrated-installation, release/private-artifact and routed Fast gates pass.
-- Diff contains only the two Skill files plus required State／Validation／DEVLOG／index closeout.
+- Diff contains only the two Skill files, one generic validation mapping update and required
+  State／Validation／DEVLOG／index closeout.
 
 Implementation updates Release & Toolchain／Documentation System／Project Structure State, independent Validation,
 DEVLOG and indexes. Root PROGRESS／HANDOFF are updated only by the central integrator.
+
+## 2026-08-30 Maintainer Scope Amendment — Validation Routing
+
+The first routed Fast dry-run correctly refused `skills/orrery-dispatch/**` as an unmapped path. Amendment task-description
+version `b5bc33c3265733d13d2bc227a9777b07c615668d` was read from the central authority chain before the mapping write.
+
+- [x] Add `skills/orrery-dispatch/**` to the existing generic `release-packaging` path mapping in
+  `scripts/ci/change-mapping.json`; no task-ID or branch-specific router logic was added.
+- [x] Refresh the Git-private Workstream to scope revision 2 before modifying the mapping.
+- [x] Re-run route dry-run with zero unknown paths／expected writes, then pass the selected formal Fast tier.
+- [x] Keep the existing Fast／Checkpoint budgets, test IDs, stage authority and Promotion coverage unchanged.
+
+This is validation metadata for an existing release/toolchain surface. It does not add a third Skill resource, change
+the Skill behavior, authorize packaging or require a new ADR.

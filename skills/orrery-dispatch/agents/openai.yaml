@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orrery Dispatch"
+  short_description: "Create authority-first Orrery task handoffs"
+  default_prompt: "Use $orrery-dispatch to prepare and hand off an Orrery-managed task from committed authority documents."

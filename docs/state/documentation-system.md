@@ -8,6 +8,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 - Orrery 已用自身权威链管理本仓库。Agent 入口为根 `AGENTS.md`；维护者入口为 `docs/PROGRESS.md`、`docs/HANDOFF.md` 与本地 Observatory。
 - ADR-0018 已把 authority-first 分发纳入权威链：首次任务和中途实质变更都必须先形成并提交 Plan／dated amendment 与 Pending Validation，必要时先完成 ADR／Approved Design；task transcript 只传 exact SHA／路径并不承担作者文档职责。U2.3 与 W7.3 是第一批按此规则补录的在途任务。
+- S0 `orrery-dispatch` Skill Candidate 只把上述作者流程翻译为宿主操作：读取目标权威链、提交任务说明版本、发送 SHA／paths 并等待 scope acknowledgment。它不新增作者文档角色，不把 transcript 升级为事实，也不取代目标项目 `AGENTS.md`。
 - Seed、ADR、Approved Design、Implementation Plan、State、Validation、Snapshot、Library 与派生视图职责分离。Authority Meta Model 定义角色与语义；Product Seed 只约束 Orrery 自身目标。
 - 文档事实显式区分 Canonical、Candidate、Worktree、Local-only、Historical 与 Unknown。普通功能分支只同步受影响 subsystem State／Plan／Validation／DEVLOG；根 PROGRESS／HANDOFF 由唯一整合者在合流阶段维护。
 - PROGRESS 与 HANDOFF 是当前控制入口，不是历史总账。SC1 已把 CI5、R3、W7D 等 post-main 事实从 Candidate／pending 表述收口为 Canonical，并把历史运行细节留在 DEVLOG／Validation。
@@ -56,6 +57,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [Authority-first Dispatch Plan](../implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)
 - [Authority-first Dispatch Contract](../validation/2026-08-30-authority-first-workstream-dispatch.md)
+- [S0 Orrery Dispatch Skill Validation](../validation/2026-08-30-s0-orrery-dispatch-skill.md)
 
 ## 已知缺口
 
@@ -68,4 +70,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
 - W7.3 relation capture inbox、gate-aware dependency confirmation、human integrator 管理与自动 mechanical `derived_from` 尚未实现；观测台仍只投影已经存在的关系证据。
 - authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
+- `orrery-dispatch` 仍是未安装／未发布的 Codex Skill source Candidate；它只能指导宿主遵守流程，不能机械阻断绕过 Skill 的写入。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。
