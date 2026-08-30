@@ -13,7 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
-- [2026-08-30 PO1 Provisional Decision Allocation Enforcement](2026-08-30-po-decision-allocation-enforcement.md) — Pending contract for dispatch-level PO enforcement and merged-tree duplicate numeric ADR refusal; A4 renumbering remains an integration action.
+- [2026-08-30 PO1 Provisional Decision Allocation Enforcement](2026-08-30-po-decision-allocation-enforcement.md) — validates dispatch-level PO enforcement and merged-tree duplicate numeric ADR refusal; A4 renumbering remains an integration action.
 - [2026-08-30 S0 Orrery Dispatch Skill](2026-08-30-s0-orrery-dispatch-skill.md) — validates the two-file authority handoff source Candidate, compact task-description version wording and negative authority/monitoring boundaries without installation or release claims.
 - [2026-08-30 Authority-first Workstream Dispatch Decision Contract](2026-08-30-authority-first-workstream-dispatch.md) — docs/process PASS for ADR-0018 and existing author roles; automated receipts and first-write enforcement are not implemented.
 - [2026-08-30 U2.3 Navigation & Live Task Visibility](2026-08-30-u2-3-navigation-live-task-visibility.md) — Pending acceptance contract authored before resumed implementation; no U2.3 behavior is yet claimed.

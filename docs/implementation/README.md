@@ -14,7 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
-- [2026-08-30 PO1 Provisional Decision Allocation Enforcement](plans/2026-08-30-po-decision-allocation-enforcement.md) — planned enforcement of ADR-0007 PO IDs in dispatch plus duplicate numeric ADR repository refusal; A4 is normalized to ADR-0019 only during integration.
+- [2026-08-30 PO1 Provisional Decision Allocation Enforcement](plans/2026-08-30-po-decision-allocation-enforcement.md) — dispatch-level ADR-0007 PO enforcement and duplicate numeric ADR repository refusal implemented as Candidate; A4 normalization to ADR-0019 remains an integration action.
 - [2026-08-30 S0 Orrery Dispatch Skill](plans/2026-08-30-s0-orrery-dispatch-skill.md) — implemented two-file source Candidate for authority-first task creation and rescoping; not installed/released and not the future Conductor.
 - [2026-08-30 Authority-first Workstream Dispatch](plans/2026-08-30-authority-first-workstream-dispatch.md) — manual authority-before-dispatch process is active under ADR-0018; versioned Git-private receipt and first-write product enforcement remain planned.
 - [2026-08-30 U2.3 Navigation, Help Surface & Live Task Visibility](plans/2026-08-30-u2-3-navigation-live-task-visibility.md) — frozen authority scope for the final shell/navigation cleanup and lightweight all-active-task projection; implementation resumes only after exact authority-SHA acknowledgment.

@@ -17,12 +17,12 @@ Updated: 2026-08-30
 - ADR-0017 与 Approved Relation Capture Design 已接受：mechanical `derived_from` 可自动写入，`depends_on` 必须按 implementation／validation／integration／release gate 由相应人类角色确认，`absorbs` 只由 human integrator 确认。W7.3 尚未实现，不能把这些规则写成当前产品能力。
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：Workstream 创建或实质范围追加前，中央先提交 ADR／Design／Plan amendment／Pending Validation；任务消息只引用 exact authority SHA 与 paths。U2.3／W7.3 已在安全边界暂停，待读取本提交并登记 scope revision 后恢复。自动 receipt 与 first-write enforcement 尚未实现。
 - S0 `orrery-dispatch` source Candidate `9294902` 已本地集成，只包含 `SKILL.md`／`agents/openai.yaml`。首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping；Fast 44/44 与本地门通过。它未安装、未发布，也不改变 v0.2.0／v0.3.0 或未来 S1 Conductor 状态。
-- A4 Candidate 与中央 authority-first 都曾使用 `ADR-0018`。根因是 ADR-0007 的 PO 规则没有进入 dispatch Skill／机械 gate，且中央分配时只看当前树。当前 integration line 保留 authority-first `ADR-0018`；A4 在 U2.3 后续集成时规范化为 `ADR-0019`，在此之前不得合入两个同号文件。
+- A4 Candidate 与中央 authority-first 都曾使用 `ADR-0018`。根因是 ADR-0007 的 PO 规则此前没有进入 dispatch Skill／机械 gate，且中央分配时只看当前树。PO1 `93ddfb7` 已本地集成 enforcement；当前线保留 authority-first `ADR-0018`，A4 在 U2.3 后续集成时规范化为 `ADR-0019`，在此之前不得合入两个同号文件。
 
 ## 当前可继续的线路
 
 1. **S0 Orrery Dispatch Skill：** 两文件 source Candidate 已本地集成。后续只有独立 Release Plan 才能安装／打包／发布它；不得把 source presence 写成用户已经可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
-2. **PO1 decision allocation：** 先补 `orrery-dispatch` PO 规则与 duplicate-number gate；完成后只把 Skill 安装到本机。A4→ADR-0019 是后续 U2.3/A4 中央集成步骤，不在 PO1 source Candidate 中冒充完成。
+2. **PO1 decision allocation：** Skill PO 规则与 duplicate-number gate 已本地集成；下一步只把更新后的 Skill 安装到本机。A4→ADR-0019 是后续 U2.3/A4 中央集成步骤，仍未完成。
 3. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
 4. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
 5. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。

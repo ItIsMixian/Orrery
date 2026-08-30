@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-30 — PO1 Decision Allocation Enforcement Candidate
+
+- 从任务说明版本 `da348b9` 建立独立 PO1 worktree 与 Git-private Scope。`orrery-dispatch` 现要求非显式唯一 integration worktree 使用 `PO-DEC-*` Proposed 文件，并明确 branch name／局部“next number”不产生正式编号权限。
+- `validate_repository_gates.py` 新增 current-tree numeric ADR 唯一性检查；`0000` 模板／历史和 proposals 不参与。synthetic unique/proposal/0000 fixture 通过，duplicate `0018` 稳定拒绝；没有 peer scan、号码服务、task-specific branch 或新 unittest ID。
+- Skill quick validation、current repository gate、44-test Fast dry-run 与正式 Fast 44/44 通过，integrated-installation 保持有效。A4→ADR-0019 继续留给 U2.3/A4 中央集成；PO1 不改 A4 产品、不安装 Skill、不修改任何 release/public/remote 状态。
+
 ## 2026-08-30 — PO1 Decision Allocation Failure & Authority Amendments
 
 - 只读核对确认 ADR-0007／Approved Collaboration Design 已明确要求并发非集成分支使用 `PO-DEC-*`，但该规则没有进入任务分发 Skill，也没有 merged-tree duplicate numeric gate。A4 因此在隔离 Candidate 中直接分配 `ADR-0018`；中央随后只检查当前 integration tree，又把同号分配给 authority-first dispatch。

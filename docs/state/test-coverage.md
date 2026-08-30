@@ -27,6 +27,7 @@ Updated: 2026-08-30
 - U2.2 用既有 owner tests 固定单一连续侧栏、15-entry/8-row Maintenance 队列、四类筛选、eligible/zero-eligible、折叠 policy/history 和移动紧凑行；隔离 Fast 34/34、Checkpoint 40/40 与三档浏览器通过。与 W7.2.3 合流后，联合 Fast 38/38 与真实 1440/390px 页面通过；联合 Checkpoint 的 44 项在既有 Maintenance real-Git fixture 上达到固定 90 秒预算，因此未声明 evidence-eligible PASS。
 - S0 `orrery-dispatch` 使用 `skill-creator` quick validator 检查 frontmatter、名称与 scaffold placeholder；文件 inventory 固定为 `SKILL.md`／`agents/openai.yaml` 两项。该结构门不证明宿主级 first-write enforcement、实际 task creation 或公开安装兼容性。
 - S0 首轮 Fast dry-run 对未登记的新 Skill 路径失败关闭；任务说明 amendment 后只把 `skills/orrery-dispatch/**` 加入 generic `release-packaging` mapping。最终 dry-run 为 44 tests／0 unknown，正式 Fast 44/44 在 15 秒预算内通过；test IDs、budgets、stage authority 与 Promotion coverage 不变。
+- PO1 扩展 repository gate：当前树 numeric ADR 编号必须唯一，`0000` 模板／历史和 `docs/decisions/proposals/` 不参与正式编号分配。函数级 synthetic fixture 验证 unique/proposal/0000 通过、duplicate `0018` 拒绝；没有新增 unittest ID 或改变 CI tier inventory。
 
 ## 覆盖面
 
@@ -52,6 +53,7 @@ Updated: 2026-08-30
 - [Validation 索引](../validation/README.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [S0 Orrery Dispatch Skill](../validation/2026-08-30-s0-orrery-dispatch-skill.md)
+- [PO1 Decision Allocation Enforcement](../validation/2026-08-30-po-decision-allocation-enforcement.md)
 - [U2 Unified Observatory Production Integration](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 Unified Observatory UX Acceptance Fixes](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)

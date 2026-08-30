@@ -23,6 +23,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
 - Unified Observatory 已有本地 W7.2.3／U2.2 joint acceptance Candidate，提供单一连续中文导航、全局 stop、密集 Maintenance、旧证据降级与 W7.1 legacy/archive graph 的最终展示修正。仍没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
 - S0 新增未发布 `skills/orrery-dispatch/` source Candidate，只包含 `SKILL.md` 与 `agents/openai.yaml`。它把 ADR-0018 的 authority handoff 投影为 Codex Skill 指令，面向用户称“任务说明版本”；没有 script／asset／reference／service／schema／network，也未进入当前 `project-orrery` Skill、installer、release manifest 或 v0.3.0 范围。
+- PO1 在同一 `SKILL.md` 内补充 ADR-0007 PO allocation；仍无新 Skill 文件或发布资产。当前 source 尚未复制到本机 Codex home，local-only install 由中央整合后单独验证。
 
 ## CI 与推广门
 

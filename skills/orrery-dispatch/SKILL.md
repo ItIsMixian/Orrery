@@ -15,7 +15,11 @@ Create a task reference, not a second copy of its requirements.
    this later” does not authorize task creation.
 3. For a new task, write the effective ADR and Approved Design when required, plus an Implementation Plan and Pending
    Validation. For a material mid-flight change, send only an immediate stop instruction, then write a dated Plan
-   amendment and update Pending Validation.
+   amendment and update Pending Validation. For a new decision outside the explicitly identified unique integration
+   worktree, use a stable
+   `PO-DEC-<task-id>-<slug>` proposal under `docs/decisions/proposals/`; do not allocate a numeric ADR. A branch name or
+   locally observed “next number” does not grant integrator authority. The integrator allocates and relinks the next
+   free numeric ADR against the current integration index.
 4. Commit the authority-only change before task creation or resumption. Call this commit the **任务说明版本** in
    user-facing text; keep its full Git commit SHA in technical details.
 5. Create or continue the task using the host's task tool when available. Preserve the target project's worktree,
