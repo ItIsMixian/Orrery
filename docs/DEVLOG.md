@@ -1,5 +1,10 @@
 # 开发日志
 
+## 2026-08-30 — GX1 External Graph Skill Evaluation Authorized
+
+- 维护者授权独立分支评测 GitHub `fireworks-tech-graph`，先验证其对 Orrery graph-native series/dependency 与 4+ 冲突 routing 的理解和几何质量，再决定替代、辅助、选择性合并或拒绝；不直接覆盖 W7.3。
+- 新增 GX1 Plan/Pending Validation：固定两套 fixture、0–12 rubric、两轮无改进停止条件、本地安装/渲染/Browser/geometry evidence 和 zero-product-diff 边界。第三方 Skill/产物保持非权威，不访问外部模型或上传项目数据。
+
 ## 2026-08-30 — W7.3 Graph UX Acceptance Rejected
 
 - 维护者在真实 W7.3 Candidate 页面复验后拒绝 Graph UX：实现把 series 关系放到画布外卡片，把 comparison 建议铺成图下大面积卡片墙；这没有满足“在图中体现关系”。旧中央页面的冲突线路也继续重叠，不能以 Candidate 另有空冲突态掩盖路由缺陷。

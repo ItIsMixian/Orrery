@@ -23,17 +23,18 @@ Updated: 2026-08-30
 
 ## 当前可继续的线路
 
-1. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
-2. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
-3. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
-4. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
-5. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。
-6. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
-7. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
-8. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
-9. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-10. **W7.3 relation capture：** `5fee848` 的 Core/capture/authority evidence 保留，但维护者拒绝 Graph UX：独立系列卡片和图下 comparison card wall 不能替代图内关系，冲突线路不得重叠成共用脊柱。原 W7.3 任务按最新 Plan amendment 修正，未通过前不得中央集成。
-11. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
+1. **GX1 external graph Skill evaluation：** 在独立 branch/worktree 用真实关系与多冲突 fixture 评测 `fireworks-tech-graph`；不得修改 W7.3。完成后由维护者选择 replace／assist／selective merge／reject。
+2. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
+3. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
+4. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
+5. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
+6. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。
+7. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
+8. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
+9. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
+10. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
+11. **W7.3 relation capture：** `5fee848` 的 Core/capture/authority evidence 保留，但维护者拒绝 Graph UX：独立系列卡片和图下 comparison card wall 不能替代图内关系，冲突线路不得重叠成共用脊柱。原 W7.3 任务按最新 Plan amendment 修正，未通过前不得中央集成。
+12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 
 ## 不得外推的边界
 

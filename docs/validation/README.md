@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-30 GX1 Fireworks Tech Graph Evaluation](2026-08-30-gx1-fireworks-graph-skill-evaluation.md) — Pending isolated evaluation of the external Skill; generated diagrams remain non-authoritative and cannot modify W7.3.
 - [2026-08-30 PO1 Provisional Decision Allocation Enforcement](2026-08-30-po-decision-allocation-enforcement.md) — validates dispatch-level PO enforcement, duplicate numeric ADR refusal and canonical local A4 allocation as ADR-0019.
 - [2026-08-30 S0 Orrery Dispatch Skill](2026-08-30-s0-orrery-dispatch-skill.md) — validates the two-file authority handoff source Candidate, compact task-description version wording and negative authority/monitoring boundaries without installation or release claims.
 - [2026-08-30 Authority-first Workstream Dispatch Decision Contract](2026-08-30-authority-first-workstream-dispatch.md) — docs/process PASS for ADR-0018 and existing author roles; automated receipts and first-write enforcement are not implemented.
