@@ -100,6 +100,10 @@ class UnifiedRegistrationTests(unittest.TestCase):
             mode="static",
         )
         self.assertIn('data-unified-navigation', page)
+        self.assertEqual(page.count('<aside class="sidebar" data-unified-sidebar'), 1)
+        self.assertEqual(page.count('data-sidebar-scroll-container'), 1)
+        self.assertEqual(page.count('data-project-document-tree'), 1)
+        self.assertLess(page.index('data-unified-navigation'), page.index('data-project-document-tree'))
         self.assertIn('data-mode="static"', page)
         self.assertIn("无服务、无 cookie、无控制能力", page)
         self.assertNotIn("/api/v1/shell/stop", page)
@@ -183,6 +187,10 @@ class UnifiedRuntimeTests(unittest.TestCase):
         ):
             self.assertIn(marker, text)
         self.assertIn("--bg:#0f1115", text)
+        self.assertEqual(text.count('<aside class="sidebar"'), 1)
+        self.assertEqual(text.count('data-sidebar-scroll-container'), 1)
+        self.assertEqual(text.count('data-project-document-tree'), 1)
+        self.assertNotIn('.uo-doc-tree{overflow', text)
         self.assertIn("data-nav-identity=\"overview\"", text)
         targets = {"overview": "overview", "personal": "personal-observatory", "team": "team-observatory", "workstreams": "workstream-relation-graph", "maintenance": "workspace-maintenance"}
         for identity, label in {
@@ -205,6 +213,13 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertIn('data-maintenance-refresh-path="/refresh"', text)
         self.assertIn('data-maintenance-remove-path="/remove-worktree"', text)
         self.assertIn('data-maintenance-reload-after-action="false"', text)
+        maintenance_start = text.index('id="workspace-maintenance"')
+        maintenance_header_end = text.index('</header>', maintenance_start)
+        self.assertLess(text.index('data-maintenance-scan', maintenance_start), maintenance_header_end)
+        self.assertNotIn('<div class="mo-actions">', text[maintenance_start:])
+        self.assertIn('>刷新工作区状态</button>', text[maintenance_start:])
+        self.assertIn('data-maintenance-page-size="8"', text[maintenance_start:])
+        self.assertIn('<summary>技术策略详情</summary>', text[maintenance_start:])
         ask = next(
             item for item in self.server.state.registrations
             if item.consumer_id == "ask-docs"

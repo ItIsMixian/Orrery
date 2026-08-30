@@ -4,6 +4,7 @@ import json
 import http.client
 import importlib.util
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -51,6 +52,9 @@ from project_orrery_core.review import (  # noqa: E402
 )
 from project_orrery_core.workspace_cleanup import compute_workspace_cleanup_eligibility  # noqa: E402
 import project_orrery_core.workspace_cleanup as workspace_cleanup  # noqa: E402
+from project_orrery_observatory.personal_observatory import (  # noqa: E402
+    render_maintenance_control_document,
+)
 from tests.fixtures.collaboration.git_fixture import CollaborationGitFixture  # noqa: E402
 
 
@@ -169,6 +173,71 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
                     "shell": "forbidden",
                 }
             )
+
+        entries = []
+        for index in range(15):
+            eligible = index in {10, 11}
+            attention = index < 10
+            entries.append(
+                {
+                    "workspace_id": f"workspace-{index:024d}",
+                    "registered_path": f"C:/fixture/worktree-{index:02d}",
+                    "branch": f"refs/heads/codex/U2-fixture-{index:02d}",
+                    "head": f"{index:040x}",
+                    "classification": (
+                        "integrated-closed" if eligible else
+                        "review-integration-pending" if attention else
+                        "registered-active"
+                    ),
+                    "cache_state": "current",
+                    "remove_worktree_eligible": eligible,
+                    "is_primary_worktree": index == 14,
+                    "reasons": [] if eligible else [
+                        "review-or-integration-is-pending" if attention else "workstream-is-active"
+                    ],
+                    "unknown": [],
+                    "scanned_at": "2026-08-29T12:00:00Z",
+                }
+            )
+        maintenance = {
+            "status": "ready",
+            "cache": {"status": "current", "entries": entries},
+            "last_run": {"counts": {"worktrees": 15}},
+            "background_refresh": {"status": "idle"},
+            "policy": DEFAULT_POLICY,
+            "protected_reasons": {"review-or-integration-is-pending": 10},
+            "historical_evidence_warnings": [{"message": "legacy fixture"}],
+            "local_branch_reminders": [],
+            "receipts": [],
+        }
+        page = render_maintenance_control_document(maintenance)
+        self.assertEqual(page.count('class="mo-row"'), 15)
+        self.assertEqual(
+            len(re.findall(r'<div class="mo-row"[^>]*data-maintenance-view-state="attention"', page)),
+            10,
+        )
+        self.assertEqual(page.count('data-maintenance-view-state="attention" hidden'), 2)
+        self.assertEqual(page.count('data-maintenance-preflight="'), 2)
+        self.assertIn('data-maintenance-page-size="8"', page)
+        for value in ("attention", "eligible", "protected", "all"):
+            self.assertIn(f'data-maintenance-filter="{value}"', page)
+        self.assertIn('>刷新工作区状态</button>', page)
+        self.assertNotIn('<div class="mo-actions">', page)
+        self.assertIn('<details class="mo-technical"><summary>技术策略详情</summary>', page)
+        self.assertIn('<dt>workspace_id</dt>', page)
+        self.assertIn('data-maintenance-historical-warning', page)
+        self.assertIn('只有合格行提供“安全删除”', page)
+        self.assertEqual(page.count("已满足当前安全删除条件"), 3)  # two rows plus dynamic renderer
+
+        zero_eligible = dict(maintenance)
+        zero_eligible["cache"] = {
+            "status": "current",
+            "entries": [{**entry, "remove_worktree_eligible": False} for entry in entries],
+        }
+        zero_page = render_maintenance_control_document(zero_eligible)
+        self.assertNotIn('data-maintenance-preflight="', zero_page)
+        self.assertIn("目前没有可安全删除项", zero_page)
+        self.assertIn("主要保护原因", zero_page)
 
     def test_minimal_git_incremental_refresh_and_target_preflight_checkpoint(self) -> None:
         with CollaborationGitFixture() as fixture:

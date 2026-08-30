@@ -174,6 +174,12 @@ SHELL_CSS = r"""
 .uo-boundary{list-style:none;margin:0;padding:0}.uo-boundary li{padding:9px 0;border-bottom:1px solid var(--line);font-size:11.5px}.uo-boundary li:last-child{border-bottom:0}.uo-boundary b{display:block}.uo-boundary span{color:var(--mut)}
 .uo-authority dl{display:grid;grid-template-columns:140px 1fr;gap:7px 12px;margin:14px 0}.uo-authority dt{color:var(--mut);font-size:11px}.uo-authority dd{margin:0;font:12px/1.5 "Cascadia Code",Consolas,monospace;overflow-wrap:anywhere}
 .uo-unavailable{border-left:3px solid var(--warn)}
+.toc:empty{display:none}
+.sidebar[data-unified-sidebar]{overscroll-behavior:contain;scrollbar-gutter:stable}.uo-rail{display:block;min-width:0}
+.uo-app-nav{padding-bottom:8px;margin-bottom:5px}.uo-app-nav .nav-title{padding-top:4px}.uo-app-nav .nav-item{min-height:32px}
+.uo-documents{margin:0;padding-top:5px;border-top:1px solid var(--line)}.uo-documents>.nav-title{padding-top:9px}
+.uo-documents:not(.expanded)>.uo-doc-tree{display:none}.uo-doc-tree{min-width:0}.uo-doc-tree>.nav-group{margin-left:0}
+.uo-doc-tree>.nav-group>.nav-title{padding-left:10px}.uo-documents>.nav-title .nav-chev{transition:transform .12s ease}
 .uo-mobile-toggle{display:none}.uo-backdrop{display:none}
 @media(max-width:820px){
  .uo-mobile-toggle{display:inline-grid;place-items:center}.sidebar{display:none!important}.sidebar-resizer{display:none!important}
@@ -182,7 +188,7 @@ SHELL_CSS = r"""
  .content{padding:0 18px}.uo-grid{grid-template-columns:1fr}.uo-caps{grid-template-columns:1fr}.top .sub{display:none}#q{width:min(42vw,190px)}
 }
 @media(max-width:460px){header.top{gap:6px;padding:0 8px}.top h1{max-width:82px;overflow:hidden;text-overflow:ellipsis}.rightgrp{gap:5px}.tbtn{padding:6px 7px}#q{display:none}.uo-stop-global{font-size:10px}.uo-authority dl{grid-template-columns:1fr}.page{padding-top:20px}}
-@media(prefers-reduced-motion:reduce){.uo-panel *{transition:none!important;scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){.uo-panel *,.uo-documents>.nav-title .nav-chev{transition:none!important;scroll-behavior:auto!important}}
 """
 
 
@@ -192,6 +198,7 @@ SHELL_JS = r"""
  function nav(open){document.body.classList.toggle('uo-nav-open',open);if(toggle)toggle.setAttribute('aria-expanded',open?'true':'false')}
  if(toggle)toggle.addEventListener('click',()=>nav(!document.body.classList.contains('uo-nav-open')));
  if(backdrop)backdrop.addEventListener('click',()=>nav(false));
+ const documents=document.querySelector('[data-project-documents-toggle]');if(documents)documents.addEventListener('click',()=>{const group=documents.closest('[data-project-documents]');requestAnimationFrame(()=>documents.setAttribute('aria-expanded',group&&group.classList.contains('expanded')?'true':'false'))});
  document.addEventListener('click',event=>{if(event.target.closest('.nav-item')&&window.innerWidth<=820)nav(false)});
  const ask=document.querySelector('[data-uo-open-ask]');if(ask)ask.addEventListener('click',()=>{if(typeof qaToggle==='function')qaToggle()});
  const stop=document.querySelector('[data-uo-stop]');if(stop)stop.addEventListener('click',async()=>{
@@ -207,6 +214,7 @@ SHELL_STATIC_JS = r"""
  function nav(open){document.body.classList.toggle('uo-nav-open',open);if(toggle)toggle.setAttribute('aria-expanded',open?'true':'false')}
  if(toggle)toggle.addEventListener('click',()=>nav(!document.body.classList.contains('uo-nav-open')));
  if(backdrop)backdrop.addEventListener('click',()=>nav(false));
+ const documents=document.querySelector('[data-project-documents-toggle]');if(documents)documents.addEventListener('click',()=>{const group=documents.closest('[data-project-documents]');requestAnimationFrame(()=>documents.setAttribute('aria-expanded',group&&group.classList.contains('expanded')?'true':'false'))});
  document.addEventListener('click',event=>{if(event.target.closest('.nav-item')&&window.innerWidth<=820)nav(false)});
 })();
 """
@@ -326,7 +334,7 @@ def inject_unified_shell(
             f'<span class="dot {dot}"></span><span class="lbl">{label}</span></a>'
         )
     unified_nav = (
-        '<div class="nav-group expanded" data-unified-navigation><div class="nav-title nogrp">'
+        '<div class="nav-group expanded uo-app-nav" data-unified-navigation><div class="nav-title nogrp">'
         '<span class="nav-icon">◉</span><span class="nav-gname">Orrery</span></div>'
         f'<div class="nav-items">{"".join(links)}</div></div>'
     )
@@ -355,8 +363,32 @@ def inject_unified_shell(
         count=1,
         flags=re.DOTALL,
     )
+    def compose_sidebar(match: re.Match[str]) -> str:
+        top, document_tree = match.group(1), match.group(2)
+        documents = (
+            '<div class="nav-group expanded uo-documents" data-project-documents>'
+            '<div class="nav-title" data-project-documents-toggle aria-expanded="true">'
+            '<span class="nav-icon">▤</span><span class="nav-gname">项目文档</span>'
+            '<span class="nav-chev">▾</span></div>'
+            f'<div class="uo-doc-tree" data-project-document-tree>{document_tree}</div></div>'
+        )
+        return top + '<div class="uo-rail">' + unified_nav + documents + '</div>'
+
+    page, sidebar_count = re.subn(
+        r'(<div class="nav-top">.*?</div>)(.*?)(?=</aside>(?:<div class="sidebar-resizer"|<main))',
+        compose_sidebar,
+        page,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if sidebar_count != 1:
+        raise ValueError("base docsite sidebar composition marker is missing")
     result = page.replace("</style>", SHELL_CSS + "</style>", 1)
-    result = result.replace(nav_marker, nav_marker + unified_nav, 1)
+    result = result.replace(
+        '<aside class="sidebar">',
+        '<aside class="sidebar" data-unified-sidebar data-sidebar-scroll-container>',
+        1,
+    )
     result = result.replace(content_marker, "".join(pages) + content_marker, 1)
     result = result.replace(
         '<div class="rightgrp">',
