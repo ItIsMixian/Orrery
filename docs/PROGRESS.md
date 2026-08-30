@@ -33,7 +33,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：先实现只有 `SKILL.md` 与 `agents/openai.yaml` 的 authority-handoff Skill；使用“任务说明版本”面向用户，不扩成 S1 Conductor，也不进入公开 Release。
+- [ ] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 Skill 已进入独立 Workstream；首次 Fast dry-run 因新 Skill 路径未映射而正确拒绝，待 Agent 确认本 amendment 后只补 generic `release-packaging` mapping，不扩成 S1 Conductor 或公开 Release。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
 - [ ] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航／help 收口与轻量全活动任务投影的权威范围已冻结；Agent 确认本 authority baseline 后恢复实现。
 - [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：ADR-0017 与 Approved Design 已接受；任务系列、状态 taxonomy、comparison／conflict amendment 已写入 Plan，Agent 确认本 authority baseline 后恢复实现。Agent／Harness／Conductor 只可建议，任务 owner／human integrator 按 gate 确认。

@@ -5,6 +5,7 @@
 - 维护者批准先做极简调度 Skill，并接受面向用户使用“任务说明版本”、只在技术详情保留完整 Git SHA。S0 由 ADR-0018／ADR-0017 与既有 Approved Design 约束，不新增权限决策。
 - 冻结两文件实现范围：`skills/orrery-dispatch/SKILL.md` 与 `agents/openai.yaml`；无 script／reference／asset／service／schema／network。它只完成 authority handoff，不修改现有安装 Skill，也不冒充未来独立 S1 Conductor。
 - Pending Validation 在产品写入前创建；后续实现必须从本 authority commit 建立独立 Workstream，并在完成后同步受影响 State／Validation／DEVLOG／index。本基线不证明 Skill 已实现、安装或发布。
+- S0 首次 Fast dry-run 对两个新 Skill 路径与 expected writes 失败关闭；中央没有顺手修改 CI，而是先追加并提交 dated Plan amendment，只允许把 `skills/orrery-dispatch/**` 纳入既有 generic `release-packaging` mapping，保持测试 ID／预算／阶段权限／Promotion 覆盖不变。
 
 ## 2026-08-30 — ADR-0018 Authority-first Workstream Dispatch
 

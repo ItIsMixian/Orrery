@@ -19,7 +19,7 @@ Updated: 2026-08-30
 
 ## 当前可继续的线路
 
-1. **S0 Orrery Dispatch Skill：** 已冻结两文件 Plan／Pending Validation；下一步从本任务说明版本建立独立 Workstream，只实现 authority handoff，不实现 S1 Conductor、自动 receipt 或首次写入阻断。
+1. **S0 Orrery Dispatch Skill：** 两文件 source 已写入独立 Workstream，标准 Skill 校验通过；首次 Fast dry-run 因 `skills/orrery-dispatch/**` 未映射而正确失败关闭。新的 Plan amendment 只授权扩展 generic `release-packaging` mapping；Agent 确认任务说明版本后恢复，不实现 S1 Conductor、自动 receipt 或首次写入阻断。
 2. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
 3. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
 4. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。

@@ -13,6 +13,8 @@ Authority source: [S0 Plan](../implementation/plans/2026-08-30-s0-orrery-dispatc
 - `skill-creator` quick validation;
 - behavior review for new-task and mid-flight amendment flows;
 - negative review for transcript authority, implicit task creation, automatic approval and unsolicited monitoring;
+- change-router evidence that `skills/orrery-dispatch/**` maps generically to `release-packaging` with zero unknown
+  path/expected-write refusal and no task-specific routing branch;
 - repository, integrated-installation, release/private-artifact and routed Fast results.
 
 No item is PASS until the implementation and reproducible evidence are recorded. This file does not prove that the

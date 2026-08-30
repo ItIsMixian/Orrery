@@ -57,7 +57,22 @@ source and not the future full Orrery Conductor.
 - Manual scenarios cover new task, mid-flight amendment, idea-only refusal, missing authority commit, dirty worktree,
   prompt/Plan mismatch and user-requested versus unsolicited monitoring.
 - Repository, integrated-installation, release/private-artifact and routed Fast gates pass.
-- Diff contains only the two Skill files plus required State／Validation／DEVLOG／index closeout.
+- Diff contains only the two Skill files, one generic validation mapping update and required
+  State／Validation／DEVLOG／index closeout.
 
 Implementation updates Release & Toolchain／Documentation System／Project Structure State, independent Validation,
 DEVLOG and indexes. Root PROGRESS／HANDOFF are updated only by the central integrator.
+
+## 2026-08-30 Maintainer Scope Amendment — Validation Routing
+
+The first routed Fast dry-run correctly refused `skills/orrery-dispatch/**` as an unmapped path. S0 remains paused
+until this amendment is committed and acknowledged.
+
+- [ ] Add `skills/orrery-dispatch/**` to the existing generic `release-packaging` path mapping in
+  `scripts/ci/change-mapping.json`; do not add task-ID or branch-specific router logic.
+- [ ] Refresh the Git-private Workstream scope revision before modifying the mapping.
+- [ ] Re-run route dry-run and require zero unknown paths／expected writes, then run the selected formal tier.
+- [ ] Keep the existing Fast／Checkpoint budgets, test IDs, stage authority and Promotion coverage unchanged.
+
+This is validation metadata for an existing release/toolchain surface. It does not add a third Skill resource, change
+the Skill behavior, authorize packaging or require a new ADR.
