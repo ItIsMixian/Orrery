@@ -118,3 +118,28 @@ Required evidence:
 
 This gate remains visual/Pending until the maintainer accepts the real page. Focused tests may support iteration; no
 routed Fast/Checkpoint may run before that acceptance.
+
+## 2026-08-30 component-local layout correction
+
+The global-rank interpretation is rejected. Required evidence now additionally proves:
+
+- horizontal rank is computed per relation-connected component, explicit series lane or accepted phase lane, with a
+  separate rank origin for each disconnected component;
+- incomparable nodes stack only within their local rank domain; disconnected roots are not collected into one global
+  x-column;
+- after local layout, independent component blocks are packed deterministically in two dimensions, with at least two
+  occupied block columns for a four-component fixture at both 1440px and 1280px;
+- A/CI/U series remain compact horizontal rows and W5/W6/W7 remain distinct phase blocks; block proximity never creates
+  chronology or a semantic edge;
+- a bundle belongs to one common endpoint and one source/destination block pair; cross-phase targets split by block or
+  use dedicated boundary channels;
+- no full-height global route bus spans unrelated series/program regions, no route crosses an unrelated block, and
+  block/route/card/label geometry remains readable without brittle exact-coordinate assertions;
+- the mechanical pipeline is membership → eligible folding → component partition → local rank → local layout → 2D
+  block packing → block-pair bundle routing → labels/selection;
+- a real default-100% screenshot shows multiple compact blocks/rows in the first viewport rather than one tall column;
+- exact corrected task-description acknowledgment and Git-private scope revision 7 precede resumed product writes.
+
+The prior partial-order, history eligibility, 30%–200% semantic invariance and visual-acceptance requirements remain
+in force. Focused layout tests may support iteration; routed Fast/Checkpoint remain blocked until maintainer screenshot
+acceptance.

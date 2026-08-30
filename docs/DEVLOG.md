@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Global-rank Layout Correction
+
+- 中央先前把“互不可达任务同 rank”写成了可被全图执行的规则，W7.3 因而把大量独立 component 根节点压入
+  全局 rank 0，形成单一超长竖列和贯穿 series/program 区域的共享总线；维护者拒绝该真实页面，本次明确记录为
+  authority/layout 说明错误，不归因于节点数量或缩放。
+- Plan/Validation 现改为 component／explicit series／accepted phase 内局部 rank，随后将独立区块二维排布；
+  bundle 只允许一个 common endpoint 与一个 source/destination block pair，禁止跨 phase 的全局主干。
+- 继续原 W7.3 dirty work／GPT-5.6 Sol medium／scope revision 7，只做最小布局与路由修正；真实 100% 截图显示
+  首屏多个紧凑区块前，routed Fast/Checkpoint 仍禁用。
+
 ## 2026-08-30 — W7.3 Partial-order Reading & History Folding
 
 - 维护者澄清 Graph “缩略”指 eligible old task 的结构折叠，不是低倍率隐藏文字；右侧“更新”是 confirmed

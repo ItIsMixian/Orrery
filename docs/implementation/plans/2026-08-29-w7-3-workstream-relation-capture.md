@@ -377,3 +377,77 @@ Continue the current W7.3 implementation and preserve all current uncommitted ch
 revision 6 after reading only this Plan amendment and its Validation section; do not reread older Skill/authority
 materials. Use focused Graph/Core tests only, and keep routed Fast/Checkpoint blocked until maintainer screenshot
 acceptance.
+
+## 2026-08-30 Maintainer Correction — Component-local Rank & Two-dimensional Block Packing
+
+The previous amendment's statement that mutually unreachable tasks share one rank was incorrectly interpreted across
+the entire visible graph. That interpretation produced a tall global rank-0 column and full-height shared route buses.
+This correction supersedes only that global-layout interpretation; the confirmed partial-order and evidence-qualified
+history-folding semantics above remain unchanged.
+
+### Rank scope and local layout
+
+- [ ] Compute horizontal rank **locally**, never once for the whole visible graph. A rank domain is one
+  relation-connected component, one explicit series lane, or one accepted program-phase lane. Every disconnected
+  component has its own rank origin.
+- [ ] Mutually unreachable tasks may share a rank and stack vertically only inside the same local domain. Independent
+  components must not be collected at one global x coordinate merely because no semantic edge connects them.
+- [ ] Explicit A/CI/U series remain compact left-to-right rows. W5/W6/W7 remain distinct program phase blocks, normally
+  arranged top-to-bottom, while confirmed chains inside each phase read left-to-right.
+- [ ] Program/phase/series containment controls block membership and presentation only; it still cannot fabricate a
+  `derived_from`, `depends_on`, `absorbs`, conflict or chronology edge.
+
+### Two-dimensional component packing
+
+- [ ] Lay out each local domain first, measure its bounds, then pack independent component blocks into bounded
+  two-dimensional rows/grid within the available viewport width. Use a subtle block header/boundary or sufficient
+  gutter so side-by-side blocks read as spatial packing rather than chronology.
+- [ ] The packer may use stable bounded rows or masonry, but it must not place every independent block in one global
+  vertical column. Default 100% should use the first viewport in both dimensions before adding canvas height.
+- [ ] Repacking is deterministic and stable under selection, inspector open/close and reset. Selection cannot trigger
+  a global column collapse, re-rank unrelated blocks or recenter the entire canvas.
+
+### Block-scoped cross-routing
+
+- [ ] A route bundle is scoped to one common endpoint **and** one source-block/destination-block pair. A declared
+  same-semantics bundle must not span unrelated components or multiple program phases as one global trunk.
+- [ ] When one endpoint targets multiple blocks/phases, split the routes into one bundle per target block/phase, or use
+  dedicated boundary channels between that exact block pair. Cross-block routes enter/leave through block boundary
+  ports and gutters, not through a full-height central bus.
+- [ ] No overview route trunk may traverse unrelated series/program regions or collect unrelated edges merely because
+  they share relation style. Local parallel segments remain separated enough to identify ports and arrowheads.
+
+### Corrected deterministic pipeline
+
+Apply exactly this order:
+
+```text
+accepted program/phase/series membership
+→ eligible history folding
+→ relation-connected component partition
+→ component-local partial-order rank
+→ local node layout
+→ two-dimensional block packing
+→ block-pair-scoped bundle routing
+→ labels, arrowheads and selection projection
+```
+
+The earlier `membership → folding → global rank` reading is invalid. Rank before component partition or bundle before
+block packing can recreate the rejected column and bus layout.
+
+### Corrected acceptance and dispatch
+
+- [ ] A fixture with at least four disconnected components produces at least two occupied block columns at 1440px and
+  1280px; disconnected roots do not all share one global rank-0 x coordinate.
+- [ ] A/CI/U series remain compact horizontal rows; W5/W6/W7 remain visibly distinct phase blocks; confirmed local
+  chains still read left-to-right without implying order between neighboring blocks.
+- [ ] No bundle crosses more than its declared source/destination block pair, and no global vertical trunk spans the
+  series and program regions. Automated geometry evidence covers block overlap, route/card crossing and boundary-port
+  routing without freezing incidental pixel coordinates.
+- [ ] The maintainer must accept a real 100% screenshot showing multiple compact blocks/rows in the first viewport—not
+  one tall column—before routed Fast/Checkpoint becomes eligible.
+
+Continue the same W7.3 task/worktree and preserve all current uncommitted changes. Refresh Git-private scope to
+revision 7 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium. Make the
+smallest layout/routing correction needed; do not rerun routed Fast/Checkpoint before screenshot acceptance and do not
+create W7.4, discard current work, integrate another branch, push, publish or change public/default behavior.

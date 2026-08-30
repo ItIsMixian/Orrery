@@ -17,14 +17,14 @@ Updated: 2026-08-30
 - ADR-0017 与 Approved Relation Capture Design 已接受。W7.3 Core/capture/confirmation/inbox evidence 可保留；
   第二版 Graph `05c83b` 仍因默认 55%、共享总线、标签重叠和 inspector 挤压被拒绝，不能中央集成或写成发布能力。
 - ADR-0020 与 Program/Bundle Design 已接受：W 是 program、W5/W6/W7 是 phase，membership 不是 series 或
-  semantic edge；同类同向且共端点的 relation 可受控束线。W7.3 当前三个未提交文件须保留并在 scope revision
-  5 下继续，尚无实现/验收事实。
-- W7.3 最新 layout clarification 规定 relation-backed partial order、同 rank 独立任务纵向堆叠、严格
-  history eligibility、外部边重定向和 membership→fold→rank→bundle pipeline；scope revision 6 后继续，zoom
-  30%–200% 不再隐藏信息，视觉接受前仍禁 Fast/Checkpoint。
+  semantic edge；同类同向且共端点的 relation 只能在同一 block pair 内受控束线。W7.3 当前未提交文件须
+  保留；旧 scope revision 5/6 已被最新 layout correction supersede，尚无实现/验收事实。
+- W7.3 最新 correction 已否决“全图同 rank”：rank 只在 relation component／explicit series／accepted phase
+  内计算；独立区块二维排布，跨区束线限定为一个 source/destination block pair，禁止贯穿全图的竖直总线。
+  严格 history eligibility 与 30%–200% 信息不变；scope revision 7 后继续，视觉接受前仍禁 Fast/Checkpoint。
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成；W7.3 已收到立即停止要求，必须
-  确认新的 readable-topology 任务说明版本并刷新 scope revision 4 后才可恢复产品写入。自动 receipt／
-  first-write enforcement 尚未实现。
+  确认最新 component-local layout 任务说明 exact SHA 并刷新 scope revision 7 后才可恢复产品写入。自动
+  receipt／first-write enforcement 尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
@@ -48,9 +48,10 @@ Updated: 2026-08-30
 8. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 9. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 10. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-11. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 与三个未提交 Graph
-    文件保留。原任务按 ADR-0020 增加 W/W5-W7 层级，允许声明式 same-semantics bundle，选中态改为语义色提亮；
-    不得用 W 前缀伪造 series，真实截图未获维护者接受前不得中央集成。
+11. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 与未提交 Graph
+    改动全部保留。原任务按 ADR-0020 增加 W/W5-W7 层级；最新 scope revision 7 要求 component/phase-local
+    rank、二维 block packing 与 block-pair bundle，禁止全局单列和贯穿总线。不得用 W 前缀伪造 series，真实
+    截图未获维护者接受前不得中央集成。
 12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 13. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
     “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。
