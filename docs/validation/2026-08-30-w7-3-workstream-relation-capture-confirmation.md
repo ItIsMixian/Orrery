@@ -194,3 +194,28 @@ additionally proves:
 
 This correction changes presentation/layout only. ADR-0020 membership, ADR-0017 relation authority, privacy,
 read-only execution boundaries and revision 8 module filtering remain unchanged.
+
+## 2026-08-30 single-pass occupied-bounds correction
+
+The revision-9 preview's overlapping nodes/decorations/routes is rejected. Required evidence additionally proves:
+
+- one canonical local placement occurs before measurement; no node or decoration changes component-relative x/y after
+  global packing;
+- every component exposes immutable node/header-or-badge/route-gutter rectangles and one union `occupied_bounds`;
+- the packer translates whole measured components and derives final canvas bounds only after translation;
+- the superseded hard-program placement and post-pack coordinate rewrite are absent from shipped source;
+- default overview contains no program/phase enclosing SVG rectangles or per-node phase hulls; W membership uses one
+  measured component header or an in-card metadata label;
+- route and relation-label geometry is computed after final positions and remains inside reserved component bounds;
+  insufficient routing space triggers remeasure/repack before render;
+- exact geometry tests cover all pairwise node, component, header, label and route intersections with declared block
+  gap, non-negative coordinates and final canvas containment;
+- real self-host focused evidence reports zero node overlap, decoration/card overlap, component-bound overlap,
+  route/card/label intersection and unmarked route crossing before preview generation;
+- no duplicate phase decoration shares a coordinate, and selection/inspector/module switching cannot mutate layout
+  footprint;
+- a new 100% 1440px/1280px screenshot is presented only after these postconditions pass;
+- exact corrected task-description acknowledgment and Git-private scope revision 10 precede resumed product writes.
+
+Revisions 8 and 9 remain effective. This correction changes no facts, relations, group authority, privacy, execution
+boundary or release state; routed Fast/Checkpoint remain blocked until maintainer screenshot acceptance.

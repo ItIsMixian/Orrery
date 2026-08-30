@@ -611,3 +611,71 @@ revision 9 after reading only this correction and the matching Validation correc
 implement revisions 8 and 9 together. Replace the hard program-stack algorithm rather than tuning its spacing. Do not
 create W7.4, discard work, integrate another branch, push, publish or run routed Fast/Checkpoint before maintainer
 visual acceptance.
+
+## 2026-08-30 Maintainer Correction — Single-pass Occupied-bounds Packing
+
+The maintainer rejected the revision-9 preview because nodes, repeated W7 phase decorations and route corridors were
+stacked on top of one another. Inspection found a concrete implementation defect: the code measured and packed blocks,
+then performed a second coordinate mutation that expanded rank columns without remeasuring or moving following
+blocks. Phase rectangles were also regenerated per node after packing, outside the measured block bounds. This is a
+layout-pipeline failure, not a spacing or theme defect.
+
+### Frontend layout brief
+
+- **Purpose:** scan real task relations without tracing through overlapping cards, group boxes or routes.
+- **Context/tone:** dense analyst workspace using the existing Orrery tokens and card typography.
+- **Memorable behavior:** every topology component is one collision-free measured object; organizational membership is
+  readable inside that object but never changes its final footprint after packing.
+- **Constraint:** no ImageGen, decorative redesign, new runtime dependency or loss of keyboard/mobile/read-only
+  behavior.
+
+### One canonical placement pass
+
+- [ ] Delete or replace the superseded hard-program placement and every post-pack x/y rewrite. A node's local
+  coordinates, rank order and decoration geometry must be final before its component is measured.
+- [ ] Each component produces one immutable local layout record containing `node_rects`, allocated header/badge rects,
+  reserved route gutters and `occupied_bounds`. `occupied_bounds` is the union of all of these plus the required
+  component gutter; raw node bounds alone are not packable bounds.
+- [ ] The global packer operates only on immutable `occupied_bounds`, assigns one translation per component and applies
+  that same translation to nodes, decorations, ports and route-gutter anchors. After translation, no element may
+  change component-relative x/y. A layout change restarts measure → pack; it cannot patch coordinates in place.
+- [ ] Canvas width/height, fit target and scroll extent are computed from final occupied bounds after all translations,
+  never from an earlier placement pass.
+
+### Remove overlapping group decoration
+
+- [ ] Default overview renders no SVG rectangle enclosing a program or phase and no per-node phase hull. Replace W
+  containment boxes with either one measured 22–28px component header (`W › W7`) or a compact membership label inside
+  the existing task-card metadata line.
+- [ ] If several same-phase tasks share one component, render at most one allocated component header. If they are in
+  separate components, each component may repeat the label inside its own occupied bounds; identical labels cannot
+  share coordinates or overlap another component.
+- [ ] Series/program/phase highlight on focus may tint existing cards/connectors, but cannot add an unmeasured overlay,
+  resize a block, cover text or create a new nested rectangle after packing.
+
+### Route-corridor reservation
+
+- [ ] Route planning starts only after final component translation. The local layout reserves rank gutters and edge
+  fan-out channels inside `occupied_bounds`; routes may not escape into a neighboring component's packed rectangle.
+- [ ] If obstacle routing needs more space than reserved, enlarge that component's local occupied bounds and rerun the
+  global pack exactly once before rendering. Never draw first and discover overlap from the screenshot.
+- [ ] Relation labels receive measured rectangles and participate in the same collision check. Labels cannot be placed
+  by midpoint alone when that point intersects another route, node, header or label.
+
+### Mechanical postconditions before preview
+
+- [ ] Before generating another maintainer preview, focused tests and the real self-host model must assert pairwise
+  intersection area `0` for every full node card, component occupied bound and measured header/label rect; distinct
+  component bounds retain at least the declared block gap.
+- [ ] Assert every node, header, label, port and route segment is contained by its owning component bounds (except the
+  exact arrowhead allowance) and every final coordinate is non-negative and within canvas bounds.
+- [ ] Assert one placement/translation per component, no post-pack node-coordinate mutation, no duplicate phase
+  decoration at the same coordinate and no superseded hard-program layout path in the shipped source.
+- [ ] The current real self-host 100% geometry must report zero node overlap, zero decoration/card overlap, zero
+  component-bound overlap, zero route/card/label intersections and zero unmarked route crossings before a screenshot
+  is shown. A screenshot is review evidence, not the first collision detector.
+
+Continue the same W7.3 task/worktree and preserve every dirty file. Refresh Git-private scope to revision 10 after
+reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and retain revisions 8/9.
+Implement the single immutable layout pipeline and mechanical postconditions before rebuilding the preview. Do not
+create W7.4, discard work, push, publish or run routed Fast/Checkpoint before maintainer visual acceptance.

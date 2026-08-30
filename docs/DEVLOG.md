@@ -1,5 +1,16 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Post-pack Coordinate Mutation Rejected
+
+- 维护者拒绝 revision-9 真实页面：底部 W7 task blocks、重复 phase 装饰与 routes 发生实体叠层。中央核对 dirty
+  source 后定位为双布局缺陷：首次按 blockWidth/blockHeight packing 后，又用 `rank*2` 等规则二次改写 positions，
+  却未重新测量/移动后续 block；phase 矩形也在 pack 后按节点重复生成，不属于 occupied bounds。
+- revision 10 要求 one canonical local placement、node/header/label/route gutter 联合 occupied bounds、整体一次
+  translation 与最终 canvas 重算；默认取消 program/phase SVG 外框，改用测量过的 component header 或卡片内
+  `W › W7` 标识。任何位置变化都必须重新 measure→pack，禁止 post-pack 补坐标。
+- 新预览只有在真实 self-host 的 node/decor/component/route/label pairwise 零碰撞断言通过后才能生成；继续原
+  W7.3 dirty work／Sol medium／scope revision 10，视觉接受前仍禁 routed Fast/Checkpoint。
+
 ## 2026-08-30 — W7.3 Hard Program-stack Rejected
 
 - 维护者拒绝 revision-7 真实页面：全图单列虽被拆开，W program 仍以一个巨型外框把 W5/W6/W7 按单一
