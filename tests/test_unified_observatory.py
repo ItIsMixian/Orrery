@@ -205,6 +205,10 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertNotIn('data-nav-identity="ask"', text)
         self.assertNotIn('data-nav-identity="operating-rules"', text)
         self.assertEqual(text.count('id="qa-fab"'), 1)
+        self.assertEqual(text.count('data-ask-docs-label'), 1)
+        self.assertIn('<p class="uo-ask-note" data-ask-docs-label><strong>问文档</strong> · 入口位于右下角</p>', text)
+        self.assertNotIn('<button class="uo-ask-note"', text)
+        self.assertNotIn('<a class="uo-ask-note"', text)
         self.assertEqual(text.count('data-uo-help-panel'), 2)  # CSS/JS selector plus the one element
         self.assertEqual(text.count('<section class="uo-help-panel"'), 1)
         self.assertIn('role="dialog" aria-modal="false"', text)

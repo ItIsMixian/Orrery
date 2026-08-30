@@ -10,13 +10,14 @@ Authority source: exact authority commit `6315415075fb78b61d9a5bb835725bced0bc9c
 
 - Code base is exactly `3d298a5c408e4fff9cc2206c87a6cdde88f4c165`; implementation remained in the independent `codex/u2-3-unified-navigation-live-task-visibility` worktree.
 - Authority amendment commit is `6315415075fb78b61d9a5bb835725bced0bc9ce1`. Before product writes resumed, `git show` verified the six requested sources with blobs `14d4e7d9`, `1de8da10`, `a2213bdf`, `5722379c`, `0170a411`, and `97da0ba8` respectively.
-- Git-private Workstream `U2.3-unified-navigation-live-task-visibility` is registered with primary subsystem `documentation-system`, affected subsystems `project-structure`, `authority-meta-model`, `test-coverage`, and `release-and-toolchain`, exact expected writes, and scope revision 3.
+- The wording amendment is bound to task-description version `da348b980b8b31e94073b0140edc030b67d22182`; its Plan and Pending Validation blobs are `cc89eaeacf673ecf1a0d0176351bce4a6a17e3e3` and `e1c0d5db667eda0edcfb5ad4ccd5d8a6860e1e9f`.
+- Git-private Workstream `U2.3-unified-navigation-live-task-visibility` is registered with primary subsystem `documentation-system`, affected subsystems `project-structure`, `authority-meta-model`, `test-coverage`, and `release-and-toolchain`, exact expected writes, and scope revision 4.
 - U2.3 did not modify A4.1-owned `authority_route.py`, operating-rules collector/schema/fixture/tests; W7.3-owned relation Core/schema/tests or Graph presentation modules; CI routing policy; or release proposals.
 
 ## Product evidence
 
 - Unified app navigation has exactly seven entries in order: 项目总览、文档与搜索、个人工作台、团队协作、任务关系、工作区维护、路线与趋势. Ask Docs and Authority are absent from app navigation; Trends is absent from the author-document tree.
-- The single floating `问文档` button remains the only Q&A entry. Overview describes that boundary and exposes no second Q&A capability card.
+- The single floating `问文档` button remains the only functional Q&A entry. Overview contains one non-interactive `<p>` label, `问文档 · 入口位于右下角`; it has no link, button, route, click handler or capability action and exposes no second Q&A capability card.
 - A top-right `? 帮助` button opens one read-only ARIA dialog/popover. It separates 项目原则、Orrery 工作规则、事实解释状态; technical legacy/readiness/rollout/rollback detail is collapsed. Escape closes it and returns focus. No edit, approval, enable, migration, execution, credential, or network action was added; reduced-motion rules are present.
 - Personal now consumes `orrery-active-task-projection-v1`: Git worktree registry plus bounded Git-common-private session JSON and the existing Maintenance cache. Initial collection does not run per-worktree status, read Scope/findings/source, or compute ignored/diff. A target-only detail request performs the existing Maintenance preflight for that task.
 - A 20-worktree fixture covers four active sessions (`A4.1`, `W7.3`, `CI7`, `REL3`), stale cache, new session revision, broken session, missing worktree and protected primary root. Registered identity remains visible as `状态待刷新`; dynamic `/api/v1/personal/status` and `/api/v1/personal/tasks` observe revision changes without server restart. Main HTML and public JSON do not expose full local paths or raw findings.
@@ -30,6 +31,7 @@ Authority source: exact authority commit `6315415075fb78b61d9a5bb835725bced0bc9c
 ## Automated validation
 
 - `python -X utf8 -m unittest tests.test_unified_observatory tests.test_personal_observatory`: **25/25 PASS** in 65.730s after the final responsive-box patch.
+- After the approved Overview wording amendment, `python -X utf8 -m unittest tests.test_unified_observatory`: **11/11 PASS** in 6.882s. The exact HTML assertion proves one `data-ask-docs-label` paragraph, one `qa-fab`, and no label-shaped anchor or button.
 - CI6 Fast dry-run and Checkpoint dry-run resolved all U2.3 paths with no unknown mapping. Formal Fast completed 28 tests with 26 PASS and two inherited A4 failures.
 - Formal Checkpoint completed 102 tests in 54.588607s (within 90s), with 99 PASS and three A4-linked failures: the operating-rules inventory raw checkout digest is `e25bbe86…` while the frozen LF blob digest is `cec90a91…`; the loader error causes one downstream Ask Docs expectation failure. U2.3 does not own or modify that inventory/collector/test surface, and does not claim an evidence-eligible receipt.
 - Integrated installation validation passed. Repository gates passed over 737 repository paths, 396 Markdown files and 1,074 links with no forbidden runtime/generated artifacts.
@@ -42,6 +44,7 @@ Authority source: exact authority commit `6315415075fb78b61d9a5bb835725bced0bc9c
 - In-app Chromium verified 1440×900 Overview/Personal, 1280×800 Trends, and 390×844 mobile Trends/drawer. All had document horizontal overflow 0; one sidebar/drawer, one floating Ask Docs entry, correct nav hierarchy, real A4/W7.3/CI7/REL3 visibility, hidden local paths, working task refresh/target detail, and no warning/error console entries.
 - Desktop help verified the three layers, collapsed technical detail, ARIA labelling, close control, Escape and focus return. The first 390×844 measurement found the panel itself at x=-10 despite document overflow 0. CSS was corrected to an explicit border-box `left:0; right:0; width:100vw`, and the exact responsive rule is regression-tested.
 - After rebuilding the isolated service, Browser policy rejected further interaction with the existing local tab. No bypass or alternate browser surface was used. Therefore the central integrator must replay the final 390×844 help screenshot/geometry check after merging A4.1, before treating Browser acceptance as complete.
+- The wording-amendment Browser attempt initially reached a transient connection-refused interstitial before the isolated server reported ready; URL policy then blocked navigation away from that data-page. No bypass was attempted, so the same central replay must also visually confirm that the Overview label reads as ordinary text rather than a second control.
 
 ## Integration boundary
 

@@ -169,6 +169,7 @@ SHELL_CSS = r"""
 .uo-panel h2,.uo-panel h3{margin:0 0 8px;color:var(--strong)}.uo-panel h2{font-size:19px}.uo-panel h3{font-size:13px}
 .uo-panel p{margin:0;color:var(--mut);font-size:13px}.uo-caps{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:15px}
 .uo-cap{background:var(--bg);padding:11px 12px;min-width:0}.uo-cap b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.uo-cap small{display:block;color:var(--mut);font-size:10px;margin-top:3px}.uo-cap.unavailable b{color:var(--warn)}
+.uo-ask-note{margin-top:12px!important;font-size:11px!important}.uo-ask-note strong{color:var(--fg);font-weight:700}
 .uo-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.uo-button{border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:var(--fg);padding:8px 11px;font:700 11px/1.2 inherit;cursor:pointer}.uo-button:hover{border-color:var(--acc);color:var(--acc)}.uo-button.danger{color:var(--warn)}
 .uo-stop-global{white-space:nowrap;color:var(--warn)}.uo-disconnected{position:fixed;z-index:400;left:50%;top:calc(var(--hh) + 16px);transform:translateX(-50%);width:min(680px,calc(100vw - 24px));padding:13px 16px;border:1px solid var(--warn);border-radius:10px;background:var(--bg2);box-shadow:0 18px 55px rgba(0,0,0,.45);color:var(--fg);font-size:12px}.uo-disconnected b{display:block;margin-bottom:3px}.uo-disconnected span{color:var(--mut)}
 .uo-boundary{list-style:none;margin:0;padding:0}.uo-boundary li{padding:9px 0;border-bottom:1px solid var(--line);font-size:11.5px}.uo-boundary li:last-child{border-bottom:0}.uo-boundary b{display:block}.uo-boundary span{color:var(--mut)}
@@ -327,8 +328,8 @@ def _overview_page(
         '<article class="page wide" id="overview" data-kind="unified-observatory-overview" '
         f'data-mode="{_esc(mode)}"><div class="uo-grid"><section class="uo-panel">'
         f'<div class="uo-topline"><span class="uo-live {"" if dynamic else "static"}"></span>{"单一本机地址" if dynamic else "静态文件 · 无运行服务"}</div>'
-        '<h2>Orrery 项目观测台</h2><p>一个导航入口组合文档、搜索与本机协作功能；右下角“问文档”是唯一问答入口。</p>'
-        f'<div class="uo-caps">{caps}</div></section><aside class="uo-panel"><h3>运行边界</h3><ul class="uo-boundary">'
+        '<h2>Orrery 项目观测台</h2><p>一个导航入口组合文档、搜索与本机协作功能；证据不足时明确显示暂不可用。</p>'
+        f'<div class="uo-caps">{caps}</div><p class="uo-ask-note" data-ask-docs-label><strong>问文档</strong> · 入口位于右下角</p></section><aside class="uo-panel"><h3>运行边界</h3><ul class="uo-boundary">'
         f'<li><b>{"本机动态控制" if dynamic else "静态只读"}</b><span>{"仅监听 127.0.0.1，并只提供一个可见页面地址" if dynamic else "无服务、无 cookie、无控制能力"}</span></li>'
         '<li><b>默认个人模式</b><span>零网络；团队协作与模型服务必须分别主动开启</span></li>'
         '<li><b>派生视图</b><span>不能创建 State、ADR、批准或 Validation 事实</span></li>'
