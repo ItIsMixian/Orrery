@@ -542,6 +542,57 @@ def _lens_edges(projection: Mapping[str, Any], lens: str) -> list[dict[str, Any]
     return result
 
 
+def _series_display_edges(projection: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Project adjacent explicit series metadata as non-authoritative display edges."""
+    grouped: dict[str, list[Mapping[str, Any]]] = {}
+    for node in projection.get("nodes", []):
+        if not isinstance(node, Mapping) or not node.get("series_id"):
+            continue
+        if node.get("series_order") is None:
+            continue
+        grouped.setdefault(str(node["series_id"]), []).append(node)
+    result: list[dict[str, Any]] = []
+    for series_id, values in sorted(grouped.items()):
+        ordered = sorted(values, key=lambda item: (int(item["series_order"]), str(item["workstream_id"])))
+        for predecessor, successor in zip(ordered, ordered[1:]):
+            result.append({
+                "display_edge_id": f"series:{series_id}:{predecessor['workstream_id']}:{successor['workstream_id']}",
+                "relation_type": "series-display",
+                "lifecycle": "presentation-only",
+                "certainty": "explicit-metadata",
+                "series_id": series_id,
+                "source_workstream_id": str(successor["workstream_id"]),
+                "target_workstream_id": str(predecessor["workstream_id"]),
+                "display_from_id": str(predecessor["workstream_id"]),
+                "display_to_id": str(successor["workstream_id"]),
+                "required_for": None,
+                "reason_codes": ["explicit-series-adjacency-presentation-only"],
+                "source_links": [],
+                "presentation_only": True,
+            })
+    return result
+
+
+def _comparison_display_edges(projection: Mapping[str, Any]) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
+    for index, item in enumerate(projection.get("comparison_suggestions", [])):
+        if not isinstance(item, Mapping):
+            continue
+        left, right = sorted((str(item["source_workstream_id"]), str(item["target_workstream_id"])))
+        edge = dict(item)
+        edge.update({
+            "display_edge_id": str(item.get("id") or f"comparison-{index}"),
+            "display_from_id": left,
+            "display_to_id": right,
+            "relation_type": "comparison-suggestion",
+            "lifecycle": "derived-review-only",
+            "certainty": "unconfirmed",
+            "presentation_only": True,
+        })
+        result.append(edge)
+    return result
+
+
 def _ordered_ancestors(tip: str, incoming: Mapping[str, set[str]]) -> list[str]:
     """Return a stable oldest-to-newest traversal for one visible tip."""
     found: set[str] = set()
@@ -564,12 +615,23 @@ def build_readability_layout(
     *,
     lens: str = "succession",
     expanded_chain_ids: Sequence[str] = (),
+    include_comparisons: bool = False,
 ) -> dict[str, Any]:
     """Build a deterministic presentation-only layout for mechanical and browser parity checks."""
     if lens not in {"succession", "dependency", "conflict"}:
         raise ValueError("lens must be succession, dependency, or conflict")
     nodes_by_id = {str(item["workstream_id"]): dict(item) for item in projection.get("nodes", [])}
-    edges = _lens_edges(projection, lens)
+    semantic_edges = _lens_edges(projection, lens)
+    series_edges = [] if lens == "conflict" else _series_display_edges(projection)
+    comparison_edges = (
+        _comparison_display_edges(projection)
+        if include_comparisons and lens != "conflict" else []
+    )
+    edges = [*semantic_edges, *series_edges, *comparison_edges]
+    series_endpoint_ids = {
+        endpoint for item in series_edges
+        for endpoint in (item["display_from_id"], item["display_to_id"])
+    }
     endpoint_ids = {
         endpoint for item in edges
         for endpoint in (item["display_from_id"], item["display_to_id"])
@@ -600,7 +662,7 @@ def build_readability_layout(
             default_ids = {tip, *direct, *siblings}
             older = [
                 item for item in _ordered_ancestors(tip, incoming)
-                if item not in default_ids and item not in claimed_history
+                if item not in default_ids and item not in claimed_history and item not in series_endpoint_ids
             ]
             claimed_history.update(older)
             visible_ids.update(default_ids)
@@ -613,6 +675,7 @@ def build_readability_layout(
                 "history_ids": older,
                 "expanded": chain_id in expanded,
             })
+        visible_ids.update(series_endpoint_ids)
 
     visible_nodes = [nodes_by_id[item] for item in sorted(visible_ids) if item in nodes_by_id]
     for chain in chains:
@@ -729,17 +792,43 @@ def build_readability_layout(
                     pending.append(sibling)
         components.append(sorted(members))
 
-    node_top = 112
+    route_reserve = max(0, len(display_edges) - 1) * 8
+    node_top = 132 + route_reserve
     positions: dict[str, dict[str, int]] = {}
-    row_cursor = 0
+    layout_series: dict[str, list[dict[str, Any]]] = {}
+    for node in visible_nodes:
+        if node.get("series_id"):
+            layout_series.setdefault(str(node["series_id"]), []).append(node)
+    layout_series = {
+        key: sorted(values, key=lambda item: (item.get("series_order") is None, item.get("series_order") or 0, item["workstream_id"]))
+        for key, values in sorted(layout_series.items()) if len(values) >= 2
+    }
+    series_member_ids = {
+        str(node["workstream_id"]) for values in layout_series.values() for node in values
+    }
+    for series_row, values in enumerate(layout_series.values()):
+        for node in values:
+            rank_value = rank[node["workstream_id"]]
+            positions[node["workstream_id"]] = {
+                "x": 36 + rank_value * (NODE_WIDTH + RANK_GAP),
+                "y": node_top + series_row * (NODE_HEIGHT + ROW_GAP),
+                "width": NODE_WIDTH, "height": NODE_HEIGHT,
+                "rank": rank_value, "row": series_row, "component": -1,
+            }
+    row_cursor = len(layout_series) + (1 if layout_series else 0)
     for component_index, members in enumerate(sorted(components, key=lambda item: item[0])):
         member_ids = set(members)
         by_rank = {
-            rank_value: [node for node in values if node["workstream_id"] in member_ids]
+            rank_value: [
+                node for node in values
+                if node["workstream_id"] in member_ids and node["workstream_id"] not in series_member_ids
+            ]
             for rank_value, values in sorted(groups.items())
         }
         by_rank = {rank_value: values for rank_value, values in by_rank.items() if values}
-        component_rows = max((len(values) for values in by_rank.values()), default=1)
+        if not by_rank:
+            continue
+        component_rows = max(len(values) for values in by_rank.values())
         for rank_value, values in by_rank.items():
             for local_row, node in enumerate(values):
                 positions[node["workstream_id"]] = {
@@ -754,29 +843,62 @@ def build_readability_layout(
         row_cursor += component_rows + 1
     max_rows = max(1, row_cursor - 1 if row_cursor else 1)
     routes: list[dict[str, Any]] = []
+    outgoing_ports: dict[str, list[str]] = {}
+    incoming_ports: dict[str, list[str]] = {}
+    for edge in display_edges:
+        outgoing_ports.setdefault(edge["display_from_id"], []).append(edge["display_edge_id"])
+        incoming_ports.setdefault(edge["display_to_id"], []).append(edge["display_edge_id"])
+    for values in (*outgoing_ports.values(), *incoming_ports.values()):
+        values.sort()
     for index, edge in enumerate(display_edges):
         source = positions[edge["display_from_id"]]
         target = positions[edge["display_to_id"]]
-        start = (source["x"] + source["width"], source["y"] + source["height"] // 2)
-        end = (target["x"], target["y"] + target["height"] // 2)
+        edge_id = edge["display_edge_id"]
+        outgoing = outgoing_ports[edge["display_from_id"]]
+        incoming = incoming_ports[edge["display_to_id"]]
+        start_y = source["y"] + round(
+            (outgoing.index(edge_id) + 1) * source["height"] / (len(outgoing) + 1)
+        )
+        end_y = target["y"] + round(
+            (incoming.index(edge_id) + 1) * target["height"] / (len(incoming) + 1)
+        )
+        start = (source["x"] + source["width"], start_y)
+        end = (target["x"], end_y)
         rank_span = max(1, target["rank"] - source["rank"])
-        if start[1] == end[1] and rank_span == 1:
+        edge_kind = str(edge.get("relation_type"))
+        same_row = source["row"] == target["row"]
+        if edge_kind == "series-display" and same_row and rank_span == 1:
+            start = (source["x"] + source["width"], source["y"] + source["height"] // 2)
+            end = (target["x"], target["y"] + target["height"] // 2)
             points = [start, end]
-        elif rank_span == 1:
-            middle = (start[0] + end[0]) // 2
-            points = [start, (middle, start[1]), (middle, end[1]), end]
+        elif start[1] == end[1] and rank_span == 1 and edge_kind != "comparison-suggestion":
+            points = [start, end]
         else:
-            start_channel = start[0] + 22
-            end_channel = end[0] - 22
-            track_y = max(88, min(source["y"], target["y"]) - 20 - (index % 4) * 8)
-            points = [
-                start, (start_channel, start[1]), (start_channel, track_y),
-                (end_channel, track_y), (end_channel, end[1]), end,
-            ]
+            channel_offset = 20 + index * 4
+            start_channel = start[0] + channel_offset
+            end_channel = end[0] - channel_offset
+            track_y = node_top - 26 - index * 8
+            points = [start, (start_channel, start[1]), (start_channel, track_y),
+                      (end_channel, track_y), (end_channel, end[1]), end]
+        longest = max(
+            zip(points, points[1:]),
+            key=lambda pair: abs(pair[1][0] - pair[0][0]) + abs(pair[1][1] - pair[0][1]),
+        )
+        label_point = (
+            (longest[0][0] + longest[1][0]) // 2,
+            (longest[0][1] + longest[1][1]) // 2,
+        )
+        has_label = (
+            edge_kind in {"series-display", "comparison-suggestion", "conflict-fact"}
+            or edge.get("lifecycle") in {"proposed", "stale"}
+            or edge.get("certainty") in {"unknown", "unconfirmed"}
+        )
         routes.append({
             "edge_id": edge["display_edge_id"], "points": points,
-            "has_arrow": True, "has_label": False,
+            "has_arrow": True, "has_label": has_label, "label_point": label_point,
             "line_encoding": (
+                "series" if edge_kind == "series-display" else
+                "comparison" if edge_kind == "comparison-suggestion" else
                 "dashed" if lens == "dependency" else
                 "compound" if lens == "conflict" else "solid"
             ),
@@ -794,6 +916,18 @@ def build_readability_layout(
         else:
             title = "直接前置／依赖"
         lane_titles.append({"rank": rank_value, "title": title})
+    series_lanes = []
+    for series_id in sorted({str(item.get("series_id")) for item in visible_nodes if item.get("series_id")}):
+        members = [item for item in visible_nodes if str(item.get("series_id")) == series_id]
+        boxes = [positions[item["workstream_id"]] for item in members if item["workstream_id"] in positions]
+        if len(boxes) < 2:
+            continue
+        left, right = min(item["x"] for item in boxes), max(item["x"] + item["width"] for item in boxes)
+        top, bottom = min(item["y"] for item in boxes), max(item["y"] + item["height"] for item in boxes)
+        series_lanes.append({
+            "series_id": series_id, "x": left - 14, "y": top - 26,
+            "width": right - left + 28, "height": bottom - top + 40,
+        })
     return {
         "lens": lens,
         "nodes": visible_nodes,
@@ -802,6 +936,10 @@ def build_readability_layout(
         "positions": positions,
         "routes": routes,
         "lanes": lane_titles,
+        "series_lanes": series_lanes,
+        "semantic_edge_count": len(semantic_edges),
+        "series_edge_count": len(series_edges),
+        "comparison_edge_count": len(comparison_edges),
         "width": (
             72 + (max_rank + 1) * NODE_WIDTH + max_rank * RANK_GAP
             if node_ids else 1
@@ -875,27 +1013,12 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
             % html.escape(str(error.get("message", "当前无法读取完整的任务关系。")))
         )
     payload = _canonical_json(dict(projection)).replace("<", "\\u003c")
-    series_groups: dict[str, list[Mapping[str, Any]]] = {}
-    for node in projection.get("nodes", []):
-        if isinstance(node, Mapping) and node.get("series_id"):
-            series_groups.setdefault(str(node["series_id"]), []).append(node)
-    series_html = "".join(
-        '<div class="wg-series-lane"><b>%s 系列</b><span>%s</span></div>' % (
-            html.escape(series_id),
-            " · ".join(
-                html.escape(str(item.get("task_code") or item.get("workstream_id")))
-                for item in sorted(values, key=lambda value: (value.get("series_order") is None, value.get("series_order") or 0, value.get("workstream_id")))
-            ),
-        )
-        for series_id, values in sorted(series_groups.items())
-    ) or '<div class="wg-series-empty">当前没有显式任务系列元数据；不会从任务名称推断。</div>'
     return (
         '<article class="page wide" id="workstream-relation-graph" data-kind="workstream-relation-graph" '
         'data-title="任务关系" data-authority="%s" data-read-only="true">'
         '<section class="wg-shell"><header class="wg-mast"><div><p class="wg-kicker">任务关系图 · 只读</p>'
         '<h2>任务关系</h2><p>从左到右阅读：更早历史 → 直接前置／依赖 → 当前任务。每条链可独立展开，本页不会执行任何操作。</p></div>'
         '<div class="wg-seal %s">%s · 技术结构版本 2</div></header>%s'
-        '<section class="wg-series" aria-label="显式任务系列"><div><h3>任务系列</h3><p>仅作结构化展示分组，不表示因果或依赖边。</p></div><div class="wg-series-lanes">%s</div></section>'
         '<section class="wg-controls" aria-label="任务关系控制"><div class="wg-lenses" role="group" aria-label="关系类型">'
         '<button class="wg-lens" type="button" data-wg-lens="succession" aria-pressed="true"><span>01</span><b>接续关系</b></button>'
         '<button class="wg-lens" type="button" data-wg-lens="dependency" aria-pressed="false"><span>02</span><b>依赖关系</b></button>'
@@ -904,19 +1027,20 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<label>运行状态<select data-wg-runtime><option value="all">全部状态</option></select></label>'
         '<button class="wg-button" type="button" data-wg-expand-all>展开全部历史</button>'
         '<button class="wg-button" type="button" data-wg-collapse-all>收起全部历史</button>'
-        '<button class="wg-button" type="button" data-wg-reset>重置布局</button></div>'
+        '<button class="wg-button" type="button" data-wg-reset>重置布局</button>'
+        '<button class="wg-button wg-comparison-toggle" type="button" data-wg-comparison-toggle aria-pressed="false">显示比较建议</button></div>'
         '<div class="wg-viewbar" role="toolbar" aria-label="关系图视图工具"><span class="wg-viewbar-note">默认保持 100%% 可读；画布内按住 Ctrl＋滚轮缩放，空白处拖动平移。</span>'
         '<button class="wg-button" type="button" data-wg-zoom-out aria-label="缩小关系图">−</button><span class="wg-zoom-readout" data-wg-zoom-readout>100%%</span>'
         '<button class="wg-button" type="button" data-wg-zoom-in aria-label="放大关系图">＋</button><button class="wg-button" type="button" data-wg-fit>适合窗口</button></div></section>'
         '<section class="wg-grid"><div class="wg-graph-panel"><div class="wg-panel-head"><div><p class="wg-panel-index">关系图 / 已验证核心数据</p><h3>分层关系拓扑</h3></div>'
-        '<div class="wg-legend" aria-label="关系图例"><span><i></i>接续：实线青</span><span><i class="dependency"></i>依赖：虚线黄</span><span><i class="conflict"></i>冲突：复合红线</span></div></div>'
+        '<div class="wg-legend" aria-label="关系图例"><span><i></i>接续：实线青</span><span><i class="series"></i>系列：细点线</span><span><i class="dependency"></i>依赖：虚线黄</span><span><i class="conflict"></i>冲突：复合红线</span></div></div>'
         '<div class="wg-frame"><div class="wg-viewport" data-wg-viewport tabindex="0" aria-label="可滚动任务关系画布"><div class="wg-canvas"><svg data-wg-svg role="group" aria-label="从左到右的分层任务关系图"></svg></div></div><div class="wg-empty" data-wg-empty hidden><b>没有匹配的关系事实</b></div>'
         '<aside class="wg-inspector" hidden aria-hidden="true" role="dialog" aria-modal="false" aria-label="任务关系技术详情" data-wg-inspector-shell><div class="wg-inspector-head"><span>技术详情 / 核心证据 · 只读</span><button class="wg-inspector-close" type="button" data-wg-inspector-close aria-label="关闭技术详情">×</button></div><div data-wg-inspector></div><div class="wg-readonly">不提供应用、撤销、关闭、删除、合并或远程执行</div></aside></div></div></section>'
-        '<section class="wg-ledger" aria-labelledby="wg-ledger-title"><h3 id="wg-ledger-title">任务关系列表</h3><p class="wg-ledger-intro">按层级与链阅读；每条关系明确显示“从谁 → 到谁”，历史折叠与桌面保持一致。</p><div class="wg-ledger-list" data-wg-ledger></div></section>'
-        '<section class="wg-comparisons" aria-labelledby="wg-comparison-title"><h3 id="wg-comparison-title">需要比较／证据待刷新</h3><p>黄色建议不属于冲突事实，不会画成红线。</p><div data-wg-comparisons></div></section>'
+        '<details class="wg-mobile-ledger"><summary>打开同事实任务关系列表</summary><section class="wg-ledger" aria-labelledby="wg-ledger-title"><h3 id="wg-ledger-title">任务关系列表</h3><p class="wg-ledger-intro">与画布使用同一组事实；移动端按需展开。</p><div class="wg-ledger-list" data-wg-ledger></div></section></details>'
+        '<details class="wg-comparison-drawer"><summary><span>需要比较／证据待刷新</span><b data-wg-comparison-count>0</b></summary><p>默认收起；仅是只读审查建议，不属于冲突事实，也不会阻塞任务。</p><div data-wg-comparisons></div></details>'
         '<p class="wg-sr" aria-live="polite" data-wg-live></p><script type="application/json" data-wg-payload>%s</script>'
         '</section></article>'
-        % (html.escape(authority, quote=True), status, html.escape(display_status(status)), failure, series_html, payload)
+        % (html.escape(authority, quote=True), status, html.escape(display_status(status)), failure, payload)
     )
 
 

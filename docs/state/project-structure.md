@@ -9,7 +9,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 单一 Git 仓库根为 `D:\coding warehouse\project-orrery`；protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`，产品 source baseline 为 `9ee831f`。
 - 项目作者权威根为 `AGENTS.md` 与 `docs/`；`.project-orrery.json` 选择 `authority_status: integrated` 和 `authority_model_version: 1`。
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
-- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。W7.3 Candidate 声明 Core 0.1.18、CLI 0.1.22、Observatory 0.1.17；Core API 为 1，组件总状态为 `unreleased`。
+- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。W7.3 Graph-native correction Candidate 声明 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18；Core API 为 1，组件总状态为 `unreleased`。
 - 薄平台层位于 `adapters/{codex,harness-json,claude-code,deepseek-harness}/`，当前 source 版本均为 0.1.1、`experimental`／`unreleased`。Adapter 不拥有 canonical 作者模板、State、ADR 或 Authority 规则。
 - 自托管观测台位于根 `scripts/docsite/`。integrated Candidate 新增 `Start Orrery.vbs`／`start-orrery.bat --console`、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 仍为 root-only/default-off consumer，没有进入默认发布模板或 v0.2.0 managed tools。
 - ADR-0016 的生产 Unified Shell 已在 integrated Candidate 实现：一个用户可见 listener／URL／导航壳，Broker／Coordinator 等内部 capability 由 supervisor 隐藏管理；当前没有公开默认切换，`start-docsite.bat` 保持 whole-shell rollback。
@@ -20,6 +20,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - W1–W7 协作源码已经进入 main：Git-private Workstream session、Scope/finding、review/integration/cleanup、Personal／Team projection、workspace maintenance、LAN discovery／manual Host switch、stacked lineage、relation event/graph、apply/undo/recovery contract 和只读 Graph consumer 均存在。
 - W7.3 Candidate 已实现 ADR-0017 relation capture：versioned append-only Git-common-private proposal／confirmation／role／series store，exact same-project ancestry `derived_from` 自动写入，四类 gate `depends_on`、Integrator-only `absorbs`、Personal／Team human integrator CAS，以及 CLI／Harness suggest/inspect/decision 边界。Agent、session、remote central request 与旧 revision 均不能确认；旧 v1 无 gate 关系保持 Unknown。
 - 当前 self-host 已显式登记 Authority A、CI、Unified U 系列，并保留 A4→A3、CI7→CI6 为待确认修复建议；没有从名称前缀推断或回写 effective 历史。另有真实 `W7.3-integration-acceptance` linked worktree 从 exact W7.3 implementation commit 自动形成 `derived_from`，对 CI6 的 integration gate 仍是非阻塞 proposal。
+- Graph-native correction 将显式 series 作为只读 presentation connector 和画布内 lane；它不进入 Core relation DAG、gate 或生命周期。detached series strip 已移除，comparison 改为默认关闭 overlay／折叠 drawer，冲突 lens 仍只消费确认冲突事实。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
 - 非权威研究控制面位于 `experiments/context-routing/`；大型原始运行根为 `D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库或发布包。

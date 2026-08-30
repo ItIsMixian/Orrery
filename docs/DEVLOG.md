@@ -2,6 +2,25 @@
 
 ## 2026-08-30 — W7.3 Workstream Relation Capture & Confirmation Candidate
 
+- 维护者以 task-description version `2ab5c465ec28d7a472ad3f5ebbb324a565bbe57a` 重开 Graph UX；实现前逐字读取
+  Plan blob `a77ace7f42f091aabf81be55d4395465b0847a7c` 与 Validation blob
+  `dd0c3eb1f7da48eec23ca47f0772aec8caa3b547`，并把 retained `5fee848` Candidate、Sol／medium 与新增验证面
+  登记为 Git-private scope revision 4。Core/capture 与 relation inbox 证据保留，未把旧 Graph 视觉验收冒充通过。
+- Observatory 0.1.18 移除 detached series strip，将 Authority A、CI、Unified U 变成画布内固定横向 lane 与
+  presentation-only “同系列演进（展示关系）”连接器；A3/A4、CI6/CI7、U1/U2/U2.2 保持同 lane。dependency
+  proposal 仍是独立黄色虚线；comparison 改为默认关闭 dotted overlay／折叠 drawer；零冲突 lens 为 0 红线空态。
+- 新增 deterministic per-edge port/track geometry：4+ confirmed conflict fixture 检查 node overlap、edge-through-node、
+  coincident segment、arrow／label。Graph focused 9/9、Unified 11/11、Core/capture 15/15 通过；Browser 在
+  1440×900、1280×800、390×844 验证零横向溢出、同事实移动 ledger、键盘 inspector 与空 console。
+- 一组额外 W7B execution 诊断在 lineage fixture setup 阶段报 8 个错误；同一错误可在未改动 clean
+  `5fee848` worktree 单测复现，故记录为 retained baseline limitation，不在本次 presentation-only correction
+  中修改 Core。最终 CI6／repository evidence 以本 Validation 的 correction ledger 为准。
+- Correction dry-run 精确选择 91 项；CI contract、repository gate（729 paths／394 Markdown／1054 links）、
+  release/Codex adapter 隔离 dry build、archive listing 与 diff gate 通过。正式 Fast 四次在固定 15 秒达到
+  budget，Checkpoint 两次在既有 Maintenance 测试运行中达到固定 90 秒；该 exact Maintenance 测试随后
+  95.385 秒独立 PASS，故失败回执如实保留且不冒充 correction PASS。`5fee848` 的 90/90 Fast 与 96/96
+  Checkpoint 仍是 Core/capture retained evidence；中央须在 clean Candidate host 重跑本次校正门。
+
 - 从 exact `codex/u1-u2-integration-baseline@3fc7e7a` 建立独立 worktree，并在产品写入前登记 Git-private
   `W7.3-workstream-relation-capture-confirmation`。暂停期间只保留安全工作树；恢复前用 `git show` 逐一核对
   authority commit `6315415` 的八个指定 blob，并把 OID、expected writes 与 validation surfaces 登记为 scope

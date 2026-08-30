@@ -168,17 +168,19 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         panel = graph_ui.render_workstream_relation_graph_panel(projection)
         for token in (
             'data-wg-lens="succession"', 'data-wg-lens="dependency"',
-            'data-wg-lens="conflict"', "任务关系列表", "只读",
+            'data-wg-lens="conflict"', "打开同事实任务关系列表", "只读",
+            'data-wg-comparison-toggle', 'class="wg-comparison-drawer"',
             "不提供应用、撤销、关闭、删除、合并或远程执行",
         ):
             self.assertIn(token, panel)
+        self.assertNotIn('class="wg-series"', panel)
         self.assertIn("waiting-task", panel)
         self.assertIn("blocked-by-conflict", panel)
         self.assertIn("synthetic-non-authoritative", panel)
 
         lens_types = {
-            "succession": {"derived_from", "absorbs"},
-            "dependency": {"depends_on"},
+            "succession": {"derived_from", "absorbs", "series-display"},
+            "dependency": {"depends_on", "series-display"},
             "conflict": {"conflict-fact"},
         }
         for lens, allowed in lens_types.items():
@@ -202,12 +204,16 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
                 edge_by_id = {item["display_edge_id"]: item for item in layout["edges"]}
                 for route in layout["routes"]:
                     self.assertTrue(route["has_arrow"])
-                    self.assertFalse(route["has_label"])
+                    edge = edge_by_id[route["edge_id"]]
+                    if edge["relation_type"] in {"series-display", "conflict-fact"}:
+                        self.assertTrue(route["has_label"])
                     self.assertEqual(
                         route["line_encoding"],
-                        {"succession": "solid", "dependency": "dashed", "conflict": "compound"}[lens],
+                        (
+                            "series" if edge_by_id[route["edge_id"]]["relation_type"] == "series-display"
+                            else {"succession": "solid", "dependency": "dashed", "conflict": "compound"}[lens]
+                        ),
                     )
-                    edge = edge_by_id[route["edge_id"]]
                     for node_id, rect in boxes:
                         if node_id in {edge["display_from_id"], edge["display_to_id"]}:
                             continue
@@ -244,12 +250,9 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             item for item in no_dependency["edges"] if item["relation_type"] != "depends_on"
         ]
         dependency_empty = graph_ui.build_readability_layout(no_dependency, lens="dependency")
-        self.assertEqual(dependency_empty["nodes"], [])
-        self.assertEqual(dependency_empty["edges"], [])
-        self.assertEqual(dependency_empty["routes"], [])
-        self.assertEqual(dependency_empty["lanes"], [])
-        self.assertEqual(dependency_empty["width"], 1)
-        self.assertEqual(dependency_empty["height"], 1)
+        self.assertEqual(dependency_empty["semantic_edge_count"], 0)
+        self.assertGreater(dependency_empty["series_edge_count"], 0)
+        self.assertTrue(all(item["relation_type"] == "series-display" for item in dependency_empty["edges"]))
 
         one_dependency = copy.deepcopy(projection)
         dependency_edge = next(
@@ -257,10 +260,9 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         one_dependency["edges"] = [dependency_edge]
         dependency_pair = graph_ui.build_readability_layout(one_dependency, lens="dependency")
-        self.assertEqual(len(dependency_pair["nodes"]), 2)
-        self.assertEqual(len(dependency_pair["edges"]), 1)
-        self.assertEqual(len(dependency_pair["routes"]), 1)
-        self.assertTrue(dependency_pair["routes"][0]["has_arrow"])
+        self.assertGreaterEqual(len(dependency_pair["nodes"]), 2)
+        self.assertEqual(dependency_pair["semantic_edge_count"], 1)
+        self.assertTrue(all(item["has_arrow"] for item in dependency_pair["routes"]))
 
     def test_invalid_provider_store_graph_legacy_and_links_fail_closed(self) -> None:
         private_session = graph_ui._safe_source_link({
@@ -336,6 +338,74 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         unavailable = graph_ui.project_core_relation_graph(lambda: empty)
         self.assertEqual(unavailable["status"], "unavailable")
         self.assertEqual(unavailable["error"]["code"], "relation-evidence-absent")
+
+    def test_graph_native_series_comparison_overlay_and_conflict_tracks(self) -> None:
+        dependency = graph_ui.build_readability_layout(self.projection, lens="dependency")
+        series_edges = [item for item in dependency["edges"] if item["relation_type"] == "series-display"]
+        self.assertTrue(series_edges)
+        self.assertTrue(all(item["presentation_only"] for item in series_edges))
+        self.assertTrue(any(item["series_id"] == "CI" for item in series_edges))
+        self.assertTrue(any(item["series_id"] == "CI" for item in dependency["series_lanes"]))
+        self.assertTrue({"CI1", "CI2-late"}.issubset(dependency["visible_fact_ids"]))
+
+        overlay = graph_ui.build_readability_layout(
+            self.projection, lens="succession", include_comparisons=True
+        )
+        self.assertEqual(
+            overlay["comparison_edge_count"], len(self.projection["comparison_suggestions"])
+        )
+        self.assertTrue(any(item["line_encoding"] == "comparison" for item in overlay["routes"]))
+        self.assertTrue(all(
+            item["relation_type"] != "conflict-fact"
+            for item in overlay["edges"] if item["relation_type"] == "comparison-suggestion"
+        ))
+
+        zero_conflicts = copy.deepcopy(self.projection)
+        zero_conflicts["conflicts"] = []
+        empty = graph_ui.build_readability_layout(zero_conflicts, lens="conflict")
+        self.assertEqual(empty["nodes"], [])
+        self.assertEqual(empty["edges"], [])
+        self.assertEqual(empty["series_edge_count"], 0)
+        self.assertEqual(empty["comparison_edge_count"], 0)
+
+        many = copy.deepcopy(self.projection)
+        targets = ["W5E", "waiting-task", "blocked-task", "failed-task"]
+        many["conflicts"] = [
+            {
+                "id": f"confirmed-conflict-{index}",
+                "relation_type": "conflict-fact",
+                "source_workstream_id": "CI1",
+                "target_workstream_id": target,
+                "certainty": "confirmed",
+                "lifecycle": "effective",
+                "conflict_evidence": {
+                    "location": [f"module/{index}"], "impact": "exclusive contract",
+                    "source": "synthetic geometry fixture",
+                },
+                "reason_codes": ["explicit-human-conflict-finding"],
+                "source_links": [],
+            }
+            for index, target in enumerate(targets)
+        ]
+        routed = graph_ui.build_readability_layout(many, lens="conflict")
+        self.assertEqual(len(routed["routes"]), 4)
+        segments: dict[tuple[tuple[int, int], tuple[int, int]], str] = {}
+        edge_by_id = {item["display_edge_id"]: item for item in routed["edges"]}
+        for route in routed["routes"]:
+            edge = edge_by_id[route["edge_id"]]
+            self.assertTrue(route["has_label"])
+            for start, end in zip(route["points"], route["points"][1:]):
+                self.assertNotEqual(start, end)
+                normalized = tuple(sorted((start, end)))
+                self.assertNotIn(normalized, segments, f"coincident segment: {route['edge_id']}")
+                segments[normalized] = route["edge_id"]
+                for node_id, rect in routed["positions"].items():
+                    if node_id in {edge["display_from_id"], edge["display_to_id"]}:
+                        continue
+                    self.assertFalse(
+                        _segment_hits_rect(start, end, rect),
+                        f"edge {route['edge_id']} crosses {node_id}",
+                    )
 
     def test_missing_real_relation_store_is_zero_write_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -435,8 +505,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("markerUnits:'userSpaceOnUse'", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("markerWidth:10,markerHeight:10", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn(".wg-edge.lens-conflict{stroke:var(--wg-red);stroke-width:4", graph_ui.WORKSTREAM_GRAPH_CSS)
-        self.assertNotIn("wg-edge-label-bg", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertNotIn("wg-edge-label", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("wg-edge-label", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("同系列演进（展示关系）", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("lineEncoding", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("0 条依赖边 · 0 个孤立节点", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("点击展开，仅影响这条上游链", graph_ui.WORKSTREAM_GRAPH_JS)
@@ -451,9 +521,11 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn(".wg-inspector[hidden]{display:none!important}", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-edge-hit:focus-visible{stroke:", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertNotIn(".wg-edge-hit:focus-visible,.wg-inspector", graph_ui.WORKSTREAM_GRAPH_CSS)
-        self.assertIn(".wg-ledger{position:absolute;width:1px", graph_ui.WORKSTREAM_GRAPH_CSS)
-        self.assertIn(".wg-graph-panel{display:none}", graph_ui.WORKSTREAM_GRAPH_CSS)
-        self.assertIn(".wg-ledger{position:static;width:auto", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn(".wg-mobile-ledger{position:absolute;width:1px", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn(".wg-graph-panel{display:block", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn(".wg-mobile-ledger{position:static", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn(".wg-comparison-drawer", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertNotIn(".wg-series{", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertNotIn("fetch(", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("XMLHttpRequest", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("WebSocket", graph_ui.WORKSTREAM_GRAPH_JS)
@@ -502,8 +574,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
         mapping = json.loads((ROOT / "scripts" / "ci" / "change-mapping.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.17")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.17")
+        self.assertEqual(component["version"], "0.1.18")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.18")
         test_ids = [item["test_id"] for item in mapping["tests"]]
         self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
         self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))

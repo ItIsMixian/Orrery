@@ -5891,6 +5891,24 @@
       "reason": "low evidence for Team/LAN via collaboration-maintenance, observatory-ui"
     },
     {
+      "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_graph_native_series_comparison_overlay_and_conflict_tracks",
+      "owner_surface": "Team/LAN",
+      "owner_shard": "team-ui-server",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "collaboration-maintenance",
+        "observatory-ui"
+      ],
+      "reason": "low deterministic geometry evidence for Graph-native series, comparison overlay, and conflict routing"
+    },
+    {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_corrected_w7a_compatibility_payload_preserves_non_active_runtime_states",
       "owner_surface": "Team/LAN",
       "owner_shard": "team-ui-server",
