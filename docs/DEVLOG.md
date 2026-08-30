@@ -1,5 +1,21 @@
 # 开发日志
 
+## 2026-08-30 — CI7 Composable Acceptance Gates & Validation Leases Amendment
+
+- 维护者以 task-description commit `a67b8c6` 扩展既有 CI7；分支从 clean retained Candidate `a520ebc` 继续，
+  Git-private scope revision 2 精确绑定 Plan/Validation blob。实现阶段使用 GPT-5.6 Sol medium，未读取或写入
+  W7.3 worktree，未改根 PROGRESS/HANDOFF、产品 Core/CLI/Observatory、版本、release/public/default 或 workflow。
+- 新增 versioned all-of acceptance policy、five gate kinds、human-only experience/operation、pre-approved exact
+  contract mechanical evidence、relevant-surface freshness、legacy shadow/new-task opt-in/explicit adoption、Personal
+  zero-network/Team request-only projection、bounded review packages 与 data-only profiles。
+- Routed formal execution新增 one-run Git-private lease；runner 在加载 tests 前验证 exact Workstream/scope/stage/
+  fingerprint/IDs/p95/budget。unchanged success 复用 prior receipt；failure/timeout cost-blocked，只有 request-bound
+  human override 可重跑。iterating focused、Fast/Checkpoint predictive headroom、valid-receipt timing summaries 与
+  router+runner setup/build total cost 均失败关闭，不改变 15／90 秒或 stage authority。
+- 新 assertions 合并进既有 CI7 final unittest ID，保持 421-ID Promotion inventory。Focused policy/lease/p95/
+  no-repeat 正负 contract 已通过；唯一 amended Fast/Checkpoint、clean Candidate gates 与 final commit evidence
+  在稳定后记录。本分支不 push/main/release，完整 Promotion 留给中央 exact-SHA acceptance。
+
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
 - 唯一整合者从 clean `codex/u1-u2-integration-baseline@6166d15` 先合入 W7.2.3 exact `30d44ff`，再合入 U2.2 exact `70e6ac9`；两条产品文件集合无直接重叠。中央 CI7／ADR-0017 与 W7.2 的 DEVLOG、State、Validation index 只做加法协调，联合 feature merge 为 `0eaad30`。

@@ -1,6 +1,6 @@
 # 实施计划：CI7 Validation Routing Precision & Total-Cost Diagnostics
 
-Status: Worktree Candidate implemented and locally validated; exact-SHA hosted Promotion remains central integration work
+Status: Original `a520ebc` Candidate retained; acceptance-gate/lease amendment implemented, final local receipts pending
 
 Date: 2026-08-29
 
@@ -81,6 +81,65 @@ CI6 已阻止 feature task 直接把任意 unittest 套件冒充层级证据，�
 required checks 继续可用。实现后同步 [Test Coverage State](../../state/test-coverage.md)、独立 Validation、
 DEVLOG 与索引；根 PROGRESS/HANDOFF 由唯一整合者维护。
 
-本分支已完成本地 contract／mutation、portfolio、正式 routed Fast／Checkpoint 与 repository gates；完整
-Promotion 不作为开发循环运行。唯一剩余验收是中央整合后冻结并 push clean exact SHA，再取得 Windows／Ubuntu
-required checks。该剩余项不改变本 Candidate 已实现的数据契约，也不授权本分支 push、main 或 release。
+## 2026-08-30 Maintainer Scope Amendment — Composable Acceptance Gates & Validation Leases
+
+Original Candidate `a520ebc74a0846c148e73312ea2fbf2a32b4b08b` 的 routing/cost 能力保留。维护者根据
+真实 UI Workstream 的重复跨模块测试成本，批准机械化 phase/gate enforcement。该扩展不改变各 stage 的证明
+含义、15／90 秒预算、exact-SHA Promotion 或 required checks；它只控制何时可进入 stage 以及哪类 evidence
+可以解锁。Agent self-acceptance、remote authorization、stage substitution、budget waiver 与 public/default
+activation 仍不在授权内。
+
+### Acceptance policy v1
+
+- [x] 提供 additive/versioned `acceptance_policy` 与可组合 `acceptance_gates`；v1 只支持 `all_of`，不使用互斥
+  `acceptance_mode`、`any_of`、weighted voting 或 Agent-selected omission。
+- [x] 每个 gate 固定 stable ID、kind、`required_before`、authority role、exact contract path/blob OID、surface IDs、
+  status、evidence requirements 与 hashed receipt ref；五类为 `human_experience`、`contract`、`measurement`、
+  `operation_authorization`、`platform_matrix`。
+- [x] status taxonomy 为 proposed／ready／accepted／rejected／stale／unknown；Unknown kind/status 不解锁。
+  Experience/operation 只认声明 role 的 human receipt，operation 还要求 action-time authorization；机械
+  contract/measurement/matrix 必须携带此前 human-approved exact contract。
+- [x] actor/role/revision/scope-CAS/receipt envelope 复用现有权威边界；validation receipt 不成为 ADR/State facts。
+
+### Compatibility, freshness and privacy
+
+- [x] 无 policy 的现有 session 以 `legacy-unclassified` shadow 兼容，不重写历史；human-authorized enforcement
+  record 可要求 activation 之后的新 Workstream 至少声明一个 gate，legacy adoption 必须显式 human-reviewed。
+- [x] acceptance 绑定 relevant `surface_fingerprint`：exact contract blob、mapping registry 与相关 source/test path；
+  无关文档不使其 stale，contract／surface／scope／authority-role 改变会拒绝旧 receipt。
+- [x] Personal 保持 zero-network；Team 只投影 bounded gate metadata 与 request-only capability，不发送 Prompt、
+  transcript、source、diff、credential 或 raw private evidence。
+
+### Validation lease and no-repeat enforcement
+
+- [x] router 只在 gates 满足且 predictive preflight 允许时签发 Git-private `validation_lease`，绑定 Workstream、
+  scope、stage、fingerprint、exact allowed test IDs/count、p95、固定 budget、receipt inputs 与 one-run identity。
+- [x] routed shard runner 在加载测试前拒绝 missing／forged／stale／expired／consumed／wrong-stage／budget-mismatch
+  lease；opt-in Promotion lane 只接受 integration-owned lease。Direct unittest 仍只是 local debugging。
+- [x] 同 Workstream+scope+surface+stage 一次正式运行；成功的 unchanged request 返回 prior receipt。失败／timeout
+  进入 `validation-cost-blocked`，只有绑定 request/revision/CAS 的 human maintainer override 可重跑。
+- [x] `iterating` 只允许 non-evidence focused stage，≤20 tests、≤20s/run、≤120 cumulative seconds/scope；
+  experience gate 未 accepted 前不能进入 Fast/Checkpoint。
+
+### Predictive cost, profiles and integration
+
+- [x] valid receipt 驱动 Git-private per-test/environment p95 summary；unknown history 如实为 Unknown 并在 enforcement
+  下保守拒绝。Fast 在 count>20 或 total p95>10s 时 preflight refusal；Checkpoint 在 single>30s 或 total>60s
+  时 refusal，不改变 15／90 秒 stage budget。
+- [x] prediction 与 cumulative cost 包含 router、runner setup/build、run、retry/optimization cost；节省与投入仍
+  同时展示，且不成为 ROI gate。
+- [x] 提供 UI experience、deterministic contract、measurement、migration/deletion/release operation、platform
+  matrix 与 mixed all-of 的 versioned data profiles；review package 限 purpose/invariants、3–5 representative
+  cases、negative cases、known gaps、contract/fingerprint 与 reproduction ref。
+- [x] Integration 只消费 child receipt refs 并重跑 integration-owned gates；child gate replay 失败关闭。完整
+  docsite、real-Git multi-repository、package/release build 与 matrix 不进入无关 UI iteration。
+
+### Validation and rollout
+
+- [x] focused contract 覆盖 legacy shadow、human/mechanical authority、mixed all-of、five kinds、freshness、Team
+  privacy、lease lifecycle/no-repeat/override、predictive limits、95 秒 Maintenance、integration replay 与 guard。
+- [ ] policy 稳定后只运行一次 routed Fast 和一次 routed Checkpoint；不得以 unchanged fingerprint 重试。
+- [ ] clean Candidate 的 repository/static/diff gates 与 Promotion inventory/lane/required-check 等价需记录到
+  Validation；完整 Promotion 不作为本地开发循环。
+- [ ] hosted/public enforcement 继续为独立维护者决定；中央整合后 push exact non-main SHA 并取得 Windows／
+  Ubuntu required checks，根 PROGRESS/HANDOFF 只由唯一整合者更新。

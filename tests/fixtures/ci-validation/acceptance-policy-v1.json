@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "contract_type": "orrery-acceptance-policy-portfolios-v1",
+  "contract_ref": {
+    "path": "docs/implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md",
+    "blob_oid": "32428b78768b348a350a2554fbf0c98790ab33fe"
+  },
+  "positive_portfolios": [
+    "legacy-shadow",
+    "visual-after-human-acceptance",
+    "pre-accepted-core-contract",
+    "measurement-threshold",
+    "destructive-operation-authorization",
+    "windows-ubuntu-platform-matrix",
+    "mixed-all-of",
+    "unrelated-doc-stability",
+    "idempotent-prior-receipt",
+    "integration-owned-gates-only"
+  ],
+  "negative_portfolios": [
+    "visual-before-human-acceptance",
+    "agent-self-accept",
+    "missing-authority-role",
+    "unknown-gate-kind",
+    "unknown-gate-status",
+    "forged-contract-blob",
+    "forged-surface-fingerprint",
+    "relevant-source-change",
+    "scope-revision-change",
+    "authority-role-revocation",
+    "missing-validation-lease",
+    "forged-validation-lease",
+    "stage-mismatched-lease",
+    "expired-or-consumed-lease",
+    "duplicate-formal-run",
+    "timeout-rerun-without-human-override",
+    "direct-heavy-run-evidence-claim",
+    "fast-selected-count-over-20",
+    "fast-p95-over-10-seconds",
+    "checkpoint-single-p95-over-30-seconds",
+    "checkpoint-total-p95-over-60-seconds",
+    "maintenance-fixture-95-seconds",
+    "guard-removal"
+  ]
+}

@@ -253,13 +253,45 @@ def validate_all(manifest_path: Path) -> list[str]:
             ):
                 if needle not in router_text:
                     errors.append(f"local validation router lost required contract text: {needle}")
+        common_text = (ROOT / "scripts" / "ci" / "_common.py").read_text(encoding="utf-8")
+        runner_text = (ROOT / "scripts" / "ci" / "run_test_shard.py").read_text(encoding="utf-8")
+        for needle in (
+            "orrery-acceptance-policy-v1", "orrery-validation-lease-v1",
+            "validation-cost-blocked", "timing-history-unknown-conservative-refusal",
+        ):
+            if needle not in common_text:
+                errors.append(f"CI7 acceptance/lease guard text is missing: {needle}")
+        if "consume_validation_lease(selection_plan)" not in runner_text:
+            errors.append("formal routed runner lost pre-test validation lease consumption")
         if not (ROOT / "scripts" / "ci" / "change-mapping.json").is_file():
             errors.append("machine-readable change mapping registry is missing")
         if not (ROOT / "scripts" / "ci" / "README.md").is_file():
             errors.append("change mapping registry extension guide is missing")
+        profile_path = ROOT / "scripts" / "ci" / "acceptance-profiles-v1.json"
+        if not profile_path.is_file():
+            errors.append("versioned acceptance policy profiles are missing")
+        else:
+            profiles = load_json(profile_path)
+            expected_kinds = {
+                "human_experience", "contract", "measurement",
+                "operation_authorization", "platform_matrix",
+            }
+            declared_kinds = {
+                kind
+                for profile in profiles.get("profiles", []) if isinstance(profile, dict)
+                for kind in profile.get("gate_kinds", [])
+            }
+            if (
+                profiles.get("schema_version") != 1
+                or profiles.get("contract_type") != "orrery-acceptance-policy-profiles-v1"
+                or profiles.get("composition") != "all_of"
+                or not expected_kinds.issubset(declared_kinds)
+            ):
+                errors.append("acceptance policy profiles lost v1 all_of/five-kind contract")
         production_policy_files = list((ROOT / "scripts" / "ci").glob("*.py")) + [
             ROOT / "scripts" / "ci" / "test-shards.json",
             ROOT / "scripts" / "ci" / "change-mapping.json",
+            ROOT / "scripts" / "ci" / "acceptance-profiles-v1.json",
             ROOT / "scripts" / "ci" / "README.md",
         ]
         task_specific_tokens = (
@@ -294,6 +326,17 @@ def validate_all(manifest_path: Path) -> list[str]:
             }
             if not required_portfolios.issubset(portfolio_ids):
                 errors.append("generic and regression change-routing portfolios are incomplete")
+        acceptance_fixture = ROOT / "tests" / "fixtures" / "ci-validation" / "acceptance-policy-v1.json"
+        if not acceptance_fixture.is_file():
+            errors.append("acceptance policy positive/negative portfolios are missing")
+        else:
+            acceptance_portfolios = load_json(acceptance_fixture)
+            if (
+                acceptance_portfolios.get("schema_version") != 1
+                or not acceptance_portfolios.get("positive_portfolios")
+                or not acceptance_portfolios.get("negative_portfolios")
+            ):
+                errors.append("acceptance policy portfolios are incomplete")
         w7b_shards = [item for item in manifest["shards"] if item["id"] == "team-relations-execution"]
         if len(w7b_shards) != 1:
             errors.append("W7B execution must have one dedicated Promotion shard")

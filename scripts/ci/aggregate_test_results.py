@@ -101,7 +101,41 @@ def aggregate(
         elif any(item.get("successful") is not True for item in records):
             errors.append(f"lane {lane_id} records a failed logical shard")
     by_shard: dict[str, list[dict[str, Any]]] = {}
+    child_receipt_keys: set[tuple[str, int, str]] = set()
+    valid_child_receipt_count = 0
     for payload in payloads:
+        if payload.get("replayed_child_gate") is True:
+            errors.append(
+                f"shard {payload.get('shard')} replayed a child-owned acceptance gate during integration"
+            )
+        refs = payload.get("child_receipt_refs", [])
+        if not isinstance(refs, list):
+            errors.append(f"shard {payload.get('shard')} child receipt references are invalid")
+        else:
+            for reference in refs:
+                if not isinstance(reference, dict) or set(reference) != {
+                    "workstream_id", "scope_revision", "surface_fingerprint",
+                    "receipt_sha256", "gate_scope",
+                }:
+                    errors.append(f"shard {payload.get('shard')} has a malformed child receipt reference")
+                    continue
+                key = (
+                    str(reference["workstream_id"]), int(reference["scope_revision"]),
+                    str(reference["surface_fingerprint"]),
+                ) if isinstance(reference["scope_revision"], int) else ("", 0, "")
+                valid = (
+                    bool(key[0]) and key[1] > 0
+                    and len(key[2]) == 64 and all(char in "0123456789abcdef" for char in key[2])
+                    and isinstance(reference["receipt_sha256"], str)
+                    and len(reference["receipt_sha256"]) == 64
+                    and all(char in "0123456789abcdef" for char in reference["receipt_sha256"])
+                    and reference["gate_scope"] == "child-owned-complete"
+                )
+                if not valid or key in child_receipt_keys:
+                    errors.append(f"shard {payload.get('shard')} has stale, duplicate, or invalid child receipt binding")
+                    continue
+                child_receipt_keys.add(key)
+                valid_child_receipt_count += 1
         by_shard.setdefault(str(payload.get("shard")), []).append(payload)
     expected_shards = set(assignments)
     actual_shards = set(by_shard)
@@ -189,6 +223,8 @@ def aggregate(
         "artifact_lane_count": len(lane_payloads),
         "expected_test_count": len(all_ids),
         "recorded_test_count": len(all_record_ids),
+        "integration_gate_scope": "integration-owned-only",
+        "child_receipts_consumed": valid_child_receipt_count,
         "complete": not errors,
         "errors": errors,
     }

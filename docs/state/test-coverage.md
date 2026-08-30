@@ -9,6 +9,8 @@ Updated: 2026-08-30
 - CI6 integration baseline inventory 为 404 unique unittest IDs、27 logical shards、10 physical lanes/OS、88 Fast、89 Checkpoint；U2 登记后为 415，U2.1 将四组新断言折叠进既有 owner test IDs，registry inventory 保持 415。`team-relations-execution` 保持独立 300 秒 Promotion 预算。
 - CI6 新增 repo-local `scripts/ci/validate_change.py`，从 Git diff、Git-private Workstream subsystem／expected writes 与版本化 mapping registry 自动选择 exact test IDs，并生成绑定 HEAD/base/dirty fingerprint/registry 的 tier receipt。直接 `unittest` 仍可调试，但不能声明正式 Fast／Checkpoint 证据。
 - CI7 Worktree Candidate 将宽 Observatory mapping 拆为 `observatory-shell`／`observatory-graph`／`observatory-maintenance`／`observatory-team-personal`；actual Git paths 优先，宽 expected-write 与路径重叠失败关闭，subsystem 只在无路径证据时保守 fallback。receipt 追加非权威 `cost_diagnostics`、四类 over-budget 诊断、单次 feature triage 与第二独立 Workstream recurrence advisory；这些字段不参与 PASS/FAIL、Authority、release 或自动任务。
+- CI7 maintainer amendment 当前新增 versioned composable `all_of` acceptance gates（experience／contract／measurement／operation／matrix）、exact contract/blob + relevant-surface fingerprint、legacy shadow/new-task opt-in/explicit adoption、human-only experience/operation authority 与 mechanical evidence 的 prior human contract approval。Personal 仍 zero-network；Team 只投影 request-only bounded metadata。
+- Opt-in routed validation 现由 one-run Git-private lease 绑定 Workstream/scope/stage/fingerprint/exact IDs/p95/budget/receipt inputs；runner 在加载测试前拒绝 missing/forged/stale/expired/consumed/wrong-stage lease。unchanged success 返回 prior receipt；failure/timeout 为 `validation-cost-blocked`，无 human override 不可重跑。iterating 只有 non-evidence focused（20 tests／20s／120s per scope）；Fast/Checkpoint predictive headroom 为 20 IDs/10s 与 single 30s/total 60s，未修改原 15／90 秒预算。
 - lane runner 为每个 logical shard 启动独立 Python 子进程，保留原 shard result 并生成 lane receipt；失败、缺失、重复、extra、manifest/SHA/OS/order drift 或取消均使 aggregate 失败关闭。
 - required check 名称仍为 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`；main branch protection strict 且 enforce-admins。
 
@@ -27,6 +29,7 @@ Updated: 2026-08-30
 - W7.2 将布局、折叠、lens 端点、inspector 与 desktop/mobile ledger 断言折叠进既有 Workstream Graph owner IDs，CI inventory／registry 不变。W7.2.1 覆盖 `Ctrl + wheel`、路径焦点、无线路标签、按链收起和 dependency 空态；W7.2.2 增加固定 marker 和全站主题 scrollbar；W7.2.3 固定 88px rank／44px component 间隔并拒绝 synthetic blank row。focused Graph＋Unified 18/18 与 JS syntax PASS；真实 self-host 桌面节点无重叠、边不穿框，390×844 无页面横向溢出，console error/warning 为空。最终 CI6 Fast／Checkpoint receipt 见 W7.2 Validation。
 - U2.2 用既有 owner tests 固定单一连续侧栏、15-entry/8-row Maintenance 队列、四类筛选、eligible/zero-eligible、折叠 policy/history 和移动紧凑行；隔离 Fast 34/34、Checkpoint 40/40 与三档浏览器通过。与 W7.2.3 合流后，联合 Fast 38/38 与真实 1440/390px 页面通过；联合 Checkpoint 的 44 项在既有 Maintenance real-Git fixture 上达到固定 90 秒预算，因此未声明 evidence-eligible PASS。
 - CI7 focused contract/portfolio 5/5、完整 `test_ci_validation` 25/25 与 CI contract PASS；当前 inventory 为 421 exact IDs／27 shards／10 lanes／92 Fast／98 Checkpoint。W7.2 Graph-only 从 CI6 的 `collaboration-maintenance + observatory-ui`／23 Checkpoint（含 Maintenance fixture）收敛为 `observatory-graph`／2（不含 fixture）；U2.2 Maintenance 为 22 项且保留真实 Git fixture；Unified security 为 4 项有界 adjacency。含同行文档的开发树 routed Fast 42/42 为 8.057895s，Checkpoint 42/42 为 7.526136s；clean Candidate exact-SHA receipt 与 hosted Promotion 由中央验收前重放。
+- Amendment assertions 并入现有 CI7 final test ID，因此 Promotion inventory 仍为 421 而不是通过增加 final IDs 扩张；focused policy/lease/p95/no-repeat 正负 contract 已通过，唯一 amended routed Fast/Checkpoint 与 clean Candidate gates 仍待 policy 稳定后各执行一次并记录。
 
 ## 覆盖面
 
@@ -66,7 +69,7 @@ Updated: 2026-08-30
 ## 已知缺口
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
-- CI7 尚待中央 clean exact-SHA Windows／Ubuntu Promotion；本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。
+- CI7 尚待 amended clean Candidate 与中央 exact-SHA Windows／Ubuntu Promotion；本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

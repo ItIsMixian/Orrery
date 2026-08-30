@@ -2,11 +2,16 @@
 
 Date: 2026-08-30
 
-Status: local Worktree Candidate PASS; clean exact-SHA hosted Promotion remains central integration work
+Status: amendment focused contracts PASS; unique amended Fast/Checkpoint and clean Candidate gates pending
 
 Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
 `3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
 No A4.1/W7.3 worktree was read or written.
+
+Amendment authority is task-description commit `a67b8c61243ab6141fd7a94af4cc2d98cdf0c1e9`: Plan blob
+`32428b78768b348a350a2554fbf0c98790ab33fe` and this Validation's pre-implementation expectation blob
+`e0a9892b1eea99e84bdd93adcea10f4a0ab706d1`. Git-private binding scope revision 2 records those OIDs while the
+repository branch continues from retained Candidate `a520ebc74a0846c148e73312ea2fbf2a32b4b08b`.
 
 ## Routing contract
 
@@ -44,6 +49,32 @@ is not an ROI gate or forecast fact.
 Over-budget diagnostics distinguish product failure, router over-selection, fixture/runtime variance and genuinely
 slow paths. A Git-private counter permits one bounded feature-task triage attempt. A recurrence finding appears only
 when the same fingerprint affects a second distinct Workstream; it creates no task, ADR, State or relation fact.
+
+## Acceptance and lease amendment
+
+- `acceptance_policy` schema 1 uses `all_of` composable gates across five stable kinds. Human-experience and
+  operation gates cannot be closed by Agent/session receipts; operation additionally requires action-time human
+  authorization. Contract, measurement and platform matrix close mechanically only with prior human approval of the
+  same exact contract. Unknown kind/status, missing role/revision/scope binding, Agent self-accept and forged
+  contract/receipt/fingerprint all refuse.
+- Relevant fingerprints cover contract blob, mapping registry and gate-owned source/test paths. Unrelated docs are
+  stable; contract, relevant source, scope revision and declared authority role changes stale the receipt. Personal
+  stays zero-network and Team emits only request-only bounded gate metadata.
+- Git-private validation leases bind Workstream/scope/stage/fingerprint/exact IDs/count/p95/budget/receipt inputs and
+  one run. Missing, forged, expired, consumed, wrong-stage and stale leases refuse before test loading. Success is
+  idempotently reused; failure/timeout is `validation-cost-blocked` and an unchanged retry needs a request-bound human
+  maintainer override.
+- Iterating allows only non-evidence focused runs with 20-test/20-second/120-cumulative-second caps. Fast refuses
+  count above 20 or p95 above 10 seconds; Checkpoint refuses single p95 above 30 or total above 60, including the
+  synthetic 95-second Maintenance portfolio. These are preflight refusals, not changed 15/90 budgets or PASS.
+- Versioned profiles cover UI experience, pre-approved deterministic contract, measurement, operation authorization,
+  Windows/Ubuntu matrix and mixed all-of. Review packages are bounded to 3–5 representative cases plus negative
+  cases. Integration accepts child receipt references and rejects child-owned gate replay.
+
+Amendment assertions are intentionally folded into the existing CI7 final unittest ID, so the frozen Promotion
+inventory remains 421 final IDs rather than growing merely to test the router. The first malformed PowerShell focused
+invocation executed no target tests and is not counted green. Corrected focused policy/lease/p95/no-repeat runs pass;
+the unique routed Fast/Checkpoint have not yet been invoked in this amendment.
 
 ## Local evidence
 

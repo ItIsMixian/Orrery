@@ -45,7 +45,8 @@ An unmapped changed path or expected-write declaration produces a non-evidence r
 Run `python -X utf8 scripts/ci/validate_change.py --stage fast --dry-run --explain` first. The JSON explains
 changed paths, Workstream scope, mapping IDs, selected exact tests and owner/tier/cost/dependency metadata. A dry run
 is never tier evidence. Formal Fast/Checkpoint evidence exists only when `validate_change.py` or
-`run_test_shard.py` emits a successful versioned receipt within budget.
+`run_test_shard.py` emits a successful versioned receipt within budget. Direct unittest remains local debugging and
+cannot emit formal tier evidence.
 
 Every receipt adds versioned, non-authoritative `cost_diagnostics`: selected count, test runtime, router/setup wall,
 Git-private mechanically counted reruns, slow IDs, changed test/CI file and line counts, independent optimization Workstream status and host usage.
@@ -58,3 +59,43 @@ An over-budget receipt classifies product failure, router over-selection, fixtur
 slow path. A feature task gets at most one `--bounded-triage` localization attempt and then reports centrally. The
 same bottleneck produces a Git-private advisory recurrence finding only after two distinct Workstream IDs; it never
 creates a task, ADR, State or relation fact.
+
+## Acceptance policy and validation leases
+
+`acceptance_policy` schema 1 is additive. It declares a stable Workstream/scope binding, `all_of` composition and
+one or more gates. Each gate has an ID, one of `human_experience`, `contract`, `measurement`,
+`operation_authorization` or `platform_matrix`, a `required_before` stage, authority role, exact contract path plus
+blob OID, relevant stable surface IDs, status, evidence requirements and a hashed receipt reference. V1 does not
+support `any_of`, weighted voting, gate omission or an `acceptance_mode` shortcut.
+
+Human-experience and operation gates require a human receipt for the declared role; operation authorization must be
+action-time. Contract, measurement and matrix receipts may be mechanical only when they carry the matching prior
+human approval of the exact contract. Unknown kinds/statuses, Agent acceptance, missing role/CAS fields, forged
+contract/receipt/fingerprint and stale scope all remain Unknown or refused. The bounded Team projection exposes
+only gate metadata and request-only capability; Personal remains zero-network and no evidence body, Prompt,
+transcript, source, diff or credential is projected.
+
+Sessions without policy are `legacy-unclassified` during shadow rollout. A human-authorized Git-private enforcement
+record may require gates for Workstreams created after activation; active legacy adoption remains explicit and
+human-reviewed. `acceptance-profiles-v1.json` provides data-only examples for UI experience, deterministic contract,
+measurement, migration/deletion/release authorization, platform matrix and mixed all-of work.
+
+An enforced formal request receives one Git-private `orrery-validation-lease-v1`. The lease binds Workstream, scope
+revision, requested stage, relevant surface fingerprint, exact allowed test IDs/count, local p95 prediction, fixed
+stage budget, receipt inputs and one run identity. The shard runner consumes it before loading tests. Missing,
+forged, stale, expired, consumed, stage-mismatched or budget-mismatched leases fail closed. An unchanged completed
+request returns its prior receipt. Failure or timeout becomes `validation-cost-blocked`; the same source cannot rerun
+without a versioned human maintainer override bound to that request.
+
+In `iterating`, only the non-evidence `focused` stage is allowed: at most 20 mapped tests, 20 seconds per run and 120
+cumulative seconds per Workstream scope revision. Human-experience work cannot reach Fast/Checkpoint until accepted.
+Fast preflight refuses more than 20 tests or predicted p95 above 10 seconds. Checkpoint refuses a single-test p95
+above 30 seconds or total p95 above 60 seconds. Unknown timing history is reported honestly and refuses conservatively
+under enforcement. Git-private summaries are updated only from valid receipts and include router plus runner
+setup/build cost. These predictive limits preserve the fixed 15/90 second stage budgets; they are not waivers or
+stage substitution.
+
+Review packages remain bounded to purpose, invariants, three to five representative cases, negative cases, known
+gaps, exact contract/fingerprint and reproduction reference. Integration may consume child receipt references but
+reruns only integration-owned gates; replaying child-owned gates is a contract error. Hosted/public enforcement is a
+separate maintainer decision, so existing workflow text and required-check names remain unchanged.

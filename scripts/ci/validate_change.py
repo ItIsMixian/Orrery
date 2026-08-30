@@ -14,17 +14,25 @@ from pathlib import Path
 from typing import Any
 
 from _common import (
+    acceptance_surface_fingerprint,
+    block_validation_lease,
     CIValidationError,
     DEFAULT_MANIFEST,
     ROOT,
     atomic_write_json,
     dirty_fingerprint,
+    enforce_acceptance_rollout,
+    evaluate_acceptance_policy,
+    git_private_ci_path,
     git_output,
     git_sha,
     load_json,
     load_mapping_registry,
     machine_inventory,
+    issue_validation_lease,
     sha256_json,
+    timing_prediction,
+    validate_acceptance_policy,
     validate_and_expand_manifest,
 )
 
@@ -200,6 +208,7 @@ def _change_volume(base_sha: str, paths: list[str]) -> dict[str, int]:
 
 def _cost_diagnostics(
     plan: dict[str, Any], *, test_runtime: float | str, slow_ids: list[str],
+    runner_setup_build_wall_seconds: float = 0.0,
 ) -> dict[str, Any]:
     inputs = plan["cost_diagnostic_inputs"]
     baseline = inputs["baseline_test_runtime_seconds"]
@@ -232,6 +241,10 @@ def _cost_diagnostics(
         "selected_test_count": plan["selected_test_count"],
         "test_runtime_seconds": test_runtime,
         "router_setup_wall_seconds": inputs["router_setup_wall_seconds"],
+        "runner_setup_build_wall_seconds": round(runner_setup_build_wall_seconds, 6),
+        "total_setup_build_wall_seconds": round(
+            inputs["router_setup_wall_seconds"] + runner_setup_build_wall_seconds, 6
+        ),
         "rerun_count": inputs["rerun_count"],
         "slow_test_ids": slow_ids,
         "change_volume": inputs["change_volume"],
@@ -426,9 +439,10 @@ def build_selection(
             "no generic mapping was derived from Git diff or Workstream scope",
             ["Add or correct path_mappings metadata for the changed path/subsystem/expected-write surface."],
         )
+    eligibility_stage = "fast" if stage == "focused" else stage
     selected_ids = sorted(
         test_id for test_id, entry in metadata.items()
-        if stage in entry["allowed_stages"] and mapping_ids.intersection(entry["dependencies"])
+        if eligibility_stage in entry["allowed_stages"] and mapping_ids.intersection(entry["dependencies"])
     )
     if not selected_ids:
         raise SelectionRefused(
@@ -440,7 +454,7 @@ def build_selection(
         )
     head = git_sha()
     fingerprint = dirty_fingerprint()
-    budget = float(registry["stages"][stage]["budget_seconds"])
+    budget = 20.0 if stage == "focused" else float(registry["stages"][stage]["budget_seconds"])
     relevant_hash = _hash_working_paths(paths)
     dependency_hash = sha256_json({
         "mappings": path_explain, "selected_test_ids": selected_ids,
@@ -472,7 +486,7 @@ def build_selection(
     }
     return {
         "schema_version": 1, "contract_type": PLAN_TYPE, "stage": stage,
-        "role": registry["stages"][stage]["role"],
+        "role": "local-focused-debug" if stage == "focused" else registry["stages"][stage]["role"],
         "head_sha": head, "base_sha": base_sha, "base_source": base_source,
         "dirty": dirty, "dirty_fingerprint": fingerprint,
         "manifest_sha256": sha256_json(manifest),
@@ -511,6 +525,108 @@ def build_selection(
     }
 
 
+def _timing_history() -> tuple[dict[str, Any], float]:
+    path = git_private_ci_path("timing-summaries-v1.json")
+    if not path.is_file():
+        return {"schema_version": 1, "tests": {}, "router_setup_p95_seconds": {}}, 0.0
+    value = load_json(path)
+    if value.get("schema_version") != 1 or value.get("contract_type") != "orrery-local-timing-summaries-v1":
+        raise CIValidationError("unsupported local timing summary")
+    environment_key = f"{platform.system()}:{platform.python_version()}"
+    setup = value.get("router_setup_p95_seconds", {}).get(environment_key, {}).get("p95_seconds", 0.0)
+    return value, float(setup) if isinstance(setup, (int, float)) else 0.0
+
+
+def _prepare_acceptance(
+    plan: dict[str, Any], *, policy_path: Path | None, session: dict[str, Any] | None,
+    task_phase: str, human_override_path: Path | None, issue_lease: bool,
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    policy = load_json(policy_path) if policy_path is not None else None
+    enforcement_path = git_private_ci_path("acceptance-enforcement-v1.json")
+    enforcement = load_json(enforcement_path) if enforcement_path.is_file() else None
+    rollout_state = enforce_acceptance_rollout(
+        policy, session=session, enforcement=enforcement,
+    )
+    if policy is not None:
+        validate_acceptance_policy(policy, session=session)
+        owned_surfaces = {
+            surface
+            for gate in policy["acceptance_gates"]
+            for surface in gate["surface_ids"]
+        }
+        relevant_paths = {
+            path
+            for item in plan["path_explain"]
+            if item["mapping_id"] in owned_surfaces or owned_surfaces.intersection(item["surfaces"])
+            for path in item["changed_paths"]
+        }
+        relevant_paths.update(
+            f"tests/{test_id.split('.', 1)[0]}.py" for test_id in plan["selected_test_ids"]
+        )
+        surface_fingerprint = acceptance_surface_fingerprint(
+            policy=policy,
+            mapping_registry_sha256=plan["mapping_registry_sha256"],
+            relevant_paths=sorted(relevant_paths),
+        )
+    else:
+        surface_fingerprint = sha256_json({
+            "schema_version": 1,
+            "classification": "legacy-unclassified",
+            "mapping_registry_sha256": plan["mapping_registry_sha256"],
+            "relevant_tree_sha256": plan["reuse"]["key"]["relevant_tree_sha256"],
+            "scope_revision": session.get("scope_revision") if session else None,
+        })
+    acceptance = evaluate_acceptance_policy(
+        policy,
+        requested_stage=plan["stage"],
+        session=session,
+        surface_fingerprint=surface_fingerprint,
+    )
+    history, setup_p95 = _timing_history()
+    environment_key = f"{platform.system()}:{platform.python_version()}"
+    prediction = timing_prediction(
+        plan["selected_test_ids"], stage=plan["stage"], environment_key=environment_key,
+        router_setup_p95_seconds=setup_p95, history=history,
+    )
+    plan["acceptance_policy"] = {
+        "schema_version": 1,
+        "policy_sha256": sha256_json(policy) if policy is not None else "legacy-unclassified",
+        "policy_path": str(policy_path) if policy_path is not None else None,
+        "rollout_state": rollout_state,
+        "evaluation": acceptance,
+    }
+    plan["surface_fingerprint"] = surface_fingerprint
+    plan["acceptance_relevant_paths"] = sorted(relevant_paths) if policy is not None else plan["changed_paths"]
+    plan["timing_prediction"] = prediction
+    plan["task_phase"] = task_phase
+    if not issue_lease:
+        return {"decision": "preview", "acceptance": acceptance, "prediction": prediction}, policy
+    override = load_json(human_override_path) if human_override_path is not None else None
+    receipt_inputs = [str(policy_path)] if policy_path is not None else []
+    if policy is not None:
+        receipt_inputs.extend(
+            str(gate["receipt_ref"]["path"])
+            for gate in policy["acceptance_gates"]
+            if isinstance(gate.get("receipt_ref"), dict)
+        )
+    if human_override_path is not None:
+        receipt_inputs.append(str(human_override_path))
+    scope_revision = int(session.get("scope_revision", 1)) if session else 1
+    result = issue_validation_lease(
+        plan,
+        acceptance=acceptance,
+        prediction=prediction,
+        scope_revision=scope_revision,
+        surface_fingerprint=surface_fingerprint,
+        receipt_inputs=receipt_inputs,
+        human_override=override,
+        task_phase=task_phase,
+    )
+    if result["decision"] == "issued":
+        plan["validation_lease"] = result["lease"]
+    return result, policy
+
+
 def _default_output(stage: str) -> Path:
     raw = str(git_output(["rev-parse", "--path-format=absolute", "--git-path", "orrery/ci-validation/receipts"])).strip()
     return Path(raw) / f"latest-{stage}.json"
@@ -531,7 +647,7 @@ def _dry_receipt(plan: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Route a local change to the only tier-evidence runner")
-    parser.add_argument("--stage", choices=("fast", "checkpoint", "candidate"), required=True)
+    parser.add_argument("--stage", choices=("focused", "fast", "checkpoint", "candidate"), required=True)
     parser.add_argument("--base", help="base SHA/ref; defaults to the Git-private Workstream task base")
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--output", type=Path)
@@ -542,6 +658,12 @@ def main() -> int:
     parser.add_argument("--baseline-test-runtime-seconds", type=float)
     parser.add_argument("--optimization-investment-seconds", type=float)
     parser.add_argument("--independent-optimization-workstream", action="store_true")
+    parser.add_argument("--acceptance-policy", type=Path)
+    parser.add_argument(
+        "--task-phase", choices=("iterating", "validating", "candidate", "promotion"),
+        default="validating",
+    )
+    parser.add_argument("--human-override-receipt", type=Path)
     parser.add_argument(
         "--bounded-triage", action="store_true",
         help="mark this as the one permitted feature-task localization attempt",
@@ -578,6 +700,17 @@ def main() -> int:
         }
         if arguments.bounded_triage and not arguments.dry_run:
             _claim_bounded_triage(plan)
+        lease_result, _ = _prepare_acceptance(
+            plan,
+            policy_path=(arguments.acceptance_policy.resolve() if arguments.acceptance_policy else None),
+            session=session,
+            task_phase=arguments.task_phase,
+            human_override_path=(
+                arguments.human_override_receipt.resolve()
+                if arguments.human_override_receipt else None
+            ),
+            issue_lease=not arguments.dry_run,
+        )
         if arguments.dry_run:
             receipt = _dry_receipt(plan)
             atomic_write_json(output, receipt)
@@ -589,6 +722,13 @@ def main() -> int:
                     f"budget {plan['budget_seconds']}s, receipt {output}"
                 )
             return 0
+        if lease_result["decision"] == "reuse-prior-receipt":
+            receipt = {**lease_result["prior_receipt"], "reused_prior_receipt": True}
+            atomic_write_json(output, receipt)
+            print(
+                f"REUSED {arguments.stage}: unchanged Workstream/surface/stage prior receipt {output}"
+            )
+            return 0 if receipt.get("evidence_eligible") is True else 1
         plan["cost_diagnostic_inputs"]["rerun_count"] = _record_run_attempt(plan)
         plan_path = output.with_suffix(output.suffix + ".plan.json")
         atomic_write_json(plan_path, plan)
@@ -621,23 +761,31 @@ def main() -> int:
                 "bounded_triage_requested": arguments.bounded_triage,
                 "recurrence_finding": "not-evaluated",
             }
+            if isinstance(plan.get("validation_lease"), dict):
+                block_validation_lease(plan["validation_lease"], receipt)
             atomic_write_json(output, receipt)
             print(f"FAIL {arguments.stage}: timed out at {plan['budget_seconds']}s", file=sys.stderr)
             return 1
         if not output.is_file():
             raise CIValidationError("runner returned without a versioned receipt")
         receipt = load_json(output)
+        runner_cost = receipt.get("cost_diagnostics", {})
         receipt["runner_contract_type"] = receipt.get("contract_type")
         receipt["contract_type"] = RECEIPT_TYPE
         receipt["schema_version"] = 1
         receipt["router_explain"] = plan["path_explain"]
         receipt["reuse"] = plan["reuse"]
         receipt["invoked_by"] = "validate_change.py"
-        receipt["evidence_eligible"] = return_code == 0 and receipt.get("successful") is True
+        receipt["evidence_eligible"] = (
+            arguments.stage != "focused" and return_code == 0 and receipt.get("successful") is True
+        )
         receipt["cost_diagnostics"] = _cost_diagnostics(
             plan,
             test_runtime=float(receipt.get("duration_seconds", 0.0)),
             slow_ids=[str(item.get("test_id")) for item in receipt.get("slowest_tests", [])],
+            runner_setup_build_wall_seconds=float(
+                runner_cost.get("runner_setup_build_wall_seconds", 0.0)
+            ),
         )
         if isinstance(receipt.get("over_budget_diagnosis"), dict):
             receipt["over_budget_diagnosis"]["recurrence_finding"] = _record_recurrence(
@@ -646,6 +794,8 @@ def main() -> int:
         atomic_write_json(output, receipt)
         if arguments.explain:
             print(json.dumps(receipt, ensure_ascii=False, indent=2))
+        if arguments.stage == "focused":
+            return 0 if return_code == 0 and receipt.get("successful") is True else 1
         return 0 if receipt["evidence_eligible"] else 1
     except KeyboardInterrupt:
         interruption = {
@@ -670,6 +820,8 @@ def main() -> int:
             "schema_version": 1, "authority": "non-authoritative-advisory",
             "selected_test_count": "Unknown", "test_runtime_seconds": "Unknown",
             "router_setup_wall_seconds": round(time.perf_counter() - started, 6),
+            "runner_setup_build_wall_seconds": "Unknown",
+            "total_setup_build_wall_seconds": "Unknown",
             "rerun_count": "Unknown", "slow_test_ids": [],
             "change_volume": "Unknown", "independent_optimization_workstream": arguments.independent_optimization_workstream,
             "host_usage": {"status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown"},
@@ -702,6 +854,8 @@ def main() -> int:
             "schema_version": 1, "authority": "non-authoritative-advisory",
             "selected_test_count": "Unknown", "test_runtime_seconds": "Unknown",
             "router_setup_wall_seconds": round(time.perf_counter() - started, 6),
+            "runner_setup_build_wall_seconds": "Unknown",
+            "total_setup_build_wall_seconds": "Unknown",
             "rerun_count": "Unknown", "slow_test_ids": [],
             "change_volume": "Unknown", "independent_optimization_workstream": arguments.independent_optimization_workstream,
             "host_usage": {"status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown"},
@@ -738,6 +892,8 @@ def main() -> int:
             "schema_version": 1, "authority": "non-authoritative-advisory",
             "selected_test_count": "Unknown", "test_runtime_seconds": "Unknown",
             "router_setup_wall_seconds": round(time.perf_counter() - started, 6),
+            "runner_setup_build_wall_seconds": "Unknown",
+            "total_setup_build_wall_seconds": "Unknown",
             "rerun_count": "Unknown", "slow_test_ids": [],
             "change_volume": "Unknown", "independent_optimization_workstream": arguments.independent_optimization_workstream,
             "host_usage": {"status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown"},

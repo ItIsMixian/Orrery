@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "contract_type": "orrery-acceptance-policy-profiles-v1",
+  "composition": "all_of",
+  "profiles": [
+    {
+      "id": "ui-experience",
+      "gate_kinds": ["human_experience"],
+      "required_before": "fast",
+      "authority_role": "product-maintainer",
+      "review_package": {
+        "representative_case_count": {"minimum": 3, "maximum": 5},
+        "requires_negative_cases": true,
+        "raw-test-output-is-not-acceptance": true
+      }
+    },
+    {
+      "id": "deterministic-contract",
+      "gate_kinds": ["contract"],
+      "required_before": "fast",
+      "authority_role": "contract-maintainer",
+      "mechanical_close_requires_human_approved_exact_contract": true
+    },
+    {
+      "id": "measured-performance",
+      "gate_kinds": ["measurement"],
+      "required_before": "checkpoint",
+      "authority_role": "performance-maintainer",
+      "mechanical_close_requires_human_approved_exact_contract": true
+    },
+    {
+      "id": "migration-deletion-release-operation",
+      "gate_kinds": ["operation_authorization"],
+      "required_before": "candidate",
+      "authority_role": "release-maintainer",
+      "action_time_human_authorization_required": true
+    },
+    {
+      "id": "platform-matrix",
+      "gate_kinds": ["platform_matrix"],
+      "required_before": "promotion",
+      "authority_role": "release-maintainer",
+      "mechanical_close_requires_human_approved_exact_contract": true
+    },
+    {
+      "id": "mixed-all-of",
+      "gate_kinds": ["human_experience", "contract", "measurement"],
+      "required_before": "checkpoint",
+      "authority_role": "product-maintainer",
+      "composition": "all_of"
+    }
+  ],
+  "rollout_order": ["shadow", "new-workstreams-enforced", "explicit-legacy-adoption"],
+  "forbidden": [
+    "agent-self-acceptance",
+    "remote-operation-authorization",
+    "stage-substitution",
+    "budget-waiver",
+    "public-default-activation"
+  ]
+}

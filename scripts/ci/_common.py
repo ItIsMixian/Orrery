@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import platform
 import re
 import subprocess
 import sys
+import time
 import unittest
 from contextlib import contextmanager
 from pathlib import Path
@@ -27,6 +29,27 @@ REQUIRED_SURFACES = {
     "Context Routing/Harness",
     "Packaging/Adapters/docsite",
     "Release/migration/restore",
+}
+ACCEPTANCE_POLICY_VERSION = 1
+ACCEPTANCE_GATE_KINDS = {
+    "human_experience",
+    "contract",
+    "measurement",
+    "operation_authorization",
+    "platform_matrix",
+}
+ACCEPTANCE_GATE_STATUSES = {
+    "proposed", "ready", "accepted", "rejected", "stale", "unknown",
+}
+HUMAN_ONLY_GATE_KINDS = {"human_experience", "operation_authorization"}
+PREDICTIVE_LIMITS = {
+    "fast": {"selected_count": 20, "total_p95_seconds": 10.0},
+    "checkpoint": {"single_p95_seconds": 30.0, "total_p95_seconds": 60.0},
+    "iterating": {
+        "selected_count": 20,
+        "run_seconds": 20.0,
+        "cumulative_seconds_per_scope_revision": 120.0,
+    },
 }
 
 
@@ -406,3 +429,555 @@ def machine_inventory(manifest: dict[str, Any], root: Path = ROOT) -> dict[str, 
         "tests": entries,
         "generated_on": {"os": platform.system(), "python": platform.python_version()},
     }
+
+
+def git_private_ci_path(name: str, root: Path = ROOT) -> Path:
+    """Resolve one CI-private record without projecting evidence into the repository."""
+    raw = str(git_output(["rev-parse", "--path-format=absolute", "--git-path", "orrery/ci-validation"], root)).strip()
+    return Path(raw) / name
+
+
+def _safe_repository_path(value: Any, *, field: str) -> str:
+    if not isinstance(value, str) or not value or value.startswith(("/", "\\")):
+        raise CIValidationError(f"{field} must be a non-empty repository-relative path")
+    normalized = value.replace("\\", "/")
+    if ".." in Path(normalized).parts:
+        raise CIValidationError(f"{field} escapes the repository")
+    return normalized
+
+
+def validate_contract_ref(value: Any, root: Path = ROOT) -> dict[str, str]:
+    if not isinstance(value, dict) or set(value) != {"path", "blob_oid"}:
+        raise CIValidationError("acceptance gate contract_ref must contain exact path and blob_oid")
+    path = _safe_repository_path(value["path"], field="contract_ref.path")
+    blob = value["blob_oid"]
+    if not isinstance(blob, str) or not re.fullmatch(r"[0-9a-f]{40}", blob):
+        raise CIValidationError("acceptance gate contract_ref blob_oid must be a full lowercase Git OID")
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f"{blob}^{{blob}}"], cwd=root,
+        text=True, capture_output=True, check=False,
+    )
+    if result.returncode != 0:
+        raise CIValidationError("acceptance gate contract_ref blob_oid is missing or forged")
+    return {"path": path, "blob_oid": blob}
+
+
+def validate_acceptance_policy(policy: dict[str, Any], *, session: dict[str, Any] | None = None) -> dict[str, Any]:
+    required = {
+        "schema_version", "contract_type", "rollout_mode", "workstream_id",
+        "scope_revision", "composition", "acceptance_gates",
+    }
+    if set(policy) != required:
+        raise CIValidationError(f"acceptance_policy fields differ from v1: {sorted(set(policy) ^ required)}")
+    if policy["schema_version"] != ACCEPTANCE_POLICY_VERSION or policy["contract_type"] != "orrery-acceptance-policy-v1":
+        raise CIValidationError("unsupported acceptance_policy schema or contract type")
+    if policy["rollout_mode"] not in {"shadow", "new-workstreams-enforced", "explicit-legacy-adoption"}:
+        raise CIValidationError("unknown acceptance_policy rollout_mode")
+    if policy["composition"] != "all_of":
+        raise CIValidationError("acceptance_policy v1 supports all_of only")
+    if not isinstance(policy["workstream_id"], str) or not policy["workstream_id"]:
+        raise CIValidationError("acceptance_policy requires a stable workstream_id")
+    if not isinstance(policy["scope_revision"], int) or isinstance(policy["scope_revision"], bool) or policy["scope_revision"] < 1:
+        raise CIValidationError("acceptance_policy scope_revision must be a positive integer")
+    if session is not None:
+        if policy["workstream_id"] != session.get("workstream_id"):
+            raise CIValidationError("acceptance_policy workstream binding mismatch")
+        if policy["scope_revision"] != session.get("scope_revision"):
+            raise CIValidationError("acceptance_policy scope revision is stale")
+    gates = policy["acceptance_gates"]
+    if not isinstance(gates, list) or not gates:
+        raise CIValidationError("opt-in acceptance_policy requires at least one gate")
+    ids: set[str] = set()
+    normalized: list[dict[str, Any]] = []
+    gate_fields = {
+        "id", "kind", "required_before", "authority_role", "contract_ref",
+        "surface_ids", "status", "evidence_requirements", "receipt_ref",
+    }
+    for gate in gates:
+        if not isinstance(gate, dict) or set(gate) != gate_fields:
+            raise CIValidationError("each acceptance gate must contain the exact v1 fields")
+        gate_id = gate["id"]
+        if not isinstance(gate_id, str) or not SHARD_ID_RE.fullmatch(gate_id) or gate_id in ids:
+            raise CIValidationError("acceptance gate ids must be stable, unique kebab-case ids")
+        ids.add(gate_id)
+        if gate["required_before"] not in {"focused", "fast", "checkpoint", "candidate", "promotion"}:
+            raise CIValidationError("acceptance gate required_before names an unknown stage")
+        if not isinstance(gate["authority_role"], str) or not gate["authority_role"]:
+            raise CIValidationError("acceptance gate authority_role is required")
+        if not isinstance(gate["surface_ids"], list) or not gate["surface_ids"] or any(
+            not isinstance(item, str) or not item for item in gate["surface_ids"]
+        ) or len(set(gate["surface_ids"])) != len(gate["surface_ids"]):
+            raise CIValidationError("acceptance gate surface_ids must be unique non-empty strings")
+        if not isinstance(gate["evidence_requirements"], list) or not gate["evidence_requirements"] or any(
+            not isinstance(item, str) or not item for item in gate["evidence_requirements"]
+        ):
+            raise CIValidationError("acceptance gate evidence_requirements must be non-empty strings")
+        if gate["receipt_ref"] is not None and not isinstance(gate["receipt_ref"], dict):
+            raise CIValidationError("acceptance gate receipt_ref must be null or a reference object")
+        item = dict(gate)
+        item["contract_ref"] = validate_contract_ref(gate["contract_ref"])
+        item["surface_ids"] = sorted(gate["surface_ids"])
+        item["recognized_kind"] = gate["kind"] in ACCEPTANCE_GATE_KINDS
+        item["recognized_status"] = gate["status"] in ACCEPTANCE_GATE_STATUSES
+        normalized.append(item)
+    if policy["rollout_mode"] == "explicit-legacy-adoption" and not any(
+        gate["kind"] in HUMAN_ONLY_GATE_KINDS and gate["status"] == "accepted"
+        for gate in normalized
+    ):
+        raise CIValidationError("explicit legacy adoption requires a human-reviewed accepted mapping gate")
+    return {**policy, "acceptance_gates": normalized}
+
+
+def _load_receipt_reference(reference: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
+    if set(reference) != {"path", "sha256"}:
+        raise CIValidationError("acceptance receipt_ref must contain exact path and sha256")
+    path = Path(str(reference["path"])).expanduser()
+    if not path.is_absolute():
+        path = root / _safe_repository_path(str(reference["path"]), field="receipt_ref.path")
+    if not path.is_file():
+        raise CIValidationError("acceptance receipt_ref is missing")
+    raw = path.read_bytes()
+    expected = reference["sha256"]
+    if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+        raise CIValidationError("acceptance receipt_ref sha256 is invalid")
+    if hashlib.sha256(raw).hexdigest() != expected:
+        raise CIValidationError("acceptance receipt_ref hash mismatch")
+    return load_json(path)
+
+
+def acceptance_surface_fingerprint(
+    *, policy: dict[str, Any], mapping_registry_sha256: str,
+    relevant_paths: list[str], root: Path = ROOT,
+) -> str:
+    normalized = validate_acceptance_policy(policy)
+    path_bindings: list[dict[str, str]] = []
+    for relative in sorted(set(relevant_paths)):
+        value = _safe_repository_path(relative, field="relevant surface path")
+        path = root / value
+        digest = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else "missing"
+        path_bindings.append({"path": value, "sha256": digest})
+    contracts = sorted(
+        (gate["contract_ref"] for gate in normalized["acceptance_gates"]),
+        key=lambda item: (item["path"], item["blob_oid"]),
+    )
+    return sha256_json({
+        "schema_version": 1,
+        "contract_refs": contracts,
+        "mapping_registry_sha256": mapping_registry_sha256,
+        "relevant_paths": path_bindings,
+    })
+
+
+def evaluate_acceptance_policy(
+    policy: dict[str, Any] | None, *, requested_stage: str,
+    session: dict[str, Any] | None, surface_fingerprint: str | None,
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    if policy is None:
+        return {
+            "schema_version": 1, "classification": "legacy-unclassified",
+            "rollout_mode": "shadow", "decision": "shadow-allow",
+            "requested_stage": requested_stage, "gate_results": [],
+            "human_authority_required": False,
+        }
+    normalized = validate_acceptance_policy(policy, session=session)
+    stage_order = {"focused": 0, "fast": 1, "checkpoint": 2, "candidate": 3, "promotion": 4}
+    if requested_stage not in stage_order:
+        raise CIValidationError("acceptance evaluation requested an unknown stage")
+    results: list[dict[str, Any]] = []
+    for gate in normalized["acceptance_gates"]:
+        if stage_order[gate["required_before"]] > stage_order[requested_stage]:
+            continue
+        result = {"id": gate["id"], "kind": gate["kind"], "status": "unknown", "satisfied": False}
+        if not gate["recognized_kind"] or not gate["recognized_status"]:
+            result["reason"] = "unknown-kind-or-status"
+        elif gate["status"] != "accepted":
+            result.update({"status": gate["status"], "reason": "gate-not-accepted"})
+        elif gate["receipt_ref"] is None:
+            result["reason"] = "accepted-gate-missing-receipt"
+        else:
+            receipt = _load_receipt_reference(gate["receipt_ref"], root)
+            binding_ok = (
+                receipt.get("workstream_id") == normalized["workstream_id"]
+                and receipt.get("scope_revision") == normalized["scope_revision"]
+                and receipt.get("gate_id") == gate["id"]
+                and receipt.get("contract_ref") == gate["contract_ref"]
+                and receipt.get("authority_role") == gate["authority_role"]
+                and receipt.get("decision") == "accepted"
+                and isinstance(receipt.get("actor_id"), str)
+                and isinstance(receipt.get("revision"), int)
+                and receipt.get("revision", 0) > 0
+                and receipt.get("expected_scope_revision") == normalized["scope_revision"]
+            )
+            fingerprint_ok = receipt.get("surface_fingerprint") == surface_fingerprint
+            if gate["kind"] in HUMAN_ONLY_GATE_KINDS:
+                authority_ok = receipt.get("actor_type") == "human"
+                if gate["kind"] == "operation_authorization":
+                    authority_ok = authority_ok and receipt.get("action_time_authorized") is True
+            else:
+                approval = receipt.get("contract_approval")
+                authority_ok = (
+                    receipt.get("actor_type") == "mechanical"
+                    and isinstance(approval, dict)
+                    and approval.get("actor_type") == "human"
+                    and approval.get("decision") == "accepted"
+                    and approval.get("contract_ref") == gate["contract_ref"]
+                )
+                if gate["kind"] == "contract":
+                    authority_ok = authority_ok and receipt.get("contract_result") == "pass"
+                elif gate["kind"] == "measurement":
+                    authority_ok = authority_ok and receipt.get("threshold_result") == "pass"
+                elif gate["kind"] == "platform_matrix":
+                    authority_ok = authority_ok and receipt.get("platform_results") == {
+                        "windows-latest": "pass", "ubuntu-latest": "pass",
+                    }
+            if binding_ok and fingerprint_ok and authority_ok:
+                result.update({"status": "accepted", "satisfied": True, "reason": "receipt-verified"})
+            else:
+                result["reason"] = "receipt-authority-binding-or-fingerprint-mismatch"
+        results.append(result)
+    satisfied = all(item["satisfied"] for item in results)
+    decision = "allow" if satisfied else "refuse"
+    return {
+        "schema_version": 1,
+        "classification": "declared-policy",
+        "rollout_mode": normalized["rollout_mode"],
+        "decision": decision,
+        "requested_stage": requested_stage,
+        "gate_results": results,
+        "human_authority_required": any(
+            gate["kind"] in HUMAN_ONLY_GATE_KINDS
+            and stage_order[gate["required_before"]] <= stage_order[requested_stage]
+            for gate in normalized["acceptance_gates"]
+        ),
+    }
+
+
+def enforce_acceptance_rollout(
+    policy: dict[str, Any] | None, *, session: dict[str, Any] | None,
+    enforcement: dict[str, Any] | None,
+) -> str:
+    """Classify shadow/new-task/explicit-adoption without rewriting legacy session bytes."""
+    if enforcement is None:
+        return "legacy-shadow"
+    if (
+        enforcement.get("schema_version") != 1
+        or enforcement.get("contract_type") != "orrery-acceptance-enforcement-v1"
+        or enforcement.get("mode") not in {"shadow", "new-workstreams-enforced", "explicit-legacy-adoption"}
+        or not isinstance(enforcement.get("activated_at"), str)
+        or enforcement.get("human_decision") != "accepted"
+    ):
+        raise CIValidationError("acceptance enforcement record is missing human authority or has an unknown mode")
+    mode = enforcement["mode"]
+    if mode == "shadow":
+        return "legacy-shadow" if policy is None else "declared-shadow"
+    captured = session.get("captured_at") if isinstance(session, dict) else None
+    is_new = isinstance(captured, str) and captured >= enforcement["activated_at"]
+    if mode == "new-workstreams-enforced" and is_new and policy is None:
+        raise CIValidationError("new Workstream created after opt-in enforcement must declare acceptance gates")
+    if mode == "explicit-legacy-adoption" and not is_new:
+        if policy is None or policy.get("rollout_mode") != "explicit-legacy-adoption":
+            raise CIValidationError("legacy Workstream adoption requires a human-reviewed explicit mapping")
+    return "enforced" if policy is not None else "legacy-shadow"
+
+
+def project_team_acceptance_metadata(policy: dict[str, Any] | None) -> dict[str, Any]:
+    """Project bounded request-only metadata; never evidence bodies or source/diff content."""
+    if policy is None:
+        return {"schema_version": 1, "classification": "legacy-unclassified", "gates": []}
+    normalized = validate_acceptance_policy(policy)
+    return {
+        "schema_version": 1,
+        "classification": "declared-policy",
+        "composition": "all_of",
+        "gates": [{
+            "id": gate["id"], "kind": gate["kind"],
+            "required_before": gate["required_before"],
+            "authority_role": gate["authority_role"],
+            "surface_ids": gate["surface_ids"], "status": gate["status"],
+        } for gate in normalized["acceptance_gates"]],
+        "execution_capability": "request-only",
+        "network_default": "personal-zero-network",
+    }
+
+
+def validate_review_package(value: dict[str, Any]) -> dict[str, Any]:
+    required = {
+        "schema_version", "contract_type", "purpose", "invariants", "representative_cases",
+        "negative_cases", "known_gaps", "contract_ref", "surface_fingerprint", "reproduction_ref",
+    }
+    if set(value) != required or value.get("schema_version") != 1 or value.get("contract_type") != "orrery-acceptance-review-package-v1":
+        raise CIValidationError("review package differs from bounded v1 contract")
+    cases = value["representative_cases"]
+    if not isinstance(value["purpose"], str) or not value["purpose"]:
+        raise CIValidationError("review package purpose is required")
+    if not isinstance(value["invariants"], list) or not value["invariants"]:
+        raise CIValidationError("review package invariants are required")
+    if not isinstance(cases, list) or not 3 <= len(cases) <= 5:
+        raise CIValidationError("review package requires 3-5 representative cases")
+    if not isinstance(value["negative_cases"], list) or not value["negative_cases"]:
+        raise CIValidationError("review package requires negative cases")
+    if not isinstance(value["known_gaps"], list):
+        raise CIValidationError("review package known_gaps must be a list")
+    if not isinstance(value["reproduction_ref"], str) or not value["reproduction_ref"]:
+        raise CIValidationError("review package reproduction_ref is required")
+    validate_contract_ref(value["contract_ref"])
+    if not isinstance(value["surface_fingerprint"], str) or not re.fullmatch(r"[0-9a-f]{64}", value["surface_fingerprint"]):
+        raise CIValidationError("review package surface_fingerprint is invalid")
+    return value
+
+
+def timing_prediction(
+    test_ids: list[str], *, stage: str, environment_key: str,
+    router_setup_p95_seconds: float = 0.0, history: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    history = history or {"tests": {}}
+    durations: list[float] = []
+    unknown: list[str] = []
+    for test_id in test_ids:
+        item = history.get("tests", {}).get(f"{environment_key}:{test_id}")
+        if not isinstance(item, dict) or not isinstance(item.get("p95_seconds"), (int, float)):
+            unknown.append(test_id)
+        else:
+            durations.append(float(item["p95_seconds"]))
+    predicted = round(router_setup_p95_seconds + sum(durations), 6) if not unknown else "Unknown"
+    single = round(max(durations), 6) if durations and not unknown else "Unknown"
+    reasons: list[str] = []
+    if stage == "fast":
+        if len(test_ids) > PREDICTIVE_LIMITS["fast"]["selected_count"]:
+            reasons.append("fast-selected-count-exceeds-20")
+        if predicted == "Unknown":
+            reasons.append("timing-history-unknown-conservative-refusal")
+        elif predicted > PREDICTIVE_LIMITS["fast"]["total_p95_seconds"]:
+            reasons.append("fast-predicted-p95-exceeds-10-seconds")
+    elif stage == "checkpoint":
+        if predicted == "Unknown":
+            reasons.append("timing-history-unknown-conservative-refusal")
+        else:
+            if single > PREDICTIVE_LIMITS["checkpoint"]["single_p95_seconds"]:
+                reasons.append("checkpoint-single-test-p95-exceeds-30-seconds")
+            if predicted > PREDICTIVE_LIMITS["checkpoint"]["total_p95_seconds"]:
+                reasons.append("checkpoint-total-p95-exceeds-60-seconds")
+    return {
+        "schema_version": 1, "environment_key": environment_key,
+        "selected_count": len(test_ids), "predicted_total_p95_seconds": predicted,
+        "predicted_single_test_p95_seconds": single, "unknown_test_ids": unknown,
+        "router_setup_p95_seconds": router_setup_p95_seconds,
+        "setup_build_p95_seconds": router_setup_p95_seconds,
+        "decision": "refuse" if reasons else "allow", "reasons": reasons,
+    }
+
+
+def update_timing_summary(
+    receipt: dict[str, Any], *, environment_key: str, root: Path = ROOT,
+) -> dict[str, Any]:
+    if receipt.get("successful") is not True or receipt.get("evidence_eligible") is not True:
+        raise CIValidationError("only valid successful receipts may update timing summaries")
+    path = git_private_ci_path("timing-summaries-v1.json", root)
+    value: dict[str, Any] = {
+        "schema_version": 1, "contract_type": "orrery-local-timing-summaries-v1", "tests": {},
+        "router_setup_p95_seconds": {},
+    }
+    if path.is_file():
+        value = load_json(path)
+        if value.get("contract_type") != "orrery-local-timing-summaries-v1" or value.get("schema_version") != 1:
+            raise CIValidationError("unsupported local timing summary")
+    for record in receipt.get("records", []):
+        if not isinstance(record, dict) or not isinstance(record.get("duration_seconds"), (int, float)):
+            continue
+        key = f"{environment_key}:{record['test_id']}"
+        samples = list(value["tests"].get(key, {}).get("samples", []))[-19:]
+        samples.append(float(record["duration_seconds"]))
+        ordered = sorted(samples)
+        index = max(0, math.ceil(0.95 * len(ordered)) - 1)
+        value["tests"][key] = {"samples": samples, "p95_seconds": round(ordered[index], 6)}
+    setup = receipt.get("cost_diagnostics", {}).get(
+        "total_setup_build_wall_seconds",
+        receipt.get("cost_diagnostics", {}).get("router_setup_wall_seconds"),
+    )
+    if isinstance(setup, (int, float)):
+        samples = list(value["router_setup_p95_seconds"].get(environment_key, {}).get("samples", []))[-19:]
+        samples.append(float(setup))
+        ordered = sorted(samples)
+        value["router_setup_p95_seconds"][environment_key] = {
+            "samples": samples, "p95_seconds": round(ordered[max(0, math.ceil(0.95 * len(ordered)) - 1)], 6),
+        }
+    atomic_write_json(path, value)
+    return value
+
+
+def _lease_ledger(root: Path = ROOT) -> tuple[Path, dict[str, Any]]:
+    path = git_private_ci_path("validation-leases-v1.json", root)
+    value: dict[str, Any] = {
+        "schema_version": 1,
+        "contract_type": "orrery-validation-lease-ledger-v1",
+        "leases": {},
+        "iteration_cost_seconds": {},
+    }
+    if path.is_file():
+        value = load_json(path)
+        if value.get("schema_version") != 1 or value.get("contract_type") != "orrery-validation-lease-ledger-v1":
+            raise CIValidationError("unsupported validation lease ledger")
+    return path, value
+
+
+def _validate_human_override(value: dict[str, Any] | None, *, request_key: str) -> bool:
+    if value is None:
+        return False
+    return (
+        set(value) == {
+            "schema_version", "contract_type", "actor_type", "actor_id", "authority_role",
+            "decision", "request_key", "expected_lease_status", "revision",
+            "previous_receipt_sha256",
+        }
+        and
+        value.get("schema_version") == 1
+        and value.get("contract_type") == "orrery-validation-rerun-override-v1"
+        and value.get("actor_type") == "human"
+        and value.get("authority_role") == "maintainer"
+        and isinstance(value.get("actor_id"), str) and bool(value.get("actor_id"))
+        and value.get("decision") == "authorized"
+        and value.get("request_key") == request_key
+        and value.get("expected_lease_status") == "validation-cost-blocked"
+        and isinstance(value.get("revision"), int) and value.get("revision") > 0
+        and isinstance(value.get("previous_receipt_sha256"), str)
+        and bool(re.fullmatch(r"[0-9a-f]{64}", value.get("previous_receipt_sha256", "")))
+    )
+
+
+def issue_validation_lease(
+    plan: dict[str, Any], *, acceptance: dict[str, Any], prediction: dict[str, Any],
+    scope_revision: int, surface_fingerprint: str, receipt_inputs: list[str],
+    human_override: dict[str, Any] | None = None, task_phase: str = "validating",
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    if acceptance.get("decision") not in {"allow", "shadow-allow"}:
+        raise CIValidationError("required acceptance gates are not satisfied for the requested stage")
+    shadow = acceptance.get("decision") == "shadow-allow"
+    if prediction.get("decision") != "allow" and not shadow:
+        raise CIValidationError("predictive budget refusal: " + ", ".join(prediction.get("reasons", [])))
+    workstream_id = plan.get("workstream", {}).get("workstream_id")
+    if not isinstance(workstream_id, str) or not workstream_id:
+        raise CIValidationError("validation lease requires a Git-private Workstream identity")
+    identity = {
+        "workstream_id": workstream_id, "scope_revision": scope_revision,
+        "stage": plan["stage"], "surface_fingerprint": surface_fingerprint,
+    }
+    request_key = sha256_json(identity)
+    path, ledger = _lease_ledger(root)
+    previous = ledger["leases"].get(request_key)
+    if isinstance(previous, dict) and not shadow:
+        if previous.get("status") == "completed" and previous.get("receipt"):
+            return {"decision": "reuse-prior-receipt", "request_key": request_key, "prior_receipt": previous["receipt"]}
+        if previous.get("status") == "validation-cost-blocked" and not _validate_human_override(human_override, request_key=request_key):
+            raise CIValidationError("validation-cost-blocked; unchanged-source rerun requires a human override receipt")
+        if previous.get("status") in {"issued", "consumed"}:
+            raise CIValidationError("duplicate formal validation request already has an active one-run lease")
+    if plan["stage"] == "focused" and task_phase != "iterating":
+        raise CIValidationError("focused validation is debug-only and requires the iterating phase")
+    if task_phase == "iterating":
+        if plan["stage"] != "focused":
+            raise CIValidationError("iterating permits focused validation only; Fast/Checkpoint remain locked")
+        iteration_key = f"{workstream_id}:{scope_revision}"
+        cumulative = float(ledger["iteration_cost_seconds"].get(iteration_key, 0.0))
+        if len(plan["selected_test_ids"]) > 20 or prediction["predicted_total_p95_seconds"] == "Unknown" or float(prediction["predicted_total_p95_seconds"]) > 20:
+            raise CIValidationError("iterating focused validation exceeds 20 tests or 20 seconds")
+        if cumulative + float(prediction["predicted_total_p95_seconds"]) > 120:
+            raise CIValidationError("iterating cumulative validation exceeds 120 seconds for this scope revision")
+    run_identity = sha256_json({**identity, "selected_test_ids": plan["selected_test_ids"], "prediction": prediction})
+    lease = {
+        "schema_version": 1,
+        "contract_type": "orrery-validation-lease-v1",
+        **identity,
+        "request_key": request_key,
+        "run_identity": run_identity,
+        "allowed_test_ids": plan["selected_test_ids"],
+        "selected_count": len(plan["selected_test_ids"]),
+        "predicted_p95": prediction,
+        "budget_seconds": plan["budget_seconds"],
+        "receipt_inputs": receipt_inputs,
+        "acceptance_decision": acceptance["decision"],
+        "enforcement": "shadow" if shadow else "enforced",
+        "task_phase": task_phase,
+        "override_authorized": _validate_human_override(human_override, request_key=request_key),
+        "issued_at_epoch": time.time(),
+        "expires_at_epoch": time.time() + 900.0,
+    }
+    lease["lease_id"] = sha256_json(lease)
+    if not shadow:
+        ledger["leases"][request_key] = {"status": "issued", "lease": lease}
+        atomic_write_json(path, ledger)
+    return {"decision": "issued", "request_key": request_key, "lease": lease}
+
+
+def consume_validation_lease(plan: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
+    lease = plan.get("validation_lease")
+    if not isinstance(lease, dict) or lease.get("contract_type") != "orrery-validation-lease-v1":
+        raise CIValidationError("formal selection plan is missing a validation lease")
+    expected_id = lease.get("lease_id")
+    unsigned = {key: value for key, value in lease.items() if key != "lease_id"}
+    if not isinstance(expected_id, str) or expected_id != sha256_json(unsigned):
+        raise CIValidationError("validation lease is forged")
+    if lease.get("stage") != plan.get("stage") or lease.get("allowed_test_ids") != plan.get("selected_test_ids"):
+        raise CIValidationError("validation lease stage or allowed test IDs mismatch")
+    if lease.get("surface_fingerprint") != plan.get("surface_fingerprint"):
+        raise CIValidationError("validation lease surface fingerprint is stale")
+    if lease.get("budget_seconds") != plan.get("budget_seconds"):
+        raise CIValidationError("validation lease budget mismatch")
+    if not isinstance(lease.get("expires_at_epoch"), (int, float)) or time.time() > float(lease["expires_at_epoch"]):
+        raise CIValidationError("validation lease is expired")
+    if lease.get("enforcement") == "shadow":
+        return lease
+    path, ledger = _lease_ledger(root)
+    entry = ledger["leases"].get(lease.get("request_key"))
+    if not isinstance(entry, dict) or entry.get("status") != "issued" or entry.get("lease") != lease:
+        raise CIValidationError("validation lease is missing, expired, consumed, or superseded")
+    entry["status"] = "consumed"
+    atomic_write_json(path, ledger)
+    return lease
+
+
+def finalize_validation_lease(
+    lease: dict[str, Any], receipt: dict[str, Any], *, root: Path = ROOT,
+) -> None:
+    if lease.get("enforcement") == "shadow":
+        return
+    path, ledger = _lease_ledger(root)
+    entry = ledger["leases"].get(lease.get("request_key"))
+    if not isinstance(entry, dict) or entry.get("status") != "consumed" or entry.get("lease") != lease:
+        raise CIValidationError("cannot finalize a missing or unconsumed validation lease")
+    successful = receipt.get("successful") is True and (
+        receipt.get("evidence_eligible") is True
+        or (lease.get("task_phase") == "iterating" and lease.get("stage") == "focused")
+    )
+    entry["status"] = "completed" if successful else "validation-cost-blocked"
+    entry["receipt"] = {**receipt, "validation_lease_id": lease.get("lease_id")}
+    if lease.get("task_phase") == "iterating":
+        key = f"{lease['workstream_id']}:{lease['scope_revision']}"
+        ledger["iteration_cost_seconds"][key] = round(
+            float(ledger["iteration_cost_seconds"].get(key, 0.0))
+            + float(receipt.get("duration_seconds", 0.0))
+            + float(receipt.get("cost_diagnostics", {}).get(
+                "total_setup_build_wall_seconds",
+                receipt.get("cost_diagnostics", {}).get("router_setup_wall_seconds", 0.0),
+            )), 6,
+        )
+    atomic_write_json(path, ledger)
+
+
+def block_validation_lease(
+    lease: dict[str, Any], receipt: dict[str, Any], *, root: Path = ROOT,
+) -> None:
+    if lease.get("enforcement") == "shadow":
+        return
+    path, ledger = _lease_ledger(root)
+    entry = ledger["leases"].get(lease.get("request_key"))
+    if (
+        not isinstance(entry, dict)
+        or entry.get("status") not in {"issued", "consumed"}
+        or entry.get("lease") != lease
+    ):
+        raise CIValidationError("cannot block a missing, completed, or superseded validation lease")
+    entry["status"] = "validation-cost-blocked"
+    entry["receipt"] = {**receipt, "validation_lease_id": lease.get("lease_id")}
+    atomic_write_json(path, ledger)

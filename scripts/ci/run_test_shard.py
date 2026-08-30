@@ -17,8 +17,11 @@ from _common import (
     DEFAULT_MANIFEST,
     ROOT,
     atomic_write_json,
+    block_validation_lease,
+    consume_validation_lease,
     dirty_fingerprint,
     expand_profile,
+    finalize_validation_lease,
     flatten_suite,
     git_sha,
     load_json,
@@ -26,6 +29,7 @@ from _common import (
     machine_inventory,
     repository_import_path,
     sha256_json,
+    update_timing_summary,
     validate_and_expand_manifest,
 )
 
@@ -210,6 +214,7 @@ def run_selected(
     *, manifest_path: Path, shard: str | None, profile: str | None, output: Path,
     selection_plan_path: Path | None = None,
 ) -> tuple[dict[str, object], bool]:
+    runner_setup_started = time.perf_counter()
     manifest = load_json(manifest_path)
     all_ids, assignments, _ = validate_and_expand_manifest(manifest)
     inventory = machine_inventory(manifest)
@@ -217,6 +222,7 @@ def run_selected(
     head_before = git_sha()
     dirty_before = dirty_fingerprint()
     selection_plan: dict[str, Any] | None = None
+    validation_lease: dict[str, Any] | None = None
     if selection_plan_path is not None:
         if shard is not None or profile is not None:
             raise CIValidationError("selection plan cannot be combined with --shard or --profile")
@@ -240,7 +246,7 @@ def run_selected(
         if selected_ids != sorted(set(selected_ids)):
             raise CIValidationError("selection plan test IDs must be sorted and unique")
         stage = str(selection_plan.get("stage"))
-        if stage not in {"fast", "checkpoint", "candidate"}:
+        if stage not in {"focused", "fast", "checkpoint", "candidate"}:
             raise CIValidationError(f"selection plan has invalid stage: {stage}")
         shard_id = stage
         role = str(selection_plan.get("role"))
@@ -251,6 +257,7 @@ def run_selected(
         selector_dependency_hash = str(
             selection_plan["reuse"]["key"]["selector_dependency_sha256"]
         )
+        validation_lease = consume_validation_lease(selection_plan)
     elif profile is not None:
         selected_ids = expand_profile(manifest, profile, all_ids)
         shard_id = profile
@@ -293,7 +300,21 @@ def run_selected(
             tree.stdout.strip().lower() if tree.returncode == 0 else sha256_json([head_before, dirty_before])
         )
     diagnostic_inputs = _cost_inputs(selection_plan)
-    suite = _load_selected_tests(selected_ids)
+    try:
+        suite = _load_selected_tests(selected_ids)
+    except (CIValidationError, OSError) as exc:
+        if validation_lease is not None:
+            block_validation_lease(validation_lease, {
+                "schema_version": 2,
+                "contract_type": "orrery-test-shard-result-v2",
+                "outcome": "runner-error",
+                "successful": False,
+                "evidence_eligible": False,
+                "duration_seconds": 0.0,
+                "runner_errors": [str(exc)],
+            })
+        raise
+    runner_setup_wall_seconds = max(0.0, time.perf_counter() - runner_setup_started)
     started = time.perf_counter()
     with repository_import_path(ROOT):
         result = unittest.TextTestRunner(verbosity=2, resultclass=TimedTextResult).run(suite)
@@ -348,7 +369,7 @@ def run_selected(
         "tests_run": result.testsRun,
         "successful": successful,
         "completed": True,
-        "evidence_eligible": successful,
+        "evidence_eligible": successful and stage != "focused",
         "outcome": outcome,
         "duration_seconds": round(duration, 6),
         "budget_seconds": budget_seconds,
@@ -370,6 +391,10 @@ def run_selected(
             "selected_test_count": len(selected_ids),
             "test_runtime_seconds": round(duration, 6),
             "router_setup_wall_seconds": diagnostic_inputs["router_setup_wall_seconds"],
+            "runner_setup_build_wall_seconds": round(runner_setup_wall_seconds, 6),
+            "total_setup_build_wall_seconds": round(
+                diagnostic_inputs["router_setup_wall_seconds"] + runner_setup_wall_seconds, 6
+            ),
             "rerun_count": diagnostic_inputs["rerun_count"],
             "slow_test_ids": [str(item["test_id"]) for item in slowest],
             "change_volume": diagnostic_inputs["change_volume"],
@@ -389,7 +414,22 @@ def run_selected(
             budget_seconds=budget_seconds, selection_plan=selection_plan,
         ),
     }
+    if selection_plan is not None and validation_lease is not None:
+        payload.update({
+            "acceptance_policy": selection_plan.get("acceptance_policy"),
+            "surface_fingerprint": selection_plan.get("surface_fingerprint"),
+            "timing_prediction": selection_plan.get("timing_prediction"),
+            "task_phase": selection_plan.get("task_phase"),
+            "validation_lease_id": validation_lease["lease_id"],
+        })
     atomic_write_json(output, payload)
+    if validation_lease is not None:
+        finalize_validation_lease(validation_lease, payload)
+        if successful and stage != "focused":
+            update_timing_summary(
+                payload,
+                environment_key=f"{platform.system()}:{platform.python_version()}",
+            )
     return payload, successful
 
 
@@ -402,6 +442,17 @@ def main() -> int:
     group.add_argument("--selection-plan", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
+
+    def block_plan_lease(failure: dict[str, object]) -> None:
+        if arguments.selection_plan is None or not arguments.selection_plan.is_file():
+            return
+        try:
+            plan = load_json(arguments.selection_plan.resolve())
+            lease = plan.get("validation_lease")
+            if isinstance(lease, dict):
+                block_validation_lease(lease, failure)
+        except (CIValidationError, OSError):
+            return
     try:
         payload, successful = run_selected(
             manifest_path=arguments.manifest.resolve(),
@@ -448,6 +499,7 @@ def main() -> int:
             "python": platform.python_version(),
         }
         atomic_write_json(arguments.output.resolve(), failure)
+        block_plan_lease(failure)
         print("FAIL shard runner: interrupted; no tier evidence is valid", file=sys.stderr)
         return 130
     except (CIValidationError, OSError) as exc:
@@ -476,6 +528,7 @@ def main() -> int:
             "python": platform.python_version(),
         }
         atomic_write_json(arguments.output.resolve(), failure)
+        block_plan_lease(failure)
         print(f"FAIL shard runner: {exc}", file=sys.stderr)
         return 2
 

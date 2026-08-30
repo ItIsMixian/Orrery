@@ -8,6 +8,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import hashlib
 from pathlib import Path
 from unittest import mock
 
@@ -21,13 +22,23 @@ from _common import (  # noqa: E402
     CIValidationError,
     DEFAULT_MANIFEST,
     atomic_write_json,
+    acceptance_surface_fingerprint,
+    consume_validation_lease,
+    enforce_acceptance_rollout,
+    evaluate_acceptance_policy,
     expand_profile,
     git_sha,
+    issue_validation_lease,
     load_json,
     load_mapping_registry,
     machine_inventory,
     promotion_lane_assignments,
+    project_team_acceptance_metadata,
     sha256_json,
+    finalize_validation_lease,
+    timing_prediction,
+    validate_acceptance_policy,
+    validate_review_package,
     validate_and_expand_manifest,
     validate_mapping_registry,
 )
@@ -54,6 +65,9 @@ class CIValidationTests(unittest.TestCase):
         self.registry = load_mapping_registry(self.manifest)
         self.portfolios = load_json(
             ROOT / "tests" / "fixtures" / "ci-validation" / "change-portfolios-v1.json"
+        )
+        self.acceptance_portfolios = load_json(
+            ROOT / "tests" / "fixtures" / "ci-validation" / "acceptance-policy-v1.json"
         )
 
     def _write_manifest(self, directory: Path, manifest: dict) -> Path:
@@ -216,6 +230,38 @@ class CIValidationTests(unittest.TestCase):
                 "synthetic-session.json",
             )
 
+    def _acceptance_policy(self, gates: list[dict], *, rollout: str = "new-workstreams-enforced") -> dict:
+        return {
+            "schema_version": 1,
+            "contract_type": "orrery-acceptance-policy-v1",
+            "rollout_mode": rollout,
+            "workstream_id": "acceptance-fixture",
+            "scope_revision": 2,
+            "composition": "all_of",
+            "acceptance_gates": gates,
+        }
+
+    def _acceptance_gate(
+        self, gate_id: str, kind: str, *, required_before: str = "fast",
+        status: str = "accepted", receipt_ref: dict | None = None,
+    ) -> dict:
+        return {
+            "id": gate_id,
+            "kind": kind,
+            "required_before": required_before,
+            "authority_role": "product-maintainer" if kind == "human_experience" else "contract-maintainer",
+            "contract_ref": self.acceptance_portfolios["contract_ref"],
+            "surface_ids": ["observatory-graph"],
+            "status": status,
+            "evidence_requirements": ["exact-contract", "surface-fingerprint"],
+            "receipt_ref": receipt_ref,
+        }
+
+    @staticmethod
+    def _receipt_reference(path: Path, payload: dict) -> dict:
+        atomic_write_json(path, payload)
+        return {"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+
     def test_generic_router_selects_docs_authority_and_collaboration_portfolios(self) -> None:
         generic = [
             portfolio for portfolio in self.portfolios["portfolios"]
@@ -257,6 +303,7 @@ class CIValidationTests(unittest.TestCase):
         production = list(CI_SCRIPTS.glob("*.py")) + [
             CI_SCRIPTS / "test-shards.json",
             CI_SCRIPTS / "change-mapping.json",
+            CI_SCRIPTS / "acceptance-profiles-v1.json",
             CI_SCRIPTS / "README.md",
         ]
         for path in production:
@@ -363,6 +410,7 @@ class CIValidationTests(unittest.TestCase):
         self.assertEqual(diagnostic["host_usage"]["status"], "Unknown")
         self.assertEqual(diagnostic["host_usage"]["agent_token_usage"], "Unknown")
         self.assertEqual(diagnostic["gate_effect"], "none")
+        self.assertEqual(diagnostic["total_setup_build_wall_seconds"], 0.25)
         self.assertEqual(diagnostic["break_even"]["break_even_runs"], 5)
         self.assertEqual(diagnostic["break_even"]["projected_net_savings_seconds"], 20.0)
 
@@ -434,6 +482,418 @@ class CIValidationTests(unittest.TestCase):
         ):
             self.assertEqual(_record_run_attempt(plan), 0)
             self.assertEqual(_record_run_attempt(plan), 1)
+
+        self._assert_acceptance_policy_all_of_authority_freshness_and_team_projection()
+        self._assert_validation_lease_is_one_run_idempotent_and_failure_requires_human_override()
+        self._assert_predictive_p95_and_iterating_caps_refuse_before_execution()
+        self._assert_formal_selection_plan_without_lease_refuses_before_test_loading()
+
+    def _assert_acceptance_policy_all_of_authority_freshness_and_team_projection(self) -> None:
+        session = {"workstream_id": "acceptance-fixture", "scope_revision": 2}
+        legacy = evaluate_acceptance_policy(
+            None, requested_stage="fast", session=session, surface_fingerprint="0" * 64
+        )
+        self.assertEqual(legacy["classification"], "legacy-unclassified")
+        self.assertEqual(legacy["decision"], "shadow-allow")
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            human_path = directory / "human.json"
+            gate = self._acceptance_gate(
+                "experience", "human_experience",
+                receipt_ref={"path": str(human_path), "sha256": "0" * 64},
+            )
+            policy = self._acceptance_policy([gate])
+            fingerprint = acceptance_surface_fingerprint(
+                policy=policy,
+                mapping_registry_sha256=sha256_json(self.registry),
+                relevant_paths=["scripts/ci/validate_change.py"],
+            )
+            human_receipt = {
+                "schema_version": 1,
+                "contract_type": "orrery-acceptance-gate-receipt-v1",
+                "workstream_id": "acceptance-fixture",
+                "scope_revision": 2,
+                "expected_scope_revision": 2,
+                "gate_id": "experience",
+                "contract_ref": self.acceptance_portfolios["contract_ref"],
+                "authority_role": "product-maintainer",
+                "actor_type": "human",
+                "actor_id": "maintainer-fixture",
+                "revision": 1,
+                "decision": "accepted",
+                "surface_fingerprint": fingerprint,
+            }
+            policy["acceptance_gates"][0]["receipt_ref"] = self._receipt_reference(
+                human_path, human_receipt
+            )
+            accepted = evaluate_acceptance_policy(
+                policy, requested_stage="fast", session=session,
+                surface_fingerprint=fingerprint,
+            )
+            self.assertEqual(accepted["decision"], "allow")
+            self.assertEqual(evaluate_acceptance_policy(
+                policy, requested_stage="checkpoint", session=session,
+                surface_fingerprint=fingerprint,
+            )["decision"], "allow")
+            agent_receipt = {**human_receipt, "actor_type": "agent", "actor_id": "agent-fixture"}
+            policy["acceptance_gates"][0]["receipt_ref"] = self._receipt_reference(
+                directory / "agent.json", agent_receipt
+            )
+            self.assertEqual(evaluate_acceptance_policy(
+                policy, requested_stage="fast", session=session,
+                surface_fingerprint=fingerprint,
+            )["decision"], "refuse")
+
+            contract_path = directory / "contract.json"
+            contract_gate = self._acceptance_gate(
+                "contract-proof", "contract",
+                receipt_ref={"path": str(contract_path), "sha256": "0" * 64},
+            )
+            mixed = self._acceptance_policy([copy.deepcopy(gate), contract_gate])
+            mixed_fingerprint = acceptance_surface_fingerprint(
+                policy=mixed,
+                mapping_registry_sha256=sha256_json(self.registry),
+                relevant_paths=["scripts/ci/validate_change.py"],
+            )
+            mixed_human_receipt = {**human_receipt, "surface_fingerprint": mixed_fingerprint}
+            mixed["acceptance_gates"][0]["receipt_ref"] = self._receipt_reference(
+                human_path, mixed_human_receipt
+            )
+            mechanical = {
+                **mixed_human_receipt,
+                "gate_id": "contract-proof",
+                "authority_role": "contract-maintainer",
+                "actor_type": "mechanical",
+                "actor_id": "ci-contract-evaluator",
+                "contract_result": "pass",
+                "contract_approval": {
+                    "actor_type": "human", "decision": "accepted",
+                    "contract_ref": self.acceptance_portfolios["contract_ref"],
+                },
+            }
+            mixed["acceptance_gates"][1]["receipt_ref"] = self._receipt_reference(
+                contract_path, mechanical
+            )
+            self.assertEqual(evaluate_acceptance_policy(
+                mixed, requested_stage="fast", session=session,
+                surface_fingerprint=mixed_fingerprint,
+            )["decision"], "allow")
+            revoked = copy.deepcopy(mixed)
+            revoked["acceptance_gates"][0]["authority_role"] = "revoked-role"
+            self.assertEqual(evaluate_acceptance_policy(
+                revoked, requested_stage="fast", session=session,
+                surface_fingerprint=mixed_fingerprint,
+            )["decision"], "refuse")
+            projection = project_team_acceptance_metadata(mixed)
+            projection_text = json.dumps(projection)
+            self.assertEqual(projection["execution_capability"], "request-only")
+            self.assertEqual(projection["network_default"], "personal-zero-network")
+            self.assertNotIn(str(human_path), projection_text)
+            self.assertNotIn("contract_approval", projection_text)
+
+            for kind, actor_type, evidence in (
+                ("measurement", "mechanical", {"threshold_result": "pass"}),
+                ("operation_authorization", "human", {"action_time_authorized": True}),
+                (
+                    "platform_matrix", "mechanical",
+                    {"platform_results": {"windows-latest": "pass", "ubuntu-latest": "pass"}},
+                ),
+            ):
+                gate_path = directory / f"{kind}.json"
+                kind_gate = self._acceptance_gate(
+                    f"{kind.replace('_', '-')}-gate", kind,
+                    receipt_ref={"path": str(gate_path), "sha256": "0" * 64},
+                )
+                kind_policy = self._acceptance_policy([kind_gate])
+                kind_fingerprint = acceptance_surface_fingerprint(
+                    policy=kind_policy,
+                    mapping_registry_sha256=sha256_json(self.registry),
+                    relevant_paths=["scripts/ci/validate_change.py"],
+                )
+                kind_receipt = {
+                    **human_receipt,
+                    "gate_id": kind_gate["id"],
+                    "authority_role": kind_gate["authority_role"],
+                    "actor_type": actor_type,
+                    "actor_id": f"{kind}-evaluator",
+                    "surface_fingerprint": kind_fingerprint,
+                    **evidence,
+                }
+                if actor_type == "mechanical":
+                    kind_receipt["contract_approval"] = {
+                        "actor_type": "human", "decision": "accepted",
+                        "contract_ref": self.acceptance_portfolios["contract_ref"],
+                    }
+                kind_policy["acceptance_gates"][0]["receipt_ref"] = self._receipt_reference(
+                    gate_path, kind_receipt
+                )
+                self.assertEqual(evaluate_acceptance_policy(
+                    kind_policy, requested_stage="fast", session=session,
+                    surface_fingerprint=kind_fingerprint,
+                )["decision"], "allow", kind)
+
+        unknown = self._acceptance_policy([
+            self._acceptance_gate("unknown-kind", "future-kind", status="future-status")
+        ])
+        result = evaluate_acceptance_policy(
+            unknown, requested_stage="fast", session=session, surface_fingerprint="1" * 64
+        )
+        self.assertEqual(result["decision"], "refuse")
+        self.assertEqual(result["gate_results"][0]["reason"], "unknown-kind-or-status")
+        stale_scope = copy.deepcopy(unknown)
+        stale_scope["scope_revision"] = 1
+        with self.assertRaisesRegex(CIValidationError, "scope revision is stale"):
+            validate_acceptance_policy(stale_scope, session=session)
+        forged_blob = copy.deepcopy(unknown)
+        forged_blob["acceptance_gates"][0]["contract_ref"]["blob_oid"] = "0" * 40
+        with self.assertRaisesRegex(CIValidationError, "missing or forged"):
+            validate_acceptance_policy(forged_blob)
+        explicit_legacy = copy.deepcopy(unknown)
+        explicit_legacy["rollout_mode"] = "explicit-legacy-adoption"
+        with self.assertRaisesRegex(CIValidationError, "human-reviewed"):
+            validate_acceptance_policy(explicit_legacy)
+        enforcement = {
+            "schema_version": 1,
+            "contract_type": "orrery-acceptance-enforcement-v1",
+            "mode": "new-workstreams-enforced",
+            "activated_at": "2026-08-30T00:00:00Z",
+            "human_decision": "accepted",
+        }
+        with self.assertRaisesRegex(CIValidationError, "must declare acceptance gates"):
+            enforce_acceptance_rollout(
+                None,
+                session={**session, "captured_at": "2026-08-30T01:00:00Z"},
+                enforcement=enforcement,
+            )
+        self.assertEqual(enforce_acceptance_rollout(
+            None,
+            session={**session, "captured_at": "2026-08-29T23:00:00Z"},
+            enforcement=enforcement,
+        ), "legacy-shadow")
+
+        with tempfile.TemporaryDirectory() as temporary, mock.patch(
+            "_common.validate_acceptance_policy", return_value=unknown
+        ):
+            root = Path(temporary)
+            (root / "surface.txt").write_text("one", encoding="utf-8")
+            first = acceptance_surface_fingerprint(
+                policy=unknown, mapping_registry_sha256="a" * 64,
+                relevant_paths=["surface.txt"], root=root,
+            )
+            (root / "unrelated.md").write_text("ignored", encoding="utf-8")
+            stable = acceptance_surface_fingerprint(
+                policy=unknown, mapping_registry_sha256="a" * 64,
+                relevant_paths=["surface.txt"], root=root,
+            )
+            (root / "surface.txt").write_text("two", encoding="utf-8")
+            changed = acceptance_surface_fingerprint(
+                policy=unknown, mapping_registry_sha256="a" * 64,
+                relevant_paths=["surface.txt"], root=root,
+            )
+        self.assertEqual(first, stable)
+        self.assertNotEqual(first, changed)
+        validate_review_package({
+            "schema_version": 1,
+            "contract_type": "orrery-acceptance-review-package-v1",
+            "purpose": "review one bounded user-visible behavior",
+            "invariants": ["no authority drift"],
+            "representative_cases": ["before", "after", "boundary"],
+            "negative_cases": ["rejected input"],
+            "known_gaps": [],
+            "contract_ref": self.acceptance_portfolios["contract_ref"],
+            "surface_fingerprint": "2" * 64,
+            "reproduction_ref": "local:review-package",
+        })
+
+    def _assert_validation_lease_is_one_run_idempotent_and_failure_requires_human_override(self) -> None:
+        acceptance = {"decision": "allow"}
+        prediction = {
+            "decision": "allow", "reasons": [], "predicted_total_p95_seconds": 1.0,
+        }
+        plan = {
+            "stage": "fast", "budget_seconds": 15.0,
+            "selected_test_ids": ["fixture.test"],
+            "workstream": {"workstream_id": "acceptance-fixture"},
+            "surface_fingerprint": "3" * 64,
+        }
+        with tempfile.TemporaryDirectory() as temporary, mock.patch(
+            "_common.git_private_ci_path",
+            side_effect=lambda name, root=ROOT: Path(temporary) / name,
+        ):
+            issued = issue_validation_lease(
+                plan, acceptance=acceptance, prediction=prediction, scope_revision=2,
+                surface_fingerprint=plan["surface_fingerprint"], receipt_inputs=["human.json"],
+            )
+            plan["validation_lease"] = issued["lease"]
+            consumed = consume_validation_lease(plan)
+            self.assertEqual(consumed["run_identity"], issued["lease"]["run_identity"])
+            passed_receipt = {
+                "contract_type": "orrery-test-shard-result-v2", "outcome": "passed",
+                "successful": True, "evidence_eligible": True, "duration_seconds": 0.5,
+            }
+            finalize_validation_lease(consumed, passed_receipt)
+            reused = issue_validation_lease(
+                plan, acceptance=acceptance, prediction=prediction, scope_revision=2,
+                surface_fingerprint=plan["surface_fingerprint"], receipt_inputs=["human.json"],
+            )
+            self.assertEqual(reused["decision"], "reuse-prior-receipt")
+            checkpoint_plan = {
+                **plan, "stage": "checkpoint", "budget_seconds": 90.0,
+            }
+            checkpoint_plan.pop("validation_lease", None)
+            checkpoint = issue_validation_lease(
+                checkpoint_plan, acceptance=acceptance, prediction=prediction,
+                scope_revision=2, surface_fingerprint=checkpoint_plan["surface_fingerprint"],
+                receipt_inputs=["human.json"],
+            )
+            checkpoint_plan["validation_lease"] = checkpoint["lease"]
+            checkpoint_lease = consume_validation_lease(checkpoint_plan)
+            finalize_validation_lease(checkpoint_lease, passed_receipt)
+            self.assertEqual(issue_validation_lease(
+                checkpoint_plan, acceptance=acceptance, prediction=prediction,
+                scope_revision=2, surface_fingerprint=checkpoint_plan["surface_fingerprint"],
+                receipt_inputs=["human.json"],
+            )["decision"], "reuse-prior-receipt")
+
+            failed_plan = {**plan, "surface_fingerprint": "4" * 64}
+            failed_plan.pop("validation_lease")
+            failed = issue_validation_lease(
+                failed_plan, acceptance=acceptance, prediction=prediction, scope_revision=2,
+                surface_fingerprint=failed_plan["surface_fingerprint"], receipt_inputs=[],
+            )
+            failed_plan["validation_lease"] = failed["lease"]
+            failed_lease = consume_validation_lease(failed_plan)
+            finalize_validation_lease(failed_lease, {
+                "contract_type": "orrery-test-shard-result-v2", "outcome": "failed",
+                "successful": False, "evidence_eligible": False, "duration_seconds": 0.25,
+            })
+            with self.assertRaisesRegex(CIValidationError, "human override"):
+                issue_validation_lease(
+                    failed_plan, acceptance=acceptance, prediction=prediction, scope_revision=2,
+                    surface_fingerprint=failed_plan["surface_fingerprint"], receipt_inputs=[],
+                )
+            override = {
+                "schema_version": 1,
+                "contract_type": "orrery-validation-rerun-override-v1",
+                "actor_type": "human",
+                "actor_id": "maintainer-fixture",
+                "authority_role": "maintainer",
+                "decision": "authorized",
+                "request_key": failed["request_key"],
+                "expected_lease_status": "validation-cost-blocked",
+                "revision": 1,
+                "previous_receipt_sha256": "5" * 64,
+            }
+            authorized = issue_validation_lease(
+                failed_plan, acceptance=acceptance, prediction=prediction, scope_revision=2,
+                surface_fingerprint=failed_plan["surface_fingerprint"], receipt_inputs=[],
+                human_override=override,
+            )
+            self.assertTrue(authorized["lease"]["override_authorized"])
+            forged_plan = copy.deepcopy(failed_plan)
+            forged_plan["validation_lease"] = copy.deepcopy(authorized["lease"])
+            forged_plan["validation_lease"]["allowed_test_ids"] = ["forged.test"]
+            with self.assertRaisesRegex(CIValidationError, "forged"):
+                consume_validation_lease(forged_plan)
+            stage_mismatch = copy.deepcopy(failed_plan)
+            stage_mismatch["validation_lease"] = copy.deepcopy(authorized["lease"])
+            stage_mismatch["stage"] = "checkpoint"
+            with self.assertRaisesRegex(CIValidationError, "stage or allowed test IDs mismatch"):
+                consume_validation_lease(stage_mismatch)
+            with self.assertRaisesRegex(CIValidationError, "missing a validation lease"):
+                consume_validation_lease({key: value for key, value in plan.items() if key != "validation_lease"})
+
+            expired_plan = {**plan, "surface_fingerprint": "7" * 64}
+            expired_plan.pop("validation_lease", None)
+            with mock.patch("_common.time.time", return_value=100.0):
+                expired = issue_validation_lease(
+                    expired_plan, acceptance=acceptance, prediction=prediction, scope_revision=2,
+                    surface_fingerprint=expired_plan["surface_fingerprint"], receipt_inputs=[],
+                )
+            expired_plan["validation_lease"] = expired["lease"]
+            with mock.patch("_common.time.time", return_value=1001.0), self.assertRaisesRegex(
+                CIValidationError, "expired"
+            ):
+                consume_validation_lease(expired_plan)
+            with self.assertRaisesRegex(CIValidationError, "predictive budget refusal"):
+                issue_validation_lease(
+                    {**plan, "surface_fingerprint": "8" * 64}, acceptance=acceptance,
+                    prediction={"decision": "refuse", "reasons": ["fixture-p95-over-budget"]},
+                    scope_revision=2, surface_fingerprint="8" * 64, receipt_inputs=[],
+                )
+
+    def _assert_predictive_p95_and_iterating_caps_refuse_before_execution(self) -> None:
+        environment = "FixtureOS:3.11"
+        history = {"tests": {
+            f"{environment}:fast.one": {"p95_seconds": 4.0},
+            f"{environment}:fast.two": {"p95_seconds": 5.0},
+            f"{environment}:slow.maintenance": {"p95_seconds": 95.0},
+        }}
+        allowed = timing_prediction(
+            ["fast.one", "fast.two"], stage="fast", environment_key=environment,
+            router_setup_p95_seconds=1.0, history=history,
+        )
+        self.assertEqual(allowed["decision"], "allow")
+        count_refusal = timing_prediction(
+            [f"known.{index}" for index in range(21)], stage="fast",
+            environment_key=environment, history={"tests": {
+                f"{environment}:known.{index}": {"p95_seconds": 0.1} for index in range(21)
+            }},
+        )
+        self.assertIn("fast-selected-count-exceeds-20", count_refusal["reasons"])
+        unknown = timing_prediction(
+            ["unknown.test"], stage="fast", environment_key=environment, history=history
+        )
+        self.assertIn("timing-history-unknown-conservative-refusal", unknown["reasons"])
+        maintenance = timing_prediction(
+            ["slow.maintenance"], stage="checkpoint", environment_key=environment, history=history
+        )
+        self.assertIn("checkpoint-single-test-p95-exceeds-30-seconds", maintenance["reasons"])
+        self.assertIn("checkpoint-total-p95-exceeds-60-seconds", maintenance["reasons"])
+
+        plan = {
+            "stage": "fast", "budget_seconds": 15.0,
+            "selected_test_ids": ["fast.one"],
+            "workstream": {"workstream_id": "iterating-fixture"},
+            "surface_fingerprint": "6" * 64,
+        }
+        with tempfile.TemporaryDirectory() as temporary, mock.patch(
+            "_common.git_private_ci_path",
+            side_effect=lambda name, root=ROOT: Path(temporary) / name,
+        ):
+            too_slow = {"decision": "allow", "reasons": [], "predicted_total_p95_seconds": 21.0}
+            with self.assertRaisesRegex(CIValidationError, "focused validation only"):
+                issue_validation_lease(
+                    plan, acceptance={"decision": "allow"}, prediction=allowed,
+                    scope_revision=2, surface_fingerprint=plan["surface_fingerprint"],
+                    receipt_inputs=[], task_phase="iterating",
+                )
+            focused_plan = {**plan, "stage": "focused", "budget_seconds": 20.0}
+            with self.assertRaisesRegex(CIValidationError, "20 tests or 20 seconds"):
+                issue_validation_lease(
+                    focused_plan, acceptance={"decision": "allow"}, prediction=too_slow,
+                    scope_revision=2, surface_fingerprint=focused_plan["surface_fingerprint"],
+                    receipt_inputs=[], task_phase="iterating",
+                )
+
+    def _assert_formal_selection_plan_without_lease_refuses_before_test_loading(self) -> None:
+        portfolio = next(
+            item for item in self.portfolios["portfolios"] if item["id"] == "w7-2-graph-only"
+        )
+        plan = self._select_portfolio(portfolio)
+        plan["dirty_fingerprint"] = ci_common.dirty_fingerprint()
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            plan_path = directory / "plan.json"
+            atomic_write_json(plan_path, plan)
+            with mock.patch("run_test_shard._load_selected_tests") as loader, self.assertRaisesRegex(
+                CIValidationError, "missing a validation lease"
+            ):
+                run_selected(
+                    manifest_path=DEFAULT_MANIFEST, shard=None, profile=None,
+                    output=directory / "receipt.json", selection_plan_path=plan_path,
+                )
+            loader.assert_not_called()
 
     def test_unmapped_path_refuses_formal_receipt_and_explains_registry_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -572,6 +1032,10 @@ class CIValidationTests(unittest.TestCase):
             self.assertEqual(payload["budget_seconds"], 15.0)
             self.assertEqual(payload["mapping_registry_sha256"], sha256_json(registry))
             self.assertFalse(payload["budget_exceeded"])
+            self.assertGreaterEqual(
+                payload["cost_diagnostics"]["total_setup_build_wall_seconds"],
+                payload["cost_diagnostics"]["router_setup_wall_seconds"],
+            )
             self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["shard"], "fast")
 
     def test_runner_enforces_profile_budget_without_changing_promotion_semantics(self) -> None:
@@ -627,6 +1091,7 @@ class CIValidationTests(unittest.TestCase):
                 copy.deepcopy(payloads[duplicate_target]["records"][0])
             )
             payloads[duplicate_target]["successful"] = False
+            payloads[duplicate_target]["replayed_child_gate"] = True
             self._write_payloads(directory, payloads)
             result = aggregate(
                 manifest_path=DEFAULT_MANIFEST,
@@ -642,6 +1107,7 @@ class CIValidationTests(unittest.TestCase):
             self.assertIn("did not execute exactly once", joined)
             self.assertIn("cancelled", joined)
             self.assertIn("skipped", joined)
+            self.assertIn("replayed a child-owned acceptance gate", joined)
             self.assertTrue(assignments[removed])
 
     def test_aggregate_fails_on_missing_or_drifted_lane_receipt(self) -> None:
