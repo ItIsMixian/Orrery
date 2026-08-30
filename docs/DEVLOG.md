@@ -724,3 +724,17 @@
 - 维护者在真实浅色页面指出少量节点仍被 disconnected component 的整行空白过度拉开；从 exact clean `4e62dba` 登记 Git-private `W7.2.3-workstream-graph-density-correction` 后写入，根 PROGRESS/HANDOFF 未修改。
 - Observatory 0.1.16 保持 248×104px 卡片与可读字号，将 rank 通道从 112px 收至 88px，并用 44px 显式 component gap 替代额外 138px synthetic row；canvas 高度改由最后一个真实节点决定。
 - 真实 self-host 14 节点／7 边桌面测量为 component gap 44px、rank gap 88px、0 node overlap、0 route/card crossing；390px 继续显示同事实 ledger，console 为空。Core facts、折叠语义、只读与所有执行安全边界未改变。
+
+## 2026-08-30 — CI7 Validation Routing Precision & Total-Cost Diagnostics Candidate
+
+- 从 exact `codex/u1-u2-integration-baseline@3fc7e7a` 建立独立分支并在首次仓库写入前注册 Git-private
+  `CI7-validation-routing-precision-total-cost`；primary `test-coverage`，affected `project-structure`／
+  `documentation-system`／`release-and-toolchain`。实现阶段使用 GPT-5.6 Sol medium；未读取或写入并发
+  A4.1/W7.3 worktree，未修改根 PROGRESS/HANDOFF。
+- 宽 `observatory-ui` 拆为四个 provider-neutral surface；actual path 优先，宽 expected-write、unknown 与
+  overlap 失败关闭。真实 W7.2 Graph portfolio 从 23 项且含 Maintenance fixture 收敛为 2 项且不含该
+  fixture；U2.2 Maintenance 22 项继续保留 real-Git/Quick Remove 门；Unified security 为 4 项有界 adjacency。
+- receipt 追加非权威 cost/over-budget diagnostics、一次 feature triage 与第二独立 Workstream recurrence
+  advisory。宿主 usage 不可得时写 `Unknown`，不估 token；expected future runs/break-even 永不升级为 gate。
+  focused 5/5、CI contract、完整 CI suite 25/25、最终开发树 Fast 42/42（8.057895s）与 Checkpoint 42/42
+  （7.526136s）通过。完整 Promotion 不作开发循环；clean exact-SHA hosted checks 留给中央整合。

@@ -1,6 +1,6 @@
 # 实施计划：CI7 Validation Routing Precision & Total-Cost Diagnostics
 
-Status: Planned; implementation not started
+Status: Worktree Candidate implemented and locally validated; exact-SHA hosted Promotion remains central integration work
 
 Date: 2026-08-29
 
@@ -40,31 +40,31 @@ CI6 已阻止 feature task 直接把任意 unittest 套件冒充层级证据，�
 
 ## Phase 1 — split generic Observatory surfaces
 
-- [ ] 将宽 `observatory-ui` 数据映射拆成稳定、可复用的 `observatory-shell`、`observatory-graph`、
+- [x] 将宽 `observatory-ui` 数据映射拆成稳定、可复用的 `observatory-shell`、`observatory-graph`、
   `observatory-maintenance` 与 `observatory-team-personal` surface；不得包含 task ID 或 branch 名。
-- [ ] 以实际 changed paths 为首要输入；Git-private subsystem 只在没有路径证据时保守 fallback。
-- [ ] expected writes 必须是精确文件或受支持的窄 glob；目录级宽声明生成 refusal／required metadata，不能扩大
+- [x] 以实际 changed paths 为首要输入；Git-private subsystem 只在没有路径证据时保守 fallback。
+- [x] expected writes 必须是精确文件或受支持的窄 glob；目录级宽声明生成 refusal／required metadata，不能扩大
   正式选择面。
-- [ ] Graph presentation 变化不选择 Maintenance Git fixture；Maintenance provider／Quick Remove 变化仍选择其
+- [x] Graph presentation 变化不选择 Maintenance Git fixture；Maintenance provider／Quick Remove 变化仍选择其
   当前安全门；Unified common security 变化选择所有受影响 consumer 的小型 adjacency。
-- [ ] 保持 Promotion inventory 每个 final unittest ID 恰好一次，完整 Windows／Ubuntu覆盖不变。
+- [x] 保持 Promotion inventory 每个 final unittest ID 恰好一次，完整 Windows／Ubuntu覆盖不变。
 
 ## Phase 2 — total validation cost diagnostics
 
-- [ ] 在 receipt 中增加纯诊断 `cost_diagnostics`，至少机械记录：selected test count、test runtime、router/setup
+- [x] 在 receipt 中增加纯诊断 `cost_diagnostics`，至少机械记录：selected test count、test runtime、router/setup
   wall time、rerun count、slow IDs、修改的 test/CI 文件数与行数、是否由独立 optimization Workstream 产生。
-- [ ] 可获得宿主 usage 时记录真实 Agent/tool usage；不可获得时写 `unknown`，不得估算或伪造 token。
-- [ ] 允许维护者提供 advisory `expected_future_runs`，CLI 计算简单 break-even 次数；该值不成为 PASS／FAIL、
+- [x] 可获得宿主 usage 时记录真实 Agent/tool usage；不可获得时写 `unknown`，不得估算或伪造 token。
+- [x] 允许维护者提供 advisory `expected_future_runs`，CLI 计算简单 break-even 次数；该值不成为 PASS／FAIL、
   Authority、release 或自动任务创建依据。
-- [ ] Validation 同时报告测试节省和优化投入；只展示“最终快了多少”不能称为整体效率改进。
+- [x] Validation 同时报告测试节省和优化投入；只展示“最终快了多少”不能称为整体效率改进。
 
 ## Phase 3 — feature-task stop and central triage
 
-- [ ] over-budget receipt 明确区分：产品 test failure、router over-selection、fixture/runtime variance 与真正慢路径。
-- [ ] feature task 默认停止并回报；中央可选择重新路由、建立独立 CI task 或继续保持 blocked，不得要求功能
+- [x] over-budget receipt 明确区分：产品 test failure、router over-selection、fixture/runtime variance 与真正慢路径。
+- [x] feature task 默认停止并回报；中央可选择重新路由、建立独立 CI task 或继续保持 blocked，不得要求功能
   Agent 自行追绿。
-- [ ] 第一次偶发超时只保留证据；同一瓶颈第二次影响独立 Workstream 时生成 advisory recurrence finding。
-- [ ] finding 只属于 Git-private／Validation 诊断，不自动形成 ADR、State、关系事实或执行任务。
+- [x] 第一次偶发超时只保留证据；同一瓶颈第二次影响独立 Workstream 时生成 advisory recurrence finding。
+- [x] finding 只属于 Git-private／Validation 诊断，不自动形成 ADR、State、关系事实或执行任务。
 
 ## Validation portfolios
 
@@ -80,3 +80,7 @@ CI6 已阻止 feature task 直接把任意 unittest 套件冒充层级证据，�
 和 exact-SHA hosted Promotion。回滚只恢复 CI7 registry／diagnostic字段；CI6 runner、现有预算、Promotion 与
 required checks 继续可用。实现后同步 [Test Coverage State](../../state/test-coverage.md)、独立 Validation、
 DEVLOG 与索引；根 PROGRESS/HANDOFF 由唯一整合者维护。
+
+本分支已完成本地 contract／mutation、portfolio、正式 routed Fast／Checkpoint 与 repository gates；完整
+Promotion 不作为开发循环运行。唯一剩余验收是中央整合后冻结并 push clean exact SHA，再取得 Windows／Ubuntu
+required checks。该剩余项不改变本 Candidate 已实现的数据契约，也不授权本分支 push、main 或 release。

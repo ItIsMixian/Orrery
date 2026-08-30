@@ -60,6 +60,8 @@
         "packages/project-orrery-core/src/project_orrery_core/schema/authority-*.json",
         "packages/project-orrery-cli/src/project_orrery_cli/__main__.py",
         "packages/project-orrery-cli/src/project_orrery_cli/authority*.py",
+        "packages/project-orrery-observatory/src/project_orrery_observatory/authority*.py",
+        "packages/project-orrery-observatory/src/project_orrery_observatory/runtime_shadow.py",
         "tests/fixtures/authority-meta-model/**",
         "tests/test_authority_*.py"
       ],
@@ -87,7 +89,8 @@
         "packages/project-orrery-cli/src/project_orrery_cli/maintenance.py",
         "packages/project-orrery-cli/src/project_orrery_cli/team.py",
         "tests/test_collaboration*.py",
-        "tests/test_workstream*.py",
+        "tests/test_workstream_relations.py",
+        "tests/test_workstream_relation_execution.py",
         "tests/test_workspace_maintenance.py"
       ],
       "subsystems": [
@@ -101,26 +104,80 @@
       "high_risk": true
     },
     {
-      "id": "observatory-ui",
+      "id": "observatory-shell",
       "patterns": [
-        "packages/project-orrery-observatory/**",
-        "scripts/docsite/**",
+        "packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py",
+        "packages/project-orrery-observatory/src/project_orrery_observatory/inventory.py",
+        "packages/project-orrery-observatory/src/project_orrery_observatory/display_vocabulary.py",
+        "scripts/docsite/build_unified_observatory.py",
+        "scripts/docsite/serve_orrery.py",
+        "scripts/docsite/build_docsite.py",
         "experiments/unified-observatory-shell/**",
         "start-*.bat",
         "Start Orrery.vbs",
-        "tests/test_personal_observatory.py",
-        "tests/test_team_observatory.py",
-        "tests/test_unified_observatory.py",
-        "tests/test_*graph*.py"
+        "tests/test_unified_observatory.py"
       ],
       "subsystems": [
         "documentation-system",
         "multi-worktree-collaboration"
       ],
       "surfaces": [
-        "Observatory UI",
+        "Unified Observatory shell",
         "root-only local server",
-        "Personal/Team projection"
+        "bounded common-security adjacency"
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "observatory-graph",
+      "patterns": [
+        "packages/project-orrery-observatory/src/project_orrery_observatory/workstream_relation_graph.py",
+        "packages/project-orrery-observatory/src/project_orrery_observatory/workstream_graph_presentation.py",
+        "scripts/docsite/build_workstream_relation_graph.py",
+        "tests/test_workstream_relation_graph_observatory.py",
+        "tests/test_workstream_graph_visual_prototype.py"
+      ],
+      "subsystems": [
+        "documentation-system",
+        "multi-worktree-collaboration"
+      ],
+      "surfaces": [
+        "read-only Workstream Graph",
+        "graph presentation"
+      ],
+      "high_risk": false
+    },
+    {
+      "id": "observatory-maintenance",
+      "patterns": [
+        "packages/project-orrery-observatory/src/project_orrery_observatory/personal_observatory.py",
+        "scripts/docsite/build_personal_observatory.py"
+      ],
+      "subsystems": [
+        "documentation-system",
+        "multi-worktree-collaboration"
+      ],
+      "surfaces": [
+        "Workspace Maintenance provider",
+        "Quick Remove presentation"
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "observatory-team-personal",
+      "patterns": [
+        "packages/project-orrery-observatory/src/project_orrery_observatory/team_observatory.py",
+        "scripts/docsite/serve_team_observatory.py",
+        "tests/test_personal_observatory.py",
+        "tests/test_team_observatory.py"
+      ],
+      "subsystems": [
+        "documentation-system",
+        "multi-worktree-collaboration"
+      ],
+      "surfaces": [
+        "Personal Observatory projection",
+        "Team Observatory projection"
       ],
       "high_risk": true
     },
@@ -2819,6 +2876,23 @@
       "reason": "low evidence for Packaging/Adapters/docsite via documentation, release-packaging"
     },
     {
+      "test_id": "test_ci_validation.CIValidationTests.test_actual_paths_are_primary_broad_scope_refuses_and_overlap_fails_closed",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "ci-control"
+      ],
+      "reason": "actual-path precedence and fail-closed scope mutation contract"
+    },
+    {
       "test_id": "test_ci_validation.CIValidationTests.test_aggregate_accepts_complete_once_only_results",
       "owner_surface": "Authority/Core",
       "owner_shard": "authority-core",
@@ -2868,6 +2942,23 @@
         "ci-control"
       ],
       "reason": "low evidence for Authority/Core via ci-control"
+    },
+    {
+      "test_id": "test_ci_validation.CIValidationTests.test_cost_diagnostics_are_advisory_unknown_usage_and_roi_fields_cannot_gate",
+      "owner_surface": "Authority/Core",
+      "owner_shard": "authority-core",
+      "allowed_stages": [
+        "fast",
+        "checkpoint",
+        "candidate",
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "ci-control"
+      ],
+      "reason": "non-authoritative cost diagnostics and forged usage/ROI gate refusal"
     },
     {
       "test_id": "test_ci_validation.CIValidationTests.test_exact_sha_binding_rejects_main_sha_alias_and_mismatch",
@@ -5051,9 +5142,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_lan_collaboration_harness.LanCollaborationHarnessTests.test_discovery_contract_is_minimal_untrusted_expiring_and_cross_project_closed",
@@ -5066,9 +5157,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_lan_collaboration_harness.LanCollaborationHarnessTests.test_one_click_two_clone_runner_emits_sealed_sanitized_verdict",
@@ -5081,9 +5172,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_absent_session_and_remote_boundary_stay_unknown",
@@ -5096,9 +5187,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_excluded_worktree_is_listed_but_never_opened",
@@ -5111,9 +5202,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_health_projection_separates_36_worktree_like_delivery_reconciliation_and_hygiene",
@@ -5126,9 +5217,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_injection_adds_a_separate_page_and_leaves_dashboard_untouched",
@@ -5141,9 +5232,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_no_review_packages_still_projects_bounded_w3_inventory",
@@ -5156,9 +5247,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_projection_reuses_w1_w2_contracts_without_network_or_writes",
@@ -5171,9 +5262,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_renderer_has_four_zones_progressive_detail_and_no_actions",
@@ -5186,9 +5277,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_renderer_separates_lifecycle_runtime_and_freshness",
@@ -5201,9 +5292,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_root_only_entry_preserves_legacy_bytes_when_disabled",
@@ -5216,9 +5307,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_unavailable_projection_renders_stable_fallback",
@@ -5231,9 +5322,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_w3_projection_keeps_policy_actions_and_receipts_separate",
@@ -5246,9 +5337,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_consumes_real_core_review_bundle_without_writes",
@@ -5261,9 +5352,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_w3_provider_failure_and_old_schema_keep_w4a_fallback",
@@ -5276,9 +5367,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_personal_observatory.PersonalObservatoryTests.test_workspace_maintenance_page_is_static_read_only_or_explicitly_host_local",
@@ -5294,9 +5385,11 @@
       "budget_seconds": 15.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-maintenance",
+        "observatory-shell",
+        "observatory-team-personal"
       ],
-      "reason": "low evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "bounded common-security adjacency for Maintenance, shell, and Personal projection"
     },
     {
       "test_id": "test_project_orrery.ProjectOrreryTests.test_all_docsite_ai_entrypoints_are_broker_only",
@@ -5539,9 +5632,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_team_observatory.TeamObservatoryTests.test_root_entry_refuses_another_project",
@@ -5554,9 +5647,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_team_observatory.TeamObservatoryTests.test_team_page_is_a_sibling_with_graphical_zero_network_onboarding",
@@ -5569,9 +5662,9 @@
       "budget_seconds": 600.0,
       "dependencies": [
         "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-team-personal"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-team-personal"
     },
     {
       "test_id": "test_workspace_maintenance.WorkspaceMaintenanceTests.test_action_surface_rejects_branch_path_shell_url_and_ai_authority",
@@ -5613,9 +5706,10 @@
       "cost_class": "medium",
       "budget_seconds": 90.0,
       "dependencies": [
-        "collaboration-maintenance"
+        "collaboration-maintenance",
+        "observatory-maintenance"
       ],
-      "reason": "medium evidence for Workspace Maintenance via collaboration-maintenance"
+      "reason": "real-Git incremental refresh and Quick Remove preflight for Maintenance provider changes"
     },
     {
       "test_id": "test_workspace_maintenance.WorkspaceMaintenanceTests.test_observatory_catch_up_respects_24_hour_freshness",
@@ -5700,10 +5794,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_graph_visual_prototype.WorkstreamGraphVisualPrototypeTests.test_fixture_covers_succession_sibling_and_collapsed_history",
@@ -5715,10 +5808,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_graph_visual_prototype.WorkstreamGraphVisualPrototypeTests.test_fixture_is_explicitly_provisional_and_versioned",
@@ -5730,10 +5822,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_graph_visual_prototype.WorkstreamGraphVisualPrototypeTests.test_prototype_has_no_production_or_external_runtime_dependency",
@@ -5745,10 +5836,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_graph_visual_prototype.WorkstreamGraphVisualPrototypeTests.test_responsive_keyboard_and_reduced_motion_contract",
@@ -5760,10 +5850,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_graph_visual_prototype.WorkstreamGraphVisualPrototypeTests.test_static_surface_has_real_controls_and_accessible_fallback",
@@ -5775,10 +5864,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_relation_execution.WorkstreamRelationExecutionTests.test_cli_apply_and_undo_accept_leading_dash_opaque_tokens",
@@ -5863,10 +5951,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_core_payload_maps_three_lenses_and_independent_axes",
@@ -5881,10 +5968,10 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph",
+        "observatory-shell"
       ],
-      "reason": "low evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "bounded fail-closed adjacency for Graph and common shell security"
     },
     {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_corrected_w7a_compatibility_payload_preserves_non_active_runtime_states",
@@ -5896,10 +5983,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_invalid_provider_store_graph_legacy_and_links_fail_closed",
@@ -5914,10 +6000,9 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "low evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "low evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_missing_real_relation_store_is_zero_write_unavailable",
@@ -5929,10 +6014,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_page_is_keyboard_responsive_read_only_and_has_no_frontend_semantics",
@@ -5944,10 +6028,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_root_only_default_off_personal_team_adjacency_and_zero_network",
@@ -5959,10 +6042,9 @@
       "cost_class": "heavy",
       "budget_seconds": 600.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
-      "reason": "heavy evidence for Team/LAN via collaboration-maintenance, observatory-ui"
+      "reason": "heavy evidence for Team/LAN via observatory-graph"
     },
     {
       "test_id": "test_workstream_relations.WorkstreamRelationTests.test_apply_undo_and_discovery_contracts_bind_session_receipt_and_no_drift",
@@ -6204,7 +6286,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "low-cost Unified Observatory launcher and rollback contract"
     },
@@ -6220,7 +6302,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "low-cost Unified Observatory crash-recovery identity contract"
     },
@@ -6235,7 +6317,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "low-cost Unified Observatory quarantine contract"
     },
@@ -6252,7 +6334,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "low-cost route collision and privilege escalation fail-closed evidence"
     },
@@ -6268,7 +6350,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "low-cost static no-server no-cookie no-control evidence"
     },
@@ -6285,7 +6367,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "low-cost versioned consumer registration and discovery evidence"
     },
@@ -6300,7 +6382,7 @@
       "cost_class": "medium",
       "budget_seconds": 90.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "dynamic Unified Observatory capability, search, and degradation evidence"
     },
@@ -6315,7 +6397,7 @@
       "cost_class": "medium",
       "budget_seconds": 90.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "dynamic Unified Observatory helper and listener lifecycle evidence"
     },
@@ -6331,7 +6413,7 @@
       "cost_class": "medium",
       "budget_seconds": 90.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "dynamic Unified Observatory Host Origin cookie and token boundary evidence"
     },
@@ -6346,7 +6428,7 @@
       "cost_class": "medium",
       "budget_seconds": 90.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "dynamic one-visible-URL and inherited docsite composition evidence"
     },
@@ -6362,7 +6444,7 @@
       "cost_class": "medium",
       "budget_seconds": 90.0,
       "dependencies": [
-        "observatory-ui"
+        "observatory-shell"
       ],
       "reason": "dynamic Team Authority AI and Maintenance non-escalation evidence"
     },
@@ -6440,7 +6522,9 @@
       "ci-control",
       "authority-core",
       "collaboration-maintenance",
-      "observatory-ui",
+      "observatory-shell",
+      "observatory-maintenance",
+      "observatory-team-personal",
       "adapters",
       "release-packaging"
     ]

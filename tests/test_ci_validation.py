@@ -33,8 +33,18 @@ from _common import (  # noqa: E402
 )
 from aggregate_test_results import aggregate  # noqa: E402
 from run_test_lane import run_lane  # noqa: E402
-from run_test_shard import TimedTextResult, run_selected  # noqa: E402
-from validate_change import SelectionRefused, build_selection, main as validate_change_main  # noqa: E402
+from run_test_shard import (  # noqa: E402
+    TimedTextResult, _cost_inputs, _over_budget_diagnosis, run_selected,
+)
+from validate_change import (  # noqa: E402
+    SelectionRefused,
+    _claim_bounded_triage,
+    _cost_diagnostics,
+    _record_recurrence,
+    _record_run_attempt,
+    build_selection,
+    main as validate_change_main,
+)
 from validate_ci import validate_binding, validate_workflows  # noqa: E402
 
 
@@ -212,7 +222,8 @@ class CIValidationTests(unittest.TestCase):
             if portfolio["id"] != "w6-1-regression"
         ]
         self.assertEqual([item["id"] for item in generic], [
-            "docs-only", "authority-schema-cli", "collaboration-maintenance"
+            "docs-only", "authority-a4-class", "collaboration-maintenance",
+            "w7-2-graph-only", "u2-2-maintenance", "unified-common-security",
         ])
         for portfolio in generic:
             with self.subTest(portfolio=portfolio["id"]):
@@ -256,7 +267,10 @@ class CIValidationTests(unittest.TestCase):
     def test_registry_mutations_fail_closed_for_unregistered_duplicate_unknown_and_heavy(self) -> None:
         self.assertEqual(
             [item["id"] for item in self.portfolios["mutations"]],
-            ["unregistered-test", "unmapped-path", "unknown-dependency"],
+            [
+                "unregistered-test", "unmapped-path", "unknown-dependency",
+                "overlapping-mapping", "broad-expected-write", "forged-usage", "roi-as-gate",
+            ],
         )
         shard_surfaces = {item["id"]: item["surface"] for item in self.manifest["shards"]}
         unregistered = copy.deepcopy(self.registry)
@@ -281,6 +295,145 @@ class CIValidationTests(unittest.TestCase):
         heavy_entry["allowed_stages"] = ["checkpoint", "promotion"]
         with self.assertRaisesRegex(CIValidationError, "heavy registered test.*lower stage"):
             validate_mapping_registry(heavy, shard_surfaces)
+
+    def test_actual_paths_are_primary_broad_scope_refuses_and_overlap_fails_closed(self) -> None:
+        graph = next(item for item in self.portfolios["portfolios"] if item["id"] == "w7-2-graph-only")
+        session = self._portfolio_session(graph)
+        session["expected_writes"] = [
+            "packages/project-orrery-core/src/project_orrery_core/maintenance.py"
+        ]
+        with mock.patch(
+            "validate_change.changed_paths", return_value=(graph["changed_paths"], False)
+        ), mock.patch("validate_change.dirty_fingerprint", return_value="2" * 64):
+            plan = build_selection(
+                self.manifest, "checkpoint", git_sha(), "actual-primary", session, "fixture.json"
+            )
+        self.assertEqual(plan["selection_mode"], "actual-changed-paths")
+        self.assertEqual(plan["mapping_ids"], ["observatory-graph"])
+        self.assertNotIn(
+            "test_workspace_maintenance.WorkspaceMaintenanceTests."
+            "test_minimal_git_incremental_refresh_and_target_preflight_checkpoint",
+            plan["selected_test_ids"],
+        )
+
+        broad = self._portfolio_session(graph)
+        broad["expected_writes"] = ["packages/project-orrery-observatory/**"]
+        with mock.patch("validate_change.changed_paths", return_value=(graph["changed_paths"], False)):
+            with self.assertRaisesRegex(SelectionRefused, "directory-wide") as raised:
+                build_selection(
+                    self.manifest, "checkpoint", git_sha(), "broad-refusal", broad, "fixture.json"
+                )
+        self.assertIn("exact repository file", "\n".join(raised.exception.required_metadata))
+
+        overlap = copy.deepcopy(self.registry)
+        overlap["path_mappings"].append({
+            "id": "overlap-fixture",
+            "patterns": [graph["changed_paths"][0]],
+            "subsystems": ["test-coverage"],
+            "surfaces": ["mutation-only"],
+            "high_risk": False,
+        })
+        with mock.patch.object(ci_common, "load_mapping_registry", return_value=overlap), mock.patch(
+            "validate_change.load_mapping_registry", return_value=overlap
+        ), mock.patch("validate_change.changed_paths", return_value=(graph["changed_paths"], False)):
+            with self.assertRaisesRegex(SelectionRefused, "overlapping"):
+                build_selection(
+                    self.manifest, "checkpoint", git_sha(), "overlap-refusal",
+                    self._portfolio_session(graph), "fixture.json",
+                )
+
+    def test_cost_diagnostics_are_advisory_unknown_usage_and_roi_fields_cannot_gate(self) -> None:
+        portfolio = next(
+            item for item in self.portfolios["portfolios"] if item["id"] == "unified-common-security"
+        )
+        plan = self._select_portfolio(portfolio)
+        plan["cost_diagnostic_inputs"].update({
+            "router_setup_wall_seconds": 0.25,
+            "rerun_count": 1,
+            "change_volume": {
+                "test_changed_files": 1, "test_changed_lines": 8,
+                "ci_changed_files": 1, "ci_changed_lines": 20,
+            },
+            "independent_optimization_workstream": True,
+            "expected_future_runs": 10,
+            "baseline_test_runtime_seconds": 12.0,
+            "optimization_investment_seconds": 20.0,
+        })
+        diagnostic = _cost_diagnostics(plan, test_runtime=8.0, slow_ids=["fixture.slow"])
+        self.assertEqual(diagnostic["host_usage"]["status"], "Unknown")
+        self.assertEqual(diagnostic["host_usage"]["agent_token_usage"], "Unknown")
+        self.assertEqual(diagnostic["gate_effect"], "none")
+        self.assertEqual(diagnostic["break_even"]["break_even_runs"], 5)
+        self.assertEqual(diagnostic["break_even"]["projected_net_savings_seconds"], 20.0)
+
+        forged = copy.deepcopy(plan)
+        forged["cost_diagnostic_inputs"]["host_usage"] = {"agent_token_usage": 1234}
+        with self.assertRaisesRegex(CIValidationError, "usage/token claims"):
+            _cost_inputs(forged)
+        forged_root = copy.deepcopy(plan)
+        forged_root["cost_diagnostics"] = {"host_usage": {"agent_token_usage": 1234}}
+        with self.assertRaisesRegex(CIValidationError, "forged usage/token claims"):
+            _cost_inputs(forged_root)
+        roi_gate = copy.deepcopy(plan)
+        roi_gate["cost_diagnostic_inputs"]["gate_effect"] = "pass"
+        with self.assertRaisesRegex(CIValidationError, "ROI gate"):
+            _cost_inputs(roi_gate)
+
+        passing = mock.Mock(failures=[], errors=[])
+        product_failure = mock.Mock(failures=[("fixture", "failure")], errors=[])
+        self.assertEqual(_over_budget_diagnosis(
+            budget_exceeded=True, result=product_failure, records=[], budget_seconds=90,
+            selection_plan=plan,
+        )["classification"], "product-test-failure")
+        fallback = copy.deepcopy(plan)
+        fallback["selection_mode"] = "conservative-subsystem-fallback"
+        self.assertEqual(_over_budget_diagnosis(
+            budget_exceeded=True, result=passing, records=[{"duration_seconds": 10}],
+            budget_seconds=90, selection_plan=fallback,
+        )["classification"], "router-over-selection")
+        self.assertEqual(_over_budget_diagnosis(
+            budget_exceeded=True, result=passing, records=[{"duration_seconds": 10}],
+            budget_seconds=90, selection_plan=plan,
+        )["classification"], "fixture-runtime-variance")
+        self.assertEqual(_over_budget_diagnosis(
+            budget_exceeded=True, result=passing, records=[{"duration_seconds": 50}],
+            budget_seconds=90, selection_plan=plan,
+        )["classification"], "genuinely-slow-path")
+
+        receipt = {
+            "budget_exceeded": True,
+            "slowest_tests": [{"test_id": "fixture.slow"}],
+            "over_budget_diagnosis": {"classification": "genuinely-slow-path"},
+        }
+        with tempfile.TemporaryDirectory() as temporary, mock.patch(
+            "validate_change.git_output", return_value=temporary
+        ):
+            first = copy.deepcopy(plan)
+            first["workstream"] = {"workstream_id": "independent-one"}
+            second = copy.deepcopy(plan)
+            second["workstream"] = {"workstream_id": "independent-two"}
+            self.assertEqual(
+                _record_recurrence(first, receipt), "first-independent-workstream-observation"
+            )
+            recurrence = _record_recurrence(second, receipt)
+        self.assertEqual(recurrence["finding_type"], "advisory-routing-cost-recurrence")
+        self.assertFalse(recurrence["automatic_task_created"])
+        self.assertFalse(recurrence["creates_adr_state_or_relation_fact"])
+
+        with tempfile.TemporaryDirectory() as temporary, mock.patch(
+            "validate_change.git_output", return_value=temporary
+        ):
+            one_attempt = copy.deepcopy(plan)
+            one_attempt["workstream"] = {"workstream_id": "feature-task"}
+            _claim_bounded_triage(one_attempt)
+            with self.assertRaisesRegex(SelectionRefused, "already used its one bounded triage"):
+                _claim_bounded_triage(one_attempt)
+
+        with tempfile.TemporaryDirectory() as temporary, mock.patch(
+            "validate_change.git_output", return_value=temporary
+        ):
+            self.assertEqual(_record_run_attempt(plan), 0)
+            self.assertEqual(_record_run_attempt(plan), 1)
 
     def test_unmapped_path_refuses_formal_receipt_and_explains_registry_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

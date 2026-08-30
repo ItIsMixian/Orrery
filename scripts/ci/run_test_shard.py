@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import math
 import os
 import platform
 import subprocess
@@ -83,6 +84,114 @@ class TimedTextResult(unittest.TextTestResult):
             record["detail"] = detail
         self.records.append(record)
         super().stopTest(test)
+
+
+def _cost_inputs(plan: dict[str, Any] | None) -> dict[str, Any]:
+    defaults = {
+        "schema_version": 1,
+        "router_setup_wall_seconds": 0.0,
+        "rerun_count": 0,
+        "change_volume": {
+            "test_changed_files": 0, "test_changed_lines": 0,
+            "ci_changed_files": 0, "ci_changed_lines": 0,
+        },
+        "independent_optimization_workstream": False,
+        "expected_future_runs": None,
+        "baseline_test_runtime_seconds": None,
+        "optimization_investment_seconds": None,
+    }
+    if plan is None:
+        return defaults
+    forbidden_claims = {"cost_diagnostics", "host_usage", "agent_token_usage", "tool_usage", "gate_effect"}
+    pending: list[Any] = [plan]
+    while pending:
+        item = pending.pop()
+        if isinstance(item, dict):
+            found = forbidden_claims & set(item)
+            if found:
+                raise CIValidationError(
+                    f"selection plan contains forged usage/token claims or ROI gate fields: {sorted(found)}"
+                )
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+    value = plan.get("cost_diagnostic_inputs")
+    if not isinstance(value, dict) or set(value) != set(defaults):
+        raise CIValidationError(
+            "selection plan cost_diagnostic_inputs must contain only the versioned CI7 advisory fields; "
+            "host usage/token claims or ROI gate fields are not accepted"
+        )
+    if value["schema_version"] != 1:
+        raise CIValidationError("unsupported cost_diagnostic_inputs schema version")
+    volume = value["change_volume"]
+    if not isinstance(volume, dict) or set(volume) != set(defaults["change_volume"]):
+        raise CIValidationError("selection plan change_volume fields are invalid")
+    numeric_fields = ("router_setup_wall_seconds", "rerun_count")
+    if any(
+        not isinstance(value[field], (int, float)) or isinstance(value[field], bool) or value[field] < 0
+        for field in numeric_fields
+    ):
+        raise CIValidationError("selection plan cost diagnostic counts/times must be non-negative")
+    if not isinstance(value["independent_optimization_workstream"], bool):
+        raise CIValidationError("independent optimization Workstream diagnostic must be boolean")
+    for field in ("expected_future_runs", "baseline_test_runtime_seconds", "optimization_investment_seconds"):
+        item = value[field]
+        if item is not None and (
+            not isinstance(item, (int, float)) or isinstance(item, bool) or item < 0
+        ):
+            raise CIValidationError(f"selection plan {field} must be non-negative or null")
+    return value
+
+
+def _over_budget_diagnosis(
+    *, budget_exceeded: bool, result: unittest.TestResult, records: list[dict[str, object]],
+    budget_seconds: float | None, selection_plan: dict[str, Any] | None,
+) -> dict[str, object]:
+    if result.failures or result.errors:
+        classification = "product-test-failure"
+    elif not budget_exceeded:
+        classification = "not-over-budget"
+    elif selection_plan is not None and selection_plan.get("selection_mode") != "actual-changed-paths":
+        classification = "router-over-selection"
+    elif budget_seconds and records and max(float(item["duration_seconds"]) for item in records) >= budget_seconds / 2:
+        classification = "genuinely-slow-path"
+    else:
+        classification = "fixture-runtime-variance"
+    return {
+        "schema_version": 1,
+        "classification": classification,
+        "feature_task_action": (
+            "stop-and-report-to-central-integrator" if classification != "not-over-budget" else "none"
+        ),
+        "bounded_triage_attempts_allowed": 1,
+        "bounded_triage_requested": bool(
+            selection_plan and selection_plan.get("bounded_triage", {}).get("requested")
+        ),
+        "recurrence_finding": "not-evaluated",
+    }
+
+
+def _break_even(inputs: dict[str, Any], runtime: float) -> dict[str, Any]:
+    baseline = inputs["baseline_test_runtime_seconds"]
+    investment = inputs["optimization_investment_seconds"]
+    future_runs = inputs["expected_future_runs"]
+    result: dict[str, Any] = {
+        "status": "not-requested" if future_runs is None else "insufficient-input",
+        "baseline_test_runtime_seconds": baseline if baseline is not None else "Unknown",
+        "optimization_investment_seconds": investment if investment is not None else "Unknown",
+        "seconds_saved_per_run": "Unknown", "break_even_runs": "Unknown",
+        "projected_net_savings_seconds": "Unknown",
+    }
+    if baseline is not None and investment is not None and baseline > runtime:
+        saving = baseline - runtime
+        result.update({
+            "status": "calculated", "seconds_saved_per_run": round(saving, 6),
+            "break_even_runs": int(math.ceil(investment / saving)),
+            "projected_net_savings_seconds": (
+                round(saving * future_runs - investment, 6) if future_runs is not None else "Unknown"
+            ),
+        })
+    return result
 
 
 def _load_selected_tests(test_ids: list[str]) -> unittest.TestSuite:
@@ -183,6 +292,7 @@ def run_selected(
         relevant_tree_hash = (
             tree.stdout.strip().lower() if tree.returncode == 0 else sha256_json([head_before, dirty_before])
         )
+    diagnostic_inputs = _cost_inputs(selection_plan)
     suite = _load_selected_tests(selected_ids)
     started = time.perf_counter()
     with repository_import_path(ROOT):
@@ -253,6 +363,30 @@ def run_selected(
         "promotion_only_suggestion": (
             "Move only inventory-declared heavy journeys to Promotion; do not record this over-budget run as tier evidence."
             if budget_exceeded else None
+        ),
+        "cost_diagnostics": {
+            "schema_version": 1,
+            "authority": "non-authoritative-advisory",
+            "selected_test_count": len(selected_ids),
+            "test_runtime_seconds": round(duration, 6),
+            "router_setup_wall_seconds": diagnostic_inputs["router_setup_wall_seconds"],
+            "rerun_count": diagnostic_inputs["rerun_count"],
+            "slow_test_ids": [str(item["test_id"]) for item in slowest],
+            "change_volume": diagnostic_inputs["change_volume"],
+            "independent_optimization_workstream": diagnostic_inputs["independent_optimization_workstream"],
+            "host_usage": {
+                "status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown",
+            },
+            "expected_future_runs": (
+                diagnostic_inputs["expected_future_runs"]
+                if diagnostic_inputs["expected_future_runs"] is not None else "Unknown"
+            ),
+            "break_even": _break_even(diagnostic_inputs, duration),
+            "gate_effect": "none",
+        },
+        "over_budget_diagnosis": _over_budget_diagnosis(
+            budget_exceeded=budget_exceeded, result=result, records=records,
+            budget_seconds=budget_seconds, selection_plan=selection_plan,
         ),
     }
     atomic_write_json(output, payload)

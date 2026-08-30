@@ -273,10 +273,13 @@ def validate_all(manifest_path: Path) -> list[str]:
                     f"generic router production policy contains task/branch-specific switch {found}: {path}"
                 )
         mapping_ids = {item["id"] for item in registry["path_mappings"]}
-        required_extension_surfaces = {"adapters", "release-packaging", "observatory-ui"}
+        required_extension_surfaces = {
+            "adapters", "release-packaging", "observatory-shell", "observatory-graph",
+            "observatory-maintenance", "observatory-team-personal",
+        }
         if not required_extension_surfaces.issubset(mapping_ids):
             errors.append(
-                "mapping registry must expose data-only Adapter, release and UI extension surfaces"
+                "mapping registry must expose data-only Adapter, release and split Observatory extension surfaces"
             )
         portfolio_path = ROOT / "tests" / "fixtures" / "ci-validation" / "change-portfolios-v1.json"
         if not portfolio_path.is_file():
@@ -285,7 +288,9 @@ def validate_all(manifest_path: Path) -> list[str]:
             portfolios = load_json(portfolio_path).get("portfolios", [])
             portfolio_ids = {item.get("id") for item in portfolios if isinstance(item, dict)}
             required_portfolios = {
-                "docs-only", "authority-schema-cli", "collaboration-maintenance", "w6" + "-1-regression"
+                "docs-only", "authority-a4-class", "collaboration-maintenance",
+                "w7-2-graph-only", "u2-2-maintenance", "unified-common-security",
+                "w6" + "-1-regression",
             }
             if not required_portfolios.issubset(portfolio_ids):
                 errors.append("generic and regression change-routing portfolios are incomplete")
