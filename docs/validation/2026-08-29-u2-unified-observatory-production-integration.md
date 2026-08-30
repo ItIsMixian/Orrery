@@ -129,3 +129,10 @@ Screenshots:
   scheduler remain unsupported.
 - Public template, managed-tool inventory, installer, release manifest, SemVer/tag/Release and main promotion require a
   separate authorized transition after maintainer experience and integration.
+
+## U2.1 acceptance follow-up
+
+The maintainer subsequently exercised the U2/W7.1 integrated Candidate and rejected its UX. Therefore this record
+remains valid only for U2's original implementation, security and lifecycle claims; it is not current UX acceptance
+evidence and must not be used alone for promotion. The corrective product Candidate and replacement browser/CI6
+evidence are recorded in [U2.1 Unified Observatory UX Acceptance Fixes](2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md).

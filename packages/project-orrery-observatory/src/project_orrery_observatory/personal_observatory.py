@@ -17,6 +17,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .display_vocabulary import (
+    TECHNICAL_DETAILS_LABEL,
+    display_status,
+    maintenance_reason,
+    workspace_classification,
+)
+
 
 PROJECTION_SCHEMA = "project-orrery-personal-observatory-v1"
 W3_SLOT_KEYS = ("review_queue", "integration_eligibility", "cleanup_eligibility")
@@ -989,7 +996,7 @@ def _esc(value: object) -> str:
 
 
 def _value(value: object, suffix: str = "") -> str:
-    return "Unknown" if value is None else f"{value}{suffix}"
+    return "待确认" if value is None else f"{value}{suffix}"
 
 
 def _status_class(value: object) -> str:
@@ -1014,7 +1021,7 @@ def _finding_rows(findings: Sequence[Mapping[str, Any]]) -> str:
     if not findings:
         return (
             '<div class="po-empty" data-state="no-local-finding">'
-            "No local finding · remote evidence remains Unknown</div>"
+            "本机没有发现直接问题；远端证据不在当前观察范围内</div>"
         )
     rows = []
     for finding in findings:
@@ -1046,7 +1053,8 @@ def _human_phase(value: object) -> str:
         "review-ready": "等待审查",
         "integrated": "已集成",
         "closed": "已关闭",
-        "unavailable": "阶段未知",
+        "unavailable": "阶段待确认",
+        "unknown": "阶段待确认",
     }.get(str(value), str(value))
 
 
@@ -1058,7 +1066,8 @@ def _human_runtime(value: object) -> str:
         "blocked-by-conflict": "被冲突阻塞",
         "failed": "执行失败",
         "offline": "Agent 离线",
-        "stale-unknown": "运行状态未知",
+        "stale-unknown": "运行状态待确认",
+        "unknown": "运行状态待确认",
     }.get(str(value), str(value))
 
 
@@ -1066,7 +1075,7 @@ def _human_freshness(value: object) -> str:
     return {
         "current": "证据最新",
         "stale": "证据已过期",
-        "unknown": "证据未知",
+        "unknown": "证据待确认",
     }.get(str(value), str(value))
 
 
@@ -1078,61 +1087,58 @@ def _workstream_card(card: Mapping[str, Any]) -> str:
         '<li><code>%s</code><span>%s</span></li>'
         % (_esc(item.get("path", "Unknown")), _esc(" · ".join(item.get("sources", []))))
         for item in card.get("scope_paths", [])
-    ) or '<li class="po-muted">Scope unavailable</li>'
+    ) or '<li class="po-muted">当前没有可显示的范围路径</li>'
     agent = card.get("platform_session")
     agent_label = (
         f"{agent.get('adapter')} · {agent.get('session_id')}"
         if isinstance(agent, Mapping)
-        else "Agent session Unavailable"
+        else "Agent 会话暂不可用"
     )
     lineage = card.get("lineage") if isinstance(card.get("lineage"), Mapping) else {}
     if lineage.get("status") == "current":
-        agent_label += " · stacked on %s@%s" % (
+        agent_label += " · 接续自 %s@%s" % (
             lineage.get("base_workstream_id", "Unknown"),
             _short_oid(lineage.get("task_base_oid")),
         )
     else:
-        agent_label += " · lineage Legacy/Unknown"
+        agent_label += " · 接续证据为历史状态或待确认"
     findings = card.get("findings", [])
     counts = card.get("finding_counts", {})
     finding_types = " · ".join(
         "%s %s" % (str(kind).title(), count)
         for kind, count in sorted(counts.items())
         if count
-    ) or "No local finding"
+    ) or "本机无直接发现"
     affected = card.get("affected_subsystem_ids", [])
     return (
         '<details class="po-workstream" data-workstream="%s" data-session-state="%s">'
         '<summary class="po-work-summary"><div class="po-work-name"><span class="po-kicker">%s</span>'
-        '<h4>%s</h4><code>%s</code></div>'
+        '<h4>%s</h4></div>'
         '<div class="po-work-now"><small>现在</small><b>%s</b><span>%s</span></div>'
-        '<div class="po-work-scope"><small>影响范围</small><b>%s</b><span>%s affected · %s paths</span></div>'
-        '<div class="po-work-signal"><small>信号</small><b>%s finding%s</b><span>%s · %s</span></div>'
+        '<div class="po-work-scope"><small>影响范围</small><b>1 个主要模块</b><span>%s 个关联模块 · %s 条范围路径</span></div>'
+        '<div class="po-work-signal"><small>信号</small><b>%s 项发现</b><span>%s · %s</span></div>'
         '<span class="po-open-label">查看证据</span></summary><div class="po-work-detail">'
         '<div class="po-tracks">%s%s%s</div>'
-        '<div class="po-detail-grid"><div><b>Integration</b><code>%s</code></div>'
-        '<div><b>Merge base</b><code>%s</code></div><div><b>HEAD</b><code>%s</code></div>'
-        '<div><b>Ahead / behind</b><span>+%s / −%s</span></div><div><b>Session</b><span>%s</span></div>'
-        '<div><b>Captured</b><span>%s</span></div><div class="po-detail-wide"><b>Worktree</b><code>%s</code></div>'
+        '<div class="po-detail-grid"><div><b>集成目标</b><code>%s</code></div>'
+        '<div><b>合并基点</b><code>%s</code></div><div><b>当前提交</b><code>%s</code></div>'
+        '<div><b>领先／落后</b><span>+%s / −%s</span></div><div><b>任务登记</b><span>%s</span></div>'
+        '<div><b>采集时间</b><span>%s</span></div><div class="po-detail-wide"><b>工作区</b><code>%s</code></div>'
         '</div><div class="po-evidence-note">%s · Scope r%s · %s changes · %s untracked · %s</div>'
-        '<div class="po-detail-section"><b>Findings and acknowledgement</b>%s</div>'
-        '<div class="po-detail-section"><b>Scope paths and sources</b><ul class="po-paths">%s</ul></div>'
+        '<div class="po-detail-section"><b>发现与确认状态</b>%s</div>'
+        '<div class="po-detail-section"><b>范围路径与来源</b><ul class="po-paths">%s</ul></div>'
         '</div></details>'
         % (
             _esc(title),
             _esc(card.get("session_state", "unknown")),
-            "CURRENT WORKSTREAM" if card.get("is_current") else "OPEN WORKSTREAM",
-            _esc(display_title),
-            _esc(branch),
-            _esc(_human_phase(card.get("lifecycle_phase", "unavailable"))),
-            _esc(_human_runtime(card.get("runtime_condition", "stale-unknown"))),
-            _esc(card.get("primary_subsystem_id", "Unknown")),
-            len(affected),
-            _esc(_value(card.get("scope_path_count"))),
-            len(findings),
-            "" if len(findings) == 1 else "s",
-            _esc(_human_freshness(card.get("evidence_freshness", "unknown"))),
-            "dirty" if card.get("dirty") else "clean",
+        "当前任务" if card.get("is_current") else "进行中的任务",
+        _esc(display_title),
+        _esc(_human_phase(card.get("lifecycle_phase", "unavailable"))),
+        _esc(_human_runtime(card.get("runtime_condition", "stale-unknown"))),
+        len(affected),
+        _esc(_value(card.get("scope_path_count"))),
+        len(findings),
+        _esc(_human_freshness(card.get("evidence_freshness", "unknown"))),
+        "有未提交改动" if card.get("dirty") else "工作区干净",
             _status_token("lifecycle", card.get("lifecycle_phase", "unavailable")),
             _status_token("runtime", card.get("runtime_condition", "stale-unknown")),
             _status_token("evidence", card.get("evidence_freshness", "unknown")),
@@ -1158,12 +1164,12 @@ def _workstream_card(card: Mapping[str, Any]) -> str:
 def _worktree_inventory_row(card: Mapping[str, Any]) -> str:
     group = str(card.get("display_group", "unavailable"))
     labels = {
-        "inactive": "Integrated / closed session",
-        "worktree-only": "No Workstream session",
-        "candidate-unregistered": "Candidate 未登记 / delivery unavailable",
-        "reconciliation": "Stale session · needs closure / reconcile",
-        "protected-primary": "Protected canonical root · not an Agent Workstream",
-        "unavailable": "Unavailable / Unknown",
+        "inactive": "已集成或关闭的任务",
+        "worktree-only": "没有任务登记",
+        "candidate-unregistered": "候选尚未登记，无法判断交付状态",
+        "reconciliation": "任务登记已过期，需要确认或关闭",
+        "protected-primary": "受保护的主工作区，不属于普通任务",
+        "unavailable": "证据暂不可用或待确认",
     }
     title = (
         card.get("workstream_id")
@@ -1181,7 +1187,7 @@ def _worktree_inventory_row(card: Mapping[str, Any]) -> str:
         % (
             _esc(group),
             _esc(title),
-            _esc(labels.get(group, "Observed locally")),
+            _esc(labels.get(group, "本机已观察")),
             _esc(card.get("branch", "Unknown")),
             _esc(card.get("lifecycle_phase", "unavailable")),
             _esc(note),
@@ -1191,7 +1197,7 @@ def _worktree_inventory_row(card: Mapping[str, Any]) -> str:
 
 def _size_label(value: object) -> str:
     if not isinstance(value, int):
-        return "Unknown"
+        return "待确认"
     units = ("B", "KB", "MB", "GB")
     amount = float(value)
     unit = units[0]
@@ -1204,7 +1210,7 @@ def _size_label(value: object) -> str:
 
 def _w3_evidence_html(bundle: Mapping[str, Any] | None) -> str:
     if not bundle:
-        return '<div class="po-empty" data-state="w3-unavailable">W4A fallback · W3 evidence Unavailable / Unknown</div>'
+        return '<div class="po-empty" data-state="w3-unavailable">W3 证据暂不可用；已保持安全降级</div>'
     reviews = "".join(
         '<details class="po-evidence-record"><summary><b>%s</b><span>%s · %s · approval %s/%s</span></summary>'
         '<div class="po-record-grid"><div><small>Risk</small><b>%s</b></div><div><small>Integration</small><b>%s</b></div>'
@@ -1245,7 +1251,7 @@ def _w3_evidence_html(bundle: Mapping[str, Any] | None) -> str:
             _esc(_size_label(item.get("estimated_reclaim_bytes"))),
         )
         for item in inventory.get("entries", [])
-    ) or '<div class="po-empty">No bounded workspace entries</div>'
+    ) or '<div class="po-empty">没有边界内工作区记录</div>'
     cleanup = "".join(
         '<details class="po-evidence-record"><summary><b>%s</b><span>%s · %s</span></summary>'
         '<div class="po-actions">%s</div><p class="po-record-note">%s</p></details>'
@@ -1447,6 +1453,7 @@ MAINTENANCE_OBSERVATORY_CSS = r"""
 .mo-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.75fr)}.mo-main,.mo-side{padding:20px 24px;min-width:0}.mo-side{border-left:1px solid var(--line);background:var(--bg2)}.mo-section+.mo-section{margin-top:22px}.mo-section h3{margin:0 0 9px;font-size:13px}.mo-item{border-top:1px solid var(--line);padding:12px 0}.mo-item-head{display:flex;justify-content:space-between;gap:12px}.mo-item b{font-size:11.5px}.mo-item code{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis}.mo-item p{margin:5px 0;color:var(--mut);font-size:10px}.mo-item-actions{display:flex;gap:7px;margin-top:9px}.mo-reason{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:8px 0;font-size:10px}.mo-policy{display:grid;grid-template-columns:1fr auto;gap:7px;font-size:10px}.mo-policy span{color:var(--mut)}.mo-history>summary{cursor:pointer;font-size:11px}.mo-empty,.mo-notice{color:var(--mut);font-size:10.5px;padding:11px 0}.mo-notice{padding:10px 24px;border-top:1px solid var(--line)}.mo-notice.error{color:var(--mo-red)}
 .mo-cache-state{font:700 9px/1.2 "Cascadia Code",Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}.mo-cache-state.current{color:var(--mo-green)}.mo-cache-state.stale{color:var(--mo-amber)}.mo-cache-state.unknown{color:var(--mo-red)}.mo-progress{height:2px;background:var(--line);overflow:hidden}.mo-progress.running::after{content:"";display:block;width:38%;height:100%;background:var(--mo-green);animation:mo-scan 1.1s ease-in-out infinite alternate}@keyframes mo-scan{from{transform:translateX(-30%)}to{transform:translateX(220%)}}
 .mo-boundaries{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.mo-boundaries>div{padding:13px 18px;background:var(--bg2)}.mo-boundaries b{display:block;font-size:11px}.mo-boundaries span{display:block;margin-top:4px;color:var(--mut);font-size:9.5px}
+.mo-warning{margin:14px 24px 0;padding:11px 13px;border:1px dashed var(--mo-amber);border-radius:8px;color:var(--mut);font-size:10.5px}.mo-warning b{display:block;color:var(--mo-amber);margin-bottom:3px}.mo-quick{padding:18px 24px;border-bottom:1px solid var(--line)}.mo-quick-head{display:flex;justify-content:space-between;gap:12px;align-items:end}.mo-quick h3{margin:0}.mo-quick-count{color:var(--mo-green);font-weight:800}.mo-quick-empty{margin-top:9px;color:var(--mut);font-size:11px}.mo-item details{margin-top:6px}.mo-item summary{cursor:pointer;color:var(--mut);font-size:10px}.mo-item details code{white-space:normal;overflow-wrap:anywhere}
 @media(max-width:850px){.mo-signals{grid-template-columns:1fr 1fr}.mo-grid{grid-template-columns:1fr}.mo-side{border-left:0;border-top:1px solid var(--line)}}
 @media(max-width:640px){.mo-shell{margin:0 -18px 24px;border-left:0;border-right:0;border-radius:0}.mo-head{grid-template-columns:1fr;padding:18px}.mo-boundary{justify-self:start}.mo-signals>div,.mo-actions,.mo-main,.mo-side,.mo-notice{padding-left:18px;padding-right:18px}.mo-boundaries{grid-template-columns:1fr}.mo-button{min-height:40px}.mo-item-head{display:block}}
 """
@@ -1464,24 +1471,35 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
     auth_by_item = {str(item.get("item_id")): item for item in authorizations}
     cache = maintenance.get("cache") if isinstance(maintenance.get("cache"), Mapping) else {}
     cache_entries = [item for item in cache.get("entries", []) if isinstance(item, Mapping)]
+    eligible_entries = [
+        entry for entry in cache_entries
+        if bool(entry.get("remove_worktree_eligible"))
+        and str(entry.get("cache_state")) == "current"
+        and not bool(entry.get("is_primary_worktree"))
+    ]
     items = []
     for entry in cache_entries:
         state = str(entry.get("cache_state", "unknown"))
         primary = bool(entry.get("is_primary_worktree"))
+        eligible = entry in eligible_entries
         action = (
-            '<button class="mo-button danger" type="button" data-maintenance-preflight="%s">移除工作区</button>'
+            '<button class="mo-button danger" type="button" data-maintenance-preflight="%s">重新检查并安全移除</button>'
             % _esc(entry.get("workspace_id"))
-            if control and not primary
-            else '<span class="mo-empty">%s</span>' % ("主工作区受保护" if primary else "只读")
+            if control and eligible
+            else '<span class="mo-empty">%s</span>' % (
+                "主工作区受保护" if primary else "当前不符合安全移除条件"
+            )
         )
-        reason = " · ".join(map(str, entry.get("reasons") or entry.get("unknown") or [])) or "last-known evidence available"
+        raw_reasons = list(entry.get("reasons") or entry.get("unknown") or [])
+        reason = " · ".join(maintenance_reason(value) for value in raw_reasons) or "当前证据没有给出可安全删除结论"
+        raw_reason_detail = " · ".join(map(str, raw_reasons)) or "no-machine-reason"
         items.append(
-            '<div class="mo-item" data-maintenance-workspace="%s"><div class="mo-item-head"><b>%s</b><span class="mo-cache-state %s">%s</span></div><code>%s</code><p>%s · 扫描 %s</p><div class="mo-item-actions">%s</div></div>'
-            % (_esc(entry.get("workspace_id")), _esc(entry.get("branch") or entry.get("workspace_id")), _esc(state), _esc(state), _esc(entry.get("registered_path")), _esc(reason), _esc(entry.get("scanned_at") or "Unknown"), action)
+            '<div class="mo-item" data-maintenance-workspace="%s"><div class="mo-item-head"><b>%s</b><span class="mo-cache-state %s">%s</span></div><p>%s</p><details><summary>%s</summary><code>%s</code><code>%s</code><code>%s</code><code>%s</code></details><div class="mo-item-actions">%s</div></div>'
+            % (_esc(entry.get("workspace_id")), _esc(workspace_classification(entry.get("classification"))), _esc(state), _esc(display_status(state)), _esc(reason), TECHNICAL_DETAILS_LABEL, _esc(entry.get("branch") or "Unknown branch"), _esc(entry.get("registered_path")), _esc(entry.get("scanned_at") or "Unknown"), _esc(raw_reason_detail), action)
         )
-    queue_html = "".join(items) or '<div class="mo-empty">缓存尚未建立；现有页面保持可用，但所有目标均为 Unknown，先启动后台增量扫描。</div>'
+    queue_html = "".join(items) or '<div class="mo-empty">缓存尚未建立；页面仍可使用，但需要先刷新才能判断各工作区状态。</div>'
     protected = maintenance.get("protected_reasons") if isinstance(maintenance.get("protected_reasons"), Mapping) else {}
-    protected_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(reason), _esc(count)) for reason, count in sorted(protected.items())) or '<div class="mo-empty">没有已记录的受保护原因；未扫描不等于可清理。</div>'
+    protected_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b><details><summary>%s</summary><code>%s</code></details></div>' % (_esc(maintenance_reason(reason)), _esc(count), TECHNICAL_DETAILS_LABEL, _esc(reason)) for reason, count in sorted(protected.items())) or '<div class="mo-empty">没有已记录的受保护原因；未扫描不等于可清理。</div>'
     policy = maintenance.get("policy") if isinstance(maintenance.get("policy"), Mapping) else {}
     policy_html = "".join('<span>%s</span><b>%s</b>' % (_esc(key), _esc(value)) for key, value in policy.items() if key != "ignored_allowlist")
     receipts = [item for item in maintenance.get("receipts", []) if isinstance(item, Mapping)]
@@ -1489,18 +1507,37 @@ def _maintenance_panel(projection: Mapping[str, Any]) -> str:
     background = maintenance.get("background_refresh") if isinstance(maintenance.get("background_refresh"), Mapping) else {}
     background_status = str(background.get("status", "idle"))
     api_base = str(maintenance.get("api_base", "/team/api/maintenance"))
-    history_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(item.get("receipt_id")), _esc(item.get("outcome"))) for item in receipts[-8:]) or '<div class="mo-empty">尚无执行 receipt。</div>'
+    history_html = "".join('<div class="mo-reason"><span>%s</span><b>%s</b></div>' % (_esc(item.get("receipt_id")), _esc(item.get("outcome"))) for item in receipts[-8:]) or '<div class="mo-empty">尚无执行记录。</div>'
+    warnings = [
+        item for item in maintenance.get("historical_evidence_warnings", [])
+        if isinstance(item, Mapping)
+    ]
+    historical_warning = (
+        '<div class="mo-warning" data-maintenance-historical-warning><b>历史维护记录无法按当前格式读取</b>'
+        '旧记录已原样保留，并仅降级为“历史／待确认”；它不会阻止当前刷新，也不会放宽当前安全移除条件。'
+        '<details><summary>%s</summary><code>%s</code></details></div>'
+        % (TECHNICAL_DETAILS_LABEL, _esc(" · ".join(str(item.get("message")) for item in warnings)))
+        if warnings else ""
+    )
+    leading_reasons = "、".join(maintenance_reason(reason) for reason in list(sorted(protected))[:3])
+    quick_empty = (
+        '<div class="mo-quick-empty" data-maintenance-quick-empty>目前没有可安全删除项。%s</div>'
+        % ("主要保护原因：" + _esc(leading_reasons) + "。" if leading_reasons else "尚未取得足够的当前证据。")
+        if not eligible_entries else
+        '<div class="mo-quick-empty" data-maintenance-quick-empty>只有下方标记为可安全移除的行会提供操作按钮；点击后仍会执行最新预检和二次确认。</div>'
+    )
     return (
         '<article class="page wide" id="workspace-maintenance" data-kind="workspace-maintenance" data-title="工作区维护" data-maintenance-control="%s" data-maintenance-api-base="%s" data-maintenance-refresh-path="%s" data-maintenance-remove-path="%s" data-maintenance-reload-after-action="%s">'
-        '<section class="mo-shell"><header class="mo-head"><div><span class="mo-kicker">WORKSPACE MAINTENANCE · LOCAL ONLY</span><h2>工作区维护</h2><p>定时发现不等于自动删除。建议、授权和执行分离；本阶段只支持本机确认后的 remove-worktree。</p></div><span class="mo-boundary">PERSONAL ZERO-NETWORK · BRANCH 保留</span></header>'
-        '<div class="mo-signals"><div><small>缓存状态</small><b data-maintenance-cache-status>%s</b></div><div><small>worktrees</small><b data-maintenance-worktrees>%s</b></div><div><small>后台刷新</small><b data-maintenance-background>%s</b></div><div><small>预计空间</small><b data-maintenance-reclaim>%s</b></div></div><div class="mo-progress %s" aria-hidden="true"></div>'
-        '<div class="mo-actions"><button class="mo-button" type="button" data-maintenance-scan%s>后台增量扫描</button><span class="mo-empty">请求线程不等待 · target-scoped preflight · 无 scheduler</span></div>'
-        '<div class="mo-boundaries"><div><b>worktree</b><span>仅 evidence-bound 本机确认后可移除</span></div><div><b>local branch</b><span>%s 个到期提醒；本阶段不执行删除</span></div><div><b>remote branch</b><span>零网络，不观察、不删除</span></div></div>'
-        '<div class="mo-grid"><main class="mo-main"><section class="mo-section"><h3>已登记 worktree · cache rail</h3><div data-maintenance-queue>%s</div></section><section class="mo-section"><h3>受保护／Unknown 原因</h3><div data-maintenance-protected>%s</div></section></main>'
-        '<aside class="mo-side"><section class="mo-section"><h3>策略</h3><div class="mo-policy">%s</div></section><section class="mo-section"><details class="mo-history"><summary>授权与执行历史</summary>%s</details></section></aside></div>'
+        '<section class="mo-shell"><header class="mo-head"><div><span class="mo-kicker">工作区维护 · 仅限本机</span><h2>工作区维护</h2><p>发现建议不会自动删除。只有证据完整的候选工作区，才会在本机二次确认后移除；分支与提交始终保留。</p></div><span class="mo-boundary">个人模式零网络 · 分支保留</span></header>%s'
+        '<div class="mo-signals"><div><small>缓存状态</small><b data-maintenance-cache-status>%s</b></div><div><small>已登记工作区</small><b data-maintenance-worktrees>%s</b></div><div><small>后台刷新</small><b data-maintenance-background>%s</b></div><div><small>预计可回收空间</small><b data-maintenance-reclaim>%s</b></div></div><div class="mo-progress %s" aria-hidden="true"></div>'
+        '<div class="mo-actions"><button class="mo-button" type="button" data-maintenance-scan%s>后台增量扫描</button><span class="mo-empty">页面不会等待完整扫描 · 仅重新检查目标 · 无定时任务</span></div>'
+        '<section class="mo-quick" data-maintenance-quick-remove><div class="mo-quick-head"><h3>快速删除</h3><span><b class="mo-quick-count" data-maintenance-eligible-count>%s</b> 项可安全删除</span></div>%s</section>'
+        '<div class="mo-boundaries"><div><b>工作区</b><span>仅在证据绑定且本机确认后可移除</span></div><div><b>本地分支</b><span>%s 个到期提醒；本阶段不执行删除</span></div><div><b>远端分支</b><span>零网络，不观察、不删除</span></div></div>'
+        '<div class="mo-grid"><main class="mo-main"><section class="mo-section"><h3>已登记工作区</h3><div data-maintenance-queue>%s</div></section><section class="mo-section"><h3>主要保护原因</h3><div data-maintenance-protected>%s</div></section></main>'
+        '<aside class="mo-side"><section class="mo-section"><details><summary>技术策略详情</summary><div class="mo-policy">%s</div></details></section><section class="mo-section"><details class="mo-history"><summary>授权与执行历史</summary>%s</details></section></aside></div>'
         '<div class="mo-notice" data-maintenance-notice>%s</div></section></article>'
         % (
-            "true" if control else "false", _esc(api_base), _esc(maintenance.get("refresh_path", "/scan")), _esc(maintenance.get("remove_path", "/quick-remove")), "true" if maintenance.get("reload_after_action", True) else "false", _esc(cache.get("status", "Unknown")), _esc(len(cache_entries) if cache_entries else counts.get("worktrees", "Unknown")), _esc(background_status), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "running" if background_status in {"pending", "running"} else "", "" if control else " disabled", _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；Quick Remove 会先做最新 target preflight，只删除 worktree，保留 branch/commit。" if control else "静态只读视图；请使用 root-only 本机动态入口进行确认。",
+            "true" if control else "false", _esc(api_base), _esc(maintenance.get("refresh_path", "/scan")), _esc(maintenance.get("remove_path", "/quick-remove")), "true" if maintenance.get("reload_after_action", True) else "false", historical_warning, _esc(display_status(cache.get("status", "unknown"))), _esc(len(cache_entries) if cache_entries else counts.get("worktrees", "待确认")), _esc(display_status(background_status)), _esc(_size_label(counts.get("estimated_reclaim_bytes"))), "running" if background_status in {"pending", "running"} else "", "" if control else " disabled", _esc(len(eligible_entries)), quick_empty, _esc(len(branch_reminders)), queue_html, protected_html, policy_html, history_html, "本机控制可用；快速删除会先重新检查目标，只删除工作区，保留分支和提交。" if control else "静态只读视图；请使用本机动态入口进行确认。",
         )
     )
 
@@ -1513,14 +1550,17 @@ MAINTENANCE_OBSERVATORY_JS = r"""
  const refreshPath=page.dataset.maintenanceRefreshPath||'/scan';
  const removePath=page.dataset.maintenanceRemovePath||'/quick-remove';
  const reloadAfterAction=page.dataset.maintenanceReloadAfterAction!=='false';
+ const reasonLabel=(value)=>({'workspace-path-not-found':'工作区路径不存在','workspace-path-boundary-not-safe':'工作区路径不在安全边界内','legacy-or-unknown-workspace-requires-explicit-adoption':'历史或待确认工作区尚未明确接管','workstream-is-active':'任务仍在进行','review-or-integration-is-pending':'审查或集成尚未完成','workspace-is-protected-or-retained':'工作区受保护或已明确保留','git-identity-or-common-dir-not-verified':'Git 身份或公共目录尚未验证','tracked-worktree-changes-present':'存在已跟踪但未提交的改动','unknown-untracked-paths-present':'存在待确认的未跟踪文件','unknown-or-sensitive-ignored-paths-present':'存在待确认或敏感的忽略文件','git-private-closure-record-missing':'缺少 Git 私有区关闭记录','review-package-evidence-missing':'缺少审查包证据','passed-validation-evidence-missing':'缺少已通过的验证证据','review-decision-evidence-missing':'缺少审查决定证据','closure-validation-references-missing':'关闭记录缺少验证引用','unique-commit-check-failed':'无法确认是否存在独有提交','workspace-has-commits-not-reachable-from-integration-oid':'工作区仍有未进入集成目标的提交','workstream-session-is-not-integrated-or-closed':'任务尚未集成并关闭','integrated-grace-period-active':'集成后的保护期尚未结束'}[value]||'其他保护原因（见技术详情）');
  async function api(path,body){const response=await fetch(base+path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(body||{})});const value=await response.json();if(!response.ok)throw new Error(value.error||'本机维护操作失败');return value}
  async function status(){const response=await fetch(base+'/status',{headers:{'Accept':'application/json'}});const value=await response.json();if(!response.ok)throw new Error(value.error||'状态读取失败');return value}
- async function waitForRefresh(){for(let attempt=0;attempt<120;attempt++){const value=await status();const state=value.maintenance.background_refresh.status;if(!['pending','running'].includes(state))return state;await new Promise(resolve=>setTimeout(resolve,500))}return 'timed-out'}
+ const shownState=(value)=>({current:'当前',stale:'历史状态',unknown:'待确认',idle:'空闲',pending:'等待刷新',running:'正在刷新',succeeded:'刷新完成',failed:'刷新失败','timed-out':'刷新超时'}[value]||value||'待确认');
+ function renderMaintenance(maintenance){const cache=maintenance.cache||{},entries=cache.entries||[],eligible=entries.filter(entry=>entry.remove_worktree_eligible&&entry.cache_state==='current'&&!entry.is_primary_worktree);const count=page.querySelector('[data-maintenance-eligible-count]');if(count)count.textContent=eligible.length;const worktrees=page.querySelector('[data-maintenance-worktrees]');if(worktrees)worktrees.textContent=entries.length;const cacheStatus=page.querySelector('[data-maintenance-cache-status]');if(cacheStatus)cacheStatus.textContent=shownState(cache.status);const root=page.querySelector('[data-maintenance-queue]');if(root){root.replaceChildren();entries.forEach(entry=>{const row=document.createElement('div');row.className='mo-item';row.dataset.maintenanceWorkspace=entry.workspace_id;const head=document.createElement('div');head.className='mo-item-head';const title=document.createElement('b');title.textContent=entry.classification==='integrated-closed'?'已集成并关闭的候选工作区':entry.is_primary_worktree?'主工作区':'待确认的工作区';const state=document.createElement('span');state.className='mo-cache-state '+entry.cache_state;state.textContent=shownState(entry.cache_state);head.append(title,state);row.append(head);const rawReasons=entry.reasons||entry.unknown||[];const reason=document.createElement('p');reason.textContent=rawReasons.length?rawReasons.map(reasonLabel).join(' · '):'当前证据没有给出可安全删除结论';row.append(reason);const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='技术详情';const branch=document.createElement('code');branch.textContent=entry.branch||'Unknown branch';const path=document.createElement('code');path.textContent=entry.registered_path||'';const codes=document.createElement('code');codes.textContent=rawReasons.join(' · ')||'no-machine-reason';details.append(summary,branch,path,codes);row.append(details);const actions=document.createElement('div');actions.className='mo-item-actions';if(entry.remove_worktree_eligible&&entry.cache_state==='current'&&!entry.is_primary_worktree){const button=document.createElement('button');button.className='mo-button danger';button.type='button';button.dataset.maintenancePreflight=entry.workspace_id;button.textContent='重新检查并安全移除';actions.append(button)}else{const protectedText=document.createElement('span');protectedText.className='mo-empty';protectedText.textContent=entry.is_primary_worktree?'主工作区受保护':'当前不符合安全移除条件';actions.append(protectedText)}row.append(actions);root.append(row)});if(!entries.length){const empty=document.createElement('div');empty.className='mo-empty';empty.textContent='刷新完成，但没有可显示的已登记工作区。';root.append(empty)}}const empty=page.querySelector('[data-maintenance-quick-empty]');if(empty)empty.textContent=eligible.length?'只有标记为可安全移除的行会提供操作按钮；点击后仍会执行最新预检和二次确认。':'目前没有可安全删除项。主要保护原因见下方列表。'}
+ async function waitForRefresh(){for(let attempt=0;attempt<120;attempt++){const value=await status();const state=value.maintenance.background_refresh.status;if(!['pending','running'].includes(state))return value.maintenance;await new Promise(resolve=>setTimeout(resolve,500))}return{background_refresh:{status:'timed-out'},cache:{entries:[]}}}
  page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;
    button.disabled=true;notice.className='mo-notice';
    try{
-    if(button.hasAttribute('data-maintenance-scan')){notice.textContent='后台增量扫描已排队；页面请求线程没有等待全量扫描。';await api(refreshPath,{});const state=await waitForRefresh();notice.textContent='后台刷新 '+state+'；最新状态已从本机 provider 读取。';if(reloadAfterAction){window.location.reload();return}const indicator=page.querySelector('[data-maintenance-background]');if(indicator)indicator.textContent=state;button.disabled=false;return}
-    if(button.dataset.maintenancePreflight){notice.textContent='正在对单个已登记目标做最新 preflight；不会扫描其他 worktree。';const value=await api('/preflight',{target_id:button.dataset.maintenancePreflight});const result=value.preflight;if(!result.eligible){throw new Error('目标受保护：'+(result.reasons||result.unknown||['Unknown']).join(' · '))}if(!window.confirm('只删除 worktree，保留 branch/commit。确认移除这个工作区？')){button.disabled=false;notice.textContent='已取消；没有执行删除。';return}notice.textContent='已确认。正在再次验证目标并移除 worktree；branch/commit 将保留。';const removed=await api(removePath,{item_id:result.item.item_id});if(removed.receipt.outcome!=='verified')throw new Error('Quick Remove '+removed.receipt.outcome);notice.textContent='工作区已移除；branch/commit 保留。后台增量刷新已启动。';if(reloadAfterAction){window.location.reload();return}const row=button.closest('[data-maintenance-workspace]');if(row)row.remove();return}
+    if(button.hasAttribute('data-maintenance-scan')){notice.textContent='后台增量扫描已排队；页面请求线程没有等待全量扫描。';await api(refreshPath,{});const maintenance=await waitForRefresh();const state=maintenance.background_refresh.status;notice.textContent='后台刷新：'+shownState(state)+'。已显示最新的工作区保护与候选状态。';if(reloadAfterAction){window.location.reload();return}renderMaintenance(maintenance);const indicator=page.querySelector('[data-maintenance-background]');if(indicator)indicator.textContent=shownState(state);button.disabled=false;return}
+    if(button.dataset.maintenancePreflight){notice.textContent='正在重新检查单个已登记目标；不会扫描其他工作区。';const value=await api('/preflight',{target_id:button.dataset.maintenancePreflight});const result=value.preflight;if(!result.eligible){throw new Error('目标受保护：'+(result.reasons||result.unknown||['证据不足']).join(' · '))}if(!window.confirm('只删除工作区，保留分支和提交。确认移除这个工作区？')){button.disabled=false;notice.textContent='已取消；没有执行删除。';return}notice.textContent='已确认。正在再次验证目标并移除工作区；分支和提交将保留。';const removed=await api(removePath,{item_id:result.item.item_id});if(removed.receipt.outcome!=='verified')throw new Error('快速删除未完成：'+removed.receipt.outcome);notice.textContent='工作区已移除；分支和提交保留。后台增量刷新已启动。';if(reloadAfterAction){window.location.reload();return}const row=button.closest('[data-maintenance-workspace]');if(row)row.remove();return}
    }catch(error){notice.className='mo-notice error';notice.textContent=error.message;button.disabled=false}});
 })();
 """
@@ -1541,7 +1581,7 @@ def render_maintenance_control_document(
 <title>Orrery · 工作区维护</title><style>
 :root{color-scheme:dark;--bg:#101516;--bg2:#151c1e;--bg3:#1c2527;--fg:#edf4f1;--mut:#91a19c;--line:#2d3a3b;--acc:#63d6cf}
 *{box-sizing:border-box}html,body{margin:0;min-width:0;background:var(--bg);color:var(--fg);font-family:"IBM Plex Sans","Segoe UI",sans-serif}body{padding:28px}.control-mast{max-width:1180px;margin:0 auto 14px;display:flex;justify-content:space-between;gap:18px;align-items:end}.control-mast small{color:var(--acc);font:700 10px/1.3 "Cascadia Code",Consolas,monospace;letter-spacing:.12em}.control-mast h1{margin:5px 0 0;font-size:18px}.control-mast span{color:var(--mut);font-size:10px}.control-wrap{max-width:1180px;margin:auto}.page{display:block!important}.page.wide{max-width:none}.mo-shell{box-shadow:0 18px 55px rgba(0,0,0,.2)}button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}@media(max-width:640px){body{padding:12px}.control-mast{align-items:start;flex-direction:column}.control-wrap{margin:0 -12px}.control-wrap .mo-shell{margin:0}}
-""" + MAINTENANCE_OBSERVATORY_CSS + """</style></head><body><header class="control-mast"><div><small>ORRERY / LOCAL CONTROL</small><h1>Git-private Maintenance Console</h1></div><span>127.0.0.1 · root-only · zero external network</span></header><main class="control-wrap">""" + panel + """</main><script>""" + MAINTENANCE_OBSERVATORY_JS + """</script></body></html>"""
+""" + MAINTENANCE_OBSERVATORY_CSS + """</style></head><body><header class="control-mast"><div><small>ORRERY / 本机控制</small><h1>工作区维护控制台</h1></div><span>127.0.0.1 · 仅项目根 · 零外部网络</span></header><main class="control-wrap">""" + panel + """</main><script>""" + MAINTENANCE_OBSERVATORY_JS + """</script></body></html>"""
 
 
 def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
@@ -1549,10 +1589,11 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         error = projection.get("error", {})
         return (
             '<article class="page wide" id="personal-observatory" data-kind="personal-observatory" '
-            'data-title="Personal Observatory" data-status="unavailable" data-read-only="true">'
-            '<section class="po-shell"><div class="po-brief"><span class="po-kicker">PERSONAL OBSERVATORY</span>'
-            '<h2>项目态势暂不可用</h2><p>Unavailable · %s: %s</p>'
-            '<span class="po-lock">READ ONLY · ZERO EXTERNAL NETWORK</span></div></section></article>'
+            'data-title="个人工作台" data-status="unavailable" data-read-only="true">'
+            '<section class="po-shell"><div class="po-brief"><span class="po-kicker">个人工作台</span>'
+            '<h2>项目态势暂不可用</h2><p>当前无法读取完整的本机项目状态。</p>'
+            '<details><summary>技术详情</summary><code>%s: %s</code></details>'
+            '<span class="po-lock">只读 · 零外部网络</span></div></section></article>'
             % (_esc(error.get("type", "Unknown")), _esc(error.get("message", "Unknown")))
         )
     current = projection.get("current") or {}
@@ -1566,9 +1607,9 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             else None,
         )
     w3_labels = {
-        "review_queue": "Review queue",
-        "integration_eligibility": "Integration eligibility",
-        "cleanup_eligibility": "Cleanup eligibility",
+        "review_queue": "审查队列",
+        "integration_eligibility": "集成资格",
+        "cleanup_eligibility": "清理资格",
     }
     w3_rows = "".join(
         '<div class="po-w3-row" data-w3-slot="%s"><b>%s</b><span class="po-scope %s">%s</span>'
@@ -1577,7 +1618,7 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             _esc(key),
             _esc(w3_labels[key]),
             _esc(_status_class(projection["w3"][key]["status"])),
-            _esc(projection["w3"][key]["label"]),
+            _esc(display_status(projection["w3"][key]["status"])),
             _esc(projection["w3"][key]["detail"]),
         )
         for key in W3_SLOT_KEYS
@@ -1595,13 +1636,13 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     }
     lineage_rows = "".join(
         '<div class="po-inventory-row" data-lineage-status="%s"><div><b>%s</b>'
-        '<span>%s</span></div><code>%s</code><span>%s</span><span>%s inherited paths</span></div>'
+        '<span>%s</span></div><code>%s</code><span>%s</span><span>继承 %s 条路径</span></div>'
         % (
             _esc(item.get("status", "unknown")),
             _esc(item.get("workstream_id", "Unknown")),
-            _esc("stacked on " + str(item.get("base_workstream_id", "Unknown"))),
+            _esc("接续自 " + str(item.get("base_workstream_id", "Unknown"))),
             _esc(_short_oid(item.get("task_base_oid"))),
-            _esc(item.get("status", "unknown")),
+            _esc({"parent-unavailable-unknown": "上游任务待确认", "current": "当前"}.get(str(item.get("status")), "待确认")),
             _esc(item.get("inherited_path_count", 0)),
         )
         for item in projection.get("lineage_summaries", [])
@@ -1621,9 +1662,9 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
         and set(map(str, item.get("workstream_ids", []))).issubset(lineage_member_ids)
     }
     lineage_panel = (
-        '<details class="po-vault po-lineage-chain" open><summary><div><b>Stacked chain</b>'
-        '<span>精确 task base；继承路径不计作 conflict finding</span></div>'
-        '<span>%s unique findings in explicit chain</span></summary><div class="po-vault-body">%s</div></details>'
+        '<details class="po-vault po-lineage-chain"><summary><div><b>接续任务链</b>'
+        '<span>精确任务基点；继承路径不计作冲突发现</span></div>'
+        '<span>%s 个任务链内独立发现</span></summary><div class="po-vault-body">%s</div></details>'
         % (len(chain_finding_ids), lineage_rows)
         if lineage_rows
         else ""
@@ -1635,12 +1676,12 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     workstreams = lineage_panel + "".join(_workstream_card(card) for card in active_cards)
     if not workstreams:
         workstreams = (
-            '<div class="po-empty" data-state="no-worktree">No active Workstream · Unknown</div>'
+            '<div class="po-empty" data-state="no-worktree">目前没有可确认的进行中任务</div>'
         )
     inventory = ""
     if inventory_cards:
         inventory = (
-            '<details class="po-inventory"><summary>本机可见 worktree · %d（非活动项，按需查看）</summary>'
+            '<details class="po-inventory"><summary>本机可见工作区 · %d（非活动项，按需查看）</summary>'
             '<div class="po-inventory-body">%s</div></details>'
             % (
                 len(inventory_cards),
@@ -1648,7 +1689,7 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             )
         )
     subsystems = "".join(
-        '<div class="po-subsystem"><div><b>%s</b><span>%d 个未结束 Workstream</span></div>'
+        '<div class="po-subsystem"><div><b>%s</b><span>%d 个未结束任务</span></div>'
         '<code>%s</code></div>'
         % (
             _esc(item["subsystem_id"]),
@@ -1656,7 +1697,7 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             _esc(" · ".join(item["workstream_ids"])),
         )
         for item in projection["subsystems"]
-    ) or '<div class="po-empty" data-state="no-subsystem">No mapped subsystem · Unknown</div>'
+    ) or '<div class="po-empty" data-state="no-subsystem">目前没有任务关联到项目模块</div>'
     delivery_health = health["delivery_now"]
     reconciliation_health = health["reconciliation"]
     hygiene_health = health["workspace_hygiene"]
@@ -1681,18 +1722,18 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     )
     if current.get("display_group") == "candidate-unregistered":
         project_summary = (
-            "当前 Candidate 未登记 Workstream，无法判断交付资格；请先注册 session 并生成或绑定 review package。"
+            "当前候选尚未登记任务，无法判断交付资格；请先登记任务并生成或绑定审查包。"
         )
     elif current.get("display_group") == "protected-primary":
         project_summary = (
-            "当前目录是受保护的 canonical root，只用于集成，不计作普通 Agent Workstream。"
+            "当前目录是受保护的主工作区，只用于集成，不计作普通 Agent 任务。"
         )
     elif focus:
         project_summary = (
             "当前 %s 正在推进 %s，处于%s。"
             % (
-                focus.get("workstream_id", "Unknown Workstream"),
-                focus.get("primary_subsystem_id", "Unknown subsystem"),
+                focus.get("workstream_id", "待确认任务"),
+                focus.get("primary_subsystem_id", "待确认模块"),
                 _human_phase(focus.get("lifecycle_phase", "unavailable")),
             )
         )
@@ -1701,11 +1742,11 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
                 focus.get("runtime_condition", "stale-unknown")
             )
         if len(active_cards) > 1:
-            project_summary += " 本机还有 %d 个未结束 Workstream。" % (
+            project_summary += " 本机还有 %d 个未结束任务。" % (
                 len(active_cards) - 1
             )
     else:
-        project_summary = "本机没有可确认的未结束 Workstream；远端和未上报工作仍为 Unknown。"
+        project_summary = "本机没有可确认的未结束任务；远端和未上报工作不在当前观察范围内。"
 
     priorities: list[tuple[str, str, str]] = []
     if direct_count:
@@ -1717,7 +1758,7 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     if blocked_count or paused_count:
         priorities.append((
             "warning",
-            "%d 个 Workstream 没有处于持续执行状态" % (blocked_count + paused_count),
+            "%d 个任务没有处于持续执行状态" % (blocked_count + paused_count),
             "%d 个阻塞／失败／离线，%d 个暂停或等待确认。" % (
                 blocked_count,
                 paused_count,
@@ -1726,8 +1767,8 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     if reconciliation_health["total"]:
         priorities.append((
             "warning",
-            "%d 项需要 closure / reconcile" % reconciliation_health["total"],
-            "%d 个 stale session，%d 个历史 overlap，%d 个过期 review package，%d 个未登记 Candidate。"
+            "%d 项待确认的任务／历史状态" % reconciliation_health["total"],
+            "%d 个状态已过期的任务登记，%d 个历史重叠，%d 个过期审查包，%d 个未登记候选。"
             % (
                 reconciliation_health["stale_session_count"],
                 reconciliation_health["finding_count"],
@@ -1756,45 +1797,45 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             priorities.append((
                 "warning",
                 "%d 个审查包仍需人工批准" % approval_needed,
-                "风险等级、所需 capability 与非作者要求均来自 W3 Core。",
+                "风险等级、所需能力与非作者要求均来自 W3 核心契约。",
             ))
         if eligible_reviews:
             priorities.append((
                 "warning",
                 "%d 个候选满足当前集成资格" % eligible_reviews,
-                "这只表示 W3 Core gate 通过；integration ref 仍未更新。",
+                "这只表示 W3 核心门禁通过；集成引用仍未更新。",
             ))
         if cleanup_ready:
             priorities.append((
                 "warning",
-                "%d 个 workspace 满足清理资格" % cleanup_ready,
+                "%d 个工作区满足清理资格" % cleanup_ready,
                 "四类动作仍需分别授权，当前全部 performed=false。",
             ))
     if all(slot.get("status") == "unavailable" for slot in projection["w3"].values()):
         priorities.append((
             "unknown",
             "当前不能判断审查、集成和清理资格",
-            "W3 provider 缺失、失败或 schema 不受支持；已保持 W4A fallback。",
+            "W3 数据来源缺失、失败或格式不受支持；已保持安全降级。",
         ))
     if hygiene_health["debt_count"] or hygiene_health["no_session"]:
         priorities.append((
             "unknown",
-            "%d 个 legacy / Unknown workspace 属于卫生债务" % hygiene_health["debt_count"],
-            "%d 个无 session，%d 个 retained；这些不计入当前 Direct blocker。"
+            "%d 个工作区需要清理建议" % hygiene_health["debt_count"],
+            "%d 个缺少任务登记，%d 个已明确保留；这些不计入当前直接阻断。"
             % (hygiene_health["no_session"], hygiene_health["retained"]),
         ))
     if unknown_health["total"]:
         priorities.append((
             "unknown",
-            "%d 项 Unknown 已完整保留" % unknown_health["total"],
-            "其中 %d 项进入对账，%d 项进入工作区卫生；Unknown 没有被静默丢弃。"
+            "%d 项证据不足状态已完整保留" % unknown_health["total"],
+            "其中 %d 项归入待确认的任务／历史状态，%d 项归入工作区清理建议；没有静默丢弃。"
             % (unknown_health["reconciliation"], unknown_health["hygiene"]),
         ))
     if not priorities:
         priorities.append((
             "unknown",
             "本机没有明确告警",
-            "Personal Mode 不观察远端，因此仍不能表达为全局零风险。",
+            "个人模式不观察远端，因此不能据此表达为全局零风险。",
         ))
     priority_html = "".join(
         '<li class="%s"><span class="po-priority-mark"></span><div><b>%s</b><p>%s</p></div></li>'
@@ -1803,29 +1844,30 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
     )
     return (
         '<article class="page wide" id="personal-observatory" data-kind="personal-observatory" '
-        'data-title="Personal Observatory" data-status="ready" data-read-only="true">'
+        'data-title="个人工作台" data-status="ready" data-read-only="true">'
         '<section class="po-shell" data-mode="personal" data-network-performed="false">'
         '<section class="po-brief" data-zone="project-status"><div class="po-brief-top">'
-        '<div><span class="po-kicker">PERSONAL OBSERVATORY · DERIVED READ ONLY</span>'
+        '<div><span class="po-kicker">个人工作台 · 派生只读视图</span>'
         '<h2>交付状态</h2><p>%s</p></div>'
-        '<span class="po-lock">READ ONLY · ZERO EXTERNAL NETWORK</span></div>'
+        '<span class="po-lock">只读 · 零外部网络</span></div>'
         '<div class="po-brief-grid"><div class="po-signals">'
-        '<div><b>%d</b><span>交付状态 · current Workstream</span></div>'
-        '<div class="%s"><b>%d</b><span>当前阻断 · current Direct</span></div>'
-        '<div><b>%d</b><span>需要对账</span></div><div><b>%d</b><span>工作区卫生</span></div>'
-        '</div><aside class="po-proof"><div><small>本机范围</small><b>%d worktrees</b></div>'
-        '<div><small>趋势</small><b>Unknown · 无历史快照</b></div><div><small>交付资格</small><b>%s</b></div>'
+        '<div><b>%d</b><span>当前交付任务</span></div>'
+        '<div class="%s"><b>%d</b><span>当前直接阻断</span></div>'
+        '<div><b>%d</b><span>待确认的任务／历史状态</span></div><div><b>%d</b><span>工作区清理建议</span></div>'
+        '</div><aside class="po-proof"><div><small>本机范围</small><b>%d 个工作区</b></div>'
+        '<div><small>趋势</small><b>暂无历史快照</b></div><div><small>交付资格</small><b>%s</b></div>'
         '<div><small>采集时间</small><code>%s</code></div></aside></div></section>'
-        '<section class="po-zone" data-zone="attention"><div class="po-zone-head"><h3>当前阻断 / 需要对账 / 工作区卫生</h3>'
-        '<span>三层互不累加；Unknown 完整保留</span></div><ol class="po-priorities">%s</ol></section>'
+        '<section class="po-zone" data-zone="attention"><div class="po-zone-head"><h3>当前阻断／待确认的任务与历史状态／工作区清理建议</h3>'
+        '<span>三类状态互不重复；证据不足会明确保留</span></div><p class="po-empty">待确认项用于追踪任务和历史证据；清理建议用于整理本机工作区，不代表可以自动删除。</p><ol class="po-priorities">%s</ol></section>'
         '<section class="po-zone" data-zone="workstreams"><div class="po-zone-head"><h3>谁在推进什么</h3>'
-        '<span>未 integrated / closed；点击行查看审计证据</span></div>'
+        '<span>仅显示尚未集成或关闭的任务；点击行查看技术证据</span></div>'
         '<div class="po-workstreams">%s</div></section>'
-        '<section class="po-zone" data-zone="subsystems"><div class="po-zone-head"><h3>影响到哪里</h3>'
-        '<span>来自 Workstream 声明的 primary + affected subsystem</span></div><div class="po-subsystems">%s</div></section>'
-        '<details class="po-vault"><summary><div><b>技术证据</b><span>Git、W3 display slots 与本机 worktree inventory</span></div>'
-        '<span>按需展开</span></summary><div class="po-vault-body"><section><h4>W3 status</h4><div class="po-w3">%s</div></section>%s%s</div></details>'
-        '<div class="po-foot"><span>captured %s</span><span>%s · writes false · network false · Team false</span></div>'
+        '<details class="po-vault" data-zone="subsystems"><summary><div><b>影响到哪里</b>'
+        '<span>模块 ID 来自任务声明，仅在技术详情中显示</span></div><span>展开技术详情</span></summary><div class="po-vault-body"><div class="po-subsystems">%s</div></div></details>'
+        '<details class="po-vault"><summary><div><b>技术证据</b><span>Git、W3 显示槽与本机工作区清单</span></div>'
+        '<span>按需展开</span></summary><div class="po-vault-body"><section><h4>W3 状态</h4><div class="po-w3">%s</div></section>%s%s</div></details>'
+        '<div class="po-foot"><span>采集于 %s</span><span>个人工作台投影 · 未写作者文档 · 未访问网络 · 团队模式关闭</span>'
+        '<details><summary>技术详情</summary><code>%s</code></details></div>'
         '</section></article>'
         % (
             _esc(project_summary),
@@ -1835,7 +1877,7 @@ def render_personal_observatory_panel(projection: Mapping[str, Any]) -> str:
             reconciliation_health["total"],
             hygiene_health["debt_count"],
             len(projection["workstreams"]),
-            _esc(projection["w3"]["integration_eligibility"]["label"]),
+            _esc(display_status(projection["w3"]["integration_eligibility"]["status"])),
             _esc(projection["captured_at"]),
             priority_html,
             workstreams,
@@ -1866,7 +1908,7 @@ def inject_personal_observatory(page: str, projection: Mapping[str, Any]) -> str
     )
     nav_item = (
         '<a class="nav-item" data-target="personal-observatory">'
-        '<span class="dot state"></span><span class="lbl">Personal Observatory</span></a>'
+        '<span class="dot state"></span><span class="lbl">个人工作台</span></a>'
     )
     maintenance_nav = (
         '<a class="nav-item" data-target="workspace-maintenance">'

@@ -22,6 +22,7 @@ if str(HERE.parent) not in sys.path:
 import build_personal_observatory  # noqa: E402
 import build_workstream_relation_graph  # noqa: E402
 from project_orrery_cli.authority_consumer import inspect_managed_consumer  # noqa: E402
+from project_orrery_observatory.display_vocabulary import NAVIGATION_LABELS  # noqa: E402
 from project_orrery_observatory.team_observatory import inject_team_observatory  # noqa: E402
 from project_orrery_observatory.unified_observatory import (  # noqa: E402
     ConsumerRegistration,
@@ -79,50 +80,50 @@ def default_registrations(
     ai_ready = dynamic and ai_available is True
     registrations = (
         _registration(
-            "shell-summary", "overview", "Overview", 10, None,
+            "shell-summary", "overview", NAVIGATION_LABELS["overview"], 10, None,
             ("read-status",), "read-only", "unified-observatory-shell", "v1", required=True,
         ),
         _registration(
-            "canonical-docsite", "docs", "Docs & Search", 20, "/api/v1/docs",
+            "canonical-docsite", "docs", NAVIGATION_LABELS["docs"], 20, "/api/v1/docs",
             ("read-docs", "search-docs"), "read-only", "build-docsite", "legacy-reader-v1", required=True,
         ),
         _registration(
-            "ask-docs", "ask", "Ask Docs", 30, "/api/v1/ai",
+            "ask-docs", "ask", NAVIGATION_LABELS["ask"], 30, "/api/v1/ai",
             ("read-derived-view", "configure-provider", "ask-provider", "refresh-derived-view"),
             "provider-opt-in", "broker-only-docsite", "v1", network="provider-opt-in",
             status="available" if ai_ready else "unavailable",
             reason=(
                 None if ai_ready else
-                "AI Provider is not safely enabled for this runtime."
+                "当前运行环境尚未安全启用模型服务。"
                 if dynamic else
-                "Static build has no server, credentials, cookie or AI control."
+                "静态文件没有服务、凭据、cookie 或模型控制能力。"
             ),
         ),
         _registration(
-            "authority-managed", "authority", "Authority", 40, "/api/v1/authority",
+            "authority-managed", "authority", NAVIGATION_LABELS["authority"], 40, "/api/v1/authority",
             ("read-status", "read-derived-view"), "read-only", "authority-managed-consumer", "v1",
         ),
         _registration(
-            "personal-observatory", "personal", "Personal", 50, "/api/v1/personal",
+            "personal-observatory", "personal", NAVIGATION_LABELS["personal"], 50, "/api/v1/personal",
             ("read-status",), "read-only", "personal-observatory-projection", "v1",
         ),
         _registration(
-            "team-observatory", "team", "Team", 60, "/api/v1/team",
+            "team-observatory", "team", NAVIGATION_LABELS["team"], 60, "/api/v1/team",
             ("read-status", "enable-team", "manage-local-transport", "send-request", "decide-request", "share-metadata"),
             "team-opt-in-request-only", "team-read-only-projection", "v1", network="team-opt-in",
             status="available" if dynamic else "unavailable",
-            reason=None if dynamic else "Static build cannot enable Team Mode or start transport.",
+            reason=None if dynamic else "静态文件不能启用团队模式或启动连接。",
         ),
         _registration(
-            "workstream-graph", "workstreams", "Workstreams", 70, "/api/v1/workstreams",
+            "workstream-graph", "workstreams", NAVIGATION_LABELS["workstreams"], 70, "/api/v1/workstreams",
             ("read-graph",), "read-only", "project-orrery-core.workstream-relations", "provider-schema-1",
         ),
         _registration(
-            "workspace-maintenance", "maintenance", "Maintenance", 80, "/api/v1/maintenance",
+            "workspace-maintenance", "maintenance", NAVIGATION_LABELS["maintenance"], 80, "/api/v1/maintenance",
             ("read-status", "background-refresh", "target-preflight", "local-remove-worktree"),
             "host-local-action-specific", "maintenance-provider", "maintenance-v2",
             status="available" if dynamic else "unavailable",
-            reason=None if dynamic else "Static build has no local action authority.",
+            reason=None if dynamic else "静态文件没有本机操作权限。",
         ),
     )
     return validate_registrations(registrations)
@@ -143,7 +144,13 @@ def render_unified_site(
     mode: str,
     title: str = "Orrery · Documentation",
     ai_available: bool | None = None,
-) -> tuple[str, dict[str, Any], tuple[ConsumerRegistration, ...], dict[str, Any] | None]:
+) -> tuple[
+    str,
+    dict[str, Any],
+    tuple[ConsumerRegistration, ...],
+    dict[str, Any] | None,
+    dict[str, Any] | None,
+]:
     root = Path(project_root).resolve()
     if root != ROOT.resolve():
         raise ValueError("Unified Observatory Candidate is root-only")
@@ -173,7 +180,7 @@ def render_unified_site(
         item = next(value for value in registrations if value.consumer_id == "personal-observatory")
         _replace_registration(
             registrations, item.consumer_id,
-            replace(item, status="unavailable", reason="Personal projection is unavailable."),
+            replace(item, status="unavailable", reason="个人工作台数据暂不可用。"),
         )
 
     team_item = next(value for value in registrations if value.consumer_id == "team-observatory")
@@ -185,14 +192,18 @@ def render_unified_site(
         _replace_registration(registrations, team_item.consumer_id, quarantine(team_item, error))
 
     graph_item = next(value for value in registrations if value.consumer_id == "workstream-graph")
+    graph_provider_payload: dict[str, Any] | None = None
     previous_graph = os.environ.get("ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW")
     os.environ["ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW"] = "1"
     try:
-        page, graph = build_workstream_relation_graph.inject_enabled_relation_graph(page, root)
+        graph_provider_payload = build_workstream_relation_graph.core_relation_provider(root)
+        page, graph = build_workstream_relation_graph.inject_enabled_relation_graph(
+            page, root, provider=lambda: graph_provider_payload or {},
+        )
         if graph is None or graph.get("status") == "unavailable":
             _replace_registration(
                 registrations, graph_item.consumer_id,
-                replace(graph_item, status="unavailable", reason="Relation provider returned Unavailable / Unknown."),
+                replace(graph_item, status="unavailable", reason="当前没有可显示的完整任务关系证据。"),
             )
     except Exception as error:
         _replace_registration(registrations, graph_item.consumer_id, quarantine(graph_item, error))
@@ -223,7 +234,7 @@ def render_unified_site(
         page, registrations, mode=mode,
         authority_status=authority_status, authority_reason=authority_reason,
     )
-    return page, stats, tuple(registrations), authority_status
+    return page, stats, tuple(registrations), authority_status, graph_provider_payload
 
 
 def main() -> None:
@@ -234,7 +245,7 @@ def main() -> None:
     arguments = parser.parse_args()
     if not arguments.enable:
         raise SystemExit("Unified Observatory is root-only/default-off; pass --enable explicitly")
-    page, stats, registrations, _authority = render_unified_site(
+    page, stats, registrations, _authority, _graph = render_unified_site(
         ROOT, mode="static", title=arguments.title,
     )
     output = Path(arguments.out)

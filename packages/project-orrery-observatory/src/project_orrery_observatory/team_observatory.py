@@ -64,7 +64,7 @@ TEAM_OBSERVATORY_JS = r"""
 (function(){
   const page=document.getElementById('team-observatory'); if(!page) return;
   const q=(s)=>page.querySelector(s), qa=(s)=>Array.from(page.querySelectorAll(s));
-  const text=(el,value)=>{if(el) el.textContent=value==null?'Unknown':String(value)};
+  const text=(el,value)=>{if(el) el.textContent=value==null?'待确认':String(value)};
   const node=(tag,cls,value)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(value!=null)el.textContent=String(value);return el};
   const presenceLabels={online:'在线',offline:'离线','stale-unknown':'状态已过期',unknown:'状态未知',unavailable:'暂不可用'};
   const phaseLabels={created:'已创建，尚未开始',planning:'正在规划',implementing:'正在实现',validating:'正在验证','review-ready':'等待审查',integrated:'已集成',closed:'已结束'};
@@ -77,21 +77,21 @@ TEAM_OBSERVATORY_JS = r"""
     const options={method:body===undefined?'GET':'POST',headers:{'Accept':'application/json'}};
     if(body!==undefined){options.headers['Content-Type']='application/json';options.body=JSON.stringify(body)}
     const response=await fetch(path,options); const value=await response.json();
-    if(!response.ok) throw new Error(value.error||'Local Team operation failed'); return value;
+    if(!response.ok) throw new Error(value.error||'本机团队操作失败'); return value;
   }
   function renderMembers(projection){
     const root=q('[data-team-members]');root.replaceChildren();
     const members=(projection&&projection.members)||[];
-    text(q('[data-team-member-note]'),members.length<=1?'目前只有你的本机状态；可显式扫描最小 LAN 候选，成员资格仍需 Host 本机确认。':'按成员查看其最近共享的任务状态；过期快照不会冒充实时在线。');
+    text(q('[data-team-member-note]'),members.length<=1?'目前只有你的本机状态；可主动查找同项目的局域网候选，成员资格仍需目标主机本机确认。':'按成员查看其最近共享的任务状态；过期快照不会冒充实时在线。');
     if(!members.length){root.append(node('div','to-empty','还没有可用的成员状态。当前不能据此判断团队是否空闲。'));return}
     members.forEach(member=>{const details=node('details','to-member');details.open=true;const summary=node('summary');
-      const title=node('div','to-member-title');title.append(node('h4',null,member.member_id==='local-owner'?'你（本机成员）':member.member_id),node('small',null,member.member_id));
-      summary.append(title,node('span','to-caps',(member.capabilities||[]).join(' · ')||'member'));details.append(summary);
+      const title=node('div','to-member-title');title.append(node('h4',null,member.member_id==='local-owner'?'你（本机成员）':'团队成员'),node('small',null,'展开查看共享任务'));
+      summary.append(title,node('span','to-caps',(member.capabilities||[]).length+' 项已声明能力'));details.append(summary);
       const table=node('div','to-worktable');const streams=member.workstreams||[];
       if(!streams.length)table.append(node('div','to-empty','该成员还没有共享可见的工作任务。'));
       streams.forEach(work=>{const row=node('div','to-workrow');
-        const visibility=(work.reported_workstream||{}).visibility||'Local-only';const subsystem=(work.scope||{}).primary_subsystem_id&&((work.scope||{}).primary_subsystem_id!=='unmapped')?'关联模块：'+work.scope.primary_subsystem_id:'尚未关联项目模块';
-        const workTitle=node('div','to-work-title');workTitle.append(node('b',null,work.workstream_id),node('small',null,subsystem+' · '+visibility+' · r'+work.revision));
+        const visibility=(work.reported_workstream||{}).visibility==='team-metadata'?'团队可见元数据':'仅本机可见';const subsystem=(work.scope||{}).primary_subsystem_id&&((work.scope||{}).primary_subsystem_id!=='unmapped')?'已关联项目模块':'尚未关联项目模块';
+        const workTitle=node('div','to-work-title');workTitle.append(node('b',null,work.workstream_id),node('small',null,subsystem+' · '+visibility));
         const workState=node('div','to-work-state');workState.append(node('span','to-presence '+work.presence,presenceLabels[work.presence]||'状态未知'),node('small',null,(phaseLabels[(work.reported_workstream||{}).lifecycle_phase]||(work.reported_workstream||{}).lifecycle_phase||'阶段未知')+' · '+presenceNote(work.presence)));
         row.append(workTitle,workState);table.append(row)});
       details.append(table);root.append(details)});
@@ -108,44 +108,44 @@ TEAM_OBSERVATORY_JS = r"""
     if(!pending.length)pendingRoot.append(node('div','to-empty','目前没有需要你处理的请求。'));
     pending.forEach(request=>pendingRoot.append(requestItem(request,false)));done.forEach(request=>historyRoot.append(requestItem(request,true)));history.hidden=!done.length;
   }
-  function renderLan(lan){lan=lan||{};const status=lan.status||{},candidates=lan.candidates||[],joins=lan.join_requests||[],host=lan.coordinator_host||{};
-    text(q('[data-lan-discovery]'),status.status||'never-started');text(q('[data-lan-candidates]'),candidates.length);text(q('[data-lan-host-generation]'),host.generation==null?'Unknown':'g'+host.generation+' · '+(host.status||'unknown'));
+  function renderLan(lan,config){lan=lan||{};config=config||{};const status=lan.status||{},candidates=lan.candidates||[],joins=lan.join_requests||[],host=lan.coordinator_host||{};
+    text(q('[data-lan-discovery]'),({'never-started':'尚未查找',running:'正在查找',succeeded:'查找完成',failed:'查找失败'}[status.status]||status.status||'尚未查找'));text(q('[data-lan-candidates]'),candidates.length);text(q('[data-lan-host-generation]'),host.generation==null?'待确认':'第 '+host.generation+' 代 · '+({'active':'当前','stale-unknown':'历史状态'}[host.status]||host.status||'待确认'));
     const root=q('[data-lan-results]');root.replaceChildren();
-    if(!candidates.length)root.append(node('div','to-empty','尚未发现候选 Host。发现提示不授予成员资格；可使用 CLI 的手工邀请地址回退。'));
-    candidates.forEach(candidate=>{const item=node('div','to-request');item.append(node('b',null,'候选 Host · '+((candidate.packet||{}).host_hint||'opaque')),node('p',null,(candidate.packet||{}).endpoint||'endpoint unavailable'),node('div','to-request-meta','不可信提示 · 必须继续校验 project fingerprint、成员凭据并由 Host Admin 确认'));root.append(item)});
-    joins.filter(item=>item.status==='pending').forEach(item=>{const row=node('div','to-request');row.append(node('b',null,'加入确认 · '+item.member_id),node('p',null,'该成员仍未加入；确认只签发成员凭据，不执行其机器上的任何动作.'));const button=node('button','to-action','在 Host 本机确认加入');button.type='button';button.dataset.joinRequestId=item.request_id;row.append(button);root.append(row)});
+    if(!candidates.length)root.append(node('div','to-empty','尚未发现候选主机。发现结果只是不可信提示，不会自动加入团队。'));
+    candidates.forEach(candidate=>{const packet=candidate.packet||{},endpoint=packet.endpoint||'',loopback=/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/i.test(endpoint),selfHint=packet.host_hint&&packet.host_hint===config.host_id,local=loopback||selfHint;const item=node('div','to-request');item.append(node('b',null,local?'本机测试／本机主机':'不可信候选主机'),node('p',null,local?'这是当前电脑上的发现回环，用于验证流程，不代表另一台设备。':'找到同一项目指纹的局域网候选，仍未建立成员关系。'),node('div','to-request-meta','用户主动查找 · 项目指纹过滤 · 仍需目标主机本机确认 · 不会自动加入、执行或上传源码'));root.append(item)});
+    joins.filter(item=>item.status==='pending').forEach(item=>{const row=node('div','to-request');row.append(node('b',null,'加入确认'),node('p',null,'该成员仍未加入；确认只签发成员凭据，不执行其电脑上的任何动作。'));const button=node('button','to-action','在目标主机本机确认加入');button.type='button';button.dataset.joinRequestId=item.request_id;row.append(button);root.append(row)});
   }
   function renderOverview(value){const config=value.config||{},running=!!(value.coordinator&&value.coordinator.running),projection=value.projection||{},members=projection.members||[];
     const pending=(value.requests||[]).filter(request=>request.status==='pending-local-confirmation').length,outbox=value.outbox_count||0;
     const externalRegistered=!running&&config.runtime_status==='team-runtime-active';let guidance;
-    if(externalRegistered){guidance='检测到另一个本机协作服务登记；请回到原页面正常停止，或退出 Team Mode 后重新启用。'}
+    if(externalRegistered){guidance='检测到另一个本机协作服务登记；请回到原页面正常停止，或退出团队模式后重新启用。'}
     else if(!running){guidance='团队连接尚未启动；本地工作保持不受影响。'}
     else if(!config.sharing_enabled){guidance='团队连接已启动，项目状态共享仍处于暂停。'}
     else if(members.length<=1){guidance=outbox?'还有 '+outbox+' 项本机状态等待同步。':'目前只有你的本机成员状态。'}
     else{guidance=pending?'有 '+pending+' 个请求等待你在本机确认。':'目前没有需要你处理的团队请求。'}
     if(running&&!(config.heartbeat&&config.heartbeat.enabled))guidance+=' 在线状态广播已关闭，因此“状态已过期／未知”是预期结果。';
     text(q('[data-team-guidance]'),guidance);text(q('[data-team-service]'),running?'本机服务运行中':externalRegistered?'其他本机服务登记':'尚未启动');text(q('[data-team-member-count]'),members.length);text(q('[data-team-pending-count]'),pending);qa('[data-team-outbox]').forEach(element=>text(element,outbox));
-    text(q('[data-lan-connection]'),running?'connected · monotonic revision aggregation':externalRegistered?'external runtime · control unavailable':'disconnected · local work preserved');
+    text(q('[data-lan-connection]'),running?'已连接 · 按递增版本聚合':externalRegistered?'其他本机服务运行中 · 当前页面不可控制':'未连接 · 本地工作已保留');
   }
   function render(value){state=value;const config=value.config||{};const enabled=!!config.enabled;const running=!!(value.coordinator&&value.coordinator.running);
     const externalRegistered=!running&&config.runtime_status==='team-runtime-active';
     q('[data-team-onboarding]').hidden=enabled;q('[data-team-workspace]').hidden=!enabled;
-    text(q('[data-team-mode]'),enabled?'TEAM · OPT-IN':'PERSONAL · ZERO NETWORK');text(q('[data-team-runtime]'),config.runtime_status||'personal-zero-network');
+    text(q('[data-team-mode]'),enabled?'团队模式 · 已主动开启':'个人模式 · 零网络');text(q('[data-team-runtime]'),config.runtime_status||'personal-zero-network');
     text(q('[data-team-member]'),config.member_id||'implicit local');text(q('[data-team-host]'),config.host_id||'not configured');
-    text(q('[data-team-sharing]'),config.sharing_enabled?'sharing':'off');text(q('[data-team-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'on':'off');
-    text(q('[data-team-last-seen]'),value.projection&&value.projection.generated_at||'Unavailable');text(q('[data-team-outbox]'),value.outbox_count||0);
+    text(q('[data-team-sharing]'),config.sharing_enabled?'已共享':'已关闭');text(q('[data-team-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'已开启':'已关闭');
+    text(q('[data-team-last-seen]'),value.projection&&value.projection.generated_at||'暂不可用');text(q('[data-team-outbox]'),value.outbox_count||0);
     const connection=q('[data-team-connection-action]');connection.dataset.teamAction=running?'stop':'start';
     qa('[data-team-action]').forEach(button=>{const action=button.dataset.teamAction;button.disabled=(action==='enable'&&enabled)||(action==='disable'&&!enabled)||(action==='start'&&(!enabled||running||externalRegistered))||(action==='stop'&&!running)||(['heartbeat','sharing','capture','sync','request-create','maintenance-request','discovery'].includes(action)&&!enabled)||(['sync','discovery'].includes(action)&&!running)});
     text(connection,running?'暂停团队连接':externalRegistered?'其他本机服务占用中':'启动团队连接');
     text(q('[data-action-heartbeat]'),config.heartbeat&&config.heartbeat.enabled?'关闭在线状态':'开启在线状态');text(q('[data-action-sharing]'),config.sharing_enabled?'暂停项目状态共享':'开始共享项目状态');text(q('[data-action-sync]'),(value.outbox_count||0)?'同步 '+value.outbox_count+' 项更新':'立即同步');
-    renderOverview(value);renderMembers(value.projection);renderRequests(value.requests||[]);renderLan(value.lan);
+    renderOverview(value);renderMembers(value.projection);renderRequests(value.requests||[]);renderLan(value.lan,config);
   }
   function setSettings(open){const backdrop=q('[data-team-settings-backdrop]'),trigger=q('[data-team-settings-open]');backdrop.classList.toggle('open',open);backdrop.setAttribute('aria-hidden',open?'false':'true');trigger.setAttribute('aria-expanded',open?'true':'false');if(open)q('[data-team-settings-close]').focus();else trigger.focus()}
   const apiBase='__ORRERY_TEAM_API_BASE__';
   async function refresh(){try{render(await api(apiBase+'/status'));q('[data-team-notice]').className='to-notice';text(q('[data-team-notice]'),'本机状态已刷新；没有返回凭据或源码内容。')}catch(error){q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),error.message)}}
   page.addEventListener('click',async(event)=>{const button=event.target.closest('button');if(!button)return;if(button.hasAttribute('data-team-settings-open')){setSettings(true);return}if(button.hasAttribute('data-team-settings-close')){setSettings(false);return}let path=null,body={};
     if(button.dataset.teamAction){path=apiBase+'/'+button.dataset.teamAction}else if(button.dataset.requestDecision){path=apiBase+'/request/decision';body={request_id:button.dataset.requestId,decision:button.dataset.requestDecision}}else if(button.dataset.joinRequestId){path=apiBase+'/join/confirm';body={request_id:button.dataset.joinRequestId}}else{return}
-    button.disabled=true;try{await api(path,body);await refresh()}catch(error){const action=button.dataset.teamAction||button.dataset.requestDecision;const friendly={start:'无法启动本机协作服务。可能存在其他 Team 页面或失效的本机登记，请按上方说明恢复。',disable:'无法退出 Team Mode。请先关闭其他本机 Team 页面后重试。',sync:'同步没有完成；本机待同步状态仍会保留。',accept:'请求尚未确认，请刷新后重试。',reject:'请求尚未拒绝，请刷新后重试。'}[action]||'本机操作没有完成；没有执行远程命令。';q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),friendly);button.disabled=false}});
+    button.disabled=true;try{await api(path,body);await refresh()}catch(error){const action=button.dataset.teamAction||button.dataset.requestDecision;const friendly={start:'无法启动本机协作服务。可能存在其他团队页面或失效的本机登记，请按上方说明恢复。',disable:'无法退出团队模式。请先关闭其他本机团队页面后重试。',sync:'同步没有完成；本机待同步状态仍会保留。',accept:'请求尚未确认，请刷新后重试。',reject:'请求尚未拒绝，请刷新后重试。'}[action]||'本机操作没有完成；没有执行远程命令。';q('[data-team-notice]').className='to-notice error';text(q('[data-team-notice]'),friendly);button.disabled=false}});
   q('[data-team-settings-backdrop]').addEventListener('click',event=>{if(event.target===event.currentTarget)setSettings(false)});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&q('[data-team-settings-backdrop]').classList.contains('open'))setSettings(false)});
   refresh();
@@ -156,37 +156,37 @@ TEAM_OBSERVATORY_JS = r"""
 def render_team_observatory_panel() -> str:
     return (
         '<article class="page wide" id="team-observatory" data-kind="team-observatory" '
-        'data-title="Team Observatory" data-authority="derived-read-only">'
-        '<section class="to-shell"><header class="to-head"><div><span class="to-kicker">TEAM OBSERVATORY · LOCAL CONTROL</span>'
+        'data-title="团队协作" data-authority="derived-read-only">'
+        '<section class="to-shell"><header class="to-head"><div><span class="to-kicker">团队协作 · 本机控制</span>'
         '<h2>团队指挥台</h2><p>先看谁在推进、哪里需要你处理；所有请求仍由目标成员在自己的电脑上确认。</p></div></header>'
-        '<section class="to-onboarding" data-team-onboarding><h3>Personal Mode 正在保护默认体验</h3>'
-        '<p>当前不会启动 Team socket。启用项目身份与启动 Coordinator 是两个独立动作；LAN bind 继续留在单独显式开关之后。</p>'
-        '<div class="to-flow"><div class="to-step"><small>01 · DEFAULT</small><b>Personal</b><span>零监听、零发现、零同步</span></div><div class="to-arrow">→</div>'
-        '<div class="to-step"><small>02 · LOCAL WRITE</small><b>Enable Team</b><span>只写 Git-private 配置，不开端口</span></div><div class="to-arrow">→</div>'
-        '<div class="to-step"><small>03 · EXPLICIT RUNTIME</small><b>Serve locally</b><span>仅 127.0.0.1；关闭 UI 即停止</span></div></div>'
-        '<div class="to-safe"><div><b>中央能做什么</b><span>读取版本化 metadata、聚合 Member → Workstream、发送 request。</span></div>'
-        '<div><b>中央不能做什么</b><span>不能执行 shell／Agent／merge／delete；accept/reject 也只写本机 receipt。</span></div></div>'
-        '<button class="to-action primary" type="button" data-team-action="enable">在本机启用 Team Mode</button></section>'
+        '<section class="to-onboarding" data-team-onboarding><h3>个人模式正在保护默认体验</h3>'
+        '<p>当前不会启动团队网络连接。启用项目团队身份与启动本机协作服务是两个独立动作；局域网监听仍需单独主动开启。</p>'
+        '<div class="to-flow"><div class="to-step"><small>01 · 默认状态</small><b>个人模式</b><span>零监听、零发现、零同步</span></div><div class="to-arrow">→</div>'
+        '<div class="to-step"><small>02 · 本机登记</small><b>启用团队模式</b><span>只写 Git-private 配置，不开端口</span></div><div class="to-arrow">→</div>'
+        '<div class="to-step"><small>03 · 主动启动</small><b>启动本机协作服务</b><span>关闭网页不会停止服务；请使用右上角“关闭 Orrery 服务”</span></div></div>'
+        '<div class="to-safe"><div><b>中央能做什么</b><span>读取版本化元数据、聚合成员与任务关系、发送请求。</span></div>'
+        '<div><b>中央不能做什么</b><span>不能执行命令、Agent、合并或删除；接受／拒绝也只写本机回执。</span></div></div>'
+        '<button class="to-action primary" type="button" data-team-action="enable">在本机启用团队模式</button></section>'
         '<section class="to-workspace" data-team-workspace hidden>'
         '<section class="to-overview"><div class="to-signals"><div class="to-signal"><small>团队连接</small><b data-team-service>尚未启动</b></div><div class="to-signal"><small>可见成员</small><b><span data-team-member-count>0</span> 人</b></div><div class="to-signal"><small>等待你处理</small><b><span data-team-pending-count>0</span> 项</b></div><div class="to-signal"><small>等待同步</small><b><span data-team-outbox>0</span> 项</b></div></div>'
-        '<div class="to-essential"><div class="to-mode-state"><small>Team Mode</small><b data-team-mode>TEAM · OPT-IN</b></div><p class="to-command-note" data-team-guidance>正在读取本机团队状态…</p><div class="to-essential-actions">'
+        '<div class="to-essential"><div class="to-mode-state"><small>团队模式</small><b data-team-mode>团队模式 · 已主动开启</b></div><p class="to-command-note" data-team-guidance>正在读取本机团队状态…</p><div class="to-essential-actions">'
         '<button class="to-action primary" type="button" data-team-action="start" data-team-connection-action>启动团队连接</button><button class="to-action" type="button" data-team-action="heartbeat" data-action-heartbeat>开启在线状态</button>'
-        '<button class="to-action to-icon-action" type="button" data-team-settings-open aria-label="本机设置与诊断" title="本机设置与诊断" aria-haspopup="dialog" aria-controls="team-local-settings" aria-expanded="false">⚙</button><button class="to-action danger" type="button" data-team-action="disable">退出 Team Mode</button></div></div></section>'
+        '<button class="to-action to-icon-action" type="button" data-team-settings-open aria-label="本机设置与诊断" title="本机设置与诊断" aria-haspopup="dialog" aria-controls="team-local-settings" aria-expanded="false">⚙</button><button class="to-action danger" type="button" data-team-action="disable">退出团队模式</button></div></div></section>'
         '<section class="to-actions"><div class="to-actions-head"><div><span class="to-section-label">建议操作</span><h3>按当前状态完成下一步</h3></div><span>这里的操作只影响你的本机节点</span></div><div class="to-action-strip">'
-        '<button class="to-action" type="button" data-team-action="discovery">显式发现同项目 Host</button><button class="to-action" type="button" data-team-action="sharing" data-action-sharing>开始共享项目状态</button>'
+        '<button class="to-action" type="button" data-team-action="discovery">在局域网查找团队成员</button><button class="to-action" type="button" data-team-action="sharing" data-action-sharing>开始共享项目状态</button>'
         '<button class="to-action" type="button" data-team-action="capture">采集本机状态</button><button class="to-action" type="button" data-team-action="sync" data-action-sync>立即同步</button></div></section>'
-        '<div class="to-grid"><main class="to-main"><section class="to-section"><div class="to-section-head"><h3>发现、加入与连接</h3><span>发现是不可信提示，加入仍需凭据与 Host 本机确认</span></div><div data-lan-results></div></section><section class="to-section"><div class="to-section-head"><h3>成员与工作任务</h3><span data-team-member-note>按成员查看最近共享的 Workstream</span></div><div data-team-members></div></section></main>'
+        '<div class="to-grid"><main class="to-main"><section class="to-section"><div class="to-section-head"><h3>发现、加入与连接</h3><span>主动点击后按项目指纹过滤；结果仍是不可信候选，必须由目标主机本机确认</span></div><p class="to-command-note">查找不会自动加入团队、执行操作或上传源码。回环结果会明确标为本机测试／本机主机。</p><div data-lan-results></div></section><section class="to-section"><div class="to-section-head"><h3>成员与工作任务</h3><span data-team-member-note>按成员查看最近共享的任务</span></div><div data-team-members></div></section></main>'
         '<aside class="to-side"><section class="to-section" data-team-requests><div class="to-section-head"><h3>待处理请求</h3><span>确认只记录决定，不会自动执行</span></div><div data-team-pending-requests></div>'
         '<details class="to-history" data-team-request-history hidden><summary data-team-history-summary>已处理请求（0）</summary><div data-team-request-history-list></div></details></section></aside></div>'
         '</section><div class="to-notice" data-team-notice>正在读取本机团队状态…</div></section>'
         '<div class="to-dialog-backdrop" data-team-settings-backdrop aria-hidden="true"><section class="to-dialog" id="team-local-settings" role="dialog" aria-modal="true" aria-labelledby="team-local-settings-title">'
         '<header class="to-dialog-head"><div><h3 id="team-local-settings-title">本机设置与诊断</h3><p>低频控制与协议字段；这里的动作仍只影响当前本机节点。</p></div><button class="to-dialog-close" type="button" data-team-settings-close aria-label="关闭本机设置">×</button></header>'
-        '<div class="to-statusline"><div><small>Mode</small><b data-team-runtime>Unknown</b></div><div><small>Member</small><b data-team-member>Unknown</b></div>'
-        '<div><small>Host</small><b data-team-host>Unknown</b></div><div><small>Sharing / Heartbeat</small><b><span data-team-sharing>off</span> · <span data-team-heartbeat>off</span></b></div>'
-        '<div><small>Last seen</small><b data-team-last-seen>Unavailable</b></div><div><small>Outbox</small><b data-team-outbox>0</b></div>'
-        '<div><small>Discovery / candidates</small><b><span data-lan-discovery>never-started</span> · <span data-lan-candidates>0</span></b></div><div><small>Active Coordinator Host</small><b data-lan-host-generation>Unknown</b></div><div><small>Connection / reconnect</small><b data-lan-connection>disconnected · local work preserved</b></div></div>'
+        '<div class="to-statusline"><div><small>运行模式</small><b data-team-runtime>待确认</b></div><div><small>成员 ID</small><b data-team-member>待确认</b></div>'
+        '<div><small>主机 ID</small><b data-team-host>待确认</b></div><div><small>共享／心跳</small><b><span data-team-sharing>已关闭</span> · <span data-team-heartbeat>已关闭</span></b></div>'
+        '<div><small>最近状态</small><b data-team-last-seen>暂不可用</b></div><div><small>待同步队列</small><b data-team-outbox>0</b></div>'
+        '<div><small>发现状态／候选数</small><b><span data-lan-discovery>尚未查找</span> · <span data-lan-candidates>0</span></b></div><div><small>当前协调主机</small><b data-lan-host-generation>待确认</b></div><div><small>连接／重连</small><b data-lan-connection>未连接 · 本地工作已保留</b></div></div>'
         '<div class="to-controlbar"><button class="to-action" type="button" data-team-action="maintenance-request">请求成员本机评估维护</button><button class="to-action" type="button" data-team-action="request-create">创建测试请求</button></div>'
-        '<div class="to-privacy"><b>只共享最小元数据</b><br>发现包仅含 protocol version、opaque project／Host／device hint、ephemeral endpoint／nonce／expiry；不发送 Prompt、回答、reasoning、transcript、源码正文、未 push diff、member token、API key 或 credential。最后快照只按 Core TTL 投影，不冒充实时在线；Host switch 只允许手工 generation 递增，不自动选主。</div></section></div></article>'
+        '<div class="to-privacy"><b>只共享最小元数据</b><br>发现包仅含协议版本、不透明的项目／主机／设备提示，以及短期端点、随机数和到期时间；不发送提示词、回答、推理、对话记录、源码正文、未推送差异、成员令牌、API 密钥或凭据。最后快照只按 Core 有效期投影，不冒充实时在线；主机切换只允许手工递增代次，不自动选主。</div></section></div></article>'
     )
 
 
@@ -200,7 +200,7 @@ def inject_team_observatory(
         raise ValueError("Team Observatory is already present")
     nav_marker = (
         '<a class="nav-item" data-target="personal-observatory">'
-        '<span class="dot state"></span><span class="lbl">Personal Observatory</span></a>'
+        '<span class="dot state"></span><span class="lbl">个人工作台</span></a>'
     )
     content_marker = '</main><aside class="toc" id="toc">'
     if nav_marker not in page or content_marker not in page or "</style>" not in page:
@@ -208,7 +208,7 @@ def inject_team_observatory(
     result = page.replace("</style>", TEAM_OBSERVATORY_CSS + "</style>", 1)
     nav = (
         '<a class="nav-item" data-target="team-observatory">'
-        '<span class="dot proposed"></span><span class="lbl">Team Observatory</span></a>'
+        '<span class="dot proposed"></span><span class="lbl">团队协作</span></a>'
     )
     result = result.replace(nav_marker, nav_marker + nav, 1)
     marker_index = result.index(nav_marker)
@@ -226,7 +226,7 @@ def inject_team_observatory(
         panel = panel.replace("<button ", "<button disabled ")
         panel = panel.replace(
             "正在读取本机团队状态…",
-            "Static read-only · Team control Unavailable；未启动 server、cookie、listener 或网络。",
+            "静态只读；团队控制暂不可用，未启动服务、cookie、监听或网络。",
         )
     result = result.replace(content_marker, panel + content_marker, 1)
     if not dynamic_control:

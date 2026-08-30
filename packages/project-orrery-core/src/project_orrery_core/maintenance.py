@@ -282,11 +282,55 @@ def _scan_path(root: Path, scan_id: str) -> Path:
 
 
 def _last_run_path(root: Path) -> Path:
-    return _maintenance_dir(root, create=True) / "last-run.json"
+    return _maintenance_dir(root, create=True) / "last-run-v2.json"
+
+
+def _legacy_last_run_path(root: Path) -> Path:
+    """Return the pre-U2.1 evidence path without creating or rewriting it."""
+    return _maintenance_dir(root) / "last-run.json"
 
 
 def _read_optional(path: Path, description: str) -> dict[str, Any] | None:
     return _read_regular_json(path, description=description) if path.exists() else None
+
+
+def _read_compatible_last_run(
+    root: Path,
+) -> tuple[dict[str, Any] | None, str | None, list[dict[str, Any]]]:
+    """Read current evidence first and preserve incompatible history as warnings.
+
+    The old ``last-run.json`` path is never migrated, deleted or overwritten.
+    A new scan writes ``last-run-v2.json`` and keeps eligibility based only on
+    current provider/cache evidence.
+    """
+    warnings: list[dict[str, Any]] = []
+    candidates = (
+        (_maintenance_dir(root) / "last-run-v2.json", "current-last-run", False),
+        (_legacy_last_run_path(root), "legacy-last-run", True),
+    )
+    selected: dict[str, Any] | None = None
+    selected_source: str | None = None
+    for path, source, historical in candidates:
+        if not path.exists():
+            continue
+        try:
+            raw = _read_regular_json(path, description="maintenance last run")
+            value = validate_maintenance_contract(raw)
+        except ValueError as exc:
+            warnings.append({
+                "source": source,
+                "error_type": type(exc).__name__,
+                "message": str(exc),
+                "evidence_scope": "historical" if historical else "current-file",
+                "display_state": "historical-unknown",
+                "affects_current_refresh": False,
+                "affects_current_eligibility": False,
+            })
+            continue
+        if selected is None:
+            selected = value
+            selected_source = source
+    return selected, selected_source, warnings
 
 
 def _bounded_call(call: Callable[..., Any], *arguments: Any, timeout_seconds: float) -> Any:
@@ -514,9 +558,7 @@ def run_maintenance_scan(
     started = _timestamp(now)
     now_dt = _parse_timestamp(started)
     last_path = _last_run_path(root)
-    last = _read_optional(last_path, "maintenance last run")
-    if last is not None:
-        last = validate_maintenance_contract(last)
+    last, _last_source, _historical_warnings = _read_compatible_last_run(root)
     if reason in {"integration-event", "closure-event"} and last and last.get("status") == "succeeded":
         finished = _parse_timestamp(str(last["finished_at"]))
         if (now_dt - finished).total_seconds() < debounce_seconds:
@@ -788,12 +830,7 @@ def request_background_catch_up(project_root: Path, *, now: str | None = None) -
     if not policy["scan_on_observatory_start"] or not host["catch_up_enabled"]:
         return {"status": "disabled", "scheduled": False, "request_thread_blocked": False, "network_performed": False}
     current = _parse_timestamp(_timestamp(now))
-    last = _read_optional(_maintenance_dir(root) / "last-run.json", "maintenance last run")
-    if last is not None:
-        try:
-            last = validate_maintenance_contract(last)
-        except ValueError:
-            last = None
+    last, _last_source, _historical_warnings = _read_compatible_last_run(root)
     if last and last.get("status") == "succeeded" and last.get("finished_at"):
         if current - _parse_timestamp(str(last["finished_at"])) < dt.timedelta(hours=int(policy["catch_up_after_hours"])):
             return {"status": "fresh", "scheduled": False, "last_run": last, "request_thread_blocked": False, "network_performed": False}
@@ -807,12 +844,7 @@ def catch_up_maintenance_scan(project_root: Path, *, now: str | None = None) -> 
     if not policy["scan_on_observatory_start"] or not host["catch_up_enabled"]:
         return {"status": "disabled", "scan_performed": False, "network_performed": False}
     current = _parse_timestamp(_timestamp(now))
-    last = _read_optional(_maintenance_dir(root) / "last-run.json", "maintenance last run")
-    if last is not None:
-        try:
-            last = validate_maintenance_contract(last)
-        except ValueError:
-            last = None
+    last, _last_source, _historical_warnings = _read_compatible_last_run(root)
     if last and last.get("status") == "succeeded" and last.get("finished_at"):
         age = current - _parse_timestamp(str(last["finished_at"]))
         if age < dt.timedelta(hours=int(policy["catch_up_after_hours"])):
@@ -1458,13 +1490,8 @@ def maintenance_status(project_root: Path) -> dict[str, Any]:
     directory = common / "orrery" / "maintenance"
     policy = load_maintenance_policy(root)
     contract_errors: list[dict[str, str]] = []
-    last = _read_optional(directory / "last-run.json", "maintenance last run")
-    if last is not None:
-        try:
-            last = validate_maintenance_contract(last)
-        except ValueError as exc:
-            contract_errors.append({"source": "last-run", "error_type": type(exc).__name__, "message": str(exc)})
-            last = None
+    last, last_run_source, last_run_warnings = _read_compatible_last_run(root)
+    contract_errors.extend(last_run_warnings)
     protected = _read_optional(directory / "latest-protected.json", "maintenance protected summary")
     receipts_dir = directory / "receipts"
     def compatible_contracts(paths: Sequence[Path], description: str) -> list[dict[str, Any]]:
@@ -1528,6 +1555,8 @@ def maintenance_status(project_root: Path) -> dict[str, Any]:
         "policy": policy,
         "host_preferences": host_preferences,
         "last_run": last,
+        "last_run_source": last_run_source,
+        "historical_evidence_warnings": last_run_warnings,
         "queue": [
             value
             for path in _queue_files(root, directory=directory / "queue")

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import importlib.util
 import os
 import socket
@@ -273,10 +274,12 @@ class PersonalObservatoryTests(unittest.TestCase):
             w3_evidence=bundle, health=health,
         ))
         self.assertIn("交付状态", panel)
-        self.assertIn("当前阻断 · current Direct", panel)
-        self.assertIn("需要对账", panel)
-        self.assertIn("工作区卫生", panel)
-        self.assertIn("Candidate 未登记 Workstream，无法判断交付资格", panel)
+        self.assertIn("1 个确定的直接重叠需要处理", panel)
+        self.assertIn("待确认的任务／历史状态", panel)
+        self.assertIn("工作区清理建议", panel)
+        self.assertIn("当前候选尚未登记任务，无法判断交付资格", panel)
+        self.assertNotIn("需要对账", panel)
+        self.assertNotIn("工作区卫生", panel)
         self.assertNotIn("38 个确定的直接重叠", panel)
     def _sessions(self, fixture: CollaborationGitFixture) -> None:
         write_workstream_session(
@@ -574,7 +577,7 @@ class PersonalObservatoryTests(unittest.TestCase):
         self.assertIn('data-zone="workstreams"', panel)
         self.assertIn('data-zone="subsystems"', panel)
         self.assertIn('data-state="no-worktree"', panel)
-        self.assertIn("W3 not integrated", panel)
+        self.assertIn("当前不能判断审查、集成和清理资格", panel)
         self.assertIn('data-read-only="true"', panel)
         self.assertNotIn("<form", panel)
         self.assertNotIn("<button", panel)
@@ -634,7 +637,7 @@ class PersonalObservatoryTests(unittest.TestCase):
         self.assertIn("查看证据", panel)
         self.assertIn("技术证据", panel)
         self.assertIn('data-display-group="worktree-only"', panel)
-        self.assertIn("No Workstream session", panel)
+        self.assertIn("没有任务登记", panel)
         self.assertNotIn("<unsafe>", panel)
         self.assertIn("&amp;lt;unsafe", panel)
 
@@ -689,8 +692,8 @@ class PersonalObservatoryTests(unittest.TestCase):
         self.assertIn('data-target="workspace-maintenance"', static)
         self.assertIn('id="workspace-maintenance"', static)
         self.assertIn('data-maintenance-control="false"', static)
-        self.assertIn("无 scheduler", static)
-        self.assertIn("branch 保留", static.lower())
+        self.assertIn("无定时任务", static)
+        self.assertIn("分支保留", static)
 
         binding = {
             "workspace_id": "workspace-1",
@@ -736,6 +739,7 @@ class PersonalObservatoryTests(unittest.TestCase):
                     "reasons": [],
                     "unknown": [],
                     "is_primary_worktree": False,
+                    "remove_worktree_eligible": True,
                 }, {
                     "workspace_id": "workspace-unknown",
                     "registered_path": "C:/fixture/unknown",
@@ -745,19 +749,39 @@ class PersonalObservatoryTests(unittest.TestCase):
                     "reasons": ["target-refresh-failed"],
                     "unknown": ["cache-corrupt"],
                     "is_primary_worktree": False,
+                    "remove_worktree_eligible": False,
                 }],
             },
             "background_refresh": {"status": "idle"},
+            "historical_evidence_warnings": [{
+                "source": "legacy-last-run",
+                "message": "unsupported maintenance contract schema version",
+                "display_state": "historical-unknown",
+                "affects_current_refresh": False,
+                "affects_current_eligibility": False,
+            }],
         }
         dynamic = inject_personal_observatory(base, _ready_projection(maintenance=maintenance))
         self.assertIn('data-maintenance-control="true"', dynamic)
         self.assertIn("后台增量扫描", dynamic)
         self.assertIn('data-maintenance-preflight="workspace-1"', dynamic)
-        self.assertIn("cache rail", dynamic)
-        self.assertIn('class="mo-cache-state stale">stale</span>', dynamic)
-        self.assertIn("受保护／Unknown 原因", dynamic)
+        self.assertIn("快速删除", dynamic)
+        self.assertIn('data-maintenance-eligible-count>1</b>', dynamic)
+        self.assertEqual(dynamic.count('data-maintenance-preflight="workspace-1"'), 1)
+        self.assertIn('class="mo-cache-state stale">历史状态</span>', dynamic)
+        self.assertIn("主要保护原因", dynamic)
+        self.assertIn("旧记录已原样保留", dynamic)
         self.assertIn("window.confirm", dynamic)
-        self.assertIn("只删除 worktree，保留 branch/commit", dynamic)
+        self.assertIn("只删除工作区，保留分支和提交", dynamic)
+
+        no_eligible = json.loads(json.dumps(maintenance))
+        no_eligible["cache"]["entries"][0]["remove_worktree_eligible"] = False
+        protected_dynamic = inject_personal_observatory(
+            base, _ready_projection(maintenance=no_eligible)
+        )
+        self.assertIn('data-maintenance-eligible-count>0</b>', protected_dynamic)
+        self.assertIn("目前没有可安全删除项", protected_dynamic)
+        self.assertNotIn('data-maintenance-preflight="workspace-1"', protected_dynamic)
 
     def test_unavailable_projection_renders_stable_fallback(self):
         projection = unavailable_personal_observatory_projection(
@@ -766,7 +790,7 @@ class PersonalObservatoryTests(unittest.TestCase):
         panel = render_personal_observatory_panel(projection)
         self.assertIn('data-status="unavailable"', panel)
         self.assertIn("fixture unavailable", panel)
-        self.assertIn("READ ONLY", panel)
+        self.assertIn("只读", panel)
         self.assertFalse(projection["network_performed"])
 
 

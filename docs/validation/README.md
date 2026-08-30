@@ -13,6 +13,7 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-29 U2.1 Unified Observatory UX Acceptance Fixes](2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md) — validates the corrective real-product Candidate: one Chinese app navigation, compatible historical Maintenance evidence, W7.1 legacy/archive graph display, honest LAN discovery, global stop/reclamation and 1280px/390px page acceptance without deletion, external network or release transition.
 - [2026-08-29 W7.1 Archived Session Relation Projection](2026-08-29-w7-1-archived-session-relation-projection.md) — validates bounded Git-private archive recovery, live precedence, conflict/unsafe-input failure closure, zero execution authority and real W5D closed-axis restoration.
 - [2026-08-29 SH1 Real Self-host Collaboration Acceptance](2026-08-29-sh1-real-self-host-collaboration-acceptance.md) — records real self-host read-only/dry-run findings without applying relations or performing deletion.
 - [2026-08-29 U2 Unified Observatory Production Integration](2026-08-29-u2-unified-observatory-production-integration.md) — validates the real root-only/default-off single-URL shell, versioned consumer registry, legacy docsite inheritance, security/lifecycle boundaries and desktop/390px browser behavior without a public/default or release transition.

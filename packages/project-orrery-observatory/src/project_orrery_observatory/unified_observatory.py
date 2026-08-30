@@ -6,9 +6,16 @@ does not parse project facts or implement consumer domain actions.
 from __future__ import annotations
 
 import html
+import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
 from typing import Any
+
+from .display_vocabulary import (
+    NAVIGATION_LABELS,
+    TECHNICAL_DETAILS_LABEL,
+    display_status,
+)
 
 
 SHELL_CONTRACT = "unified-observatory-shell-v1"
@@ -163,6 +170,7 @@ SHELL_CSS = r"""
 .uo-panel p{margin:0;color:var(--mut);font-size:13px}.uo-caps{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:15px}
 .uo-cap{background:var(--bg);padding:11px 12px;min-width:0}.uo-cap b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.uo-cap small{display:block;color:var(--mut);font-size:10px;margin-top:3px}.uo-cap.unavailable b{color:var(--warn)}
 .uo-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.uo-button{border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:var(--fg);padding:8px 11px;font:700 11px/1.2 inherit;cursor:pointer}.uo-button:hover{border-color:var(--acc);color:var(--acc)}.uo-button.danger{color:var(--warn)}
+.uo-stop-global{white-space:nowrap;color:var(--warn)}.uo-disconnected{position:fixed;z-index:400;left:50%;top:calc(var(--hh) + 16px);transform:translateX(-50%);width:min(680px,calc(100vw - 24px));padding:13px 16px;border:1px solid var(--warn);border-radius:10px;background:var(--bg2);box-shadow:0 18px 55px rgba(0,0,0,.45);color:var(--fg);font-size:12px}.uo-disconnected b{display:block;margin-bottom:3px}.uo-disconnected span{color:var(--mut)}
 .uo-boundary{list-style:none;margin:0;padding:0}.uo-boundary li{padding:9px 0;border-bottom:1px solid var(--line);font-size:11.5px}.uo-boundary li:last-child{border-bottom:0}.uo-boundary b{display:block}.uo-boundary span{color:var(--mut)}
 .uo-authority dl{display:grid;grid-template-columns:140px 1fr;gap:7px 12px;margin:14px 0}.uo-authority dt{color:var(--mut);font-size:11px}.uo-authority dd{margin:0;font:12px/1.5 "Cascadia Code",Consolas,monospace;overflow-wrap:anywhere}
 .uo-unavailable{border-left:3px solid var(--warn)}
@@ -173,7 +181,7 @@ SHELL_CSS = r"""
  body.uo-nav-open .uo-backdrop{display:block;position:fixed;z-index:170;inset:var(--hh) 0 0;background:rgba(0,0,0,.55)}
  .content{padding:0 18px}.uo-grid{grid-template-columns:1fr}.uo-caps{grid-template-columns:1fr}.top .sub{display:none}#q{width:min(42vw,190px)}
 }
-@media(max-width:460px){header.top{gap:7px;padding:0 10px}.top h1{max-width:116px;overflow:hidden;text-overflow:ellipsis}.rightgrp{gap:6px}.tbtn{padding:6px 8px}#q{width:118px}.uo-authority dl{grid-template-columns:1fr}.page{padding-top:20px}}
+@media(max-width:460px){header.top{gap:6px;padding:0 8px}.top h1{max-width:82px;overflow:hidden;text-overflow:ellipsis}.rightgrp{gap:5px}.tbtn{padding:6px 7px}#q{display:none}.uo-stop-global{font-size:10px}.uo-authority dl{grid-template-columns:1fr}.page{padding-top:20px}}
 @media(prefers-reduced-motion:reduce){.uo-panel *{transition:none!important;scroll-behavior:auto!important}}
 """
 
@@ -187,8 +195,8 @@ SHELL_JS = r"""
  document.addEventListener('click',event=>{if(event.target.closest('.nav-item')&&window.innerWidth<=820)nav(false)});
  const ask=document.querySelector('[data-uo-open-ask]');if(ask)ask.addEventListener('click',()=>{if(typeof qaToggle==='function')qaToggle()});
  const stop=document.querySelector('[data-uo-stop]');if(stop)stop.addEventListener('click',async()=>{
-   if(!window.confirm('Stop the local Orrery runtime?'))return;stop.disabled=true;
-   try{const response=await fetch('/api/v1/shell/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});if(!response.ok)throw new Error('stop refused');stop.textContent='Stopping…'}catch(error){stop.disabled=false;stop.textContent='Stop failed'}
+   if(!window.confirm('确认关闭当前 Orrery 本机服务？其他已打开的标签页也会断开。'))return;stop.disabled=true;
+   try{const response=await fetch('/api/v1/shell/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});if(!response.ok)throw new Error('关闭请求被拒绝');stop.textContent='服务已关闭';const banner=document.createElement('div');banner.className='uo-disconnected';banner.setAttribute('role','status');banner.innerHTML='<b>Orrery 服务已关闭</b><span>当前页面已经与本机服务断开，可以安全关闭标签页。</span>';document.body.append(banner)}catch(error){stop.disabled=false;stop.textContent='关闭失败，请重试'}
  });
 })();
 """
@@ -212,15 +220,15 @@ def _status_page(identity: str, label: str, reason: str) -> str:
     return (
         f'<article class="page wide" id="{_esc(identity)}" data-kind="unavailable-consumer" '
         f'data-title="{_esc(label)}"><section class="uo-panel uo-unavailable">'
-        f'<h2>{_esc(label)}</h2><p><b>Unavailable / Unknown.</b> {_esc(reason)}</p>'
-        '<p style="margin-top:10px">其他 consumer 与文档阅读保持可用；此状态不会推断为完成或安全。</p>'
+        f'<h2>{_esc(label)}</h2><p><b>当前暂不可用。</b> {_esc(reason)}</p>'
+        '<p style="margin-top:10px">其他功能与文档阅读保持可用；证据不足不会被推断为完成或安全。</p>'
         '</section></article>'
     )
 
 
 def _authority_page(status: Mapping[str, Any] | None, reason: str | None) -> str:
     if status is None:
-        return _status_page("authority", "Authority", reason or "A3 managed-consumer contract is unavailable.")
+        return _status_page("authority", NAVIGATION_LABELS["authority"], reason or "当前无法读取完整的权威状态。")
     selection = status.get("selection", {}) if isinstance(status.get("selection"), Mapping) else {}
     readiness = status.get("readiness", {}) if isinstance(status.get("readiness"), Mapping) else {}
     rollout = status.get("rollout_plan", {}) if isinstance(status.get("rollout_plan"), Mapping) else {}
@@ -228,15 +236,15 @@ def _authority_page(status: Mapping[str, Any] | None, reason: str | None) -> str
     return (
         '<article class="page wide" id="authority" data-kind="authority-managed-consumer" '
         'data-authority="derived-read-only" data-contract="authority-managed-consumer-v1">'
-        '<section class="uo-panel uo-authority"><div class="uo-topline"><span class="uo-live static"></span>A3 MANAGED CONSUMER · READ ONLY</div>'
-        '<h2>Authority consumer status</h2><p>Shell 只显示 A3 的受限状态；不会选择、启用或拼接 Authority claims。</p><dl>'
-        f'<dt>Active consumer</dt><dd>{_esc(selection.get("active_consumer", "Unknown"))}</dd>'
-        f'<dt>Requested / effective</dt><dd>{_esc(selection.get("requested", "Unknown"))} / {_esc(selection.get("effective", "Unknown"))}</dd>'
-        f'<dt>Readiness</dt><dd>{_esc(readiness.get("status", "Unknown"))}</dd>'
-        f'<dt>Production switched</dt><dd>{_esc(selection.get("production_behavior_switched", False))}</dd>'
-        f'<dt>Rollout plan</dt><dd>{_esc(rollout.get("plan_id", "Unavailable"))}</dd>'
-        f'<dt>Rollback plan</dt><dd>{_esc(rollback.get("plan_id", "Unavailable"))}</dd>'
-        '</dl><p>AI 与 Coordinator 均无 selection authority；partial render 不会进入页面。</p></section></article>'
+        '<section class="uo-panel uo-authority"><div class="uo-topline"><span class="uo-live static"></span>权威状态 · 只读</div>'
+        '<h2>权威状态</h2><p>这里只呈现受限的当前状态，不会选择、启用或拼接项目权威事实。</p>'
+        f'<p style="margin-top:10px">当前读取器：{_esc(selection.get("active_consumer", "待确认"))}；准备状态：{_esc(display_status(readiness.get("status", "unknown")))}</p>'
+        f'<details><summary>{TECHNICAL_DETAILS_LABEL}</summary><dl>'
+        f'<dt>requested / effective</dt><dd>{_esc(selection.get("requested", "Unknown"))} / {_esc(selection.get("effective", "Unknown"))}</dd>'
+        f'<dt>production switched</dt><dd>{_esc(selection.get("production_behavior_switched", False))}</dd>'
+        f'<dt>rollout plan</dt><dd>{_esc(rollout.get("plan_id", "Unavailable"))}</dd>'
+        f'<dt>rollback plan</dt><dd>{_esc(rollback.get("plan_id", "Unavailable"))}</dd>'
+        '</dl></details><p>AI 与团队协调服务都没有权威选择权；不完整结果不会进入页面。</p></section></article>'
     )
 
 
@@ -248,28 +256,27 @@ def _overview_page(
         % (
             "unavailable" if item.status != "available" else "",
             _esc(item.navigation_label),
-            _esc(item.status),
-            _esc(item.reason or item.source_contract_version),
+            _esc(display_status(item.status)),
+            _esc(item.reason or "来源契约已登记"),
         )
         for item in registrations
     )
     dynamic = mode == "dynamic"
     actions = (
-        '<div class="uo-actions"><button class="uo-button" type="button" data-uo-open-ask>Open Ask Docs</button>'
-        '<button class="uo-button danger" type="button" data-uo-stop>Stop Orrery</button></div>'
+        '<div class="uo-actions"><button class="uo-button" type="button" data-uo-open-ask>打开文档问答</button></div>'
         if dynamic
-        else '<div class="uo-actions"><button class="uo-button" type="button" disabled>Dynamic controls unavailable in static mode</button></div>'
+        else '<div class="uo-actions"><button class="uo-button" type="button" disabled>静态阅读模式不提供动态控制</button></div>'
     )
     return (
         '<article class="page wide" id="overview" data-kind="unified-observatory-overview" '
         f'data-mode="{_esc(mode)}"><div class="uo-grid"><section class="uo-panel">'
-        f'<div class="uo-topline"><span class="uo-live {"" if dynamic else "static"}"></span>{"ONE LOOPBACK URL" if dynamic else "STATIC FILE · NO RUNTIME"}</div>'
-        '<h2>Orrery Observatory</h2><p>一个导航壳组合文档、搜索、AI 与本机协作 consumer；缺失证据保持 Unavailable / Unknown。</p>'
-        f'<div class="uo-caps">{caps}</div>{actions}</section><aside class="uo-panel"><h3>Runtime boundaries</h3><ul class="uo-boundary">'
-        f'<li><b>{"Dynamic local control" if dynamic else "Static read-only"}</b><span>{"127.0.0.1 only; one visible UI URL" if dynamic else "no server · no cookie · no control"}</span></li>'
-        '<li><b>Personal default</b><span>zero-network; Team and provider access are independent opt-ins</span></li>'
-        '<li><b>Derived views</b><span>cannot create State, ADR, approval or Validation facts</span></li>'
-        '<li><b>Local actions</b><span>provider-owned capability and fresh preflight remain required</span></li>'
+        f'<div class="uo-topline"><span class="uo-live {"" if dynamic else "static"}"></span>{"单一本机地址" if dynamic else "静态文件 · 无运行服务"}</div>'
+        '<h2>Orrery 项目观测台</h2><p>一个导航入口组合文档、搜索、问答与本机协作功能；证据不足时明确显示暂不可用。</p>'
+        f'<div class="uo-caps">{caps}</div>{actions}</section><aside class="uo-panel"><h3>运行边界</h3><ul class="uo-boundary">'
+        f'<li><b>{"本机动态控制" if dynamic else "静态只读"}</b><span>{"仅监听 127.0.0.1，并只提供一个可见页面地址" if dynamic else "无服务、无 cookie、无控制能力"}</span></li>'
+        '<li><b>默认个人模式</b><span>零网络；团队协作与模型服务必须分别主动开启</span></li>'
+        '<li><b>派生视图</b><span>不能创建 State、ADR、批准或 Validation 事实</span></li>'
+        '<li><b>本机操作</b><span>仍需来源功能授权与最新的目标预检</span></li>'
         '</ul></aside></div></article>'
     )
 
@@ -299,14 +306,14 @@ def inject_unified_shell(
         if item.status != "available" and target not in existing and target not in {"overview", "authority", "dashboard"}:
             pages.append(_status_page(target, item.navigation_label, item.reason or "Consumer is unavailable."))
     nav_targets = {
-        "overview": ("overview", "Overview", "accepted"),
-        "docs": ("dashboard", "Docs & Search", "state"),
-        "ask": ("dashboard", "Ask Docs", "deferred"),
-        "authority": ("authority", "Authority", "state"),
-        "personal": ("personal-observatory", "Personal", "state"),
-        "team": ("team-observatory", "Team", "proposed"),
-        "workstreams": ("workstream-relation-graph", "Workstreams", "proposed"),
-        "maintenance": ("workspace-maintenance", "Maintenance", "state"),
+        "overview": ("overview", NAVIGATION_LABELS["overview"], "accepted"),
+        "docs": ("dashboard", NAVIGATION_LABELS["docs"], "state"),
+        "ask": ("dashboard", NAVIGATION_LABELS["ask"], "deferred"),
+        "authority": ("authority", NAVIGATION_LABELS["authority"], "state"),
+        "personal": ("personal-observatory", NAVIGATION_LABELS["personal"], "state"),
+        "team": ("team-observatory", NAVIGATION_LABELS["team"], "proposed"),
+        "workstreams": ("workstream-relation-graph", NAVIGATION_LABELS["workstreams"], "proposed"),
+        "maintenance": ("workspace-maintenance", NAVIGATION_LABELS["maintenance"], "state"),
     }
     by_identity = {item.navigation_identity: item for item in items}
     links = []
@@ -323,12 +330,38 @@ def inject_unified_shell(
         '<span class="nav-icon">◉</span><span class="nav-gname">Orrery</span></div>'
         f'<div class="nav-items">{"".join(links)}</div></div>'
     )
+    duplicate_targets = (
+        "dashboard", "personal-observatory", "team-observatory",
+        "workstream-relation-graph", "workspace-maintenance",
+    )
+    duplicate_pattern = (
+        r'<a class="nav-item"[^>]*data-target="(?:'
+        + "|".join(map(re.escape, duplicate_targets))
+        + r')"[^>]*>.*?</a>'
+    )
+    page = re.sub(duplicate_pattern, "", page, flags=re.DOTALL)
+    page = re.sub(
+        r"<title>.*?</title>",
+        "<title>Orrery · 项目观测台</title>",
+        page,
+        count=1,
+        flags=re.DOTALL,
+    )
+    page = re.sub(
+        r'<header class="top"><h1>.*?</h1><span class="sub">.*?</span>',
+        '<header class="top"><h1>Orrery · 项目观测台</h1>'
+        '<span class="sub">文档观测台 · 源自 Markdown</span>',
+        page,
+        count=1,
+        flags=re.DOTALL,
+    )
     result = page.replace("</style>", SHELL_CSS + "</style>", 1)
     result = result.replace(nav_marker, nav_marker + unified_nav, 1)
     result = result.replace(content_marker, "".join(pages) + content_marker, 1)
     result = result.replace(
         '<div class="rightgrp">',
-        '<div class="rightgrp"><button class="tbtn uo-mobile-toggle" type="button" data-uo-nav-toggle aria-label="Open navigation" aria-expanded="false">☰</button>',
+        '<div class="rightgrp"><button class="tbtn uo-mobile-toggle" type="button" data-uo-nav-toggle aria-label="打开导航" aria-expanded="false">☰</button>'
+        + ('<button class="tbtn uo-stop-global" type="button" data-uo-stop>关闭 Orrery 服务</button>' if mode == "dynamic" else ""),
         1,
     )
     result = result.replace('<div class="app">', '<div class="uo-backdrop" data-uo-backdrop></div><div class="app">', 1)

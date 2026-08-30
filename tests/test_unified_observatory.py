@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import socket
+import subprocess
 import sys
 import tempfile
 import threading
@@ -100,7 +101,7 @@ class UnifiedRegistrationTests(unittest.TestCase):
         )
         self.assertIn('data-unified-navigation', page)
         self.assertIn('data-mode="static"', page)
-        self.assertIn("no server · no cookie · no control", page)
+        self.assertIn("无服务、无 cookie、无控制能力", page)
         self.assertNotIn("/api/v1/shell/stop", page)
         self.assertNotIn("Set-Cookie", page)
         self.assertIn("@media(max-width:820px)", page)
@@ -116,12 +117,19 @@ class UnifiedRuntimeTests(unittest.TestCase):
         cls.logger.handlers.clear()
         cls.logger.addHandler(logging.FileHandler(cls.identity.log_path, encoding="utf-8"))
         cls.logger.setLevel(logging.INFO)
-        page, _stats, registrations, authority = build_unified_observatory.render_unified_site(
-            ROOT, mode="dynamic",
-        )
+        synthetic_graph = build_unified_observatory.build_workstream_relation_graph.synthetic_browser_provider()
+        with mock.patch.object(
+            build_unified_observatory.build_workstream_relation_graph,
+            "core_relation_provider",
+            return_value=synthetic_graph,
+        ):
+            page, _stats, registrations, authority, graph_payload = build_unified_observatory.render_unified_site(
+                ROOT, mode="dynamic",
+            )
         cls.rendered_page = page
         state = serve_orrery.UnifiedState(
             page=page, registrations=registrations, authority_status=authority,
+            graph_provider_payload=graph_payload,
             identity=cls.identity, logger=cls.logger,
         )
         cls.server = serve_orrery.UnifiedServer(("127.0.0.1", 0), state)
@@ -176,6 +184,23 @@ class UnifiedRuntimeTests(unittest.TestCase):
             self.assertIn(marker, text)
         self.assertIn("--bg:#0f1115", text)
         self.assertIn("data-nav-identity=\"overview\"", text)
+        targets = {"overview": "overview", "personal": "personal-observatory", "team": "team-observatory", "workstreams": "workstream-relation-graph", "maintenance": "workspace-maintenance"}
+        for identity, label in {
+            "overview": "项目总览", "personal": "个人工作台", "team": "团队协作",
+            "workstreams": "任务关系", "maintenance": "工作区维护",
+        }.items():
+            self.assertEqual(text.count(f'data-nav-identity="{identity}"'), 1)
+            self.assertEqual(text.count(f'data-target="{targets[identity]}"'), 1)
+            self.assertIn(label, text)
+        for obsolete in ("Personal Observatory", "Team Observatory", "Workstream Graph", "Workspace Maintenance", "Stop Orrery"):
+            self.assertNotIn(f'<span class="lbl">{obsolete}</span>', text)
+        self.assertIn("关闭 Orrery 服务", text)
+        self.assertIn("<title>Orrery · 项目观测台</title>", text)
+        self.assertIn("文档观测台 · 源自 Markdown", text)
+        self.assertNotIn('<header class="top"><h1>Orrery · Documentation', text)
+        self.assertNotIn("doc viewer · 源自 markdown", text)
+        self.assertNotIn("beforeunload", text)
+        self.assertNotIn("unload", text)
         self.assertIn("/api/v1/team", text)
         self.assertIn('data-maintenance-refresh-path="/refresh"', text)
         self.assertIn('data-maintenance-remove-path="/remove-worktree"', text)
@@ -185,7 +210,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
             if item.consumer_id == "ask-docs"
         )
         self.assertEqual(ask.status, "unavailable")
-        self.assertIn("not safely enabled", ask.reason or "")
+        self.assertIn("尚未安全启用", ask.reason or "")
         production_source = (
             (ROOT / "scripts/docsite/build_unified_observatory.py").read_text(encoding="utf-8")
             + (ROOT / "scripts/docsite/serve_orrery.py").read_text(encoding="utf-8")
@@ -235,7 +260,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertFalse(authority["selection"]["production_behavior_switched"])
         self.assertFalse(authority["guarantees"]["ai_may_select"])
 
-        self.assertIn("window.confirm('只删除 worktree，保留 branch/commit。确认移除这个工作区？')", self.rendered_page)
+        self.assertIn("window.confirm('只删除工作区，保留分支和提交。确认移除这个工作区？')", self.rendered_page)
         cookie = self.cookie()
         status, _headers, _body = self.request(
             "POST", "/api/v1/maintenance/remove-worktree", body={},
@@ -266,6 +291,13 @@ class UnifiedRuntimeTests(unittest.TestCase):
         status, _headers, body = self.request("GET", "/api/v1/docs/search?q=Unified%20Observatory")
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)["bounded"])
+        expected_hash = self.server.state.graph_provider_payload["graph"]["graph_hash"]
+        with mock.patch("project_orrery_core.workstream_relations.build_relation_graph", side_effect=AssertionError("request-time graph recomputation")):
+            status, _headers, body = self.request("GET", "/api/v1/workstreams/graph")
+        value = json.loads(body)
+        self.assertEqual(status, 200)
+        self.assertEqual(value["dynamic_delivery"], "startup-cached-projection")
+        self.assertEqual(value["graph"]["graph_hash"], expected_hash)
 
     def test_close_reclaims_owned_state_and_bound_port(self) -> None:
         with tempfile.TemporaryDirectory(prefix="orrery-unified-close-") as temporary:
@@ -277,6 +309,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
                 page=self.rendered_page,
                 registrations=self.server.state.registrations,
                 authority_status=self.server.state.authority_status,
+                graph_provider_payload=self.server.state.graph_provider_payload,
                 identity=identity,
                 logger=logger,
             )
@@ -284,15 +317,36 @@ class UnifiedRuntimeTests(unittest.TestCase):
             port = int(server.server_address[1])
             thread = threading.Thread(target=server.serve_forever, daemon=True)
             thread.start()
-            with socket.create_connection(("127.0.0.1", port), timeout=2):
-                pass
-            server.shutdown()
-            server.server_close()
-            thread.join(timeout=5)
-            self.assertFalse(thread.is_alive())
-            self.assertTrue(identity.cleaned)
-            with self.assertRaises(OSError):
-                socket.create_connection(("127.0.0.1", port), timeout=0.5)
+            try:
+                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                connection.request("GET", "/", headers={"Host": f"127.0.0.1:{port}"})
+                response = connection.getresponse()
+                response.read()
+                cookie = dict(response.getheaders())["Set-Cookie"].split(";", 1)[0]
+                connection.close()
+                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                connection.request(
+                    "POST", "/api/v1/shell/stop", body=b"{}",
+                    headers={
+                        "Host": f"127.0.0.1:{port}", "Origin": f"http://127.0.0.1:{port}",
+                        "Sec-Fetch-Site": "same-origin", "Cookie": cookie,
+                        "Content-Type": "application/json", "Accept": "application/json",
+                    },
+                )
+                response = connection.getresponse()
+                self.assertEqual(response.status, 202)
+                self.assertEqual(json.loads(response.read()), {"status": "stopping"})
+                connection.close()
+                thread.join(timeout=5)
+                self.assertFalse(thread.is_alive())
+                self.assertTrue(identity.cleaned)
+                with self.assertRaises(OSError):
+                    socket.create_connection(("127.0.0.1", port), timeout=0.5)
+            finally:
+                if thread.is_alive():
+                    server.shutdown()
+                    server.server_close()
+                    thread.join(timeout=5)
 
 
 class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
@@ -306,6 +360,14 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
             identity.marker.write_text(json.dumps({"pid": 99999999}), encoding="utf-8")
             identity.recover()
             self.assertFalse(identity.marker.exists())
+            if os.name == "nt":
+                exited = subprocess.Popen([sys.executable, "-c", "pass"])
+                self.assertEqual(exited.wait(timeout=10), 0)
+                identity.marker.write_text(
+                    json.dumps({"pid": exited.pid}), encoding="utf-8"
+                )
+                identity.recover()
+                self.assertFalse(identity.marker.exists())
             identity.marker.write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
             with self.assertRaisesRegex(RuntimeError, "already running"):
                 identity.recover()

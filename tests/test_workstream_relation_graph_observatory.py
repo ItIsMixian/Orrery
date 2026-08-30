@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import os
@@ -25,6 +26,17 @@ if str(ROOT / "scripts" / "docsite") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts" / "docsite"))
 
 from project_orrery_observatory import workstream_relation_graph as graph_ui
+from project_orrery_core.workstream_relations import build_relation_graph, build_succession_plan
+
+
+def _rebind(payload: dict) -> dict:
+    graph = payload["graph"]
+    body = {key: value for key, value in graph.items() if key != "graph_hash"}
+    graph["graph_hash"] = hashlib.sha256(
+        json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    payload["succession_plan"] = build_succession_plan(graph)
+    return payload
 
 
 def _load_builder():
@@ -44,12 +56,12 @@ def _base_page(*, team: bool = False, personal: bool = False) -> str:
     if personal:
         nav += (
             '<a class="nav-item" data-target="personal-observatory"><span class="dot state"></span>'
-            '<span class="lbl">Personal Observatory</span></a>'
+            '<span class="lbl">个人工作台</span></a>'
         )
     if team:
         nav += (
             '<a class="nav-item" data-target="team-observatory"><span class="dot proposed"></span>'
-            '<span class="lbl">Team Observatory</span></a>'
+            '<span class="lbl">团队协作</span></a>'
         )
     return (
         '<html><head><style>body{color:red}</style></head><body><aside class="sidebar">'
@@ -113,8 +125,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         panel = graph_ui.render_workstream_relation_graph_panel(projection)
         for token in (
             'data-wg-lens="succession"', 'data-wg-lens="dependency"',
-            'data-wg-lens="conflict"', "Accessible relation ledger", "READ ONLY",
-            "No apply · undo · close · delete · merge · remote execution",
+            'data-wg-lens="conflict"', "无障碍关系清单", "只读",
+            "不提供应用、撤销、关闭、删除、合并或远程执行",
         ):
             self.assertIn(token, panel)
         self.assertIn("waiting-task", panel)
@@ -126,9 +138,6 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         old_provider = copy.deepcopy(self.provider)
         old_provider["provider_schema_version"] = 0
         cases.append(("provider", old_provider, "unsupported-provider-schema"))
-        absent = copy.deepcopy(self.provider)
-        absent["relation_root_present"] = False
-        cases.append(("store", absent, "relation-store-absent"))
         invalid = copy.deepcopy(self.provider)
         invalid["graph"]["validation"] = {
             "valid": False, "errors": [{"code": "cycle"}], "warnings": []
@@ -136,21 +145,20 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         cases.append(("graph", invalid, "core-graph-invalid"))
         dangling = copy.deepcopy(self.provider)
         dangling["graph"]["nodes"] = dangling["graph"]["nodes"][:-1]
+        _rebind(dangling)
         cases.append(("node", dangling, "dangling-node"))
         unsafe = copy.deepcopy(self.provider)
         unsafe["graph"]["nodes"][0]["source_links"] = [
             {"kind": "validation", "ref": "https://example.invalid/run"}
         ]
+        _rebind(unsafe)
         cases.append(("link", unsafe, "unsafe-source-link"))
         windows_path = copy.deepcopy(self.provider)
         windows_path["graph"]["nodes"][0]["source_links"] = [
             {"kind": "validation", "ref": "C:/private/orrery/worktree.json"}
         ]
+        _rebind(windows_path)
         cases.append(("path", windows_path, "unsafe-source-link"))
-        legacy = copy.deepcopy(self.provider)
-        selected = next(item for item in legacy["graph"]["nodes"] if item["workstream_id"] == "offline-unknown")
-        selected["origin"] = "legacy-session-projection"
-        cases.append(("legacy", legacy, "legacy-unknown"))
 
         for label, payload, expected in cases:
             with self.subTest(label=label):
@@ -168,6 +176,31 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertEqual(failed["error"]["code"], "core-provider-failure")
         self.assertNotIn("private", json.dumps(failed))
         self.assertNotIn("prompt body", json.dumps(failed))
+
+        legacy = copy.deepcopy(self.provider)
+        legacy["relation_root_present"] = False
+        for item in [*legacy["graph"]["nodes"], *legacy["graph"]["edges"]]:
+            item["origin"] = "legacy-session-projection"
+        _rebind(legacy)
+        projection = graph_ui.project_core_relation_graph(lambda: legacy)
+        self.assertEqual(projection["status"], "ready")
+        self.assertFalse(projection["native_relation_root_present"])
+        self.assertEqual(projection["evidence_origins"], ["legacy-session-projection"])
+        self.assertTrue(projection["nodes"])
+        self.assertTrue(projection["edges"])
+
+        graph = build_relation_graph([])
+        empty = {
+            "provider_schema_version": 1,
+            "provider_id": "project-orrery-core.workstream-relations",
+            "authority": "derived-read-only",
+            "relation_root_present": False,
+            "graph": graph,
+            "succession_plan": build_succession_plan(graph),
+        }
+        unavailable = graph_ui.project_core_relation_graph(lambda: empty)
+        self.assertEqual(unavailable["status"], "unavailable")
+        self.assertEqual(unavailable["error"]["code"], "relation-evidence-absent")
 
     def test_missing_real_relation_store_is_zero_write_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -194,7 +227,7 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             self.assertEqual(before, after)
             self.assertFalse(relation_root.exists())
             self.assertEqual(projection["status"], "unavailable")
-            self.assertEqual(projection["error"]["code"], "relation-store-absent")
+            self.assertEqual(projection["error"]["code"], "relation-evidence-absent")
 
     def test_corrected_w7a_compatibility_payload_preserves_non_active_runtime_states(self) -> None:
         payload = copy.deepcopy(self.builder.synthetic_browser_provider())
@@ -280,12 +313,12 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             (ROOT / "packages" / "project-orrery-observatory" / "src" / "project_orrery_observatory" / "component.json").read_text(encoding="utf-8")
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
-        shards = json.loads((ROOT / "scripts" / "ci" / "test-shards.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.10")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.10")
-        selectors = [selector for shard in shards["shards"] for selector in shard["selectors"]]
-        self.assertIn("test_workstream_relation_graph_observatory.*", selectors)
-        self.assertIn("test_workstream_graph_visual_prototype.*", selectors)
+        mapping = json.loads((ROOT / "scripts" / "ci" / "change-mapping.json").read_text(encoding="utf-8"))
+        self.assertEqual(component["version"], "0.1.12")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.12")
+        test_ids = [item["test_id"] for item in mapping["tests"]]
+        self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
+        self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))
         self.assertNotIn("scripts/docsite/build_workstream_relation_graph.py", component["managed_tools"])
 
 

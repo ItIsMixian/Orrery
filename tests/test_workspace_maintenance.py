@@ -358,6 +358,44 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
             self.assertFalse(fresh["scan_performed"])
             later = catch_up_maintenance_scan(fixture.repository, now="2026-08-26T00:01:00Z")
             self.assertTrue(later["scan_performed"])
+            common = Path(
+                fixture.git(
+                    fixture.repository, "rev-parse", "--path-format=absolute",
+                    "--git-common-dir",
+                ).stdout.strip()
+            )
+            maintenance_dir = common / "orrery" / "maintenance"
+            legacy_path = maintenance_dir / "last-run.json"
+            legacy_bytes = json.dumps(
+                {
+                    "schema_version": 1,
+                    "contract_type": "maintenance-scan",
+                    "status": "succeeded",
+                    "finished_at": "2026-08-01T00:00:00Z",
+                    "legacy_evidence": "preserve exactly",
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+            ).encode("utf-8")
+            legacy_path.write_bytes(legacy_bytes)
+            refreshed = catch_up_maintenance_scan(
+                fixture.repository, now="2026-08-29T12:00:00Z"
+            )
+            self.assertEqual(refreshed["status"], "succeeded")
+            self.assertTrue(refreshed["scan_performed"])
+            self.assertEqual(legacy_path.read_bytes(), legacy_bytes)
+            self.assertTrue((maintenance_dir / "last-run-v2.json").is_file())
+            status = maintenance_status(fixture.repository)
+            self.assertEqual(status["status"], "ready")
+            self.assertEqual(status["last_run_source"], "current-last-run")
+            self.assertEqual(status["cache"]["status"], "current")
+            self.assertNotEqual(status["background_refresh"]["status"], "failed")
+            self.assertEqual(len(status["historical_evidence_warnings"]), 1)
+            warning = status["historical_evidence_warnings"][0]
+            self.assertEqual(warning["source"], "legacy-last-run")
+            self.assertEqual(warning["display_state"], "historical-unknown")
+            self.assertFalse(warning["affects_current_refresh"])
+            self.assertFalse(warning["affects_current_eligibility"])
 
     def test_queue_authorization_is_evidence_bound_and_drift_stales(self) -> None:
         with CollaborationGitFixture() as fixture:
@@ -531,7 +569,7 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
             try:
                 response, page = request("GET", "/control/maintenance")
                 self.assertEqual(response.status, 200)
-                self.assertIn(b"Git-private Maintenance Console", page)
+                self.assertIn("工作区维护控制台".encode("utf-8"), page)
                 cookie = response.getheader("Set-Cookie").split(";", 1)[0]
                 self.assertIn("HttpOnly", response.getheader("Set-Cookie"))
                 self.assertIn("SameSite=Strict", response.getheader("Set-Cookie"))

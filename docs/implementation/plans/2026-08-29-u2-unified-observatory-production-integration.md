@@ -61,7 +61,10 @@ historical full Promotion suite as its development loop and does not push main o
 
 ## Future transition
 
-- [ ] maintainer manually experiences the root-only Candidate and confirms the preferred entry behavior;
+- [x] maintainer manually experienced the root-only integrated Candidate and rejected its duplicated navigation,
+  mixed-language primary UI and misleading/degraded runtime states;
+- [x] U2.1 repairs those acceptance defects on the exact U2/W7.1 integrated baseline; see
+  [U2.1 Plan](2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md);
 - [ ] unique integrator reconciles Candidate lineage and root PROGRESS/HANDOFF in a clean integration worktree;
 - [ ] exact Candidate SHA is pushed to a non-main ref and obtains both required hosted checks;
 - [ ] public/default launcher, managed-tool/template/installer/release changes are separately authorized and versioned.

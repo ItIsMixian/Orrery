@@ -33,7 +33,6 @@ if str(HERE.parent) not in sys.path:
     sys.path.insert(0, str(HERE.parent))
 
 import build_unified_observatory  # noqa: E402
-import build_workstream_relation_graph  # noqa: E402
 import serve as legacy_serve  # noqa: E402
 from project_orrery_core.maintenance import maintenance_status  # noqa: E402
 from project_orrery_observatory.unified_observatory import capability_document  # noqa: E402
@@ -60,13 +59,24 @@ def _pid_alive(pid: object) -> bool:
         return False
     if os.name == "nt":
         process_query_limited_information = 0x1000
-        handle = ctypes.windll.kernel32.OpenProcess(  # type: ignore[attr-defined]
-            process_query_limited_information, False, pid
-        )
+        still_active = 259
+        kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+        kernel32.OpenProcess.argtypes = [ctypes.c_ulong, ctypes.c_int, ctypes.c_ulong]
+        kernel32.OpenProcess.restype = ctypes.c_void_p
+        kernel32.GetExitCodeProcess.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_ulong)]
+        kernel32.GetExitCodeProcess.restype = ctypes.c_int
+        kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+        kernel32.CloseHandle.restype = ctypes.c_int
+        handle = kernel32.OpenProcess(process_query_limited_information, False, pid)
         if not handle:
             return False
-        ctypes.windll.kernel32.CloseHandle(handle)  # type: ignore[attr-defined]
-        return True
+        exit_code = ctypes.c_ulong()
+        try:
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                return True
+            return exit_code.value == still_active
+        finally:
+            kernel32.CloseHandle(handle)
     try:
         os.kill(pid, 0)
         return True
@@ -134,10 +144,14 @@ def _logger(identity: RuntimeIdentity, *, console: bool) -> logging.Logger:
 
 
 class UnifiedState:
-    def __init__(self, *, page: str, registrations, authority_status, identity, logger):
+    def __init__(
+        self, *, page: str, registrations, authority_status, graph_provider_payload,
+        identity, logger,
+    ):
         self.page = legacy_serve.inject_qa(page).encode("utf-8")
         self.registrations = tuple(registrations)
         self.authority_status = authority_status
+        self.graph_provider_payload = dict(graph_provider_payload or {})
         self.identity = identity
         self.logger = logger
         self.control_token = secrets.token_urlsafe(32)
@@ -175,7 +189,11 @@ class UnifiedState:
     def request_stop(self) -> None:
         server = self.server
         if server is not None:
-            threading.Thread(target=server.shutdown, daemon=True, name="orrery-unified-stop").start()
+            def stop() -> None:
+                server.shutdown()
+                server.server_close()
+
+            threading.Thread(target=stop, daemon=True, name="orrery-unified-stop").start()
 
     def close(self) -> None:
         with self.close_lock:
@@ -286,7 +304,10 @@ class UnifiedHandler(legacy_serve.Handler):
                 self._send_json(HTTPStatus.OK, self.server.state.team.public_status())
                 return
             if path == "/api/v1/workstreams/graph":
-                self._send_json(HTTPStatus.OK, build_workstream_relation_graph.core_relation_provider(ROOT))
+                self._send_json(HTTPStatus.OK, {
+                    **self.server.state.graph_provider_payload,
+                    "dynamic_delivery": "startup-cached-projection",
+                })
                 return
             if path == "/api/v1/maintenance/status":
                 self._send_json(HTTPStatus.OK, {"maintenance": maintenance_status(ROOT)})
@@ -415,12 +436,12 @@ def main(argv: list[str] | None = None) -> int:
     server: UnifiedServer | None = None
     try:
         identity.recover()
-        page, _stats, registrations, authority = build_unified_observatory.render_unified_site(
+        page, _stats, registrations, authority, graph_provider_payload = build_unified_observatory.render_unified_site(
             ROOT, mode="dynamic", ai_available=legacy_serve.PROVIDER is not None,
         )
         state = UnifiedState(
             page=page, registrations=registrations, authority_status=authority,
-            identity=identity, logger=logger,
+            graph_provider_payload=graph_provider_payload, identity=identity, logger=logger,
         )
         server = _bind_server(state, arguments.port)
         port = int(server.server_address[1])

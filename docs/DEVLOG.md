@@ -673,3 +673,11 @@
 - 唯一整合分支在 W6.1／CI6／A3／U1 baseline 上合入 U2 `a0e5dbc` 与 W7.1 `903d4ac`。U2 提供真实 root-only 单 URL shell、静态 builder、headless/debug launcher 与版本化 consumer registry；W7.1 恢复 relation 已引用 archived endpoint 的 closed/offline/current/superseded 轴。
 - W7.1 推进 Core 到 0.1.16；CLI 因精确 Core package 依赖同步推进到 0.1.20；U2 Observatory 为 0.1.11。四个 archive 安全回归登记为 `team-lan-core` Promotion-only medium evidence，不进入 Fast／Checkpoint。
 - 当前节点只形成供维护者本机体验的 integrated Candidate。`origin/main`、public template、managed-tool inventory、installer、release manifest、v0.2.0、tag 与 Release 均未改变。
+
+## 2026-08-29 — U2.1 Unified Observatory UX Acceptance Fixes Candidate
+
+- 维护者实际体验 `codex/u1-u2-integration-baseline@4e2b5436d1744d8034011a34986df1eb6a04c9a4` 后拒绝 U2 UX；从该 exact SHA 建立独立 U2.1 worktree，并在首次作者写入前登记 Git-private Session。原 U2 Validation 只保留历史实现／安全证据，不再单独代表 UX acceptance。
+- Core 0.1.17 将不兼容的 `last-run.json` 保持原字节并降级为历史 warning，current run 改写独立 `last-run-v2.json`；旧证据不再使 refresh/background/cache 整体失败，也不参与当前 removal eligibility。CLI 因精确 Core 依赖推进到 0.1.21。
+- Observatory 0.1.12 只保留一组中文 app 导航与作者文档树，集中主视图词汇，新增全页 `关闭 Orrery 服务`；Team discovery 解释 fingerprint／untrusted／目标 Host 确认边界并标注 loopback self。Personal 改用待确认任务／历史状态与工作区清理建议；Quick Remove 对 0／有 eligible 两种状态均可发现且仍需 fresh preflight＋本机确认。
+- Workstream provider gate 接受完整、只读、validation-valid、hash-bound 的 native 或 legacy/archive evidence，native root 只作来源事实；空 evidence 保持 Unavailable，archive 无执行权。动态 endpoint 复用启动缓存；真实 self-host 恢复 W7.1 引用节点／边与 closed 轴，不创建 relation root。
+- fixture／内存／loopback 回归与真实 in-app Chromium 覆盖 1280x800、390x844 的 Overview／Personal／Team／Workstreams／Maintenance；无页面级横向溢出和 console error。未读取 Provider key、未访问外网、未真实 join Team、未执行删除。正式 CI6 Fast／Checkpoint 与 clean Candidate SHA 记录在 U2.1 Validation；本分支不修改根 PROGRESS/HANDOFF、不 push main、不发布。
