@@ -263,6 +263,12 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertTrue(dependency_pair["routes"][0]["has_arrow"])
 
     def test_invalid_provider_store_graph_legacy_and_links_fail_closed(self) -> None:
+        private_session = graph_ui._safe_source_link({
+            "kind": "workstream-session",
+            "ref": "git-private-session:CI6-local-validation-router-tier-enforcement@e5ee31c418fa4d2d81f3df792f683064a0a9c5d0",
+        })
+        self.assertIsNone(private_session["href"])
+
         cases: list[tuple[str, dict, str]] = []
         old_provider = copy.deepcopy(self.provider)
         old_provider["provider_schema_version"] = 0

@@ -19,7 +19,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - ADR-0016 与 Approved Unified Observatory Design 已接受“一个用户入口／URL／导航壳、受管隐藏 helper”的目标。U2.2 integrated Candidate 在现有 docsite 阅读、搜索、AI 与作者信息架构上，用一个连续 sidebar/scroll rail 组合中文 app 入口和可折叠项目文档树；Maintenance 使用密集有界队列和折叠技术详情。协议值只在技术详情显示，U1 synthetic prototype 仍不是 UI 规范，公开默认尚未切换。
 - W7.2.3 integrated Candidate 将真实只读 Graph 改为单一从左到右 DAG：固定可读卡片、中文 rank lane、工程图式实线／虚线／复合线、固定 10px 箭头、每链独立展开和收起、锚点式 `Ctrl + 滚轮` 缩放，以及默认关闭的画布内技术详情抽屉。dependency／conflict 只从各自真实端点建图；空 dependency 不显示孤立 active tips。桌面以 88px rank 通道和 44px 独立链间隔显示主图并保留 1×1px 语义 ledger，390px 用同事实列表替代微型图；文档根、侧栏、画布与详情滚动条共享深浅主题变量。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
-- ADR-0017 已接受 Git-private relation proposal／confirmation 的职责边界：Agent、Harness 与未来 Conductor 只能提出带来源和证据的建议；任务 owner 确认 implementation／validation gate，human integrator 确认 integration／release gate 与 `absorbs`。中央调度只是可选交互形态，不是权限来源；当前产品尚无 relation inbox 或这些确认入口。
+- ADR-0017 的 Git-private relation proposal／confirmation 已在 W7.3 Candidate 实现。Unified Observatory 的 Personal／Team 页面增加“关系待确认”收件箱：Personal 仅在本机 human role capability 成立时显示 accept/change-gate/defer/reject，Team／central 始终 request-only；Graph 继续只读，只投影 effective／proposed 与 gate。
+- Graph projection schema 2 将任务系列作为结构化展示 lane，不把 series 当因果边；主状态机械区分正在进行、等待人工确认、状态待刷新／证据过期、历史任务、缺少任务记录、未登记和关系证据不足。Core `compare_pairs` 只作为黄色 comparison suggestions；红色 conflict lens 只接受带 location／impact／source 的明确冲突证据。
 - 动态 docsite 的模型调用统一经过 Broker。Provider 配置与凭据按端点绑定，同源 POST、body gate、预算、缓存和错误脱敏已实现；同用户本机 Broker 不宣称秘密隔离。
 - 当前展示品牌为 Orrery；目标项目标题仍由模板 token 定制。历史 `Project Orrery` 与稳定 `project-orrery` 技术标识按 ADR-0015 保留。
 
@@ -52,6 +53,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - [W7.2 Graph Readability Plan](../implementation/plans/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
+- [W7.3 Relation Capture & Confirmation Validation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
 
 ## 已知缺口
 
@@ -62,5 +64,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Personal／Team／Maintenance／Graph 尚未接入默认 docsite、Skill template 或公开 release。
 - Unified Observatory 仍只是本地 root-only/default-off integrated Candidate；尚未进入默认 docsite、Skill template、managed-tool inventory、installer 或公开 Release。`start-docsite.bat`／`serve.py` 继续作为 legacy rollback 与当前公开兼容入口。
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
-- W7.3 relation capture inbox、gate-aware dependency confirmation、human integrator 管理与自动 mechanical `derived_from` 尚未实现；观测台仍只投影已经存在的关系证据。
+- W7.3 relation capture 仍是 root-only/default-off Candidate；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

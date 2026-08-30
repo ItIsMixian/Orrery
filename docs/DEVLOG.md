@@ -1,5 +1,25 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Workstream Relation Capture & Confirmation Candidate
+
+- 从 exact `codex/u1-u2-integration-baseline@3fc7e7a` 建立独立 worktree，并在产品写入前登记 Git-private
+  `W7.3-workstream-relation-capture-confirmation`。暂停期间只保留安全工作树；恢复前用 `git show` 逐一核对
+  authority commit `6315415` 的八个指定 blob，并把 OID、expected writes 与 validation surfaces 登记为 scope
+  revision 3。实现阶段使用 GPT-5.6 Sol／medium；未读取或写入 A4.1 worktree，也未改动中央 63203 服务。
+- Core 0.1.18／CLI 0.1.22／Observatory 0.1.17／Harness JSON 0.1.2 实现 versioned append-only relation
+  proposal／confirmation／role／series store、exact mechanical `derived_from`、四类 dependency gate、Integrator-only
+  `absorbs`、CAS 与本机人类权限门。Agent／Harness 只能 suggest，central／remote／session spoof 失败关闭；旧 v1
+  无 gate dependency 保持 Unknown，proposal/deferred/Unknown 不阻塞 lifecycle。
+- Unified Observatory 增加 Personal 可授权／Team request-only 的“关系待确认”收件箱；Graph 继续只读，增加结构化
+  A／CI／U series lane、机械中文状态 taxonomy，并把 comparison suggestions 与 evidence-backed conflict facts 分离。
+  真实 self-host A4→A3、CI7→CI6 只写 proposal；新 `W7.3-integration-acceptance` 从 exact `84e1c0a` 自动形成
+  `derived_from`，对 CI6 的 integration requirement 仍待 integrator 确认。最终投影 27 nodes／13 edges、15
+  comparisons、0 conflicts、3 pending capture proposals。
+- 相关回归 41/41、最终 Fast 90/90（10.488559s）与最终 Checkpoint 96/96（78.812261s）通过。前两次 Checkpoint
+  在既有 Maintenance fixture 处 90 秒超时，未冒充通过；Unified test setup 改用有界合成 capture 后重跑。
+  Browser 1440×900／390×844 的 Personal／Team／Graph 均无横向溢出或 console warning/error，Graph 无确认按钮。
+  repository/release/archive/diff 门通过；不运行 Promotion、不 push main、不发布、不改 v0.2.0。
+
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
 - 唯一整合者从 clean `codex/u1-u2-integration-baseline@6166d15` 先合入 W7.2.3 exact `30d44ff`，再合入 U2.2 exact `70e6ac9`；两条产品文件集合无直接重叠。中央 CI7／ADR-0017 与 W7.2 的 DEVLOG、State、Validation index 只做加法协调，联合 feature merge 为 `0eaad30`。

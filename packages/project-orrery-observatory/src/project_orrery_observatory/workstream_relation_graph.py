@@ -24,10 +24,13 @@ DOCUMENT_LINK_PREFIXES = {
     "scope": ("docs/state/",),
     "other": ("docs/decisions/", "docs/design/", "docs/implementation/"),
 }
-OPAQUE_LINK_PREFIXES = ("git-private:", "git-private-series:", "git-common:", "fixture:", "opaque:")
+OPAQUE_LINK_PREFIXES = (
+    "git-private:", "git-private-series:", "git-private-session:",
+    "git-common:", "fixture:", "opaque:",
+)
 OID = re.compile(r"^[0-9a-f]{40}$")
 HASH = re.compile(r"^[0-9a-f]{64}$")
-SAFE_TOKEN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{0,511}$")
+SAFE_TOKEN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,511}$")
 ACTIVE_NODE_STATUSES = {"active", "review-pending"}
 ENDED_PHASES = {"closed", "integrated", "unknown"}
 NODE_WIDTH = 248
