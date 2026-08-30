@@ -1,6 +1,6 @@
 # PO1 Provisional Decision Allocation Enforcement
 
-Status: Planned; authority scope frozen before implementation
+Status: Enforcement implemented as a local Candidate; A4 renumber pending integration
 
 Date: 2026-08-30
 
@@ -24,14 +24,14 @@ duplicate-number gate. Branch isolation made the violation invisible until integ
 
 ## Implementation
 
-- [ ] Amend `orrery-dispatch` so any decision-bearing non-integration task uses a stable PO ID and `Status: Proposed`.
-- [ ] Never infer integrator authority from a branch name. Numeric allocation is allowed only when the target
+- [x] Amend `orrery-dispatch` so any decision-bearing non-integration task uses a stable PO ID and `Status: Proposed`.
+- [x] Never infer integrator authority from a branch name. Numeric allocation is allowed only when the target
   authority explicitly identifies the current task/worktree as the unique integrator.
-- [ ] Before allocating a numeric ADR, inspect the current integration decision index and pending PO sources; allocate
+- [x] Before allocating a numeric ADR, inspect the current integration decision index and pending PO sources; allocate
   the next free number only in the integration worktree, then update filename, metadata and all references together.
-- [ ] Add a repository gate that rejects two current `docs/decisions/NNNN-*.md` files sharing one number. It does not
+- [x] Add a repository gate that rejects two current `docs/decisions/NNNN-*.md` files sharing one number. It does not
   scan peer worktrees or turn a Candidate number into a reservation service.
-- [ ] Preserve the existing PO mechanism and schema; do not add a central network number service or rewrite accepted
+- [x] Preserve the existing PO mechanism and schema; do not add a central network number service or rewrite accepted
   ADR history.
 
 ## A4 collision closeout

@@ -11,6 +11,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - ADR-0018 已将任务分发改为 authority-first：创建 Workstream 或追加实质范围前，中央协调者先提交 ADR／Design／Plan scope amendment／Pending Validation；任务消息只引用 exact SHA 和路径。U2.3 与 W7.3 正在按此流程补录并在确认 scope revision 前暂停；旧 transcript 只保留为非权威 provenance。
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
 - `skills/orrery-dispatch/` 是 S0 独立两文件 source Candidate；它与安装／迁移／审计用的 `skills/project-orrery/` 分开，也不是未来独立 S1 Conductor repository。
+- PO1 在不增加文件角色或号码服务的前提下，把 decision proposal/number allocation 边界投影进 dispatch Skill，并在 repository gate 检查当前树 numeric ADR 唯一性；它不扫描或锁定 peer Candidate 编号。
 - 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。W7.2.3／U2.2 integrated Candidate 声明 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16；Core API 为 1，组件总状态为 `unreleased`。
 - 薄平台层位于 `adapters/{codex,harness-json,claude-code,deepseek-harness}/`，当前 source 版本均为 0.1.1、`experimental`／`unreleased`。Adapter 不拥有 canonical 作者模板、State、ADR 或 Authority 规则。
 - 自托管观测台位于根 `scripts/docsite/`。integrated Candidate 新增 `Start Orrery.vbs`／`start-orrery.bat --console`、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 仍为 root-only/default-off consumer，没有进入默认发布模板或 v0.2.0 managed tools。

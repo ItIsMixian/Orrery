@@ -11,6 +11,7 @@ from _common import CIValidationError, ROOT
 
 
 LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
+ADR_PATH_RE = re.compile(r"^docs/decisions/(?P<number>\d{4})-[^/]+\.md$")
 FORBIDDEN_NAMES = {"ai-config.json", ".doccache.json", ".port"}
 FORBIDDEN_SUFFIXES = {".pyc", ".pyo"}
 
@@ -38,6 +39,21 @@ def validate_forbidden_artifacts(paths: list[Path]) -> list[str]:
         if len(lowered_parts) >= 2 and lowered_parts[0] == "docs" and lowered_parts[1] == "_site":
             errors.append(f"tracked generated docsite artifact: {path.as_posix()}")
     return errors
+
+
+def validate_adr_number_allocations(paths: list[Path]) -> list[str]:
+    allocated: dict[str, list[str]] = {}
+    for path in paths:
+        value = path.as_posix()
+        match = ADR_PATH_RE.fullmatch(value)
+        if match is None or match.group("number") == "0000":
+            continue
+        allocated.setdefault(match.group("number"), []).append(value)
+    return [
+        f"duplicate current ADR number {number}: {', '.join(sorted(values))}"
+        for number, values in sorted(allocated.items())
+        if len(values) > 1
+    ]
 
 
 def _link_target(raw: str) -> str | None:
@@ -88,6 +104,7 @@ def main() -> int:
     try:
         paths = repository_paths()
         errors = validate_forbidden_artifacts(paths)
+        errors.extend(validate_adr_number_allocations(paths))
         link_errors, markdown_files, links = validate_markdown_links(ROOT, paths)
         errors.extend(link_errors)
         if errors:
@@ -97,7 +114,7 @@ def main() -> int:
             return 1
         print(
             f"PASS repository gates: {len(paths)} tracked/untracked repository paths, {markdown_files} Markdown files, "
-            f"{links} local links, no forbidden runtime/generated artifacts"
+            f"{links} local links, unique numeric ADRs, no forbidden runtime/generated artifacts"
         )
         return 0
     except CIValidationError as exc:
