@@ -252,3 +252,63 @@ authority, product component or responsive implementation.
 - Preserve relation capture Core/schema/CLI/Harness, human confirmation authority, inbox behavior and append-only
   history unless a focused regression proves a necessary compatibility fix. Do not integrate CI7/REL3, modify root
   PROGRESS/HANDOFF from the feature branch, push main, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Scope Amendment — W Program Hierarchy & Controlled Bundling
+
+Governing decision: [ADR-0020](../../decisions/0020-workstream-program-and-phase-hierarchy.md)
+
+Approved Design: [Workstream program hierarchy and graph bundling](../../design/workstream-program-hierarchy-and-graph-bundling.md)
+
+The maintainer clarified that W tasks share a real development-program structure. The previous re-layout contract
+was too restrictive in two ways: it treated the absence of `series_id` as absence of all W organization, and it
+prohibited useful same-semantics fan-out trunks. W is not one linear series, but it is one program with W5/W6/W7
+phases. This amendment supersedes only the conflicting presentation constraints; ADR-0017 relation authority and the
+remaining readable-topology requirements stay in force.
+
+### Program hierarchy implementation
+
+- [ ] Implement ADR-0020 group-definition and primary-membership contracts with program/phase hierarchy, opaque IDs,
+  explicit order, revision/CAS, source links and human-integrator acceptance. Agent/task owner may propose only.
+- [ ] Keep group membership orthogonal to series and semantic relations. Membership must not alter relation counts,
+  active tips, gate eligibility, closure, ownership, review or validation state.
+- [ ] Legacy records without accepted membership remain ungrouped/Unknown. Reject prefix/title/branch inference and
+  W-looking negative fixtures.
+- [ ] Add the Approved Design's exact self-host repair fixture for W/W5/W6/W7. It appends explicit metadata and keeps
+  CI1/SH1 outside the W program while real edges may cross the program boundary.
+- [ ] Project one continuous W program region with W5/W6/W7 phase lanes and independent folding. Do not connect all W
+  tasks with a fake series; retain actual chains and cross-boundary relations.
+
+### Controlled relation bundling
+
+- [ ] Replace the blanket long-collinear-overlap prohibition with declared `route_bundle_id` semantics. Bundling is
+  allowed only for identical relation type/direction/lifecycle/certainty/gate/style with a common source or target.
+- [ ] Draw one owned trunk and separate endpoint branches. Branches use distinct ports/arrowheads and separate by
+  ≥24px before the target. Mixed series/dependency/conflict/comparison/Unknown edges cannot share a bundle.
+- [ ] Keep every underlying relation selectable and inspectable. Branch click selects one relation; trunk click opens
+  a bounded relation list; selected relation highlights its trunk plus its branch without merging evidence.
+- [ ] Geometry tests treat declared trunk overlap as valid and all undeclared coincident segments as failure. Nodes,
+  headers, labels and controls remain hard obstacles.
+
+### Selection correction
+
+- [ ] Pointer selection brightens the existing semantic border and adds only a weak same-color glow. Remove the white
+  outer selection rectangle. Dim unrelated graph content without hiding status or evidence.
+- [ ] Preserve keyboard focus visibility with a non-white semantic accent and no layout shift. Inspector behavior and
+  read-only authority remain unchanged.
+
+### Acceptance and dispatch
+
+- [ ] Desktop screenshots show a continuous W program with W5/W6/W7 substructure, actual CI1/SH1 cross-boundary
+  chains and no fabricated W series edge.
+- [ ] U1 same-type fan-out fixture demonstrates a shared succession trunk with visibly separated U2/A4/CI7 branches,
+  distinct arrowheads and correct individual inspector identities.
+- [ ] Existing A/CI/U series, dependency/conflict lens separation, 100% reset, inspector, mobile topology and geometry
+  gates remain accepted only after a new maintainer screenshot review.
+- [ ] The prior two visual correction rounds were performed under superseded grouping/bundle constraints. This
+  amendment permits at most two focused visual correction rounds after the new hierarchy/bundle implementation.
+
+Continue the same W7.3 task/worktree from `05c83b75723a9e6681c0885dd090606060cb696e`, preserving its current
+uncommitted changes to the two Graph modules and focused test file. Refresh Git-private scope to revision 5 after
+acknowledging the new task-description version. Use GPT-5.6 Sol medium. Do not run routed Fast/Checkpoint before the
+maintainer accepts the new visual direction; do not create W7.4, integrate CI7/REL3, modify feature-branch root
+PROGRESS/HANDOFF, push main, publish or change public/default behavior.

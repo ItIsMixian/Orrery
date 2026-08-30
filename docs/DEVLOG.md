@@ -1,5 +1,16 @@
 # 开发日志
 
+## 2026-08-30 — ADR-0020 Workstream Program Hierarchy & Graph Bundling
+
+- 维护者澄清 W 不是无意义前缀或单一线性 series，而是真实开发 program；W5/W6/W7 是 phase，局部真实链可
+  跨 CI1/SH1。中央新增 ADR-0020 与 Approved Design，使用显式 human-confirmed group/membership，不从标题、
+  branch、`display_prefix` 或 task-code 文本自动推断。
+- Design 接受当前 self-host W/W5/W6/W7 exact repair fixture；membership 只影响组织、过滤、折叠和布局，不
+  创建 `derived_from`／`depends_on`／`absorbs`、series、gate、closure 或 ownership。
+- W7.3 Plan/Validation 允许同 type/direction/lifecycle/certainty/gate/style 且共 source/target 的 relation 使用
+  声明式 bundle trunk；分支保留独立 arrowhead/selection/evidence，其他共线仍失败。节点选中改为原语义色提亮
+  和弱光晕，不加白框。继续原 W7.3／Sol medium／scope revision 5，视觉接受前不跑 routed Fast/Checkpoint。
+
 ## 2026-08-30 — CI7 Acceptance Gates & Validation Leases Authorized
 
 - 维护者确认 W7.3 的 53 分钟真实任务中开发只占少数，Core/capture、Maintenance、Fast/Checkpoint 重跑、

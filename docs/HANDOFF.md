@@ -16,6 +16,9 @@ Updated: 2026-08-30
 - `codex/u1-u2-integration-baseline` 已按 W7.2.3 `30d44ff` → U2.2 `70e6ac9` 合流，联合 feature merge `0eaad30` 是供维护者复验的本地 integrated Candidate。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未虚报通过。它尚不等于 `origin/main`、默认切换或公开发布。
 - ADR-0017 与 Approved Relation Capture Design 已接受。W7.3 Core/capture/confirmation/inbox evidence 可保留；
   第二版 Graph `05c83b` 仍因默认 55%、共享总线、标签重叠和 inspector 挤压被拒绝，不能中央集成或写成发布能力。
+- ADR-0020 与 Program/Bundle Design 已接受：W 是 program、W5/W6/W7 是 phase，membership 不是 series 或
+  semantic edge；同类同向且共端点的 relation 可受控束线。W7.3 当前三个未提交文件须保留并在 scope revision
+  5 下继续，尚无实现/验收事实。
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成；W7.3 已收到立即停止要求，必须
   确认新的 readable-topology 任务说明版本并刷新 scope revision 4 后才可恢复产品写入。自动 receipt／
   first-write enforcement 尚未实现。
@@ -39,9 +42,9 @@ Updated: 2026-08-30
 8. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 9. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 10. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-11. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 保留，但第二版 Graph
-    仍不可读。原任务须按 readable-topology amendment 从节点布局重做，使用独立 corridor、按 lens 降噪、
-    closed-by-default inspector 与专用移动 topology；真实截图未获维护者接受前不得中央集成。
+11. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 与三个未提交 Graph
+    文件保留。原任务按 ADR-0020 增加 W/W5-W7 层级，允许声明式 same-semantics bundle，选中态改为语义色提亮；
+    不得用 W 前缀伪造 series，真实截图未获维护者接受前不得中央集成。
 12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 13. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
     “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。

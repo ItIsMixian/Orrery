@@ -37,6 +37,9 @@ Updated: 2026-08-30
   人类接受前运行正式层级或对同一 fingerprint 原样重跑。维护者已批准 additive acceptance policy v1：组合
   gates、surface fingerprint、Git-private validation lease、focused iteration 累计预算、predictive refusal 与
   timeout cost-blocked；15／90 秒预算和各层证据含义不变，产品实现仍 Pending。
+- ADR-0020/W7.3 新门要求 program/phase schema、explicit self-host W repair、prefix negative controls、membership
+  non-escalation、same-source/target bundle 与 mixed-semantics refusal、branch/trunk hit testing、semantic selection
+  以及桌面/移动视觉验收；未通过前不得把 W grouping 或 route bundle 写成产品事实。
 
 ## 覆盖面
 

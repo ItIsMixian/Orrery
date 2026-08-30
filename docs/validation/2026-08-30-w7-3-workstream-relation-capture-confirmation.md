@@ -68,3 +68,31 @@ Required new evidence:
 
 The previous Core/capture/inbox evidence remains reusable. Re-layout work must not reopen confirmation authority,
 append-only history, Team privacy, release or public/default decisions.
+
+## 2026-08-30 W program hierarchy and controlled bundle acceptance contract
+
+Governing sources:
+
+- [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md)
+- [Approved Program/Bundle Design](../design/workstream-program-hierarchy-and-graph-bundling.md)
+
+Required evidence:
+
+- versioned program/phase group and membership schemas, explicit order, one primary path, revision/CAS and
+  human-integrator authority;
+- legacy Unknown and negative prefix/title/branch inference fixtures;
+- exact self-host W/W5/W6/W7 repair fixture with CI1/SH1 outside the program and no rewritten session/relation bytes;
+- proof that membership changes no semantic relation counts, series, active tips, gates, closure or ownership;
+- desktop/mobile W program and phase containment with actual cross-boundary edges and no fabricated W series;
+- same-source U1→U2/A4/CI7 controlled succession bundle, plus same-target fixture;
+- mixed type/direction/lifecycle/certainty/gate/style and conflict/comparison/series bundle refusal;
+- trunk/branch geometry: no node/header/label/control intersections, ≥24px pre-target branch separation, distinct
+  ports/arrowheads and no undeclared coincident segments;
+- branch selects one relation; trunk opens bounded list; inspector keeps each relation's exact evidence identity;
+- pointer selection uses brightened semantic stroke/weak same-color glow with no white rectangle; keyboard focus remains
+  visible and non-white;
+- new 1440×900, 1280×800 and 390×844 screenshots presented to the maintainer before any routed Fast/Checkpoint;
+- focused implementation tests only during visual iteration; after acceptance, one routed Fast and one Checkpoint.
+
+No previous Graph screenshot or Candidate closes this scope. Group hierarchy and route bundles are not relation facts,
+execution authority or public/release adoption.

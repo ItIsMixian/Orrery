@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0020: Workstream Program and Phase Hierarchy](0020-workstream-program-and-phase-hierarchy.md) — Accepted; adds explicit human-confirmed program/phase membership separate from series and causal relations, plus presentation-only controlled route bundling without gate or execution effects.
 - [ADR-0019: Portable operating rules and Authority Route Preflight](0019-portable-operating-rules-and-authority-route-preflight.md) — Accepted; amends/extends ADR-0009 with a versioned portable-rules inventory, provider-neutral fact-route receipt, four independent claim axes and novelty/absence gate while preserving Core as the sole semantics owner and keeping all consumers read-only/unreleased.
 - [ADR-0018: Authority-first Workstream Dispatch](0018-authority-first-workstream-dispatch.md) — Accepted; requires the authority commit to precede task creation or material scope amendment, reduces task messages to exact SHA/path references and makes transcript-only requirements non-authoritative.
 - [ADR-0017: Workstream relation capture, stage gates and confirmation authority](0017-workstream-relation-capture-and-confirmation-authority.md) — Accepted; permits future automatic recording of mechanically verified `derived_from`, adds four `depends_on` gates with task-owner/integrator confirmation, restricts `absorbs` to human integrators and makes central Conductor proposal-only; W7.3 is not implemented.
