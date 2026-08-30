@@ -16,6 +16,7 @@ NAVIGATION_LABELS = {
     "team": "团队协作",
     "workstreams": "任务关系",
     "maintenance": "工作区维护",
+    "trends": "路线与趋势",
 }
 
 STATUS_LABELS = {

@@ -182,14 +182,16 @@ SHELL_CSS = r"""
 .uo-documents:not(.expanded)>.uo-doc-tree{display:none}.uo-doc-tree{min-width:0}.uo-doc-tree>.nav-group{margin-left:0}
 .uo-doc-tree>.nav-group>.nav-title{padding-left:10px}.uo-documents>.nav-title .nav-chev{transition:transform .12s ease}
 .uo-mobile-toggle{display:none}.uo-backdrop{display:none}
+.uo-help-trigger{white-space:nowrap}.uo-help-backdrop{position:fixed;z-index:245;inset:var(--hh) 0 0;background:rgba(4,10,12,.52);backdrop-filter:blur(2px)}.uo-help-backdrop[hidden],.uo-help-panel[hidden]{display:none}.uo-help-panel{position:fixed;z-index:250;right:12px;top:calc(var(--hh) + 12px);bottom:12px;width:min(620px,calc(100vw - 24px));overflow:auto;background:var(--bg2);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 72px rgba(0,0,0,.48);padding:20px}.uo-help-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:13px;border-bottom:1px solid var(--line)}.uo-help-head h2{margin:3px 0 4px;font-size:20px}.uo-help-head p{margin:0;color:var(--mut);font-size:11px}.uo-help-close{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--bg3);color:var(--fg);font-size:18px;cursor:pointer}.uo-help-close:hover,.uo-help-close:focus-visible,.uo-help-trigger:focus-visible{border-color:var(--acc);color:var(--acc);outline:2px solid var(--acc);outline-offset:2px}.uo-help-panel .uo-authority{border:0;background:transparent;padding:16px 0 0}.uo-help-panel .uo-authority-grid{grid-template-columns:1fr}.uo-help-panel .uo-fact-status{border-top:1px solid var(--line);padding-top:14px}
 @media(max-width:820px){
  .uo-mobile-toggle{display:inline-grid;place-items:center}.sidebar{display:none!important}.sidebar-resizer{display:none!important}
  body.uo-nav-open{overflow:hidden}body.uo-nav-open .sidebar{display:block!important;position:fixed;z-index:180;left:0;top:var(--hh);bottom:0;width:min(330px,88vw);height:auto;box-shadow:20px 0 50px rgba(0,0,0,.45)}
  body.uo-nav-open .uo-backdrop{display:block;position:fixed;z-index:170;inset:var(--hh) 0 0;background:rgba(0,0,0,.55)}
  .content{padding:0 18px}.uo-grid,.uo-authority-grid{grid-template-columns:1fr}.uo-caps{grid-template-columns:1fr}.top .sub{display:none}#q{width:min(42vw,190px)}
+ .uo-help-panel{left:0;right:0;top:var(--hh);bottom:0;width:100vw;max-width:none;box-sizing:border-box;border-radius:0;border-top:0;border-bottom:0;border-right:0;padding:18px}
 }
 @media(max-width:460px){header.top{gap:6px;padding:0 8px}.top h1{max-width:82px;overflow:hidden;text-overflow:ellipsis}.rightgrp{gap:5px}.tbtn{padding:6px 7px}#q{display:none}.uo-stop-global{font-size:10px}.uo-authority dl{grid-template-columns:1fr}.page{padding-top:20px}}
-@media(prefers-reduced-motion:reduce){.uo-panel *,.uo-documents>.nav-title .nav-chev{transition:none!important;scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){.uo-panel *,.uo-documents>.nav-title .nav-chev,.uo-help-panel *{transition:none!important;scroll-behavior:auto!important}}
 """
 
 
@@ -201,7 +203,10 @@ SHELL_JS = r"""
  if(backdrop)backdrop.addEventListener('click',()=>nav(false));
  const documents=document.querySelector('[data-project-documents-toggle]');if(documents)documents.addEventListener('click',()=>{const group=documents.closest('[data-project-documents]');requestAnimationFrame(()=>documents.setAttribute('aria-expanded',group&&group.classList.contains('expanded')?'true':'false'))});
  document.addEventListener('click',event=>{if(event.target.closest('.nav-item')&&window.innerWidth<=820)nav(false)});
- const ask=document.querySelector('[data-uo-open-ask]');if(ask)ask.addEventListener('click',()=>{if(typeof qaToggle==='function')qaToggle()});
+ const help=document.querySelector('[data-uo-help]'),helpPanel=document.querySelector('[data-uo-help-panel]'),helpBackdrop=document.querySelector('[data-uo-help-backdrop]'),helpClose=document.querySelector('[data-uo-help-close]');let helpReturn=null;
+ function setHelp(open){if(!help||!helpPanel||!helpBackdrop)return;helpPanel.hidden=!open;helpBackdrop.hidden=!open;help.setAttribute('aria-expanded',open?'true':'false');if(open){helpReturn=document.activeElement;helpClose&&helpClose.focus()}else if(helpReturn&&typeof helpReturn.focus==='function')helpReturn.focus()}
+ if(help)help.addEventListener('click',()=>setHelp(helpPanel&&helpPanel.hidden));if(helpClose)helpClose.addEventListener('click',()=>setHelp(false));if(helpBackdrop)helpBackdrop.addEventListener('click',()=>setHelp(false));
+ document.addEventListener('keydown',event=>{if(!helpPanel||helpPanel.hidden)return;if(event.key==='Escape'){event.preventDefault();setHelp(false);return}if(event.key==='Tab'){const focusable=[...helpPanel.querySelectorAll('button,summary')].filter(item=>!item.disabled);if(!focusable.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}});
  const stop=document.querySelector('[data-uo-stop]');if(stop)stop.addEventListener('click',async()=>{
    if(!window.confirm('确认关闭当前 Orrery 本机服务？其他已打开的标签页也会断开。'))return;stop.disabled=true;
    try{const response=await fetch('/api/v1/shell/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});if(!response.ok)throw new Error('关闭请求被拒绝');stop.textContent='服务已关闭';const banner=document.createElement('div');banner.className='uo-disconnected';banner.setAttribute('role','status');banner.innerHTML='<b>Orrery 服务已关闭</b><span>当前页面已经与本机服务断开，可以安全关闭标签页。</span>';document.body.append(banner)}catch(error){stop.disabled=false;stop.textContent='关闭失败，请重试'}
@@ -217,6 +222,9 @@ SHELL_STATIC_JS = r"""
  if(backdrop)backdrop.addEventListener('click',()=>nav(false));
  const documents=document.querySelector('[data-project-documents-toggle]');if(documents)documents.addEventListener('click',()=>{const group=documents.closest('[data-project-documents]');requestAnimationFrame(()=>documents.setAttribute('aria-expanded',group&&group.classList.contains('expanded')?'true':'false'))});
  document.addEventListener('click',event=>{if(event.target.closest('.nav-item')&&window.innerWidth<=820)nav(false)});
+ const help=document.querySelector('[data-uo-help]'),helpPanel=document.querySelector('[data-uo-help-panel]'),helpBackdrop=document.querySelector('[data-uo-help-backdrop]'),helpClose=document.querySelector('[data-uo-help-close]');let helpReturn=null;
+ function setHelp(open){if(!help||!helpPanel||!helpBackdrop)return;helpPanel.hidden=!open;helpBackdrop.hidden=!open;help.setAttribute('aria-expanded',open?'true':'false');if(open){helpReturn=document.activeElement;helpClose&&helpClose.focus()}else if(helpReturn&&typeof helpReturn.focus==='function')helpReturn.focus()}
+ if(help)help.addEventListener('click',()=>setHelp(helpPanel&&helpPanel.hidden));if(helpClose)helpClose.addEventListener('click',()=>setHelp(false));if(helpBackdrop)helpBackdrop.addEventListener('click',()=>setHelp(false));document.addEventListener('keydown',event=>{if(!helpPanel||helpPanel.hidden)return;if(event.key==='Escape'){event.preventDefault();setHelp(false);return}if(event.key==='Tab'){const focusable=[...helpPanel.querySelectorAll('button,summary')].filter(item=>!item.disabled);if(!focusable.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}});
 })();
 """
 
@@ -235,7 +243,7 @@ def _status_page(identity: str, label: str, reason: str) -> str:
     )
 
 
-def _authority_page(
+def _help_panel(
     status: Mapping[str, Any] | None,
     reason: str | None,
     projection: Mapping[str, Any] | None,
@@ -279,10 +287,11 @@ def _authority_page(
     rollout = status.get("rollout_plan", {}) if isinstance(status.get("rollout_plan"), Mapping) else {}
     rollback = status.get("rollback_plan", {}) if isinstance(status.get("rollback_plan"), Mapping) else {}
     return (
-        '<article class="page wide" id="authority" data-kind="authority-managed-consumer" '
-        'data-authority="derived-read-only" data-contract="authority-managed-consumer-v1">'
-        '<section class="uo-panel uo-authority"><div class="uo-topline"><span class="uo-live static"></span>事实与规则 · 只读投影</div>'
-        '<h2>事实与规则</h2><p>项目自己的原则与 Orrery 工具规则来自不同层；文字相似也不会让工具规则变成项目事实。</p>'
+        '<div class="uo-help-backdrop" data-uo-help-backdrop hidden></div>'
+        '<section class="uo-help-panel" data-uo-help-panel role="dialog" aria-modal="false" aria-labelledby="uo-help-title" hidden>'
+        '<header class="uo-help-head"><div><span class="uo-topline">帮助 / 系统状态 · 只读</span><h2 id="uo-help-title">Orrery 如何解释项目事实</h2><p>三层来源保持独立；此处没有编辑、批准、启用或执行能力。</p></div>'
+        '<button class="uo-help-close" type="button" data-uo-help-close aria-label="关闭帮助与系统状态">×</button></header>'
+        '<section class="uo-authority" data-authority="derived-read-only" data-contract="authority-managed-consumer-v1">'
         '<div class="uo-authority-grid"><section class="uo-layer"><div class="uo-layer-head"><div><h3>项目原则</h3><p>目标项目选择的方向与约束</p></div><span class="uo-source">来源：项目文档</span></div>'
         f'<ol class="uo-principles">{principle_items}</ol></section>'
         '<section class="uo-layer"><div class="uo-layer-head"><div><h3>Orrery 工作规则</h3><p>同版本工具在读取、判断与维护时遵循的规则</p></div><span class="uo-source">来源：工具版本</span></div>'
@@ -295,13 +304,14 @@ def _authority_page(
         f'<dt>production switched</dt><dd>{_esc(selection.get("production_behavior_switched", False))}</dd>'
         f'<dt>rollout plan</dt><dd>{_esc(rollout.get("plan_id", "Unavailable"))}</dd>'
         f'<dt>rollback plan</dt><dd>{_esc(rollback.get("plan_id", "Unavailable"))}</dd>'
-        '</dl></details><p>AI、页面与团队协调服务都没有编辑、批准、执行或权威选择权。</p></details></section></article>'
+        '</dl></details><p>AI、页面与团队协调服务都没有编辑、批准、执行或权威选择权。</p></details></section></section>'
     )
 
 
 def _overview_page(
     registrations: Sequence[ConsumerRegistration], *, mode: str
 ) -> str:
+    visible_identities = {"overview", "docs", "personal", "team", "workstreams", "maintenance", "trends"}
     caps = "".join(
         '<div class="uo-cap %s"><b>%s</b><small>%s · %s</small></div>'
         % (
@@ -310,20 +320,15 @@ def _overview_page(
             _esc(display_status(item.status)),
             _esc(item.reason or "来源契约已登记"),
         )
-        for item in registrations
+        for item in registrations if item.navigation_identity in visible_identities
     )
     dynamic = mode == "dynamic"
-    actions = (
-        '<div class="uo-actions"><button class="uo-button" type="button" data-uo-open-ask>打开文档问答</button></div>'
-        if dynamic
-        else '<div class="uo-actions"><button class="uo-button" type="button" disabled>静态阅读模式不提供动态控制</button></div>'
-    )
     return (
         '<article class="page wide" id="overview" data-kind="unified-observatory-overview" '
         f'data-mode="{_esc(mode)}"><div class="uo-grid"><section class="uo-panel">'
         f'<div class="uo-topline"><span class="uo-live {"" if dynamic else "static"}"></span>{"单一本机地址" if dynamic else "静态文件 · 无运行服务"}</div>'
-        '<h2>Orrery 项目观测台</h2><p>一个导航入口组合文档、搜索、问答与本机协作功能；证据不足时明确显示暂不可用。</p>'
-        f'<div class="uo-caps">{caps}</div>{actions}</section><aside class="uo-panel"><h3>运行边界</h3><ul class="uo-boundary">'
+        '<h2>Orrery 项目观测台</h2><p>一个导航入口组合文档、搜索与本机协作功能；右下角“问文档”是唯一问答入口。</p>'
+        f'<div class="uo-caps">{caps}</div></section><aside class="uo-panel"><h3>运行边界</h3><ul class="uo-boundary">'
         f'<li><b>{"本机动态控制" if dynamic else "静态只读"}</b><span>{"仅监听 127.0.0.1，并只提供一个可见页面地址" if dynamic else "无服务、无 cookie、无控制能力"}</span></li>'
         '<li><b>默认个人模式</b><span>零网络；团队协作与模型服务必须分别主动开启</span></li>'
         '<li><b>派生视图</b><span>不能创建 State、ADR、批准或 Validation 事实</span></li>'
@@ -348,14 +353,14 @@ def inject_unified_shell(
     nav_marker = '<div class="nav-top">'
     if content_marker not in page or nav_marker not in page or "</style>" not in page:
         raise ValueError("base docsite composition markers are missing")
-    pages = [_overview_page(items, mode=mode), _authority_page(authority_status, authority_reason, fact_rules_projection)]
+    pages = [_overview_page(items, mode=mode)]
     existing = {marker for marker in ("personal-observatory", "team-observatory", "workstream-relation-graph", "workspace-maintenance") if f'id="{marker}"' in page}
     for item in items:
         target = {
             "docs": "dashboard", "search": "dashboard", "ask": "dashboard",
             "workstreams": "workstream-relation-graph", "maintenance": "workspace-maintenance",
         }.get(item.navigation_identity, item.navigation_identity)
-        if item.status != "available" and target not in existing and target not in {"overview", "authority", "dashboard"}:
+        if item.status != "available" and target not in existing and target not in {"overview", "authority", "dashboard", "trends"}:
             pages.append(_status_page(target, item.navigation_label, item.reason or "Consumer is unavailable."))
     nav_targets = {
         "overview": ("overview", NAVIGATION_LABELS["overview"], "accepted"),
@@ -366,10 +371,11 @@ def inject_unified_shell(
         "team": ("team-observatory", NAVIGATION_LABELS["team"], "proposed"),
         "workstreams": ("workstream-relation-graph", NAVIGATION_LABELS["workstreams"], "proposed"),
         "maintenance": ("workspace-maintenance", NAVIGATION_LABELS["maintenance"], "state"),
+        "trends": ("trends", NAVIGATION_LABELS["trends"], "proposed"),
     }
     by_identity = {item.navigation_identity: item for item in items}
     links = []
-    for identity in ("overview", "docs", "ask", "authority", "personal", "team", "workstreams", "maintenance"):
+    for identity in ("overview", "docs", "personal", "team", "workstreams", "maintenance", "trends"):
         if identity not in by_identity:
             continue
         target, label, dot = nav_targets[identity]
@@ -384,7 +390,7 @@ def inject_unified_shell(
     )
     duplicate_targets = (
         "dashboard", "personal-observatory", "team-observatory",
-        "workstream-relation-graph", "workspace-maintenance",
+        "workstream-relation-graph", "workspace-maintenance", "trends",
     )
     duplicate_pattern = (
         r'<a class="nav-item"[^>]*data-target="(?:'
@@ -437,12 +443,14 @@ def inject_unified_shell(
     result = result.replace(
         '<div class="rightgrp">',
         '<div class="rightgrp"><button class="tbtn uo-mobile-toggle" type="button" data-uo-nav-toggle aria-label="打开导航" aria-expanded="false">☰</button>'
+        + '<button class="tbtn uo-help-trigger" type="button" data-uo-help aria-controls="uo-help-title" aria-expanded="false">? 帮助</button>'
         + ('<button class="tbtn uo-stop-global" type="button" data-uo-stop>关闭 Orrery 服务</button>' if mode == "dynamic" else ""),
         1,
     )
     result = result.replace('<div class="app">', '<div class="uo-backdrop" data-uo-backdrop></div><div class="app">', 1)
     if mode == "static":
         result = result.replace("start-docsite.bat", "Start Orrery.vbs")
+    result = result.replace("</body>", _help_panel(authority_status, authority_reason, fact_rules_projection) + "</body>", 1)
     shell_script = SHELL_JS if mode == "dynamic" else SHELL_STATIC_JS
     return result.replace("</body>", "<script>" + shell_script + "</script></body>", 1)
 

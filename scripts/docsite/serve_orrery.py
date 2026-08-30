@@ -36,6 +36,11 @@ import build_unified_observatory  # noqa: E402
 import serve as legacy_serve  # noqa: E402
 from project_orrery_cli.operating_rules import preflight_repository_query  # noqa: E402
 from project_orrery_core.maintenance import maintenance_status  # noqa: E402
+from project_orrery_observatory.active_task_projection import (  # noqa: E402
+    build_active_task_projection,
+    collect_active_task_detail,
+    render_task_fragment,
+)
 from project_orrery_observatory.unified_observatory import capability_document  # noqa: E402
 from serve_team_observatory import TeamUIState  # noqa: E402
 
@@ -309,7 +314,31 @@ class UnifiedHandler(legacy_serve.Handler):
                 self._send_json(HTTPStatus.OK, self.server.state.fact_rules_projection)
                 return
             if path == "/api/v1/personal/status":
-                self._send_json(HTTPStatus.OK, {"status": "available", "authority": "host-local-projection"})
+                projection = build_active_task_projection(ROOT)
+                self._send_json(HTTPStatus.OK, {
+                    "status": "available",
+                    "authority": "host-local-projection",
+                    "revision": projection["revision"],
+                    "counts": projection["counts"],
+                    "captured_at": projection["captured_at"],
+                })
+                return
+            if path == "/api/v1/personal/tasks":
+                projection = build_active_task_projection(ROOT)
+                public_projection = {
+                    key: value for key, value in projection.items()
+                    if key not in {"maintenance"}
+                }
+                self._send_json(HTTPStatus.OK, {
+                    "projection": public_projection,
+                    "fragment": render_task_fragment(projection),
+                })
+                return
+            if path.startswith("/api/v1/personal/tasks/"):
+                task_id = path.removeprefix("/api/v1/personal/tasks/")
+                if not task_id or len(task_id) > 64:
+                    raise ValueError("task id must contain 1..64 characters")
+                self._send_json(HTTPStatus.OK, collect_active_task_detail(ROOT, task_id))
                 return
             if path == "/api/v1/team/status":
                 self._send_json(HTTPStatus.OK, self.server.state.team.public_status())

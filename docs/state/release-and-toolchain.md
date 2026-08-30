@@ -14,7 +14,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前 Canonical source
 
 - protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- A4 Candidate 声明 Core 0.1.18、CLI 0.1.22、Observatory 0.1.17、Harness JSON Adapter 0.1.2；Core API、CLI/Harness JSON schema version 仍为 1，组件总状态为 `unreleased`。
+- A4 Candidate 声明 Core 0.1.18、CLI 0.1.22、Harness JSON Adapter 0.1.2；U2.3 Worktree Candidate 将 Observatory 推进到 0.1.18。Core API、CLI/Harness JSON schema version 仍为 1，组件总状态为 `unreleased`。
 - Codex、Claude Code 与 DeepSeek Harness Adapter source 为 0.1.1；Harness JSON 因 A4 inspect/route 增至 0.1.2。它们均为 `experimental`／`unreleased`，且 runtime evidence 不能互相外推。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。
@@ -22,6 +22,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 local release-candidate gate 已进入 source；公开 manifest、standalone installer 和默认 managed Observatory 尚未声明或启用模型 1。
 - Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
 - Unified Observatory 已有本地 W7.2.3／U2.2 joint acceptance Candidate，提供单一连续中文导航、全局 stop、密集 Maintenance、旧证据降级与 W7.1 legacy/archive graph 的最终展示修正。仍没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
+- U2.3 只更新 source Observatory 与 root self-host builder/server：发布 dry build 仍为冻结 v0.2.0 Skill archive，且排除 Git-private session、cache、凭据与生成站点。它没有修改 release manifest、proposal、tag、public/default consumer 或 CI routing policy。
 - 发布源码中的 Skill 已携带 A4 inventory 投影与 bootstrap/preflight 指令，但 `release-manifest.json`、tag、ZIP、checksum 和 phase-0 fixture 未改；因此“source 分发已接线”与“公开 v0.2.0 已发布”分别为 present/absent。
 
 ## CI 与推广门
@@ -52,6 +53,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 UX Acceptance Fixes Validation](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
+- [U2.3 Navigation & Live Task Visibility](../validation/2026-08-30-u2-3-navigation-live-task-visibility.md)
 - [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [Platform-neutral Plan](../implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)

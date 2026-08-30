@@ -130,6 +130,10 @@ def default_registrations(
             status="available" if dynamic else "unavailable",
             reason=None if dynamic else "静态文件没有本机操作权限。",
         ),
+        _registration(
+            "routes-and-trends", "trends", NAVIGATION_LABELS["trends"], 90, None,
+            ("read-derived-view",), "read-only", "build-docsite", "legacy-reader-v1",
+        ),
     )
     return validate_registrations(registrations)
 
@@ -175,7 +179,7 @@ def render_unified_site(
             maintenance_refresh_path="/refresh",
             maintenance_remove_path="/remove-worktree",
             maintenance_reload_after_action=False,
-            include_local_worktrees=False,
+            lightweight_active_tasks=True,
         )
     finally:
         if previous_personal is None:

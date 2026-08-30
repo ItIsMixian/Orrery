@@ -2,6 +2,8 @@
 
 Validation records reproducible evidence for implementation and documentation claims.
 
+- [2026-08-30 U2.3 Navigation & Live Task Visibility](2026-08-30-u2-3-navigation-live-task-visibility.md) — seven-entry application rail, unique Ask Docs entry, read-only help/status surface and bounded Git-private active-task projection; focused/repository gates pass, while inherited A4 digest and final mobile Browser replay remain explicit integration blockers.
+
 For each validation, record:
 
 - Scope and expected behavior

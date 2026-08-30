@@ -15,6 +15,7 @@ Active Plan: [A4 Portable Operating Rules 与 Authority Route Preflight](../impl
 - self-host 项目已在 `.project-orrery.json` 显式选择 `authority_model_version: 1`。当前公开 v0.2.0 release manifest、installer 与旧项目仍是 `legacy-unversioned`；普通工具升级不会替项目选择模型。
 - Authority 实现代码已经进入本地 `main` 的 Canonical Git baseline，但其产品支持状态仍是 `experimental`／`unreleased`。Canonical source scope、runtime support status 与 public release status 必须分别表达。
 - A4 Candidate 扩展既有 Meta Model：Core 0.1.18 冻结 `orrery-operating-rules-v1` inventory 与 provider-neutral Authority Route Preflight；CLI 0.1.22／Harness JSON 0.1.2 提供只读 inspect／route receipt，Skill source 消费同版本投影。它没有创建第二个语义层或 evaluator owner。
+- U2.3 Worktree Candidate 不改变 Authority Core、collector、schema、fixture 或 claim 语义；它只把 A4 的项目原则／Orrery 工作规则／事实解释状态投影移入顶栏只读帮助 surface，并将 legacy/hash/rollout/rollback 保持为默认折叠的技术注释。该 surface 没有编辑、批准、启用、迁移或执行权。
 - route receipt 独立输出 semantic/decision、implementation、distribution/consumer 与 public/default/release 四轴；novelty/absence claim 只有在有界 negative-evidence receipt 完整时才可成立。已索引 governing source 存在时，“不存在／全新层”断言被拒绝。
 
 | 层 | 当前能力 | 当前默认与边界 |
@@ -55,6 +56,7 @@ Active Plan: [A4 Portable Operating Rules 与 Authority Route Preflight](../impl
 - [M2.1 CLI claims](../validation/2026-08-21-m2-1-authority-cli-claims.md), [M2.2 Observatory projection](../validation/2026-08-21-m2-2-observatory-authority-projection.md), [M2.3 release gate](../validation/2026-08-21-m2-3-authority-release-candidate-gate.md)——各检查点的独立证据。
 - 其余逐能力记录见 [Validation 索引](../validation/README.md)；State 不重复保存逐次测试历史。
 - [A4 Portable Operating Rules 与 Authority Route Preflight](../validation/2026-08-30-a4-portable-operating-rules-and-authority-route-preflight.md)——inventory、route corpus、Skill/CLI/Harness/Ask Docs/UI、安装非覆盖与 Candidate 验证。
+- [U2.3 Navigation & Live Task Visibility](../validation/2026-08-30-u2-3-navigation-live-task-visibility.md)——Authority 只读帮助 surface 与产品权限边界；未修改 Core 语义。
 
 ## 已知缺口
 

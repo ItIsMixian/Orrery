@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-30 — U2.3 Unified Navigation & Live Task Visibility Candidate
+
+- Resumed only after verifying authority commit `6315415075fb78b61d9a5bb835725bced0bc9ce1` and registering Git-private scope revision 3 against exact base `3d298a5c`; root PROGRESS/HANDOFF and all A4.1/W7.3/CI7/REL3-owned surfaces remain untouched.
+- Observatory 0.1.18 now has one seven-entry app rail, one floating Ask Docs entry, a top-right read-only help/status surface, and a lightweight Personal task projection from the Git registry, bounded session metadata and Maintenance cache. Startup performs no per-worktree source/Scope/diff/status scan; detail is target-only.
+- Focused 25/25, integrated installation, repository gates, release dry build/private exclusion and diff checks pass. Real projection found 22 worktrees in 834.872 ms with 104,370 session bytes and zero source reads. Browser covered 1440×900, 1280×800 and 390×844 with zero document overflow/console warnings; a final mobile help border-box fix is mechanically covered but needs one central Browser replay because Browser policy blocked the rebuilt local tab.
+- Formal Fast/Checkpoint remain ineligible only on the inherited A4 operating-rules CRLF/hash baseline (Checkpoint 99/102 in 54.589s). A4.1 must merge first; U2.3 then replays gates/browser before W7.3 is assessed against the final shell. No Promotion, push, main, release, network, Team join or delete occurred.
+
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
 - 唯一整合者从 clean `codex/u1-u2-integration-baseline@6166d15` 先合入 W7.2.3 exact `30d44ff`，再合入 U2.2 exact `70e6ac9`；两条产品文件集合无直接重叠。中央 CI7／ADR-0017 与 W7.2 的 DEVLOG、State、Validation index 只做加法协调，联合 feature merge 为 `0eaad30`。
