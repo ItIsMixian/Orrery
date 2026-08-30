@@ -32,6 +32,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
+- [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：拆分 Observatory 影响面并增加非权威总成本诊断；不改变层级证据、15/90 秒预算或 main 推广门。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
 - [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：首次体验返工已实现并验证；维护者复验、public/default transition 与 Release 尚未完成。
 - [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：Phase 5 self-host／发布未完成；真实多机、云 relay 与自动选主也不在当前支持范围。

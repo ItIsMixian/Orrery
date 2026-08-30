@@ -60,6 +60,7 @@ Updated: 2026-08-29
 ## 已知缺口
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
+- CI6 的宽 `observatory-ui`／expected-write scope 仍可能让 Graph-only diff 选中无关 Maintenance real-Git fixture；receipt 也尚未汇总测试优化投入、重跑与回本诊断。CI7 已规划但未实现，当前 stage authority、15/90 秒预算与 Promotion 门保持不变。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

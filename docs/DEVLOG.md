@@ -681,3 +681,8 @@
 - Observatory 0.1.12 只保留一组中文 app 导航与作者文档树，集中主视图词汇，新增全页 `关闭 Orrery 服务`；Team discovery 解释 fingerprint／untrusted／目标 Host 确认边界并标注 loopback self。Personal 改用待确认任务／历史状态与工作区清理建议；Quick Remove 对 0／有 eligible 两种状态均可发现且仍需 fresh preflight＋本机确认。
 - Workstream provider gate 接受完整、只读、validation-valid、hash-bound 的 native 或 legacy/archive evidence，native root 只作来源事实；空 evidence 保持 Unavailable，archive 无执行权。动态 endpoint 复用启动缓存；真实 self-host 恢复 W7.1 引用节点／边与 closed 轴，不创建 relation root。
 - fixture／内存／loopback 回归与真实 in-app Chromium 覆盖 1280x800、390x844 的 Overview／Personal／Team／Workstreams／Maintenance；无页面级横向溢出和 console error。未读取 Provider key、未访问外网、未真实 join Team、未执行删除。正式 CI6 Fast／Checkpoint 与 clean Candidate SHA 记录在 U2.1 Validation；本分支不修改根 PROGRESS/HANDOFF、不 push main、不发布。
+## 2026-08-29 — CI7 routing precision and validation-cost Plan
+
+- 维护者确认“最终测试更快”不能单独证明整体效率提高；Agent token、调试、重跑和后续维护也属于验证成本。
+- 新增 CI7 Plan，优先把宽 Observatory mapping 拆成 Graph／Maintenance／Shell／Team-Personal 数据面，并让 feature task 在超预算后停止扩张，由中央按 exact diff 重路由或另立 CI task。
+- CI7 只增加非权威 cost diagnostics，不改变 Fast／Checkpoint／Candidate／Promotion 的证明含义、15／90 秒预算、required checks 或 exact-SHA main 推广门；因此本轮不新增 ADR。
