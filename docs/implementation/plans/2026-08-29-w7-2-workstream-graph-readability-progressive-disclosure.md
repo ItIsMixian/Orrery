@@ -1,6 +1,6 @@
 # W7.2 Workstream Graph Readability & Progressive Disclosure
 
-Status: W7.2 complete; W7.2.1/W7.2.2 implementation complete, local Checkpoint budget blocked
+Status: W7.2 complete; W7.2.1/W7.2.2/W7.2.3 implementation complete, local Checkpoint budget blocked
 
 Date: 2026-08-29
 
@@ -113,3 +113,16 @@ registered as Git-private `W7.2.2-graph-arrow-scrollbar-visual-integration` from
 - [x] give light mode its own root and descendant scrollbar palette, including the document-element scrollbar;
 - [x] retain mobile ledger substitution, keyboard/ARIA semantics, read-only behavior and zero page-level horizontal
   overflow.
+
+## W7.2.3 graph density correction
+
+The maintainer's live light-theme review found that disconnected components were separated by a full synthetic row,
+making a small fact set look sparse and forcing unnecessary vertical travel. The correction is registered as
+Git-private `W7.2.3-workstream-graph-density-correction` from exact task base
+`4e62dba49fb0780cd801c8fd7f19ea51beb29c23`.
+
+- [x] preserve 248×104px cards and 34px within-component row clearance;
+- [x] replace the extra 138px blank component row with an explicit 44px component grouping gap;
+- [x] reduce the horizontal rank channel from 112px to 88px while retaining arrow and elbow clearance;
+- [x] derive canvas height from the last real node instead of synthetic row count;
+- [x] keep node non-overlap, edge non-intersection, desktop scrolling and the mobile ledger semantics unchanged.

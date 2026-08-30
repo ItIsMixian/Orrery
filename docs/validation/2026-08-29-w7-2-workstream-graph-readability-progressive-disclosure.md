@@ -2,7 +2,7 @@
 
 Date: 2026-08-29, corrected 2026-08-30
 
-Status: W7.2 PASS; W7.2.1/W7.2.2 implementation/browser/Fast PASS, local Checkpoint budget timeout
+Status: W7.2 PASS; W7.2.1/W7.2.2/W7.2.3 implementation/browser/Fast PASS, local Checkpoint budget timeout
 
 ## Scope and baseline
 
@@ -24,8 +24,10 @@ Status: W7.2 PASS; W7.2.1/W7.2.2 implementation/browser/Fast PASS, local Checkpo
 - W7.2.2 exact task base: `bff8ce6de1eed9b51e83a2e7cd92abc1297dddbe`; its Git-private scope adds only
   Graph presentation, shared docsite scrollbar CSS, owner regression, component version and the existing W7.2
   documentation surfaces.
+- W7.2.3 exact task base: `4e62dba49fb0780cd801c8fd7f19ea51beb29c23`; after a clean private scope
+  observation bound the completed W7.2.2 HEAD, the W7.2.3 session registered before its first author write.
 - Presentation-only boundary: Core 0.1.17 relation schema/facts and CLI 0.1.21 are byte-unchanged by this task;
-  Observatory advances from 0.1.12 through W7.2 0.1.13 and corrections 0.1.14/0.1.15.
+  Observatory advances from 0.1.12 through W7.2 0.1.13 and corrections 0.1.14/0.1.15/0.1.16.
 
 ## Layout and disclosure evidence
 
@@ -203,6 +205,44 @@ synchronized authored diff, Checkpoint dry-run selected 44 tests with 0 unknown 
 the fixed 90.0-second outer timeout while
 `test_minimal_git_incremental_refresh_and_target_preflight_checkpoint` was still running; no evidence-eligible
 Checkpoint PASS is claimed.
+
+## W7.2.3 density evidence
+
+Observatory 0.1.16 keeps the readable 248×104px cards and 34px multi-row clearance, but replaces the old
+`componentRows + 1` synthetic-row increment with an explicit 44px disconnected-component gap. Horizontal rank
+clearance moves from 112px to 88px, and SVG height is computed from the last real node rather than an inflated row
+count.
+
+```text
+python -X utf8 -m pytest -q tests/test_workstream_relation_graph_observatory.py tests/test_unified_observatory.py
+PASS — 18/18 in 24.57s
+
+python -X utf8 -c "...WORKSTREAM_GRAPH_JS..." | node --check -
+PASS
+
+python -X utf8 scripts/ci/validate_change.py --stage fast --base 4e62dba... --dry-run --explain
+PASS routing — 38 tests, 0 unknown paths; dry-run is not evidence-eligible
+
+python -X utf8 scripts/ci/validate_change.py --stage fast --base 4e62dba...
+PASS — 38/38 in 3.270728s, evidence-eligible
+
+python -X utf8 scripts/ci/validate_change.py --stage checkpoint --base 4e62dba... --dry-run --explain
+PASS routing — 44 tests, 0 unknown paths; dry-run is not evidence-eligible
+```
+
+The live self-host startup projection contained 14 visible nodes, 7 succession routes and 7 disconnected components.
+At 1440×900, every adjacent component measured exactly 44px of clear vertical space, all rank channels measured 88px,
+node overlap count was zero, every edge retained an arrow, and sampled orthogonal segments crossed zero card interiors.
+The resulting canvas was 992×1138 instead of inserting a full blank card row for each component. At 390×844 the SVG
+remained hidden and the normal relation ledger rendered the same 14 items and 7 edges with zero document horizontal
+overflow. Browser console logs were empty. Local-only screenshots:
+
+- `C:/Users/1/.codex/visualizations/2026/08/30/01a04fb7-0d1c-7c62-8ff3-c98cf4316b83/w7-2-3/1440-compact-components.jpg`
+- `C:/Users/1/.codex/visualizations/2026/08/30/01a04fb7-0d1c-7c62-8ff3-c98cf4316b83/w7-2-3/390-density-ledger.jpg`
+
+W7.2.3 does not modify Maintenance or the CI selector. The unchanged formal Checkpoint boundary remains the W7.2.2
+90.0-second outer timeout on the existing Maintenance incremental fixture; this narrow spacing correction does not
+claim a new Checkpoint PASS.
 
 ## Remaining boundary and integration order
 

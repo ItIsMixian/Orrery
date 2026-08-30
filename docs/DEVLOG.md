@@ -701,3 +701,9 @@
 - 维护者在真实深色页面指出冲突箭头比例失衡、页面／作者侧栏／图画布原生白色滚动条突兀；从 exact clean `bff8ce6` 登记 Git-private `W7.2.2-graph-arrow-scrollbar-visual-integration` 后写入，根 PROGRESS/HANDOFF 未修改。
 - Observatory 0.1.15 将 SVG marker 从隐式 `strokeWidth` 倍增改为固定 10×10 `userSpaceOnUse`，默认／冲突路线收敛为 3px／4px；关系事实、lens、方向、折叠语义和执行边界均未改变。
 - docsite 根 CSS 新增深浅主题 scrollbar token：页面、侧栏、图画布和技术详情共享 10px 低对比圆角轨道／滑块，去掉原生按钮；390px ledger 和屏幕阅读语义保持。focused 18/18、JS syntax、CI6 Fast 38/38 与三档真实浏览器验收通过，详情见 W7.2 Validation。
+
+## 2026-08-30 — W7.2.3 Workstream Graph Density Correction
+
+- 维护者在真实浅色页面指出少量节点仍被 disconnected component 的整行空白过度拉开；从 exact clean `4e62dba` 登记 Git-private `W7.2.3-workstream-graph-density-correction` 后写入，根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.16 保持 248×104px 卡片与可读字号，将 rank 通道从 112px 收至 88px，并用 44px 显式 component gap 替代额外 138px synthetic row；canvas 高度改由最后一个真实节点决定。
+- 真实 self-host 14 节点／7 边桌面测量为 component gap 44px、rank gap 88px、0 node overlap、0 route/card crossing；390px 继续显示同事实 ledger，console 为空。Core facts、折叠语义、只读与所有执行安全边界未改变。

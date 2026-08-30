@@ -23,7 +23,7 @@ Updated: 2026-08-30
 - U2 Unified Observatory focused 11/11 与最终 adjacent 12/12 PASS；CI6 final Fast 根据当前 diff 选择 49 项并 49/49 PASS，final Checkpoint 选择 54 项并 54/54 PASS（evidence-eligible，未超预算）。真实动态单 URL、静态无控制、Host／Origin／cookie／token、Team／Authority／AI／Maintenance 不升级、helper/marker 回收和 desktop/390px browser 均有独立证据。
 - U2.1 新增 legacy Maintenance/current refresh、legacy/archive graph/empty refusal、startup-cached graph endpoint 与全局 stop 资源回收四组断言，并折叠进既有 owner test IDs；registry byte-for-byte 不变，不扩大历史 W6.1 `<24` Checkpoint selector。focused 五套 47/47、折叠后 exact methods 5/5、Unified 11/11；最终 CI6 Fast 选择 38 项、Checkpoint 选择 44 项，均 evidence-eligible PASS，详见 U2.1 Validation。
 - W7.1 的四个 archived-session 安全回归已登记为 `team-lan-core` Promotion-only medium evidence，不进入 Fast／Checkpoint；其分支 focused 19/19、exact Fast 57/57、Checkpoint 85/85 及真实 self-host read-only graph 均通过，最终整合 Candidate 仍需 Promotion 重放。
-- W7.2 将布局、折叠、lens 端点、inspector 与 desktop/mobile ledger 断言折叠进既有 Workstream Graph owner IDs，CI inventory／registry 不变。W7.2.1 又覆盖 `Ctrl + wheel` 缩放边界、Reset 100%、路径焦点不产生 bbox 黑框、无在线路标签、按链二次收起和 dependency 零事实解释；W7.2.2 增加固定 marker units／尺寸、冲突线宽与全站深浅主题 scrollbar contract。focused Graph＋Unified 18/18 与 JS syntax PASS；真实 self-host 1280×800、1440×900、390×844 无页面横向溢出或 console warning/error。最终 CI6 Fast／Checkpoint receipt 见 W7.2 Validation。
+- W7.2 将布局、折叠、lens 端点、inspector 与 desktop/mobile ledger 断言折叠进既有 Workstream Graph owner IDs，CI inventory／registry 不变。W7.2.1 覆盖 `Ctrl + wheel`、路径焦点、无线路标签、按链收起和 dependency 空态；W7.2.2 增加固定 marker 和全站主题 scrollbar；W7.2.3 固定 88px rank／44px component 间隔并拒绝 synthetic blank row。focused Graph＋Unified 18/18 与 JS syntax PASS；真实 self-host 桌面节点无重叠、边不穿框，390×844 无页面横向溢出，console error/warning 为空。最终 CI6 Fast／Checkpoint receipt 见 W7.2 Validation。
 
 ## 覆盖面
 
