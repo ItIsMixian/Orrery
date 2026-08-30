@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-30 — S0 Orrery Dispatch Skill Candidate
+
+- 从任务说明版本 `8bb7e1f` 建立独立 `codex/s0-orrery-dispatch-skill` worktree，并在首次 Skill 写入前登记 Git-private Scope。实现严格限于 `SKILL.md` 与 `agents/openai.yaml`，没有 script／reference／asset／service／schema／network。
+- Skill 只处理显式授权的新任务或实质 rescope：先提交权威来源，面向用户显示“任务说明版本”，向 Agent 只传 code base／SHA／paths／配置／安全边界，并在 source acknowledgment 前阻止继续写入。默认不轮询任务，缺失权威或 prompt/Plan mismatch 失败关闭。
+- `skill-creator` quick validation 通过；人工 contract review 覆盖 new task、idea-only、mid-flight amendment、missing authority、dirty worktree、unsolicited monitoring 和自动审批负例。它仍是未安装／未发布 source Candidate，不修改现有 `project-orrery` Skill，也不实现 S1 Conductor 或宿主级 first-write enforcement。
+- 首次路由拒绝后，S0 读取 amendment `b5bc33c`、把 Git-private Scope 升到 revision 2，并只扩展 generic `release-packaging` path mapping。最终 route 为 44 tests／0 unknown，Fast 44/44、repository gate（734 paths／403 Markdown／1087 links）、integrated installation、CI contract 与临时 release boundary 通过；冻结 v0.2.0 archive 为 40 entries 且不包含 S0 Skill。
+
 ## 2026-08-30 — S0 Orrery Dispatch Skill Authority Baseline
 
 - 维护者批准先做极简调度 Skill，并接受面向用户使用“任务说明版本”、只在技术详情保留完整 Git SHA。S0 由 ADR-0018／ADR-0017 与既有 Approved Design 约束，不新增权限决策。

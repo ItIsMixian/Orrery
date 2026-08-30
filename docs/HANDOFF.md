@@ -16,10 +16,11 @@ Updated: 2026-08-30
 - `codex/u1-u2-integration-baseline` 已按 W7.2.3 `30d44ff` → U2.2 `70e6ac9` 合流，联合 feature merge `0eaad30` 是供维护者复验的本地 integrated Candidate。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未虚报通过。它尚不等于 `origin/main`、默认切换或公开发布。
 - ADR-0017 与 Approved Relation Capture Design 已接受：mechanical `derived_from` 可自动写入，`depends_on` 必须按 implementation／validation／integration／release gate 由相应人类角色确认，`absorbs` 只由 human integrator 确认。W7.3 尚未实现，不能把这些规则写成当前产品能力。
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：Workstream 创建或实质范围追加前，中央先提交 ADR／Design／Plan amendment／Pending Validation；任务消息只引用 exact authority SHA 与 paths。U2.3／W7.3 已在安全边界暂停，待读取本提交并登记 scope revision 后恢复。自动 receipt 与 first-write enforcement 尚未实现。
+- S0 `orrery-dispatch` source Candidate `9294902` 已本地集成，只包含 `SKILL.md`／`agents/openai.yaml`。首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping；Fast 44/44 与本地门通过。它未安装、未发布，也不改变 v0.2.0／v0.3.0 或未来 S1 Conductor 状态。
 
 ## 当前可继续的线路
 
-1. **S0 Orrery Dispatch Skill：** 两文件 source 已写入独立 Workstream，标准 Skill 校验通过；首次 Fast dry-run 因 `skills/orrery-dispatch/**` 未映射而正确失败关闭。新的 Plan amendment 只授权扩展 generic `release-packaging` mapping；Agent 确认任务说明版本后恢复，不实现 S1 Conductor、自动 receipt 或首次写入阻断。
+1. **S0 Orrery Dispatch Skill：** 两文件 source Candidate 已本地集成。后续只有独立 Release Plan 才能安装／打包／发布它；不得把 source presence 写成用户已经可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
 2. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
 3. **Authority production consumer：** 单独评审 managed projection 的启用／回滚；之后再由维护者选择实际 SemVer／candidate manifest。两项不得在同一未经审阅的发布动作里一起关闭。
 4. **Documentation D2：** 只有维护者批准后才实现 `docs audit` scanner／CLI；finding 继续 advisory、zero-network、无自动修复。

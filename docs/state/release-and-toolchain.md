@@ -1,8 +1,8 @@
 # 发布与工具链 State
 
-Updated: 2026-08-29
+Updated: 2026-08-30
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md)
 
 ## 当前公开发布
 
@@ -22,6 +22,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 local release-candidate gate 已进入 source；公开 manifest、standalone installer 和默认 managed Observatory 尚未声明或启用模型 1。
 - Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
 - Unified Observatory 已有本地 W7.2.3／U2.2 joint acceptance Candidate，提供单一连续中文导航、全局 stop、密集 Maintenance、旧证据降级与 W7.1 legacy/archive graph 的最终展示修正。仍没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
+- S0 新增未发布 `skills/orrery-dispatch/` source Candidate，只包含 `SKILL.md` 与 `agents/openai.yaml`。它把 ADR-0018 的 authority handoff 投影为 Codex Skill 指令，面向用户称“任务说明版本”；没有 script／asset／reference／service／schema／network，也未进入当前 `project-orrery` Skill、installer、release manifest 或 v0.3.0 范围。
 
 ## CI 与推广门
 
@@ -42,6 +43,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 实现证据
 
 - `skills/project-orrery/release-manifest.json`
+- `skills/orrery-dispatch/SKILL.md`, `skills/orrery-dispatch/agents/openai.yaml`
 - `scripts/package_release.py`, `.github/workflows/release.yml`
 - `packages/component-versions.json`, `packages/`
 - `adapters/`, `scripts/package_*adapter.py`
@@ -63,3 +65,4 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - v0.2.0 archive 在 Windows／Linux 重建尚非 byte-for-byte 一致。
 - Unified／Collaboration／Maintenance／Graph 没有默认 consumer 或 public release；self-host relation apply、真实双机与 scheduler 不受支持。
 - R4 alias、R5 optional default transition 和最早 0.4.0 cleanup review 均未启动。
+- `orrery-dispatch` 尚未安装、打包或发布；未来是否进入 v0.3.0 必须由独立 release Plan/Validation 决定。

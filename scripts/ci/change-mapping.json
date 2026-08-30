@@ -148,6 +148,7 @@
         "packages/*/src/*/__init__.py",
         "packages/*/src/*/component.json",
         "skills/project-orrery/**",
+        "skills/orrery-dispatch/**",
         "scripts/package_*.py",
         "tests/test_project_orrery.py",
         "tests/test_cli_wheel_installation.py",

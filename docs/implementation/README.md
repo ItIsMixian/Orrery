@@ -14,7 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
-- [2026-08-30 S0 Orrery Dispatch Skill](plans/2026-08-30-s0-orrery-dispatch-skill.md) — planned two-file Skill for authority-first task creation and rescoping; not the future Conductor and not yet implemented or released.
+- [2026-08-30 S0 Orrery Dispatch Skill](plans/2026-08-30-s0-orrery-dispatch-skill.md) — implemented two-file source Candidate for authority-first task creation and rescoping; not installed/released and not the future Conductor.
 - [2026-08-30 Authority-first Workstream Dispatch](plans/2026-08-30-authority-first-workstream-dispatch.md) — manual authority-before-dispatch process is active under ADR-0018; versioned Git-private receipt and first-write product enforcement remain planned.
 - [2026-08-30 U2.3 Navigation, Help Surface & Live Task Visibility](plans/2026-08-30-u2-3-navigation-live-task-visibility.md) — frozen authority scope for the final shell/navigation cleanup and lightweight all-active-task projection; implementation resumes only after exact authority-SHA acknowledgment.
 - [2026-08-29 U2.2 Unified Navigation & Workspace Maintenance UX](plans/2026-08-29-u2-2-unified-navigation-workspace-maintenance-ux.md) — implemented and integrated into the local acceptance Candidate: one continuous rail and dense, safe Maintenance presentation; no Core eligibility or deletion semantics changed.
