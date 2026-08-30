@@ -22,9 +22,11 @@ Updated: 2026-08-30
 - W7.3 最新 correction 已否决“全图同 rank”：rank 只在 relation component／explicit series／accepted phase
   内计算；独立区块二维排布，跨区束线限定为一个 source/destination block pair，禁止贯穿全图的竖直总线。
   随后的 module correction 规定 concrete module 在布局前严格裁剪 full-card 输入，跨模块只留 boundary stub，
-  Unknown 不得广播到所有视角；scope revision 8 后继续，视觉接受前仍禁 Fast/Checkpoint。
+  Unknown 不得广播到所有视角。最新 topology correction 又否决单一 W program 高塔：真实关系 component 跨
+  组织边界共同排版，program/phase 只作 local soft overlay，束线限端点 64px／一 rank gap 内；scope revision 9
+  后继续，视觉接受前仍禁 Fast/Checkpoint。
 - ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成；W7.3 已收到立即停止要求，必须
-  确认最新 module-scoped/layout 任务说明 exact SHA 并刷新 scope revision 8 后才可恢复产品写入。自动
+  确认最新 topology-first/module-scoped 任务说明 exact SHA 并刷新 scope revision 9 后才可恢复产品写入。自动
   receipt／first-write enforcement 尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
@@ -50,9 +52,9 @@ Updated: 2026-08-30
 9. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 10. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
 11. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 与未提交 Graph
-    改动全部保留。原任务按 ADR-0020 增加 W/W5-W7 层级；最新 scope revision 8 要求 concrete module 严格
-    full-card filter、跨模块 boundary stub、component/phase-local rank、二维 block packing 与 block-pair bundle，
-    禁止不同模块重复全图、全局单列和贯穿总线。真实截图未获维护者接受前不得中央集成。
+    改动全部保留。原任务按 ADR-0020 增加 W/W5-W7 层级；最新 scope revision 9 要求 concrete module 严格
+    full-card filter、跨模块 boundary stub、跨组织 relation component、soft phase overlay、二维 packing 与
+    端点局部短扇出，禁止模块重复全图、W 单列高塔和跨页交叉线路。真实截图未获接受前不得中央集成。
 12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 13. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
     “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。

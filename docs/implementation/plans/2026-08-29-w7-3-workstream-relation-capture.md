@@ -522,3 +522,92 @@ Continue the same W7.3 task/worktree and preserve all current uncommitted change
 revision 8 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and
 apply it together with revision 7's layout correction. Do not rerun routed Fast/Checkpoint before maintainer visual
 acceptance; do not create W7.4, discard work, push, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Correction — Topology-first Soft Grouping & Local Crossing-free Routing
+
+The maintainer rejected the revision-7 preview because it replaced the global single column with a single tall W
+program tower. The implementation removed program members from normal connected-component packing, stacked every
+phase by incrementing one vertical cursor, and then reconnected displaced endpoints with page-scale orthogonal lines.
+Passing presence tests for phase boxes and edges did not establish a readable graph. This correction supersedes hard
+program containment and broad block-pair routing while preserving ADR-0020 membership facts.
+
+### Relation topology has placement priority
+
+- [ ] After revision 8 module projection and eligible folding, partition by the **visible graph edges for the current
+  lens**, including subdued explicit-series connectors. A connected component may contain tasks from several modules,
+  programs or phases; all of its full endpoints and boundary stubs are laid out together as one topology unit.
+- [ ] Program/phase/series membership may label, tint or order otherwise equivalent placements, but it must not remove
+  a node from its relation-connected component, split related endpoints into distant containers, merge disconnected
+  components or override crossing minimization.
+- [ ] Lay out actual adjacency first: connected predecessor/successor endpoints occupy neighboring ranks whenever the
+  partial order permits. Within a rank, use deterministic median/barycentric sweeps (or equivalent crossing
+  minimization) over adjacent ranks before applying stable-ID tie breaking.
+- [ ] Optimize in this order: zero node/container intersections → minimum edge crossings → short adjacent-endpoint
+  routes → compact area → stable tie ordering. Compactness may not win over crossings or route length.
+
+### W program is a soft overlay, not one enclosing tower
+
+- [ ] Remove the single bounding rectangle that encloses every W program member. Render W membership as a lightweight
+  repeated program label and phase-local header/hull attached to each local topology block; no empty rectangle may
+  span disconnected W components.
+- [ ] W5/W6/W7 phase order may sort local blocks, but it cannot force them into one vertical column. Disconnected phase
+  components participate in the same two-dimensional packer as A/CI/U components.
+- [ ] A phase containing three or more mutually incomparable visible tasks must use at least two desktop columns (or
+  separate local component blocks); it cannot become a one-card-wide vertical rail. A genuine confirmed chain remains
+  left-to-right rather than being wrapped into a fake grid.
+- [ ] In the current self-host fixture, W5C/W5D/W5E and W7.1/W7.2.2/W7.2.3/W7.3-INT/W7.3 must not form one narrow
+  vertical tower. CI1/SH1/U1 and their related W endpoints must be co-placed by their real connections, not separated
+  to the bottom of a program box and joined by page-height lines.
+
+### Local routing and fan-out only
+
+- [ ] A declared bundle is only a short endpoint fan-out aid. Its shared trunk must remain inside the common
+  endpoint's local rank gutter and end within 64px or one rank gap (whichever is smaller); after that, every branch
+  owns a separate obstacle-avoiding route. `block-pair` identity alone never licenses a long shared spine.
+- [ ] Route inside the owning topology component using node, label, group header/hull and existing route tracks as
+  obstacles. A route cannot cross an unrelated component/phase interior or use the whitespace inside another block
+  as a corridor.
+- [ ] Reorder or repack nodes before accepting a crossing. The real self-host default view must have zero unmarked
+  route/route crossings, zero route/card/header intersections and zero page-spanning vertical or horizontal trunks.
+  If a synthetic graph cannot avoid a crossing, use an explicit bridge only after proving reordering and separate
+  tracks cannot solve it.
+- [ ] Existing route stretch, bend, segment and label-clearance requirements apply to every relation branch and trunk,
+  including declared bundles; bundling does not exempt geometry gates.
+
+### Corrected pipeline
+
+```text
+eligible facts
+→ strict module full-card projection and boundary stubs
+→ eligible history folding
+→ visible-edge connected components across organizational boundaries
+→ component-local partial-order rank
+→ crossing-minimized in-rank ordering
+→ local topology layout
+→ two-dimensional component packing
+→ soft program/phase overlays
+→ short endpoint fan-out and obstacle-avoiding routes
+→ labels and selection
+```
+
+Hard program containment before component partition is invalid because it creates the rejected W tower and forces
+long cross-program routes.
+
+### Acceptance and dispatch
+
+- [ ] Geometry tests run against the actual self-host snapshot as well as synthetic fixtures. They assert zero
+  route/route crossings, zero route/node/header/hull intersections, no trunk longer than the local fan-out limit, no
+  one-column W tower and no program hull spanning disconnected components.
+- [ ] A topology fixture with cross-phase and cross-program edges proves related endpoints remain in one local
+  component while organizational labels remain readable and do not create edges.
+- [ ] The default 100% desktop screenshot must show several balanced topology blocks, short local connectors and
+  readable W phase labels. A full-height capture that requires tracing lines across multiple screen heights is a
+  failure even if every endpoint is technically connected.
+- [ ] Focused unit/geometry tests are necessary but cannot close this gate. Present the new real 1440px/1280px page to
+  the maintainer before any routed Fast/Checkpoint.
+
+Continue the same W7.3 task/worktree and preserve every current uncommitted file. Refresh Git-private scope to
+revision 9 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and
+implement revisions 8 and 9 together. Replace the hard program-stack algorithm rather than tuning its spacing. Do not
+create W7.4, discard work, integrate another branch, push, publish or run routed Fast/Checkpoint before maintainer
+visual acceptance.

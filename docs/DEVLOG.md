@@ -1,5 +1,16 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Hard Program-stack Rejected
+
+- 维护者拒绝 revision-7 真实页面：全图单列虽被拆开，W program 仍以一个巨型外框把 W5/W6/W7 按单一
+  `componentTop` 纵向堆叠；CI1/SH1/U1 等真实关系端点被推到远处，只能由跨多屏长折线重新连接并相互交叉。
+- 中央核对 dirty implementation 后确认这是算法顺序错误，不是 CSS 间距：program 成员先被移出普通
+  relation component，hard containment 优先于 topology；现有 12 项 focused PASS 未覆盖 self-host 交叉数、
+  program 纵横比、跨页 trunk 或 endpoint adjacency，因此不能作为视觉证据。
+- Plan/Validation revision 9 改为 relation topology 优先、跨组织 component 共同排版、W/phase local soft
+  overlay、crossing-minimized rank ordering 与端点 64px／一 rank gap 内短扇出；真实截图接受前仍禁
+  routed Fast/Checkpoint。
+
 ## 2026-08-30 — W7.3 Module-view Projection Correction
 
 - 维护者指出 Documentation／Context Routing／Authority／Multi-worktree 等具体模块选择仍显示近似同一批任务；

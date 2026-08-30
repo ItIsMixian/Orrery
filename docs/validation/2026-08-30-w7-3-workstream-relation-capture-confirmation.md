@@ -167,3 +167,30 @@ Required evidence additionally proves:
 This remains a derived read-only projection. It changes no module fact, relation, lifecycle, gate, history eligibility,
 confirmation authority or execution capability. Routed Fast/Checkpoint remain blocked until maintainer screenshot
 acceptance.
+
+## 2026-08-30 topology-first soft-grouping correction
+
+The revision-7 preview's single tall W container and page-scale intersecting routes are rejected. Required evidence
+additionally proves:
+
+- visible-edge connected components are constructed after module projection/folding and across organizational
+  boundaries; program/phase membership cannot remove endpoints from or split a topology component;
+- crossing-minimized local rank ordering and adjacency take precedence over compactness and stable-ID tie sorting;
+- W program membership uses repeated lightweight local labels/hulls rather than one rectangle enclosing every W task;
+- disconnected W5/W6/W7 components participate in two-dimensional packing, and phases with three or more incomparable
+  tasks do not form a one-card-wide vertical rail;
+- current W5C/W5D/W5E and W7.1/W7.2.2/W7.2.3/W7.3-INT/W7.3 are not stacked into one W tower; CI1/SH1/U1 remain
+  locally positioned with their actual related W endpoints;
+- shared route trunks are limited to the common endpoint's local gutter and at most 64px or one rank gap; every later
+  branch owns a separate obstacle-avoiding route;
+- declared bundles remain subject to stretch/bend/segment/label gates and cannot use block-pair membership as an
+  exemption;
+- actual self-host geometry, not only synthetic presence tests, records zero unmarked route crossings, zero
+  node/header/hull intersections, zero page-spanning trunks and no hull spanning disconnected components;
+- the verified pipeline is strict module projection → folding → cross-organization component partition → local rank
+  → crossing-minimized ordering → local layout → 2D packing → soft overlays → local fan-out routing;
+- the maintainer accepts a real default-100% 1440px/1280px page before routed Fast/Checkpoint;
+- exact corrected task-description acknowledgment and Git-private scope revision 9 precede resumed product writes.
+
+This correction changes presentation/layout only. ADR-0020 membership, ADR-0017 relation authority, privacy,
+read-only execution boundaries and revision 8 module filtering remain unchanged.
