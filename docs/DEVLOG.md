@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-30 — GX2 W Phase Small-multiple Correction
+
+- 中央实际操作 revision-14 本地页面：succession、dependency、Project Structure primary-only 与
+  semantic-context-only 已可读，affected/semantic 两控制独立且 desktop 均保持 100%；未通知维护者。
+- W 视角虽改 external boundary stubs，仍为 1821×1383 giant compound，内容偏右、跨多个滚动区且报告保留
+  crossing/长线；第二 mixed-algorithm 配置 crash。继续调同一 compound 判定无价值。
+- GX2 scope revision 15 改为 W5/W6/W7 phase small multiples：各 panel 内由 ELK 布 W full cards/真实边/外部
+  stubs，只允许真实 direct cross-phase edge 跨 panel；edge-free affected 改用 flat box packing。仍只允许
+  页面/截图/人工 Browser review，测试和产品写入保持全禁。
+
 ## 2026-08-30 — GX2 Maintainer-supervised Render-only Iteration
 
 - 维护者明确要求中央监督 W7.3，直到中央认为视图可读才通知，并要求其确认视图前不得启动测试流程。中央

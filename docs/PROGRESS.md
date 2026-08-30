@@ -42,7 +42,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 - [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：ADR-0021 已接受；等待含 ADR-0022 pinned local ELK 的 W7.3、CI7 Canonical integration 与最终网页验收后才注册 RC，随后完成 manifest、self-contained ZIP、runtime、双平台 Promotion、main/tag/Release 分权流程。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
-- [ ] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：当前唯一获准动作；首版 flat views 可用但 W=40%、context=30% 且 compound 有 crossing/长线，不通知维护者。scope revision 14 允许两次中央监督的 render-only 修正，确认视图前零测试流程。
+- [ ] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：中央已接受 succession/dependency/primary/semantic-context 方向，但拒绝 1821×1383 W compound。scope revision 15 改为 W5/W6/W7 ELK phase small multiples 与 flat affected packing；仍为 render-only/零测试。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
 - [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 与 PO enforcement 已本地集成，并只安装到当前本机 Codex home；未进入发布包，S1 Conductor 仍是独立后续事项。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。

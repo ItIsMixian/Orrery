@@ -153,3 +153,39 @@ Do not notify the maintainer directly from W7.3 and do not begin product integra
 Continue the same task/worktree, preserve all existing dirty/product/legacy files and refresh Git-private scope to
 revision 14 after reading this amendment plus the matching Validation section. Use GPT-5.6 Sol medium. The no-test and
 experiment-only boundaries override earlier GX2 validation commands until the maintainer confirms the view.
+
+## 2026-08-30 coordinator correction — W phase small multiples
+
+Central browser inspection accepts the direction of succession, dependency, Project Structure primary-only and
+semantic-context-only views, but rejects the remaining W compound geometry. One 1821×1383 nested compound still places
+content far to the right, requires several scroll regions and retains a crossing/long routes. Further option tuning of
+that single compound has already crashed ELK 0.11.0 and must stop.
+
+### W view composition
+
+- [ ] Replace the one giant nested W compound with one W program workspace containing three visible phase panels:
+  W5, W6 and W7. These are presentation small multiples backed by the same accepted membership, not new facts or edges.
+- [ ] Each phase panel runs ELK independently for its own W member full cards, real intra-phase edges and compact typed
+  boundary stubs for every external CI/SH/U endpoint. An external relation terminates at the nearest panel boundary;
+  inspector identity preserves its exact original endpoint/relation.
+- [ ] A real direct cross-phase W relation, if present, uses an explicit top-level connector between phase ports. Do not
+  route indirect chains through full external cards across all panels and do not duplicate a semantic edge.
+- [ ] Arrange the three measured phase panels as readable desktop small multiples at 100% (for example W5/W6 compact
+  and W7 wider according to content). Cards keep existing size; no global auto-fit, tiny compound thumbnail or
+  multi-screen detour.
+- [ ] W program/phase headers remain subtle containment labels. Inspector starts closed. No panel/card/label overlap,
+  route crossing or route-through-card is acceptable in the coordinator screenshot.
+
+### Flat affected context
+
+- [ ] Project Structure affected-only has no semantic edges in the fixture, so use ELK box/rectangle packing for that
+  flat layer instead of a 2190px single column. Keep the `+N` summary and 100% cards. This flat layout is independent
+  from compound cross-hierarchy configuration and must not re-enable semantic context.
+
+### Handoff
+
+Preserve succession, dependency, primary-only, semantic-only and mobile behavior already inspected centrally. Generate
+fresh 1440×900, 1280×800 and 390×844 screenshots for W and affected-only plus unchanged-reference screenshots for the
+other views. Do not run any test command/workflow. Refresh Git-private scope to revision 15 after reading this section
+and the matching Validation gate. This is one further render-only coordinator correction; product/legacy files remain
+untouched.

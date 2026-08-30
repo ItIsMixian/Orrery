@@ -54,3 +54,21 @@ Before the coordinator may notify the maintainer, browser inspection—not a tes
 - exact task-description acknowledgment and Git-private scope revision 14 precede corrections.
 
 This is a visual readiness gate only. It does not mark GX2, W7.3 or any product/release validation PASS.
+
+## 2026-08-30 W phase small-multiple readiness gate
+
+Central Browser review additionally requires:
+
+- W view presents W5/W6/W7 as three readable phase panels inside one W workspace at 100%; no giant nested compound or
+  automatic fit;
+- each panel contains only its W full cards plus typed boundary stubs, uses ELK for its local layout and preserves exact
+  relation/endpoint inspector identity;
+- indirect external chains do not become page-spanning routes; only real direct cross-phase W edges may connect panels;
+- no visible panel/card/label overlap, route crossing, route-through-card or multi-screen detour;
+- inspector starts closed and phase/card typography matches the accepted Orrery trial styling;
+- Project Structure affected-only uses bounded flat packing with `+N`, while semantic context remains off and unchanged;
+- succession, dependency, primary-only, semantic-only and mobile views do not regress;
+- no test command/workflow or product/vendor/package/default write occurs;
+- exact task-description acknowledgment and Git-private scope revision 15 precede the correction.
+
+The coordinator, not W7.3, decides whether the resulting view is ready to show the maintainer.

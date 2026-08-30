@@ -22,10 +22,10 @@ Updated: 2026-08-30
 - W7.3 revisions 7–10 的全局 rank、hard/soft program grouping、手写 packing/routing/label 页面均已被拒绝。
   ADR-0022 选择 ELK layout-only；ADR-0023 又保留手写 geometry 为 frozen/manual/visibly-labelled legacy 后手，
   禁止自动回退。Orrery 继续拥有事实选择与现有 SVG/frontend。
-- ADR-0018 authority-first 继续生效：GX2 首版自身判定失败（W compound 1 crossing/2 长线、修正配置 crash，
-  40%/30% 自动 fit）。维护者要求中央持续监督；scope revision 14 只允许至多两次 render-only correction，
-  所有 tab 默认 100%、W 外部端点改 boundary stub、Project Structure 分开 context/affected。维护者确认前禁止
-  任意测试流程和 product/vendor/package/default 写入。自动 receipt／first-write enforcement 尚未实现。
+- ADR-0018 authority-first 继续生效：central Browser 已接受 flat succession/dependency、Project Structure
+  primary/semantic-only 方向，但 1821×1383 W nested compound 仍跨多滚动区。scope revision 15 改为 W5/W6/W7
+  phase small multiples（各自 ELK + external boundary stubs）与 edge-free affected flat packing。维护者确认前
+  继续禁止任意测试流程和 product/vendor/package/default 写入。自动 receipt／first-write enforcement 尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
@@ -40,9 +40,9 @@ Updated: 2026-08-30
 ## 当前可继续的线路
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
-2. **GX2 ELK layout evaluation：** 当前唯一获准动作；中央先审首版并拒绝。revision 14 修复 W compound
-   100% 可读性、boundary stubs、context/affected 独立与默认 closed inspector；每轮只生成页面/截图并交中央，
-   不运行测试，达到可读后才通知维护者。
+2. **GX2 ELK layout evaluation：** 当前唯一获准动作；revision 15 不再调 giant compound 选项，改做三个
+   phase small multiples 和 flat affected packing，同时保持已通过方向不回退。只生成页面/截图交中央，不运行
+   测试，达到可读后才通知维护者。
 3. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
 4. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
 5. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
