@@ -1,5 +1,11 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Graph UX Acceptance Rejected
+
+- 维护者在真实 W7.3 Candidate 页面复验后拒绝 Graph UX：实现把 series 关系放到画布外卡片，把 comparison 建议铺成图下大面积卡片墙；这没有满足“在图中体现关系”。旧中央页面的冲突线路也继续重叠，不能以 Candidate 另有空冲突态掩盖路由缺陷。
+- `5fee848` 的 Core capture/schema、human confirmation、relation inbox 与权限证据保留；最终 Graph UX 不接受、不中央集成。新增 dated Plan amendment/Pending Validation，要求 graph-native series connector、依赖 proposal 线、default-collapsed comparison overlay/drawer 和多冲突 separated tracks。
+- 继续原 W7.3 task／branch，不创建 W7.4；实现必须使用现有 Orrery dense engineering visual system，并在 1440/1280/390px Browser 中证明无图外替代卡片、无线路重叠、无横向溢出和无 console warning/error。
+
 ## 2026-08-30 — A4/U2.3 Central Integration & ADR-0019 Allocation
 
 - 唯一整合者在本地 integration worktree 合入 U2.3 `4981d8b`（包含 A4 `3d298a5c`），保留 authority-first 为 ADR-0018，并把 A4 portable operating rules 原 Candidate 编号机械规范化为 ADR-0019；文件、标题、State/Design/Plan/index 与 inventory source links 同步，decision status/semantics 不变。

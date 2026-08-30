@@ -1,6 +1,6 @@
 # 实施计划：W7.3 Workstream Relation Capture & Confirmation
 
-Status: Active; paused for authority amendment acknowledgment
+Status: Reopened for maintainer-required Graph UX correction; prior Candidate not accepted visually
 
 Date: 2026-08-29
 
@@ -110,3 +110,66 @@ derived/read-only and are no longer presented as confirmed conflicts.
 Expected affected surfaces include relation capture Core/schema, registration/CLI/Harness, relation inbox,
 presentation projection and their focused tests. If implementation requires a new relation kind or changes
 confirmation authority, W7.3 must stop for a new ADR rather than expanding this Plan.
+
+## 2026-08-30 Maintainer Scope Amendment — Graph-native Relations, No Detached Substitutes
+
+The prior W7.3 Candidate is rejected for Graph UX acceptance. It placed explicit task series in a detached card strip
+and comparison suggestions in a large card ledger below the canvas. Those surfaces describe relationships outside the
+graph while leaving the actual topology visually disconnected. Passing contract tests does not satisfy the requested
+product behavior.
+
+### Design brief
+
+- **Purpose:** let a maintainer understand task lineage, explicit series progression, dependencies and confirmed
+  conflicts from the topology itself.
+- **Tone:** dense engineering/analyst workspace; graph-first, calm and legible.
+- **Memorable interaction:** every visible relationship is a selectable connector inside the canvas, with its type and
+  confidence readable from route style and inspector evidence.
+- **Constraint:** existing read-only authority, Chinese UI, current Orrery visual tokens, keyboard/ARIA and mobile
+  same-fact behavior remain. No ImageGen or decorative redesign.
+
+### Graph-native series and relationship presentation
+
+- [ ] Remove the standalone “任务系列” card strip. Explicit `series_id`／`series_order` metadata must create an actual
+  graph-native series lane/group and ordered connector between adjacent tasks.
+- [ ] A3→A4, CI6→CI7 and U1→U2→U2.2 must be visibly connected in the canvas without requiring the user to read a
+  separate list. The connector is labelled/inspectable as “同系列演进（展示关系）”.
+- [ ] A series connector is presentation-only: it cannot satisfy `derived_from`, confirm `depends_on`, block a gate,
+  close a task or create an effective relation event. Its style must be distinct from succession, dependency and
+  conflict edges.
+- [ ] In the dependency lens, explicit predecessor proposals remain amber dashed directional edges with
+  “等待人工确认”; A3→A4 and CI6→CI7 must appear in the same canvas. In other lenses, a subdued series connector keeps
+  the structural relationship visible without changing semantic edge counts.
+- [ ] Series lane headers may appear inside the canvas margin/swimlane, but no detached top card grid may substitute
+  for nodes and connectors.
+
+### Comparison and conflict information architecture
+
+- [ ] Remove the always-expanded “需要比较／证据待刷新” card grid below the graph. Comparison suggestions become a
+  compact default-collapsed inspector/drawer or an explicit default-off graph overlay.
+- [ ] If comparison overlay is enabled, suggestions use thin neutral/amber dotted connectors, never red, and each
+  connector selects a bounded evidence explanation. They remain non-authoritative and non-blocking.
+- [ ] Conflict lens draws only confirmed conflict facts. Zero confirmed conflicts displays a clear empty canvas state
+  and zero red relationship paths; comparison suggestions remain collapsed outside the conflict topology.
+- [ ] With multiple confirmed conflicts, unrelated edges cannot share long coincident horizontal/vertical spines.
+  Assign deterministic per-edge tracks, separate fan-out near endpoints, avoid node interiors and minimize crossings;
+  crossings that remain must be visually distinguishable rather than rendered as one merged line.
+- [ ] Remove or collapse any full-width technical/card ledger that pushes the graph below the fold. The first desktop
+  viewport prioritizes controls plus usable topology.
+
+### Acceptance
+
+- [ ] Real self-host desktop screenshots show A3→A4 and CI6→CI7 inside the graph in succession-context and dependency
+  views; no standalone series strip and no expanded comparison-card wall exist.
+- [ ] Conflict lens with current self-host data has zero red edges and a visible “当前没有已确认的任务冲突” canvas
+  state. A synthetic 4+ conflict fixture proves distinct tracks with no coincident unrelated path segments or
+  node intersections.
+- [ ] Geometry assertions cover node overlap, edge-through-node, coincident path segments, arrow/label visibility and
+  stable routing after filter/reset/fit.
+- [ ] 1440×900, 1280×800 and 390×844 Browser acceptance verifies topology, inspector/overlay, keyboard focus,
+  reduced-motion, zero document overflow and zero console warning/error.
+- [ ] Continue the existing W7.3 branch/task and GPT-5.6 Sol medium implementation profile. Do not create W7.4, do not
+  integrate CI7/REL3, and do not modify root PROGRESS/HANDOFF outside central integration.
+
+This amendment changes presentation and explicit-series projection only. If implementation needs a new authoritative
+relation kind or changes human confirmation authority, stop for a new ADR.

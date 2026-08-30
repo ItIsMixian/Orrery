@@ -23,7 +23,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - U2.3 local integrated Candidate 的 Personal active-task projection 只读取共享 Git worktree registry、Git-common-private bounded session JSON 和 Maintenance cache；公开 HTML/JSON 隐藏本机完整路径与原始 finding，缺失／损坏／cache stale 的已登记任务保持身份可见并标为待刷新。Git-private 数据仍不进入作者文档、发布包或远程同步。
 - W7.1 integrated Candidate 只为 relation 已引用且 live endpoint 缺失的 Workstream 读取有界 Git-common-private retired-session archive，恢复 closed/offline/current/superseded 轴；archive 不进入 active tip、apply/undo、Review Ready 或执行面。
 - W1–W7 协作源码已经进入 main：Git-private Workstream session、Scope/finding、review/integration/cleanup、Personal／Team projection、workspace maintenance、LAN discovery／manual Host switch、stacked lineage、relation event/graph、apply/undo/recovery contract 和只读 Graph consumer 均存在。
-- ADR-0017 已接受后续 relation capture 规则：只有 exact-base／同项目／ancestry 可验证的 `derived_from` 可由 Core 自动写为有效事实；`depends_on` 必须标注 implementation／validation／integration／release gate，并由任务 owner 或 human integrator 确认；`absorbs` 只能由 human integrator 确认。Personal owner 默认是唯一 integrator，Team owner 可显式增加其他 human integrator。W7.3 尚未实现这些写入、角色与确认入口。
+- ADR-0017 已接受 relation capture 规则。W7.3 Worktree Candidate `5fee848` 已实现写入、角色与确认入口，但尚未进入本地 integration／Canonical；维护者保留 Core/capture 证据并拒绝 detached-series/comparison Graph UX，修正版未完成前不得集成。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
 - 非权威研究控制面位于 `experiments/context-routing/`；大型原始运行根为 `D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库或发布包。
@@ -76,7 +76,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 默认 docsite／Skill template 尚未启用 Unified Observatory 或 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。
 - 没有真实双机 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。
 - W7 relation store 没有 self-host native apply 记录；旧 session 到 post-main closure 的兼容收口仍需保守人工流程。
-- W7.3 relation capture 尚未实现：当前没有 exact-base `derived_from` 自动写入、gate-aware `depends_on` proposal／confirmation、integrator registry／`absorbs` 确认或 Observatory relation inbox；现有 Graph 只能显示已有证据，因此仍可能稀疏。
+- 当前本地 integration 尚无 W7.3 relation capture 产品能力。Worktree Candidate 的 Graph UX 需要 graph-native series/dependency connectors、折叠 comparison 和 separated conflict routing 后重新验收。
 - ADR-0018 的自动 dispatch receipt、scope revision CAS、Adapter acknowledgment evidence 和 first-write enforcement 尚未实现。
 - S0 Skill 仅在当前本机安装、未发布，也没有任务状态聚合、scheduler、relation confirmation 或执行权限。
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。

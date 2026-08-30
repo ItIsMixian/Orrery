@@ -14,8 +14,8 @@ Updated: 2026-08-30
 - 后续本机维护已归档并移除六个 `closed/superseded` worktree，只删除工作目录并保留 branch／commit；当前七个 registered worktree 中包含一个并发创建、未触碰的 `github-front-door-redesign`。
 - 维护者已接受 ADR-0016／Unified Observatory Design：目标是一个可见 launcher、URL 与导航壳，内部 helper 可受管独立运行；现有 docsite 阅读、搜索、AI、作者信息架构和可识别视觉体验必须继承，U1 prototype 不是最终 UI。
 - `codex/u1-u2-integration-baseline` 已按 W7.2.3 `30d44ff` → U2.2 `70e6ac9` 合流，联合 feature merge `0eaad30` 是供维护者复验的本地 integrated Candidate。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未虚报通过。它尚不等于 `origin/main`、默认切换或公开发布。
-- ADR-0017 与 Approved Relation Capture Design 已接受：mechanical `derived_from` 可自动写入，`depends_on` 必须按 implementation／validation／integration／release gate 由相应人类角色确认，`absorbs` 只由 human integrator 确认。W7.3 尚未实现，不能把这些规则写成当前产品能力。
-- ADR-0018 与 Approved Authority-first Dispatch Design 已接受：Workstream 创建或实质范围追加前，中央先提交 ADR／Design／Plan amendment／Pending Validation；任务消息只引用 exact authority SHA 与 paths。U2.3／W7.3 已在安全边界暂停，待读取本提交并登记 scope revision 后恢复。自动 receipt 与 first-write enforcement 尚未实现。
+- ADR-0017 与 Approved Relation Capture Design 已接受。W7.3 Worktree Candidate `5fee848` 已实现 mechanical lineage、gate confirmation、integrator/absorbs 与 inbox，但尚未进入本地 integration；维护者已拒绝其 Graph UX，因此这些能力仍不能写成当前中央产品或发布能力。
+- ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成，W7.3 已确认旧 scope revision；新的 Graph UX amendment 必须再次确认任务说明版本后才能恢复产品写入。自动 receipt 与 first-write enforcement 尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
@@ -32,7 +32,7 @@ Updated: 2026-08-30
 7. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 8. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 9. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-10. **W7.3 relation capture：** 当前为在途 Workstream，已暂停等待 authority amendment acknowledgment；之后实现 exact-base `derived_from`、gate-aware dependency proposal／confirmation、human integrator、task-series metadata、status taxonomy、comparison/conflict 分离与 relation inbox。不得让 Agent／Harness／未来 Conductor 自行确认依赖或吸收关系。
+10. **W7.3 relation capture：** `5fee848` 的 Core/capture/authority evidence 保留，但维护者拒绝 Graph UX：独立系列卡片和图下 comparison card wall 不能替代图内关系，冲突线路不得重叠成共用脊柱。原 W7.3 任务按最新 Plan amendment 修正，未通过前不得中央集成。
 11. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 
 ## 不得外推的边界

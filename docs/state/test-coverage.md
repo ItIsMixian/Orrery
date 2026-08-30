@@ -29,6 +29,7 @@ Updated: 2026-08-30
 - S0 首轮 Fast dry-run 对未登记的新 Skill 路径失败关闭；任务说明 amendment 后只把 `skills/orrery-dispatch/**` 加入 generic `release-packaging` mapping。最终 dry-run 为 44 tests／0 unknown，正式 Fast 44/44 在 15 秒预算内通过；test IDs、budgets、stage authority 与 Promotion coverage 不变。
 - PO1 扩展 repository gate：当前树 numeric ADR 编号必须唯一，`0000` 模板／历史和 `docs/decisions/proposals/` 不参与正式编号分配。函数级 synthetic fixture 验证 unique/proposal/0000 通过、duplicate `0018` 拒绝；没有新增 unittest ID 或改变 CI tier inventory。
 - A4/U2.3 中央合流把 portable inventory 的 hash domain 固定为 LF canonical bytes，使 Windows CRLF/LF checkout 等价且额外内容仍判 tamper；A4/Adapter/wheel 15/15、Unified/Personal 25/25 通过。正式 routed Fast 84/84（9.470s/15s）与 Checkpoint 89/89（17.312s/90s）均 evidence-eligible；390×844 中央 Browser 为零横向溢出、help x=0/width=390、唯一功能 Ask Docs、0 console warning/error。
+- W7.3 `5fee848` 的 Core/capture/permission suites 与原 Browser evidence 可保留，但维护者真实页面验收拒绝 Graph 信息架构。后续 Validation 必须增加图内 series connector、comparison 默认折叠、zero-red empty conflict 和 synthetic multi-conflict no-coincident-track 几何断言；旧 PASS 不足以关闭 UI gate。
 
 ## 覆盖面
 
