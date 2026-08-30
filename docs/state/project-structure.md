@@ -9,11 +9,12 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 单一 Git 仓库根为 `D:\coding warehouse\project-orrery`；protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`，产品 source baseline 为 `9ee831f`。
 - 项目作者权威根为 `AGENTS.md` 与 `docs/`；`.project-orrery.json` 选择 `authority_status: integrated` 和 `authority_model_version: 1`。
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
-- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。U2.1 Worktree Candidate 在 exact U2/W7.1 integrated baseline 上声明 Core 0.1.17、CLI 0.1.21、Observatory 0.1.12；Core API 为 1，组件总状态为 `unreleased`。
+- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。W7.2 Worktree Candidate 在 exact U2.1 continuation baseline 上声明 Core 0.1.17、CLI 0.1.21、Observatory 0.1.13；Core API 为 1，组件总状态为 `unreleased`。
 - 薄平台层位于 `adapters/{codex,harness-json,claude-code,deepseek-harness}/`，当前 source 版本均为 0.1.1、`experimental`／`unreleased`。Adapter 不拥有 canonical 作者模板、State、ADR 或 Authority 规则。
 - 自托管观测台位于根 `scripts/docsite/`。integrated Candidate 新增 `Start Orrery.vbs`／`start-orrery.bat --console`、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 仍为 root-only/default-off consumer，没有进入默认发布模板或 v0.2.0 managed tools。
 - ADR-0016 的生产 Unified Shell 已在 integrated Candidate 实现：一个用户可见 listener／URL／导航壳，Broker／Coordinator 等内部 capability 由 supervisor 隐藏管理；当前没有公开默认切换，`start-docsite.bat` 保持 whole-shell rollback。
 - U2.1 Worktree Candidate 修复维护者拒绝的集成体验：只保留一个中文 app 导航并保留作者文档树；全页共享显式关闭服务入口；旧 Maintenance last-run 仅作历史警告；完整、valid、hash-bound 的 W7.1 legacy/archive graph 不再被 native root 缺失误挡。它没有创建 relation root、赋予 archive 执行权或放宽 Quick Remove 当前资格。
+- W7.2 Worktree Candidate 只重构 Observatory Graph presentation：从左到右的确定性 rank、固定可读节点、非穿卡正交边、按链历史 cluster、三 lens 真实端点、overlay inspector 与移动 relation ledger。Core relation schema／facts、W7.1 archive 证据与执行边界未改。
 - W7.1 integrated Candidate 只为 relation 已引用且 live endpoint 缺失的 Workstream 读取有界 Git-common-private retired-session archive，恢复 closed/offline/current/superseded 轴；archive 不进入 active tip、apply/undo、Review Ready 或执行面。
 - W1–W7 协作源码已经进入 main：Git-private Workstream session、Scope/finding、review/integration/cleanup、Personal／Team projection、workspace maintenance、LAN discovery／manual Host switch、stacked lineage、relation event/graph、apply/undo/recovery contract 和只读 Graph consumer 均存在。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
@@ -53,6 +54,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 UX Acceptance Fixes Validation](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
+- [W7.2 Graph Readability](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [W7D Validation](../validation/2026-08-28-w7d-w7-integration-candidate.md)
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 

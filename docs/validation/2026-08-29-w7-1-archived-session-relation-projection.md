@@ -2,6 +2,11 @@
 
 Date: 2026-08-29
 
+UX acceptance note: W7.1's archive resolver, evidence hashes, closed-axis restoration and zero-authority findings remain
+valid. The maintainer later rejected the integrated graph's readability and progressive-disclosure implementation;
+[W7.2](2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md) supersedes only that Observatory
+presentation acceptance, not W7.1's Core facts or safety evidence.
+
 Status: implementation and bounded validation complete; central test-shard reconciliation and exact Candidate
 promotion remain outside this branch
 

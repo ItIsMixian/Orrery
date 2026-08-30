@@ -681,3 +681,10 @@
 - Observatory 0.1.12 只保留一组中文 app 导航与作者文档树，集中主视图词汇，新增全页 `关闭 Orrery 服务`；Team discovery 解释 fingerprint／untrusted／目标 Host 确认边界并标注 loopback self。Personal 改用待确认任务／历史状态与工作区清理建议；Quick Remove 对 0／有 eligible 两种状态均可发现且仍需 fresh preflight＋本机确认。
 - Workstream provider gate 接受完整、只读、validation-valid、hash-bound 的 native 或 legacy/archive evidence，native root 只作来源事实；空 evidence 保持 Unavailable，archive 无执行权。动态 endpoint 复用启动缓存；真实 self-host 恢复 W7.1 引用节点／边与 closed 轴，不创建 relation root。
 - fixture／内存／loopback 回归与真实 in-app Chromium 覆盖 1280x800、390x844 的 Overview／Personal／Team／Workstreams／Maintenance；无页面级横向溢出和 console error。未读取 Provider key、未访问外网、未真实 join Team、未执行删除。正式 CI6 Fast／Checkpoint 与 clean Candidate SHA 记录在 U2.1 Validation；本分支不修改根 PROGRESS/HANDOFF、不 push main、不发布。
+
+## 2026-08-29 — W7.2 Workstream Graph Readability & Progressive Disclosure Candidate
+
+- 维护者拒绝 integrated Graph 的卡片比例、长 ID、箭头层级和伪展开体验；U2.1 worktree 从 clean `02efa41` 以 `--ff-only` 接续唯一中央 baseline `ad9f094`，并在首次 W7.2 作者写入前登记 Git-private Workstream。根 PROGRESS/HANDOFF 未修改。
+- Observatory 0.1.13 将 Graph 改为固定 248×104px 卡片、单一从左到右 rank lane、正交高对比箭头与不透明关系标签；每条链拥有自己的更早历史 cluster，Reset 恢复默认折叠／100%／关闭 inspector。桌面 inspector 为 overlay，390px 用同一事实集合的任务关系列表，桌面重复 ledger 只保留 screen-reader 语义。
+- succession／dependency／conflict 三 lens 不再共享 active-tip 填充：dependency 无 edge 时为 0 节点中文空态，单边 fixture 为 2 端点＋1 箭头；conflict 只显示真实 pair 端点。Core relation schema／facts、W7.1 archive hash/source evidence 与零执行权均未改。
+- focused Graph＋Unified 18/18、JS syntax、真实 self-host 1280×800／1440×900／390×844 交互与 frontend visual checks 通过；无页面横向溢出或 console warning/error。CI6 Fast／Checkpoint 与 exact clean Candidate 记录在 W7.2 Validation；不运行完整 Promotion、不 push main、不发布。
