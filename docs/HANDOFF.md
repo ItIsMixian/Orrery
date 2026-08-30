@@ -7,13 +7,13 @@ Updated: 2026-08-29
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
 - CI5 exact `9ee831f` 的 Fast 与 Promotion 已完成：Promotion run `33235992711` 为 25/25 jobs PASS，双平台 required checks 均通过，Windows／Ubuntu 各聚合 390 tests／27 logical shards；同一 SHA 已进入 main。
-- 当前未发布组件为 Core 0.1.14、CLI 0.1.18、Observatory 0.1.9；四个 Adapter 均为 0.1.1 source，支持状态仍为 `experimental`／`unreleased`。
+- 当前本地 integrated Candidate 的未发布组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.12；四个 Adapter 均为 0.1.1 source，支持状态仍为 `experimental`／`unreleased`。
 - W1–W7、Personal／Team Observatory、workspace maintenance、LAN discovery／manual Host switch、relation execution 和只读 Graph 已进入 Canonical source。默认 docsite、公开模板、release manifest 和 v0.2.0 用户能力没有因此切换。
 - R3 已把当前展示面收口为 Orrery；`project-orrery` 继续作为稳定 Skill／package／CLI／schema／协议及历史资产标识。R4/R5 未启动。
 - SC1 已把权威入口、State、Plan 状态和 CI5 hosted evidence 对齐；Fast `33256438925`、Promotion `33256558285` 与 main Fast `33256757429` 均通过。该 source commit 没有执行物理 cleanup，Git-private session 状态也不升级为作者事实。
 - 后续本机维护已归档并移除六个 `closed/superseded` worktree，只删除工作目录并保留 branch／commit；当前七个 registered worktree 中包含一个并发创建、未触碰的 `github-front-door-redesign`。
 - 维护者已接受 ADR-0016／Unified Observatory Design：目标是一个可见 launcher、URL 与导航壳，内部 helper 可受管独立运行；现有 docsite 阅读、搜索、AI、作者信息架构和可识别视觉体验必须继承，U1 prototype 不是最终 UI。
-- `codex/u1-u2-integration-baseline` 已组合 W6.1／CI6、A3、U1、U2 与 W7.1，当前组件为 Core 0.1.16、CLI 0.1.20、Observatory 0.1.11；它是供维护者体验的本地 integrated Candidate，尚不等于 `origin/main`、默认切换或公开发布。
+- `codex/u1-u2-integration-baseline` 已吸收 U2.1 source `02efa41`，当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.12；它是供维护者复验的本地 integrated Candidate，尚不等于 `origin/main`、默认切换或公开发布。
 
 ## 当前可继续的线路
 
@@ -23,7 +23,7 @@ Updated: 2026-08-29
 4. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
 5. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 6. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
-7. **Unified Observatory Candidate：** U2 root-only 单一可见入口、supervisor 与 consumer registry 已实现并整合；下一步先由维护者体验，不切换 public template／managed tools／Release。
+7. **Unified Observatory Candidate：** U2.1 已关闭首次体验反馈；下一步启动修正后的本地实例供维护者复验，不切换 public template／managed tools／Release。完整英文模式仍未实现，当前统一为中文主界面并把机器字段收进技术详情。
 
 ## 不得外推的边界
 
