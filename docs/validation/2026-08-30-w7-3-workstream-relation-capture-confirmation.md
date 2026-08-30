@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — Core/capture Candidate retained; Graph UX rejected pending maintainer re-acceptance
+Status: PENDING — Core/capture Candidate retained; `05c83b` Graph UX rejected pending readable re-layout and maintainer re-acceptance
 
 Authority sources:
 
@@ -38,3 +38,33 @@ reproducible evidence are recorded.
 
 The previous `5fee848...` Candidate remains evidence for Core capture, authority and inbox behavior. It is not accepted
 as the final Graph UX and must not be integrated unchanged.
+
+## 2026-08-30 readable topology re-layout acceptance contract
+
+The second Graph correction `05c83b75723a9e6681c0885dd090606060cb696e` is also visually rejected. Presence of
+graph-native connectors does not pass when the default page is 55%, routes share a vertical bus, labels cover lines,
+or a docked inspector removes the usable canvas.
+
+Required new evidence:
+
+- exact acknowledgment of the new central task-description version and Git-private Scope revision 4 before resumed
+  product writes;
+- `git show` inspection of GX1 exact `f5fd5afa3f9b133166495119080629a5be5f67b2`, with explicit proof that no
+  third-party runtime or generated SVG/HTML entered the product;
+- aligned in-canvas A, CI and Unified series lanes, bounded default-collapsed history and initial/reset 100% readable
+  scale;
+- closed-by-default non-layout-shifting inspector plus selected-edge focus/dimming behavior;
+- per-lens visible-edge separation and comparison default-off;
+- zero node intersections and unmarked crossings, no unrelated collinear overlap >8px outside endpoint fan-out,
+  ≤2 bends/edge, route stretch ≤1.35, segment ≥16px, node gap ≥40px and label clearance ≥4px for current self-host and
+  synthetic 4+ conflict fixtures;
+- short offset Chinese labels, route/marker semantic-color agreement, and zero route collision with lane headings,
+  legends or controls;
+- 1440×900, 1280×800 and dedicated 390×844 topology Browser evidence for load/reset/filter/fit/select/inspector/
+  history interactions, including scale, DOM geometry, overflow, ARIA/focus and console outputs;
+- focused Graph tests during iteration, then one final routed Fast/Checkpoint after visual stabilization;
+- a final real self-host screenshot explicitly presented for maintainer acceptance. Automated tests cannot mark this
+  Validation complete without that acceptance.
+
+The previous Core/capture/inbox evidence remains reusable. Re-layout work must not reopen confirmation authority,
+append-only history, Team privacy, release or public/default decisions.

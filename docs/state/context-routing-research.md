@@ -1,6 +1,6 @@
 # 上下文路由研究 State
 
-Updated: 2026-08-22
+Updated: 2026-08-30
 Authority: research state; no routing candidate is accepted product policy
 
 ## 当前事实
@@ -59,6 +59,9 @@ Authority: research state; no routing candidate is accepted product policy
 - 已完成 `Ariestar/sivtr` 固定提交 `4fae091` 的外部源码观察：其类型化 WorkRecord／WorkRef、WorkSet
   anchors、渐进检索与只读 MCP 适合作为“情境证据层”参考，但不具备 Orrery 的权威事实职责。研究没有
   采纳依赖、Adapter、路由策略或新 Pilot；隐私生命周期、公开检索快照缺失和文档漂移仍是明确边界。
+- GX1 在隔离 Candidate `f5fd5afa3f9b133166495119080629a5be5f67b2` 对固定
+  `fireworks-tech-graph` Skill 做了两套本地关系图评测，结果为 8/12。其 lane／port／corridor／geometry
+  技术可辅助 W7.3，静态 runtime、生成 SVG/HTML、移动缩放和关系语义均不采纳为产品或 Authority。
 
 ## 当前产品影响
 

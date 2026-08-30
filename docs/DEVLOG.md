@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-30 — W7.3 Readable Topology Re-layout Authorized
+
+- 维护者在真实 `05c83b` 页面再次拒绝 W7.3 Graph：默认缩放为 55%，多条关系合并成共享竖直总线，标签压在
+  线路上，series/lane 阅读顺序不清，常驻技术 inspector 又挤掉大块画布；graph-native 元素存在不等于可读。
+- GX1 `f5fd5af` 的 8/12 结果被接受为 assist/selective reimplementation：只借用 lane、port/corridor、
+  crossing/bridge、spacing 与 route metric 技术，不导入第三方 runtime／生成 SVG/HTML 或关系事实。
+- 中央先向原 W7.3 任务发送 stop，再新增 dated Plan/Pending Validation。新门要求 100% readable reset、
+  每关系独立轨道、按 lens 降噪、closed-by-default non-layout-shifting inspector、专用 390px topology、硬几何
+  指标与真实截图人工接受；继续原 W7.3／GPT-5.6 Sol medium，不创建 W7.4，不触碰 CI7/REL3/release。
+
 ## 2026-08-30 — GX1 External Graph Skill Evaluation Authorized
 
 - 维护者授权独立分支评测 GitHub `fireworks-tech-graph`，先验证其对 Orrery graph-native series/dependency 与 4+ 冲突 routing 的理解和几何质量，再决定替代、辅助、选择性合并或拒绝；不直接覆盖 W7.3。

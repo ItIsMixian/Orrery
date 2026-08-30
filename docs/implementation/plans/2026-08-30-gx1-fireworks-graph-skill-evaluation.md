@@ -1,6 +1,6 @@
 # GX1 Fireworks Tech Graph Evaluation
 
-Status: Planned; authority scope frozen before experiment
+Status: Completed on isolated Candidate `f5fd5afa3f9b133166495119080629a5be5f67b2`; accepted as W7.3 assistance/selective technique only
 
 Date: 2026-08-30
 
@@ -80,3 +80,12 @@ Decision outcomes:
 - Browser-check desktop and mobile outputs with zero overflow/console error;
 - stop after two focused correction rounds if the best objective geometry score does not improve;
 - report actual result without modifying or resuming W7.3. A later maintainer decision controls any W7.3 amendment.
+
+## Result accepted by maintainer
+
+- Exact GX1 Candidate: `codex/gx1-fireworks-graph-skill-evaluation@f5fd5afa3f9b133166495119080629a5be5f67b2`.
+- Score: 8/12, no semantic-safety zero.
+- Decision: assist W7.3 and selectively reimplement lane/port/corridor/geometry techniques; do not replace Orrery's
+  runtime graph and do not import the third-party Skill/SVG/HTML as a product dependency.
+- The maintainer subsequently requested a new W7.3 readable-topology amendment. That amendment, not the GX1
+  experiment transcript or generated output, is the product authority.

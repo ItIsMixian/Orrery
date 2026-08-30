@@ -14,8 +14,11 @@ Updated: 2026-08-30
 - 后续本机维护已归档并移除六个 `closed/superseded` worktree，只删除工作目录并保留 branch／commit；当前七个 registered worktree 中包含一个并发创建、未触碰的 `github-front-door-redesign`。
 - 维护者已接受 ADR-0016／Unified Observatory Design：目标是一个可见 launcher、URL 与导航壳，内部 helper 可受管独立运行；现有 docsite 阅读、搜索、AI、作者信息架构和可识别视觉体验必须继承，U1 prototype 不是最终 UI。
 - `codex/u1-u2-integration-baseline` 已按 W7.2.3 `30d44ff` → U2.2 `70e6ac9` 合流，联合 feature merge `0eaad30` 是供维护者复验的本地 integrated Candidate。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未虚报通过。它尚不等于 `origin/main`、默认切换或公开发布。
-- ADR-0017 与 Approved Relation Capture Design 已接受。W7.3 Worktree Candidate `5fee848` 已实现 mechanical lineage、gate confirmation、integrator/absorbs 与 inbox，但尚未进入本地 integration；维护者已拒绝其 Graph UX，因此这些能力仍不能写成当前中央产品或发布能力。
-- ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成，W7.3 已确认旧 scope revision；新的 Graph UX amendment 必须再次确认任务说明版本后才能恢复产品写入。自动 receipt 与 first-write enforcement 尚未实现。
+- ADR-0017 与 Approved Relation Capture Design 已接受。W7.3 Core/capture/confirmation/inbox evidence 可保留；
+  第二版 Graph `05c83b` 仍因默认 55%、共享总线、标签重叠和 inspector 挤压被拒绝，不能中央集成或写成发布能力。
+- ADR-0018 与 Approved Authority-first Dispatch Design 已接受：U2.3 已完成；W7.3 已收到立即停止要求，必须
+  确认新的 readable-topology 任务说明版本并刷新 scope revision 4 后才可恢复产品写入。自动 receipt／
+  first-write enforcement 尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
@@ -23,7 +26,7 @@ Updated: 2026-08-30
 
 ## 当前可继续的线路
 
-1. **GX1 external graph Skill evaluation：** 在独立 branch/worktree 用真实关系与多冲突 fixture 评测 `fireworks-tech-graph`；不得修改 W7.3。完成后由维护者选择 replace／assist／selective merge／reject。
+1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
 2. **S0 Orrery Dispatch Skill：** 两文件已在当前本机安装。后续只有独立 Release Plan 才能打包／发布它；不得把本机安装外推为其他用户可用，也不得扩成 S1 Conductor、自动 receipt 或首次写入阻断。
 3. **PO1 decision allocation：** Skill PO 规则、duplicate-number gate、本机安装与 A4→ADR-0019 均已完成。
 4. **Collaboration self-host：** 对真实 self-host 仓库运行 relation／maintenance 的只读 inspect 与 dry-run，补齐旧 Workstream lifecycle／closure 证据。任何 apply、undo、remove-worktree 或成员本机动作仍逐次本机确认。
@@ -33,7 +36,9 @@ Updated: 2026-08-30
 8. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 9. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 10. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-11. **W7.3 relation capture：** `5fee848` 的 Core/capture/authority evidence 保留，但维护者拒绝 Graph UX：独立系列卡片和图下 comparison card wall 不能替代图内关系，冲突线路不得重叠成共用脊柱。原 W7.3 任务按最新 Plan amendment 修正，未通过前不得中央集成。
+11. **W7.3 relation capture：** 当前分支 `05c83b` 的 Core/capture/authority evidence 保留，但第二版 Graph
+    仍不可读。原任务须按 readable-topology amendment 从节点布局重做，使用独立 corridor、按 lens 降噪、
+    closed-by-default inspector 与专用移动 topology；真实截图未获维护者接受前不得中央集成。
 12. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 
 ## 不得外推的边界

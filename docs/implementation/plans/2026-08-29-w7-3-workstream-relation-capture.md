@@ -173,3 +173,82 @@ product behavior.
 
 This amendment changes presentation and explicit-series projection only. If implementation needs a new authoritative
 relation kind or changes human confirmation authority, stop for a new ADR.
+
+## 2026-08-30 Maintainer Scope Amendment — Readable Topology Re-layout after `05c83b`
+
+The maintainer has rejected the second Graph implementation at exact W7.3 branch commit
+`05c83b75723a9e6681c0885dd090606060cb696e`. The page now contains graph-native connectors, but the topology is still
+not readable: the default view is reduced to 55%, unrelated relations form a shared vertical bus, labels sit on top
+of routes, lane boundaries do not create a comprehensible reading order, and the permanently docked evidence panel
+removes a large part of the usable canvas. Contract presence is not visual acceptance.
+
+The isolated GX1 evaluation at `f5fd5afa3f9b133166495119080629a5be5f67b2` is accepted only as an implementation
+aid. W7.3 must inspect these exact non-authoritative inputs with `git show`:
+
+- `experiments/workstream-graph-skill-evaluation/evaluation.md`;
+- `experiments/workstream-graph-skill-evaluation/fixture-a-relations.json`;
+- `experiments/workstream-graph-skill-evaluation/fixture-b-conflicts.json`;
+- `docs/validation/2026-08-30-gx1-fireworks-graph-skill-evaluation.md`.
+
+The useful techniques are explicit lanes, separate ports/corridors, bridge/crossing detection, label clearance,
+node spacing and route-stretch measurement. The third-party Skill/SVG/HTML is not a runtime dependency, relation
+authority, product component or responsive implementation.
+
+### Re-layout contract
+
+- [ ] Rebuild node placement before repairing arrows. At desktop width, A3→A4, CI6→CI7 and U1→U2→U2.2 each occupy
+  one aligned series row/lane with consistent node height and a clear left-to-right reading direction. A lane is a
+  subtle in-canvas group, not nested boxes that mix unrelated series.
+- [ ] Collapse historical chains by default into bounded in-canvas cluster nodes. Expanding one chain must re-layout
+  only the affected component; it cannot introduce a full-height shared relation spine or force all current nodes to
+  55% scale.
+- [ ] The initial desktop/reset view is readable at 100%. `适合窗口` is an explicit action, not the default. If the
+  topology cannot fit at readable size, reduce visible history or focus a component instead of shrinking text.
+- [ ] The evidence inspector is closed by default. Selecting a node/edge opens an overlay/drawer that does not
+  permanently recompute or compress the graph layout; Escape and the close control restore the same viewport.
+- [ ] Succession view renders succession + subdued series only; dependency view renders dependency proposals +
+  subdued series only; conflict view renders confirmed conflicts only. Comparison overlay remains default-off.
+- [ ] Selecting an edge highlights its two endpoints and route while unrelated edges fade. A user must not have to
+  follow every line simultaneously to understand one relation.
+
+### Routing and typography contract
+
+- [ ] Every visible relation owns a deterministic route and distinct endpoint ports. Unrelated edges may not share a
+  collinear segment longer than 8px outside a 16px endpoint fan-out zone; several edges cannot merge into one
+  vertical or horizontal bus.
+- [ ] Default/current and synthetic 4+ conflict fixtures meet the GX1 showcase geometry target: zero node
+  intersections, zero unmarked crossings/bridges, at most two bends per edge, route stretch ≤1.35, shortest segment
+  ≥16px, node gap ≥40px and unrelated edge-label clearance ≥4px. If a fixture cannot meet this, move/collapse nodes
+  before adding waypoints.
+- [ ] Relation labels use ordinary Chinese, at most three short words in the canvas, offset 6–8px from the line and
+  at least 10px from nodes. Full IDs, reason codes and evidence stay in the inspector. Labels cannot mask routes or
+  stack on the same coordinate.
+- [ ] Stroke and marker colors are one semantic pair: series is muted fine solid, succession is cyan solid,
+  dependency is amber dashed, comparison is neutral/amber dotted and confirmed conflict alone is red. Arrowheads
+  cannot use a different semantic color from their route.
+- [ ] Canvas lanes, titles, legend and controls are obstacles in geometry checks. Routes cannot run through lane
+  headings, node text or container borders.
+
+### Responsive and acceptance contract
+
+- [ ] At 390×844, render a dedicated top-to-bottom compact topology/focused chain with ≥12px primary text; do not
+  scale the entire desktop canvas to a miniature image. Inspector becomes a dismissible sheet and the page has zero
+  horizontal overflow.
+- [ ] Browser evidence covers 1440×900, 1280×800 and 390×844 at initial load, reset, filter, fit, select, inspector
+  open/close and history expand/collapse. Record visible scale, node/edge bounds, pairwise route overlap, crossings,
+  bends, label clearance, focus/ARIA, document overflow and console warnings/errors.
+- [ ] Use `fireworks-tech-graph` only as a local design/geometry oracle and perform visual inspection after automated
+  checks. At most two focused visual correction rounds may follow a stable implementation; tests alone cannot close
+  this gate.
+- [ ] The maintainer must accept a real self-host screenshot before W7.3 can return to completed/accepted state.
+  `05c83b` and earlier Graph screenshots remain rejected evidence.
+
+### Dispatch and safety
+
+- Continue the existing W7.3 task/branch from exact `05c83b75723a9e6681c0885dd090606060cb696e`; do not create
+  W7.4. Refresh Git-private scope to revision 4 after acknowledging the new task-description version.
+- Use GPT-5.6 Sol with medium reasoning for implementation. Run focused Graph tests while iterating; run routed Fast
+  and Checkpoint once after the visual layout stabilizes instead of repeatedly paying full checkpoint cost.
+- Preserve relation capture Core/schema/CLI/Harness, human confirmation authority, inbox behavior and append-only
+  history unless a focused regression proves a necessary compatibility fix. Do not integrate CI7/REL3, modify root
+  PROGRESS/HANDOFF from the feature branch, push main, publish or change public/default behavior.
