@@ -102,7 +102,8 @@ Updated: 2026-08-31
   PASS、zero rerun、evidence-eligible 完成。旧失败未重试、拆批或改写。
 - corrected final runtime 的 Codex/Unified/upgrade/migration/dependency/Skill lifecycle 已通过，但 final ZIP
   direct Harness validate 在 CLI JSON 前因 extracted `assets/project-template/` 未被 runtime context 解析而
-  non-green；invalid request 仍 exit 2。scope revision 8 修复后必须在新 SHA 重建 Candidate/package/runtime。
+  non-green；invalid request 仍 exit 2。scope revision 8 exact `e120aaa...` 修复后 Candidate 36/36、双根
+  package 与完整 final runtime 均 PASS；旧 `ba230555...` 结果未复用。
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
 - CI7 clean Candidate 与 fresh central Fast/Checkpoint 已完成；exact non-main Windows／Ubuntu Promotion 仍待 Final RC。本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。

@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Final runtime PARTIAL / Harness blocker; scope revision 8 Pending; Promotion/main/tag not started
+Status: Candidate/package/final runtime PASS on `e120aaa...`; Promotion/main/tag Pending; GitHub Release withheld
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -461,3 +461,39 @@ assets or source-checkout root tools. Direct CLI stderr ends with
 
 Scope revision 8 must fix only extracted release-root asset/runtime binding and add the exact final-archive Harness
 regression. Candidate/ZIP/runtime/Promotion evidence must be recreated on the new SHA; no prior PASS is reused.
+
+## 2026-08-31 scope revision 8 exact Candidate and final runtime — PASS
+
+Exact source is `e120aaae27f9f4e1b74c72c053dd2f6e72eed88b`. CI7 selected the changed release/runtime surfaces against
+`ba230555...`; one dry-run was allowed and the one Candidate lease
+`9d5506700b35d391c3a177daa90ab822ab7301e546893966a295f99b6b330a93c` completed 36/36 PASS in 4.059441s,
+zero reruns, evidence-eligible.
+
+Two independent exact-Git builds produced 162 entries and unchanged path-list SHA-256
+`26d6570585b3507880f83c652000bdcc857e7bac3ea59866f06ad40abdb0bf5c`; bytes matched pairwise:
+
+| Object | SHA-256 |
+| --- | --- |
+| ZIP | `25b3c38eb1bd5bb0f41c21502970f3ca59beb3ae0c9cdc1e3233f0fdc44ef50b` |
+| checksum file | `7c9f3cff88c38539e353f51b4cd83ca7d3f4d7e8aaedfe25a6865bf7524ed59c` |
+| deterministic receipt | `bfe993bdbbd9d6dbb33b96a61795ba9357a97e5c23991295d82d9d8c4d0ab7c9` |
+
+The external runtime root is
+`C:\Users\1\AppData\Local\Temp\orrery-final-runtime-rev8-e7e974f0eac84995a2e2bcdcf1a889fc`. Evidence:
+
+- offline scaffold/validator: exit 0, v0.3.0, Model 1, migration-pending, 120 managed tools;
+- bundled Harness validate: exit 0, `valid=true`, `integrated=false` warning; invalid arbitrary argv exits 2,
+  `launch=false`, Provider sentinel absent;
+- Codex CLI 0.151.0-alpha.7.2, GPT-5.6 Sol medium: unique repo candidate Skill, explicit integrated-gate negative
+  (`VALIDATE_EXIT=1`, not integrated) and implicit ordinary positive (`VALIDATE_EXIT=0`, migration pending);
+- Unified: two complete start→HTTP 200→console stop cycles on the same port, helper ownership released both times;
+- v0.2 upgrade: dry/apply exit 0, eight replaced tools backed up, custom `AGENTS.md` SHA unchanged, final 120 tools;
+- Authority Model migrate/apply and receipt-bound restore returned the exact original manifest SHA; author marker
+  remained present;
+- missing embedded packages fail closed with `ModuleNotFoundError` and nonzero exit;
+- repo Skill discovery 1→0→1; excluding contractually ignored `__pycache__`/bytecode, source/trash/reinstalled trees
+  are 162 files with canonical digest `4156242b4fa54771f4e2f24a8354867f138da09625eefd4074d4b7f66c1932a1`;
+  fixture Git status is clean and real user Skill `SKILL.md` retains its 2026-08-17 write time.
+
+The previous `ba230555...` Harness failure remains historical and is not reused. Exact `e120aaa...` is ready for the
+authorized non-main Promotion. No remote ref, main, tag, asset upload or GitHub Release operation has yet occurred.

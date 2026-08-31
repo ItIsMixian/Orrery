@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Scope Revision 8 Candidate and Final Runtime PASS
+
+- exact `e120aaa...` 的 CI7 Candidate 36/36 PASS、zero rerun；两根 162-entry ZIP/checksum/receipt byte-identical，
+  ZIP SHA-256 `25b3c38e...`。
+- final ZIP direct Harness validate exit 0、invalid argv exit 2；Codex 0.151/Sol medium unique discovery、explicit
+  negative、implicit positive；Unified restart、v0.2 upgrade/migrate/restore、missing dependency、Skill 1→0→1 均绿。
+- canonical Skill tree 162 files digest `4156242b...`，fixture clean，真实 user Skill 保持 2026-08-17 mtime。
+  exact SHA 现可进入 non-main Promotion；Release 仍 withheld。
+
 ## 2026-08-31 — Corrected Final Runtime Reaches Extracted-root Harness Blocker
 
 - exact `ba230555...` archive identity 保持 162 entries／ZIP `7a0cf3dd...`。Codex CLI 0.151.0-alpha.7.2 + Sol

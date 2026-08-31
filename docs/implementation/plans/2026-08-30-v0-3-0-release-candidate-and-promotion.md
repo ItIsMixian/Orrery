@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Scope revision 8 fixing final-archive Harness runtime blocker; Promotion/main/tag pending; GitHub Release withheld
+Status: Final Candidate/runtime PASS on `e120aaa...`; Promotion authorized and pending; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -536,6 +536,11 @@ After the fix, a new exact SHA requires one Candidate dry-run/run, two-root dete
 portfolio and the full corrected final runtime matrix once. Any non-green result stops without retry. The previous
 `ba230555...` evidence remains immutable history and cannot be promoted. Remote operations and GitHub Release remain
 blocked until the new exact SHA is green.
+
+Scope revision 8 completed on exact `e120aaae27f9f4e1b74c72c053dd2f6e72eed88b`. Candidate 36/36, two-root
+package identity, offline scaffold, direct final-bundle Harness, real Codex explicit/implicit invocation, Unified
+restart, v0.2 upgrade/migrate/restore, dependency failure and recoverable Skill lifecycle are green. The frozen SHA
+is now eligible for the already-authorized `promotion/v0.3.0-rc` push; no later evidence-only commit may replace it.
 
 ## Phase 1 — register Final RC and freeze inputs
 
