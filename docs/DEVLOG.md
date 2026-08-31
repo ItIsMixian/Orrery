@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Revision-10 Portfolio Expansion Rollback
+
+- policy-v4 后 unique Fast 20/20 PASS（0.880405s）；unique Checkpoint 29/30，唯一 failure 为新增 portfolio
+  未加入 hardcoded ID list。失败 receipt 保留并 validation-cost-blocked。
+- 一行 list 修复随后让 `tests/test_ci_validation.py` 触发全 ci-control：Fast 41/23.297s refused，Checkpoint
+  51/27.988s allowed；无 lease/test。该写入虽有 committed Plan 授权，但 Git-private expected-write 刷新晚于
+  首次写入，顺序偏差如实记录。
+- revision 10 撤回两条新 portfolio 和一行 list，恢复原 bytes；precise relation mappings 与 Brand tiering
+  保留。不是删除测试，只是不为两个 examples 扩大整个控制面。
+
 ## 2026-08-31 — Phase 0 Revision-9 Real-window Cost Correction Authorized
 
 - revision-8 已让全部产品路径可映射；真实 base dry-run 为 Fast 25/Checkpoint 31，唯一 Unknown 是新 Core

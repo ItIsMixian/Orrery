@@ -53,6 +53,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   前拒绝；IDs 已折叠，revision 8 只补 precise generic mapping。当前仍无 Final RC 或 release input。
 - revision-8 mapping 已消除 unmapped path；真实产品窗口仍因 Fast 25 和一个 Unknown owner timing 拒绝。
   revision 9 保留真实窗口，以一次 focused owner + Brand 2-fast/4-checkpoint 分层收敛成本，不改变 release 门。
+- revision-9 unique Fast 20/20 PASS；Checkpoint 因新增 portfolio 未同步 hardcoded list 而 29/30。修 list 后
+  Fast 又因 ci-control 41 项拒绝。revision 10 撤回新增 examples/list，等待新 fingerprint；Final RC 仍未注册。
 
 ## 兼容与安全边界
 

@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 revision-9 bounded owner check and Brand tier correction authorized; no RC task registered
+Status: Phase 0 revision-10 portfolio expansion rollback authorized after ci-control over-selection; no RC task registered
 
 Date: 2026-08-30
 
@@ -220,6 +220,31 @@ Revision 9 preserves the real `2aa1c61...` validation window and authorizes only
   and Checkpoint 30 with known timing. Budgets, stage meanings, final IDs, required checks and Promotion remain fixed.
 
 If either new dry-run still refuses, stop and record it; do not issue a formal lease or repeat the focused owner.
+
+### 2026-08-31 scope revision 10 — do not expand CI control to validate two data examples
+
+The first revision-9 formal Fast completed 20/20 PASS. Its paired Checkpoint ran once and failed only because
+`test_generic_router_selects_docs_authority_and_collaboration_portfolios` hardcodes the old portfolio ID sequence; the
+other 29 methods passed in the 5.072s test runtime. The failed fingerprint is blocked and will not be retried.
+
+The conditionally authorized one-line `tests/test_ci_validation.py` update fixed that assertion, but the next dry-run
+mapped the whole file to `ci-control`: Fast 41 / predicted 23.297s refused; Checkpoint 51 / 27.988s allowed. No lease or
+test ran on this new fingerprint. Adding two routing examples has therefore expanded validation more than the product
+change itself.
+
+Revision 10 authorizes rollback of only the two new portfolio objects and the one hardcoded-ID insertion so both files
+return exactly to their pre-revision-8 bytes. The precise generic source mappings and Brand tier split remain. Current
+mapping evidence will instead be:
+
+- existing registry completeness/mutation/actual-path gates;
+- real dry-run path explanations showing `workstream_relation_capture.py → collaboration-relation-capture` and
+  `relation_inbox.py → observatory-shell`;
+- absence of the slow Maintenance owner from selected IDs;
+- final Promotion inventory retaining every relation-capture test.
+
+No test or coverage item is deleted; only the two new data examples that caused broad `ci-control` selection are
+withdrawn. After the rollback commit, real-base Fast/Checkpoint dry-run must return to the bounded product window
+before any new policy receipt or formal lease is created.
 
 ## Phase 1 — register Final RC and freeze inputs
 

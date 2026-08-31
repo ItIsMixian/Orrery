@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS (CI7 feature Candidate); Phase 0 revision-9 tier correction and fresh routed evidence remain Pending
+Status: PASS (CI7 feature Candidate); Phase 0 revision-10 portfolio rollback and new-fingerprint evidence remain Pending
 
 Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
 `3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
@@ -135,3 +135,8 @@ Revision-8 real-window dry-run proves exact product paths are now mapped but Fas
 the new Core owner timing is Unknown. The 3/4 mapping-only short window is not accepted as product evidence. Revision 9
 uses one bounded non-evidence owner check and moves four existing Brand deep checks to Checkpoint while retaining two
 Fast sentinels; no coverage, IDs, budgets or Promotion tests are removed.
+
+Revision-9 formal Fast passed 20/20; Checkpoint failed only the hardcoded portfolio ID list, with 29 other methods
+green. Updating that list expanded the next Fast plan to 41 through `ci-control`, so revision 10 removes the two new
+examples and the list insertion while preserving the precise path mappings. This is a source correction and creates a
+new fingerprint; the failed lease remains blocked and is never retried.

@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — revision-9 bounded owner check and Brand tier correction required before formal leases
+Status: PENDING — revision-10 CI portfolio rollback required before a new fingerprint can receive formal leases
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -236,3 +236,20 @@ for the post-correction source.
 Revision 9 keeps the real window, permits one non-evidence exact Core focused run, restores that owner to Promotion-
 only and moves four existing low-frequency Brand tests from Fast to Checkpoint while retaining two Fast sentinels.
 Expected formal selections are 20/30 with no deleted test or raised budget. Formal run count remains zero.
+
+### Revision-9 formal/failed fingerprint and revision-10 rollback
+
+- The direct exact Core focused process completed, but its orchestration channel retained only the start line and not
+  the final exit code. CI7 no-repeat forbids rerunning merely to obtain prettier output; its result is `Unknown` and is
+  not evidence. Promotion still owns the registered exact test.
+- Policy v4 allowed the 20/30 real-window plan. Unique Fast completed 20/20 PASS in 0.880405s test runtime.
+- Unique Checkpoint ran 30 methods once; 29 passed and the generic portfolio test failed because its hardcoded ID list
+  lacked the two newly added fixture entries. Test runtime was 5.071729s. This receipt stays failed and blocked.
+- After the one-line list correction, dry-run fingerprint `f88ad63e...` selected `ci-control` as well: Fast 41 at
+  predicted 23.296930s refused; Checkpoint 51 at 27.988454s allowed. No formal lease/test ran for this fingerprint.
+- The one-line write occurred after its path was authorized in committed revision 8 but before the narrowed Git-
+  private revision-9 expected-write list was refreshed. Scope metadata was repaired immediately; the required
+  first-write ordering was not met and is not reported as compliant.
+
+Revision 10 is Pending until the two new fixture objects and one test-list line return byte-for-byte to their earlier
+form. The failed Checkpoint is not retried; any later formal pair must use a new fingerprint after dry-run.
