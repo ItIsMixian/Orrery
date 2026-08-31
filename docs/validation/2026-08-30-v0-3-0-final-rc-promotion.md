@@ -96,3 +96,14 @@ five mapping integrity/router/mutation tests; Promotion inventory and all other 
 unchanged. The Phase 0 formal task base will rebind to `e587e378aacd46c6c2bd092b29f1b2f41eb87cbe`, immediately before
 this mapping split, so formal stages validate the integration-owned routing correction rather than replaying accepted
 W7.3/CI7 child surfaces.
+
+The attempted lineage CAS updated the exact task base but returned non-green because the historical
+`U1-U2-integration-baseline` has no verifiable parent Workstream record; the current session therefore keeps
+`parent-unverified-unknown` rather than fabricating an effective `derived_from`. Exact Git selection remains bound to
+the recorded task base.
+
+Dry-run v4 selected 22 tests from `ci-mapping-registry + documentation`. Both stages used child-derived timing:
+12.066636s total p95 and 2.497992s single-test p95. Checkpoint prediction allowed; Fast refused at 22>20 and
+12.066636>10. No lease or test run occurred. The documentation records are committed before the formal task base.
+For the mapping-only diff, `machine_inventory_gives_every_test_owner_stage_cost_budget_and_reason` is redundant with
+the stale-registry/completeness gate and loses the mapping-specific dependency; four exact mapping tests remain.
