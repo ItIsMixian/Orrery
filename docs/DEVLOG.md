@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Candidate Dry-run Non-evidence Correctly Distinguished from Refusal
+
+- REL4 merge `0f82d565...` 的唯一 Candidate dry-run 选择 81 tests，exit 0、acceptance shadow-allow、timing
+  allow、runner errors 为空；它不是 refusal。
+- task commit `b9f9c82...` 把 `_dry_receipt()` 固定的 `successful=false/evidence_eligible=false` 和 Candidate
+  reuse refusal 误判为 fresh-run refusal。该提交保留为历史，不重写。
+- scope revision 4 只纠正分类并授权唯一 fresh Candidate；不改 router/mapping/test/product/budget，也不重新
+  dry-run。非绿即停，push/main/tag/assets/Release 仍未授权。
+
 ## 2026-08-31 — Final RC Release Inputs Centrally Integrated; Candidate Path Narrowed
 
 - 唯一整合者只选择 REL4 产品提交 `29d0a6f`、`d54ff95`、`56f4aca`，在任务说明 `17bb70b...` 后形成

@@ -349,3 +349,16 @@ Pending evidence is now exactly the scope-revision-3 path: merge central authori
 task without new product behavior; run one Candidate dry-run against base `17bb70b...`; only an allowed plan may
 receive one formal Candidate run, one two-root deterministic rebuild and one external offline new-project portfolio.
 Any refusal or non-green result stops without retry or substitute evidence.
+
+## 2026-08-31 Candidate dry-run interpretation correction — Pending Validation
+
+Task merge `0f82d565...` produced a valid Candidate preview, not a router refusal. The machine receipt has
+`outcome=dry-run`, exit code 0, `completed=true`, `runner_errors=[]`, acceptance `shadow-allow` and timing `allow`.
+Its `successful=false` and `evidence_eligible=false` are the fixed `_dry_receipt()` contract for every preview. The
+separate reuse block correctly refuses prior-receipt reuse for Candidate/high-risk inputs; no `--reuse` request was
+made, so it cannot be used as a fresh-run gate.
+
+Branch commit `b9f9c82...` is preserved as the task's mistaken classification and is not Candidate evidence. Scope
+revision 4 must append a correction, issue exactly one fresh Candidate lease/run for the already selected 81 tests,
+and—only after green—run the same-SHA deterministic build/offline portfolio. No second dry-run, router change, retry,
+manual split or substitute evidence is authorized.

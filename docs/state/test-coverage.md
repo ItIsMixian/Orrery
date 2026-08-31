@@ -93,10 +93,10 @@ Updated: 2026-08-31
 
 ## 已知缺口
 
-- v0.3.0 release-input dry-run 已消除 unknown path，但 Fast 75 因 count/Unknown timing、Checkpoint 81 因
-  Unknown timing在测试加载前拒绝；两者均无 lease、无 test、非 evidence-eligible。唯一 bounded Focused
-  attempt 也在加载前因 task phase 拒绝且未重试。scope revision 3 只允许一次 Candidate dry-run，不允许把
-  75/81 手工拆批或冒充 PASS。
+- v0.3.0 release-input Fast 75／Checkpoint 81 与 bounded Focused 均在测试加载前拒绝。后续 Candidate dry-run
+  在 merge `0f82d565...` 上选择 81 tests，acceptance=`shadow-allow`、timing=`allow`、runner_errors=[]；
+  `successful=false/evidence_eligible=false` 只是所有 dry-run 的固定非证据语义，reuse refusal 不阻止 fresh
+  Candidate。scope revision 4 允许一次正式 Candidate；仍禁止重跑、拆批或冒充 PASS。
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
 - CI7 clean Candidate 与 fresh central Fast/Checkpoint 已完成；exact non-main Windows／Ubuntu Promotion 仍待 Final RC。本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。

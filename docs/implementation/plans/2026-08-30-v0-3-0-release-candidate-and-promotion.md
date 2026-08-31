@@ -409,6 +409,27 @@ Validation, affected State, PROGRESS, HANDOFF, DEVLOG and indexes. No new code/t
 authorized. A needed product or routing correction requires another committed amendment. Scope revision 3 still
 forbids push, main mutation, tag, asset upload and GitHub Release.
 
+### 2026-08-31 scope revision 4 — Candidate dry-run semantics clarification
+
+The scope-revision-3 task completed one Candidate dry-run on clean merge `0f82d565...`, selected 81 tests and then
+stopped because it interpreted `successful=false`, `evidence_eligible=false` and the embedded reuse refusal as a
+Candidate-plan refusal. Read-only inspection of the versioned router proves that interpretation wrong:
+
+- `_dry_receipt()` always emits `outcome=dry-run`, `successful=false` and `evidence_eligible=false` because a preview
+  cannot itself be test evidence;
+- the command returned exit 0, `runner_errors=[]`, acceptance `decision=shadow-allow` and timing
+  `decision=allow` with no timing refusal reason;
+- the plan's reuse block describes whether a prior receipt may be reused. Candidate/high-risk reuse remains refused by
+  contract, but this command did not request `--reuse` and the refusal does not block a fresh Candidate run.
+
+Therefore the existing dry-run is the single allowed preview required by scope revision 3; do not rerun it. Scope
+revision 4 authorizes the same Sol-medium task to appenditively correct its branch State/Validation/DEVLOG
+classification, refresh Git-private scope revision 4, freeze the resulting clean exact SHA and issue exactly one fresh
+Candidate lease/run for the already selected 81 tests. No router, mapping, test, product or budget change is
+authorized. If Candidate is green, continue the already-authorized two-root deterministic build and external offline
+new-project portfolio on that same SHA. A non-green Candidate/build/runtime result stops without retry or substitute
+evidence. Push, main, tag, asset upload and GitHub Release remain forbidden at this scope.
+
 ## Phase 1 — register Final RC and freeze inputs
 
 1. Create an isolated Sol-medium Final RC Workstream from the accepted central SHA with precise expected writes.

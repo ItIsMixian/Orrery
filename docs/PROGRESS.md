@@ -52,7 +52,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 COMPLETE；release inputs 已选择性进入中央 `ef145180...`。scope revision 3 禁止重试 Fast/Checkpoint 大包，只允许同一 REL4 合并中央状态后做一次 Candidate dry-run；允许才运行一次 Candidate。push/main/tag/Release 仍分别授权。
+- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 COMPLETE；release inputs 已进入中央。Candidate preview 实际为 acceptance/timing allow，任务误把固定 dry-run non-evidence 与 reuse refusal 当成 run refusal；scope revision 4 纠正记录并允许唯一 fresh Candidate。push/main/tag/Release 仍分别授权。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
@@ -96,5 +96,5 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 让 `V0.3.0-final-rc` 读取 scope revision 3、合并中央 exact state，并只执行一次 Candidate dry-run；允许才运行一次 Candidate 与同 SHA build/offline gates。
+1. 让 `V0.3.0-final-rc` 读取 scope revision 4、追加纠正错误 STOP 记录，并运行唯一 fresh Candidate；绿色后完成同 SHA build/offline gates。
 2. Candidate 通过后才请求 non-main exact-SHA Promotion；main、annotated tag 与 GitHub Release 继续分别授权。
