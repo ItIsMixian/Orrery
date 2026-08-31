@@ -7,6 +7,8 @@ Updated: 2026-08-31
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
 - `V0.3.0-final-rc` exact `ba230555...` 已完成 Candidate 81/81、双根 byte-identical package 和一次外部
   offline new-project scaffold/validate/Unified-help PASS；final runtime matrix、Promotion 与发布操作未运行。
+- 维护者已授权持续推进 final runtime、exact non-main Promotion、同 SHA protected main 与 annotated v0.3.0
+  tag；GitHub Release 创建/asset upload 明确保留为最终停止门。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
 - CI5 exact `9ee831f` 的 Fast 与 Promotion 已完成：Promotion run `33235992711` 为 25/25 jobs PASS，双平台 required checks 均通过，Windows／Ubuntu 各聚合 390 tests／27 logical shards；同一 SHA 已进入 main。
 - 当前本地 integrated Candidate 的未发布组件为 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19；Harness JSON 为 0.1.2，其余 Adapter 为 0.1.1，支持状态仍为 `experimental`／`unreleased`。
@@ -76,8 +78,8 @@ Updated: 2026-08-31
     拒绝。Candidate preview 随后在 `0f82d565...` 选择 81 tests，acceptance/timing 均 allow，但任务误把固定
     dry-run non-evidence/reuse refusal 写成 run refusal。scope revision 5 只修 stale fixture-ID expectation；
     exact `ba230555...` 新 fingerprint Candidate 81/81、双根 package bytes 相同、external offline new-project
-    portfolio PASS。下一步仍需新的 authority 才能运行剩余 runtime/Promotion；不得表述为公开生效，也不得
-    push ref、改 main、tag、上传 asset 或创建 Release。
+    portfolio PASS。scope revision 6 已授权 final runtime、exact non-main Promotion、同 SHA main 与 annotated
+    tag；必须停在 GitHub Release 创建/asset upload 前。
 
 ## 不得外推的边界
 
