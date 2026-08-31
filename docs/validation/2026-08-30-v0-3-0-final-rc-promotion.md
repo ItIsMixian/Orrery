@@ -27,3 +27,18 @@ suite by default. CI7 controls stale-surface selection, same-fingerprint no-repe
 Validation records actual wall/setup/runtime cost and any explicit packaging waiver.
 
 No public manifest, main, tag, asset or Release fact is PASS until the exact evidence is recorded here.
+
+## Phase 0 central integration acceptance — pending evidence
+
+Current local merge facts before formal validation:
+
+- W7.3 focused Candidate: `44ea200d9dfa0107168ed49b8306393bbfccafa8`;
+- W7.3 central merge: `ae909741edc8b72d004c8701d96fd3a810e0540c`;
+- CI7 Candidate: `111f4abc47b8122aee5469db4489ad6fb0dee75a`;
+- combined local integration merge: `079de741aa13c338051f537650898633492f764e`.
+
+The combined worktree is clean and low-cost syntax/JSON/diff checks passed during conflict resolution. These checks
+are not routed Fast/Checkpoint evidence. Required next evidence is a versioned Git-private Phase 0 Workstream and
+human gate receipt, stable Fast/Checkpoint dry-run plans, one formal receipt for each stage, additive State/Validation/
+DEVLOG reconciliation, and final desktop/mobile review of the resulting clean exact SHA. Candidate/Promotion,
+manifest/package/runtime, push/main/tag/Release and publication remain out of scope.

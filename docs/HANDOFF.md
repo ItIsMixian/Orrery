@@ -37,6 +37,9 @@ Updated: 2026-08-30
 - ADR-0021 已接受 REL3 六项选择并纳入最新 W7.3/CI7 scope：0.3.0 使用单一 self-contained ZIP，新项目
   Unified/Model 1/Rules 1，旧项目显式迁移，Codex final runtime blocker，byte-identical 默认门，main/tag/Release
   分权。Final RC 尚未注册，等待 W7.3/CI7 和最终网页验收；DSH/alias/scheduler 明确延期 0.3.1。
+- W7.3 clean `44ea200` 已通过 focused closeout，中央 merge 为 `ae90974`；CI7 clean `111f4ab` 的中央合流为
+  `079de74`。当前中央 worktree clean，组件为 Core/Observatory 0.1.19、CLI 0.1.22、Harness JSON 0.1.2；
+  正式 Fast/Checkpoint 与 exact-SHA 整页验收尚未发生，不能注册 Final RC。
 
 ## 当前可继续的线路
 
@@ -59,9 +62,10 @@ Updated: 2026-08-30
 14. **CI7 validation governance：** clean `111f4ab` 已实现组合 gates、lease、predictive refusal 与 no-repeat；
     现有 Fast 非绿、Checkpoint 绿不能互相替代。下一步由唯一整合者合入 W7.3 后对新实际 diff 运行一次
     fresh Fast/Checkpoint，并保留任何 over-selection refusal。
-15. **v0.3.0 Final RC：** ADR-0021/Approved Design/blocked Plan 已进入中央 authority。依赖完成后创建独立
-    Sol-medium RC；只消费 child receipts，运行 integration/package/runtime/Promotion-owned gates，不得提前改
-    public manifest、push ref、tag 或 Release。
+15. **v0.3.0 Final RC：** 先在当前根任务登记 `V0.3.0-central-integration-acceptance`，对 `079de74` 后续稳定
+    fingerprint 各运行一次 CI7 Fast/Checkpoint，并完成 exact-SHA 整页验收。通过后才创建独立 Sol-medium RC；
+    RC 只消费 child receipts 并运行 integration/package/runtime/Promotion-owned gates，不得提前改 public
+    manifest、push ref、tag 或 Release。
 
 ## 不得外推的边界
 

@@ -30,6 +30,33 @@ build release assets.
    global stop/rollback, zero overflow and zero console warning/error.
 4. Bind acceptance to the source SHA. Any change after acceptance requires a new page review.
 
+### 2026-08-30 central integration acceptance binding
+
+The unique integrator has merged W7.3 exact `44ea200d9dfa0107168ed49b8306393bbfccafa8` and CI7 exact
+`111f4abc47b8122aee5469db4489ad6fb0dee75a` into the current local integration line. This does not satisfy Phase 0
+until the merged source receives fresh CI7 evidence and exact-SHA webpage acceptance.
+
+- [ ] Register Git-private Workstream `V0.3.0-central-integration-acceptance` on the primary integration worktree,
+  primary `release-and-toolchain`, affected `test-coverage`, `documentation-system`, `project-structure`,
+  `multi-worktree-collaboration` and `authority-meta-model`, scope revision 1.
+- [ ] Bind this Plan and the matching Final RC Validation from the exact committed task-description version. Expected
+  writes are limited to central State/Validation/DEVLOG/index reconciliation, component inventory, and a narrow
+  `scripts/ci/change-mapping.json` correction plus its existing CI fixture/test only if the integrated dry-run proves
+  over-selection. No product feature or release input may be added in this Workstream.
+- [ ] Create a Git-private human-experience gate receipt for the maintainer's accepted W7.3 product direction and this
+  Phase 0 integration contract. The receipt grants validation entry only; it is not release operation authorization.
+- [ ] Run Fast and Checkpoint dry-run/explain first. A predictive or unknown-timing refusal is resolved or reported
+  before any formal lease; dry runs do not count as stage evidence.
+- [ ] After the mapping/fingerprint is stable, issue exactly one Fast lease/run and exactly one Checkpoint lease/run.
+  An unchanged non-green result is not retried or substituted. Record the receipts and total cost in the matching
+  Validation.
+- [ ] Commit the reconciled central evidence and rebuild the Unified page from that clean exact SHA. Final RC remains
+  blocked until the maintainer accepts that SHA's desktop/mobile page.
+
+Use the current root task as the unique integrator; do not create a separate Codex task for Phase 0. This Workstream
+may not run Candidate/Promotion/release validation, modify public manifest/defaults/workflows, push, tag, publish or
+perform a release operation.
+
 ## Phase 1 — register Final RC and freeze inputs
 
 1. Create an isolated Sol-medium Final RC Workstream from the accepted central SHA with precise expected writes.
