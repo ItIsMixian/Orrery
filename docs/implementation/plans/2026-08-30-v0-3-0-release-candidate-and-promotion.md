@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 product/mapping routed evidence PASS; final exact-SHA webpage acceptance pending; no RC task registered
+Status: Phase 0 COMPLETE on accepted page `a2d7737...`; Phase 1 Final RC dispatch ready; no release operation authorized
 
 Date: 2026-08-30
 
@@ -10,7 +10,7 @@ Approved Design: [v0.3.0 Release Scope and Default Matrix](../../design/v0-3-0-r
 
 ## Entry gates
 
-- [ ] W7.3 includes ADR-0020 hierarchy, ADR-0022 pinned local ELK layout-only integration and ADR-0023 explicit frozen
+- [x] W7.3 includes ADR-0020 hierarchy, ADR-0022 pinned local ELK layout-only integration and ADR-0023 explicit frozen
   legacy recovery, has integrated State/Validation, reviewed vendor/license/provenance inventory and
   maintainer-approved final page; no silent engine fallback exists. Integration, inventory and routed evidence are
   complete; only the exact integrated page acceptance remains open.
@@ -29,9 +29,10 @@ build release assets.
    DEVLOG/indexes additively.
 2. [x] Run CI7-selected integration Fast and Checkpoint once on the final product/mapping fingerprint without replaying
    unaffected child suites. Current result is Fast 19/19 and Checkpoint 30/30 PASS on `74afb989...`.
-3. [ ] Start the exact integrated Unified page; maintainer accepts all primary pages at 1440×900 and 390×844, including
+3. [x] Start the exact integrated Unified page; maintainer accepts all primary pages at 1440×900 and 390×844, including
    global stop/rollback, zero overflow and zero console warning/error.
-4. [ ] Bind acceptance to the source SHA. Any change after acceptance requires a new page review.
+4. [x] Bind acceptance to source SHA `a2d7737802be66714ff88064820685de6e231e95`. Later product/page changes require
+   a new review; the append-only task-description commit records this acceptance without pretending it was itself reviewed.
 
 ### 2026-08-30 central integration acceptance binding
 
@@ -68,8 +69,8 @@ resulting documentation commit's exact-SHA Unified page acceptance.
 - [x] After the mapping/fingerprint is stable, issue exactly one Fast lease/run and exactly one Checkpoint lease/run.
   An unchanged non-green result is not retried or substituted. Record the receipts and total cost in the matching
   Validation.
-- [ ] Commit the reconciled central evidence and rebuild the Unified page from that clean exact SHA. Final RC remains
-  blocked until the maintainer accepts that SHA's desktop/mobile page.
+- [x] Commit the reconciled central evidence and rebuild the Unified page from that clean exact SHA. The maintainer
+  accepted `a2d7737802be66714ff88064820685de6e231e95` at desktop/mobile sizes.
 
 Use the current root task as the unique integrator; do not create a separate Codex task for Phase 0. This Workstream
 may not run Candidate/Promotion/release validation, modify public manifest/defaults/workflows, push, tag, publish or
@@ -273,6 +274,36 @@ remains Promotion-only and will run in Final RC Promotion.
 The next commit changes only author evidence records. It does not rewrite the product/mapping receipt SHA. Build the
 Unified page from that clean docs SHA and obtain final desktop/mobile maintainer acceptance; Final RC registration
 remains blocked until then. Final RC Candidate later validates the complete release-input SHA including these records.
+
+### 2026-08-31 Phase 0 final page acceptance and Phase 1 dispatch
+
+The maintainer explicitly accepted Unified page `http://127.0.0.1:8771/` generated from exact clean SHA
+`a2d7737802be66714ff88064820685de6e231e95`. Browser evidence covered 1440×900 and 390×844: seven navigation
+identities, no unavailable primary consumer, one Ask Docs button, one global stop, facts/rules help, two relation
+inboxes, four pending proposals, lineage defer/reject only, three dependency gate cards, zero Team decision actions,
+read-only Graph with no relation decisions, ledger/rollback controls, zero document horizontal overflow and empty
+browser console. AI was disabled and server stderr was empty.
+
+Phase 0 is complete. The task-description commit containing this paragraph is an append-only authority descendant of
+the accepted page SHA; it is not misreported as a reviewed page. Final RC must perform its own final runtime/browser
+gate on the release-input SHA.
+
+Phase 1 may now register isolated Workstream `V0.3.0-final-rc`, branch `codex/v0-3-0-final-rc`, GPT-5.6 Sol medium,
+primary `release-and-toolchain`, affected `documentation-system`, `test-coverage`, `project-structure`,
+`authority-meta-model` and `multi-worktree-collaboration`, scope revision 1. Initial writes are limited to:
+
+- `skills/project-orrery/release-manifest.json`;
+- `scripts/package_release.py`;
+- `.github/workflows/release.yml`;
+- `packages/project-orrery-core/src/project_orrery_core/data/release-v0.3.0.json`;
+- `docs/implementation/v0.3.0-onboarding.md` and `docs/implementation/v0.3.0-upgrade-rollback.md`;
+- this Plan's matching Validation, affected subsystem State/DEVLOG/indexes;
+- existing release/packaging tests and CI registry files only when dry-run proves the exact required change.
+
+Before additional Skill assets, templates, launchers or package inventory are changed, the Final RC Agent must return
+an exact self-contained archive inventory and request a dated scope amendment. Phase 1 may inspect/build locally but
+may not push a ref, modify main, create a tag, create/upload assets or publish a GitHub Release. Those remain separate
+Phase 3/4 maintainer authorizations.
 
 ## Phase 1 — register Final RC and freeze inputs
 

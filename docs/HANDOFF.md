@@ -45,7 +45,8 @@ Updated: 2026-08-31
   拒绝，revision 8 已补 precise mapping。真实窗口当前 25/31 + one Unknown；3/4 mapping-only 窗口被拒绝，
   revision 9 以 one focused owner 和 Brand tiering 收口到 20/30。Fast 20/20 PASS；Checkpoint 因 hardcoded
   portfolio list 29/30。修 list 后 Fast 41 拒绝，revision 10 撤回新增 examples/list；新窗口 20/30 中 Fast
-  又因 setup+actual-path 为 10.300s 拒绝。revision 11 最终 `74afb989...` Fast 19/19、Checkpoint 30/30 PASS。
+  又因 setup+actual-path 为 10.300s 拒绝。revision 11 最终 `74afb989...` Fast 19/19、Checkpoint 30/30 PASS；
+  `a2d7737...` final page 已接受，Phase 0 COMPLETE。
 
 ## 当前可继续的线路
 
@@ -66,10 +67,10 @@ Updated: 2026-08-31
 13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 与 current fingerprint fresh Fast 3/3、Checkpoint 4/4
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
-15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` revision 11 routed evidence 已完成；现在只同步
-    evidence、提交并重建 final docs SHA 页面。维护者接受后才创建独立 Sol-medium RC；
-    RC 只消费 child receipts 并运行 integration/package/runtime/Promotion-owned gates，不得提前改 public
-    manifest、push ref、tag 或 Release。
+15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` Phase 0 已完成；现在创建独立 Sol-medium
+    `V0.3.0-final-rc` worktree，先做 manifest/archive/runtime Candidate；
+    RC 只消费 child receipts 并运行 integration/package/runtime/Promotion-owned gates；可在隔离 worktree 准备
+    candidate manifest，但不得表述为公开生效，也不得 push ref、改 main、tag 或创建 Release。
 
 ## 不得外推的边界
 

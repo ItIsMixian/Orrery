@@ -118,6 +118,8 @@ Updated: 2026-08-31
 - revision-11 final fingerprint `4b4c56c...` 在 `74afb989...` 上完成 Fast 19/19（0.170343s）与 Checkpoint
   30/30（7.119383s），均 evidence-eligible、zero rerun。旧 Fast green/Checkpoint failure 与后续 predictive
   refusals全部保留；direct Core focused exit code 丢失，结果保持 Unknown，exact owner 仍由 Promotion 执行。
+- Phase 0 final page `a2d7737...` 在 1440×900/390×844 完成同事实 Browser review：零横向溢出、空 console、
+  4 pending、lineage 无 Accept/gate、Team 0 actions、Graph 0 decision actions。Final RC runtime/Promotion 未运行。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

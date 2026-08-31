@@ -2,8 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS — focused Candidate, revision-7 corrected preview and Phase 0 product/mapping routed evidence are green;
-final exact-SHA page remains owned by v0.3.0 Phase 0.
+Status: PASS — focused Candidate, corrected preview, routed evidence and Phase 0 exact-page acceptance are green.
 
 Authority sources:
 
@@ -454,3 +453,6 @@ and fresh CI7 routing; it is not final exact-SHA page or release acceptance.
 Final Phase 0 source `74afb989...` completes Fast 19/19 and Checkpoint 30/30 under fingerprint `4b4c56c...`, both
 evidence-eligible and zero rerun. The Core exact lineage/supersession owner remains Promotion-only; its direct focused
 attempt is Unknown and was not repeated. Final RC Promotion must execute it before release.
+
+The maintainer accepted final Unified SHA `a2d7737802be66714ff88064820685de6e231e95`; W7.3 Phase 0 page ownership is
+closed. Release/runtime/Promotion evidence remains Final RC work.

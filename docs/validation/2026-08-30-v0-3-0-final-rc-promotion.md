@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — Phase 0 product/mapping routed evidence PASS; final exact-SHA page and Final RC remain incomplete
+Status: Phase 0 PASS — exact page `a2d7737...` accepted; Phase 1 Final RC, Candidate, Promotion and publication Pending
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -290,3 +290,15 @@ Evidence boundary:
   page must bind the docs SHA, and Final RC Candidate must validate the complete release-input SHA.
 
 No Candidate, packaging/runtime, remote push, Promotion, main, tag, asset or Release operation has run.
+
+## 2026-08-31 Phase 0 exact-page acceptance
+
+The maintainer accepted exact clean SHA `a2d7737802be66714ff88064820685de6e231e95` at
+`http://127.0.0.1:8771/`. Browser checks at 1440×900 and 390×844 match the accepted revision-7 semantics and the
+reconciled authority records: seven app entries, no unavailable primary consumer, four pending proposals, no human
+Accept/gate for mechanical lineage, three dependency gate cards, Team request-only, Graph action-free, stop/rollback/
+help present, zero horizontal overflow and empty console. AI remained disabled; server stderr was empty.
+
+This closes Phase 0 only. The next authority commit records the acceptance and dispatches `V0.3.0-final-rc`; it is not
+itself a reviewed page SHA. Final RC must bind Candidate/runtime/Promotion evidence to its own later exact SHA. Public
+manifest, ZIP, push, main, tag, assets and Release remain Pending and separately authorized.

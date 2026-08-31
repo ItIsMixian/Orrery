@@ -86,5 +86,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
   proposals。revision 6 修 Core append-only supersession，而不是在 UI 中隐藏重复；维护者看修复页前仍禁测试。
 - revision-6 新服务已把 pending 收敛为四条，但 lineage 卡片仍显示不适用的 Accept/gate 控件。revision 7
   保留人类 defer/reject，同时把 effective `derived_from` 恢复为 Core-only；真实 1280/390 页面已获维护者
-  确认，product/mapping source 已取得 current Fast/Checkpoint；尚未形成最终 docs exact-SHA acceptance。
+  确认，product/mapping source 已取得 current Fast/Checkpoint；最终 docs exact-SHA `a2d7737...` 已接受。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

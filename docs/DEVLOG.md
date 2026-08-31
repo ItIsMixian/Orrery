@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Exact Unified Page Accepted
+
+- 维护者接受 exact clean `a2d7737802be66714ff88064820685de6e231e95` 页面；1440×900/390×844 为 7
+  app entries、4 pending、lineage defer/reject only、Team 0 actions、Graph 0 decisions、overflow 0、console 0。
+- Phase 0 COMPLETE。该接受不授权 push/main/tag/assets/Release；后续 task-description commit 只记录事实，
+  不冒充自己也被浏览器验收。
+- 独立 `V0.3.0-final-rc` 使用 GPT-5.6 Sol medium，先冻结 manifest/self-contained archive/runtime inputs；
+  超出初始精确 writes 前必须回中央提交 amendment。
+
 ## 2026-08-31 — Phase 0 Revision-11 Routed Evidence Complete
 
 - policy/receipt v6 绑定 `74afb989...`、scope 11 与 fingerprint `4b4c56c...`；AI disabled，human/timing gates

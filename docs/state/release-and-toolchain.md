@@ -58,7 +58,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - revision-10 rollback fingerprint 的 Checkpoint 预测允许，Fast 仅因 setup+actual-path deep check 为 10.300s
   拒绝。revision 11 做单项 tier correction，不改变 release authority；仍无 Final RC。
 - revision-11 product/mapping exact `74afb989...` 已通过 Fast 19/19 与 Checkpoint 30/30；下一安全动作仅是
-  docs evidence commit + exact-SHA final page acceptance。Candidate/Promotion/public release 尚未开始。
+  docs evidence commit + exact-SHA final page acceptance。`a2d7737...` 页面现已接受；Phase 1 Final RC 可注册，
+  Candidate/Promotion/public release 尚未开始。
 
 ## 兼容与安全边界
 
