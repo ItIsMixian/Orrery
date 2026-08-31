@@ -2,9 +2,9 @@
 
 Date: 2026-08-30
 
-Status: PASS (focused Candidate closeout) — maintainer accepted the current ELK product preview; revision-17 focused
-checks and revision-18 exact attribute/hash/complete-staged-diff gates are green. The clean Candidate SHA is reported
-in the task receipt; central integration evidence remains pending.
+Status: PASS (focused Candidate and central routed integration) — clean Candidate `44ea200`, central merge
+`ae90974`, and current integrated Fast/Checkpoint evidence are green; exact-SHA final Unified page acceptance remains
+owned by the v0.3.0 Phase 0 gate.
 
 Authority sources:
 
@@ -407,3 +407,20 @@ the v0.3.0 Final RC task.
   `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`; vendor bytes were not rewritten.
 - Complete `git diff --cached --check` — PASS, exit 0 after staging all revision-18 metadata and closeout records.
 - Revision-17 focused tests, Browser review and JavaScript syntax were not rerun.
+
+## 2026-08-30 central integration evidence
+
+- Clean W7.3 Candidate `44ea200d9dfa0107168ed49b8306393bbfccafa8` entered the central line at merge
+  `ae909741edc8b72d004c8701d96fd3a810e0540c`; combined W7.3/CI7 merge is
+  `079de741aa13c338051f537650898633492f764e`.
+- Core/CLI/Observatory/Harness JSON resolve to 0.1.19/0.1.22/0.1.19/0.1.2. Both pinned ELK copies preserve exact
+  SHA-256 `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`; only the two reviewed exact paths use
+  `-whitespace`.
+- The combined non-formal integration set has unique PASS results for both Harness relation/rule commands, Unified
+  composition and host/origin/cookie boundaries, and component boundary/version inventory. Initial wrong class-name
+  loader errors did not execute target tests and are not counted as results; the manifest/help issues they exposed
+  were corrected without rerunning unchanged green targets.
+- CI7 current fingerprint `0eea7f...` on source `f41b659...` completed one Fast 3/3 PASS and one Checkpoint 4/4 PASS,
+  both evidence-eligible with zero reruns. The prior fingerprint's Checkpoint failure remains preserved.
+- This closes W7.3 central routed integration only. The final whole-page desktop/mobile acceptance must bind the
+  subsequent clean documentation SHA before the v0.3.0 Final RC task can be registered.

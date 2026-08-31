@@ -1,6 +1,6 @@
 # 发布与工具链 State
 
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md)
 
@@ -12,11 +12,12 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。
 - ADR-0021 已接受 0.3.0 release/default/distribution contract：新项目 Unified/Model 1/Rules 1，旧项目 legacy
   until explicit migration，单一 self-contained ZIP + checksum，Codex final runtime blocker，tag/Release 分权。
-  W7.3/CI7 与最终网页尚未完成，Final RC 未注册，public manifest/tag/assets 均仍为 0.2.0。
-- ADR-0022 已接受 W7.3 Graph 使用 pinned local ELK.js layout-only engine，并要求 vendor/license/provenance
-  进入同一 self-contained ZIP 与 deterministic receipt；exact artifact 与产品接线尚未完成，公开资产未变。
-- ADR-0023 保留 frozen legacy geometry 在未来 ZIP 中作为显式本地兼容后手；不得自动回退，且 GX2 页面
-  接受前不允许开始产品/vendor/package 写入。
+  W7.3/CI7 本地中央合流与 routed Fast/Checkpoint 已完成；最终 exact-SHA 网页尚未接受，Final RC 未注册，
+  public manifest/tag/assets 均仍为 0.2.0。
+- ADR-0022 的 pinned local ELK.js layout-only engine、vendor/license/provenance 与产品接线已进入本地 source；
+  它们尚未进入 final self-contained ZIP、deterministic receipt 或公开资产。
+- ADR-0023 的 frozen legacy geometry 作为显式本地兼容后手保留且禁止自动回退；维护者已接受 W7.3 收口
+  方向，最终整页 acceptance 仍与发布授权分离。
 
 ## 当前 Canonical source
 
@@ -28,7 +29,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Claude Code 2.1.87 只完成 Plugin／Skill 发现与认证前失败关闭；没有成功模型路由。Harness JSON 证明 subprocess JSON 合约，不证明第三方 Agent runtime 兼容。
 - Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 local release-candidate gate 已进入 source；公开 manifest、standalone installer 和默认 managed Observatory 尚未声明或启用模型 1。
 - Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
-- Unified Observatory 已有本地 W7.2.3／U2.2 joint acceptance Candidate，提供单一连续中文导航、全局 stop、密集 Maintenance、旧证据降级与 W7.1 legacy/archive graph 的最终展示修正。仍没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
+- Unified Observatory 当前本地中央 Candidate 组合 A4/U2.3/W7.3，提供单一连续中文导航、规则帮助、轻量活动任务、关系待确认、全局 stop、密集 Maintenance、旧证据降级与 pinned-ELK/legacy 同事实 Graph。仍没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
 - S0 新增未发布 `skills/orrery-dispatch/` source Candidate，只包含 `SKILL.md` 与 `agents/openai.yaml`。它把 ADR-0018 的 authority handoff 投影为 Codex Skill 指令，面向用户称“任务说明版本”；没有 script／asset／reference／service／schema／network，也未进入当前 `project-orrery` Skill、installer、release manifest 或 v0.3.0 范围。
 - PO1 在同一 `SKILL.md` 内补充 ADR-0007 PO allocation；仍无新 Skill 文件或发布资产。local integration `8b73f26` 后，两文件已按 SHA-256 一致性校验复制到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，但没有进入 release manifest 或公共分发。
 - U2.3 只更新 source Observatory 与 root self-host builder/server：发布 dry build 仍为冻结 v0.2.0 Skill archive，且排除 Git-private session、cache、凭据与生成站点。它没有修改 release manifest、proposal、tag、public/default consumer 或 CI routing policy。
@@ -41,6 +42,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - CI5 manifest schema 3 保留 27 个逻辑 shard，并映射为每 OS 十个物理 lane。每个 logical shard 仍在独立 Python 子进程中执行；aggregate 验证 lane receipt、exact SHA、OS、manifest、顺序与每个 final test ID 恰好一次。
 - exact `9ee831f` 的 Fast run `33235942078` 与 Promotion run `33235992711` 已通过；Promotion 为 25/25 jobs、Windows／Ubuntu 各 390 tests／27 shards、required checks 双 PASS。十 lane 共 23.9 job-min，测试步骤 14.352 分钟，派生 overhead 约 40%。同一 SHA 随后 fast-forward 到 main，main Fast run `33236225082` 通过。
 - CI5 不改变 branch protection、组件版本、发布 manifest、tag、Release 或测试覆盖范围；墙钟时间仍是 queue-dependent advisory 指标。
+- CI7 Phase 0 current fingerprint `0eea7f...` 在 source `f41b659...` 上用 fresh one-run lease 完成 Fast 3/3
+  与 Checkpoint 4/4 PASS，均 zero rerun；旧 fingerprint 的 Checkpoint failure 保留。此证据不等于 Candidate、
+  Promotion 或 public release。
 
 ## 兼容与安全边界
 
@@ -78,5 +82,5 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Unified／Collaboration／Maintenance／Graph／relation inbox 没有默认 consumer 或 public release；真实双机与 scheduler 不受支持。W7.3 只允许本机确认并将 effective relation 交给现有 lifecycle consumer，不提供中央 apply。
 - R4 alias、R5 optional default transition 和最早 0.4.0 cleanup review 均未启动。
 - `orrery-dispatch` 只在当前本机安装，尚未打包或发布；未来是否进入任何公开版本必须由独立 release Plan/Validation 决定。
-- ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 仍未进入产品 source；在
-  GX2/W7.3 evidence 完成前不得写成 v0.3.0 已包含。
+- ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 已进入未发布本地 source；
+  在 final ZIP／runtime／Promotion／publication evidence 完成前不得写成 v0.3.0 已公开包含。

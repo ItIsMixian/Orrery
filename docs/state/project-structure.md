@@ -1,6 +1,6 @@
 # 项目结构 State
 
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md)
 
@@ -8,7 +8,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 
 - 单一 Git 仓库根为 `D:\coding warehouse\project-orrery`；protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`，产品 source baseline 为 `9ee831f`。
 - 项目作者权威根为 `AGENTS.md` 与 `docs/`；`.project-orrery.json` 选择 `authority_status: integrated` 和 `authority_model_version: 1`。
-- ADR-0018 已将任务分发改为 authority-first：创建 Workstream 或追加实质范围前，中央协调者先提交 ADR／Design／Plan scope amendment／Pending Validation；任务消息只引用 exact SHA 和路径。U2.3 与 W7.3 正在按此流程补录并在确认 scope revision 前暂停；旧 transcript 只保留为非权威 provenance。
+- ADR-0018 已将任务分发改为 authority-first：创建 Workstream 或追加实质范围前，中央协调者先提交 ADR／Design／Plan scope amendment／Pending Validation；任务消息只引用 exact SHA 和路径。U2.3、W7.3、CI7 与 v0.3.0 Phase 0 已按此流程登记/修订；旧 transcript 只保留为非权威 provenance。
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
 - `skills/orrery-dispatch/` 是 S0 独立两文件 source Candidate；它与安装／迁移／审计用的 `skills/project-orrery/` 分开，也不是未来独立 S1 Conductor repository。
 - PO1 在不增加文件角色或号码服务的前提下，把 decision proposal/number allocation 边界投影进 dispatch Skill，并在 repository gate 检查当前树 numeric ADR 唯一性；它不扫描或锁定 peer Candidate 编号。
@@ -81,7 +81,11 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - W7 relation store 没有 self-host native apply 记录；旧 session 到 post-main closure 的兼容收口仍需保守人工流程。
 - ADR-0018 的自动 dispatch receipt、scope revision CAS、Adapter acknowledgment evidence 和 first-write enforcement 尚未实现。
 - S0 Skill 仅在当前本机安装、未发布，也没有任务状态聚合、scheduler、relation confirmation 或执行权限。
-- W7.3 focused Candidate closeout 已通过；scope revision 18 只为两份 exact vendored ELK bundle 设置路径级 `-whitespace`，两路径属性、SHA-256 与完整 staged diff check 均 PASS。中央整合后的 routed Fast／Checkpoint、exact non-main SHA Windows／Ubuntu Promotion 与 main／public／default 均未发生。当前 self-host 三条 `depends_on` 均只是待人工确认 proposal；没有把它们宣称为 effective dependency。
+- W7.3 focused Candidate `44ea200` 已进入本地中央合流；CI7 current fingerprint `0eea7f...` 在 source
+  `f41b659...` 上取得唯一 Fast 3/3 与 Checkpoint 4/4 PASS，均为 evidence-eligible、zero rerun。两份 exact
+  vendored ELK bundle 仍保持同一 SHA-256，只有两条路径级 `-whitespace`。exact-SHA 最终整页验收、non-main
+  Windows／Ubuntu Promotion 与 main／public／default 尚未发生。当前 self-host 三条 `depends_on` 仍只是待人工
+  确认 proposal；没有把它们宣称为 effective dependency。
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。
 - Claude Code 尚未完成认证后的真实模型路由；DeepSeek 与 Codex evidence 只覆盖各自记录的精确 runtime 范围。
 - 自动 R1 脱敏导出器、跨平台 byte-for-byte archive 与 Brownfield Adoption 研究／Plan 均未实现。

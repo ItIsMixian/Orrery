@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — release decision accepted; dependencies and Final RC not complete
+Status: PENDING — Phase 0 routed validation PASS; exact-SHA page acceptance and Final RC remain incomplete
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -28,7 +28,7 @@ Validation records actual wall/setup/runtime cost and any explicit packaging wai
 
 No public manifest, main, tag, asset or Release fact is PASS until the exact evidence is recorded here.
 
-## Phase 0 central integration acceptance — pending evidence
+## Phase 0 central integration acceptance — routed validation PASS; exact-SHA page pending
 
 Current local merge facts before formal validation:
 
@@ -107,3 +107,42 @@ Dry-run v4 selected 22 tests from `ci-mapping-registry + documentation`. Both st
 12.066636>10. No lease or test run occurred. The documentation records are committed before the formal task base.
 For the mapping-only diff, `machine_inventory_gives_every_test_owner_stage_cost_budget_and_reason` is redundant with
 the stale-registry/completeness gate and loses the mapping-specific dependency; four exact mapping tests remain.
+
+Dry-run v5 therefore selected four mapping tests. Checkpoint was allowed, while Fast refused on predicted total p95
+11.976s > 10s; no lease or test run occurred. The generic cross-surface portfolio was moved from Fast to
+Checkpoint/Candidate/Promotion because it does not provide mapping-only fast feedback. Dry-run v6 then selected
+three Fast tests at predicted 9.478s and four Checkpoint tests at 11.976s; both plans were allowed.
+
+The first versioned Phase 0 policy/receipt was then made stale by a further mapping correction and was not reused.
+On old fingerprint `7bd6fec4db85e210a9a0b6c84f6b3e09fc6ce3b300e8e4224ec706b1991bdc66`, the unique formal Fast completed
+3/3 PASS, while the unique Checkpoint failed because a stale Graph portfolio selected five tests against a four-test
+cap. Both receipts are preserved as evidence for that old fingerprint; the failure was not retried, replaced or
+reported as green. The correction moved the component-local packing/module-boundary test to Candidate/Promotion,
+where its release-boundary role remains covered, rather than weakening the Checkpoint cap or deleting the test.
+
+Dry-run v8 bound the corrected mapping to Git-private acceptance policy v2 and maintainer experience receipt v2.
+The receipt SHA-256 is `b6fe5fb3cad09a4d0b9c72a0a59f6c9ad45299c3400a3f019184b8439033b276`, and the exact contract blob is
+`e392be200e08021db5e3628b2339b2672f79c91f`. Both Fast and Checkpoint were allowed on current fingerprint
+`0eea7fbe07a182de209d080dfa7c2c04a7c12956f801342ebf7c15b0a37aab7d`.
+
+### Current formal routed evidence
+
+Both current receipts bind source `f41b659720905367351ed11394754f4d7bb6b547`, used fresh one-run leases and
+report zero reruns:
+
+| Stage | Result | Test runtime | Router setup | Runner setup | Evidence |
+| --- | --- | ---: | ---: | ---: | --- |
+| Fast | 3/3 PASS | 0.804195s | 4.574633s | 3.886780s | eligible; lease `392780a1cbc64770fad75e99be8c0df58183665a2b74bc6d8dfb18ee0224fb37` |
+| Checkpoint | 4/4 PASS | 2.580301s | 4.614220s | 3.853087s | eligible; lease `df769c30750968530c4f545e13fa2654b92ca97edfbeb2887237e6c3eec4c1b1` |
+
+The exact Git-private outputs are `.git/orrery/ci-validation/phase0/fast-formal-v2.json` and
+`.git/orrery/ci-validation/phase0/checkpoint-formal-v2.json`; they are local evidence, not release artifacts. Formal
+routing ran with `DOCSITE_AI_ENABLED=0`. The only unintended Provider calls occurred in the first pre-plan dry-run
+and are not test evidence. No child suite, Candidate, Promotion, packaging, runtime, push or release operation was
+replayed.
+
+This documentation-only reconciliation advances repository HEAD without changing the CI7 relevant product/mapping
+surface, so the routed receipts remain bound to `f41b659...` and its fingerprint. The Unified page must now be built
+from the resulting clean documentation commit and accepted at desktop/mobile sizes. Until that exact SHA is accepted,
+Final RC remains unregistered and no public manifest/default/workflow, remote ref, main, tag, asset or Release is
+authorized.

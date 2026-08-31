@@ -1,5 +1,19 @@
 # 开发日志
 
+## 2026-08-31 — v0.3.0 Phase 0 Central Routed Validation Complete
+
+- 唯一整合者把 W7.3 clean `44ea200` 和 CI7 clean `111f4ab` 合入本地中央线，完成 Core/CLI/Observatory/
+  Harness JSON 0.1.19/0.1.22/0.1.19/0.1.2 inventory、package-local ELK managed-tools 边界与 A4/U2.3
+  “事实与规则”/单入口组合收口。公开 v0.2.0、默认 consumer、manifest、workflow 与 Release 未改。
+- CI7 dry-run 依次暴露旧 surface ID、四个未登记 W7.3 ID、unknown timing、48/22/4 test over-selection 与
+  一个旧 fingerprint Checkpoint 组合门失败。每个失败都保留且未原样重跑；最后把 mapping registry、CI
+  control、generic portfolio 与 Candidate-only component-boundary ownership拆开，没有删除 Promotion coverage。
+- current fingerprint `0eea7f...` 在 exact relevant source `f41b659...` 上各运行一次：Fast 3/3 PASS、
+  Checkpoint 4/4 PASS，test runtime 0.804195s/2.580301s，zero rerun，均 evidence-eligible。除第一次 dry-run
+  setup 外所有正式路由均禁用 AI Provider；Git-private policy/receipt/lease 不进入发布资产。
+- Phase 0 现在只待这次权威文档收口 commit 的 exact-SHA Unified Observatory 1440×900/390×844 页面验收。
+  维护者接受前不注册 Final RC，不运行 Candidate/Promotion，不改 public manifest，不 push/tag/publish。
+
 ## 2026-08-30 — GX2 Direction Accepted; W7.3 Product Wiring Authorized
 
 - 维护者查看中央监督后的 GX2 页面并回复“感觉好像还不错，接线看看”，正式接受 ELK 0.11.0、W5/W6/W7

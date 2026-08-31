@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: amendment focused contracts PASS; exact-SHA Fast honestly non-green; exact-SHA Checkpoint PASS; follow-up Candidate requires fresh central evidence
+Status: PASS (clean Candidate plus fresh central routed evidence); prior exact-SHA Fast refusal and old-fingerprint Checkpoint failure remain preserved
 
 Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
 `3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
@@ -104,11 +104,21 @@ Fast/Checkpoint/Candidate/Promotion meaning, 15/90 second budgets, failure/timeo
 Windows/Ubuntu required-check names are unchanged. Because Fast is non-green, `290482f` is a clean Git Candidate but
 is not an all-green validation Candidate.
 
-## Remaining central integration work
+## Central integration evidence
 
-The central integrator must additively reconcile any newly integrated paths from parallel A4.1/W7.3 without making
-their unintegrated files required here. On a new final fingerprint and actual integrated diff, central must resolve or
-explicitly report Fast router over-selection, then obtain fresh Fast/Checkpoint/Candidate evidence; the green
-`290482f` Checkpoint cannot substitute for its non-green Fast or authorize a new SHA. Central must push the exact
-non-main final SHA and obtain both hosted required checks. This branch does not push, promote main, change a
-component/public release, or edit root PROGRESS/HANDOFF.
+The clean CI7 Candidate is `111f4abc47b8122aee5469db4489ad6fb0dee75a`; central merge
+`079de741aa13c338051f537650898633492f764e` combines it with W7.3. Dry-run reconciliation preserved every refusal:
+unknown `observatory-ui`, four unregistered W7.3 IDs, timing-Unknown, 48-test and 22-test over-selection, and the old
+fingerprint Checkpoint failure were all recorded before a new lease was issued. The old Fast green receipt is not
+reused for the corrected mapping.
+
+Current relevant source `f41b659720905367351ed11394754f4d7bb6b547` binds fingerprint
+`0eea7fbe07a182de209d080dfa7c2c04a7c12956f801342ebf7c15b0a37aab7d`. Its unique Fast lease completed 3/3 PASS
+in 0.804195s test runtime with 8.461413s total setup; its unique Checkpoint lease completed 4/4 PASS in 2.580301s
+test runtime with 8.467307s total setup. Both are evidence-eligible and report zero reruns. The exact local receipts
+are referenced by the v0.3.0 Final RC Validation and are not release artifacts.
+
+This closes fresh central Fast/Checkpoint evidence, not Candidate or Promotion. The subsequent docs-only commit still
+requires exact-SHA desktop/mobile Unified acceptance before Final RC registration. A later Final RC must run only
+release-owned gates, then push an exact non-main SHA and obtain both hosted required checks; this local integration
+does not promote main, change public manifest/defaults, tag or publish a Release.

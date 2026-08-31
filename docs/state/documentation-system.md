@@ -1,6 +1,6 @@
 # 文档系统 State
 
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md) | [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md)
 
@@ -20,12 +20,12 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - AI Q&A、briefing、roadmap、milestones、radar、Authority projection、Personal／Team／Maintenance 与 Workstream Graph 都是派生视图。它们只能消费受约束输入并保留 source／scope／Unknown，不能创造 State、ADR、批准或 Validation。
 - Authority shadow、diagnostic 与完整 projection 使用彼此独立的显式开关；默认 legacy build 保持。完整 M2.2 projection 仅由 root-only `build_authority_projection.py` 启用，失败关闭回无 claim 的 legacy 页面。
 - Personal／Team／Maintenance／Graph 已作为 root-only/default-off sibling page 进入 Canonical source。U2.1 Candidate 的主视图用“交付／待确认的任务或历史状态／工作区清理建议”表达 Personal；Team 为 metadata-only/request-only，Maintenance 只显示当前资格与本机确认，Graph 只读消费完整且验证有效、hash-bound 的 native 或 legacy/archive relation evidence。
-- ADR-0016 与 Approved Unified Observatory Design 已接受“一个用户入口／URL／导航壳、受管隐藏 helper”的目标。U2.2 integrated Candidate 在现有 docsite 阅读、搜索、AI 与作者信息架构上，用一个连续 sidebar/scroll rail 组合中文 app 入口和可折叠项目文档树；Maintenance 使用密集有界队列和折叠技术详情。协议值只在技术详情显示，U1 synthetic prototype 仍不是 UI 规范，公开默认尚未切换。
+- ADR-0016 与 Approved Unified Observatory Design 已接受“一个用户入口／URL／导航壳、受管隐藏 helper”的目标。当前本地中央 Candidate 在现有 docsite 阅读、搜索、AI 与作者信息架构上，用一个连续 sidebar/scroll rail 组合中文 app 入口和可折叠项目文档树，并加入 A4 规则帮助、U2.3 活动任务、W7.3 关系待确认与 ELK 只读 Graph；Maintenance 使用密集有界队列和折叠技术详情。协议值只在技术详情显示，U1 synthetic prototype 仍不是 UI 规范，公开默认尚未切换。
 - U2.3 local integrated Candidate 将 app rail 收敛为七个固定入口，把路线与趋势从作者文档树移入 app 区，并以唯一 floating Ask Docs 和顶栏只读帮助／系统状态面板替代独立问答／Authority 页面。Personal 使用 Git registry、Git-common-private 有界 session metadata 与现有 Maintenance cache 的轻量 active-task projection；启动不逐 worktree 读取源码、Scope、ignored 或 diff，重证据只在目标详情／刷新时读取。
 - W7.2.3 integrated Candidate 将真实只读 Graph 改为单一从左到右 DAG：固定可读卡片、中文 rank lane、工程图式实线／虚线／复合线、固定 10px 箭头、每链独立展开和收起、锚点式 `Ctrl + 滚轮` 缩放，以及默认关闭的画布内技术详情抽屉。dependency／conflict 只从各自真实端点建图；空 dependency 不显示孤立 active tips。桌面以 88px rank 通道和 44px 独立链间隔显示主图并保留 1×1px 语义 ledger，390px 用同事实列表替代微型图；文档根、侧栏、画布与详情滚动条共享深浅主题变量。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
-- ADR-0017 的 Git-private relation proposal／confirmation 已在 W7.3 Candidate 实现。Unified Observatory 的 Personal／Team 页面增加“关系待确认”收件箱：Personal 仅在本机 human role capability 成立时显示 accept/change-gate/defer/reject，Team／central 始终 request-only；Graph 继续只读，只投影 effective／proposed 与 gate。
-- Graph projection schema 2 将 program／phase／series 作为只读分组元数据，不把 membership 当因果边；主状态机械区分正在进行、等待人工确认、状态待刷新／证据过期、历史任务、缺少任务记录、未登记和关系证据不足。当前 Candidate 用固定本地 ELK 布局同一 semantic projection，桌面图与移动 ledger 保持同事实；Core `compare_pairs` 只作为默认关闭的黄色 comparison review，红色 conflict lens 只接受带 location／impact／source 的明确冲突证据。画布不含确认／应用／撤销动作。
+- ADR-0017 的 Git-private relation proposal／confirmation 已进入本地中央 source。Unified Observatory 的 Personal／Team 页面增加“关系待确认”收件箱：Personal 仅在本机 human role capability 成立时显示 accept/change-gate/defer/reject，Team／central 始终 request-only；Graph 继续只读，只投影 effective／proposed 与 gate。
+- Graph projection schema 2 将 program／phase／series 作为只读分组元数据，不把 membership 当因果边；主状态机械区分正在进行、等待人工确认、状态待刷新／证据过期、历史任务、缺少任务记录、未登记和关系证据不足。本地中央 Candidate 用固定本地 ELK 布局同一 semantic projection，桌面图与移动 ledger 保持同事实；Core `compare_pairs` 只作为默认关闭的黄色 comparison review，红色 conflict lens 只接受带 location／impact／source 的明确冲突证据。画布不含确认／应用／撤销动作。
 - 动态 docsite 的模型调用统一经过 Broker。Provider 配置与凭据按端点绑定，同源 POST、body gate、预算、缓存和错误脱敏已实现；同用户本机 Broker 不宣称秘密隔离。
 - 当前展示品牌为 Orrery；目标项目标题仍由模板 token 定制。历史 `Project Orrery` 与稳定 `project-orrery` 技术标识按 ADR-0015 保留。
 - A4 local integrated Candidate 不增加第九个一级导航；既有 `authority` 身份显示“事实与规则”，分栏投影目标项目 Seed 与 Core-owned Orrery 工作规则，legacy/managed/readiness 技术状态默认折叠。Ask Docs 在 root Unified 宿主中先消费 route receipt；Skill template 只能 advisory。
@@ -79,5 +79,5 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
 - authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
 - `orrery-dispatch` 已在当前本机安装但未发布；它只能指导宿主遵守流程，不能机械阻断绕过 Skill 的写入，也不能外推为其他主机可用。
-- W7.3 relation capture 仍是 root-only/default-off Candidate；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收。
+- W7.3 relation capture 已进入 root-only/default-off 本地中央 Candidate；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收，最终 exact-SHA 整页仍待维护者接受。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

@@ -1,6 +1,6 @@
 # 当前进度
 
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 ## 当前阶段
 
@@ -14,8 +14,8 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
-| 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；ADR-0020 hierarchy、ADR-0022 ELK layout-only 与 ADR-0023 explicit legacy fallback 已接受；W7.3 Core/capture 保留 | 只完成 GX2 并先让维护者看图；未接受前不接产品。未来 ELK 为候选正常引擎，手写 geometry 冻结为显式/带标签后手，禁止自动回退 |
-| Unified Observatory | A4/U2.3 已加入 W7.2.3/U2.2 本地 integration line：七入口导航、只读帮助/规则、轻量活动任务、密集维护和只读 Graph 已组合；公开默认仍未切换 | 等 W7.3 合流后做最终整页体验，再冻结 non-main exact-SHA Promotion Candidate |
+| 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate | 只完成 exact-SHA Unified 整页验收；不在 Phase 0 重跑 feature suites |
+| Unified Observatory | A4/U2.3/W7.3 已组合为本地 root-only/default-off Candidate：七入口导航、只读帮助/规则、轻量活动任务、关系待确认、密集维护和只读 Graph 共存；公开默认仍未切换 | 从干净 docs SHA 生成最终桌面/移动页面并由维护者接受，再注册 Final RC |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
 | 文档治理 | D1 已冻结只读 finding contract、规则 registry 与 synthetic fixture；当前没有 `docs audit` 产品入口 | 维护者另行决定是否启动 D2 scanner／CLI；不自动改写 Markdown 或启用长度硬门 |
@@ -28,28 +28,31 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - 协作源码已经 Canonical，但真实 self-host relation store 仍缺正式 native event／closure；Graph 的 legacy session 投影与产品能力不能混写。
 - 当前 display brand 为 Orrery；`project-orrery` Skill／distribution／CLI／schema／协议与 v0.2.0 资产继续作为稳定技术或历史标识保留。
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
-- `codex/u1-u2-integration-baseline` 已吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；联合 feature merge 为 `0eaad30`，当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它在维护者接受、exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
+- `codex/u1-u2-integration-baseline` 曾在联合 feature merge `0eaad30` 吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；该历史节点组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它仍只作为后续中央 Candidate 的历史 child evidence。
 - ADR-0018 已接受 authority-first Workstream dispatch：U2.3 已按两次任务说明版本完成并本地集成，W7.3 也已确认其 scope revision；自动 receipt／first-write enforcement 尚未实现。
 - ADR-0022 已接受 ELK.js 作为 Workstream Graph 唯一正常 layout/routing engine；它不改变现有 Orrery 前端或
-  事实选择。GX2 provenance 与 W7.3 dirty product wiring 已存在，维护者已接受当前真实页面作为收口方向；
-  尚无 clean exact-SHA Candidate、当前实现测试回执、中央合流或 Release 事实。
-- ADR-0023 保留 frozen、manual、visibly-labelled legacy engine 并禁止静默回退；W7.3 scope revision 17
-  现只允许聚焦收口和干净 Candidate，正式 Fast/Checkpoint 转由合入 CI7 后的新中央 fingerprint 各运行一次。
+  事实选择。GX2 provenance、W7.3 clean Candidate 与中央接线已完成，维护者接受的产品方向保持不变；
+  公开 release/default 仍未发生。
+- ADR-0023 保留 frozen、manual、visibly-labelled legacy engine 并禁止静默回退；W7.3 focused closeout 与
+  中央 current fingerprint Fast/Checkpoint 已完成，最终整页接受由 v0.3.0 Phase 0 单独持有。
 - S0 `orrery-dispatch` 两文件 source 与 PO enforcement 已进入本地 integration line并安装到当前本机 Codex home；标准 Skill 校验、generic routing 与本地门通过。它未发布，也不是 S1 Conductor 或宿主级 first-write enforcement。
 - PO1 source Candidate `93ddfb7` 已进入本地 integration line：dispatch Skill 强制非整合任务使用 `PO-DEC-*`，repository gate 拒绝同树重复正式 ADR 编号；A4 已规范化为 ADR-0019。
-- A4/U2.3 local integration 现为 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18、Harness JSON 0.1.2；Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25 和 390px Browser 通过，仍不等于 public/default/release。
+- A4/U2.3 在合入 W7.3 前的 local integration 为 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18、Harness JSON 0.1.2；其 Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25 和 390px Browser 回执作为 child evidence 保留，仍不等于 public/default/release。
+- 当前中央组件为 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19、Harness JSON 0.1.2。W7.3 `44ea200` 与
+  CI7 `111f4ab` 已合流；current fingerprint `0eea7f...` 在 `f41b659...` 上一次 Fast 3/3、一次 Checkpoint
+  4/4 PASS，均 evidence-eligible、zero rerun。旧 fingerprint 的 Checkpoint failure 保留。
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：W7.3 `44ea200` 与 CI7 `111f4ab` 已进入本地中央 merge `079de74`；Phase 0 现等待新 fingerprint 的一次 Fast/Checkpoint、State/Validation 收口和 exact-SHA 整页验收。通过后才注册 Sol-medium Final RC，随后处理 manifest、self-contained ZIP、runtime、双平台 Promotion 与 main/tag/Release 分权。
+- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 中央合流、State/Validation reconciliation 与 current fingerprint Fast/Checkpoint 已完成；现只等待本次 docs commit 的 exact-SHA 桌面/移动整页验收。通过后才注册 Sol-medium Final RC，随后处理 manifest、self-contained ZIP、runtime、双平台 Promotion 与 main/tag/Release 分权。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
 - [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 与 PO enforcement 已本地集成，并只安装到当前本机 Codex home；未进入发布包，S1 Conductor 仍是独立后续事项。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
 - [x] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航/help、轻量全活动任务、“问文档”说明和中央移动复验已完成并本地集成；Promotion/public/default 仍未发生。
-- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：维护者已接受当前 ELK 产品页；revision 17 focused 13/13、vendor/JS/Browser/组件检查通过，但 staged diff 被上游 ELK 固有空格阻断。scope revision 18 只允许两条 exact `-whitespace` 属性后完成 clean Candidate；正式 Fast/Checkpoint 留给 W7.3+CI7 中央 fingerprint。
-- [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：clean `111f4ab` 已实现 acceptance gates、surface receipt、validation lease、predictive refusal 与 no-repeat；`290482f` Checkpoint 42/42 PASS，但 Fast 按预测门非绿拒绝，必须在中央集成 fingerprint 重新路由并取得新证据。
+- [x] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：clean `44ea200`、中央 merge `ae90974`、pinned ELK inventory、focused/browser 与 current central Fast/Checkpoint 已完成；最终全页 acceptance 转由 v0.3.0 Phase 0 持有。
+- [x] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：clean `111f4ab` 与中央 current fingerprint fresh Fast 3/3、Checkpoint 4/4 已完成；旧 refusal/failure 均保留，Promotion 仍由 Final RC 持有。
 - [ ] [U2.2／W7.2 联合验收](validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)：本地联合 Candidate 已就绪；等待维护者真实体验，之后再决定 exact-SHA Promotion。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
 - [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：基础体验返工已进入联合 Candidate；W7.2/U2.2 后的维护者复验、public/default transition 与 Release 尚未完成。

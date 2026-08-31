@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Blocked on W7.3/CI7 Canonical integration and final webpage acceptance; no RC task registered
+Status: Phase 0 integrated routed validation complete; blocked only on exact-SHA final webpage acceptance; no RC task registered
 
 Date: 2026-08-30
 
@@ -12,54 +12,58 @@ Approved Design: [v0.3.0 Release Scope and Default Matrix](../../design/v0-3-0-r
 
 - [ ] W7.3 includes ADR-0020 hierarchy, ADR-0022 pinned local ELK layout-only integration and ADR-0023 explicit frozen
   legacy recovery, has integrated State/Validation, reviewed vendor/license/provenance inventory and
-  maintainer-approved final page; no silent engine fallback exists.
-- [ ] CI7 acceptance gates/validation lease/no-repeat/predictive refusal has integrated State/Validation.
-- [ ] A4/U2.3 current central source and component versions are reconciled against final W7.3/CI7.
-- [ ] Child receipts are current for exact integrated surfaces; stale/missing evidence is returned to the owning task.
-- [ ] ADR-0021/default/distribution matrix remains unchanged.
+  maintainer-approved final page; no silent engine fallback exists. Integration, inventory and routed evidence are
+  complete; only the exact integrated page acceptance remains open.
+- [x] CI7 acceptance gates/validation lease/no-repeat/predictive refusal has integrated State/Validation.
+- [x] A4/U2.3 current central source and component versions are reconciled against final W7.3/CI7.
+- [x] Child receipts are current for exact integrated surfaces; stale/missing evidence is returned to the owning task.
+- [x] ADR-0021/default/distribution matrix remains unchanged.
 
 Until all gates pass, do not register Final RC, modify public manifest/components/workflow, push a ref, create a tag or
 build release assets.
 
 ## Phase 0 — clean integration and webpage acceptance
 
-1. Unique integrator merges accepted dependencies into a clean central descendant and reconciles State/Validation/
+1. [x] Unique integrator merges accepted dependencies into a clean central descendant and reconciles State/Validation/
    DEVLOG/indexes additively.
-2. Run CI7-selected integration Fast and Checkpoint once. Do not manually replay child suites with current receipts.
-3. Start the exact integrated Unified page; maintainer accepts all primary pages at 1440×900 and 390×844, including
+2. [x] Run CI7-selected integration Fast and Checkpoint once. Do not manually replay child suites with current receipts.
+3. [ ] Start the exact integrated Unified page; maintainer accepts all primary pages at 1440×900 and 390×844, including
    global stop/rollback, zero overflow and zero console warning/error.
-4. Bind acceptance to the source SHA. Any change after acceptance requires a new page review.
+4. [ ] Bind acceptance to the source SHA. Any change after acceptance requires a new page review.
 
 ### 2026-08-30 central integration acceptance binding
 
-The unique integrator has merged W7.3 exact `44ea200d9dfa0107168ed49b8306393bbfccafa8` and CI7 exact
-`111f4abc47b8122aee5469db4489ad6fb0dee75a` into the current local integration line. This does not satisfy Phase 0
-until the merged source receives fresh CI7 evidence and exact-SHA webpage acceptance.
+The unique integrator merged W7.3 exact `44ea200d9dfa0107168ed49b8306393bbfccafa8` and CI7 exact
+`111f4abc47b8122aee5469db4489ad6fb0dee75a` into the local integration line. The stable relevant source at
+`f41b659720905367351ed11394754f4d7bb6b547` received one fresh Fast and one fresh Checkpoint receipt under CI7
+fingerprint `0eea7fbe07a182de209d080dfa7c2c04a7c12956f801342ebf7c15b0a37aab7d`. Phase 0 remains open only for the
+resulting documentation commit's exact-SHA Unified page acceptance.
 
-- [ ] Register Git-private Workstream `V0.3.0-central-integration-acceptance` on the primary integration worktree,
+- [x] Register Git-private Workstream `V0.3.0-central-integration-acceptance` on the primary integration worktree,
   primary `release-and-toolchain`, affected `test-coverage`, `documentation-system`, `project-structure`,
-  `multi-worktree-collaboration` and `authority-meta-model`, scope revision 1.
-- [ ] Bind this Plan and the matching Final RC Validation from the exact committed task-description version. Expected
+  `multi-worktree-collaboration` and `authority-meta-model`. It started at revision 1 and reached revision 4 through
+  the bounded component/help/mapping corrections recorded in Validation.
+- [x] Bind this Plan and the matching Final RC Validation from the exact committed task-description version. Expected
   writes are limited to central State/Validation/DEVLOG/index reconciliation, component inventory, and a narrow
   `scripts/ci/change-mapping.json` correction plus its existing CI fixture/test only if the integrated dry-run proves
   over-selection. No product feature or release input may be added in this Workstream.
-- [ ] Reconcile runtime component constants with the merged inventory: Core and Observatory pyproject/component
+- [x] Reconcile runtime component constants with the merged inventory: Core and Observatory pyproject/component
   metadata already declare 0.1.19, so the exact `packages/project-orrery-core/src/project_orrery_core/__init__.py` and
   `packages/project-orrery-observatory/src/project_orrery_observatory/__init__.py` version constants must also be
   0.1.19 before routing. This is inventory alignment only; no API/default/release change is authorized.
-- [ ] Keep the reviewed ELK files as Observatory package data, not root managed tools. Remove the four package-local
+- [x] Keep the reviewed ELK files as Observatory package data, not root managed tools. Remove the four package-local
   `vendor/...` entries from exact
   `packages/project-orrery-observatory/src/project_orrery_observatory/component.json`; do not copy vendor bytes into
   the repository root or Skill project template, and do not alter package-data inclusion, hashes or provenance.
-- [ ] Preserve the A4/U2.3 help-surface vocabulary during W7.3 integration. Exact
+- [x] Preserve the A4/U2.3 help-surface vocabulary during W7.3 integration. Exact
   `packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py` must expose the existing
   “事实与规则” label inside the read-only help/status panel while keeping the standalone Authority navigation absent.
   This is copy reconciliation only; it adds no page, authority selection or action.
-- [ ] Create a Git-private human-experience gate receipt for the maintainer's accepted W7.3 product direction and this
+- [x] Create a Git-private human-experience gate receipt for the maintainer's accepted W7.3 product direction and this
   Phase 0 integration contract. The receipt grants validation entry only; it is not release operation authorization.
-- [ ] Run Fast and Checkpoint dry-run/explain first. A predictive or unknown-timing refusal is resolved or reported
+- [x] Run Fast and Checkpoint dry-run/explain first. A predictive or unknown-timing refusal is resolved or reported
   before any formal lease; dry runs do not count as stage evidence.
-- [ ] After the mapping/fingerprint is stable, issue exactly one Fast lease/run and exactly one Checkpoint lease/run.
+- [x] After the mapping/fingerprint is stable, issue exactly one Fast lease/run and exactly one Checkpoint lease/run.
   An unchanged non-green result is not retried or substituted. Record the receipts and total cost in the matching
   Validation.
 - [ ] Commit the reconciled central evidence and rebuild the Unified page from that clean exact SHA. Final RC remains

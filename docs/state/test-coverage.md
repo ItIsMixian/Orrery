@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 ## 当前验证体系
 
@@ -47,9 +47,9 @@ Updated: 2026-08-30
   A4/W7.3/CI7 suites 被禁止。RC 专属门是 manifest、migration/restore、deterministic package、final runtime、
   dual-platform Promotion 与 publication identity，且同 fingerprint 遵守 CI7 no-repeat。
 - W7.3 registry 覆盖 relation schema/fixture、exact-base 幂等 lineage、cycle、role spoof、CAS、stale、legacy、privacy、zero-network、Harness bounded JSON、program/phase/series non-authority、status taxonomy、comparison/conflict 分离以及 pinned-ELK semantic/layout contract。revision-17 focused program/Graph suites为 13/13 PASS；JS byte-safe syntax、vendor inventory和组件版本清点 PASS。scope revision 18 的两条 exact `-whitespace` 属性、vendor SHA-256 与完整 staged diff check 均 PASS。
-- W7.3 当前 total succession 自托管投影在桌面/移动均为 19 nodes／14 edges。Browser focused closeout 覆盖 1440×900 默认 100%／fit 46%／reset 100%、语义色 edge selection 与只读 inspector，以及 390×844 same-fact ledger；两端页面横向 overflow 为 0，console warning/error 为 0。中央整合后的 routed Fast／Checkpoint 尚未运行，不能用本 focused receipt 替代。
+- W7.3 当前 total succession 自托管投影在桌面/移动均为 19 nodes／14 edges。Browser focused closeout 覆盖 1440×900 默认 100%／fit 46%／reset 100%、语义色 edge selection 与只读 inspector，以及 390×844 same-fact ledger；两端页面横向 overflow 为 0，console warning/error 为 0。中央 current fingerprint 已取得 Fast 3/3 与 Checkpoint 4/4 PASS；最终整页 acceptance 仍必须绑定后续 clean docs SHA。
 - 原始 `a520ebc` CI7 routing/cost 实现的 focused contract/portfolio 5/5、完整 `test_ci_validation` 25/25 与 CI contract PASS；当前 inventory 为 421 exact IDs／27 shards／10 lanes／92 Fast／98 Checkpoint。W7.2 Graph-only 从 CI6 的 `collaboration-maintenance + observatory-ui`／23 Checkpoint（含 Maintenance fixture）收敛为 `observatory-graph`／2（不含 fixture）；U2.2 Maintenance 为 22 项且保留真实 Git fixture；Unified security 为 4 项有界 adjacency。该 pre-amendment 开发树 routed Fast 42/42 为 8.057895s，Checkpoint 42/42 为 7.526136s；它们不替代下条 amendment exact-SHA 事实。
-- Amendment assertions 并入现有 CI7 final test ID，因此 Promotion inventory 仍为 421 而不是通过增加 final IDs 扩张；focused policy/lease/p95/no-repeat stable sweep 16/16 PASS。exact `290482f` 唯一 Fast 对 42>20 在 test loading 前 predictive refusal，保持 non-green 且未重试／未由 Checkpoint 替代；唯一 Checkpoint 42/42 PASS（16.417209s/90s，evidence-eligible）。后续 refusal diagnostics 修复不追写旧 receipt，新 final SHA／fingerprint 由中央取得 fresh evidence。
+- Amendment assertions 并入现有 CI7 final test ID，因此 Promotion inventory 仍为 421 而不是通过增加 final IDs 扩张；focused policy/lease/p95/no-repeat stable sweep 16/16 PASS。exact `290482f` 唯一 Fast 对 42>20 在 test loading 前 predictive refusal，保持 non-green 且未重试／未由 Checkpoint 替代；唯一 Checkpoint 42/42 PASS（16.417209s/90s，evidence-eligible）。中央旧 fingerprint 的 Fast 3/3 PASS 与 Checkpoint 组合门 failure 均保留；修正后 current fingerprint `0eea7f...` 在 `f41b659...` 上以 fresh lease 完成 Fast 3/3（0.804195s test runtime）和 Checkpoint 4/4（2.580301s），均 evidence-eligible、zero rerun。
 
 ## 覆盖面
 
@@ -94,7 +94,7 @@ Updated: 2026-08-30
 ## 已知缺口
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
-- CI7 尚待 amended clean Candidate 与中央 exact-SHA Windows／Ubuntu Promotion；本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。
+- CI7 clean Candidate 与 fresh central Fast/Checkpoint 已完成；exact non-main Windows／Ubuntu Promotion 仍待 Final RC。本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。
