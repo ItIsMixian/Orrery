@@ -65,3 +65,9 @@ After the exact lineage rebind, the second Fast/Checkpoint dry-run pair refused 
 unittest discovery contained four W7.3 IDs missing from the registry. No lease or test run occurred. The registry now
 adds the two program-hierarchy IDs as promotion-only `collaboration-maintenance` evidence and the two pure Graph IDs
 as low-cost `observatory-graph` evidence. It does not add broad Workstream globs or Graph→Maintenance dependencies.
+
+A five-method non-formal integration probe then produced two Harness PASS results, two Unified loader errors caused by
+an incorrect test class name (the targets did not run), and one real component-boundary failure. The failure showed
+that W7.3 had listed package-local `vendor/...` files as root `managed_tools`; that contract would require nonexistent
+root/Skill-template duplicates even though the Graph correctly reads the package vendor directory. Scope revision 3
+must remove only those four manifest entries while preserving the package bytes and package-data configuration.
