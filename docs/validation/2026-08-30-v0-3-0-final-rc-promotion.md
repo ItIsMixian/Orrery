@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Local Candidate/package/offline PASS on `ba230555...`; final runtime, Promotion, main and tag Pending; GitHub Release withheld
+Status: Final runtime PARTIAL / Harness blocker; scope revision 8 Pending; Promotion/main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -437,3 +437,27 @@ call, credential/config read or user-state mutation occurred. The exact failed c
 Scope revision 7 is Pending for a command-only local-variable rename to a task-specific non-system name, followed by
 one complete runtime matrix attempt on the unchanged exact archive. No repository/product/test/archive change is
 authorized.
+
+## 2026-08-31 corrected runtime through Harness blocker — Pending Validation
+
+The corrected external orchestration retained exact `ba230555...` archive identity and did not modify the real user
+Skill/config or inspect credentials. Current completed checks are:
+
+- unique repo candidate discovery with the user Skill disabled per invocation;
+- real explicit Skill invocation with expected migration-pending integrated-gate refusal;
+- real implicit Skill selection with ordinary validator exit 0;
+- Unified start/HTTP 200/stop/restart twice with AI disabled;
+- v0.2→0.3 managed upgrade dry-run/apply with eight backups and byte-identical custom `AGENTS.md`;
+- Authority Model migrate/apply and receipt-bound restore to the original manifest hash;
+- missing embedded package failure closure;
+- repo Skill uninstall/reinstall discovery 1→0→1 with equal tree/trash hashes;
+- Harness invalid-argv exit 2, `launch=false`, and no environment sentinel leak.
+
+The normal bundled Harness validate request is non-green: the CLI child exits before JSON because the extracted
+archive's managed assets live at `assets/project-template/`, while `observatory_asset_root()` recognizes only wheel
+assets or source-checkout root tools. Direct CLI stderr ends with
+`RuntimeError: cannot locate packaged or source Observatory managed assets`; the Adapter correctly reports
+`cli_protocol_error`/exit 3.
+
+Scope revision 8 must fix only extracted release-root asset/runtime binding and add the exact final-archive Harness
+regression. Candidate/ZIP/runtime/Promotion evidence must be recreated on the new SHA; no prior PASS is reused.

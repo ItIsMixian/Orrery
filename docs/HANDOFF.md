@@ -80,7 +80,9 @@ Updated: 2026-08-31
     exact `ba230555...` 新 fingerprint Candidate 81/81、双根 package bytes 相同、external offline new-project
     portfolio PASS。scope revision 6 已授权 final runtime、exact non-main Promotion、同 SHA main 与 annotated
     tag；首个 runtime orchestration 在安装前因 `$home`/`$HOME` 变量冲突停止，用户状态未改变。scope revision
-    7 只允许用任务专用变量重建 orchestration 并完整运行一次；必须停在 GitHub Release 创建/asset upload 前。
+    7 corrected runtime 已通过 Codex/Unified/upgrade/migration/Skill lifecycle，但 final ZIP direct Harness validate
+    暴露 extracted asset/runtime root resolution defect。scope revision 8 精确修复后必须重建全部 exact-SHA
+    evidence；Promotion 未开始，最终仍停在 GitHub Release 创建/asset upload 前。
 
 ## 不得外推的边界
 

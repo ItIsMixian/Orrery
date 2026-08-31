@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Corrected Final Runtime Reaches Extracted-root Harness Blocker
+
+- exact `ba230555...` archive identity 保持 162 entries／ZIP `7a0cf3dd...`。Codex CLI 0.151.0-alpha.7.2 + Sol
+  medium 的 unique discovery、真实 explicit negative、implicit positive、Unified restart、v0.2 upgrade、migration/
+  restore、dependency failure 与 Skill 1→0→1 lifecycle 通过，真实 user Skill 未写入。
+- Harness invalid argv exit 2、launch=false、environment sentinel 不泄漏；正常 validate 却因 extracted archive
+  的 `assets/project-template/` 未被 `observatory_asset_root()` 识别而在 CLI JSON 前 exit 1，Adapter exit 3。
+- scope revision 8 只允许 inventory/context 两处 release-root binding 与一个 final-archive package owner regression；
+  新 SHA 必须重做 Candidate/package/runtime，旧 `ba230555...` 不可 Promotion。
+
 ## 2026-08-31 — Final Runtime Pre-install Variable Failure; Corrected Orchestration Authorized
 
 - scope revision 6 首个 Codex lifecycle orchestration 在第一条安装/发现命令前失败：PowerShell 局部 `$home`

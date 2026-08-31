@@ -52,7 +52,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Candidate/package/offline PASS。首个 runtime orchestration 在安装前因 `$home`/`$HOME` 冲突 non-green，未触碰用户状态；scope revision 7 只更名外部脚本局部变量并完整运行一次。绿色后继续 Promotion/main/tag，停在 GitHub Release 前。
+- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：corrected runtime 已通过真实显式/隐式 Codex、Unified lifecycle、v0.2 upgrade/migration/restore、dependency failure 与 Skill lifecycle；final ZIP 直接 Harness validate 因 extracted asset root 无法解析而 exit 3。scope revision 8 精确修复两份 context/inventory source 加一个 package owner regression；Promotion 继续阻塞。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
@@ -96,5 +96,5 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 按 scope revision 7 用任务专用 PowerShell 变量完整运行一次 `ba230555...` Codex/Harness runtime；绿色后推 exact non-main Promotion并推进同 SHA main/tag。
+1. 按 scope revision 8 修复 final ZIP embedded-source context，形成新 SHA并重新完成 Candidate/package/runtime。
 2. 停在 GitHub Release 创建/asset upload 前，向维护者提交完整证据与已知限制。
