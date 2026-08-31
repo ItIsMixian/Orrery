@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Candidate 80/81; One Stale Portfolio Expectation
+
+- exact `ac44630...` 使用唯一 Candidate lease 完成 81 tests／12.061400s；80 success，1 failure，无 timeout 或
+  runner error，receipt 非 evidence-eligible 且旧 fingerprint 不重试。
+- 唯一失败是 `test_generic_router_selects_docs_authority_and_collaboration_portfolios` 的硬编码列表漏掉已进入
+  versioned fixture 的 `release-candidate-packaging`；不是产品、mapping 或 router failure。
+- scope revision 5 只允许补这一项 ID 并在新 fingerprint 运行一次 Candidate；不改 assertion 语义、fixture、
+  mapping、预算或产品，也不做部分替代。
+
 ## 2026-08-31 — Candidate Dry-run Non-evidence Correctly Distinguished from Refusal
 
 - REL4 merge `0f82d565...` 的唯一 Candidate dry-run 选择 81 tests，exit 0、acceptance shadow-allow、timing

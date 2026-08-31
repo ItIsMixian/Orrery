@@ -96,7 +96,9 @@ Updated: 2026-08-31
 - v0.3.0 release-input Fast 75／Checkpoint 81 与 bounded Focused 均在测试加载前拒绝。后续 Candidate dry-run
   在 merge `0f82d565...` 上选择 81 tests，acceptance=`shadow-allow`、timing=`allow`、runner_errors=[]；
   `successful=false/evidence_eligible=false` 只是所有 dry-run 的固定非证据语义，reuse refusal 不阻止 fresh
-  Candidate。scope revision 4 允许一次正式 Candidate；仍禁止重跑、拆批或冒充 PASS。
+  Candidate。scope revision 4 的 exact `ac44630...` Candidate 为 80/81；唯一 failure 是
+  `test_ci_validation.py` 的 fixture-ID 期望漏掉已存在的 `release-candidate-packaging`。scope revision 5 只修
+  这一行并在新 fingerprint 跑一次 Candidate；旧失败不得重试、拆批或冒充 PASS。
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
 - CI7 clean Candidate 与 fresh central Fast/Checkpoint 已完成；exact non-main Windows／Ubuntu Promotion 仍待 Final RC。本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。

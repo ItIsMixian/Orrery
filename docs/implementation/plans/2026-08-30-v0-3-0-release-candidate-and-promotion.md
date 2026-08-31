@@ -430,6 +430,22 @@ authorized. If Candidate is green, continue the already-authorized two-root dete
 new-project portfolio on that same SHA. A non-green Candidate/build/runtime result stops without retry or substitute
 evidence. Push, main, tag, asset upload and GitHub Release remain forbidden at this scope.
 
+### 2026-08-31 scope revision 5 — stale release portfolio expectation
+
+The unique formal Candidate on exact `ac44630c84afc84d887a63bd43541e41ecc0a38c` executed all 81 selected tests
+once in 12.061400s. Eighty passed; the only failure was
+`test_generic_router_selects_docs_authority_and_collaboration_portfolios`, whose hardcoded ordered fixture-ID list
+still begins with `docs-only` and omits the already-versioned `release-candidate-packaging` object. The production
+registry, generic portfolio fixture and selection plan all contain the new ID as intended. The receipt is non-green,
+not evidence-eligible and will never be retried on the same fingerprint.
+
+Scope revision 5 authorizes only `tests/test_ci_validation.py` to add exact `release-candidate-packaging` at the start
+of that existing expected ID list, plus the usual Plan/Validation/State/PROGRESS/HANDOFF/DEVLOG/index reconciliation.
+No assertion, portfolio object, mapping, router, product, budget or selected-test inventory may otherwise change.
+After the one-line correction and a clean commit, run one Candidate dry-run on the new fingerprint; only if allowed,
+run one fresh Candidate. Green then resumes the scope-revision-4 same-SHA build/offline gates. Any other non-green
+result stops without retry. Push/main/tag/assets/Release remain forbidden.
+
 ## Phase 1 — register Final RC and freeze inputs
 
 1. Create an isolated Sol-medium Final RC Workstream from the accepted central SHA with precise expected writes.

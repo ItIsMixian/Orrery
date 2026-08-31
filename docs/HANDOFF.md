@@ -72,7 +72,8 @@ Updated: 2026-08-31
     已授权并实现 CLI→Core 0.1.19 pin、自包含 offline scaffold runtime projection 与 canonical release notes。
     三个产品提交已选择性进入中央，中央 baseline 为 `ef145180...`；任务分支 75/81 CI7 dry-run 在加载测试前
     拒绝。Candidate preview 随后在 `0f82d565...` 选择 81 tests，acceptance/timing 均 allow，但任务误把固定
-    dry-run non-evidence/reuse refusal 写成 run refusal。scope revision 4 已纠正语义并允许唯一 fresh Candidate；
+    dry-run non-evidence/reuse refusal 写成 run refusal。纠正后的 exact `ac44630...` Candidate 为 80/81；唯一
+    failure 是 stale fixture-ID expectation。scope revision 5 只修这一行并运行一次新 fingerprint Candidate；
     不得表述为公开生效，也不得 push ref、改 main、tag、上传 asset 或创建 Release。
 
 ## 不得外推的边界

@@ -362,3 +362,17 @@ Branch commit `b9f9c82...` is preserved as the task's mistaken classification an
 revision 4 must append a correction, issue exactly one fresh Candidate lease/run for the already selected 81 tests,
 and—only after green—run the same-SHA deterministic build/offline portfolio. No second dry-run, router change, retry,
 manual split or substitute evidence is authorized.
+
+## 2026-08-31 exact Candidate `ac44630...` — 80/81 FAIL
+
+The scope-revision-4 Candidate used one lease, loaded all 81 selected tests, completed in 12.061400s and did not time
+out. It reports 80 success records and one failure:
+
+`test_ci_validation.CIValidationTests.test_generic_router_selects_docs_authority_and_collaboration_portfolios`
+
+The assertion expected the previous six generic fixture IDs, while the current versioned fixture correctly contains
+`release-candidate-packaging` before them. There are no runner errors and no other failing test. The receipt remains
+`successful=false`, `evidence_eligible=false`; its fingerprint is blocked and is not retried.
+
+Pending scope revision 5 is one exact test-expectation line, followed by one new-fingerprint Candidate dry-run and—if
+allowed—one fresh Candidate. No mapping/fixture/product change or partial substitute is accepted.
