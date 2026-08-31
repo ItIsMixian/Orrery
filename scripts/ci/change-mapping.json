@@ -104,11 +104,15 @@
         "packages/project-orrery-core/src/project_orrery_core/collaboration.py",
         "packages/project-orrery-core/src/project_orrery_core/maintenance*.py",
         "packages/project-orrery-core/src/project_orrery_core/workspace_*.py",
-        "packages/project-orrery-core/src/project_orrery_core/workstream_*.py",
+        "packages/project-orrery-core/src/project_orrery_core/workstream_program_hierarchy.py",
+        "packages/project-orrery-core/src/project_orrery_core/workstream_relation_execution.py",
+        "packages/project-orrery-core/src/project_orrery_core/workstream_relations.py",
         "packages/project-orrery-core/src/project_orrery_core/review.py",
         "packages/project-orrery-core/src/project_orrery_core/schema/collaboration-*.json",
         "packages/project-orrery-core/src/project_orrery_core/schema/maintenance-*.json",
-        "packages/project-orrery-core/src/project_orrery_core/schema/workstream-*.json",
+        "packages/project-orrery-core/src/project_orrery_core/schema/workstream-program-hierarchy-v1.json",
+        "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-execution-v1.json",
+        "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relations-v1.json",
         "packages/project-orrery-core/src/project_orrery_core/schema.py",
         "packages/project-orrery-cli/src/project_orrery_cli/worktree.py",
         "packages/project-orrery-cli/src/project_orrery_cli/workstream_*.py",
@@ -117,9 +121,7 @@
         "tests/test_collaboration*.py",
         "tests/test_workstream_relations.py",
         "tests/test_workstream_relation_execution.py",
-        "tests/test_workstream_relation_capture.py",
         "tests/test_workstream_program_hierarchy.py",
-        "tests/fixtures/workstream-relation-capture/**",
         "tests/test_workspace_maintenance.py"
       ],
       "subsystems": [
@@ -133,9 +135,28 @@
       "high_risk": true
     },
     {
+      "id": "collaboration-relation-capture",
+      "patterns": [
+        "packages/project-orrery-core/src/project_orrery_core/workstream_relation_capture.py",
+        "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-capture-v2.json",
+        "tests/test_workstream_relation_capture.py",
+        "tests/fixtures/workstream-relation-capture/**"
+      ],
+      "subsystems": [
+        "multi-worktree-collaboration"
+      ],
+      "surfaces": [
+        "relation proposal lifecycle",
+        "mechanical lineage capture",
+        "human confirmation authority"
+      ],
+      "high_risk": true
+    },
+    {
       "id": "observatory-shell",
       "patterns": [
         "packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py",
+        "packages/project-orrery-observatory/src/project_orrery_observatory/relation_inbox.py",
         "packages/project-orrery-observatory/src/project_orrery_observatory/inventory.py",
         "packages/project-orrery-observatory/src/project_orrery_observatory/display_vocabulary.py",
         "scripts/docsite/build_unified_observatory.py",
@@ -6645,49 +6666,49 @@
       "test_id": "test_harness_json_adapter.HarnessJsonAdapterTests.test_relation_harness_can_suggest_and_inspect_but_remote_decisions_fail_closed", "owner_surface": "Packaging/Adapters/docsite", "owner_shard": "packaging-adapters", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["adapters"], "reason": "heavy W7.3 Harness relation evidence via adapters"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_absorbs_requires_context_and_human_integrator", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 relation authority evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_absorbs_requires_context_and_human_integrator", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 relation authority evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_agent_harness_remote_and_session_spoof_cannot_decide", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 relation authority evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_agent_harness_remote_and_session_spoof_cannot_decide", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 relation authority evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_cli_json_suggest_inspect_and_remote_accept_receipts_are_bounded", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 relation CLI evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_cli_json_suggest_inspect_and_remote_accept_receipts_are_bounded", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 relation CLI evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_cycle_duplicate_and_self_edges_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 Core DAG evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_cycle_duplicate_and_self_edges_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 Core DAG evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_explicit_series_is_display_metadata_and_predecessor_stays_proposed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 task-series evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_explicit_series_is_display_metadata_and_predecessor_stays_proposed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 task-series evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_integrator_required_for_project_gate_and_personal_owner_is_sole_default", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 integrator evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_integrator_required_for_project_gate_and_personal_owner_is_sole_default", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 integrator evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_legacy_dependency_without_gate_remains_unknown_and_non_blocking", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 legacy compatibility evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_legacy_dependency_without_gate_remains_unknown_and_non_blocking", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 legacy compatibility evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_privacy_path_size_count_and_symlink_style_boundaries_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 private-store safety evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_privacy_path_size_count_and_symlink_style_boundaries_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 private-store safety evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_private_observed_heads_can_seed_repair_proposal_but_never_make_it_effective", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 self-host repair evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_private_observed_heads_can_seed_repair_proposal_but_never_make_it_effective", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 self-host repair evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_registration_auto_derived_from_is_exact_and_idempotent", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 exact lineage evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_registration_auto_derived_from_is_exact_and_idempotent", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "direct W7.3 exact lineage, automatic supersession, and Core-only derived_from authority evidence"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_schema_append_only_suggest_change_defer_reject_and_cas", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 append-only CAS evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_schema_append_only_suggest_change_defer_reject_and_cas", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 append-only CAS evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_stale_confirmation_stops_blocking_and_old_revision_conflicts_are_rejected", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 stale-confirmation evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_stale_confirmation_stops_blocking_and_old_revision_conflicts_are_rejected", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 stale-confirmation evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_task_owner_accepts_local_gate_and_current_effective_relation_blocks", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 gate lifecycle evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_task_owner_accepts_local_gate_and_current_effective_relation_blocks", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 gate lifecycle evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_team_integrator_grant_revoke_cas_spoof_and_empty_registry_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 Team integrator evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_team_integrator_grant_revoke_cas_spoof_and_empty_registry_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 Team integrator evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_versioned_positive_and_negative_schema_fixtures", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["collaboration-maintenance"], "reason": "low W7.3 schema fixture evidence via collaboration-maintenance"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_versioned_positive_and_negative_schema_fixtures", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["collaboration-relation-capture"], "reason": "low W7.3 schema fixture evidence via collaboration-relation-capture"
     },
     {
       "test_id": "test_workstream_program_hierarchy.WorkstreamProgramHierarchyTests.test_schema_human_authority_cas_and_path_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 program hierarchy authority, CAS, and path-boundary evidence"
