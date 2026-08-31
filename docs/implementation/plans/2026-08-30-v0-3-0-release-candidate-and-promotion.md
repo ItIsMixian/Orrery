@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Final Candidate/runtime PASS on `e120aaa...`; Promotion authorized and pending; GitHub Release withheld
+Status: Promotion preflight FAIL on `e120aaa...`; scope revision 9 machine-output fix authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -541,6 +541,33 @@ Scope revision 8 completed on exact `e120aaae27f9f4e1b74c72c053dd2f6e72eed88b`. 
 package identity, offline scaffold, direct final-bundle Harness, real Codex explicit/implicit invocation, Unified
 restart, v0.2 upgrade/migrate/restore, dependency failure and recoverable Skill lifecycle are green. The frozen SHA
 is now eligible for the already-authorized `promotion/v0.3.0-rc` push; no later evidence-only commit may replace it.
+
+### 2026-08-31 scope revision 9 — machine-only Promotion inventory output
+
+Exact `e120aaa...` was pushed to `promotion/v0.3.0-rc` and remote equality was verified. Promotion run
+`33449930707` failed in preflight before any lane or repository gate ran: `test_inventory.py --lane-list` imported the
+test inventory, whose docsite modules printed `building reader…` and related lines before the JSON array. Workflow
+command substitution wrote those lines to `$GITHUB_OUTPUT`, which rejected the multiline value as invalid format.
+Both named smoke jobs then failed closed because no lane artifacts existed. The run is immutable and is not replayed.
+
+One local diagnostic invocation omitted `DOCSITE_AI_ENABLED=0` and reached the configured `openai-compat` briefing/
+roadmap/milestone path. It is not evidence and may have incurred Provider cost; all subsequent inventory commands must
+disable AI before imports.
+
+Scope revision 9 authorizes the unique integrator to modify only:
+
+- `scripts/ci/test_inventory.py`: set the inventory process to AI-disabled before test discovery; for `--lane-list`
+  and `--shard-list`, redirect incidental discovery stdout away from machine stdout so stdout is exactly one compact
+  JSON array line; retain diagnostics on stderr and preserve normal `--output`/human summary behavior;
+- `tests/test_ci_validation.py`: extend an existing CI control owner to prove list modes are parseable single-line JSON
+  despite a synthetic incidental stdout emitter, while inventory IDs/order remain unchanged;
+- matching Plan/Validation/State/PROGRESS/HANDOFF/DEVLOG/index records.
+
+No workflow graph, test inventory, lane assignment, budget, product, release archive or required-check name may
+change. The fix creates a new exact SHA: run one CI7 Candidate dry-run/run for the changed CI surface, rebuild twice
+and prove release ZIP/checksum entries remain equivalent except source-bound receipt fields, then rerun the required
+exact-SHA final runtime and update the existing promotion ref by fast-forward only. A new Promotion run is allowed
+once; any non-green result stops without same-SHA replay. GitHub Release remains withheld.
 
 ## Phase 1 — register Final RC and freeze inputs
 

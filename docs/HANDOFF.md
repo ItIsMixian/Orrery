@@ -82,7 +82,9 @@ Updated: 2026-08-31
     tag；首个 runtime orchestration 在安装前因 `$home`/`$HOME` 变量冲突停止，用户状态未改变。scope revision
     7 corrected runtime 暴露 extracted asset/runtime root defect；scope revision 8 exact `e120aaa...` 已修复并
     完成 Candidate 36/36、双根 package、final ZIP Harness、真实 Codex、Unified、upgrade/migration/Skill lifecycle。
-    现在可推 non-main Promotion；最终仍停在 GitHub Release 创建/asset upload 前。
+    Promotion run `33449930707` 在 lanes 前因 machine lane-list stdout 被 docsite 日志污染而失败关闭。scope
+    revision 9 只修 JSON-only/AI-disabled inventory output，随后用新 SHA 重走 gates；最终仍停在 GitHub Release
+    创建/asset upload 前。
 
 ## 不得外推的边界
 

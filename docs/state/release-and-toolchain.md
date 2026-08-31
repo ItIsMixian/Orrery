@@ -17,8 +17,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   action-time authorization；首个 runtime orchestration 在安装前因 PowerShell `$home`/`$HOME` 冲突停止且
   未改变用户状态。corrected runtime 随后通过 Codex/Unified/upgrade/migration/Skill lifecycle，但 final ZIP
   direct Harness validate 因 extracted release-root assets 无法解析而 exit 3。scope revision 8 exact
-  `e120aaa...` 已修复并完成 Candidate/package/final runtime PASS；现可进入 non-main Promotion。GitHub Release
-  create/upload 仍未授权。
+  `e120aaa...` 已修复并完成 Candidate/package/final runtime PASS。Promotion run `33449930707` 在任何 lane 前因
+  lane-list stdout 污染 `$GITHUB_OUTPUT` 而 non-green；scope revision 9 生成新 SHA。GitHub Release create/upload
+  仍未授权。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。

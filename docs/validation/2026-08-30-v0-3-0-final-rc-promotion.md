@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Candidate/package/final runtime PASS on `e120aaa...`; Promotion/main/tag Pending; GitHub Release withheld
+Status: Promotion preflight FAIL before lanes; scope revision 9 Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -497,3 +497,19 @@ The external runtime root is
 
 The previous `ba230555...` Harness failure remains historical and is not reused. Exact `e120aaa...` is ready for the
 authorized non-main Promotion. No remote ref, main, tag, asset upload or GitHub Release operation has yet occurred.
+
+## 2026-08-31 Promotion run `33449930707` preflight — FAIL
+
+Remote `promotion/v0.3.0-rc` resolved exactly to `e120aaae27f9f4e1b74c72c053dd2f6e72eed88b`. The push-triggered
+Promotion run failed before inventory upload, lanes or repository gates:
+
+- exact-SHA bind passed;
+- `test_inventory.py --lane-list` emitted docsite build/corpus lines before its JSON lane array;
+- `$GITHUB_OUTPUT` rejected `pages: 23 ADR / 6 state / 2 snap / 209 classified docs` as invalid format;
+- lane and repository-gate jobs were skipped; Windows/Ubuntu smoke jobs failed closed during aggregation because
+  their required artifacts did not exist.
+
+No test or package build ran remotely. The run is retained as non-green and is not replayed. A local reproduction
+confirmed the stdout contract and accidentally ran with AI enabled, reaching the configured provider path; that
+diagnostic is excluded from evidence. Scope revision 9 must make machine list stdout JSON-only with AI disabled,
+without changing inventory/lane semantics, then validate a new SHA.

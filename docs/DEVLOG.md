@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-31 — Promotion Preflight Rejects Noisy Lane-list Output
+
+- remote `promotion/v0.3.0-rc` 精确等于 `e120aaa...`；run `33449930707` 的 exact-SHA bind 通过，但
+  `--lane-list` 将 docsite build/corpus 日志和 JSON 一起写入 `$GITHUB_OUTPUT`，preflight invalid-format FAIL。
+- lanes/gates 均未运行，Windows/Ubuntu smoke 因无 artifacts 失败关闭；旧 run 保留且不重放。
+- 本地复现首次漏设 AI-disabled 并到达 configured provider path，不计 evidence且可能产生 Provider cost。
+  scope revision 9 只修 AI-disabled discovery + JSON-only stdout，inventory/lane/workflow graph 不变。
+
 ## 2026-08-31 — Scope Revision 8 Candidate and Final Runtime PASS
 
 - exact `e120aaa...` 的 CI7 Candidate 36/36 PASS、zero rerun；两根 162-entry ZIP/checksum/receipt byte-identical，
