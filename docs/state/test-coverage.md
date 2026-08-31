@@ -8,6 +8,9 @@ Updated: 2026-08-30
 - Fast 使用 15 秒预算；Checkpoint 使用 90 秒预算；完整 Promotion 保留每个 final unittest ID、动态 build、结构／docsite／链接／发布包／diff gate 与安全预算。
 - CI6 integration baseline inventory 为 404 unique unittest IDs、27 logical shards、10 physical lanes/OS、88 Fast、89 Checkpoint；U2 登记后为 415，U2.1 将四组新断言折叠进既有 owner test IDs，registry inventory 保持 415。`team-relations-execution` 保持独立 300 秒 Promotion 预算。
 - CI6 新增 repo-local `scripts/ci/validate_change.py`，从 Git diff、Git-private Workstream subsystem／expected writes 与版本化 mapping registry 自动选择 exact test IDs，并生成绑定 HEAD/base/dirty fingerprint/registry 的 tier receipt。直接 `unittest` 仍可调试，但不能声明正式 Fast／Checkpoint 证据。
+- CI7 Worktree Candidate 将宽 Observatory mapping 拆为 `observatory-shell`／`observatory-graph`／`observatory-maintenance`／`observatory-team-personal`；actual Git paths 优先，宽 expected-write 与路径重叠失败关闭，subsystem 只在无路径证据时保守 fallback。receipt 追加非权威 `cost_diagnostics`、四类 over-budget 诊断、单次 feature triage 与第二独立 Workstream recurrence advisory；这些字段不参与 PASS/FAIL、Authority、release 或自动任务。
+- CI7 maintainer amendment 当前新增 versioned composable `all_of` acceptance gates（experience／contract／measurement／operation／matrix）、exact contract/blob + relevant-surface fingerprint、legacy shadow/new-task opt-in/explicit adoption、human-only experience/operation authority 与 mechanical evidence 的 prior human contract approval。Personal 仍 zero-network；Team 只投影 request-only bounded metadata。
+- Opt-in routed validation 现由 one-run Git-private lease 绑定 Workstream/scope/stage/fingerprint/exact IDs/p95/budget/receipt inputs；runner 在加载测试前拒绝 missing/forged/stale/expired/consumed/wrong-stage lease。unchanged success 返回 prior receipt；failure/timeout 为 `validation-cost-blocked`，无 human override 不可重跑。iterating 只有 non-evidence focused（20 tests／20s／120s per scope）；Fast/Checkpoint predictive headroom 为 20 IDs/10s 与 single 30s/total 60s，未修改原 15／90 秒预算。
 - lane runner 为每个 logical shard 启动独立 Python 子进程，保留原 shard result 并生成 lane receipt；失败、缺失、重复、extra、manifest/SHA/OS/order drift 或取消均使 aggregate 失败关闭。
 - required check 名称仍为 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`；main branch protection strict 且 enforce-admins。
 
@@ -45,6 +48,8 @@ Updated: 2026-08-30
   dual-platform Promotion 与 publication identity，且同 fingerprint 遵守 CI7 no-repeat。
 - W7.3 registry 覆盖 relation schema/fixture、exact-base 幂等 lineage、cycle、role spoof、CAS、stale、legacy、privacy、zero-network、Harness bounded JSON、program/phase/series non-authority、status taxonomy、comparison/conflict 分离以及 pinned-ELK semantic/layout contract。revision-17 focused program/Graph suites为 13/13 PASS；JS byte-safe syntax、vendor inventory和组件版本清点 PASS。scope revision 18 的两条 exact `-whitespace` 属性、vendor SHA-256 与完整 staged diff check 均 PASS。
 - W7.3 当前 total succession 自托管投影在桌面/移动均为 19 nodes／14 edges。Browser focused closeout 覆盖 1440×900 默认 100%／fit 46%／reset 100%、语义色 edge selection 与只读 inspector，以及 390×844 same-fact ledger；两端页面横向 overflow 为 0，console warning/error 为 0。中央整合后的 routed Fast／Checkpoint 尚未运行，不能用本 focused receipt 替代。
+- 原始 `a520ebc` CI7 routing/cost 实现的 focused contract/portfolio 5/5、完整 `test_ci_validation` 25/25 与 CI contract PASS；当前 inventory 为 421 exact IDs／27 shards／10 lanes／92 Fast／98 Checkpoint。W7.2 Graph-only 从 CI6 的 `collaboration-maintenance + observatory-ui`／23 Checkpoint（含 Maintenance fixture）收敛为 `observatory-graph`／2（不含 fixture）；U2.2 Maintenance 为 22 项且保留真实 Git fixture；Unified security 为 4 项有界 adjacency。该 pre-amendment 开发树 routed Fast 42/42 为 8.057895s，Checkpoint 42/42 为 7.526136s；它们不替代下条 amendment exact-SHA 事实。
+- Amendment assertions 并入现有 CI7 final test ID，因此 Promotion inventory 仍为 421 而不是通过增加 final IDs 扩张；focused policy/lease/p95/no-repeat stable sweep 16/16 PASS。exact `290482f` 唯一 Fast 对 42>20 在 test loading 前 predictive refusal，保持 non-green 且未重试／未由 Checkpoint 替代；唯一 Checkpoint 42/42 PASS（16.417209s/90s，evidence-eligible）。后续 refusal diagnostics 修复不追写旧 receipt，新 final SHA／fingerprint 由中央取得 fresh evidence。
 
 ## 覆盖面
 
@@ -89,7 +94,7 @@ Updated: 2026-08-30
 ## 已知缺口
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
-- CI6 的宽 `observatory-ui`／expected-write scope 仍可能让 Graph-only diff 选中无关 Maintenance real-Git fixture；receipt 也尚未汇总测试优化投入、重跑与回本诊断。CI7 已规划但未实现，当前 stage authority、15/90 秒预算与 Promotion 门保持不变。
+- CI7 尚待 amended clean Candidate 与中央 exact-SHA Windows／Ubuntu Promotion；本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

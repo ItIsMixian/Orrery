@@ -276,6 +276,34 @@
   Browser 1440×900／390×844 的 Personal／Team／Graph 均无横向溢出或 console warning/error，Graph 无确认按钮。
   repository/release/archive/diff 门通过；不运行 Promotion、不 push main、不发布、不改 v0.2.0。
 
+## 2026-08-30 — CI7 Exact-SHA Evidence Correction
+
+- clean `290482f` 上唯一 amended Fast 对 42-test plan 在加载测试前以
+  `fast-selected-count-exceeds-20` predictive refusal，保持 non-green、未重试且未由 Checkpoint 替代；同一
+  fingerprint 的唯一 Checkpoint 42/42 PASS（16.417209s/90s，evidence-eligible）。
+- 审校后修复 plan-known refusal diagnostics：保留机械 selected count、change volume、rerun count 与空 slow
+  IDs，runtime、runner setup/build 和宿主 usage 继续为 `Unknown`。负向断言折叠进既有 CI7 final ID，不扩大
+  421-ID inventory，也不追写 immutable `290482f` receipt。
+- 此 follow-up 只运行 focused CI contract；不重跑正式 Fast/Checkpoint 或 Promotion。新 Candidate 因 SHA／
+  fingerprint 已变化，必须由中央基于最终 actual diff 处理 over-selection 并取得 fresh tier evidence。定向
+  refusal／mapping contracts 3/3 与 CI contract PASS。
+
+## 2026-08-30 — CI7 Composable Acceptance Gates & Validation Leases Amendment
+
+- 维护者以 task-description commit `a67b8c6` 扩展既有 CI7；分支从 clean retained Candidate `a520ebc` 继续，
+  Git-private scope revision 2 精确绑定 Plan/Validation blob。实现阶段使用 GPT-5.6 Sol medium，未读取或写入
+  W7.3 worktree，未改根 PROGRESS/HANDOFF、产品 Core/CLI/Observatory、版本、release/public/default 或 workflow。
+- 新增 versioned all-of acceptance policy、five gate kinds、human-only experience/operation、pre-approved exact
+  contract mechanical evidence、relevant-surface freshness、legacy shadow/new-task opt-in/explicit adoption、Personal
+  zero-network/Team request-only projection、bounded review packages 与 data-only profiles。
+- Routed formal execution新增 one-run Git-private lease；runner 在加载 tests 前验证 exact Workstream/scope/stage/
+  fingerprint/IDs/p95/budget。unchanged success 复用 prior receipt；failure/timeout cost-blocked，只有 request-bound
+  human override 可重跑。iterating focused、Fast/Checkpoint predictive headroom、valid-receipt timing summaries 与
+  router+runner setup/build total cost 均失败关闭，不改变 15／90 秒或 stage authority。
+- 新 assertions 合并进既有 CI7 final unittest ID，保持 421-ID Promotion inventory。Focused policy/lease/p95/
+  no-repeat stable sweep 16/16 PASS；唯一 amended Fast/Checkpoint 与 clean Candidate gates 的实际结果由上方
+  evidence correction 记录。本分支不 push/main/release，完整 Promotion 留给中央 exact-SHA acceptance。
+
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
 - 唯一整合者从 clean `codex/u1-u2-integration-baseline@6166d15` 先合入 W7.2.3 exact `30d44ff`，再合入 U2.2 exact `70e6ac9`；两条产品文件集合无直接重叠。中央 CI7／ADR-0017 与 W7.2 的 DEVLOG、State、Validation index 只做加法协调，联合 feature merge 为 `0eaad30`。
@@ -1009,3 +1037,18 @@
 - 泛化 corpus 覆盖真实 A4 failure 与另外 9 个 subsystem 场景，以及 stale State、断链 ADR、unindexed concept、unknown schema/version、tamper 和伪造 Agent assertion。临时新项目显示两层；brownfield 默认安装和实际 `--upgrade-tools` 逐字节保留作者 AGENTS/Seed/State。
 - focused、wheel install、integrated validator、repository/release dry-build gates、CI6 Fast 84/84 和 Checkpoint 89/89 均通过。真实 in-app 浏览器在 1440×900 与 390×844 验证单一入口、分层、渐进披露、零 Authority controls、无横向溢出和空 warning/error console；独立 `63204` 服务已停止，中央 `63203` 未触碰。
 - public v0.2.0 tag/asset/checksum/manifest、默认 public consumer、main 与 Release 均未改变；跨宿主强制 pre-model receipt 仍需各 Adapter 证明真实 hook，纯 SKILL.md 不能宣称机械保证。根 PROGRESS/HANDOFF 未修改，留给中央整合者收口。
+
+## 2026-08-30 — CI7 Validation Routing Precision & Total-Cost Diagnostics Candidate
+
+- 从 exact `codex/u1-u2-integration-baseline@3fc7e7a` 建立独立分支并在首次仓库写入前注册 Git-private
+  `CI7-validation-routing-precision-total-cost`；primary `test-coverage`，affected `project-structure`／
+  `documentation-system`／`release-and-toolchain`。实现阶段使用 GPT-5.6 Sol medium；未读取或写入并发
+  A4.1/W7.3 worktree，未修改根 PROGRESS/HANDOFF。
+- 宽 `observatory-ui` 拆为四个 provider-neutral surface；actual path 优先，宽 expected-write、unknown 与
+  overlap 失败关闭。真实 W7.2 Graph portfolio 从 23 项且含 Maintenance fixture 收敛为 2 项且不含该
+  fixture；U2.2 Maintenance 22 项继续保留 real-Git/Quick Remove 门；Unified security 为 4 项有界 adjacency。
+- receipt 追加非权威 cost/over-budget diagnostics、一次 feature triage 与第二独立 Workstream recurrence
+  advisory。宿主 usage 不可得时写 `Unknown`，不估 token；expected future runs/break-even 永不升级为 gate。
+  原始 `a520ebc` focused 5/5、CI contract、完整 CI suite 25/25、pre-amendment 开发树 Fast 42/42
+  （8.057895s）与 Checkpoint 42/42（7.526136s）通过；这些不替代上方 amendment exact-SHA non-green Fast
+  事实。完整 Promotion 不作开发循环；新 final fingerprint 的 hosted checks 留给中央整合。

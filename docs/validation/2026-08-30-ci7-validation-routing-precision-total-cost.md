@@ -2,52 +2,113 @@
 
 Date: 2026-08-30
 
-Status: PENDING — original `a520ebc` routing/cost Candidate retained; acceptance-gate/lease extension not implemented
+Status: amendment focused contracts PASS; exact-SHA Fast honestly non-green; exact-SHA Checkpoint PASS; follow-up Candidate requires fresh central evidence
 
-Authority source: [CI7 Plan and 2026-08-30 amendment](../implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)
+Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
+`3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
+No A4.1/W7.3 worktree was read or written.
 
-## Retained evidence boundary
+Amendment authority is task-description commit `a67b8c61243ab6141fd7a94af4cc2d98cdf0c1e9`: Plan blob
+`32428b78768b348a350a2554fbf0c98790ab33fe` and this Validation's pre-implementation expectation blob
+`e0a9892b1eea99e84bdd93adcea10f4a0ab706d1`. Git-private binding scope revision 2 records those OIDs while the
+repository branch continues from retained Candidate `a520ebc74a0846c148e73312ea2fbf2a32b4b08b`.
 
-Exact branch Candidate `a520ebc74a0846c148e73312ea2fbf2a32b4b08b` may retain its generic Observatory surface
-split, cost diagnostics and local evidence. It does not implement acceptance policies, leases, phase blocking,
-surface-bound receipt freshness or no-repeat enforcement. No prior PASS may close the new scope.
+## Routing contract
 
-## Expected acceptance-policy evidence
+- Actual changed paths are primary. Narrow expected writes are used only without an actual path; subsystem metadata
+  is the final conservative fallback. Directory-wide `**`, unsafe declarations, unmapped paths and mapping overlap
+  return non-evidence refusal receipts with required metadata.
+- The former `observatory-ui` is split into provider-neutral `observatory-shell`, `observatory-graph`,
+  `observatory-maintenance` and `observatory-team-personal`; production registry data contains no task or branch ID.
+- Frozen portfolio result:
 
-- additive versioned schema for composable all-of gates and five initial kinds;
-- human-role enforcement for experience/operation gates and exact pre-approved contracts for mechanical gates;
-- legacy-unclassified shadow compatibility, explicit new-task requirement and human-reviewed legacy adoption;
-- exact path + blob contract refs and surface fingerprint that ignores unrelated docs but stales on relevant changes;
-- Personal zero-network, Team request-only metadata and no transcript/source/diff/credential projection;
-- unknown kind/status, Agent self-accept, stale role/CAS, forged receipt and mixed-gate negative fixtures.
+| Portfolio | CI6 before | CI7 after | Safety result |
+| --- | --- | --- | --- |
+| W7.2 Graph-only | `collaboration-maintenance` + `observatory-ui`; 23 Checkpoint | `observatory-graph`; 2 Checkpoint | Maintenance real-Git fixture changed from selected to absent |
+| U2.2 Maintenance | coarse mixed UI/maintenance | four precise mappings; 22 Checkpoint | real-Git incremental/Quick Remove fixture remains selected |
+| Unified common security | coarse all-UI | `observatory-shell`; 4 Fast | bounded Unified + Personal + Graph fail-closed adjacency |
+| Authority/A4-class live paths | `authority-core` | `authority-core` | no unintegrated A4 file is required |
 
-## Expected validation-lease evidence
+The before result was mechanically evaluated from the exact-base registry; after results used the same generic
+selection algorithm and current integrated files. Missing/duplicate/overlap mapping, unknown path/dependency, broad
+expected-write, forged usage and ROI-as-gate mutations fail closed.
 
-- lease binds Workstream/scope/stage/fingerprint/test IDs/count/p95/budget/receipts/one-run identity;
-- formal runner refuses missing, forged, stale, wrong-stage, over-budget and already-consumed leases before execution;
-- unchanged same-stage request returns the prior receipt; timeout/failure becomes `validation-cost-blocked` and cannot
-  rerun without a human override receipt;
-- direct unittest cannot produce formal tier evidence; heavy common runners fail fast without a valid lease;
-- `iterating` permits only ≤20 focused tests, ≤20 seconds/run and ≤120 cumulative seconds/scope revision;
-- visual task has zero Fast/Checkpoint before human acceptance, then exactly one of each after acceptance.
+## Receipt diagnostics
 
-## Expected routing/cost evidence
+`cost_diagnostics` schema 1 is additive and explicitly `non-authoritative-advisory`. It records selected count, test
+runtime, router/setup wall, reruns, slow IDs, changed test/CI files and lines, independent optimization Workstream,
+optional future runs and simple break-even. Host agent-token/tool usage was unavailable and is exactly `Unknown`; no
+token estimate was made. `gate_effect` is always `none`.
 
-- Fast preflight refuses selected count >20 or predicted p95 >10 seconds;
-- Checkpoint refuses any test p95 >30 seconds or predicted total >60 seconds without changing the 90-second stage
-  budget or treating refusal as PASS;
-- router/setup/build/rerun/optimization cost remains visible and non-authoritative;
-- 95-second Maintenance, full docsite, real-Git multi-repository, packaging and platform matrix workloads stay out of
-  unrelated UI iteration;
-- integration consumes child receipts and selects only integration-owned gates.
+One pre-amendment diagnostic sample selected 25 tests, ran them in 5.009717s, spent 3.620797s in router/setup, recorded zero reruns,
+2 changed test files/155 changed lines and 4 changed CI files/724 changed lines. A maintainer-supplied diagnostic
+example used 12s baseline, 30s optimization investment and 20 expected future runs: saving 6.990283s/run,
+break-even 5 runs, projected net saving 109.805660s. Both the saving and the 30s investment are shown; this example
+is not an ROI gate or forecast fact.
 
-## Portfolios and rollout evidence
+Over-budget diagnostics distinguish product failure, router over-selection, fixture/runtime variance and genuinely
+slow paths. A Git-private counter permits one bounded feature-task triage attempt. A recurrence finding appears only
+when the same fingerprint affects a second distinct Workstream; it creates no task, ADR, State or relation fact.
 
-- UI experience, deterministic contract, measurement, operation authorization, platform matrix, mixed all-of,
-  legacy shadow, unknown kind, receipt staleness and unrelated-doc stability portfolios;
-- focused CI contract tests during implementation; one final routed Fast/Checkpoint after stabilization;
-- exact Candidate, repository gates and unchanged Promotion inventory/lanes/required checks;
-- shadow → new-task enforcement → explicit legacy adoption, with no public/default/release activation.
+## Acceptance and lease amendment
 
-No item is PASS until reproducible implementation evidence is recorded. This Validation does not authorize stage
-substitution, budget waiver, Agent acceptance, remote authorization, release or main promotion.
+- `acceptance_policy` schema 1 uses `all_of` composable gates across five stable kinds. Human-experience and
+  operation gates cannot be closed by Agent/session receipts; operation additionally requires action-time human
+  authorization. Contract, measurement and platform matrix close mechanically only with prior human approval of the
+  same exact contract. Unknown kind/status, missing role/revision/scope binding, Agent self-accept and forged
+  contract/receipt/fingerprint all refuse.
+- Relevant fingerprints cover contract blob, mapping registry and gate-owned source/test paths. Unrelated docs are
+  stable; contract, relevant source, scope revision and declared authority role changes stale the receipt. Personal
+  stays zero-network and Team emits only request-only bounded gate metadata.
+- Git-private validation leases bind Workstream/scope/stage/fingerprint/exact IDs/count/p95/budget/receipt inputs and
+  one run. Missing, forged, expired, consumed, wrong-stage and stale leases refuse before test loading. Success is
+  idempotently reused; failure/timeout is `validation-cost-blocked` and an unchanged retry needs a request-bound human
+  maintainer override.
+- Iterating allows only non-evidence focused runs with 20-test/20-second/120-cumulative-second caps. Fast refuses
+  count above 20 or p95 above 10 seconds; Checkpoint refuses single p95 above 30 or total above 60, including the
+  synthetic 95-second Maintenance portfolio. These are preflight refusals, not changed 15/90 budgets or PASS.
+- Versioned profiles cover UI experience, pre-approved deterministic contract, measurement, operation authorization,
+  Windows/Ubuntu matrix and mixed all-of. Review packages are bounded to 3–5 representative cases plus negative
+  cases. Integration accepts child receipt references and rejects child-owned gate replay.
+
+Amendment assertions are intentionally folded into the existing CI7 final unittest ID, so the frozen Promotion
+inventory remains 421 final IDs rather than growing merely to test the router. The first malformed PowerShell focused
+invocation executed no target tests and is not counted green. Corrected focused policy/lease/p95/no-repeat stable sweep
+is 16/16 PASS. On clean exact SHA `290482fe7cfc502fbd32f733629c5d619736b5f4`, the unique amended Fast was
+invoked once and refused before test loading because the 42-test plan exceeded the predictive 20-test limit
+(`fast-selected-count-exceeds-20`). It is non-green, was not retried and cannot be substituted by Checkpoint. The
+unique amended Checkpoint used the same surface fingerprint and completed its one-run lease with 42/42 PASS in
+16.417209s / 90s, evidence-eligible.
+
+## Local evidence
+
+| Check | Result |
+| --- | --- |
+| focused CI7 acceptance/routing/lease stable sweep | 16/16 PASS |
+| follow-up focused refusal/mapping contracts | 3/3 PASS; no formal stage invoked |
+| `validate_ci.py --all` | PASS |
+| unique routed Fast on `290482f` | predictive refusal before test loading; 42 > 20; non-green; no retry or substitution |
+| unique routed Checkpoint on `290482f` | 42/42 PASS; 16.417209s / 90s; evidence-eligible |
+| Promotion inventory | 421 exact final IDs, each once; 27 logical shards; 10 lanes; 92 Fast; 98 Checkpoint |
+| repository/static/YAML/secret/diff gates | PASS on `290482f`; 726 paths, 394 Markdown files, 1046 links |
+| workflow/manifest text against retained `a520ebc` | byte-equivalent; required checks and lane graph unchanged |
+| complete local Promotion | intentionally not run as a development loop |
+
+The `290482f` Checkpoint cost sample records selected count 42, test runtime 16.417209s, router wall 4.659261s,
+runner setup/build 3.930978s, total setup/build 8.590239s, zero reruns, two changed test files / 511 lines and eight
+changed CI files / 1003 lines. Host usage remains `Unknown`. A follow-up fixes refusal diagnostics so that a plan-known
+predictive refusal also preserves selected count and change volume while runtime, runner setup/build and usage remain
+`Unknown`; this does not retroactively rewrite the immutable `290482f` Fast receipt.
+
+Fast/Checkpoint/Candidate/Promotion meaning, 15/90 second budgets, failure/timeout semantics, exact-SHA binding and
+Windows/Ubuntu required-check names are unchanged. Because Fast is non-green, `290482f` is a clean Git Candidate but
+is not an all-green validation Candidate.
+
+## Remaining central integration work
+
+The central integrator must additively reconcile any newly integrated paths from parallel A4.1/W7.3 without making
+their unintegrated files required here. On a new final fingerprint and actual integrated diff, central must resolve or
+explicitly report Fast router over-selection, then obtain fresh Fast/Checkpoint/Candidate evidence; the green
+`290482f` Checkpoint cannot substitute for its non-green Fast or authorize a new SHA. Central must push the exact
+non-main final SHA and obtain both hosted required checks. This branch does not push, promote main, change a
+component/public release, or edit root PROGRESS/HANDOFF.

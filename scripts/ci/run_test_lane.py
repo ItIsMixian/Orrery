@@ -14,6 +14,8 @@ from _common import (
     DEFAULT_MANIFEST,
     ROOT,
     atomic_write_json,
+    consume_validation_lease,
+    finalize_validation_lease,
     git_sha,
     load_json,
     load_mapping_registry,
@@ -33,6 +35,7 @@ def run_lane(
     output_dir: Path,
     runner_script: Path = SHARD_RUNNER,
     executor: Callable[[list[str]], int] | None = None,
+    validation_lease_plan: Path | None = None,
 ) -> tuple[dict[str, object], bool]:
     manifest = load_json(manifest_path)
     registry = load_mapping_registry(manifest)
@@ -40,6 +43,12 @@ def run_lane(
     lanes = promotion_lane_assignments(manifest)
     if lane not in lanes:
         raise CIValidationError(f"unknown Promotion lane: {lane}")
+    validation_lease = None
+    if validation_lease_plan is not None:
+        plan = load_json(validation_lease_plan)
+        if plan.get("stage") != "promotion" or plan.get("integration_owned_gate") is not True:
+            raise CIValidationError("Promotion lane lease must be integration-owned and stage-matched")
+        validation_lease = consume_validation_lease(plan)
     output_dir.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
     records: list[dict[str, object]] = []
@@ -106,10 +115,16 @@ def run_lane(
         "shards": lanes[lane],
         "records": records,
         "successful": all_successful,
+        "evidence_eligible": all_successful,
         "completed": True,
         "duration_seconds": round(duration, 6),
+        "lease_enforcement": "enforced" if validation_lease is not None else "legacy-shadow",
     }
+    if validation_lease is not None:
+        payload["validation_lease_id"] = validation_lease["lease_id"]
     atomic_write_json(output_dir / "lane-result.json", payload)
+    if validation_lease is not None:
+        finalize_validation_lease(validation_lease, payload)
     return payload, all_successful
 
 
@@ -120,12 +135,17 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--lane", required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--validation-lease-plan", type=Path)
     arguments = parser.parse_args()
     try:
         payload, successful = run_lane(
             manifest_path=arguments.manifest.resolve(),
             lane=arguments.lane,
             output_dir=arguments.output_dir.resolve(),
+            validation_lease_plan=(
+                arguments.validation_lease_plan.resolve()
+                if arguments.validation_lease_plan is not None else None
+            ),
         )
         print(
             f"{'PASS' if successful else 'FAIL'} Promotion lane {payload['lane']}: "

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import math
 import os
 import platform
 import subprocess
@@ -16,8 +17,11 @@ from _common import (
     DEFAULT_MANIFEST,
     ROOT,
     atomic_write_json,
+    block_validation_lease,
+    consume_validation_lease,
     dirty_fingerprint,
     expand_profile,
+    finalize_validation_lease,
     flatten_suite,
     git_sha,
     load_json,
@@ -25,6 +29,7 @@ from _common import (
     machine_inventory,
     repository_import_path,
     sha256_json,
+    update_timing_summary,
     validate_and_expand_manifest,
 )
 
@@ -85,6 +90,114 @@ class TimedTextResult(unittest.TextTestResult):
         super().stopTest(test)
 
 
+def _cost_inputs(plan: dict[str, Any] | None) -> dict[str, Any]:
+    defaults = {
+        "schema_version": 1,
+        "router_setup_wall_seconds": 0.0,
+        "rerun_count": 0,
+        "change_volume": {
+            "test_changed_files": 0, "test_changed_lines": 0,
+            "ci_changed_files": 0, "ci_changed_lines": 0,
+        },
+        "independent_optimization_workstream": False,
+        "expected_future_runs": None,
+        "baseline_test_runtime_seconds": None,
+        "optimization_investment_seconds": None,
+    }
+    if plan is None:
+        return defaults
+    forbidden_claims = {"cost_diagnostics", "host_usage", "agent_token_usage", "tool_usage", "gate_effect"}
+    pending: list[Any] = [plan]
+    while pending:
+        item = pending.pop()
+        if isinstance(item, dict):
+            found = forbidden_claims & set(item)
+            if found:
+                raise CIValidationError(
+                    f"selection plan contains forged usage/token claims or ROI gate fields: {sorted(found)}"
+                )
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+    value = plan.get("cost_diagnostic_inputs")
+    if not isinstance(value, dict) or set(value) != set(defaults):
+        raise CIValidationError(
+            "selection plan cost_diagnostic_inputs must contain only the versioned CI7 advisory fields; "
+            "host usage/token claims or ROI gate fields are not accepted"
+        )
+    if value["schema_version"] != 1:
+        raise CIValidationError("unsupported cost_diagnostic_inputs schema version")
+    volume = value["change_volume"]
+    if not isinstance(volume, dict) or set(volume) != set(defaults["change_volume"]):
+        raise CIValidationError("selection plan change_volume fields are invalid")
+    numeric_fields = ("router_setup_wall_seconds", "rerun_count")
+    if any(
+        not isinstance(value[field], (int, float)) or isinstance(value[field], bool) or value[field] < 0
+        for field in numeric_fields
+    ):
+        raise CIValidationError("selection plan cost diagnostic counts/times must be non-negative")
+    if not isinstance(value["independent_optimization_workstream"], bool):
+        raise CIValidationError("independent optimization Workstream diagnostic must be boolean")
+    for field in ("expected_future_runs", "baseline_test_runtime_seconds", "optimization_investment_seconds"):
+        item = value[field]
+        if item is not None and (
+            not isinstance(item, (int, float)) or isinstance(item, bool) or item < 0
+        ):
+            raise CIValidationError(f"selection plan {field} must be non-negative or null")
+    return value
+
+
+def _over_budget_diagnosis(
+    *, budget_exceeded: bool, result: unittest.TestResult, records: list[dict[str, object]],
+    budget_seconds: float | None, selection_plan: dict[str, Any] | None,
+) -> dict[str, object]:
+    if result.failures or result.errors:
+        classification = "product-test-failure"
+    elif not budget_exceeded:
+        classification = "not-over-budget"
+    elif selection_plan is not None and selection_plan.get("selection_mode") != "actual-changed-paths":
+        classification = "router-over-selection"
+    elif budget_seconds and records and max(float(item["duration_seconds"]) for item in records) >= budget_seconds / 2:
+        classification = "genuinely-slow-path"
+    else:
+        classification = "fixture-runtime-variance"
+    return {
+        "schema_version": 1,
+        "classification": classification,
+        "feature_task_action": (
+            "stop-and-report-to-central-integrator" if classification != "not-over-budget" else "none"
+        ),
+        "bounded_triage_attempts_allowed": 1,
+        "bounded_triage_requested": bool(
+            selection_plan and selection_plan.get("bounded_triage", {}).get("requested")
+        ),
+        "recurrence_finding": "not-evaluated",
+    }
+
+
+def _break_even(inputs: dict[str, Any], runtime: float) -> dict[str, Any]:
+    baseline = inputs["baseline_test_runtime_seconds"]
+    investment = inputs["optimization_investment_seconds"]
+    future_runs = inputs["expected_future_runs"]
+    result: dict[str, Any] = {
+        "status": "not-requested" if future_runs is None else "insufficient-input",
+        "baseline_test_runtime_seconds": baseline if baseline is not None else "Unknown",
+        "optimization_investment_seconds": investment if investment is not None else "Unknown",
+        "seconds_saved_per_run": "Unknown", "break_even_runs": "Unknown",
+        "projected_net_savings_seconds": "Unknown",
+    }
+    if baseline is not None and investment is not None and baseline > runtime:
+        saving = baseline - runtime
+        result.update({
+            "status": "calculated", "seconds_saved_per_run": round(saving, 6),
+            "break_even_runs": int(math.ceil(investment / saving)),
+            "projected_net_savings_seconds": (
+                round(saving * future_runs - investment, 6) if future_runs is not None else "Unknown"
+            ),
+        })
+    return result
+
+
 def _load_selected_tests(test_ids: list[str]) -> unittest.TestSuite:
     loader = unittest.TestLoader()
     with repository_import_path(ROOT):
@@ -101,6 +214,7 @@ def run_selected(
     *, manifest_path: Path, shard: str | None, profile: str | None, output: Path,
     selection_plan_path: Path | None = None,
 ) -> tuple[dict[str, object], bool]:
+    runner_setup_started = time.perf_counter()
     manifest = load_json(manifest_path)
     all_ids, assignments, _ = validate_and_expand_manifest(manifest)
     inventory = machine_inventory(manifest)
@@ -108,6 +222,7 @@ def run_selected(
     head_before = git_sha()
     dirty_before = dirty_fingerprint()
     selection_plan: dict[str, Any] | None = None
+    validation_lease: dict[str, Any] | None = None
     if selection_plan_path is not None:
         if shard is not None or profile is not None:
             raise CIValidationError("selection plan cannot be combined with --shard or --profile")
@@ -131,7 +246,7 @@ def run_selected(
         if selected_ids != sorted(set(selected_ids)):
             raise CIValidationError("selection plan test IDs must be sorted and unique")
         stage = str(selection_plan.get("stage"))
-        if stage not in {"fast", "checkpoint", "candidate"}:
+        if stage not in {"focused", "fast", "checkpoint", "candidate"}:
             raise CIValidationError(f"selection plan has invalid stage: {stage}")
         shard_id = stage
         role = str(selection_plan.get("role"))
@@ -142,6 +257,7 @@ def run_selected(
         selector_dependency_hash = str(
             selection_plan["reuse"]["key"]["selector_dependency_sha256"]
         )
+        validation_lease = consume_validation_lease(selection_plan)
     elif profile is not None:
         selected_ids = expand_profile(manifest, profile, all_ids)
         shard_id = profile
@@ -183,7 +299,22 @@ def run_selected(
         relevant_tree_hash = (
             tree.stdout.strip().lower() if tree.returncode == 0 else sha256_json([head_before, dirty_before])
         )
-    suite = _load_selected_tests(selected_ids)
+    diagnostic_inputs = _cost_inputs(selection_plan)
+    try:
+        suite = _load_selected_tests(selected_ids)
+    except (CIValidationError, OSError) as exc:
+        if validation_lease is not None:
+            block_validation_lease(validation_lease, {
+                "schema_version": 2,
+                "contract_type": "orrery-test-shard-result-v2",
+                "outcome": "runner-error",
+                "successful": False,
+                "evidence_eligible": False,
+                "duration_seconds": 0.0,
+                "runner_errors": [str(exc)],
+            })
+        raise
+    runner_setup_wall_seconds = max(0.0, time.perf_counter() - runner_setup_started)
     started = time.perf_counter()
     with repository_import_path(ROOT):
         result = unittest.TextTestRunner(verbosity=2, resultclass=TimedTextResult).run(suite)
@@ -238,7 +369,7 @@ def run_selected(
         "tests_run": result.testsRun,
         "successful": successful,
         "completed": True,
-        "evidence_eligible": successful,
+        "evidence_eligible": successful and stage != "focused",
         "outcome": outcome,
         "duration_seconds": round(duration, 6),
         "budget_seconds": budget_seconds,
@@ -254,8 +385,51 @@ def run_selected(
             "Move only inventory-declared heavy journeys to Promotion; do not record this over-budget run as tier evidence."
             if budget_exceeded else None
         ),
+        "cost_diagnostics": {
+            "schema_version": 1,
+            "authority": "non-authoritative-advisory",
+            "selected_test_count": len(selected_ids),
+            "test_runtime_seconds": round(duration, 6),
+            "router_setup_wall_seconds": diagnostic_inputs["router_setup_wall_seconds"],
+            "runner_setup_build_wall_seconds": round(runner_setup_wall_seconds, 6),
+            "total_setup_build_wall_seconds": round(
+                diagnostic_inputs["router_setup_wall_seconds"] + runner_setup_wall_seconds, 6
+            ),
+            "rerun_count": diagnostic_inputs["rerun_count"],
+            "slow_test_ids": [str(item["test_id"]) for item in slowest],
+            "change_volume": diagnostic_inputs["change_volume"],
+            "independent_optimization_workstream": diagnostic_inputs["independent_optimization_workstream"],
+            "host_usage": {
+                "status": "Unknown", "agent_token_usage": "Unknown", "tool_usage": "Unknown",
+            },
+            "expected_future_runs": (
+                diagnostic_inputs["expected_future_runs"]
+                if diagnostic_inputs["expected_future_runs"] is not None else "Unknown"
+            ),
+            "break_even": _break_even(diagnostic_inputs, duration),
+            "gate_effect": "none",
+        },
+        "over_budget_diagnosis": _over_budget_diagnosis(
+            budget_exceeded=budget_exceeded, result=result, records=records,
+            budget_seconds=budget_seconds, selection_plan=selection_plan,
+        ),
     }
+    if selection_plan is not None and validation_lease is not None:
+        payload.update({
+            "acceptance_policy": selection_plan.get("acceptance_policy"),
+            "surface_fingerprint": selection_plan.get("surface_fingerprint"),
+            "timing_prediction": selection_plan.get("timing_prediction"),
+            "task_phase": selection_plan.get("task_phase"),
+            "validation_lease_id": validation_lease["lease_id"],
+        })
     atomic_write_json(output, payload)
+    if validation_lease is not None:
+        finalize_validation_lease(validation_lease, payload)
+        if successful and stage != "focused":
+            update_timing_summary(
+                payload,
+                environment_key=f"{platform.system()}:{platform.python_version()}",
+            )
     return payload, successful
 
 
@@ -268,6 +442,17 @@ def main() -> int:
     group.add_argument("--selection-plan", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
+
+    def block_plan_lease(failure: dict[str, object]) -> None:
+        if arguments.selection_plan is None or not arguments.selection_plan.is_file():
+            return
+        try:
+            plan = load_json(arguments.selection_plan.resolve())
+            lease = plan.get("validation_lease")
+            if isinstance(lease, dict):
+                block_validation_lease(lease, failure)
+        except (CIValidationError, OSError):
+            return
     try:
         payload, successful = run_selected(
             manifest_path=arguments.manifest.resolve(),
@@ -314,6 +499,7 @@ def main() -> int:
             "python": platform.python_version(),
         }
         atomic_write_json(arguments.output.resolve(), failure)
+        block_plan_lease(failure)
         print("FAIL shard runner: interrupted; no tier evidence is valid", file=sys.stderr)
         return 130
     except (CIValidationError, OSError) as exc:
@@ -342,6 +528,7 @@ def main() -> int:
             "python": platform.python_version(),
         }
         atomic_write_json(arguments.output.resolve(), failure)
+        block_plan_lease(failure)
         print(f"FAIL shard runner: {exc}", file=sys.stderr)
         return 2
 
