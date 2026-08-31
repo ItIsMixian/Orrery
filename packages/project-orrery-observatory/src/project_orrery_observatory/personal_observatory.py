@@ -1503,7 +1503,10 @@ def _maintenance_activity_label(value: object) -> str:
         parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
     except ValueError:
         return "最近证据待确认"
-    return parsed.strftime("最近检查 %m月%d日 %H:%M")
+    return (
+        f"最近检查 {parsed.month:02d}月{parsed.day:02d}日 "
+        f"{parsed.hour:02d}:{parsed.minute:02d}"
+    )
 
 
 def _maintenance_row(entry: Mapping[str, Any], *, hidden: bool, control: bool) -> str:

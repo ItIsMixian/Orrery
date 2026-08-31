@@ -42,8 +42,13 @@ class CliWheelInstallationTests(unittest.TestCase):
             staged_packages.mkdir(parents=True)
             for name in PACKAGE_NAMES:
                 shutil.copytree(REPOSITORY_ROOT / "packages" / name, staged_packages / name)
-            shutil.copytree(REPOSITORY_ROOT / "scripts" / "docsite", staged_repository / "scripts" / "docsite")
-            shutil.copy2(REPOSITORY_ROOT / "start-docsite.bat", staged_repository / "start-docsite.bat")
+            component = json.loads(
+                (REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src" / "project_orrery_observatory" / "component.json").read_text(encoding="utf-8")
+            )
+            for relative in component["managed_tools"]:
+                destination = staged_repository / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(REPOSITORY_ROOT / relative, destination)
 
             wheelhouse = root / "wheelhouse"
             wheelhouse.mkdir()
@@ -70,9 +75,6 @@ class CliWheelInstallationTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
             observatory_wheel = next(wheelhouse.glob("project_orrery_observatory-*.whl"))
-            component = json.loads(
-                (REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src" / "project_orrery_observatory" / "component.json").read_text(encoding="utf-8")
-            )
             with zipfile.ZipFile(observatory_wheel) as bundle:
                 wheel_entries = set(bundle.namelist())
             for relative in component["managed_tools"]:

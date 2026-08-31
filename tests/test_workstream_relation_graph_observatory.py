@@ -782,7 +782,7 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         test_ids = [item["test_id"] for item in mapping["tests"]]
         self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
         self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))
-        self.assertNotIn("scripts/docsite/build_workstream_relation_graph.py", component["managed_tools"])
+        self.assertIn("scripts/docsite/build_workstream_relation_graph.py", component["managed_tools"])
 
 
 if __name__ == "__main__":

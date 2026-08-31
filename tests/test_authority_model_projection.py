@@ -202,18 +202,16 @@ class AuthorityModelReleaseProjectionTests(unittest.TestCase):
             self.assertNotIn("authority_model_version", manifest)
 
     def test_published_v020_contracts_remain_historical_and_unversioned(self) -> None:
-        public = load_object(PUBLIC_RELEASE_PATH)
+        current = load_object(PUBLIC_RELEASE_PATH)
         bundled = load_object(BUNDLED_V020_PATH)
-        for payload in (public, bundled):
-            with self.subTest(source=payload.get("version")):
-                self.assertEqual(payload["version"], "0.2.0")
-                self.assertNotIn("authority_model_version", payload)
-                self.assertNotIn(
-                    "authority_model_versions", payload["compatibility"]
-                )
+        self.assertEqual(bundled["version"], "0.2.0")
+        self.assertNotIn("authority_model_version", bundled)
+        self.assertNotIn("authority_model_versions", bundled["compatibility"])
+        self.assertEqual(current["version"], "0.3.0")
+        self.assertEqual(current["authority_model_version"], 1)
         release = default_release_contract()
-        self.assertIsNone(release.authority_model_version)
-        self.assertEqual(release.supported_authority_model_versions, ())
+        self.assertEqual(release.authority_model_version, 1)
+        self.assertEqual(release.supported_authority_model_versions, (1,))
 
 
 if __name__ == "__main__":

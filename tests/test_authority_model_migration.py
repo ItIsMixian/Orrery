@@ -211,7 +211,7 @@ class AuthorityModelMigrationCliTests(unittest.TestCase):
             self.assertEqual(code, 0)
             data = payload["data"]
             self.assertEqual(payload["command"], "migrate-authority-model")
-            self.assertEqual(payload["versions"]["cli"], "0.1.19")
+            self.assertEqual(payload["versions"]["cli"], "0.1.22")
             self.assertEqual(data["project_root"], str(root.resolve()))
             self.assertTrue(data["allowed"])
             self.assertTrue(data["backup_required"])

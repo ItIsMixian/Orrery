@@ -175,9 +175,9 @@ class StackedLineageTests(unittest.TestCase):
             ]
             self.assertEqual(chain_direct, [])
             page = render_personal_observatory_panel(projection)
-            self.assertIn("Stacked chain", page)
+            self.assertIn("接续任务链", page)
             self.assertIn(w5d_base[:9], page)
-            self.assertIn("unique findings in explicit chain", page)
+            self.assertIn("任务链内独立发现", page)
 
             sibling = self._add_worktree(
                 fixture, "stack-w5e", "codex/stack-w5e", w5d_base,

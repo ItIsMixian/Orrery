@@ -19,28 +19,28 @@ OBSERVATORY_SOURCE = (
 for source in (CORE_SOURCE, CLI_SOURCE, OBSERVATORY_SOURCE):
     sys.path.insert(0, str(source))
 
-from project_orrery_cli.context import repository_context  # noqa: E402
+from project_orrery_cli.context import CliContext, repository_context  # noqa: E402
 from project_orrery_cli.update import evaluate, main  # noqa: E402
+from project_orrery_core.manifests import ReleaseContract  # noqa: E402
 
 
 PUBLIC_RELEASE_PATH = (
     REPOSITORY_ROOT / "skills" / "project-orrery" / "release-manifest.json"
 )
+PUBLISHED_V020_PATH = (
+    CORE_SOURCE / "project_orrery_core" / "data" / "release-v0.2.0.json"
+)
 
 
 def load_public_release() -> dict[str, object]:
-    value = json.loads(PUBLIC_RELEASE_PATH.read_text(encoding="utf-8"))
+    value = json.loads(PUBLISHED_V020_PATH.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise AssertionError("public release fixture is not an object")
     return value
 
 
 def future_release() -> dict[str, object]:
-    release = copy.deepcopy(load_public_release())
-    release["version"] = "0.3.0"
-    release["authority_model_version"] = 1
-    release["compatibility"]["authority_model_versions"] = {"supported": [1]}
-    return release
+    return copy.deepcopy(json.loads(PUBLIC_RELEASE_PATH.read_text(encoding="utf-8")))
 
 
 def project_manifest(*, model: object = ...) -> dict[str, object]:
@@ -146,6 +146,12 @@ class AuthorityUpdateCompatibilityTests(unittest.TestCase):
             )
             output = io.StringIO()
             with contextlib.redirect_stdout(output):
+                source_context = repository_context()
+                historical_context = CliContext(
+                    release=ReleaseContract(load_public_release()),
+                    authority_root=source_context.authority_root,
+                    observatory_root=source_context.observatory_root,
+                )
                 code = main(
                     [
                         "--target",
@@ -154,7 +160,7 @@ class AuthorityUpdateCompatibilityTests(unittest.TestCase):
                         str(manifest_path),
                         "--json",
                     ],
-                    context=repository_context(),
+                    context=historical_context,
                 )
             payload = json.loads(output.getvalue())
             self.assertEqual(code, 5)

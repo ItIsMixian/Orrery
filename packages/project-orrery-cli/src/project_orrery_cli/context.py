@@ -39,10 +39,17 @@ def repository_context() -> CliContext:
 def skill_context(skill_root: Path) -> CliContext:
     """Bridge an existing Skill manifest and Observatory projection into the neutral CLI."""
     root = skill_root.expanduser().resolve()
+    runtime_root: Path | None = None
+    if (root / "packages" / "component-versions.json").is_file():
+        runtime_root = root
+    elif root.parent.name == "skills":
+        source_root = root.parent.parent
+        if (source_root / "packages" / "component-versions.json").is_file():
+            runtime_root = source_root
     return CliContext(
         release=ReleaseContract.from_path(root / "release-manifest.json"),
         authority_root=authority_template_root(),
         observatory_root=root / "assets" / "project-template",
-        runtime_root=root,
-        managed_runtime=MANAGED_RUNTIME,
+        runtime_root=runtime_root,
+        managed_runtime=MANAGED_RUNTIME if runtime_root is not None else (),
     )

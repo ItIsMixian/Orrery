@@ -28,6 +28,7 @@ POLICY_PATH = REPOSITORY_ROOT / "packaging" / "authority-release-candidate-polic
 CORE_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-core" / "src"
 CLI_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-cli" / "src"
 OBSERVATORY_SOURCE = REPOSITORY_ROOT / "packages" / "project-orrery-observatory" / "src"
+PUBLISHED_RELEASE_PATH = CORE_SOURCE / "project_orrery_core" / "data" / "release-v0.2.0.json"
 SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:[-+][0-9A-Za-z.-]+)?$")
 SECRET_PATTERNS = (
     re.compile(rb"sk-[A-Za-z0-9]{20,}"),
@@ -189,10 +190,10 @@ def _validate_candidate_manifest(
     except (KeyError, TypeError, ValueError) as exc:
         raise CandidateGateError(f"invalid candidate release contract: {exc}") from exc
     version = contract.version
-    current = _read_object(SKILL_ROOT / "release-manifest.json")
-    if _version_tuple(version) <= _version_tuple(str(current["version"])):
+    published = _read_object(PUBLISHED_RELEASE_PATH)
+    if _version_tuple(version) <= _version_tuple(str(published["version"])):
         raise CandidateGateError(
-            f"candidate version {version} must be newer than historical {current['version']}"
+            f"candidate version {version} must be newer than published {published['version']}"
         )
     if expected_version is not None and version != expected_version:
         raise CandidateGateError(
@@ -359,7 +360,10 @@ def _json_command(arguments: list[str], *, cwd: Path) -> dict[str, Any]:
 
 def _offline_lifecycle(extracted_skill: Path, temporary: Path) -> dict[str, Any]:
     installer = extracted_skill / "scripts" / "install_project_orrery.py"
-    public_installer = SKILL_ROOT / "scripts" / "install_project_orrery.py"
+    published_skill = temporary / "published-v0.2.0"
+    shutil.copytree(SKILL_ROOT, published_skill)
+    shutil.copy2(PUBLISHED_RELEASE_PATH, published_skill / "release-manifest.json")
+    public_installer = published_skill / "scripts" / "install_project_orrery.py"
 
     new_target = temporary / "new-project"
     _require_success(
@@ -374,8 +378,8 @@ def _offline_lifecycle(extracted_skill: Path, temporary: Path) -> dict[str, Any]
 
     legacy_target = temporary / "legacy-project"
     _require_success(
-        _run([sys.executable, "-X", "utf8", str(public_installer), "--target", str(legacy_target), "--title", "Legacy"], cwd=REPOSITORY_ROOT),
-        "current-source v0.2-manifest legacy scaffold",
+        _run([sys.executable, "-X", "utf8", str(public_installer), "--target", str(legacy_target), "--title", "Legacy"], cwd=temporary),
+        "frozen published v0.2 legacy scaffold",
     )
     if "authority_model_version" in _read_object(legacy_target / ".project-orrery.json"):
         raise CandidateGateError("historical scaffold unexpectedly selected a model")

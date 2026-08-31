@@ -261,6 +261,12 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
                     "amends": ["ADR-0001", "ADR-0004", "ADR-0006", "ADR-0008"]
                 },
                 "ADR-0017": {"amends": ["ADR-0008", "ADR-0014"]},
+                "ADR-0018": {"amends": ["ADR-0007", "ADR-0012"]},
+                "ADR-0020": {
+                    "amends": ["ADR-0007", "ADR-0014", "ADR-0017"]
+                },
+                "ADR-0022": {"amends": ["ADR-0020"]},
+                "ADR-0023": {"amends": ["ADR-0022"]},
             },
         )
 

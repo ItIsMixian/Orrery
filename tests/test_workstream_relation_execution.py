@@ -166,25 +166,29 @@ class SuccessionGitFixture:
     ) -> None:
         base_id = self.parents[workstream_id] if exact_lineage else None
         task_base = self.task_bases[workstream_id] if exact_lineage else None
-        write_workstream_session(
-            self.worktrees[workstream_id],
-            workstream_id=workstream_id,
-            primary_subsystem_id="project-structure",
-            affected_subsystem_ids=(
-                "documentation-system",
-                "release-and-toolchain",
-                "test-coverage",
-            ),
-            expected_writes=(f"fixture/{workstream_id}.txt",),
-            validation_surfaces=(f"fixture:{workstream_id}",),
-            runtime_condition=runtime_condition,
-            lifecycle_phase=lifecycle_phase,
-            evidence_freshness=evidence_freshness,
-            closure_reason=closure_reason,
-            base_workstream_id=base_id,
-            task_base_oid=task_base,
-            captured_at=DISCOVERY_AT,
-        )
+        with mock.patch(
+            "project_orrery_core.workstream_relation_capture.auto_capture_derived_from",
+            return_value={"status": "fixture-disabled", "writes_performed": False},
+        ):
+            write_workstream_session(
+                self.worktrees[workstream_id],
+                workstream_id=workstream_id,
+                primary_subsystem_id="project-structure",
+                affected_subsystem_ids=(
+                    "documentation-system",
+                    "release-and-toolchain",
+                    "test-coverage",
+                ),
+                expected_writes=(f"fixture/{workstream_id}.txt",),
+                validation_surfaces=(f"fixture:{workstream_id}",),
+                runtime_condition=runtime_condition,
+                lifecycle_phase=lifecycle_phase,
+                evidence_freshness=evidence_freshness,
+                closure_reason=closure_reason,
+                base_workstream_id=base_id,
+                task_base_oid=task_base,
+                captured_at=DISCOVERY_AT,
+            )
 
     def reset_head(self, workstream_id: str, oid: str) -> None:
         path = self.worktrees[workstream_id]
@@ -473,7 +477,22 @@ class WorkstreamRelationExecutionTests(unittest.TestCase):
         ) as temporary:
             before_status = fixture.statuses()
 
-            fixture._write("W6", exact_lineage=False)
+            w6_session_path = Path(
+                inspect_worktree_status(fixture.worktrees["W6"])["session"]["path"]
+            )
+            exact_w6_session = w6_session_path.read_bytes()
+            legacy_w6_session = json.loads(exact_w6_session)
+            legacy_w6_session["lineage"] = {
+                "lineage_schema_version": 1,
+                "status": "legacy-unknown",
+                "base_workstream_id": None,
+                "task_base_oid": None,
+                "validated_head": None,
+            }
+            w6_session_path.write_text(
+                json.dumps(legacy_w6_session, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
             legacy = fixture.discovery(include_similarity=True)
             self.assertIn(
                 "legacy-no-lineage-evidence",
@@ -488,7 +507,7 @@ class WorkstreamRelationExecutionTests(unittest.TestCase):
                 "branch-or-path-similarity-insufficient-evidence",
             )
             self.assertFalse(legacy["similarity_inference_permitted"])
-            fixture._write("W6")
+            w6_session_path.write_bytes(exact_w6_session)
 
             parent = fixture.worktrees["W5D"]
             baseline = str(fixture.task_bases["W5E"])

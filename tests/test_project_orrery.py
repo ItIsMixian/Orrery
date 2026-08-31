@@ -349,9 +349,14 @@ class ProjectOrreryTests(unittest.TestCase):
             )
             self.assertEqual(harness.returncode, 0, harness.stdout + harness.stderr)
             harness_payload = json.loads(harness.stdout)
-            self.assertEqual(harness_payload["status"], "ok")
+            self.assertEqual(harness_payload["status"], "warning")
             self.assertEqual(harness_payload["command"], "validate")
             self.assertTrue(harness_payload["data"]["valid"])
+            self.assertFalse(harness_payload["data"]["integrated"])
+            self.assertIn(
+                "authority_migration_pending",
+                {item["code"] for item in harness_payload["warnings"]},
+            )
 
     def test_fresh_install_validates_and_builds(self) -> None:
         with tempfile.TemporaryDirectory(prefix="project-orrery-test-") as temporary:
