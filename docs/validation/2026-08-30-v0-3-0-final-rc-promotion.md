@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Promotion run `33451288289` FAIL on `4556db3...`; scope revision 10 remediation Pending; main/tag not started
+Status: Scope revision 10 Candidate dry-run REFUSED before tests; revision 11 mapping Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -577,3 +577,15 @@ Raw remote evidence remains at GitHub Actions run `33451288289`. Downloaded aggr
 Scope revision 10 is Pending. It may correct only the exact product/workflow/test surfaces listed in the Plan, must
 retain all test IDs and Promotion coverage, and must create a new SHA. `main`, `v0.3.0`, GitHub Release and asset
 upload have not started.
+
+## 2026-08-31 revision-10 Candidate dry-run — REFUSED before tests
+
+Exact `5dbc494c146c4c2b867380e24ea0333b854b6185` contains the bounded revision-10 implementation. Its one Candidate
+dry-run against `4556db3...` returned exit 2 before selection-plan creation, lease issuance or test loading. The only
+runner error is an unmapped actual/expected path:
+
+`scripts/authority_release_candidate_gate.py`
+
+The existing `release-packaging` mapping already owns the gate's registered tests but does not list the script path.
+Revision 11 is Pending for that single exact pattern. This refused SHA/fingerprint is not rerun, and it supplies no
+Candidate evidence.

@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Promotion run `33451288289` failed on exact `4556db3...`; scope revision 10 remediation authorized; GitHub Release withheld
+Status: Scope revision 10 Candidate dry-run refused before tests; revision 11 mapping amendment authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -623,6 +623,19 @@ run once. A green Candidate is followed by two exact-Git builds, the existing bo
 one fast-forward Promotion update/run on the new SHA. No same-SHA rerun, per-lane retry or split substitute is
 allowed. Main, tag and GitHub Release remain blocked until both required checks are green; final publication still
 stops before GitHub Release creation or asset upload.
+
+### 2026-08-31 scope revision 11 — register the existing Authority release gate surface
+
+Candidate dry-run on exact `5dbc494c146c4c2b867380e24ea0333b854b6185` refused before test loading because
+`scripts/authority_release_candidate_gate.py` was absent from every generic path mapping. The script's twelve existing
+test IDs are already registered under `authority-core + release-packaging`; no test dependency, stage or inventory
+member is missing.
+
+Revision 11 authorizes only `scripts/ci/change-mapping.json` to add the exact script path to the existing
+`release-packaging` mapping, plus the matching authority/evidence records. It must not add a new mapping ID, test ID,
+dependency, portfolio, budget, lane or task-specific condition. The refused fingerprint is not retried. Commit the
+mapping as a new SHA, refresh the Git-private scope before the write, and generate one new Candidate dry-run against
+`4556db3...`; all later gates remain as specified by revision 10.
 
 ## Phase 1 — register Final RC and freeze inputs
 
