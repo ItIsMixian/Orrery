@@ -112,6 +112,9 @@ Updated: 2026-08-31
 - revision-9 Fast 20/20 PASS；Checkpoint 29/30，唯一 failure 是 hardcoded portfolio ID list。补一行后
   `test_ci_validation.py` 触发 ci-control，使新 dry-run Fast 41/23.297s 拒绝、Checkpoint 51/27.988s allowed。
   revision 10 撤回两条新 portfolio/一行 list，保留 precise mappings；失败 fingerprint 不重跑。
+- revision-10 rollback 后为 20/30；Checkpoint 14.991s allowed，Fast 因 setup p95 9.320s + actual-path deep
+  check 0.817s = 10.300s 拒绝。revision 11 只把该 existing test 移到 Checkpoint，Fast 仍有 inventory/mutation
+  两个 mapping 哨兵；无 ID/预算/Promotion 变化。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

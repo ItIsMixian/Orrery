@@ -44,7 +44,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：revision-9 Fast 20/20 PASS；Checkpoint 29/30，仅 hardcoded portfolio list 失败。修 list 后 ci-control 使 Fast 41 拒绝。revision 10 撤回两条 examples/一行 list、保留 precise mapping，之后只对新 fingerprint dry-run；旧 Checkpoint 不重跑。
+- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：revision-10 已恢复 20/30；Checkpoint 14.991s allowed，Fast 因 setup 9.320s + actual-path deep check 0.817s = 10.300s 拒绝。revision 11 只把该深检移到 Checkpoint，Fast 保留两个 mapping 哨兵，再对新 fingerprint dry-run。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。

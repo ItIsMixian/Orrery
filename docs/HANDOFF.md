@@ -44,7 +44,8 @@ Updated: 2026-08-31
   route，不得手工重放 child suites。source `15f013b` 保持 421 final IDs；两次 dry-run 均在 test loading 前
   拒绝，revision 8 已补 precise mapping。真实窗口当前 25/31 + one Unknown；3/4 mapping-only 窗口被拒绝，
   revision 9 以 one focused owner 和 Brand tiering 收口到 20/30。Fast 20/20 PASS；Checkpoint 因 hardcoded
-  portfolio list 29/30。修 list 后 Fast 41 拒绝，revision 10 撤回新增 examples/list，旧 fingerprint 不重跑。
+  portfolio list 29/30。修 list 后 Fast 41 拒绝，revision 10 撤回新增 examples/list；新窗口 20/30 中 Fast
+  又因 setup+actual-path 为 10.300s 拒绝。revision 11 只做该 deep-check tier correction。
 
 ## 当前可继续的线路
 
@@ -65,8 +66,8 @@ Updated: 2026-08-31
 13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 与 current fingerprint fresh Fast 3/3、Checkpoint 4/4
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
-15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` 进入 scope revision 10；revision-7 页面已确认，
-    现在恢复 portfolio/test-list 原 bytes 并对新 fingerprint dry-run；允许后才 fresh route、同步
+15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` 进入 scope revision 11；revision-7 页面已确认，
+    现在把 actual-path deep check 移到 Checkpoint 并对新 fingerprint dry-run；允许后才 fresh route、同步
     evidence、重建 final docs SHA；全部通过后才创建独立 Sol-medium RC；
     RC 只消费 child receipts 并运行 integration/package/runtime/Promotion-owned gates，不得提前改 public
     manifest、push ref、tag 或 Release。

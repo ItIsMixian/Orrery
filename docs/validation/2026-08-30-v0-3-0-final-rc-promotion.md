@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — revision-10 CI portfolio rollback required before a new fingerprint can receive formal leases
+Status: PENDING — revision-11 mapping deep-check tier correction required before a new fingerprint can receive formal leases
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -253,3 +253,12 @@ Expected formal selections are 20/30 with no deleted test or raised budget. Form
 
 Revision 10 is Pending until the two new fixture objects and one test-list line return byte-for-byte to their earlier
 form. The failed Checkpoint is not retried; any later formal pair must use a new fingerprint after dry-run.
+
+### Revision-10 rollback dry-run and revision-11 gate
+
+The portfolio fixture and test list returned byte-for-byte to pre-revision-8 form. New fingerprint `b7423560...`
+selects Fast 20 and Checkpoint 30 with no Unknown. Checkpoint allows at 14.991177s. Fast refuses at 10.299653s because
+router setup p95 is 9.320101s and the actual-path mapping deep check is 0.817371s. No lease or test ran.
+
+Revision 11 moves only that existing test to Checkpoint; two mapping Fast sentinels remain. Expected Fast is 19 with
+predicted p95 below 10 seconds; Checkpoint stays 30. Formal runs remain zero for this fingerprint.

@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS (CI7 feature Candidate); Phase 0 revision-10 portfolio rollback and new-fingerprint evidence remain Pending
+Status: PASS (CI7 feature Candidate); Phase 0 revision-11 tier correction and new-fingerprint evidence remain Pending
 
 Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
 `3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
@@ -140,3 +140,7 @@ Revision-9 formal Fast passed 20/20; Checkpoint failed only the hardcoded portfo
 green. Updating that list expanded the next Fast plan to 41 through `ci-control`, so revision 10 removes the two new
 examples and the list insertion while preserving the precise path mappings. This is a source correction and creates a
 new fingerprint; the failed lease remains blocked and is never retried.
+
+Revision-10 rollback restores 20/30, but Fast's 9.320s setup p95 plus the 0.817s actual-path deep check exceeds the
+10-second predictive cap. Revision 11 moves that one existing check to Checkpoint while preserving two Fast mapping
+sentinels and all higher-stage coverage; it does not raise a budget or weaken Promotion.

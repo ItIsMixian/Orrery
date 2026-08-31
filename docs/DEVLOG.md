@@ -1,5 +1,12 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Revision-11 Mapping Deep-check Tier Correction
+
+- revision-10 rollback 恢复真实窗口 20/30；Checkpoint 14.991s allowed，Fast 10.300s refused。
+- Fast 的固定 setup p95 已是 9.320s，actual-path/overlap deep check 为 0.817s；即使删除其余 tiny tests 仍
+  超 10s。revision 11 将这一项移到 Checkpoint，Fast 保留 inventory 与 mutation 哨兵。
+- 不增删 test ID、不涨预算、不减 Candidate/Promotion；formal lease 仍未为该 fingerprint 创建。
+
 ## 2026-08-31 — Phase 0 Revision-10 Portfolio Expansion Rollback
 
 - policy-v4 后 unique Fast 20/20 PASS（0.880405s）；unique Checkpoint 29/30，唯一 failure 为新增 portfolio

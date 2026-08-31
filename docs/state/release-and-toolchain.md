@@ -55,6 +55,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   revision 9 保留真实窗口，以一次 focused owner + Brand 2-fast/4-checkpoint 分层收敛成本，不改变 release 门。
 - revision-9 unique Fast 20/20 PASS；Checkpoint 因新增 portfolio 未同步 hardcoded list 而 29/30。修 list 后
   Fast 又因 ci-control 41 项拒绝。revision 10 撤回新增 examples/list，等待新 fingerprint；Final RC 仍未注册。
+- revision-10 rollback fingerprint 的 Checkpoint 预测允许，Fast 仅因 setup+actual-path deep check 为 10.300s
+  拒绝。revision 11 做单项 tier correction，不改变 release authority；仍无 Final RC。
 
 ## 兼容与安全边界
 

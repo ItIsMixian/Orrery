@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 revision-10 portfolio expansion rollback authorized after ci-control over-selection; no RC task registered
+Status: Phase 0 revision-11 mapping deep-check tier correction authorized; no RC task registered
 
 Date: 2026-08-30
 
@@ -245,6 +245,19 @@ mapping evidence will instead be:
 No test or coverage item is deleted; only the two new data examples that caused broad `ci-control` selection are
 withdrawn. After the rollback commit, real-base Fast/Checkpoint dry-run must return to the bounded product window
 before any new policy receipt or formal lease is created.
+
+### 2026-08-31 scope revision 11 — Fast setup leaves no room for the 0.817s mapping deep check
+
+After revision-10 rollback, real-base dry-run returns to Fast 20 / Checkpoint 30 under fingerprint `b7423560...`.
+Checkpoint allows at predicted 14.991s. Fast still refuses at predicted 10.300s because router setup p95 is 9.320s
+and `test_actual_paths_are_primary_broad_scope_refuses_and_overlap_fails_closed` alone is 0.817s; removing all other
+tiny Fast tests would still leave the plan above 10 seconds.
+
+Revision 11 may modify only `scripts/ci/change-mapping.json` to move that existing deep mapping/overlap check from
+Fast to Checkpoint/Candidate/Promotion. Fast retains exact inventory-staleness and registry-mutation fail-closed
+sentinels; Checkpoint retains all three plus the generic portfolio gate. No ID, assertion, budget, mapping, required
+check or Promotion coverage changes. Expected new plan is Fast 19 below 10 seconds and Checkpoint 30; refusal stops
+without a lease.
 
 ## Phase 1 — register Final RC and freeze inputs
 
