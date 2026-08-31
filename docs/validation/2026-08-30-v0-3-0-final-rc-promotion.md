@@ -84,3 +84,15 @@ one app-level Documentation entry, removes only the duplicate root `dashboard` a
 and exposes “事实与规则” in the existing help panel without restoring an Authority navigation item. The corrected
 composition method passes; the host/origin/cookie method remains green. Across the final unique non-formal integration
 set, both Harness methods, two Unified methods and the component-boundary method pass. No formal lease has been issued.
+
+Two existing evidence-eligible child Checkpoint receipts were imported into CI7's Git-private timing summary: the
+previous central 89-record receipt and CI7 `290482f`'s 42-record receipt. Together they provide Windows/Python 3.13.5
+timings for all 48 IDs selected by the third dry-run pair. That pair generated plans successfully but refused Fast at
+48>20 and reported both stages timing-Unknown before the child timing import; no formal lease or test run occurred.
+
+The remaining over-selection came from treating `change-mapping.json` as all of `scripts/ci/**`. The final registry
+splits stable high-risk `ci-mapping-registry` from runner/workflow `ci-control`. Registry/portfolio paths select exactly
+five mapping integrity/router/mutation tests; Promotion inventory and all other CI tests remain registered and
+unchanged. The Phase 0 formal task base will rebind to `e587e378aacd46c6c2bd092b29f1b2f41eb87cbe`, immediately before
+this mapping split, so formal stages validate the integration-owned routing correction rather than replaying accepted
+W7.3/CI7 child surfaces.

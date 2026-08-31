@@ -20,9 +20,12 @@
     {
       "id": "ci-control",
       "patterns": [
-        "scripts/ci/**",
+        "scripts/ci/*.py",
+        "scripts/ci/README.md",
+        "scripts/ci/acceptance-profiles-v1.json",
+        "scripts/ci/test-shards.json",
         "tests/test_ci_validation.py",
-        "tests/fixtures/ci-validation/**",
+        "tests/fixtures/ci-validation/acceptance-policy-v1.json",
         ".github/workflows/**"
       ],
       "subsystems": [
@@ -32,6 +35,21 @@
         "CI contract",
         "Promotion completeness",
         "receipt integrity"
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "ci-mapping-registry",
+      "patterns": [
+        "scripts/ci/change-mapping.json",
+        "tests/fixtures/ci-validation/change-portfolios-v1.json"
+      ],
+      "subsystems": [
+        "test-coverage"
+      ],
+      "surfaces": [
+        "change mapping registry",
+        "data-only selection portfolios"
       ],
       "high_risk": true
     },
@@ -2981,7 +2999,8 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "ci-control"
+        "ci-control",
+        "ci-mapping-registry"
       ],
       "reason": "actual-path precedence and fail-closed scope mutation contract"
     },
@@ -3134,7 +3153,8 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "ci-control"
+        "ci-control",
+        "ci-mapping-registry"
       ],
       "reason": "low evidence for Authority/Core via ci-control"
     },
@@ -3185,7 +3205,8 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "ci-control"
+        "ci-control",
+        "ci-mapping-registry"
       ],
       "reason": "low evidence for Authority/Core via ci-control"
     },
@@ -3253,7 +3274,8 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "ci-control"
+        "ci-control",
+        "ci-mapping-registry"
       ],
       "reason": "low evidence for Authority/Core via ci-control"
     },
@@ -3270,7 +3292,8 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "ci-control"
+        "ci-control",
+        "ci-mapping-registry"
       ],
       "reason": "low evidence for Authority/Core via ci-control"
     },
@@ -6693,6 +6716,7 @@
     ],
     "security_high_risk_mappings": [
       "ci-control",
+      "ci-mapping-registry",
       "authority-core",
       "collaboration-maintenance",
       "observatory-shell",
