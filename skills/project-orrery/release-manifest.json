@@ -11,30 +11,96 @@
   "authority_model_version": 1,
   "operating_rules_version": 1,
   "compatibility": {
-    "direct_upgrade_from": {"minimum": "0.1.0", "maximum_exclusive": "1.0.0"},
-    "project_manifest_format": {"minimum": 1, "maximum": 1, "supported": [1]},
-    "document_schema": {"minimum": 1, "maximum": 1, "supported": [1]},
-    "authority_model_versions": {"supported": [1]},
-    "operating_rules_versions": {"supported": [1]},
-    "python": {"minimum": "3.10"}
+    "direct_upgrade_from": {
+      "minimum": "0.1.0",
+      "maximum_exclusive": "1.0.0"
+    },
+    "project_manifest_format": {
+      "minimum": 1,
+      "maximum": 1,
+      "supported": [
+        1
+      ]
+    },
+    "document_schema": {
+      "minimum": 1,
+      "maximum": 1,
+      "supported": [
+        1
+      ]
+    },
+    "authority_model_versions": {
+      "supported": [
+        1
+      ]
+    },
+    "operating_rules_versions": {
+      "supported": [
+        1
+      ]
+    },
+    "python": {
+      "minimum": "3.10"
+    }
   },
   "components": {
-    "core": {"distribution": "project-orrery-core", "version": "0.1.19"},
-    "cli": {"distribution": "project-orrery-cli", "version": "0.1.22"},
-    "observatory": {"distribution": "project-orrery-observatory", "version": "0.1.19"},
-    "harness_json": {"distribution": "project-orrery-harness-json-adapter", "version": "0.1.2", "embedded": true}
+    "core": {
+      "distribution": "project-orrery-core",
+      "version": "0.1.19"
+    },
+    "cli": {
+      "distribution": "project-orrery-cli",
+      "version": "0.1.22"
+    },
+    "observatory": {
+      "distribution": "project-orrery-observatory",
+      "version": "0.1.19"
+    },
+    "harness_json": {
+      "distribution": "project-orrery-harness-json-adapter",
+      "version": "0.1.2",
+      "embedded": true
+    }
   },
   "default_matrix": {
-    "personal_mode": {"default": true, "network": "disabled"},
-    "team_mode": {"default": false, "activation": "explicit-per-project"},
-    "authority_projection": {"default": "root-only-opt-in"},
-    "graph_layout": {"default": "elkjs", "legacy_fallback": "explicit-only"}
+    "personal_mode": {
+      "default": true,
+      "network": "disabled"
+    },
+    "team_mode": {
+      "default": false,
+      "activation": "explicit-per-project"
+    },
+    "authority_projection": {
+      "default": "root-only-opt-in"
+    },
+    "graph_layout": {
+      "default": "elkjs",
+      "legacy_fallback": "explicit-only"
+    }
   },
   "scope": {
-    "included": ["platform-neutral Core, CLI, and Observatory source runtime", "Codex Skill compatibility entry", "embedded Harness JSON adapter", "Unified local Observatory launchers and builders"],
-    "experimental": ["Authority Model evaluator and release-candidate gate"],
-    "deferred": ["PyPI and wheel publication", "independent adapter releases", "remote authority defaults"],
-    "unsupported": ["DSH Store", "orrery CLI alias", "scheduler", "automatic deletion", "automatic Team Mode enablement"]
+    "included": [
+      "platform-neutral Core, CLI, and Observatory source runtime",
+      "Codex Skill compatibility entry",
+      "embedded Harness JSON adapter",
+      "Unified local Observatory launchers and builders"
+    ],
+    "experimental": [
+      "Authority Model evaluator and release-candidate gate"
+    ],
+    "deferred": [
+      "PyPI and wheel publication",
+      "independent adapter releases",
+      "remote authority defaults"
+    ],
+    "unsupported": [
+      "DSH Store",
+      "orrery CLI alias",
+      "scheduler",
+      "automatic deletion",
+      "automatic Team Mode enablement"
+    ]
   },
   "distribution": {
     "repository": "https://github.com/ItIsMixian/Orrery",
@@ -48,7 +114,174 @@
     "builder_contract": 2,
     "allowlist_contract": "v0.3.0-exact-git-tree",
     "source_binding": "deterministic-entry-receipt",
-    "assets": ["project-orrery-v0.3.0.zip", "project-orrery-v0.3.0.sha256"]
+    "assets": [
+      "project-orrery-v0.3.0.zip",
+      "project-orrery-v0.3.0.sha256"
+    ],
+    "archive_paths": [
+      "project-orrery/adapters/harness-json/adapter-manifest.json",
+      "project-orrery/adapters/harness-json/README.md",
+      "project-orrery/adapters/harness-json/run_harness.py",
+      "project-orrery/adapters/harness-json/schemas/request-v1.schema.json",
+      "project-orrery/adapters/harness-json/schemas/response-v1.schema.json",
+      "project-orrery/agents/openai.yaml",
+      "project-orrery/assets/project-template/.gitignore",
+      "project-orrery/assets/project-template/AGENTS.md",
+      "project-orrery/assets/project-template/docs/backlog.md",
+      "project-orrery/assets/project-template/docs/core/principles.md",
+      "project-orrery/assets/project-template/docs/decisions/0000-orrery-adoption-proposal.md",
+      "project-orrery/assets/project-template/docs/decisions/0000-template.md",
+      "project-orrery/assets/project-template/docs/decisions/README.md",
+      "project-orrery/assets/project-template/docs/design/README.md",
+      "project-orrery/assets/project-template/docs/DEVLOG.md",
+      "project-orrery/assets/project-template/docs/HANDOFF.md",
+      "project-orrery/assets/project-template/docs/implementation/README.md",
+      "project-orrery/assets/project-template/docs/library/README.md",
+      "project-orrery/assets/project-template/docs/product-philosophy.md",
+      "project-orrery/assets/project-template/docs/PROGRESS.md",
+      "project-orrery/assets/project-template/docs/README.md",
+      "project-orrery/assets/project-template/docs/snapshots/README.md",
+      "project-orrery/assets/project-template/docs/state/_TEMPLATE.md",
+      "project-orrery/assets/project-template/docs/state/project-structure.md",
+      "project-orrery/assets/project-template/docs/state/test-coverage.md",
+      "project-orrery/assets/project-template/docs/validation/README.md",
+      "project-orrery/assets/project-template/scripts/docsite/_llm.py",
+      "project-orrery/assets/project-template/scripts/docsite/build_authority_projection.py",
+      "project-orrery/assets/project-template/scripts/docsite/build_docsite.py",
+      "project-orrery/assets/project-template/scripts/docsite/build_personal_observatory.py",
+      "project-orrery/assets/project-template/scripts/docsite/build_unified_observatory.py",
+      "project-orrery/assets/project-template/scripts/docsite/build_workstream_relation_graph.py",
+      "project-orrery/assets/project-template/scripts/docsite/docsite_insights.py",
+      "project-orrery/assets/project-template/scripts/docsite/docsite_qa.py",
+      "project-orrery/assets/project-template/scripts/docsite/llm_broker.py",
+      "project-orrery/assets/project-template/scripts/docsite/requirements.txt",
+      "project-orrery/assets/project-template/scripts/docsite/serve_orrery_control.py",
+      "project-orrery/assets/project-template/scripts/docsite/serve_orrery.py",
+      "project-orrery/assets/project-template/scripts/docsite/serve_team_observatory.py",
+      "project-orrery/assets/project-template/scripts/docsite/serve.py",
+      "project-orrery/assets/project-template/scripts/docsite/set_key.py",
+      "project-orrery/assets/project-template/Start Orrery.vbs",
+      "project-orrery/assets/project-template/start-docsite.bat",
+      "project-orrery/assets/project-template/start-orrery.bat",
+      "project-orrery/LICENSE",
+      "project-orrery/packages/component-versions.json",
+      "project-orrery/packages/project-orrery-cli/pyproject.toml",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/__init__.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/__main__.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/authority_consumer.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/authority_migrate.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/authority_observations.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/authority_restore.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/authority_shadow.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/collaboration_contract.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/context.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/integration.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/maintenance.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/operating_rules.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/protocol.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/review.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/scaffold.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/team.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/update.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/validate.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/workstream_relations.py",
+      "project-orrery/packages/project-orrery-cli/src/project_orrery_cli/worktree.py",
+      "project-orrery/packages/project-orrery-core/pyproject.toml",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/__init__.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/authority_compatibility.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/authority_consumer.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/authority_migration.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/authority_route.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/authority.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/collaboration.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/compatibility.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/data/documentation-governance-rules-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/data/orrery-operating-rules-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/data/release-v0.2.0.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/data/release-v0.3.0.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/documentation_governance.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/maintenance_cache.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/maintenance.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/manifests.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/operating_rules.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/review.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/authority-managed-consumer-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/authority-route-preflight-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/authority-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/documentation-governance-finding-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/maintenance-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/maintenance-v2.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/orrery-operating-rules-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/project-manifest-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/team-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/workstream-program-hierarchy-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-capture-v2.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-execution-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/schema/workstream-relations-v1.json",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/team.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/.gitignore",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/AGENTS.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/backlog.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/core/principles.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/decisions/0000-orrery-adoption-proposal.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/decisions/0000-template.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/decisions/README.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/design/README.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/DEVLOG.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/HANDOFF.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/implementation/README.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/library/README.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/product-philosophy.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/PROGRESS.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/README.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/snapshots/README.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/state/_TEMPLATE.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/state/project-structure.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/state/test-coverage.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/templates/authority/docs/validation/README.md",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/workspace_cleanup.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/workstream_program_hierarchy.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/workstream_relation_capture.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/workstream_relation_execution.py",
+      "project-orrery/packages/project-orrery-core/src/project_orrery_core/workstream_relations.py",
+      "project-orrery/packages/project-orrery-observatory/pyproject.toml",
+      "project-orrery/packages/project-orrery-observatory/setup.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/__init__.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/active_task_projection.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/authority_model_status.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/authority_projection.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/authority_role_shadow.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/component.json",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/display_vocabulary.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/fact_rules_projection.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/inventory.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/personal_observatory.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/relation_inbox.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/runtime_shadow.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/team_observatory.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/vendor/elk.bundled.js",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/vendor/LICENSE.elkjs.md",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/vendor/package.elkjs.json",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/vendor/PROVENANCE.elkjs.json",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/workstream_graph_presentation.py",
+      "project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/workstream_relation_graph.py",
+      "project-orrery/references/architecture.md",
+      "project-orrery/references/migration-contract.md",
+      "project-orrery/references/orrery-operating-rules-v1.json",
+      "project-orrery/release-manifest.json",
+      "project-orrery/scripts/_legacy_check_project_orrery_update.py",
+      "project-orrery/scripts/_legacy_install_project_orrery.py",
+      "project-orrery/scripts/_legacy_validate_installation.py",
+      "project-orrery/scripts/check_project_orrery_update.py",
+      "project-orrery/scripts/install_project_orrery.py",
+      "project-orrery/scripts/validate_installation.py",
+      "project-orrery/SKILL.md"
+    ]
   },
   "latest_manifest_url": "https://raw.githubusercontent.com/ItIsMixian/Orrery/main/skills/project-orrery/release-manifest.json"
 }
