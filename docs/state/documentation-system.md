@@ -82,4 +82,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - W7.3 relation capture 已进入 root-only/default-off 本地中央 Candidate；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收，最终 exact-SHA 整页仍待维护者接受。
 - `807096d...` 的真实静态构建暴露 U2.3 lightweight Personal 与 W7.3 Relation Inbox 的锚点不兼容：导航仍在，
   但 Personal 被 quarantine。scope revision 5 已先登记，修复页面由维护者预览前禁止运行测试流程。
+- revision-5 动态预览已恢复 Personal/Team inbox placement，但显示四个同端点 automatic Unknown lineage
+  proposals。revision 6 修 Core append-only supersession，而不是在 UI 中隐藏重复；维护者看修复页前仍禁测试。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

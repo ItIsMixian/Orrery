@@ -2,8 +2,8 @@
 
 Date: 2026-08-30
 
-Status: PASS (focused Candidate); central lightweight Personal/Relation Inbox composition correction is Pending under
-v0.3.0 Phase 0 scope revision 5. Prior central routed receipts remain preserved but do not cover corrected source.
+Status: PASS (focused Candidate); central lightweight composition and obsolete automatic Unknown proposal correction
+are Pending under v0.3.0 Phase 0 scope revision 6. Prior routed receipts do not cover corrected source.
 
 Authority sources:
 
@@ -431,3 +431,11 @@ composition uses `orrery-active-task-projection-v1`, whose panel intentionally h
 still used that obsolete marker. Exact page `807096d...` therefore quarantined Personal before acceptance. The fix is
 owned by Final RC Phase 0 revision 5 and must preserve two inboxes, local-only confirmation, Team request-only and a
 Graph with no decision action. No post-discovery tests have run.
+
+## 2026-08-31 automatic Unknown proposal supersession blocker
+
+The repaired preview exposes four open `auto-derived-unknown-*` proposal IDs for the same central source/target. They
+are historical task-base observations, not four semantic decisions. Phase 0 revision 6 implements ADR-0017's existing
+append-only `superseded` lifecycle for obsolete tool-owned Unknown lineage proposals, preserves every event and leaves
+one current proposal. Human proposals, confirmations and effective relations remain out of scope. The maintainer must
+see four total pending rows after bounded self-host repair before any post-correction test runs.

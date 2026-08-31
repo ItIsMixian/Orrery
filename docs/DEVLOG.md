@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Automatic Unknown Lineage Supersession Authorized
+
+- revision-5 动态页恢复七入口与 Personal/Team 两个 inbox，但 7 条 pending 中有 4 条是同一个 Phase 0→U1-U2
+  Unknown `derived_from`，只因历史 task-base 不同而拥有不同 auto proposal ID。
+- 维护者授权继续修复。scope revision 6 使用 ADR-0017 已有 append-only `superseded` lifecycle：只失效旧
+  tool-owned/open/同端点提案，保留全部事件和一个 current；不碰人工提案、确认或 effective relation。
+- 先写实现与测试契约并运行一次 bounded self-host session refresh；维护者看到 pending 从 7 收敛为 4 前，
+  unittest/Fast/Checkpoint/Candidate/Promotion 全禁。
+
 ## 2026-08-31 — Phase 0 Real Lightweight Composition Blocker Recorded
 
 - clean `807096d...` Unified 静态页面在交给维护者前暴露 Personal quarantine：U2.3 lightweight panel 已用

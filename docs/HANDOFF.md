@@ -38,7 +38,8 @@ Updated: 2026-08-31
   分权。Final RC 尚未注册，等待 W7.3/CI7 和最终网页验收；DSH/alias/scheduler 明确延期 0.3.1。
 - W7.3 clean `44ea200` 已通过 focused closeout，中央 merge 为 `ae90974`；CI7 clean `111f4ab` 的中央合流为
   `079de74`。`f41b659` 的唯一正式 Fast/Checkpoint 保留，但 `807096d...` 实页在接受前暴露 lightweight
-  Personal/Relation Inbox 锚点不兼容。revision 5 只允许极窄兼容修复和预览；维护者看页前禁止测试。
+  Personal/Relation Inbox 锚点不兼容。revision 5 预览已恢复组合；同页的四个同端点 automatic Unknown
+  lineage proposals 由维护者授权 revision 6 做 append-only supersession。修复页确认前禁止测试。
 
 ## 当前可继续的线路
 
@@ -59,8 +60,8 @@ Updated: 2026-08-31
 13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 与 current fingerprint fresh Fast 3/3、Checkpoint 4/4
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
-15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` 已进入 scope revision 5；先修真实
-    lightweight Personal/Relation Inbox 组合并给维护者看页，不运行测试。预览接受后才 fresh route、同步
+15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` 进入 scope revision 6；先把旧 automatic
+    Unknown lineage proposals 机械 supersede 到一个 current，并给维护者看四条待确认页面，不运行测试。预览接受后才 fresh route、同步
     evidence、重建 final docs SHA；全部通过后才创建独立 Sol-medium RC；
     RC 只消费 child receipts 并运行 integration/package/runtime/Promotion-owned gates，不得提前改 public
     manifest、push ref、tag 或 Release。

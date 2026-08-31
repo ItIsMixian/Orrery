@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — pre-correction routed evidence preserved; real lightweight-page composition correction and preview required
+Status: PENDING — scope revision 6 lineage-proposal supersession correction authorized; preview and fresh routing required
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -164,3 +164,16 @@ Scope revision 5 is Pending until the exact two product/test files in the Plan a
 shown to the maintainer. The `f41b659...` Fast 3/3 and Checkpoint 4/4 receipts remain immutable historical evidence,
 but they cannot authorize corrected source. No fresh unittest/Fast/Checkpoint may run before maintainer preview
 acceptance.
+
+## 2026-08-31 obsolete automatic Unknown lineage proposals — Pending Validation
+
+The dynamic revision-5 preview at `127.0.0.1:8768` reports Personal ready, two correctly placed relation inboxes,
+Team request-only, seven navigation identities and zero document horizontal overflow at 1440×900 and 390×844. No
+test command ran. Its Personal payload contains seven pending proposals, of which four distinct
+`auto-derived-unknown-*` IDs share the same `V0.3.0-central-integration-acceptance → U1-U2-integration-baseline`
+Unknown `derived_from` semantics. The other three are distinct integration-gate dependencies.
+
+Scope revision 6 is Pending until Core appends `superseded` to only the obsolete tool-owned open lineage proposals,
+keeps one current proposal, preserves all history and leaves manual/effective relations untouched. A bounded
+self-host session refresh may exercise only that mechanical cleanup. Before the maintainer reviews the repaired four-
+proposal page, tests and formal validation remain prohibited; the old `f41b659...` receipts remain historical only.

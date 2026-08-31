@@ -98,6 +98,8 @@ Updated: 2026-08-31
 - Unified runtime composition test 当前用 full Personal fixture 替代真实 U2.3 lightweight panel，因此没有覆盖
   Relation Inbox 对已移除 `.po-foot` 的依赖；`807096d...` 页面在人工 DOM 检查中发现该缺口。revision 5
   必须先改为真实轻量契约并给维护者看页，之后才允许 fresh routed validation。
+- relation capture 现有 idempotence 只覆盖 same exact base，不覆盖 task-base A→B 时旧 automatic Unknown
+  proposal 的 supersession。revision 6 增加 exact lifecycle regression；测试代码可先写，但维护者预览前不得执行。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 lightweight-page composition correction authorized; preview required before fresh routed validation; no RC task registered
+Status: Phase 0 scope revision 6 lineage-proposal supersession correction authorized; preview required before fresh routed validation; no RC task registered
 
 Date: 2026-08-30
 
@@ -101,6 +101,39 @@ DOM/layout/console inspection and local preview serving are allowed. Do not run 
 Fast, Checkpoint, Candidate, Promotion or release commands. After preview acceptance, commit/freeze the exact source,
 route one fresh Fast and one fresh Checkpoint under CI7, reconcile evidence, then rebuild the final docs SHA for the
 binding page review.
+
+### 2026-08-31 scope revision 6 — obsolete automatic Unknown lineage proposals
+
+The revision-5 real preview proves the Personal/Team anchor correction works, but its relation inbox exposes seven
+pending proposals. Four have different proposal IDs yet the same source, target and semantics:
+`V0.3.0-central-integration-acceptance → U1-U2-integration-baseline`, `derived_from`, Unknown. Read-only inspection
+traces them to earlier task-base changes: `auto_capture_derived_from()` hashes the exact base into a new proposal ID,
+but never appends `superseded` to older tool-owned open proposals for the same endpoints. This inflates the actionable
+count and makes stale mechanical observations look like four human decisions.
+
+ADR-0017 and its Approved Design already require append-only `superseded` proposal lifecycle and say a changed base
+uses an explicit proposal/rebind path. Revision 6 implements that existing decision; it does not authorize a new ADR,
+relation type, automatic semantic confirmation or destructive history rewrite. Exact behavior:
+
+- before creating/reusing the current automatic Unknown `derived_from` proposal, append a `superseded` event to every
+  other still-`proposed` `auto-derived-unknown-*` proposal with the same source/target whose proposer is exactly
+  `tool:workstream-registration`;
+- preserve all proposal files and revisions; never touch human/Agent/Harness/conductor proposals, accepted/deferred/
+  rejected proposals or effective relations;
+- leave exactly one current automatic Unknown proposal for one session input; repeating the same input performs zero
+  writes. If a previously superseded task base becomes current again, create a new scope-bound generation instead of
+  reopening terminal history;
+- return the superseded proposal IDs in the local mechanical receipt without turning them into project authority;
+- run one bounded self-host session refresh after implementation so the current inbox mechanically supersedes the
+  three obsolete rows. It may not accept, defer or reject any proposal.
+
+Authorized repository writes are the revision-5 files plus exact
+`packages/project-orrery-core/src/project_orrery_core/workstream_relation_capture.py` and
+`tests/test_workstream_relation_capture.py`, followed by the already-listed authority/evidence documents. The preview
+gate remains unchanged: before the maintainer sees the repaired page, no unittest/pytest/focused/Fast/Checkpoint/
+Candidate/Promotion/release command may run. The preview must show four pending proposals total—one current automatic
+Unknown lineage proposal plus the three distinct existing dependency proposals—while Personal local confirmation,
+Team request-only and Graph read-only boundaries remain unchanged.
 
 ## Phase 1 — register Final RC and freeze inputs
 
