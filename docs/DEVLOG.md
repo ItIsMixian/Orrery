@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Real Lightweight Composition Blocker Recorded
+
+- clean `807096d...` Unified 静态页面在交给维护者前暴露 Personal quarantine：U2.3 lightweight panel 已用
+  semantic footer 取代 `.po-foot`，W7.3 Relation Inbox 仍依赖旧展示锚点；现有 runtime test 用 full Personal
+  fixture 掩盖了真实组合缺口。
+- Phase 0 scope revision 5 先登记后写入，只允许修 `relation_inbox.py` 稳定 article 边界与
+  `test_unified_observatory.py` 真实轻量组合契约。该修复不改变 ADR/schema/authority/security/default/release。
+- 维护者看到并接受修复页前禁止 unittest/Fast/Checkpoint/Candidate/Promotion；旧 `f41b659...` receipts
+  原样保留但不能授权新 source。
+
 ## 2026-08-31 — v0.3.0 Phase 0 Central Routed Validation Complete
 
 - 唯一整合者把 W7.3 clean `44ea200` 和 CI7 clean `111f4ab` 合入本地中央线，完成 Core/CLI/Observatory/

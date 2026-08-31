@@ -44,7 +44,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 中央合流、State/Validation reconciliation 与 current fingerprint Fast/Checkpoint 已完成；现只等待本次 docs commit 的 exact-SHA 桌面/移动整页验收。通过后才注册 Sol-medium Final RC，随后处理 manifest、self-contained ZIP、runtime、双平台 Promotion 与 main/tag/Release 分权。
+- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：`807096d...` 页面在验收前发现 real lightweight Personal/Relation Inbox 锚点不兼容；revision 5 先修两份 exact 产品/测试文件并给维护者看页，禁止预览前测试。旧 `f41b659...` receipts 保留，修复获接受后再 fresh route，之后才注册 Sol-medium Final RC。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。

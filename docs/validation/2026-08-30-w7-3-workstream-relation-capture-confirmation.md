@@ -2,9 +2,8 @@
 
 Date: 2026-08-30
 
-Status: PASS (focused Candidate and central routed integration) — clean Candidate `44ea200`, central merge
-`ae90974`, and current integrated Fast/Checkpoint evidence are green; exact-SHA final Unified page acceptance remains
-owned by the v0.3.0 Phase 0 gate.
+Status: PASS (focused Candidate); central lightweight Personal/Relation Inbox composition correction is Pending under
+v0.3.0 Phase 0 scope revision 5. Prior central routed receipts remain preserved but do not cover corrected source.
 
 Authority sources:
 
@@ -424,3 +423,11 @@ the v0.3.0 Final RC task.
   both evidence-eligible with zero reruns. The prior fingerprint's Checkpoint failure remains preserved.
 - This closes W7.3 central routed integration only. The final whole-page desktop/mobile acceptance must bind the
   subsequent clean documentation SHA before the v0.3.0 Final RC task can be registered.
+
+## 2026-08-31 lightweight Personal integration blocker
+
+The clean W7.3 Candidate remains valid for its own full Personal fixture, relation semantics and Graph. Real U2.3
+composition uses `orrery-active-task-projection-v1`, whose panel intentionally has no `.po-foot`; W7.3 Relation Inbox
+still used that obsolete marker. Exact page `807096d...` therefore quarantined Personal before acceptance. The fix is
+owned by Final RC Phase 0 revision 5 and must preserve two inboxes, local-only confirmation, Team request-only and a
+Graph with no decision action. No post-discovery tests have run.

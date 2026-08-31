@@ -80,4 +80,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
 - `orrery-dispatch` 已在当前本机安装但未发布；它只能指导宿主遵守流程，不能机械阻断绕过 Skill 的写入，也不能外推为其他主机可用。
 - W7.3 relation capture 已进入 root-only/default-off 本地中央 Candidate；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收，最终 exact-SHA 整页仍待维护者接受。
+- `807096d...` 的真实静态构建暴露 U2.3 lightweight Personal 与 W7.3 Relation Inbox 的锚点不兼容：导航仍在，
+  但 Personal 被 quarantine。scope revision 5 已先登记，修复页面由维护者预览前禁止运行测试流程。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — Phase 0 routed validation PASS; exact-SHA page acceptance and Final RC remain incomplete
+Status: PENDING — pre-correction routed evidence preserved; real lightweight-page composition correction and preview required
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -146,3 +146,21 @@ surface, so the routed receipts remain bound to `f41b659...` and its fingerprint
 from the resulting clean documentation commit and accepted at desktop/mobile sizes. Until that exact SHA is accepted,
 Final RC remains unregistered and no public manifest/default/workflow, remote ref, main, tag, asset or Release is
 authorized.
+
+## 2026-08-31 real lightweight composition blocker — Pending Validation
+
+Building Unified from clean `807096d672f318335ae77c8f8fdbcc38c480f890` with AI disabled produced a 4.7 MB
+static page and exposed Personal as quarantined with `ValueError: Unified Personal/Team composition markers are
+unavailable`. Direct artifact inspection confirmed that Team and document markers exist, while the real U2.3
+lightweight Personal panel contains no `.po-foot`. The relation injector's obsolete presentation marker—not missing
+Git-private task data, ELK, Team or Authority evidence—is the blocker.
+
+No test suite, formal lease, Candidate, Promotion or release operation ran after this discovery. One accidental
+`serve_orrery.py --help` invocation executed import-time docsite setup and attempted the configured Provider before
+argument parsing because `DOCSITE_AI_ENABLED=0` was omitted on that read-only command; it is not validation evidence
+and will not be repeated. All subsequent preview commands must explicitly disable AI.
+
+Scope revision 5 is Pending until the exact two product/test files in the Plan are corrected and a real full page is
+shown to the maintainer. The `f41b659...` Fast 3/3 and Checkpoint 4/4 receipts remain immutable historical evidence,
+but they cannot authorize corrected source. No fresh unittest/Fast/Checkpoint may run before maintainer preview
+acceptance.

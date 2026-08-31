@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 integrated routed validation complete; blocked only on exact-SHA final webpage acceptance; no RC task registered
+Status: Phase 0 lightweight-page composition correction authorized; preview required before fresh routed validation; no RC task registered
 
 Date: 2026-08-30
 
@@ -16,7 +16,8 @@ Approved Design: [v0.3.0 Release Scope and Default Matrix](../../design/v0-3-0-r
   complete; only the exact integrated page acceptance remains open.
 - [x] CI7 acceptance gates/validation lease/no-repeat/predictive refusal has integrated State/Validation.
 - [x] A4/U2.3 current central source and component versions are reconciled against final W7.3/CI7.
-- [x] Child receipts are current for exact integrated surfaces; stale/missing evidence is returned to the owning task.
+- [ ] Child receipts are current for exact integrated surfaces; the `f41b659...` receipts remain valid historical
+  evidence but do not cover the real lightweight Personal/Relation Inbox composition blocker found on `807096d...`.
 - [x] ADR-0021/default/distribution matrix remains unchanged.
 
 Until all gates pass, do not register Final RC, modify public manifest/components/workflow, push a ref, create a tag or
@@ -26,7 +27,9 @@ build release assets.
 
 1. [x] Unique integrator merges accepted dependencies into a clean central descendant and reconciles State/Validation/
    DEVLOG/indexes additively.
-2. [x] Run CI7-selected integration Fast and Checkpoint once. Do not manually replay child suites with current receipts.
+2. [ ] Run CI7-selected integration Fast and Checkpoint once. The `f41b659...` run is preserved; after the revision-5
+   product correction and maintainer preview acceptance, route the corrected exact source once without replaying
+   unaffected child suites.
 3. [ ] Start the exact integrated Unified page; maintainer accepts all primary pages at 1440×900 and 390×844, including
    global stop/rollback, zero overflow and zero console warning/error.
 4. [ ] Bind acceptance to the source SHA. Any change after acceptance requires a new page review.
@@ -72,6 +75,32 @@ resulting documentation commit's exact-SHA Unified page acceptance.
 Use the current root task as the unique integrator; do not create a separate Codex task for Phase 0. This Workstream
 may not run Candidate/Promotion/release validation, modify public manifest/defaults/workflows, push, tag, publish or
 perform a release operation.
+
+### 2026-08-31 scope revision 5 — real lightweight composition blocker
+
+Static page `807096d672f318335ae77c8f8fdbcc38c480f890` exposed a real integration failure before maintainer acceptance:
+U2.3's `orrery-active-task-projection-v1` renders a semantic `<footer>` and no legacy `.po-foot`, while W7.3
+`inject_relation_inbox()` still requires the old `.po-foot` marker. Relation Inbox quarantine then makes Personal
+appear unavailable even though all seven navigation identities remain visible. The existing Unified runtime test
+replaces the real lightweight renderer with a full Personal fixture, so its green composition assertion did not cover
+this contract.
+
+This is a compatibility bug inside already accepted ADR-0016/ADR-0017 behavior, not a new release, schema, authority or
+security decision; no new ADR is required. Scope revision 5 authorizes only:
+
+- `packages/project-orrery-observatory/src/project_orrery_observatory/relation_inbox.py`: replace the presentation-
+  specific `.po-foot` anchor with a bounded stable Personal article boundary while preserving Personal local-only and
+  Team request-only placement;
+- `tests/test_unified_observatory.py`: make the composition contract cover the real lightweight Personal panel and
+  retain two-inbox/no-action-in-Graph assertions;
+- this Plan, matching Final RC/W7.3 Validation, affected State/PROGRESS/HANDOFF/DEVLOG/index records and generated
+  external previews only.
+
+Before the maintainer sees and accepts a corrected real page, only source editing, `git diff --check`, page generation,
+DOM/layout/console inspection and local preview serving are allowed. Do not run unittest, pytest, focused suites,
+Fast, Checkpoint, Candidate, Promotion or release commands. After preview acceptance, commit/freeze the exact source,
+route one fresh Fast and one fresh Checkpoint under CI7, reconcile evidence, then rebuild the final docs SHA for the
+binding page review.
 
 ## Phase 1 — register Final RC and freeze inputs
 
