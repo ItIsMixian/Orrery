@@ -91,7 +91,7 @@ def tree_entries(source_sha: str) -> list[dict[str, Any]]:
                 "content": content,
             }
         )
-    entries.sort(key=lambda item: item["archive_path"])
+    entries.sort(key=lambda item: item["archive_path"].casefold())
     names = [entry["archive_path"] for entry in entries]
     if len(names) != len(set(names)) or len(names) != len({name.casefold() for name in names}):
         raise ValueError("duplicate or case-colliding archive paths")

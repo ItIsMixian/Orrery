@@ -472,7 +472,7 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertIn("project-orrery/adapters/harness-json/run_harness.py", names)
             self.assertEqual(len(names), 162)
             manifest = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
-            path_list = "".join(f"{name}\n" for name in sorted(names)).encode("utf-8")
+            path_list = "".join(f"{name}\n" for name in sorted(names, key=str.casefold)).encode("utf-8")
             self.assertEqual(
                 hashlib.sha256(path_list).hexdigest(),
                 manifest["distribution"]["archive_path_list_sha256"],
