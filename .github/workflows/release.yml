@@ -1,4 +1,4 @@
-name: Release Project Orrery
+name: Verify Orrery Release Tag
 
 on:
   push:
@@ -6,10 +6,10 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  release:
+  verify-release-source:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -29,9 +29,11 @@ jobs:
         run: python -m unittest discover -s tests -v
 
       - name: Package tagged Skill
-        run: python scripts/package_release.py --check-tag "$GITHUB_REF_NAME"
+        run: python scripts/package_release.py --source-sha "$GITHUB_SHA" --check-tag "$GITHUB_REF_NAME" --receipt-file "${RUNNER_TEMP}/orrery-entry-receipt.json"
 
-      - name: Publish GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes
+      - name: Verify checksum
+        shell: bash
+        run: cd dist && sha256sum --check "project-orrery-${GITHUB_REF_NAME}.sha256"
+
+      # Publishing the tag, ZIP/checksum pair, and GitHub Release is a separate
+      # maintainer-authorized operation after exact-SHA Windows and Ubuntu PASS.

@@ -3,6 +3,16 @@
   "contract_type": "orrery-change-routing-portfolios-v2",
   "portfolios": [
     {
+      "id": "release-candidate-packaging", "stage": "fast",
+      "changed_paths": ["packages/project-orrery-core/src/project_orrery_core/data/release-v0.3.0.json", "packages/project-orrery-core/src/project_orrery_core/manifests.py", "packages/project-orrery-cli/src/project_orrery_cli/context.py", "packages/project-orrery-cli/src/project_orrery_cli/scaffold.py", "tests/fixtures/brand/orrery-brand-contract-v1.json"],
+      "subsystems": ["release-and-toolchain"],
+      "expected_writes": ["tests/fixtures/platform_neutral_phase0_baseline.json"],
+      "expected_mapping_ids": ["release-packaging"],
+      "required_test_ids": ["test_project_orrery.ProjectOrreryTests.test_phase1_component_boundaries_and_compatibility_projection"],
+      "forbidden_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"],
+      "max_selected": 20
+    },
+    {
       "id": "docs-only", "stage": "fast",
       "changed_paths": ["docs/validation/synthetic-change.md"],
       "subsystems": ["documentation-system"],

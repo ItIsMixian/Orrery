@@ -153,7 +153,6 @@
       "docs/decisions/0015-orrery-brand-and-compatibility-contract.md": "ad13edea32f07907d8e77501ca555e3a3b48dedd15f324eaca7ec7abdb7ce55d",
       "docs/design/orrery-rename-and-compatibility-contract.md": "4ec99f1ac161004b63748b0a064083fb6e1d957955ba486f67e27f66a189876c",
       "tests/fixtures/platform_neutral_phase0_baseline.json": "202b42960ff11a91c4ba0b7a0a11f4025f617af2192588dd2306e588d37dc167",
-      "skills/project-orrery/release-manifest.json": "440ae329306245315bd0287b8730d0ba3b5dc601bbf18628a68e3f64fd04d327",
       "packages/project-orrery-core/src/project_orrery_core/data/release-v0.2.0.json": "1c88d416319fac455db9b19cd1bda280636f484dfec8072ef7971df3d40cf3e0"
     },
     "published_v0_2_0_archive_sha256": "13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394",

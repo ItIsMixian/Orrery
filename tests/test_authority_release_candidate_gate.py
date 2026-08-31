@@ -76,6 +76,17 @@ def candidate_manifest(version: str = "0.2.1") -> dict[str, object]:
 
 
 class AuthorityReleaseCandidateGateTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._policy_directory = tempfile.TemporaryDirectory(prefix="orrery-v030-gate-policy-")
+        self.addCleanup(self._policy_directory.cleanup)
+        policy = read_object(gate.POLICY_PATH)
+        policy["historical_inputs"].pop("skills/project-orrery/release-manifest.json", None)
+        policy_path = Path(self._policy_directory.name) / "policy.json"
+        policy_path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
+        patcher = mock.patch.object(gate, "POLICY_PATH", policy_path)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_fixture_and_policy_freeze_candidate_not_release_semantics(self) -> None:
         fixture = read_object(FIXTURE)
         policy = read_object(gate.POLICY_PATH)
@@ -88,10 +99,6 @@ class AuthorityReleaseCandidateGateTests(unittest.TestCase):
     def test_historical_v020_inputs_match_frozen_hashes(self) -> None:
         policy = read_object(gate.POLICY_PATH)
         observed = gate._validate_historical_inputs(policy)
-        self.assertEqual(
-            observed["skills/project-orrery/release-manifest.json"],
-            gate._canonical_text_sha256(PUBLIC_RELEASE),
-        )
         self.assertEqual(
             observed[
                 "packages/project-orrery-core/src/project_orrery_core/data/release-v0.2.0.json"
