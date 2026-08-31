@@ -3205,8 +3205,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "ci-control",
-        "ci-mapping-registry"
+        "ci-control"
       ],
       "reason": "low evidence for Authority/Core via ci-control"
     },
