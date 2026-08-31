@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Promotion preflight FAIL on `e120aaa...`; scope revision 9 machine-output fix authorized; GitHub Release withheld
+Status: Scope revision 9 Candidate/runtime PASS on `4556db3...`; second Promotion run authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -568,6 +568,12 @@ change. The fix creates a new exact SHA: run one CI7 Candidate dry-run/run for t
 and prove release ZIP/checksum entries remain equivalent except source-bound receipt fields, then rerun the required
 exact-SHA final runtime and update the existing promotion ref by fast-forward only. A new Promotion run is allowed
 once; any non-green result stops without same-SHA replay. GitHub Release remains withheld.
+
+Scope revision 9 completed on exact `4556db3a8b75e9b92e3e2cfe9d229273b203ab33`. The first fix SHA
+`14f771f...` Candidate was 41/42 non-green because importing the inventory CLI in-process exposed a pre-existing bare
+`_common` module-name collision; it was not retried. The final regression uses a subprocess black-box and object-bound
+mock targets, preserving all 421 unittest IDs. Candidate 42/42, two-root package identity and the complete final
+runtime matrix are green. The promotion ref may now fast-forward from `e120aaa...` to `4556db3...` exactly once.
 
 ## Phase 1 — register Final RC and freeze inputs
 

@@ -106,7 +106,9 @@ Updated: 2026-08-31
   package 与完整 final runtime 均 PASS；旧 `ba230555...` 结果未复用。
 - exact `e120aaa...` Promotion run `33449930707` 在 test/lane 前失败：`test_inventory.py --lane-list` 的 stdout
   混入 docsite discovery 日志，导致 `$GITHUB_OUTPUT` invalid format；required checks 正确失败关闭。scope
-  revision 9 只稳定 machine-list stdout 和 AI-disabled discovery，不改 inventory/lane/coverage。
+  revision 9 只稳定 machine-list stdout 和 AI-disabled discovery，不改 inventory/lane/coverage。初始
+  `14f771f...` Candidate 41/42 的 bare `_common` test-module collision 未重试；final `4556db3...` Candidate
+  42/42 PASS，Promotion inventory 仍为 421 IDs。
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
 - CI7 clean Candidate 与 fresh central Fast/Checkpoint 已完成；exact non-main Windows／Ubuntu Promotion 仍待 Final RC。本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。

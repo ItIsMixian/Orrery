@@ -83,8 +83,8 @@ Updated: 2026-08-31
     7 corrected runtime 暴露 extracted asset/runtime root defect；scope revision 8 exact `e120aaa...` 已修复并
     完成 Candidate 36/36、双根 package、final ZIP Harness、真实 Codex、Unified、upgrade/migration/Skill lifecycle。
     Promotion run `33449930707` 在 lanes 前因 machine lane-list stdout 被 docsite 日志污染而失败关闭。scope
-    revision 9 只修 JSON-only/AI-disabled inventory output，随后用新 SHA 重走 gates；最终仍停在 GitHub Release
-    创建/asset upload 前。
+    revision 9 exact `4556db3...` 已完成 Candidate 42/42、双根 package 和完整 final runtime PASS；现在只可
+    fast-forward Promotion ref 并运行一次新矩阵。最终仍停在 GitHub Release 创建/asset upload 前。
 
 ## 不得外推的边界
 

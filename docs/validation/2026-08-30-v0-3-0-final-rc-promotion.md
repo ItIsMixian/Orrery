@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Promotion preflight FAIL before lanes; scope revision 9 Pending; main/tag not started
+Status: Candidate/package/runtime PASS on `4556db3...`; second Promotion run Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -513,3 +513,40 @@ No test or package build ran remotely. The run is retained as non-green and is n
 confirmed the stdout contract and accidentally ran with AI enabled, reaching the configured provider path; that
 diagnostic is excluded from evidence. Scope revision 9 must make machine list stdout JSON-only with AI disabled,
 without changing inventory/lane semantics, then validate a new SHA.
+
+## 2026-08-31 scope revision 9 exact Candidate and runtime — PASS
+
+Central Git-private scope revision 12 retained the existing integration Workstream lineage and added only the exact CI
+and evidence paths. The metadata refresh occurred after the first two code writes; committed authority still preceded
+those writes, but the first-write private-scope ordering deviation is recorded and not called compliant.
+
+The initial fix SHA `14f771feae9e2ef42f3d2d0b0bdffaaaf7cfcb87` Candidate ran 42 tests once and ended
+41 success/1 error: the in-process `test_inventory` import allowed Anaconda's `win32ctypes.core.cffi._common` to occupy
+the bare `_common` name used by an existing string patch. That receipt remains non-green and was not retried. Final
+`4556db3a8b75e9b92e3e2cfe9d229273b203ab33` uses subprocess black-box list checks and object-bound `ci_common`
+patches; one dry-run was allowed and one Candidate completed 42/42 PASS, zero reruns, evidence-eligible.
+
+Two exact-Git builds produced pairwise-identical objects:
+
+| Object | SHA-256 |
+| --- | --- |
+| ZIP | `25b3c38eb1bd5bb0f41c21502970f3ca59beb3ae0c9cdc1e3233f0fdc44ef50b` |
+| checksum file | `7c9f3cff88c38539e353f51b4cd83ca7d3f4d7e8aaedfe25a6865bf7524ed59c` |
+| deterministic receipt | `2465646542740b56762a44d426622d8954001dc4b3305b506af25ed3f65f42d1` |
+
+The ZIP/checksum bytes exactly equal `e120aaa...`; only the source-bound receipt changed. Runtime root is
+`C:\Users\1\AppData\Local\Temp\orrery-final-runtime-rev9-bc6e6a0637324075b90b8076a8d614d2`:
+
+- offline scaffold/validator and bundled Harness validate exit 0; invalid argv exits 2, sentinel absent,
+  `launch=false`;
+- Codex CLI 0.151.0-alpha.7.2/Sol medium unique discovery, explicit integrated-gate negative and implicit ordinary
+  positive are exact-SHA green;
+- Unified completed two start→HTTP 200→stop cycles;
+- v0.2 upgrade dry/apply backed up eight tools and preserved custom `AGENTS.md`; migrate/apply/restore returned the
+  exact original hash;
+- missing packages fail closed; Skill discovery is 1→0→1; canonical 162-file trees match, fixture is clean and the
+  real user Skill retains its 2026-08-17 write time.
+
+Two pre-formal local diagnostics omitted AI-disable and reached the configured provider path; neither is evidence and
+Provider cost may have occurred. All Candidate/runtime commands above explicitly disabled AI where applicable.
+Exact `4556db3...` is ready for one fast-forward update of `promotion/v0.3.0-rc` and one new Promotion run.

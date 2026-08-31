@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Scope Revision 9 Final Candidate/Runtime PASS
+
+- `14f771f...` Candidate 41/42 暴露 in-process inventory import 与 Anaconda bare `_common` collision；旧失败不
+  重试。最终回归改为 subprocess black-box + `ci_common` object patch，421 IDs 不变。
+- exact `4556db3...` Candidate 42/42 PASS；ZIP/checksum 与 `e120aaa...` 完全相同，source-bound receipt 更新。
+  final ZIP Harness、Codex explicit/implicit、Unified restart、v0.2 upgrade/migrate/restore、dependency/Skill
+  lifecycle 全绿。
+- 两次 pre-formal 本地诊断漏设 AI-disable 并到达 configured provider path，可能有成本且不计 evidence。后续
+  formal commands均 AI-disabled。Promotion ref 只允许 fast-forward 到 `4556db3...`。
+
 ## 2026-08-31 — Promotion Preflight Rejects Noisy Lane-list Output
 
 - remote `promotion/v0.3.0-rc` 精确等于 `e120aaa...`；run `33449930707` 的 exact-SHA bind 通过，但
