@@ -261,6 +261,7 @@
         "packages/project-orrery-core/src/project_orrery_core/templates/**",
         "skills/project-orrery/**",
         "skills/orrery-dispatch/**",
+        "scripts/authority_release_candidate_gate.py",
         "scripts/package_*.py",
         "tests/test_project_orrery.py",
         "tests/test_cli_wheel_installation.py",
