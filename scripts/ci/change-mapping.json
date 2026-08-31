@@ -2904,7 +2904,6 @@
       "owner_surface": "Packaging/Adapters/docsite",
       "owner_shard": "packaging-project",
       "allowed_stages": [
-        "fast",
         "checkpoint",
         "candidate",
         "promotion"
@@ -2915,7 +2914,7 @@
         "documentation",
         "release-packaging"
       ],
-      "reason": "low evidence for Packaging/Adapters/docsite via documentation, release-packaging"
+      "reason": "checkpoint Brand classification depth; Fast keeps current-surface and immutable-history sentinels"
     },
     {
       "test_id": "test_brand_contract.OrreryBrandContractTests.test_current_brand_surfaces_use_orrery_and_current_repository",
@@ -2933,14 +2932,13 @@
         "documentation",
         "release-packaging"
       ],
-      "reason": "low evidence for Packaging/Adapters/docsite via documentation, release-packaging"
+      "reason": "Fast current Brand/repository sentinel via documentation and release-packaging"
     },
     {
       "test_id": "test_brand_contract.OrreryBrandContractTests.test_default_self_host_display_and_target_title_projection_are_separate",
       "owner_surface": "Packaging/Adapters/docsite",
       "owner_shard": "packaging-project",
       "allowed_stages": [
-        "fast",
         "checkpoint",
         "candidate",
         "promotion"
@@ -2951,14 +2949,13 @@
         "documentation",
         "release-packaging"
       ],
-      "reason": "low evidence for Packaging/Adapters/docsite via documentation, release-packaging"
+      "reason": "checkpoint self-host/title projection depth; Fast keeps current-surface and immutable-history sentinels"
     },
     {
       "test_id": "test_brand_contract.OrreryBrandContractTests.test_display_metadata_changes_without_identity_alias_or_duplicate_implementation",
       "owner_surface": "Packaging/Adapters/docsite",
       "owner_shard": "packaging-project",
       "allowed_stages": [
-        "fast",
         "checkpoint",
         "candidate",
         "promotion"
@@ -2969,7 +2966,7 @@
         "documentation",
         "release-packaging"
       ],
-      "reason": "low evidence for Packaging/Adapters/docsite via documentation, release-packaging"
+      "reason": "checkpoint display/identity separation depth; Fast keeps current-surface and immutable-history sentinels"
     },
     {
       "test_id": "test_brand_contract.OrreryBrandContractTests.test_protocol_and_historical_hash_denylists_are_unchanged",
@@ -2994,7 +2991,6 @@
       "owner_surface": "Packaging/Adapters/docsite",
       "owner_shard": "packaging-project",
       "allowed_stages": [
-        "fast",
         "checkpoint",
         "candidate",
         "promotion"
@@ -3005,7 +3001,7 @@
         "documentation",
         "release-packaging"
       ],
-      "reason": "low evidence for Packaging/Adapters/docsite via documentation, release-packaging"
+      "reason": "checkpoint distribution/import identity depth; Fast keeps current-surface and immutable-history sentinels"
     },
     {
       "test_id": "test_ci_validation.CIValidationTests.test_actual_paths_are_primary_broad_scope_refuses_and_overlap_fails_closed",
@@ -6693,7 +6689,7 @@
       "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_private_observed_heads_can_seed_repair_proposal_but_never_make_it_effective", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 self-host repair evidence via collaboration-relation-capture"
     },
     {
-      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_registration_auto_derived_from_is_exact_and_idempotent", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "direct W7.3 exact lineage, automatic supersession, and Core-only derived_from authority evidence"
+      "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_registration_auto_derived_from_is_exact_and_idempotent", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "Promotion evidence for exact lineage, automatic supersession, and Core-only derived_from authority; revision-9 focused check is non-evidence"
     },
     {
       "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_schema_append_only_suggest_change_defer_reject_and_cas", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-relation-capture"], "reason": "medium W7.3 append-only CAS evidence via collaboration-relation-capture"
