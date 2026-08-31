@@ -891,3 +891,30 @@ Continue the existing W7.3 task and worktree. Read this amendment and the matchi
 committed task-description version, acknowledge it and refresh Git-private scope to revision 17 before running any
 focused check or writing closeout documentation. Use GPT-5.6 Sol medium. Do not push, integrate, modify public/default
 behavior, run Promotion/release validation or publish.
+
+## 2026-08-30 Central Blocker Amendment — Exact ELK Vendor Whitespace Attribute
+
+Revision 17 focused checks passed, but the first complete staged `git diff --cached --check` correctly stopped on five
+trailing-whitespace lines inside each byte-identical upstream `elk.bundled.js` copy. Rewriting those lines would break
+ADR-0022's reviewed SHA-256 and provenance. A broad JavaScript or vendor-tree exemption would weaken repository
+hygiene beyond the accepted dependency and is not authorized.
+
+### Exact exception
+
+- [ ] Add root `.gitattributes` entries for exactly these two files and set only their Git `whitespace` attribute to
+  unset (`-whitespace`):
+  - `packages/project-orrery-observatory/src/project_orrery_observatory/vendor/elk.bundled.js`;
+  - `experiments/workstream-graph-elk-evaluation/vendor/elk.bundled.js`.
+- [ ] Do not add `*.js`, `vendor/**` or another pattern exemption; do not change text/eol attributes for these files;
+  do not rewrite, format or regenerate either reviewed bundle.
+- [ ] Verify `git check-attr whitespace -- <both exact paths>` reports `unset`, both SHA-256 values remain
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`, and the complete staged
+  `git diff --cached --check` passes while authored files remain covered by the normal repository rules.
+- [ ] Do not rerun the already green 13 focused tests, Browser review or JavaScript check merely because this metadata
+  line was added. Record only the attribute/hash/diff evidence, then create the single clean W7.3 Candidate.
+
+Continue the same W7.3 task/worktree and preserve its staged index and all dirty files. Read this amendment and its
+matching Validation section from the committed task-description version, acknowledge it and refresh Git-private scope
+to revision 18 before writing `.gitattributes`. The only new expected write is root `.gitattributes`. All revision 17
+boundaries remain: no routed Fast/Checkpoint/Promotion/release, no push/integration/public/default change and no root
+PROGRESS/HANDOFF edit from the feature branch.

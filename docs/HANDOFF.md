@@ -52,8 +52,9 @@ Updated: 2026-08-30
 10. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 11. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
 12. **W7.3 relation capture：** 当前 dirty 分支已接 pinned ELK、shared projection、W phase small multiples
-    和显式 legacy；维护者已接受页面。按 scope revision 17 只做 focused closeout、branch State/Validation/
-    DEVLOG/index 同步和 clean Candidate，不在旧 CI6 fingerprint 重放正式 Fast/Checkpoint。
+    和显式 legacy；维护者已接受页面。revision 17 focused 13/13、vendor/JS/Browser/组件检查通过，唯一阻塞是
+    exact 上游 ELK bundle 的固有尾随空格。scope revision 18 只允许两条精确 `.gitattributes -whitespace`
+    后完成 clean Candidate；不在旧 CI6 fingerprint 重放正式 Fast/Checkpoint。
 13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 已实现组合 gates、lease、predictive refusal 与 no-repeat；
     现有 Fast 非绿、Checkpoint 绿不能互相替代。下一步由唯一整合者合入 W7.3 后对新实际 diff 运行一次

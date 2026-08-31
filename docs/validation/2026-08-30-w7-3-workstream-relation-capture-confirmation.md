@@ -318,3 +318,21 @@ before the v0.3.0 Final RC task may be registered.
 The implementation Agent must acknowledge the exact committed Plan/Validation sources and refresh Git-private scope
 to revision 17 before focused validation or closeout documentation writes. Promotion, public/default changes, push,
 tag, Release and publication remain unauthorized.
+
+## 2026-08-30 exact vendor whitespace exception gate
+
+Revision 17 implementation checks are green, but the complete staged diff check found the same five upstream
+trailing-whitespace lines in the experiment and product copies of the reviewed `elk.bundled.js`. The bundle bytes are
+part of the accepted provenance contract, so changing them to satisfy a generic whitespace fixer is invalid.
+
+Scope revision 18 may add only two exact root `.gitattributes` entries with `-whitespace`, one for each reviewed bundle
+path named in the Plan. Acceptance requires:
+
+- both paths report `whitespace: unset` through `git check-attr`;
+- both files retain SHA-256 `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`;
+- the complete staged `git diff --cached --check` passes;
+- no wildcard JavaScript/vendor exemption, byte rewrite, eol override or repeated focused/browser suite is introduced;
+- the final branch is clean after one W7.3 Candidate commit.
+
+This path-specific metadata exception is not a test waiver and does not turn upstream whitespace into an authored-file
+policy. All formal Fast/Checkpoint and integrated-page evidence remain assigned to the later central fingerprint.
