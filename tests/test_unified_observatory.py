@@ -33,6 +33,9 @@ from project_orrery_observatory.unified_observatory import (  # noqa: E402
     quarantine,
     validate_registrations,
 )
+from project_orrery_observatory.personal_observatory import inject_personal_observatory  # noqa: E402
+from project_orrery_observatory.relation_inbox import RELATION_INBOX_JS, inject_relation_inbox  # noqa: E402
+from project_orrery_observatory.team_observatory import inject_team_observatory  # noqa: E402
 
 
 class FakeIdentity:
@@ -155,6 +158,51 @@ class UnifiedRegistrationTests(unittest.TestCase):
         self.assertIn('aria-expanded="false">? 帮助</button>', page)
         self.assertIn("prefers-reduced-motion:reduce", page)
         self.assertIn("left:0;right:0;top:var(--hh);bottom:0;width:100vw;max-width:none;box-sizing:border-box", page)
+
+    def test_relation_inbox_composes_with_real_lightweight_personal_panel(self) -> None:
+        page, _stats, _authority = _bounded_docsite()
+        projection = {
+            "contract_type": "orrery-active-task-projection-v1",
+            "captured_at": "2026-08-31T00:00:00Z",
+            "counts": {"current": 0, "history": 0, "refresh_needed": 0, "registry_worktrees": 1},
+            "tasks": [],
+            "maintenance": {
+                "status": "ready",
+                "control_available": True,
+                "api_base": "/api/v1/maintenance",
+                "refresh_path": "/refresh",
+                "remove_path": "/remove-worktree",
+                "reload_after_action": False,
+                "queue": [],
+                "authorizations": [],
+                "receipts": [],
+                "protected_reasons": {},
+            },
+        }
+        page = inject_personal_observatory(page, projection)
+        page = inject_team_observatory(page, api_base="/api/v1/team", dynamic_control=True)
+        page = inject_relation_inbox(
+            page,
+            {
+                "pending_proposals": [], "effective_relations": [], "stale_confirmations": [],
+                "writes_performed": False, "network_performed": False,
+                "local_actions_require_same_origin_cookie": True, "central_request_only": True,
+            },
+            dynamic=True,
+        )
+
+        self.assertEqual(page.count('<section class="ri-shell" data-relation-inbox'), 2)
+        personal_at = page.index('id="personal-observatory"')
+        maintenance_at = page.index('id="workspace-maintenance"')
+        team_at = page.index('id="team-observatory"')
+        first_inbox = page.index('<section class="ri-shell" data-relation-inbox')
+        second_inbox = page.index('<section class="ri-shell" data-relation-inbox', first_inbox + 1)
+        self.assertLess(personal_at, first_inbox)
+        self.assertLess(first_inbox, maintenance_at)
+        self.assertLess(team_at, second_inbox)
+        self.assertIn('data-request-only="true"', page[second_inbox:])
+        self.assertIn("canAccept=p.relation_type!=='derived_from'", RELATION_INBOX_JS)
+        self.assertIn("canChangeGate=p.relation_type==='depends_on'", RELATION_INBOX_JS)
 
 
 class UnifiedRuntimeTests(unittest.TestCase):

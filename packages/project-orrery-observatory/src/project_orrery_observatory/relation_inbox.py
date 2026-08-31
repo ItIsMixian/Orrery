@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from typing import Any, Mapping
 
 
@@ -20,7 +21,7 @@ async function api(path,body){const response=await fetch(path,{method:body?'POST
 function render(panel,data){const list=panel.querySelector('[data-ri-list]'),count=panel.querySelector('[data-ri-count]'),requestOnly=panel.dataset.requestOnly==='true';list.replaceChildren();const items=data.pending_proposals||[];count.textContent=`${items.length} 项`;
  if(!items.length){list.append(el('div','ri-empty','当前没有等待人工确认的关系建议。'));return}
  items.forEach(item=>{const p=item.current,card=el('article','ri-card'),title=el('h4',null,`${relationLabels[p.relation_type]||p.relation_type} · revision ${p.revision}`),direction=el('div','ri-direction',`${p.source_workstream_id} 依赖／接续 ${p.target_workstream_id}`),copy=el('p','ri-consequence',p.consequence),why=el('p','ri-rationale',`原因：${p.rationale}`),evidence=el('div','ri-evidence');card.append(title,direction);if(p.required_for)direction.prepend(el('span','ri-gate',gateLabels[p.required_for]||p.required_for));card.append(copy,why,evidence);(p.evidence||[]).forEach(value=>evidence.append(el('span',null,`${value.category} · ${value.ref} · ${value.fact_scope}`)));
-  const capability=item.local_confirmation||{},allowed=!requestOnly&&capability.allowed===true&&panel.dataset.dynamic==='true';if(allowed){const actions=el('div','ri-actions'),accept=el('button','primary','接受'),defer=el('button',null,'暂缓／Unknown'),reject=el('button','danger','拒绝'),label=el('label',null,'阻塞阶段'),select=el('select');['implementation','validation','integration','release'].forEach(gate=>{const option=el('option',null,gateLabels[gate]);option.value=gate;option.selected=gate===p.required_for;select.append(option)});label.append(select);const change=el('button',null,'更改阶段');[[accept,'accept'],[defer,'defer'],[reject,'reject'],[change,'change-gate']].forEach(([button,action])=>button.addEventListener('click',async()=>{button.disabled=true;try{const body={proposal_id:p.proposal_id,expected_revision:p.revision};if(action==='change-gate')body.required_for=select.value;await api(`/api/v1/workstreams/relations/${action}`,body);await refresh()}catch(error){panel.querySelector('[data-ri-notice]').textContent=error.message;button.disabled=false}}));actions.append(accept,label,change,defer,reject);card.append(actions)}else{card.append(el('div','ri-request-only',requestOnly?'中央／团队视图只能发送请求；确认必须回到具备权限的成员本机。':'当前本机身份没有该 gate 所需的 task owner／integrator 权限。'))}list.append(card)})}
+  const capability=item.local_confirmation||{},allowed=!requestOnly&&capability.allowed===true&&panel.dataset.dynamic==='true';if(allowed){const actions=el('div','ri-actions'),accept=el('button','primary','接受'),defer=el('button',null,'暂缓／Unknown'),reject=el('button','danger','拒绝'),canAccept=p.relation_type!=='derived_from',canChangeGate=p.relation_type==='depends_on',bindings=[];let label=null,select=null,change=null;if(canAccept)bindings.push([accept,'accept']);if(canChangeGate){label=el('label',null,'阻塞阶段');select=el('select');['implementation','validation','integration','release'].forEach(gate=>{const option=el('option',null,gateLabels[gate]);option.value=gate;option.selected=gate===p.required_for;select.append(option)});label.append(select);change=el('button',null,'更改阶段');bindings.push([change,'change-gate'])}bindings.push([defer,'defer'],[reject,'reject']);bindings.forEach(([button,action])=>button.addEventListener('click',async()=>{button.disabled=true;try{const body={proposal_id:p.proposal_id,expected_revision:p.revision};if(action==='change-gate')body.required_for=select.value;await api(`/api/v1/workstreams/relations/${action}`,body);await refresh()}catch(error){panel.querySelector('[data-ri-notice]').textContent=error.message;button.disabled=false}}));if(canAccept)actions.append(accept);if(canChangeGate)actions.append(label,change);actions.append(defer,reject);card.append(actions)}else{card.append(el('div','ri-request-only',requestOnly?'中央／团队视图只能发送请求；确认必须回到具备权限的成员本机。':'当前本机身份没有该 gate 所需的 task owner／integrator 权限。'))}list.append(card)})}
 async function refresh(){try{const data=await api('/api/v1/workstreams/relations');panels.forEach(panel=>render(panel,data));}catch(error){panels.forEach(panel=>panel.querySelector('[data-ri-notice]').textContent=error.message)}}
 panels.forEach(panel=>{const payload=panel.querySelector('[data-ri-payload]');if(payload)render(panel,JSON.parse(payload.textContent))});if(panels.some(panel=>panel.dataset.dynamic==='true'))refresh();})();
 """
@@ -39,17 +40,44 @@ def _panel(capture: Mapping[str, Any], *, dynamic: bool, request_only: bool) -> 
     )
 
 
+def _inject_before_article_end(page: str, article_id: str, panel: str) -> str:
+    """Insert into one generated page article without depending on its internal presentation."""
+    identity = 'id="%s"' % article_id
+    identity_at = page.find(identity)
+    article_at = page.rfind("<article", 0, identity_at + 1)
+    if identity_at < 0 or article_at < 0:
+        raise ValueError("Unified %s article is unavailable" % article_id)
+
+    depth = 0
+    for match in re.finditer(r"</?article\b[^>]*>", page[article_at:], flags=re.IGNORECASE):
+        token = match.group(0)
+        if token.startswith("</"):
+            depth -= 1
+            if depth == 0:
+                insert_at = article_at + match.start()
+                return page[:insert_at] + panel + page[insert_at:]
+        else:
+            depth += 1
+    raise ValueError("Unified %s article boundary is incomplete" % article_id)
+
+
 def inject_relation_inbox(page: str, capture: Mapping[str, Any], *, dynamic: bool) -> str:
     """Inject Personal local-confirmation and Team request-only views without adding navigation."""
     if 'data-relation-inbox' in page:
         raise ValueError("relation inbox is already present")
-    personal_marker = '<div class="po-foot">'
-    team_marker = '</section><div class="to-notice" data-team-notice>'
-    if personal_marker not in page or team_marker not in page or "</style>" not in page or "</body>" not in page:
+    if "</style>" not in page or "</body>" not in page:
         raise ValueError("Unified Personal/Team composition markers are unavailable")
     result = page.replace("</style>", RELATION_INBOX_CSS + "</style>", 1)
-    result = result.replace(personal_marker, _panel(capture, dynamic=dynamic, request_only=False) + personal_marker, 1)
-    result = result.replace(team_marker, _panel(capture, dynamic=False, request_only=True) + team_marker, 1)
+    result = _inject_before_article_end(
+        result,
+        "personal-observatory",
+        _panel(capture, dynamic=dynamic, request_only=False),
+    )
+    result = _inject_before_article_end(
+        result,
+        "team-observatory",
+        _panel(capture, dynamic=False, request_only=True),
+    )
     return result.replace("</body>", "<script>" + RELATION_INBOX_JS + "</script></body>", 1)
 
 

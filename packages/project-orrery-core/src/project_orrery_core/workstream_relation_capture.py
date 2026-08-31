@@ -1014,6 +1014,8 @@ def _confirmation_history(project_root: Path, proposal_id: str | None = None) ->
 
 
 def _authority_for_proposal(project_root: Path, proposal: Mapping[str, Any], member_id: str, claimed_role: str) -> dict[str, Any]:
+    if proposal["relation_type"] == "derived_from":
+        raise PermissionError("derived_from becomes effective only through Core-verified mechanical ancestry")
     roles = inspect_integrator_roles(project_root)
     sessions = _session_index(project_root)
     source = sessions.get(str(proposal["source_workstream_id"]), {}).get("record", {})
@@ -1393,8 +1395,24 @@ def auto_capture_derived_from(project_root: Path, session: Mapping[str, Any], *,
         lineage.get("status") != "current" or task_base is None or source_head is None
         or target_session is None or target_session.get("state") != "current" or target_head != task_base
     ):
-        proposal_id = f"auto-derived-unknown-{_digest({'source': source, 'target': target, 'base': task_base})[:20]}"
-        try:
+        timestamp = _timestamp(recorded_at)
+        histories = _load_proposal_history(project_root)
+        canonical_id = f"auto-derived-unknown-{_digest({'source': source, 'target': target, 'base': task_base})[:20]}"
+        canonical_history = histories.get(canonical_id, [])
+        proposal_id = canonical_id
+        if canonical_history and canonical_history[-1]["status"] == "superseded":
+            scope_revision = session.get("scope_revision")
+            generation_seed = {
+                "source": source, "target": target, "base": task_base,
+                "scope_revision": scope_revision if isinstance(scope_revision, int) else None,
+                "source_head": source_head,
+            }
+            proposal_id = f"auto-derived-unknown-{_digest(generation_seed)[:20]}"
+
+        desired_history = histories.get(proposal_id, [])
+        if desired_history:
+            proposal = {"event": dict(desired_history[-1]), "writes_performed": False, "idempotent": True}
+        else:
             proposal = suggest_relation(
                 project_root, proposal_id=proposal_id, relation_type="derived_from",
                 source_workstream_id=source, target_workstream_id=target, required_for=None,
@@ -1403,15 +1421,37 @@ def auto_capture_derived_from(project_root: Path, session: Mapping[str, Any], *,
                 proposer_kind="tool", proposer_id="workstream-registration",
                 evidence=[evidence_reference(
                     category="workstream-session", reference=f"git-private:{source}", fact_scope="local-only"
-                )], recorded_at=recorded_at,
+                )], recorded_at=timestamp,
             )
-        except ValueError as exc:
-            if "proposal" not in str(exc) and "already exists" not in str(exc):
-                raise
-            proposal = {"writes_performed": False}
+
+        superseded: list[str] = []
+        current_histories = _load_proposal_history(project_root)
+        for identifier, events in sorted(current_histories.items()):
+            current = events[-1]
+            proposer = current.get("proposer")
+            if (
+                identifier == proposal_id
+                or not identifier.startswith("auto-derived-unknown-")
+                or current.get("status") != "proposed"
+                or current.get("relation_type") != "derived_from"
+                or current.get("source_workstream_id") != source
+                or current.get("target_workstream_id") != target
+                or not isinstance(proposer, Mapping)
+                or proposer.get("kind") != "tool"
+                or proposer.get("id") != "workstream-registration"
+            ):
+                continue
+            _next_proposal_event(
+                project_root, identifier, expected_revision=int(current["revision"]),
+                event_kind="superseded", status="superseded",
+                reason="superseded by the current exact task-base lineage observation",
+                actor_kind="tool", actor_id="workstream-registration", recorded_at=timestamp,
+            )
+            superseded.append(identifier)
         return {
             "status": "unknown", "reason_codes": ["same-project-exact-base-or-ancestry-unverified"],
-            "proposal": proposal, "writes_performed": bool(proposal.get("writes_performed")),
+            "proposal": proposal, "superseded_proposal_ids": superseded,
+            "writes_performed": bool(proposal.get("writes_performed")) or bool(superseded),
             "effective_relation_created": False,
         }
     from .workstream_relations import _is_ancestor

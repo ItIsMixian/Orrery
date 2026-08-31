@@ -27,6 +27,7 @@ from project_orrery_core.collaboration import (  # noqa: E402
 from project_orrery_core.workstream_relation_capture import (  # noqa: E402
     CAPTURE_MAX_FILE_BYTES,
     accept_proposal,
+    auto_capture_derived_from,
     capture_storage_root,
     change_integrator_role,
     change_proposal_gate,
@@ -380,6 +381,78 @@ class WorkstreamRelationCaptureTests(unittest.TestCase):
             )
             self.assertFalse(refreshed["relation_capture"]["writes_performed"])
             self.assertEqual(len(load_relation_history(child)["current_records"]), len(records))
+
+    def test_unknown_lineage_supersedes_only_obsolete_automatic_proposals(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            def unknown_session(task_base: str, scope_revision: int) -> dict:
+                return {
+                    "workstream_id": "child-task",
+                    "head": "a" * 40,
+                    "scope_revision": scope_revision,
+                    "lineage": {
+                        "base_workstream_id": "missing-parent",
+                        "task_base_oid": task_base,
+                        "status": "parent-unverified-unknown",
+                    },
+                }
+
+            first = auto_capture_derived_from(
+                fixture.worktree_a, unknown_session("b" * 40, 1), recorded_at="2026-08-31T00:00:00Z",
+            )
+            first_id = first["proposal"]["event"]["proposal_id"]
+            self.assertTrue(first["writes_performed"])
+            with self.assertRaisesRegex(PermissionError, "Core-verified mechanical ancestry"):
+                accept_proposal(
+                    fixture.worktree_a, first_id, expected_revision=1,
+                    confirmer_id="local-owner", confirmer_role="task-owner",
+                    local_confirmation=True,
+                )
+
+            manual = suggest_relation(
+                fixture.worktree_a, proposal_id="human-lineage-observation",
+                relation_type="derived_from", source_workstream_id="child-task",
+                target_workstream_id="missing-parent", required_for=None,
+                rationale="human wants to preserve a separate observation",
+                consequence="this observation remains pending until a human decides it",
+                proposer_kind="human", proposer_id="local-owner",
+                recorded_at="2026-08-31T00:00:01Z",
+            )
+            self.assertTrue(manual["writes_performed"])
+
+            second = auto_capture_derived_from(
+                fixture.worktree_a, unknown_session("c" * 40, 2), recorded_at="2026-08-31T00:00:02Z",
+            )
+            second_id = second["proposal"]["event"]["proposal_id"]
+            self.assertNotEqual(first_id, second_id)
+            self.assertEqual(second["superseded_proposal_ids"], [first_id])
+
+            inspection = inspect_relation_capture(fixture.worktree_a)
+            by_id = {item["proposal_id"]: item for item in inspection["proposals"]}
+            self.assertEqual(by_id[first_id]["display_status"], "superseded")
+            self.assertEqual(by_id[first_id]["history_count"], 2)
+            self.assertEqual(by_id[second_id]["display_status"], "proposed")
+            self.assertEqual(by_id["human-lineage-observation"]["display_status"], "proposed")
+            self.assertEqual(inspection["counts"]["pending"], 2)
+
+            repeated = auto_capture_derived_from(
+                fixture.worktree_a, unknown_session("c" * 40, 2), recorded_at="2026-08-31T00:00:03Z",
+            )
+            self.assertFalse(repeated["writes_performed"])
+            self.assertEqual(repeated["superseded_proposal_ids"], [])
+            self.assertEqual(inspect_relation_capture(fixture.worktree_a)["counts"]["pending"], 2)
+
+            returned = auto_capture_derived_from(
+                fixture.worktree_a, unknown_session("b" * 40, 3), recorded_at="2026-08-31T00:00:04Z",
+            )
+            returned_id = returned["proposal"]["event"]["proposal_id"]
+            self.assertNotEqual(returned_id, first_id)
+            self.assertEqual(returned["superseded_proposal_ids"], [second_id])
+            final = inspect_relation_capture(fixture.worktree_a)
+            self.assertEqual(final["counts"]["pending"], 2)
+            self.assertEqual(
+                {item["proposal_id"] for item in final["pending_proposals"]},
+                {"human-lineage-observation", returned_id},
+            )
 
     def test_explicit_series_is_display_metadata_and_predecessor_stays_proposed(self) -> None:
         with CollaborationGitFixture() as fixture:
