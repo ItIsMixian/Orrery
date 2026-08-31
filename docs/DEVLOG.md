@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Scope Revision 5 Local Gates PASS
+
+- 登记 task-description `368d6ca...`／Git-private scope revision 5 后，merge `ba230555...` 只在既有 generic
+  fixture-ID 期望首项加入 `release-candidate-packaging`；未改其他 assertion/fixture/mapping/router/product/budget。
+- 新 fingerprint `f4530713...` dry-run allowed；唯一 fresh Candidate 81/81 PASS、11.679034s test runtime、
+  zero rerun、evidence-eligible，旧 `ac44630...` failure 未重跑。
+- 同 SHA 两根构建的 162-entry ZIP/checksum/receipt bytes 全相同；ZIP `7a0cf3dd...`。一次仓库外 offline
+  scaffold/validate/Unified-help PASS，目标为 0.3.0／Model 1／120 managed tools，且无 `__pycache__`。
+- 未运行剩余 final runtime matrix、Promotion、push、main、tag、asset 或 GitHub Release。
+
 ## 2026-08-31 — Final RC Candidate 80/81; One Stale Portfolio Expectation
 
 - exact `ac44630...` 使用唯一 Candidate lease 完成 81 tests／12.061400s；80 success，1 failure，无 timeout 或

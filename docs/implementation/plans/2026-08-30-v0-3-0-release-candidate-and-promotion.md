@@ -446,6 +446,11 @@ After the one-line correction and a clean commit, run one Candidate dry-run on t
 run one fresh Candidate. Green then resumes the scope-revision-4 same-SHA build/offline gates. Any other non-green
 result stops without retry. Push/main/tag/assets/Release remain forbidden.
 
+Scope revision 5 completed on exact `ba2305555e30ee34c88bd7622d13aa8d02930fb8`: the new-fingerprint Candidate,
+two-root deterministic build and external offline new-project portfolio are green. These results close only the
+bounded local gates authorized above; Phase 2's remaining migration/runtime matrix and all Promotion/publication
+authority remain open.
+
 ## Phase 1 — register Final RC and freeze inputs
 
 1. Create an isolated Sol-medium Final RC Workstream from the accepted central SHA with precise expected writes.
