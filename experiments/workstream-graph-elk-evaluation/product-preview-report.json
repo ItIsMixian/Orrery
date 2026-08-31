@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "task_description_version": "ad3d8b5189c8bd3fcb2c6b06fce67e074bf79b44",
+  "scope_revision": 16,
+  "status": "pending-maintainer-review",
+  "preview_url": "http://127.0.0.1:8766/docs/_site/workstream-relations.html#workstream-relation-graph",
+  "failure_preview_url": "http://127.0.0.1:8766/docs/_site/workstream-relations.html?orrery-preview-elk-failure=1#workstream-relation-graph",
+  "component": {
+    "distribution": "project-orrery-observatory",
+    "version": "0.1.19",
+    "release_status": "unreleased"
+  },
+  "elk": {
+    "name": "elkjs",
+    "version": "0.11.0",
+    "bundle_bytes": 1627496,
+    "bundle_sha256": "cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8",
+    "package_tarball_sha256": "559188be5aba91ce22457c1e2f4693135af43e68cf9a71b53b129b762de9d52d",
+    "runtime": "vendored-local-only-zero-network"
+  },
+  "product_states": [
+    "succession-all",
+    "w-phase-multiples",
+    "project-structure-primary",
+    "project-structure-semantic",
+    "project-structure-affected",
+    "dependency",
+    "elk-failure",
+    "legacy-explicit"
+  ],
+  "viewport_matrix": [
+    "1440x900",
+    "1280x800",
+    "390x844"
+  ],
+  "additional_evidence": [
+    "screenshots/product-revision-16/w-phase-multiples-ledger-390x844.png",
+    "screenshots/product-revision-16/theme-light-1440x900.png",
+    "screenshots/product-revision-16/theme-dark-1440x900.png"
+  ],
+  "observations": {
+    "default_engine": "elk",
+    "default_zoom_percent": 100,
+    "inspector_default": "closed",
+    "w_phase_ids": [
+      "workstream-w5",
+      "workstream-w6",
+      "workstream-w7"
+    ],
+    "module_context_controls": [
+      "primary-only",
+      "semantic-one-hop",
+      "affected"
+    ],
+    "failure_behavior": "same-fact-ledger-plus-explicit-retry-or-manual-legacy-no-automatic-fallback",
+    "zoom_pipeline": "accepted-layout-viewport-only-no-projection-render-or-elk",
+    "scope_conservation": "all-scope-semantic-edge-ids-superset-of-w-scope",
+    "mobile_horizontal_overflow": false
+  },
+  "commands_not_run": [
+    "unittest",
+    "pytest",
+    "focused-tests",
+    "geometry-tests",
+    "repository-gates",
+    "Fast",
+    "Checkpoint",
+    "Promotion",
+    "release-validation"
+  ],
+  "claims": {
+    "maintainer_visual_acceptance": false,
+    "validation_pass": false,
+    "release_ready": false
+  }
+}

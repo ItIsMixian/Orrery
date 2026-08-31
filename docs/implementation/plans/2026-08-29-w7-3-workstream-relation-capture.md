@@ -1,6 +1,6 @@
 # 实施计划：W7.3 Workstream Relation Capture & Confirmation
 
-Status: Graph-native correction Candidate complete with documented local CI6 timing limitation; task-description version `2ab5c465ec28d7a472ad3f5ebbb324a565bbe57a`
+Status: Reopened for maintainer-required Graph UX correction; prior Candidate not accepted visually
 
 Date: 2026-08-29
 
@@ -8,8 +8,7 @@ Governing ADR: [ADR-0017](../../decisions/0017-workstream-relation-capture-and-c
 
 Approved Design: [Workstream relation capture and confirmation](../../design/workstream-relation-capture-and-confirmation.md)
 
-Dispatch governance: ADR-0018 at authority commit `6315415075fb78b61d9a5bb835725bced0bc9ce1`
-(the integration branch must land that exact authority commit before this Candidate).
+Dispatch governance: [ADR-0018](../../decisions/0018-authority-first-workstream-dispatch.md)
 
 ## Goal
 
@@ -18,41 +17,41 @@ Dispatch governance: ADR-0018 at authority commit `6315415075fb78b61d9a5bb835725
 
 ## Phase 0 — versioned contracts and fixtures
 
-- [x] 冻结 proposal/event/confirmation/role fixture 与 JSON schema；v1 relation 继续可读。
-- [x] 为 `depends_on.required_for` 冻结 implementation／validation／integration／release 四种 gate 及 legacy
+- [ ] 冻结 proposal/event/confirmation/role fixture 与 JSON schema；v1 relation 继续可读。
+- [ ] 为 `depends_on.required_for` 冻结 implementation／validation／integration／release 四种 gate 及 legacy
   unknown 行为。
-- [x] 冻结 proposer/evidence/confirmer/role/revision/hash 字段和 path/size/count/symlink 安全门。
-- [x] 建立单人 owner、Team owner、多 integrator conflict、无 integrator、Agent spoof、legacy v1、cycle、
+- [ ] 冻结 proposer/evidence/confirmer/role/revision/hash 字段和 path/size/count/symlink 安全门。
+- [ ] 建立单人 owner、Team owner、多 integrator conflict、无 integrator、Agent spoof、legacy v1、cycle、
   late-CI fan-in 等正负组合。
 
 ## Phase 1 — automatic mechanical lineage
 
-- [x] Workstream registration/rebind 自动尝试 `derived_from`，仅接受 same-project exact OID 和本地 ancestry。
-- [x] 重复输入幂等；drift/non-ancestor/self/cycle/Unknown 失败关闭并返回 required metadata。
-- [x] append-only event 写入 Git-common-private store；作者树、package、Team sync 和外网零写入。
-- [x] Codex/Claude/DeepSeek/Harness Adapter 只提供 caller/platform provenance，不拥有确认权。
+- [ ] Workstream registration/rebind 自动尝试 `derived_from`，仅接受 same-project exact OID 和本地 ancestry。
+- [ ] 重复输入幂等；drift/non-ancestor/self/cycle/Unknown 失败关闭并返回 required metadata。
+- [ ] append-only event 写入 Git-common-private store；作者树、package、Team sync 和外网零写入。
+- [ ] Codex/Claude/DeepSeek/Harness Adapter 只提供 caller/platform provenance，不拥有确认权。
 
 ## Phase 2 — `depends_on` proposal and gate confirmation
 
-- [x] Core/CLI 支持 suggest/inspect/accept/change-gate/defer/reject；Agent 只能 suggest。
-- [x] implementation/validation 只接受 source task owner 的本机人类确认。
-- [x] integration/release 只接受人类 integrator 确认；central Team request 不能直接生效。
-- [x] gate-aware lifecycle eligibility 只消费 effective current relation，Unknown/proposed 不阻塞。
-- [x] Harness 从明确 Prompt/Plan/artifact/gate evidence 生成候选，不把 path overlap 自动升级为 dependency。
+- [ ] Core/CLI 支持 suggest/inspect/accept/change-gate/defer/reject；Agent 只能 suggest。
+- [ ] implementation/validation 只接受 source task owner 的本机人类确认。
+- [ ] integration/release 只接受人类 integrator 确认；central Team request 不能直接生效。
+- [ ] gate-aware lifecycle eligibility 只消费 effective current relation，Unknown/proposed 不阻塞。
+- [ ] Harness 从明确 Prompt/Plan/artifact/gate evidence 生成候选，不把 path overlap 自动升级为 dependency。
 
 ## Phase 3 — integrator and `absorbs`
 
-- [x] Personal project owner 成为默认 sole integrator；Agent/session 身份拒绝。
-- [x] Team owner 可显式 grant/revoke human integrator；无 integrator 时失败关闭。
-- [x] `absorbs` proposal 显示 target closure/Validation/scope，只有 integrator confirmation 产生 effective event。
-- [x] 多 integrator 使用 revision/CAS；冲突决定保持 pending，不 last-writer-win。
+- [ ] Personal project owner 成为默认 sole integrator；Agent/session 身份拒绝。
+- [ ] Team owner 可显式 grant/revoke human integrator；无 integrator 时失败关闭。
+- [ ] `absorbs` proposal 显示 target closure/Validation/scope，只有 integrator confirmation 产生 effective event。
+- [ ] 多 integrator 使用 revision/CAS；冲突决定保持 pending，不 last-writer-win。
 
 ## Phase 4 — Observatory inbox and graph projection
 
-- [x] Personal/Team 增加“关系待确认”，显示原因、gate、证据与本机权限；中央仍 request-only。
-- [x] Graph 显示 effective/proposed 与 required_for，但不增加 confirm/apply/undo 按钮。
-- [x] 任务创建不经过 Orrery UI 时，Skill/CLI 在首次产品写入前完成注册；未登记任务显示 finding 而不伪造关系。
-- [x] 真实 self-host 以新 Integration Workstream 演示 fan-out/fan-in，不能回写旧历史意图。
+- [ ] Personal/Team 增加“关系待确认”，显示原因、gate、证据与本机权限；中央仍 request-only。
+- [ ] Graph 显示 effective/proposed 与 required_for，但不增加 confirm/apply/undo 按钮。
+- [ ] 任务创建不经过 Orrery UI 时，Skill/CLI 在首次产品写入前完成注册；未登记任务显示 finding 而不伪造关系。
+- [ ] 真实 self-host 以新 Integration Workstream 演示 fan-out/fan-in，不能回写旧历史意图。
 
 ## Validation and rollout
 
@@ -75,38 +74,38 @@ derived/read-only and are no longer presented as confirmed conflicts.
 
 ### Task series and predecessor proposals
 
-- [x] Add versioned explicit `series_id`, `task_code`, `series_order` and optional
+- [ ] Add versioned explicit `series_id`, `task_code`, `series_order` and optional
   `series_predecessor_workstream_id` (or versioned equivalent); never
   infer facts from `A3/A4`, `CI6/CI7` name prefixes.
-- [x] Keep series grouping visually distinct from `derived_from`／`depends_on`／`absorbs` edges.
-- [x] Explicit predecessor registration creates a proposal with suggested gate/evidence, never an effective edge.
-- [x] Produce read-only self-host repair proposals for A3→A4 and CI6→CI7; maintainer confirmation selects the exact
+- [ ] Keep series grouping visually distinct from `derived_from`／`depends_on`／`absorbs` edges.
+- [ ] Explicit predecessor registration creates a proposal with suggested gate/evidence, never an effective edge.
+- [ ] Produce read-only self-host repair proposals for A3→A4 and CI6→CI7; maintainer confirmation selects the exact
   relation/gate before any effective event.
 
 ### User-facing status taxonomy
 
-- [x] Replace the generic “待确认” collapse with deterministic Chinese states for active, human-confirmation pending,
+- [ ] Replace the generic “待确认” collapse with deterministic Chinese states for active, human-confirmation pending,
   evidence/scope stale, historical, session missing/relation-only, unregistered and genuinely Unknown.
-- [x] Keep raw lifecycle/runtime/evidence/scope axes in technical details; only actual human decision pending uses
+- [ ] Keep raw lifecycle/runtime/evidence/scope axes in technical details; only actual human decision pending uses
   “等待人工确认”.
 
 ### Comparison versus conflict
 
-- [x] Preserve conservative Core `compare_pairs` semantics but project them as amber comparison/review suggestions,
+- [ ] Preserve conservative Core `compare_pairs` semantics but project them as amber comparison/review suggestions,
   not red conflicts.
-- [x] Conflict lens contains only evidence-backed conflict facts (path/module/exclusive-resource/contract or explicit
+- [ ] Conflict lens contains only evidence-backed conflict facts (path/module/exclusive-resource/contract or explicit
   human finding), with location, impact and source.
-- [x] No confirmed conflicts produces “当前没有已确认的任务冲突”.
-- [x] Translate stale/unconfirmed/independent/post-fork reason codes into ordinary Chinese in a separate comparison
+- [ ] No confirmed conflicts produces “当前没有已确认的任务冲突”.
+- [ ] Translate stale/unconfirmed/independent/post-fork reason codes into ordinary Chinese in a separate comparison
   queue; they must not create red Graph edges.
-- [x] Version any changed projection/schema contract without rewriting v1 history.
+- [ ] Version any changed projection/schema contract without rewriting v1 history.
 
 ### Acceptance
 
-- [x] Real self-host shows A and CI series while unconfirmed predecessor links remain proposals.
-- [x] Current compare suggestions and confirmed conflicts are completely separated.
-- [x] 1440px/390px Graph and ledger preserve facts, keyboard/ARIA, zero overflow and read-only canvas.
-- [x] Graph never confirms relations; local relation inbox remains the only confirmation UI.
+- [ ] Real self-host shows A and CI series while unconfirmed predecessor links remain proposals.
+- [ ] Current compare suggestions and confirmed conflicts are completely separated.
+- [ ] 1440px/390px Graph and ledger preserve facts, keyboard/ARIA, zero overflow and read-only canvas.
+- [ ] Graph never confirms relations; local relation inbox remains the only confirmation UI.
 
 Expected affected surfaces include relation capture Core/schema, registration/CLI/Harness, relation inbox,
 presentation projection and their focused tests. If implementation requires a new relation kind or changes
@@ -114,46 +113,808 @@ confirmation authority, W7.3 must stop for a new ADR rather than expanding this 
 
 ## 2026-08-30 Maintainer Scope Amendment — Graph-native Relations, No Detached Substitutes
 
-Authority source: task-description version `2ab5c465ec28d7a472ad3f5ebbb324a565bbe57a`, Plan blob
-`a77ace7f42f091aabf81be55d4395465b0847a7c`. The prior `5fee848...` Candidate remains accepted evidence for
-Core capture, authority and inbox behavior, but is not accepted unchanged for Graph UX.
+The prior W7.3 Candidate is rejected for Graph UX acceptance. It placed explicit task series in a detached card strip
+and comparison suggestions in a large card ledger below the canvas. Those surfaces describe relationships outside the
+graph while leaving the actual topology visually disconnected. Passing contract tests does not satisfy the requested
+product behavior.
 
-This amendment changes presentation and explicit-series projection only. It adds no authoritative relation kind and
-does not change human confirmation authority, DAG or privacy boundaries, so ADR-0017 remains sufficient.
+### Design brief
+
+- **Purpose:** let a maintainer understand task lineage, explicit series progression, dependencies and confirmed
+  conflicts from the topology itself.
+- **Tone:** dense engineering/analyst workspace; graph-first, calm and legible.
+- **Memorable interaction:** every visible relationship is a selectable connector inside the canvas, with its type and
+  confidence readable from route style and inspector evidence.
+- **Constraint:** existing read-only authority, Chinese UI, current Orrery visual tokens, keyboard/ARIA and mobile
+  same-fact behavior remain. No ImageGen or decorative redesign.
 
 ### Graph-native series and relationship presentation
 
-- [x] Remove the standalone “任务系列” card strip; explicit series metadata now creates graph-native lanes and
-  ordered adjacent connectors.
-- [x] Show A3→A4, CI6→CI7 and U1→U2→U2.2 as connected nodes in the canvas, labelled and inspectable as
-  “同系列演进（展示关系）”.
-- [x] Keep series connectors presentation-only: they do not satisfy `derived_from`, confirm `depends_on`, block a
-  gate, close a task or create an effective relation event.
-- [x] Keep predecessor proposals as amber dashed “等待人工确认” dependency edges while other non-conflict lenses
-  retain subdued series structure.
-- [x] Render series headers inside the canvas; no detached top grid substitutes for nodes and connectors.
+- [ ] Remove the standalone “任务系列” card strip. Explicit `series_id`／`series_order` metadata must create an actual
+  graph-native series lane/group and ordered connector between adjacent tasks.
+- [ ] A3→A4, CI6→CI7 and U1→U2→U2.2 must be visibly connected in the canvas without requiring the user to read a
+  separate list. The connector is labelled/inspectable as “同系列演进（展示关系）”.
+- [ ] A series connector is presentation-only: it cannot satisfy `derived_from`, confirm `depends_on`, block a gate,
+  close a task or create an effective relation event. Its style must be distinct from succession, dependency and
+  conflict edges.
+- [ ] In the dependency lens, explicit predecessor proposals remain amber dashed directional edges with
+  “等待人工确认”; A3→A4 and CI6→CI7 must appear in the same canvas. In other lenses, a subdued series connector keeps
+  the structural relationship visible without changing semantic edge counts.
+- [ ] Series lane headers may appear inside the canvas margin/swimlane, but no detached top card grid may substitute
+  for nodes and connectors.
 
 ### Comparison and conflict information architecture
 
-- [x] Replace the always-expanded comparison card wall with a compact default-collapsed drawer and default-off
-  graph overlay.
-- [x] Render enabled comparison suggestions as thin amber dotted selectable connectors, never red, authoritative or
-  blocking.
-- [x] Keep the conflict lens restricted to confirmed conflict facts; the current zero-conflict self-host shows the
-  explicit empty state and zero red paths.
-- [x] Use deterministic per-edge ports/tracks for multi-conflict fan-out, with no unrelated coincident segment or
-  edge-through-node in the synthetic 4-conflict geometry fixture.
-- [x] Keep the first desktop viewport graph-first; the same-fact mobile ledger is collapsed by default.
+- [ ] Remove the always-expanded “需要比较／证据待刷新” card grid below the graph. Comparison suggestions become a
+  compact default-collapsed inspector/drawer or an explicit default-off graph overlay.
+- [ ] If comparison overlay is enabled, suggestions use thin neutral/amber dotted connectors, never red, and each
+  connector selects a bounded evidence explanation. They remain non-authoritative and non-blocking.
+- [ ] Conflict lens draws only confirmed conflict facts. Zero confirmed conflicts displays a clear empty canvas state
+  and zero red relationship paths; comparison suggestions remain collapsed outside the conflict topology.
+- [ ] With multiple confirmed conflicts, unrelated edges cannot share long coincident horizontal/vertical spines.
+  Assign deterministic per-edge tracks, separate fan-out near endpoints, avoid node interiors and minimize crossings;
+  crossings that remain must be visually distinguishable rather than rendered as one merged line.
+- [ ] Remove or collapse any full-width technical/card ledger that pushes the graph below the fold. The first desktop
+  viewport prioritizes controls plus usable topology.
 
-### Acceptance and non-goals
+### Acceptance
 
-- [x] Real self-host succession and dependency views contain A3/A4 and CI6/CI7 inside graph-native lanes; no series
-  strip or expanded comparison wall remains.
-- [x] Synthetic and real conflict acceptance verifies label/arrow visibility, node overlap, edge-through-node,
-  coincident segments and stable deterministic routing.
-- [x] Browser acceptance covers 1440×900, 1280×800 and 390×844, keyboard/ARIA, reduced motion, zero document
-  overflow and zero console warning/error.
-- [x] Continue W7.3 with GPT-5.6 Sol medium; do not create W7.4, integrate CI7/REL3, or edit root PROGRESS/HANDOFF.
+- [ ] Real self-host desktop screenshots show A3→A4 and CI6→CI7 inside the graph in succession-context and dependency
+  views; no standalone series strip and no expanded comparison-card wall exist.
+- [ ] Conflict lens with current self-host data has zero red edges and a visible “当前没有已确认的任务冲突” canvas
+  state. A synthetic 4+ conflict fixture proves distinct tracks with no coincident unrelated path segments or
+  node intersections.
+- [ ] Geometry assertions cover node overlap, edge-through-node, coincident path segments, arrow/label visibility and
+  stable routing after filter/reset/fit.
+- [ ] 1440×900, 1280×800 and 390×844 Browser acceptance verifies topology, inspector/overlay, keyboard focus,
+  reduced-motion, zero document overflow and zero console warning/error.
+- [ ] Continue the existing W7.3 branch/task and GPT-5.6 Sol medium implementation profile. Do not create W7.4, do not
+  integrate CI7/REL3, and do not modify root PROGRESS/HANDOFF outside central integration.
 
-No ImageGen, U2.3 navigation/personal capture changes, remote execution, confirmation-on-canvas, public/default
-enablement or release is in scope.
+This amendment changes presentation and explicit-series projection only. If implementation needs a new authoritative
+relation kind or changes human confirmation authority, stop for a new ADR.
+
+## 2026-08-30 Maintainer Scope Amendment — Readable Topology Re-layout after `05c83b`
+
+The maintainer has rejected the second Graph implementation at exact W7.3 branch commit
+`05c83b75723a9e6681c0885dd090606060cb696e`. The page now contains graph-native connectors, but the topology is still
+not readable: the default view is reduced to 55%, unrelated relations form a shared vertical bus, labels sit on top
+of routes, lane boundaries do not create a comprehensible reading order, and the permanently docked evidence panel
+removes a large part of the usable canvas. Contract presence is not visual acceptance.
+
+The isolated GX1 evaluation at `f5fd5afa3f9b133166495119080629a5be5f67b2` is accepted only as an implementation
+aid. W7.3 must inspect these exact non-authoritative inputs with `git show`:
+
+- `experiments/workstream-graph-skill-evaluation/evaluation.md`;
+- `experiments/workstream-graph-skill-evaluation/fixture-a-relations.json`;
+- `experiments/workstream-graph-skill-evaluation/fixture-b-conflicts.json`;
+- `docs/validation/2026-08-30-gx1-fireworks-graph-skill-evaluation.md`.
+
+The useful techniques are explicit lanes, separate ports/corridors, bridge/crossing detection, label clearance,
+node spacing and route-stretch measurement. The third-party Skill/SVG/HTML is not a runtime dependency, relation
+authority, product component or responsive implementation.
+
+### Re-layout contract
+
+- [ ] Rebuild node placement before repairing arrows. At desktop width, A3→A4, CI6→CI7 and U1→U2→U2.2 each occupy
+  one aligned series row/lane with consistent node height and a clear left-to-right reading direction. A lane is a
+  subtle in-canvas group, not nested boxes that mix unrelated series.
+- [ ] Collapse historical chains by default into bounded in-canvas cluster nodes. Expanding one chain must re-layout
+  only the affected component; it cannot introduce a full-height shared relation spine or force all current nodes to
+  55% scale.
+- [ ] The initial desktop/reset view is readable at 100%. `适合窗口` is an explicit action, not the default. If the
+  topology cannot fit at readable size, reduce visible history or focus a component instead of shrinking text.
+- [ ] The evidence inspector is closed by default. Selecting a node/edge opens an overlay/drawer that does not
+  permanently recompute or compress the graph layout; Escape and the close control restore the same viewport.
+- [ ] Succession view renders succession + subdued series only; dependency view renders dependency proposals +
+  subdued series only; conflict view renders confirmed conflicts only. Comparison overlay remains default-off.
+- [ ] Selecting an edge highlights its two endpoints and route while unrelated edges fade. A user must not have to
+  follow every line simultaneously to understand one relation.
+
+### Routing and typography contract
+
+- [ ] Every visible relation owns a deterministic route and distinct endpoint ports. Unrelated edges may not share a
+  collinear segment longer than 8px outside a 16px endpoint fan-out zone; several edges cannot merge into one
+  vertical or horizontal bus.
+- [ ] Default/current and synthetic 4+ conflict fixtures meet the GX1 showcase geometry target: zero node
+  intersections, zero unmarked crossings/bridges, at most two bends per edge, route stretch ≤1.35, shortest segment
+  ≥16px, node gap ≥40px and unrelated edge-label clearance ≥4px. If a fixture cannot meet this, move/collapse nodes
+  before adding waypoints.
+- [ ] Relation labels use ordinary Chinese, at most three short words in the canvas, offset 6–8px from the line and
+  at least 10px from nodes. Full IDs, reason codes and evidence stay in the inspector. Labels cannot mask routes or
+  stack on the same coordinate.
+- [ ] Stroke and marker colors are one semantic pair: series is muted fine solid, succession is cyan solid,
+  dependency is amber dashed, comparison is neutral/amber dotted and confirmed conflict alone is red. Arrowheads
+  cannot use a different semantic color from their route.
+- [ ] Canvas lanes, titles, legend and controls are obstacles in geometry checks. Routes cannot run through lane
+  headings, node text or container borders.
+
+### Responsive and acceptance contract
+
+- [ ] At 390×844, render a dedicated top-to-bottom compact topology/focused chain with ≥12px primary text; do not
+  scale the entire desktop canvas to a miniature image. Inspector becomes a dismissible sheet and the page has zero
+  horizontal overflow.
+- [ ] Browser evidence covers 1440×900, 1280×800 and 390×844 at initial load, reset, filter, fit, select, inspector
+  open/close and history expand/collapse. Record visible scale, node/edge bounds, pairwise route overlap, crossings,
+  bends, label clearance, focus/ARIA, document overflow and console warnings/errors.
+- [ ] Use `fireworks-tech-graph` only as a local design/geometry oracle and perform visual inspection after automated
+  checks. At most two focused visual correction rounds may follow a stable implementation; tests alone cannot close
+  this gate.
+- [ ] The maintainer must accept a real self-host screenshot before W7.3 can return to completed/accepted state.
+  `05c83b` and earlier Graph screenshots remain rejected evidence.
+
+### Dispatch and safety
+
+- Continue the existing W7.3 task/branch from exact `05c83b75723a9e6681c0885dd090606060cb696e`; do not create
+  W7.4. Refresh Git-private scope to revision 4 after acknowledging the new task-description version.
+- Use GPT-5.6 Sol with medium reasoning for implementation. Run focused Graph tests while iterating; run routed Fast
+  and Checkpoint once after the visual layout stabilizes instead of repeatedly paying full checkpoint cost.
+- Preserve relation capture Core/schema/CLI/Harness, human confirmation authority, inbox behavior and append-only
+  history unless a focused regression proves a necessary compatibility fix. Do not integrate CI7/REL3, modify root
+  PROGRESS/HANDOFF from the feature branch, push main, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Scope Amendment — W Program Hierarchy & Controlled Bundling
+
+Governing decision: [ADR-0020](../../decisions/0020-workstream-program-and-phase-hierarchy.md)
+
+Approved Design: [Workstream program hierarchy and graph bundling](../../design/workstream-program-hierarchy-and-graph-bundling.md)
+
+The maintainer clarified that W tasks share a real development-program structure. The previous re-layout contract
+was too restrictive in two ways: it treated the absence of `series_id` as absence of all W organization, and it
+prohibited useful same-semantics fan-out trunks. W is not one linear series, but it is one program with W5/W6/W7
+phases. This amendment supersedes only the conflicting presentation constraints; ADR-0017 relation authority and the
+remaining readable-topology requirements stay in force.
+
+### Program hierarchy implementation
+
+- [ ] Implement ADR-0020 group-definition and primary-membership contracts with program/phase hierarchy, opaque IDs,
+  explicit order, revision/CAS, source links and human-integrator acceptance. Agent/task owner may propose only.
+- [ ] Keep group membership orthogonal to series and semantic relations. Membership must not alter relation counts,
+  active tips, gate eligibility, closure, ownership, review or validation state.
+- [ ] Legacy records without accepted membership remain ungrouped/Unknown. Reject prefix/title/branch inference and
+  W-looking negative fixtures.
+- [ ] Add the Approved Design's exact self-host repair fixture for W/W5/W6/W7. It appends explicit metadata and keeps
+  CI1/SH1 outside the W program while real edges may cross the program boundary.
+- [ ] Project one continuous W program region with W5/W6/W7 phase lanes and independent folding. Do not connect all W
+  tasks with a fake series; retain actual chains and cross-boundary relations.
+
+### Controlled relation bundling
+
+- [ ] Replace the blanket long-collinear-overlap prohibition with declared `route_bundle_id` semantics. Bundling is
+  allowed only for identical relation type/direction/lifecycle/certainty/gate/style with a common source or target.
+- [ ] Draw one owned trunk and separate endpoint branches. Branches use distinct ports/arrowheads and separate by
+  ≥24px before the target. Mixed series/dependency/conflict/comparison/Unknown edges cannot share a bundle.
+- [ ] Keep every underlying relation selectable and inspectable. Branch click selects one relation; trunk click opens
+  a bounded relation list; selected relation highlights its trunk plus its branch without merging evidence.
+- [ ] Geometry tests treat declared trunk overlap as valid and all undeclared coincident segments as failure. Nodes,
+  headers, labels and controls remain hard obstacles.
+
+### Selection correction
+
+- [ ] Pointer selection brightens the existing semantic border and adds only a weak same-color glow. Remove the white
+  outer selection rectangle. Dim unrelated graph content without hiding status or evidence.
+- [ ] Preserve keyboard focus visibility with a non-white semantic accent and no layout shift. Inspector behavior and
+  read-only authority remain unchanged.
+
+### Acceptance and dispatch
+
+- [ ] Desktop screenshots show a continuous W program with W5/W6/W7 substructure, actual CI1/SH1 cross-boundary
+  chains and no fabricated W series edge.
+- [ ] U1 same-type fan-out fixture demonstrates a shared succession trunk with visibly separated U2/A4/CI7 branches,
+  distinct arrowheads and correct individual inspector identities.
+- [ ] Existing A/CI/U series, dependency/conflict lens separation, 100% reset, inspector, mobile topology and geometry
+  gates remain accepted only after a new maintainer screenshot review.
+- [ ] The prior two visual correction rounds were performed under superseded grouping/bundle constraints. This
+  amendment permits at most two focused visual correction rounds after the new hierarchy/bundle implementation.
+
+Continue the same W7.3 task/worktree from `05c83b75723a9e6681c0885dd090606060cb696e`, preserving its current
+uncommitted changes to the two Graph modules and focused test file. Refresh Git-private scope to revision 5 after
+acknowledging the new task-description version. Use GPT-5.6 Sol medium. Do not run routed Fast/Checkpoint before the
+maintainer accepts the new visual direction; do not create W7.4, integrate CI7/REL3, modify feature-branch root
+PROGRESS/HANDOFF, push main, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Scope Amendment — Partial-order Reading & Evidence-qualified History Folding
+
+The maintainer clarified that “缩略” means structural folding of eligible old tasks, not low-zoom semantic hiding.
+The invariant “right is newer” must be restored as a relation-backed partial-order reading contract rather than an
+invented global timeline. This section refines ADR-0020 presentation only and does not add authority semantics.
+
+### Horizontal ordering
+
+- [ ] Interpret horizontal direction as **confirmed predecessor/history on the left → confirmed successor/current on
+  the right**, not calendar time. Canvas/help text must say that unrelated tasks do not imply time order.
+- [ ] Only effective/current `derived_from`, confirmed succession and explicit series predecessor/order may increase
+  horizontal rank. `depends_on`, `absorbs`, program/phase membership, task code, display prefix, branch/title and
+  filesystem timestamps cannot define old/new rank.
+- [ ] Mutually unreachable/incomparable tasks occupy the same horizontal rank and stack vertically. Stable sorting is
+  allowed only inside that rank; it cannot move an independent task into a later x-column and fabricate chronology.
+- [ ] A current/rightmost tip is shown only when endpoint, scope and evidence are current. Unknown/stale records remain
+  visibly non-current and cannot be forced right merely because they are active in memory.
+
+### History eligibility and cluster semantics
+
+- [ ] Default folding requires all of: closed/superseded/historical lifecycle; not active tip; current evidence and
+  scope; no pending human confirmation; no Unknown/stale/conflict; no untransferred responsibility; and membership in
+  one contiguous historical chain or a wholly completed phase.
+- [ ] W5/W6 may collapse as completed phase clusters only when every included member meets eligibility. Branches that
+  do not form one contiguous phase/chain remain separate clusters; age or left position alone cannot collect them.
+- [ ] Cluster summary shows phase/chain label, member count, first/last endpoints, status summary and inbound/outbound
+  external relation counts. Internal edges may hide, but every external edge redirects to a typed cluster boundary
+  port and remains inspectable.
+- [ ] Expanding a cluster restores exact member nodes/edges in place and preserves an anchor near the clicked cluster;
+  it cannot recenter or globally rescale the canvas. Collapse/expand changes structure only, not facts or zoom.
+- [ ] Tasks with pending confirmation, unresolved conflict, Unknown/stale evidence, active responsibility or current
+  blocking role are never folded even if another task considers them historical.
+
+### Deterministic layout pipeline
+
+Apply exactly this order:
+
+```text
+accepted program/phase membership
+→ history eligibility and contiguous cluster folding
+→ confirmed partial-order rank
+→ node placement
+→ declared same-semantics route bundling
+→ labels, arrowheads and selection projection
+```
+
+Bundling before folding or rank is invalid because it can create orphan trunks or routes through clusters.
+
+### Zoom and acceptance
+
+- [ ] Keep explicit zoom at 30%–200% and reset at 100%. Do not hide labels, evidence or nodes because of zoom level;
+  a user-chosen 30% may be physically small but must represent the same facts.
+- [ ] Space reduction comes from eligible history/phase folding and focused selection, never conditional semantic
+  removal tied to scale.
+- [ ] Tests cover independent same-rank tasks, false order from dependency/absorbs, stale/pending/non-transferred
+  no-fold cases, contiguous versus branched clusters, external-edge redirection, anchor-preserving expansion and
+  folding-before-bundling order.
+- [ ] Browser evidence shows default folded W5/W6 plus expanded views at 100%, 30% and 200%, with identical fact
+  counts after expansion, no overflow/console errors and no fabricated horizontal order.
+
+Continue the current W7.3 implementation and preserve all current uncommitted changes. Refresh Git-private scope to
+revision 6 after reading only this Plan amendment and its Validation section; do not reread older Skill/authority
+materials. Use focused Graph/Core tests only, and keep routed Fast/Checkpoint blocked until maintainer screenshot
+acceptance.
+
+## 2026-08-30 Maintainer Correction — Component-local Rank & Two-dimensional Block Packing
+
+The previous amendment's statement that mutually unreachable tasks share one rank was incorrectly interpreted across
+the entire visible graph. That interpretation produced a tall global rank-0 column and full-height shared route buses.
+This correction supersedes only that global-layout interpretation; the confirmed partial-order and evidence-qualified
+history-folding semantics above remain unchanged.
+
+### Rank scope and local layout
+
+- [ ] Compute horizontal rank **locally**, never once for the whole visible graph. A rank domain is one
+  relation-connected component, one explicit series lane, or one accepted program-phase lane. Every disconnected
+  component has its own rank origin.
+- [ ] Mutually unreachable tasks may share a rank and stack vertically only inside the same local domain. Independent
+  components must not be collected at one global x coordinate merely because no semantic edge connects them.
+- [ ] Explicit A/CI/U series remain compact left-to-right rows. W5/W6/W7 remain distinct program phase blocks, normally
+  arranged top-to-bottom, while confirmed chains inside each phase read left-to-right.
+- [ ] Program/phase/series containment controls block membership and presentation only; it still cannot fabricate a
+  `derived_from`, `depends_on`, `absorbs`, conflict or chronology edge.
+
+### Two-dimensional component packing
+
+- [ ] Lay out each local domain first, measure its bounds, then pack independent component blocks into bounded
+  two-dimensional rows/grid within the available viewport width. Use a subtle block header/boundary or sufficient
+  gutter so side-by-side blocks read as spatial packing rather than chronology.
+- [ ] The packer may use stable bounded rows or masonry, but it must not place every independent block in one global
+  vertical column. Default 100% should use the first viewport in both dimensions before adding canvas height.
+- [ ] Repacking is deterministic and stable under selection, inspector open/close and reset. Selection cannot trigger
+  a global column collapse, re-rank unrelated blocks or recenter the entire canvas.
+
+### Block-scoped cross-routing
+
+- [ ] A route bundle is scoped to one common endpoint **and** one source-block/destination-block pair. A declared
+  same-semantics bundle must not span unrelated components or multiple program phases as one global trunk.
+- [ ] When one endpoint targets multiple blocks/phases, split the routes into one bundle per target block/phase, or use
+  dedicated boundary channels between that exact block pair. Cross-block routes enter/leave through block boundary
+  ports and gutters, not through a full-height central bus.
+- [ ] No overview route trunk may traverse unrelated series/program regions or collect unrelated edges merely because
+  they share relation style. Local parallel segments remain separated enough to identify ports and arrowheads.
+
+### Corrected deterministic pipeline
+
+Apply exactly this order:
+
+```text
+accepted program/phase/series membership
+→ eligible history folding
+→ relation-connected component partition
+→ component-local partial-order rank
+→ local node layout
+→ two-dimensional block packing
+→ block-pair-scoped bundle routing
+→ labels, arrowheads and selection projection
+```
+
+The earlier `membership → folding → global rank` reading is invalid. Rank before component partition or bundle before
+block packing can recreate the rejected column and bus layout.
+
+### Corrected acceptance and dispatch
+
+- [ ] A fixture with at least four disconnected components produces at least two occupied block columns at 1440px and
+  1280px; disconnected roots do not all share one global rank-0 x coordinate.
+- [ ] A/CI/U series remain compact horizontal rows; W5/W6/W7 remain visibly distinct phase blocks; confirmed local
+  chains still read left-to-right without implying order between neighboring blocks.
+- [ ] No bundle crosses more than its declared source/destination block pair, and no global vertical trunk spans the
+  series and program regions. Automated geometry evidence covers block overlap, route/card crossing and boundary-port
+  routing without freezing incidental pixel coordinates.
+- [ ] The maintainer must accept a real 100% screenshot showing multiple compact blocks/rows in the first viewport—not
+  one tall column—before routed Fast/Checkpoint becomes eligible.
+
+Continue the same W7.3 task/worktree and preserve all current uncommitted changes. Refresh Git-private scope to
+revision 7 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium. Make the
+smallest layout/routing correction needed; do not rerun routed Fast/Checkpoint before screenshot acceptance and do not
+create W7.4, discard current work, integrate another branch, push, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Correction — Module-scoped Graph Projection
+
+The maintainer observed that selecting Documentation System, Context Routing Research, Authority Model or
+Multi-worktree Collaboration still showed nearly the same task population. A module selector that only changes a
+label, highlight or layout emphasis is not a module view. This correction uses ADR-0020's existing derived-view
+filter permission and adds no authority or relation semantics.
+
+### Strict module visibility
+
+- [ ] `全部模块` is the only default option that projects the complete eligible graph. Selecting a concrete module
+  applies a strict visibility predicate before history folding, component partition, rank or routing.
+- [ ] A full task card is in scope only when the selected stable module ID equals its explicit primary subsystem or
+  appears in its explicit affected-subsystem set. Display labels, task codes, branch/title text, series/program
+  membership and relation proximity cannot infer module membership.
+- [ ] Missing, Unknown or unregistered module metadata belongs to a separate `未归属` view. Unknown tasks must not be
+  copied into every concrete module view.
+- [ ] Module and runtime/status filters intersect. Selecting a module plus a status means `module AND status`, never a
+  union that restores unrelated tasks.
+
+### Cross-module context without graph flooding
+
+- [ ] When an in-scope task has a visible relation to an out-of-scope task, retain the relation as a compact boundary
+  endpoint/stub labelled with the external module and task identity. Do not render the out-of-scope task's full card,
+  series lane, phase contents or unrelated neighbors.
+- [ ] A group/series/program/phase container appears only when it contains at least one in-scope full task card. It
+  projects only visible members plus required boundary stubs; container membership cannot pull every member into the
+  selected module.
+- [ ] An explicit `显示关联上下文` action may expand one-hop external full cards for inspection, but it is off by
+  default, visibly marked as context, bounded to one hop and reset whenever the selected module changes.
+- [ ] Boundary stubs preserve exact underlying edge identity and inspector evidence. They do not change relation
+  counts, module facts, active tips, gates, history eligibility or execution authority.
+
+### Pipeline and interaction
+
+Apply module projection before layout:
+
+```text
+eligible task/relation facts
+→ selected-module full-card predicate
+→ bounded cross-module boundary stubs
+→ eligible history folding
+→ relation-connected component partition
+→ component-local rank and local layout
+→ two-dimensional block packing
+→ block-pair bundle routing
+```
+
+- [ ] Changing modules recomputes visible nodes, containers, components, bounds and fit target while keeping reset at
+  100%. It must not retain hidden-module nodes as layout obstacles or invisible route endpoints.
+- [ ] The empty state names the selected module and says that no matching task evidence is available. It must not
+  silently fall back to all modules.
+- [ ] Visible counts and any summary/legend describe full cards separately from external boundary stubs.
+
+### Acceptance and dispatch
+
+- [ ] A fixture with disjoint Authority, Documentation, Context Routing and Multi-worktree tasks proves distinct node
+  sets for all four concrete selections; a deliberately multi-module task appears only in its explicitly listed
+  modules.
+- [ ] A cross-module relation fixture shows one full in-scope endpoint plus one compact external boundary stub by
+  default, and only the explicit one-hop action may reveal the external full card.
+- [ ] Browser screenshots for the four real self-host module selections visibly differ in task count and topology;
+  none repeats the all-module graph, and module+status intersection, empty state and module switching remain stable at
+  1440px, 1280px and 390px.
+- [ ] Focused tests assert exact visible Workstream IDs, boundary-stub IDs, container membership and zero hidden-node
+  influence on component/rank/bundle geometry; they do not rely only on dropdown text or CSS visibility.
+
+Continue the same W7.3 task/worktree and preserve all current uncommitted changes. Refresh Git-private scope to
+revision 8 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and
+apply it together with revision 7's layout correction. Do not rerun routed Fast/Checkpoint before maintainer visual
+acceptance; do not create W7.4, discard work, push, publish or change public/default behavior.
+
+## 2026-08-30 Maintainer Correction — Topology-first Soft Grouping & Local Crossing-free Routing
+
+The maintainer rejected the revision-7 preview because it replaced the global single column with a single tall W
+program tower. The implementation removed program members from normal connected-component packing, stacked every
+phase by incrementing one vertical cursor, and then reconnected displaced endpoints with page-scale orthogonal lines.
+Passing presence tests for phase boxes and edges did not establish a readable graph. This correction supersedes hard
+program containment and broad block-pair routing while preserving ADR-0020 membership facts.
+
+### Relation topology has placement priority
+
+- [ ] After revision 8 module projection and eligible folding, partition by the **visible graph edges for the current
+  lens**, including subdued explicit-series connectors. A connected component may contain tasks from several modules,
+  programs or phases; all of its full endpoints and boundary stubs are laid out together as one topology unit.
+- [ ] Program/phase/series membership may label, tint or order otherwise equivalent placements, but it must not remove
+  a node from its relation-connected component, split related endpoints into distant containers, merge disconnected
+  components or override crossing minimization.
+- [ ] Lay out actual adjacency first: connected predecessor/successor endpoints occupy neighboring ranks whenever the
+  partial order permits. Within a rank, use deterministic median/barycentric sweeps (or equivalent crossing
+  minimization) over adjacent ranks before applying stable-ID tie breaking.
+- [ ] Optimize in this order: zero node/container intersections → minimum edge crossings → short adjacent-endpoint
+  routes → compact area → stable tie ordering. Compactness may not win over crossings or route length.
+
+### W program is a soft overlay, not one enclosing tower
+
+- [ ] Remove the single bounding rectangle that encloses every W program member. Render W membership as a lightweight
+  repeated program label and phase-local header/hull attached to each local topology block; no empty rectangle may
+  span disconnected W components.
+- [ ] W5/W6/W7 phase order may sort local blocks, but it cannot force them into one vertical column. Disconnected phase
+  components participate in the same two-dimensional packer as A/CI/U components.
+- [ ] A phase containing three or more mutually incomparable visible tasks must use at least two desktop columns (or
+  separate local component blocks); it cannot become a one-card-wide vertical rail. A genuine confirmed chain remains
+  left-to-right rather than being wrapped into a fake grid.
+- [ ] In the current self-host fixture, W5C/W5D/W5E and W7.1/W7.2.2/W7.2.3/W7.3-INT/W7.3 must not form one narrow
+  vertical tower. CI1/SH1/U1 and their related W endpoints must be co-placed by their real connections, not separated
+  to the bottom of a program box and joined by page-height lines.
+
+### Local routing and fan-out only
+
+- [ ] A declared bundle is only a short endpoint fan-out aid. Its shared trunk must remain inside the common
+  endpoint's local rank gutter and end within 64px or one rank gap (whichever is smaller); after that, every branch
+  owns a separate obstacle-avoiding route. `block-pair` identity alone never licenses a long shared spine.
+- [ ] Route inside the owning topology component using node, label, group header/hull and existing route tracks as
+  obstacles. A route cannot cross an unrelated component/phase interior or use the whitespace inside another block
+  as a corridor.
+- [ ] Reorder or repack nodes before accepting a crossing. The real self-host default view must have zero unmarked
+  route/route crossings, zero route/card/header intersections and zero page-spanning vertical or horizontal trunks.
+  If a synthetic graph cannot avoid a crossing, use an explicit bridge only after proving reordering and separate
+  tracks cannot solve it.
+- [ ] Existing route stretch, bend, segment and label-clearance requirements apply to every relation branch and trunk,
+  including declared bundles; bundling does not exempt geometry gates.
+
+### Corrected pipeline
+
+```text
+eligible facts
+→ strict module full-card projection and boundary stubs
+→ eligible history folding
+→ visible-edge connected components across organizational boundaries
+→ component-local partial-order rank
+→ crossing-minimized in-rank ordering
+→ local topology layout
+→ two-dimensional component packing
+→ soft program/phase overlays
+→ short endpoint fan-out and obstacle-avoiding routes
+→ labels and selection
+```
+
+Hard program containment before component partition is invalid because it creates the rejected W tower and forces
+long cross-program routes.
+
+### Acceptance and dispatch
+
+- [ ] Geometry tests run against the actual self-host snapshot as well as synthetic fixtures. They assert zero
+  route/route crossings, zero route/node/header/hull intersections, no trunk longer than the local fan-out limit, no
+  one-column W tower and no program hull spanning disconnected components.
+- [ ] A topology fixture with cross-phase and cross-program edges proves related endpoints remain in one local
+  component while organizational labels remain readable and do not create edges.
+- [ ] The default 100% desktop screenshot must show several balanced topology blocks, short local connectors and
+  readable W phase labels. A full-height capture that requires tracing lines across multiple screen heights is a
+  failure even if every endpoint is technically connected.
+- [ ] Focused unit/geometry tests are necessary but cannot close this gate. Present the new real 1440px/1280px page to
+  the maintainer before any routed Fast/Checkpoint.
+
+Continue the same W7.3 task/worktree and preserve every current uncommitted file. Refresh Git-private scope to
+revision 9 after reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and
+implement revisions 8 and 9 together. Replace the hard program-stack algorithm rather than tuning its spacing. Do not
+create W7.4, discard work, integrate another branch, push, publish or run routed Fast/Checkpoint before maintainer
+visual acceptance.
+
+## 2026-08-30 Maintainer Correction — Single-pass Occupied-bounds Packing
+
+The maintainer rejected the revision-9 preview because nodes, repeated W7 phase decorations and route corridors were
+stacked on top of one another. Inspection found a concrete implementation defect: the code measured and packed blocks,
+then performed a second coordinate mutation that expanded rank columns without remeasuring or moving following
+blocks. Phase rectangles were also regenerated per node after packing, outside the measured block bounds. This is a
+layout-pipeline failure, not a spacing or theme defect.
+
+### Frontend layout brief
+
+- **Purpose:** scan real task relations without tracing through overlapping cards, group boxes or routes.
+- **Context/tone:** dense analyst workspace using the existing Orrery tokens and card typography.
+- **Memorable behavior:** every topology component is one collision-free measured object; organizational membership is
+  readable inside that object but never changes its final footprint after packing.
+- **Constraint:** no ImageGen, decorative redesign, new runtime dependency or loss of keyboard/mobile/read-only
+  behavior.
+
+### One canonical placement pass
+
+- [ ] Delete or replace the superseded hard-program placement and every post-pack x/y rewrite. A node's local
+  coordinates, rank order and decoration geometry must be final before its component is measured.
+- [ ] Each component produces one immutable local layout record containing `node_rects`, allocated header/badge rects,
+  reserved route gutters and `occupied_bounds`. `occupied_bounds` is the union of all of these plus the required
+  component gutter; raw node bounds alone are not packable bounds.
+- [ ] The global packer operates only on immutable `occupied_bounds`, assigns one translation per component and applies
+  that same translation to nodes, decorations, ports and route-gutter anchors. After translation, no element may
+  change component-relative x/y. A layout change restarts measure → pack; it cannot patch coordinates in place.
+- [ ] Canvas width/height, fit target and scroll extent are computed from final occupied bounds after all translations,
+  never from an earlier placement pass.
+
+### Remove overlapping group decoration
+
+- [ ] Default overview renders no SVG rectangle enclosing a program or phase and no per-node phase hull. Replace W
+  containment boxes with either one measured 22–28px component header (`W › W7`) or a compact membership label inside
+  the existing task-card metadata line.
+- [ ] If several same-phase tasks share one component, render at most one allocated component header. If they are in
+  separate components, each component may repeat the label inside its own occupied bounds; identical labels cannot
+  share coordinates or overlap another component.
+- [ ] Series/program/phase highlight on focus may tint existing cards/connectors, but cannot add an unmeasured overlay,
+  resize a block, cover text or create a new nested rectangle after packing.
+
+### Route-corridor reservation
+
+- [ ] Route planning starts only after final component translation. The local layout reserves rank gutters and edge
+  fan-out channels inside `occupied_bounds`; routes may not escape into a neighboring component's packed rectangle.
+- [ ] If obstacle routing needs more space than reserved, enlarge that component's local occupied bounds and rerun the
+  global pack exactly once before rendering. Never draw first and discover overlap from the screenshot.
+- [ ] Relation labels receive measured rectangles and participate in the same collision check. Labels cannot be placed
+  by midpoint alone when that point intersects another route, node, header or label.
+
+### Mechanical postconditions before preview
+
+- [ ] Before generating another maintainer preview, focused tests and the real self-host model must assert pairwise
+  intersection area `0` for every full node card, component occupied bound and measured header/label rect; distinct
+  component bounds retain at least the declared block gap.
+- [ ] Assert every node, header, label, port and route segment is contained by its owning component bounds (except the
+  exact arrowhead allowance) and every final coordinate is non-negative and within canvas bounds.
+- [ ] Assert one placement/translation per component, no post-pack node-coordinate mutation, no duplicate phase
+  decoration at the same coordinate and no superseded hard-program layout path in the shipped source.
+- [ ] The current real self-host 100% geometry must report zero node overlap, zero decoration/card overlap, zero
+  component-bound overlap, zero route/card/label intersections and zero unmarked route crossings before a screenshot
+  is shown. A screenshot is review evidence, not the first collision detector.
+
+Continue the same W7.3 task/worktree and preserve every dirty file. Refresh Git-private scope to revision 10 after
+reading only this correction and the matching Validation correction. Use GPT-5.6 Sol medium and retain revisions 8/9.
+Implement the single immutable layout pipeline and mechanical postconditions before rebuilding the preview. Do not
+create W7.4, discard work, push, publish or run routed Fast/Checkpoint before maintainer visual acceptance.
+
+## 2026-08-30 Maintainer Adoption Amendment — ELK.js Layout-only Integration
+
+Governing decision: [ADR-0022](../../decisions/0022-elkjs-workstream-graph-layout-engine.md)
+
+Approved Design: [ELK.js Workstream Graph Layout and Orrery Rendering](../../design/elkjs-workstream-graph-layout-and-rendering.md)
+
+The maintainer has ended the custom-layout correction loop and selected ELK.js for product layout/routing while
+preserving the Orrery frontend. Revisions 7–10 remain rejection evidence and semantic requirements; their handwritten
+geometry implementation is not a base to keep extending.
+
+### Phase A — close GX2 provenance before product dependency writes
+
+- [ ] Finish the isolated GX2 report and identify the exact released ELK.js artifact/ref/version/SHA-256/size/license.
+  If local loading, compound cross-hierarchy layout or the four target fixtures fail, stop and report the conflict with
+  ADR-0022 rather than choosing a different dependency silently.
+- [ ] Freeze one sanitized self-host input plus exact succession/W compound/Project Structure/dependency ID sets. ELK
+  geometry must preserve those sets exactly.
+- [ ] Keep all evaluation files under the experiment path until the product provenance and selected bytes are reviewed.
+
+### Phase B — preserve retained W7.3 work and replace geometry only
+
+- [ ] Save the current rejected Graph geometry diff in recoverable Git-private evidence. Do not reset the worktree or
+  lose retained Core/schema/capture/confirmation/inbox changes.
+- [ ] Separate semantic projection from geometry in the affected Graph modules. Keep accepted relation/group contracts,
+  but remove both handwritten Python and Browser rank/pack/router/label implementations and their parity assertions.
+- [ ] Do not cherry-pick generated GX2 HTML/SVG into product. Reuse only the pinned dependency provenance, frozen
+  semantic fixtures and validated ELK adapter configuration.
+
+### Phase C — local pinned engine and package boundary
+
+- [ ] Vendor the minimal reviewed ELK.js runtime bytes plus license/provenance inside the Observatory package, update
+  package-data/component inventory and bind exact hashes. No npm/CDN/build-time download is required by users.
+- [ ] Load only local bytes in static/dynamic Observatory modes. Network instrumentation must remain zero; dependency
+  failure produces `布局不可用` plus the accessible same-fact ledger, never the old renderer.
+- [ ] Include the vendor asset/license in the v0.3.0 self-contained ZIP and deterministic Windows/Ubuntu entry receipt.
+  Public/default/release transition remains owned by the Final RC task.
+
+### Phase D — Orrery semantic adapter
+
+- [ ] Implement the Approved Design's primary-only module cards, separate affected/context layers, bounded one-hop
+  semantic context and `未归属` behavior before creating ELK JSON.
+- [ ] Dependency admits only `depends_on` endpoints; series may connect admitted endpoints but cannot add nodes.
+  Succession/conflict retain their accepted contracts.
+- [ ] Encode W/W5/W6/W7 as compound parents/children and preserve real CI/SH/U cross-hierarchy edges without
+  membership-as-edge.
+- [ ] Hash the immutable LayoutInput and require the asynchronous LayoutResult to repeat the same node/edge IDs and
+  input revision before display. Stale results are discarded.
+
+### Phase E — existing Orrery renderer
+
+- [ ] Map ELK node/container/port/section/label geometry into the existing SVG cards, status styles, legend, selection,
+  inspector, zoom/pan and themes. No React Flow/Sprotty/generic editor UI and no card/typography redesign.
+- [ ] Use ELK label positions only. Missing/invalid positions become inspector-only labels, never arbitrary fallbacks.
+- [ ] Mobile preserves the same facts through the accepted compact ledger/focused-chain behavior rather than shrinking
+  the desktop compound graph.
+
+### Validation and dispatch
+
+- [ ] Focused semantic tests assert exact pre-layout ID sets. Actual Browser/ELK output supplies geometry evidence;
+  Python does not reproduce ELK coordinates.
+- [ ] Validate local-only load, timeout/exception/stale-result failure, input/output identity, compound containment,
+  route/node/label bounds and unchanged representative Orrery UI snapshots.
+- [ ] Present 1440×900, 1280×800 and 390×844 real self-host pages covering all four rejected scenarios. The maintainer
+  accepts the page before one routed Fast and one Checkpoint; no repeated full-suite loop.
+
+Continue the same W7.3 task/worktree, preserve every dirty file and finish any in-progress GX2-only write first.
+Refresh Git-private scope to revision 12 after reading ADR-0022, the Approved Design, this amendment and the matching
+Validation section. Use GPT-5.6 Sol medium. Product writes may begin only after GX2 pins valid provenance. Do not create
+W7.4, push, publish, change main/default, run Promotion or run routed Fast/Checkpoint before maintainer visual
+acceptance.
+
+## 2026-08-30 Maintainer Amendment — GX2 Preview First & Frozen Legacy Recovery
+
+Governing decision: [ADR-0023](../../decisions/0023-explicit-legacy-graph-layout-fallback.md)
+
+Approved Design: [ELK Cutover and Explicit Legacy Fallback](../../design/elkjs-cutover-and-explicit-legacy-fallback.md)
+
+This amendment supersedes revision 12's permission to begin product integration immediately after provenance. The
+maintainer first wants to inspect the isolated ELK page and requires the handwritten renderer to remain as an explicit
+recovery path.
+
+### Current authorized work
+
+- [ ] Complete GX2 only under `experiments/workstream-graph-elk-evaluation/`: provenance, four semantic fixtures,
+  offline interactive HTML, geometry report and 1440/1280/390 screenshots.
+- [ ] Preserve every W7.3 dirty product file. Do not vendor ELK into `packages/`, refactor product Graph modules,
+  extract/delete/move legacy code, change manifests or alter defaults during this scope.
+- [ ] Present the GX2 Browser URL/screenshots and exact geometry/provenance result to the maintainer, then stop.
+
+### Future product boundary after a separate acceptance
+
+- [ ] A later exact task-description version is required before product integration. It will implement one shared
+  Orrery GraphProjection plus `ElkLayoutEngine` and frozen `LegacyLayoutEngine` adapters.
+- [ ] The legacy engine remains manual local opt-in and visibly labelled. ELK failure is ledger-first and can offer an
+  explicit legacy action; no exception/timer silently switches engines.
+- [ ] ELK may become the normal engine only after the maintainer accepts both GX2 and the later product Candidate.
+
+Continue the same W7.3 task/worktree and preserve all dirty files. Refresh Git-private scope to revision 13 after
+reading ADR-0023, its Approved Design, this amendment and the matching Validation section. Use GPT-5.6 Sol medium.
+Revision 13 authorizes experiment files only; it explicitly withdraws revision 12 product-write permission. Do not
+run routed Fast/Checkpoint/Promotion, push, publish or change main/default.
+
+## 2026-08-30 Maintainer Amendment — Product ELK Wiring Candidate
+
+Governing decisions:
+
+- [ADR-0022](../../decisions/0022-elkjs-workstream-graph-layout-engine.md)
+- [ADR-0023](../../decisions/0023-explicit-legacy-graph-layout-fallback.md)
+
+Approved designs:
+
+- [ELK.js Workstream Graph Layout and Orrery Rendering](../../design/elkjs-workstream-graph-layout-and-rendering.md)
+- [ELK Cutover and Explicit Legacy Fallback](../../design/elkjs-cutover-and-explicit-legacy-fallback.md)
+
+Accepted experiment: [GX2 Validation](../../validation/2026-08-30-gx2-elk-layout-engine-evaluation.md)
+
+The maintainer has accepted the isolated GX2 visual direction and authorized product wiring for another visual review.
+This restores product-write permission under a new scope, but keeps every test workflow blocked until the maintainer
+accepts the real product page.
+
+### Exact dependency and retained engines
+
+- [ ] Vendor the GX2-reviewed `elkjs@0.11.0` browser runtime, EPL-2.0 license and provenance under the Observatory
+  package. Bind bundle SHA-256 `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8` and
+  package tarball SHA-256 `559188be5aba91ce22457c1e2f4693135af43e68cf9a71b53b129b762de9d52d`.
+- [ ] Preserve current handwritten geometry as a named frozen `LegacyLayoutEngine`; do not delete its source or Git
+  history. It consumes the shared semantic input, remains local/manual/visibly labelled and never activates silently.
+- [ ] Add one engine adapter/result contract with stable input hash/revision/IDs. ELK and legacy may differ in geometry
+  but cannot differ in admitted facts.
+
+### Product semantic projection
+
+- [ ] Extract module/lens/history/context/group selection ahead of both engines. Default concrete module full cards are
+  primary-only; affected and one-hop semantic context are independent, bounded and default-off.
+- [ ] Dependency admits only scoped `depends_on` endpoints; series/program/active-tip facts cannot introduce isolated
+  cards. Succession/conflict preserve accepted semantics.
+- [ ] W view implements the accepted phase small multiples: W5/W6/W7 panels independently use ELK for W members,
+  intra-phase relations and typed external boundary stubs. Only a real direct cross-phase W relation connects panels.
+- [ ] Flat edge-free affected context uses bounded box packing and `+N`; mobile uses the same-fact ledger.
+
+### Existing Orrery frontend and runtime
+
+- [ ] Integrate into the real Unified Observatory Graph surface, retaining its navigation, controls, Chinese display
+  vocabulary, card typography/colors/status borders, legend, zoom/pan, selection and inspector. Do not ship the GX2
+  experiment shell or generated HTML.
+- [ ] Local Candidate starts Graph with ELK at 100%; `适合窗口` remains explicit. Add engine selection only in the
+  technical/help surface. Legacy mode shows `旧版兼容布局` persistently.
+- [ ] ELK failure shows the same-fact ledger and explicit retry/legacy actions. No automatic fallback, CDN, external
+  request, stale-result display or layout-owned fact changes.
+- [ ] Clip/truncate card text inside its rect while preserving full title/ARIA/inspector values. Inspector starts closed
+  and does not change layout footprint.
+
+### Preview-only gate before tests
+
+- [ ] Build and serve the real W7.3 product page with local assets, then capture 1440×900, 1280×800 and 390×844 views
+  for succession, W, Project Structure primary/semantic/affected, dependency, ELK failure and explicit legacy mode.
+- [ ] Central performs browser interaction and may request focused visual corrections. Do not run unittest/pytest,
+  focused tests, geometry tests, repository gates, Fast, Checkpoint, Promotion or release validation before the
+  maintainer accepts this product page.
+- [ ] Product code, vendor bytes, component/package inventory and local preview may change; public manifest, main,
+  default migration, tag and Release remain forbidden.
+
+Continue the same W7.3 task/worktree and preserve all retained Core/capture/authority/inbox and rejected-geometry
+evidence. Refresh Git-private scope to revision 16 after reading this amendment and the matching Validation section.
+Use GPT-5.6 Sol medium. Produce the real product preview and stop for central/maintainer review; no test workflow.
+
+## 2026-08-30 Maintainer Acceptance — Product Preview Closeout and Central Validation Handoff
+
+The maintainer has accepted the current real W7.3 ELK product preview as the v0.3.0 closeout direction and has deferred
+any later visual refinement to a future correction. This closes revision 16's preview-only stop, but it does not turn
+the dirty worktree, an earlier `05c83b` receipt or the generated local HTML into an exact-SHA Validation or release
+fact.
+
+### Frozen closeout surface
+
+- [ ] Preserve the accepted current behavior: pinned local ELK normal engine, frozen/manual/visibly-labelled legacy
+  engine, no silent fallback, shared semantic projection, W phase small multiples, primary-only module view, bounded
+  context layers, dependency endpoint admission, relation-revision aggregation, zoom without ELK rerun and the current
+  low-noise total succession overview.
+- [ ] Do not begin another visual redesign during closeout. A deterministic product assertion failure may receive the
+  smallest compatibility correction; a new UX direction, fact change or authority change stops for a new maintainer
+  decision.
+- [ ] Preserve every current dirty product/Core/capture/authority/inbox/vendor file. Do not reset, discard or replace
+  the accepted preview with the earlier committed renderer.
+
+### W7.3 closeout validation and Candidate
+
+- [ ] Run only focused W7.3 checks needed to bind the current implementation: relation Graph/program semantic
+  projection, vendored asset/license/package inventory, JavaScript load/syntax, representative desktop/mobile Browser
+  interactions and `git diff --check`. Record every command and non-green result without retrying unchanged failures.
+- [ ] Update the affected subsystem State, W7.3 Validation, DEVLOG and indexes from actual results, then create one
+  clean W7.3 Candidate commit and report its exact SHA and component inventory. Do not edit root PROGRESS/HANDOFF from
+  the feature branch.
+- [ ] Do not run CI6 routed Fast/Checkpoint on the pre-CI7 feature fingerprint. The earlier requirement for one routed
+  Fast and one Checkpoint is assigned to the clean central integration fingerprint after W7.3 and CI7 are combined,
+  as required by the Final RC Plan. This prevents duplicate replay and avoids treating CI6 over-selection as product
+  evidence.
+
+### Central handoff
+
+- [ ] The unique integrator combines the clean W7.3 Candidate, CI7 exact `111f4abc47b8122aee5469db4489ad6fb0dee75a`
+  and the current A4/U2.3 integration line, then reconciles State/Validation/DEVLOG/indexes and component versions.
+- [ ] On that new integrated fingerprint, CI7 must resolve or explicitly report Fast over-selection and obtain one
+  fresh routed Fast plus one fresh routed Checkpoint. Earlier W7.3/CI7 receipts cannot authorize the new SHA.
+- [ ] Rebuild the complete Unified Observatory from the exact integrated SHA for final desktop/mobile maintainer
+  acceptance. Only that accepted SHA may unblock creation of the Sol-medium v0.3.0 Final RC Workstream.
+
+Continue the existing W7.3 task and worktree. Read this amendment and the matching Validation section from the exact
+committed task-description version, acknowledge it and refresh Git-private scope to revision 17 before running any
+focused check or writing closeout documentation. Use GPT-5.6 Sol medium. Do not push, integrate, modify public/default
+behavior, run Promotion/release validation or publish.
+
+## 2026-08-30 Central Blocker Amendment — Exact ELK Vendor Whitespace Attribute
+
+Revision 17 focused checks passed, but the first complete staged `git diff --cached --check` correctly stopped on five
+trailing-whitespace lines inside each byte-identical upstream `elk.bundled.js` copy. Rewriting those lines would break
+ADR-0022's reviewed SHA-256 and provenance. A broad JavaScript or vendor-tree exemption would weaken repository
+hygiene beyond the accepted dependency and is not authorized.
+
+### Exact exception
+
+- [x] Add root `.gitattributes` entries for exactly these two files and set only their Git `whitespace` attribute to
+  unset (`-whitespace`):
+  - `packages/project-orrery-observatory/src/project_orrery_observatory/vendor/elk.bundled.js`;
+  - `experiments/workstream-graph-elk-evaluation/vendor/elk.bundled.js`.
+- [x] Do not add `*.js`, `vendor/**` or another pattern exemption; do not change text/eol attributes for these files;
+  do not rewrite, format or regenerate either reviewed bundle.
+- [x] Verify `git check-attr whitespace -- <both exact paths>` reports `unset`, both SHA-256 values remain
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`, and the complete staged
+  `git diff --cached --check` passes while authored files remain covered by the normal repository rules.
+- [x] Do not rerun the already green 13 focused tests, Browser review or JavaScript check merely because this metadata
+  line was added. Record only the attribute/hash/diff evidence, then create the single clean W7.3 Candidate.
+
+Continue the same W7.3 task/worktree and preserve its staged index and all dirty files. Read this amendment and its
+matching Validation section from the committed task-description version, acknowledge it and refresh Git-private scope
+to revision 18 before writing `.gitattributes`. The only new expected write is root `.gitattributes`. All revision 17
+boundaries remain: no routed Fast/Checkpoint/Promotion/release, no push/integration/public/default change and no root
+PROGRESS/HANDOFF edit from the feature branch.

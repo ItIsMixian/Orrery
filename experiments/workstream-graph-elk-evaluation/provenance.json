@@ -1,0 +1,21 @@
+{
+  "schema": "orrery-gx2-provenance-v1",
+  "engine": "elkjs",
+  "version": "0.11.0",
+  "source_ref": "npm:elkjs@0.11.0",
+  "upstream": "https://github.com/kieler/elkjs/tree/0.11.0",
+  "registry_tarball": "https://registry.npmjs.org/elkjs/-/elkjs-0.11.0.tgz",
+  "license": "EPL-2.0",
+  "license_path": "vendor/LICENSE.elkjs.md",
+  "license_sha256": "89591d4578fb1ebd91501312a3d25f021bd865a2e436641c1cf7b1bc7e3c1617",
+  "license_size_bytes": 14480,
+  "bundle_path": "vendor/elk.bundled.js",
+  "bundle_sha256": "cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8",
+  "bundle_size_bytes": 1627496,
+  "package_tarball_sha256": "559188be5aba91ce22457c1e2f4693135af43e68cf9a71b53b129b762de9d52d",
+  "package_tarball_size_bytes": 1705987,
+  "runtime_network": "forbidden",
+  "production_dependency": false,
+  "release_asset": false,
+  "task_description": "01ff835de3f2611929c8c0766a621108d03ae72e"
+}

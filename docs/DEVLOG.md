@@ -2,6 +2,21 @@
 
 ## 2026-08-30 — W7.3 Workstream Relation Capture & Confirmation Candidate
 
+- 维护者接受真实 pinned-ELK 产品预览后，task-description
+  `4522a5beec5d2ffdd90022197cf8c78ad7ea7faa` 将行为冻结为 scope revision 17。收口保留一个共享 semantic
+  projection、固定本地 `elkjs@0.11.0` 默认布局、显式 legacy 选择、ledger-first failure 和只读 Graph；没有把
+  program／phase／series membership 升级为 relation、gate、closure 或 ownership。
+- Core／Observatory 同步推进到 0.1.19，CLI 保持 0.1.22，Harness JSON 保持 0.1.2，全部仍为 unreleased；ELK
+  bundle/license/package/provenance 随 Observatory package data 固定，运行时不访问网络。focused program/Graph
+  13/13、JS syntax、vendor/component inventory 与真实 1440×900／390×844 浏览器通过；桌面 100%／fit 46%／
+  reset 100%，移动 same-fact ledger 与页面均无横向溢出，console 为空。
+- 完整 staged diff check 曾在两份 exact upstream ELK bundle 的五处相同行尾空格非绿并停止。scope revision 18
+  只增加两个精确路径的 `.gitattributes -whitespace`；两路径均报告 unset，bundle hash 保持
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`，最终 staged diff check PASS。
+  CI7 `111f4abc47b8122aee5469db4489ad6fb0dee75a` 合入后的新 fingerprint 才运行
+  一次 routed Fast／Checkpoint，并由中央对 exact integrated desktop/mobile page 做最终接受；本轮不运行
+  Promotion／release、不 push／main／public／default，也不修改根 PROGRESS／HANDOFF。
+
 - 维护者以 task-description version `2ab5c465ec28d7a472ad3f5ebbb324a565bbe57a` 重开 Graph UX；实现前逐字读取
   Plan blob `a77ace7f42f091aabf81be55d4395465b0847a7c` 与 Validation blob
   `dd0c3eb1f7da48eec23ca47f0772aec8caa3b547`，并把 retained `5fee848` Candidate、Sol／medium 与新增验证面

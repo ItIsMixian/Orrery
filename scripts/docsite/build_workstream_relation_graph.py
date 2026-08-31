@@ -21,6 +21,7 @@ if str(HERE.parent) not in sys.path:
 
 import build_personal_observatory
 from project_orrery_observatory.workstream_relation_graph import (
+    build_readability_layout,
     inject_workstream_relation_graph,
     project_core_relation_graph,
     write_projection_json,
@@ -50,6 +51,7 @@ def core_relation_provider(project_root: Path) -> dict[str, Any]:
         inspect_relation_capture,
         inspect_task_series,
     )
+    from project_orrery_core.workstream_program_hierarchy import inspect_program_hierarchy
 
     root = Path(project_root).resolve()
     relation_root_present = relation_storage_root(root).is_dir()
@@ -63,6 +65,7 @@ def core_relation_provider(project_root: Path) -> dict[str, Any]:
         "graph": graph,
         "succession_plan": plan,
         "task_series": inspect_task_series(root),
+        "program_hierarchy": inspect_program_hierarchy(root),
     }
     if capture_storage_root(root).is_dir():
         payload["relation_capture"] = inspect_relation_capture(root)
@@ -82,6 +85,21 @@ def synthetic_browser_provider() -> dict[str, Any]:
     if fixture.get("schema_version") != 1 or not str(fixture.get("fixture_id", "")).startswith("workstream-relations-v1-sanitized"):
         raise ValueError("W7A synthetic browser fixture boundary is invalid")
     extra_nodes = [
+        *[
+            {
+                "workstream_id": workstream_id, "status": "completed", "session_state": "current",
+                "lifecycle_phase": "integrated", "runtime_condition": "paused",
+                "evidence_freshness": "current", "head_oid": digit * 40, "scope_status": "current",
+                "closure_reason": None, "primary_subsystem_id": "multi-worktree-collaboration",
+                "affected_subsystem_ids": [], "visibility": "worktree-local", "observability": "local",
+                "source_links": [{"kind": "workstream-session", "ref": f"fixture:{workstream_id}"}],
+                "origin": "native",
+            }
+            for workstream_id, digit in (
+                ("U1-bundle-source", "5"), ("U2-bundle-target", "6"),
+                ("A4-bundle-target", "7"), ("CI7-bundle-target", "8"),
+            )
+        ],
         {
             "workstream_id": "waiting-task", "status": "inactive", "session_state": "current",
             "lifecycle_phase": "implementing", "runtime_condition": "waiting-for-user",
@@ -116,6 +134,23 @@ def synthetic_browser_provider() -> dict[str, Any]:
         },
     ]
     extra_records = [
+        *[
+            build_relation_record(
+                relation_id=f"rel-bundle-{target.lower()}", event_id=f"event-bundle-{target.lower()}", revision=1,
+                relation_type="derived_from", source_workstream_id=target,
+                target_workstream_id="U1-bundle-source", lifecycle="active",
+                recorded_at=f"2026-08-28T00:5{index}:00Z", actor_kind="tool",
+                actor_id="synthetic-browser-fixture", origin="discovery",
+                reason="synthetic same-semantics common-source bundle fixture",
+                evidence=default_relation_evidence(
+                    status="confirmed", source_head_oid=str(6 + index) * 40, target_head_oid="5" * 40,
+                    source_head_status="current", target_head_status="current", scope_status="current",
+                    ancestry_status="confirmed", dependency_status="not-applicable",
+                ),
+                source_links=[{"kind": "validation", "ref": "fixture:controlled-route-bundle"}],
+            )
+            for index, target in enumerate(("U2-bundle-target", "A4-bundle-target", "CI7-bundle-target"))
+        ],
         build_relation_record(
             relation_id="rel-w5e-ci1-dependency", event_id="event-w5e-ci1-dependency", revision=1,
             relation_type="depends_on", source_workstream_id="W5E", target_workstream_id="CI1",
@@ -179,6 +214,15 @@ def synthetic_browser_provider() -> dict[str, Any]:
             "writes_performed": False,
             "name_inference_performed": False,
         },
+        "program_hierarchy": {
+            "schema_version": 1,
+            "contract_type": "workstream-program-hierarchy-inspection",
+            "groups": [], "memberships": [], "pending_group_events": [],
+            "pending_membership_events": [], "read_only": True,
+            "writes_performed": False, "name_inference_performed": False,
+            "relation_effects": {"series": False, "relations": False, "gates": False,
+                                 "closure": False, "ownership": False},
+        },
     }
 
 
@@ -195,6 +239,17 @@ def inject_enabled_relation_graph(
         return page, None
     selected = provider or (lambda: core_relation_provider(root))
     projection = project_core_relation_graph(selected)
+    if projection.get("status") == "ready":
+        failures = {}
+        for lens in ("succession", "dependency", "conflict"):
+            geometry = build_readability_layout(projection, lens=lens)["geometry_postconditions"]
+            if not geometry["passed"]:
+                failures[lens] = geometry["counts"]
+        if failures:
+            raise ValueError(
+                "workstream relation graph geometry postconditions failed: "
+                + json.dumps(failures, ensure_ascii=False, sort_keys=True)
+            )
     return inject_workstream_relation_graph(page, projection), projection
 
 
@@ -213,6 +268,8 @@ def render_workstream_relation_graph_site(
         Path(docs_dir), Path(agents_file), root, title
     )
     page, projection = inject_enabled_relation_graph(page, root, provider=provider)
+    if projection is not None and 'rel="icon"' not in page:
+        page = page.replace("</head>", '<link rel="icon" href="data:,">\n</head>', 1)
     return page, stats, authority, personal, projection
 
 

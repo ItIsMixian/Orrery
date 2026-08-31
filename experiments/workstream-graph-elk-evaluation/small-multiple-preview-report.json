@@ -1,0 +1,187 @@
+{
+  "schema": "orrery-gx2-w-phase-small-multiples-preview-v1",
+  "task_description": "3401ef6f845493ab2f98405a5da65d6f4f28472a",
+  "scope_revision": 15,
+  "constraints": {
+    "experiment_only": true,
+    "test_commands_or_workflows_run": false,
+    "product_vendor_package_default_writes": false,
+    "desktop_default_zoom": "100%"
+  },
+  "composition": {
+    "program": "workstream-w",
+    "panels": [
+      {
+        "phase": "workstream-w5",
+        "direction": "DOWN",
+        "members": 3,
+        "stubs": 1,
+        "edges": 2
+      },
+      {
+        "phase": "workstream-w6",
+        "direction": "DOWN",
+        "members": 1,
+        "stubs": 1,
+        "edges": 1
+      },
+      {
+        "phase": "workstream-w7",
+        "direction": "RIGHT",
+        "members": 5,
+        "stubs": 2,
+        "edges": 4
+      }
+    ],
+    "top_level_semantic_edges": 0,
+    "semantic_edge_duplication": false
+  },
+  "passive_diagnostics": {
+    "w_phase_multiples": {
+      "view": "w_compound",
+      "layers": {
+        "affected": true,
+        "semantic": false,
+        "external": false
+      },
+      "input_full_card_ids": [
+        "W5C-team-observatory-ux",
+        "W5D-lan-collaboration-harness",
+        "W5E-team-observatory-ui-closeout",
+        "W6.1-incremental-maintenance-quick-remove",
+        "W7.1-archived-session-relation-projection",
+        "W7.2.2-graph-arrow-scrollbar-visual-integration",
+        "W7.2.3-workstream-graph-density-correction",
+        "W7.3-workstream-relation-capture-confirmation",
+        "W7.3-integration-acceptance"
+      ],
+      "input_boundary_ids": [
+        "stub-w5-ci1",
+        "stub-w6-ci6",
+        "stub-w7-sh1",
+        "stub-w7-ci6"
+      ],
+      "input_edge_ids": [
+        "legacy-w5d-ci1",
+        "legacy-ci1-w5e",
+        "legacy-w61-ci6",
+        "legacy-sh1-w71",
+        "legacy-w722-w723",
+        "effective-w73-compound",
+        "proposal-ci6-w73"
+      ],
+      "output_bounds": {
+        "width": 1878,
+        "height": 844
+      },
+      "layout_time_ms": 24,
+      "node_node_overlaps": [],
+      "container_external_node_overlaps": [],
+      "label_node_overlaps": [],
+      "route_node_intersections": [],
+      "unmarked_crossings": [],
+      "route_stretch": [
+        {
+          "edge_id": "legacy-w5d-ci1",
+          "ratio": 1,
+          "route_length": 168
+        },
+        {
+          "edge_id": "legacy-ci1-w5e",
+          "ratio": 1,
+          "route_length": 168
+        },
+        {
+          "edge_id": "legacy-w61-ci6",
+          "ratio": 1,
+          "route_length": 168
+        },
+        {
+          "edge_id": "legacy-sh1-w71",
+          "ratio": 1,
+          "route_length": 214
+        },
+        {
+          "edge_id": "legacy-w722-w723",
+          "ratio": 1,
+          "route_length": 214
+        },
+        {
+          "edge_id": "effective-w73-compound",
+          "ratio": 1,
+          "route_length": 240
+        },
+        {
+          "edge_id": "proposal-ci6-w73",
+          "ratio": 1,
+          "route_length": 361
+        }
+      ],
+      "external_network_requests": [],
+      "post_processed_coordinates": false,
+      "engine_owned_fact_set_changes": false
+    },
+    "project_structure_affected_only": {
+      "view": "project_structure",
+      "layers": {
+        "affected": true,
+        "semantic": false,
+        "external": false
+      },
+      "input_full_card_ids": [
+        "SH1-real-self-host-collaboration-acceptance",
+        "A4-portable-meta-rules-bootstrap-contract",
+        "CI1-tiered-parallel-validation",
+        "CI5-promotion-throughput-optimization",
+        "CI7-validation-routing-precision-total-cost",
+        "G1-github-front-door-static-v1",
+        "REL3-v0-3-0-release-scope-default-matrix",
+        "S0-orrery-dispatch-skill",
+        "SC1-canonical-state-closeout",
+        "U2-unified-observatory-production-integration",
+        "U2.2-unified-navigation-workspace-maintenance-ux",
+        "U2.3-unified-navigation-live-task-visibility",
+        "W5D-lan-collaboration-harness"
+      ],
+      "input_boundary_ids": [
+        "context-overflow+4"
+      ],
+      "input_edge_ids": [],
+      "output_bounds": {
+        "width": 774,
+        "height": 1016
+      },
+      "layout_time_ms": 4.8,
+      "node_node_overlaps": [],
+      "container_external_node_overlaps": [],
+      "label_node_overlaps": [],
+      "route_node_intersections": [],
+      "unmarked_crossings": [],
+      "route_stretch": [],
+      "external_network_requests": [],
+      "post_processed_coordinates": false,
+      "engine_owned_fact_set_changes": false
+    }
+  },
+  "screenshots": {
+    "root": "screenshots/revision-15",
+    "viewports": [
+      "1440x900",
+      "1280x800",
+      "390x844"
+    ],
+    "desktop_default_zoom": "100%",
+    "mobile_projection": "same-fact-ledger"
+  },
+  "browser_observation": {
+    "console_warnings_or_errors": [],
+    "w_phase_headers_visible_together": true,
+    "inspector_initially_closed": true,
+    "mobile_document_horizontal_overflow": false
+  },
+  "claim": {
+    "visual_readiness_pass": false,
+    "coordinator_review_required": true,
+    "note": "Render-only artifact for central review; no GX2 or product validation PASS is claimed."
+  }
+}

@@ -4,6 +4,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 import os
 import socket
 import subprocess
@@ -188,6 +189,13 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
                 layout = graph_ui.build_readability_layout(projection, lens=lens)
                 self.assertTrue(layout["nodes"])
                 self.assertTrue(all(item["relation_type"] in allowed for item in layout["edges"]))
+                self.assertTrue(
+                    layout["geometry_postconditions"]["passed"],
+                    layout["geometry_postconditions"]["violations"],
+                )
+                self.assertEqual(len(layout["placement_translations"]), len(layout["component_bounds"]))
+                self.assertEqual(layout["program_bands"], [])
+                self.assertEqual(layout["component_headers"], [])
                 boxes = list(layout["positions"].items())
                 for index, (left_id, left) in enumerate(boxes):
                     self.assertGreaterEqual(left["width"], 220)
@@ -201,9 +209,28 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
                             or right["y"] + right["height"] <= left["y"]
                         )
                         self.assertTrue(separated, f"overlap: {left_id} / {right_id}")
+                        horizontal_gap = max(
+                            0,
+                            right["x"] - (left["x"] + left["width"]),
+                            left["x"] - (right["x"] + right["width"]),
+                        )
+                        vertical_gap = max(
+                            0,
+                            right["y"] - (left["y"] + left["height"]),
+                            left["y"] - (right["y"] + right["height"]),
+                        )
+                        self.assertGreaterEqual(
+                            math.hypot(horizontal_gap, vertical_gap), 40,
+                            f"node gap: {left_id} / {right_id}",
+                        )
                 edge_by_id = {item["display_edge_id"]: item for item in layout["edges"]}
                 for route in layout["routes"]:
                     self.assertTrue(route["has_arrow"])
+                    self.assertLessEqual(route["bend_count"], 2)
+                    self.assertGreaterEqual(route["shortest_segment"], 16)
+                    self.assertLessEqual(route["stretch"], 1.65)
+                    self.assertTrue(route["source_port"])
+                    self.assertTrue(route["target_port"])
                     edge = edge_by_id[route["edge_id"]]
                     if edge["relation_type"] in {"series-display", "conflict-fact"}:
                         self.assertTrue(route["has_label"])
@@ -224,6 +251,37 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
                             )
 
         collapsed = graph_ui.build_readability_layout(projection, lens="succession")
+        self.assertFalse([item for item in collapsed["chains"] if item["history_ids"]])
+        history_projection = {
+            "nodes": [
+                {
+                    "workstream_id": item, "display_prefix": item, "display_name": item,
+                    "status": "completed" if item.startswith("old") else "active",
+                    "session_state": "current", "runtime_condition": "inactive" if item.startswith("old") else "active",
+                    "lifecycle_phase": "historical" if item.startswith("old") else "implementing",
+                    "evidence_freshness": "current", "scope_status": "current",
+                    "closure_reason": "responsibility-transferred" if item.startswith("old") else None,
+                    "plain_status": "历史任务" if item.startswith("old") else "正在进行",
+                    "plain_status_code": "historical" if item.startswith("old") else "active",
+                    "primary_subsystem_id": "test-coverage", "affected_subsystem_ids": [],
+                    "visibility": "worktree-local", "observability": "local", "source_links": [],
+                    "series_id": None, "series_order": None, "program_id": None, "phase_id": None,
+                }
+                for item in ("old-1", "old-2", "direct", "tip")
+            ],
+            "edges": [
+                {
+                    "relation_id": f"edge-{source}", "relation_type": "derived_from",
+                    "source_workstream_id": source, "target_workstream_id": target,
+                    "lifecycle": "active", "certainty": "confirmed",
+                    "effective_active_succession": True, "source_links": [],
+                }
+                for source, target in (("old-2", "old-1"), ("direct", "old-2"), ("tip", "direct"))
+            ],
+            "active_tip_workstream_ids": ["tip"], "history_candidate_ids": ["old-1", "old-2"],
+            "comparison_suggestions": [], "conflicts": [], "program_groups": [],
+        }
+        collapsed = graph_ui.build_readability_layout(history_projection, lens="succession")
         history_chains = [item for item in collapsed["chains"] if item["history_ids"]]
         self.assertTrue(history_chains)
         chain = history_chains[0]
@@ -234,7 +292,7 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertEqual(cluster["cluster_last_id"], chain["history_ids"][-1])
         self.assertEqual(cluster["cluster_tip_id"], chain["tip_id"])
         expanded = graph_ui.build_readability_layout(
-            projection, lens="succession", expanded_chain_ids=[chain["chain_id"]]
+            history_projection, lens="succession", expanded_chain_ids=[chain["chain_id"]]
         )
         self.assertFalse(any(item.get("chain_id") == chain["chain_id"] for item in expanded["nodes"]))
         self.assertTrue(set(chain["history_ids"]).issubset(expanded["visible_fact_ids"]))
@@ -345,7 +403,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertTrue(series_edges)
         self.assertTrue(all(item["presentation_only"] for item in series_edges))
         self.assertTrue(any(item["series_id"] == "CI" for item in series_edges))
-        self.assertTrue(any(item["series_id"] == "CI" for item in dependency["series_lanes"]))
+        self.assertEqual(dependency["series_lanes"], [])
+        self.assertTrue(dependency["geometry_postconditions"]["passed"])
         self.assertTrue({"CI1", "CI2-late"}.issubset(dependency["visible_fact_ids"]))
 
         overlay = graph_ui.build_readability_layout(
@@ -434,6 +493,64 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             self.assertEqual(projection["status"], "unavailable")
             self.assertEqual(projection["error"]["code"], "relation-evidence-absent")
 
+    def test_program_membership_is_containment_only_and_same_semantics_bundle_is_declared(self) -> None:
+        provider = copy.deepcopy(self.provider)
+        provider["program_hierarchy"] = {
+            "schema_version": 1,
+            "contract_type": "workstream-program-hierarchy-inspection",
+            "groups": [
+                {"group_id": "program-w", "group_kind": "program", "parent_group_id": None,
+                 "display_label": "W program", "order": 0},
+                {"group_id": "phase-w5", "group_kind": "phase", "parent_group_id": "program-w",
+                 "display_label": "W5 phase", "order": 5},
+            ],
+            "memberships": [
+                {"membership_id": "member-w5e", "workstream_id": "W5E",
+                 "group_path": ["program-w", "phase-w5"]},
+            ],
+            "pending_group_events": [], "pending_membership_events": [],
+            "read_only": True, "writes_performed": False, "name_inference_performed": False,
+            "relation_effects": {"series": False, "relations": False, "gates": False,
+                                 "closure": False, "ownership": False},
+        }
+        projection = graph_ui.project_core_relation_graph(lambda: provider)
+        before_relations = len(projection["edges"])
+        self.assertEqual(next(item for item in projection["nodes"] if item["workstream_id"] == "W5E")["phase_id"], "phase-w5")
+        layout = graph_ui.build_readability_layout(projection, lens="succession")
+        self.assertEqual(layout["program_bands"], [])
+        self.assertTrue(layout["geometry_postconditions"]["passed"])
+        self.assertEqual(len(projection["edges"]), before_relations)
+
+        bundled = copy.deepcopy(self.projection)
+        ids = [item["workstream_id"] for item in bundled["nodes"] if item.get("evidence_freshness") == "current" and item.get("scope_status") == "current"][:4]
+        self.assertEqual(len(ids), 4)
+        common, targets = ids[0], ids[1:]
+        bundled["active_tip_workstream_ids"] = targets
+        bundled["edges"] = [
+            {
+                "relation_id": f"bundle-edge-{index}", "relation_type": "derived_from",
+                "source_workstream_id": target, "target_workstream_id": common,
+                "lifecycle": "active", "certainty": "confirmed", "required_for": None,
+                "evidence_status": "confirmed", "evidence": {}, "reason_codes": [],
+                "source_links": [], "origin": "native",
+            }
+            for index, target in enumerate(targets)
+        ]
+        bundle_layout = graph_ui.build_readability_layout(bundled, lens="succession")
+        self.assertEqual(len(bundle_layout["route_bundles"]), 1)
+        bundle = bundle_layout["route_bundles"][0]
+        self.assertEqual(len(bundle["edge_ids"]), 3)
+        self.assertLessEqual(abs(bundle["trunk_points"][1][1] - bundle["trunk_points"][0][1]), 64)
+        self.assertEqual(bundle["endpoint_kind"], "source")
+        bundled_routes = [item for item in bundle_layout["routes"] if item["route_bundle_id"] == bundle["bundle_id"]]
+        self.assertEqual(len(bundled_routes), 3)
+        self.assertEqual({tuple(item["points"][:2]) for item in bundled_routes}, {tuple(bundle["trunk_points"])})
+
+        mixed = copy.deepcopy(bundled)
+        mixed["edges"][0]["lifecycle"] = "stale"
+        mixed_layout = graph_ui.build_readability_layout(mixed, lens="succession")
+        self.assertLess(len([item for item in mixed_layout["routes"] if item["route_bundle_id"]]), 3)
+
     def test_corrected_w7a_compatibility_payload_preserves_non_active_runtime_states(self) -> None:
         payload = copy.deepcopy(self.builder.synthetic_browser_provider())
         self.assertEqual(payload["authority"], "synthetic-non-authoritative")
@@ -462,6 +579,57 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertEqual(projection["status"], "ready")
         self.assertTrue(projection["nodes"])
 
+    def test_component_local_packing_and_module_boundary_projection(self) -> None:
+        def node(workstream_id: str, module: str, *, runtime: str = "active", affected: list[str] | None = None) -> dict:
+            return {
+                "workstream_id": workstream_id, "display_prefix": workstream_id,
+                "display_name": workstream_id, "status": "active", "session_state": "current",
+                "lifecycle_phase": "implementing", "runtime_condition": runtime,
+                "evidence_freshness": "current", "scope_status": "current", "closure_reason": None,
+                "plain_status": "正在进行", "plain_status_code": "active",
+                "primary_subsystem_id": module, "affected_subsystem_ids": affected or [],
+                "visibility": "worktree-local", "observability": "local", "source_links": [],
+                "series_id": None, "series_order": None, "program_id": None, "phase_id": None,
+            }
+
+        disconnected = {
+            "nodes": [node(f"component-{index}", "documentation-system") for index in range(4)],
+            "edges": [], "active_tip_workstream_ids": [f"component-{index}" for index in range(4)],
+            "history_candidate_ids": [], "comparison_suggestions": [], "conflicts": [], "program_groups": [],
+        }
+        packed = graph_ui.build_readability_layout(disconnected, lens="succession")
+        self.assertGreaterEqual(len({item["x"] for item in packed["positions"].values()}), 2)
+
+        scoped = {
+            "nodes": [
+                node("doc-task", "documentation-system"),
+                node("authority-task", "authority-meta-model"),
+                node("multi-task", "multi-worktree-collaboration", runtime="paused", affected=["documentation-system"]),
+            ],
+            "edges": [{
+                "relation_id": "cross-module", "relation_type": "derived_from",
+                "source_workstream_id": "doc-task", "target_workstream_id": "authority-task",
+                "lifecycle": "active", "certainty": "confirmed", "effective_active_succession": True,
+                "source_links": [],
+            }],
+            "active_tip_workstream_ids": ["doc-task", "multi-task"], "history_candidate_ids": [],
+            "comparison_suggestions": [], "conflicts": [], "program_groups": [],
+        }
+        documentation = graph_ui.build_readability_layout(
+            scoped, lens="succession", subsystem="documentation-system"
+        )
+        full_ids = {item["workstream_id"] for item in documentation["nodes"] if not item.get("is_boundary_stub")}
+        boundary_ids = {item["boundary_external_id"] for item in documentation["nodes"] if item.get("is_boundary_stub")}
+        self.assertEqual(full_ids, {"doc-task", "multi-task"})
+        self.assertEqual(boundary_ids, {"authority-task"})
+        active_only = graph_ui.build_readability_layout(
+            scoped, lens="succession", subsystem="documentation-system", runtime="active"
+        )
+        self.assertEqual(
+            {item["workstream_id"] for item in active_only["nodes"] if not item.get("is_boundary_stub")},
+            {"doc-task"},
+        )
+
     def test_page_is_keyboard_responsive_read_only_and_has_no_frontend_semantics(self) -> None:
         page = graph_ui.inject_workstream_relation_graph(
             _base_page(team=True, personal=True), self.projection
@@ -481,8 +649,13 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("addEventListener('wheel'", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("if(!event.ctrlKey)return", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("{passive:false}", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("MIN_ZOOM=.55,MAX_ZOOM=1.6", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("Math.max(1,Math.min(1.15", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("MIN_ZOOM=.3,MAX_ZOOM=2", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("Math.max(MIN_ZOOM,Math.min(1.15", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("history:all", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("wg-overview", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("wg-overview", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn(".wg-node:focus,.wg-node:focus-visible{outline:none!important}", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertNotIn("drop-shadow(0 0 4px color-mix", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn("expandedChains:new Set()", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("data-wg-expand-all", page)
         self.assertIn("data-wg-collapse-all", page)
@@ -493,7 +666,7 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn('aria-label="关闭技术详情"', page)
         self.assertIn("任务关系列表", page)
         self.assertIn("当前没有已登记的依赖关系", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("层级 ${String(lane.rank+1)", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("层级 ${String(lane.rank+1)", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("'documentation-system':'文档系统'", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("`RANK ${String(lane.rank+1)", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("visibleFactIds", graph_ui.WORKSTREAM_GRAPH_JS)
@@ -506,17 +679,40 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("markerWidth:10,markerHeight:10", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn(".wg-edge.lens-conflict{stroke:var(--wg-red);stroke-width:4", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn("wg-edge-label", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("同系列演进（展示关系）", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("同系列演进（仅展示）", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("compact?'系列演进'", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("lineEncoding", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("0 条依赖边 · 0 个孤立节点", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("点击展开，仅影响这条上游链", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("收起本链", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("H${", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("--wg-node-width:248px;--wg-node-height:104px", graph_ui.WORKSTREAM_GRAPH_CSS)
-        self.assertIn("RANK_GAP=88,ROW_GAP=34,COMPONENT_GAP=44", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("componentTop+=componentRows*NODE_H", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("height:nodeIds.size?maxNodeBottom+34:1", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("--wg-node-width:224px;--wg-node-height:96px", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn("RANK_GAP=144,ROW_GAP=40,SERIES_GAP=88,SERIES_ROW_GAP=54", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("function localRanks", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("PACK_WIDTH=1180,BLOCK_GAP=56", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("declareBundles(displayEdges,blockById)", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("boundaryByExternal", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("扩展任务范围", page)
+        self.assertIn("显示直接关联任务", page)
+        self.assertIn("显示影响本模块的任务", page)
+        self.assertIn("data-wg-semantic-context", page)
+        self.assertIn("height:nodeIds.size?canvasBottom+54:1", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("componentLayouts", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("occupiedBounds", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("placementTranslations", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("const programBands=[]", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("positions.clear()", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("layoutSeries", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("programTop", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("rowCursor+=componentRows+1", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("routeReserve", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("trackY=nodeTop-26", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("window.matchMedia('(max-width:640px)')", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("function applySelectionFocus", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("verticalBlockers", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("svg g.is-muted{opacity:.22", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn("data-wg-edge-id", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("data-wg-node-id", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn(".wg-graph-panel{min-width:0;width:100%", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-inspector[hidden]{display:none!important}", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-edge-hit:focus-visible{stroke:", graph_ui.WORKSTREAM_GRAPH_CSS)
@@ -525,6 +721,13 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn(".wg-graph-panel{display:block", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-mobile-ledger{position:static", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-comparison-drawer", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn(".wg-edge.series-display{stroke:var(--wg-dim);stroke-width:1.5}", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn("W ›", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn(".wg-bundle-trunk", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn("--wg-node-accent", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertNotIn(".wg-node.is-endpoint>rect{stroke:var(--wg-ink)", graph_ui.WORKSTREAM_GRAPH_CSS)
+        self.assertIn("kind==='node'", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("declareBundles", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn(".wg-series{", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertNotIn("fetch(", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("XMLHttpRequest", graph_ui.WORKSTREAM_GRAPH_JS)
@@ -574,8 +777,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
         mapping = json.loads((ROOT / "scripts" / "ci" / "change-mapping.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.18")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.18")
+        self.assertEqual(component["version"], "0.1.19")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.19")
         test_ids = [item["test_id"] for item in mapping["tests"]]
         self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
         self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))

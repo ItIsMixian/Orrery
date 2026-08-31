@@ -14,7 +14,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前 Canonical source
 
 - protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- W7.3 Graph-native correction Candidate 声明 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18；内部 relation capture schema 2 与 Graph projection schema 2 不变，组件总状态仍为 `unreleased`，Core API／CLI 顶层 JSON schema 仍为 1。
+- W7.3 revision-17 Candidate 声明 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19；内部 relation capture schema 2 与 Graph projection schema 2 不变，组件总状态仍为 `unreleased`，Core API／CLI 顶层 JSON schema 仍为 1。Observatory 随包携带固定 `elkjs@0.11.0` bundle、EPL-2.0 license、package metadata 与 hash-bound provenance，运行时保持 zero-network。
 - Codex、Claude Code 与 DeepSeek Harness Adapter source 保持 0.1.1；Harness JSON 因新增有界 relation `suggest`／`inspect` 请求推进到 0.1.2。各 Adapter 的 runtime evidence 继续不能互相外推，Harness 不获得 confirmation 权限。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。

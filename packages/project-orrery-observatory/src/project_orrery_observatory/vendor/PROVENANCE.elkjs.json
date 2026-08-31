@@ -1,0 +1,12 @@
+{
+  "name": "elkjs",
+  "version": "0.11.0",
+  "license": "EPL-2.0",
+  "source": "https://registry.npmjs.org/elkjs/-/elkjs-0.11.0.tgz",
+  "package_tarball_sha256": "559188be5aba91ce22457c1e2f4693135af43e68cf9a71b53b129b762de9d52d",
+  "browser_bundle": "elk.bundled.js",
+  "browser_bundle_bytes": 1627496,
+  "browser_bundle_sha256": "cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8",
+  "runtime_policy": "vendored-local-only-zero-network",
+  "accepted_evidence": "docs/validation/2026-08-30-gx2-elk-layout-engine-evaluation.md"
+}

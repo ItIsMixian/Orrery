@@ -1,7 +1,7 @@
 {
   "manifest_format": 1,
   "name": "project-orrery-observatory",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "status": "unreleased",
   "legacy_toolchain_version": "0.2.0",
   "template_projection": {
@@ -13,6 +13,10 @@
     }
   },
   "managed_tools": [
+    "vendor/elk.bundled.js",
+    "vendor/LICENSE.elkjs.md",
+    "vendor/package.elkjs.json",
+    "vendor/PROVENANCE.elkjs.json",
     "start-docsite.bat",
     "scripts/docsite/_llm.py",
     "scripts/docsite/build_docsite.py",

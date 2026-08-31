@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Orrery · GX2 ELK 布局隔离评估</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="mast">
+      <div>
+        <p class="kicker">GX2 · 隔离布局评估 · 只读</p>
+        <h1>任务关系几何试验台</h1>
+        <p class="lede">Orrery 决定显示什么；ELK 只返回坐标、正交线路与标签位置。</p>
+      </div>
+      <div class="seal"><span></span>本地 ELK.js 0.11.0</div>
+    </header>
+
+    <section class="toolbar" aria-label="图视图切换">
+      <div class="view-tabs" role="tablist">
+        <button role="tab" data-view="succession" aria-selected="true">接续总览</button>
+        <button role="tab" data-view="w_compound" aria-selected="false">W 复合视图</button>
+        <button role="tab" data-view="project_structure" aria-selected="false">Project Structure</button>
+        <button role="tab" data-view="dependency" aria-selected="false">依赖视图</button>
+      </div>
+      <div class="context-controls" hidden>
+        <label class="project-control"><input type="checkbox" data-layer="affected"> affected 上下文</label>
+        <label class="project-control"><input type="checkbox" data-layer="semantic"> 一跳语义上下文</label>
+        <label class="external-control" hidden><input type="checkbox" data-layer="external"> 显示外部完整卡片</label>
+      </div>
+      <div class="zoom-controls" aria-label="画布缩放">
+        <button type="button" data-zoom="out" aria-label="缩小">−</button>
+        <output data-zoom-value>100%</output>
+        <button type="button" data-zoom="in" aria-label="放大">＋</button>
+        <button type="button" data-zoom="fit">适合窗口</button>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <header class="workspace-head">
+        <div>
+          <p data-view-eyebrow>关系图 / 已冻结输入</p>
+          <h2 data-view-title>接续总览</h2>
+          <p data-view-description></p>
+        </div>
+        <div class="legend" aria-label="关系图例">
+          <span><i class="confirmed"></i>接续</span>
+          <span><i class="series"></i>系列（展示）</span>
+          <span><i class="proposed"></i>依赖待确认</span>
+          <span><i class="stale"></i>证据过期</span>
+        </div>
+      </header>
+
+      <div class="stage">
+        <div class="canvas-viewport" tabindex="0" aria-label="ELK 分层任务关系图，可拖动画布并按 Ctrl 加滚轮缩放">
+          <svg class="graph" role="img" aria-label="从左到右的任务关系图"></svg>
+          <div class="loading" role="status">正在计算本地布局…</div>
+        </div>
+        <aside class="inspector" aria-live="polite">
+          <div class="inspector-head">
+            <span>技术详情 / 核心证据 · 只读</span>
+            <button type="button" data-close-inspector aria-label="关闭技术详情">×</button>
+          </div>
+          <div data-inspector>
+            <p class="empty-copy">选择任务卡片或关系线，查看 Orrery 输入事实与 ELK 几何输出。</p>
+          </div>
+          <footer>不提供确认、应用、撤销、合并或远程执行</footer>
+        </aside>
+      </div>
+
+      <section class="mobile-ledger" aria-label="移动端同事实任务关系列表">
+        <p>同事实任务关系列表</p>
+        <div data-ledger></div>
+      </section>
+
+      <footer class="statusbar">
+        <span data-layout-status>等待布局</span>
+        <span data-fact-count></span>
+        <span>运行时网络：0</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="vendor/elk.bundled.js"></script>
+  <script type="application/json" id="gx2-report">{}</script>
+  <script src="app.js"></script>
+</body>
+</html>

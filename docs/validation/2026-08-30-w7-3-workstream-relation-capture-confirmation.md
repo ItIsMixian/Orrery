@@ -2,30 +2,15 @@
 
 Date: 2026-08-30
 
-Status: CANDIDATE WITH TIMING LIMITATION — Graph-native correction implemented and browser-accepted; retained
-`5fee848` Core/capture Candidate has formal Fast/Checkpoint PASS, while the correction diff's formal reruns exceeded
-the unchanged local 15s/90s budgets without a product assertion failure
+Status: PASS (focused Candidate closeout) — maintainer accepted the current ELK product preview; revision-17 focused
+checks and revision-18 exact attribute/hash/complete-staged-diff gates are green. The clean Candidate SHA is reported
+in the task receipt; central integration evidence remains pending.
 
 Authority sources:
 
 - [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md)
 - [Approved Design](../design/workstream-relation-capture-and-confirmation.md)
 - [W7.3 Plan and 2026-08-30 Scope Amendment](../implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)
-
-## Fact scope and authority acknowledgment
-
-- Candidate branch/worktree fact scope only; not Canonical, released, public or default-enabled.
-- Exact code base: `codex/u1-u2-integration-baseline@3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`.
-- Exact authority commit: `6315415075fb78b61d9a5bb835725bced0bc9ce1`; its parent is the exact code base.
-- The eight requested authority blobs were read and verified before resumed product writes; Git-private session scope
-  revision 3 binds their exact blob OIDs and expected validation surfaces.
-- Graph correction resumed from task-description version `2ab5c465ec28d7a472ad3f5ebbb324a565bbe57a` without
-  rebasing or overwriting the clean `5fee848e369bae0c55e7ab505ea3b1e3711b8301` Candidate. Exact Plan blob is
-  `a77ace7f42f091aabf81be55d4395465b0847a7c`; exact Validation blob is
-  `dd0c3eb1f7da48eec23ca47f0772aec8caa3b547`. Git-private scope revision 4 binds those OIDs, retained Candidate,
-  expected writes and the GPT-5.6 Sol／medium execution profile before resumed product writes.
-- This implementation record is separate from the docs-only
-  [ADR-0017 decision contract](2026-08-29-w7-3-relation-capture-decision-contract.md).
 
 ## Expected evidence
 
@@ -38,109 +23,388 @@ Authority sources:
 - Personal/Team/inbox/Graph desktop/mobile browser acceptance;
 - Fast/Checkpoint, repository/release/private-artifact/diff evidence.
 
-## Command ledger
+The docs-only ADR-0017 decision contract remains separate. No item here is PASS until actual implementation and
+reproducible evidence are recorded.
 
-| Surface | Command/evidence | Result |
-|---|---|---|
-| Core/capture/schema | `python -X utf8 -m pytest tests/test_workstream_relation_capture.py tests/test_workstream_relation_graph_observatory.py tests/test_harness_json_adapter.py tests/test_unified_observatory.py -q` | PASS — 41/41, 256.04s |
-| CLI/Harness | focused relation CLI test plus Harness JSON suggest/inspect/refusal matrix in the 41-test run | PASS |
-| Observatory/Graph | `python -X utf8 -m unittest tests.test_workstream_relation_graph_observatory -q` and bounded Unified fixture | PASS — final correction Graph 9/9 in 2.247s; Unified 11/11 in 5.464s |
-| Self-host | Core capture/provider projection for A/CI/U and new `W7.3-integration-acceptance` | PASS — details below |
-| Browser | Browser skill at 1440×900 and 390×844 for Personal, Team and Graph | PASS — details below |
-| CI6 | dry-run/explain, Fast and Checkpoint | RETAINED PASS / CORRECTION TIMING LIMIT — `5fee848` Fast 90/90 and Checkpoint 96/96; correction dry-run selects 91 tests, while formal Fast/Checkpoint exceed 15s/90s locally |
-| Repository/release | repository gates, v0.2.0/Codex adapter dry builds and archive exclusion inspection | PASS |
-| Hygiene | `git diff --check`; clean Candidate verified after evidence commit | PASS |
+## 2026-08-30 Graph UX correction acceptance contract
 
-## Results
+- graph-native series lanes/connectors for A3→A4, CI6→CI7 and U1→U2→U2.2;
+- dependency proposals remain distinct amber dashed edges and require human confirmation;
+- no detached “任务系列” card strip and no always-expanded comparison card grid;
+- comparison overlay/drawer default collapsed and never red/authoritative;
+- zero-conflict self-host canvas contains zero red paths;
+- synthetic multiple-conflict geometry proves separated tracks, no unrelated coincident segments and no
+  edge-through-node;
+- desktop/mobile Browser screenshots and DOM/geometry/console evidence;
+- final routed Fast/Checkpoint and repository/release/private-artifact gates after the correction.
 
-### Contract, authority and compatibility
+The previous `5fee848...` Candidate remains evidence for Core capture, authority and inbox behavior. It is not accepted
+as the final Graph UX and must not be integrated unchanged.
 
-- Core 0.1.18, CLI 0.1.22, Observatory 0.1.18 and Harness JSON 0.1.2 are unreleased source versions. Codex,
-  Claude Code and DeepSeek adapter versions remain 0.1.1; v0.2.0 manifest/tag/checksum bytes were not changed.
-- `workstream-relation-capture-v2` freezes append-only proposal/event/confirmation/role/series records, revision/CAS,
-  event hashes and bounded regular-file/path/count/size/symlink rules. Positive and negative fixtures cover Personal,
-  Team, cycle, duplicate, stale, no-integrator, multi-integrator, spoof, remote request, legacy v1 and broken evidence.
-- Registration/rebind only auto-captures `derived_from` after exact same-project OID and local ancestry verification.
-  Drift/Unknown produces an explainable proposal/finding; no branch/title prefix becomes evidence.
-- `depends_on` consumes explicit implementation/validation/integration/release gates. Only task owner may decide the
-  first two and a human integrator the last two; `absorbs` is integrator-only and exposes closure, Validation, scope
-  and unfinished responsibility. Proposed/deferred/Unknown and stale confirmation do not block lifecycle eligibility.
-- CLI exposes bounded JSON `suggest/inspect/accept/change-gate/defer/reject`; Harness exposes only `suggest/inspect`.
-  Neither path executes arbitrary shell, path or URL input, and central/remote/session/Agent callers cannot decide.
+## 2026-08-30 readable topology re-layout acceptance contract
 
-### Self-host facts
+The second Graph correction `05c83b75723a9e6681c0885dd090606060cb696e` is also visually rejected. Presence of
+graph-native connectors does not pass when the default page is 55%, routes share a vertical bus, labels cover lines,
+or a docked inspector removes the usable canvas.
 
-- Append-only series records explicitly group A3/A4 as Authority A, CI6/CI7 as CI and U1/U2/U2.2 as Unified U.
-  A4→A3 and CI7→CI6 remain `integration` proposals. They are not effective history and did not come from name
-  inference.
-- A real linked worktree `W7.3-integration-acceptance` was created from exact implementation commit
-  `84e1c0a1ac5fa306f834568c389651f69135af2b`. Its exact lineage automatically wrote native
-  `derived_from(W7.3-integration-acceptance, W7.3-workstream-relation-capture-confirmation)`; a genuine CI6
-  integration requirement remains proposal `w73-integration-requires-ci6`, not an effective dependency.
-- Final read-only self-host projection is `ready`, 27 nodes／14 Core edges. The Integration workstream has one active
-  mechanical `derived_from` and one proposed `depends_on(required_for=integration)`. Capture has 3 pending proposals,
-  0 confirmed capture relations and 0 stale confirmations. Graph has 15 comparison suggestions and 0 confirmed
-  conflicts; the two sets are disjoint. Projection reports `writes_performed=false` and `network_performed=false`.
+Required new evidence:
 
-### Status, comparison and conflict projection
+- exact acknowledgment of the new central task-description version and Git-private Scope revision 4 before resumed
+  product writes;
+- `git show` inspection of GX1 exact `f5fd5afa3f9b133166495119080629a5be5f67b2`, with explicit proof that no
+  third-party runtime or generated SVG/HTML entered the product;
+- aligned in-canvas A, CI and Unified series lanes, bounded default-collapsed history and initial/reset 100% readable
+  scale;
+- closed-by-default non-layout-shifting inspector plus selected-edge focus/dimming behavior;
+- per-lens visible-edge separation and comparison default-off;
+- zero node intersections and unmarked crossings, no unrelated collinear overlap >8px outside endpoint fan-out,
+  ≤2 bends/edge, route stretch ≤1.35, segment ≥16px, node gap ≥40px and label clearance ≥4px for current self-host and
+  synthetic 4+ conflict fixtures;
+- short offset Chinese labels, route/marker semantic-color agreement, and zero route collision with lane headings,
+  legends or controls;
+- 1440×900, 1280×800 and dedicated 390×844 topology Browser evidence for load/reset/filter/fit/select/inspector/
+  history interactions, including scale, DOM geometry, overflow, ARIA/focus and console outputs;
+- focused Graph tests during iteration, then one final routed Fast/Checkpoint after visual stabilization;
+- a final real self-host screenshot explicitly presented for maintainer acceptance. Automated tests cannot mark this
+  Validation complete without that acceptance.
 
-- Projection schema 2 preserves raw axes while mapping cards to the frozen Chinese taxonomy: 正在进行、等待人工确认、
-  状态待刷新／证据过期、历史任务、缺少任务记录、未登记、关系证据不足. “等待人工确认” is not a fallback.
-- Task series use graph-native lanes and presentation-only “同系列演进（展示关系）” connectors distinct from
-  relation edges. The detached series strip is absent. Core v1 `compare_pairs` remains conservative, but Observatory
-  consumes them as a default-off amber dotted overlay and default-collapsed review drawer; red conflict facts require
-  explicit location/impact/source. With no such fact the lens says “当前没有已确认的任务冲突”.
+The previous Core/capture/inbox evidence remains reusable. Re-layout work must not reopen confirmation authority,
+append-only history, Team privacy, release or public/default decisions.
 
-### Graph-native correction evidence
+## 2026-08-30 W program hierarchy and controlled bundle acceptance contract
 
-- Mechanical layout and browser parity expose A3/A4, CI6/CI7 and U1/U2/U2.2 on three fixed horizontal canvas lanes;
-  every adjacent pair has an inspectable presentation-only connector. Dependency view retains the three actual
-  proposed `depends_on(required_for=integration)` edges as separate amber dashed “等待人工确认” paths.
-- Synthetic 4-conflict geometry has four distinct per-edge routes, arrows and labels, no node overlap, no unrelated
-  coincident segment and no edge-through-node. Series/comparison edges are excluded from the conflict lens.
-- Focused Graph 9/9 (final 2.247s), Unified Observatory 11/11 and retained Core/capture 15/15 (290.216s) pass. An additional broad
-  W7B execution/relations diagnostic produced eight setup errors before execution planning; the first error reproduces
-  unchanged in the clean retained `5fee848` worktree, so it is a documented baseline limitation rather than Graph
-  correction evidence and no out-of-scope Core change was made.
+Governing sources:
 
-### Browser acceptance
+- [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md)
+- [Approved Program/Bundle Design](../design/workstream-program-hierarchy-and-graph-bundling.md)
 
-- Browser skill used a separate local service at `127.0.0.1:63373`; it was stopped after acceptance. The central
-  `127.0.0.1:63203` service was never stopped, reused or modified.
-- The Graph correction used Browser at 1440×900, 1280×800 and 390×844. All three explicit series are canvas-native;
-  dependency view visibly contains A3/A4 and CI6/CI7 proposals; comparison is default-collapsed/default-off; the
-  conflict view contains 0 red paths and its explicit empty state. No confirm/apply/undo control exists on canvas.
-- All three sizes had zero horizontal page overflow. Keyboard activation opened the same-fact mobile ledger and
-  evidence inspector, reduced-motion CSS remains present, and final console warning/error arrays were empty. No real
-  remote/team/delete action ran.
+Required evidence:
 
-### CI6 and repository gates
+- versioned program/phase group and membership schemas, explicit order, one primary path, revision/CAS and
+  human-integrator authority;
+- legacy Unknown and negative prefix/title/branch inference fixtures;
+- exact self-host W/W5/W6/W7 repair fixture with CI1/SH1 outside the program and no rewritten session/relation bytes;
+- proof that membership changes no semantic relation counts, series, active tips, gates, closure or ownership;
+- desktop/mobile W program and phase containment with actual cross-boundary edges and no fabricated W series;
+- same-source U1→U2/A4/CI7 controlled succession bundle, plus same-target fixture;
+- mixed type/direction/lifecycle/certainty/gate/style and conflict/comparison/series bundle refusal;
+- trunk/branch geometry: no node/header/label/control intersections, ≥24px pre-target branch separation, distinct
+  ports/arrowheads and no undeclared coincident segments;
+- branch selects one relation; trunk opens bounded list; inspector keeps each relation's exact evidence identity;
+- pointer selection uses brightened semantic stroke/weak same-color glow with no white rectangle; keyboard focus remains
+  visible and non-white;
+- new 1440×900, 1280×800 and 390×844 screenshots presented to the maintainer before any routed Fast/Checkpoint;
+- focused implementation tests only during visual iteration; after acceptance, one routed Fast and one Checkpoint.
 
-- Retained `5fee848` formal Fast: final 90/90 PASS in 10.488559s. Two immediately preceding post-self-host reruns hit the fixed 15s
-  budget under local timing variance and remain failed evidence; the successful rerun changed no source or scope.
-- Retained `5fee848` evidence: the first two Checkpoint attempts reached the fixed 90s limit while the existing real-Git Workspace Maintenance
-  fixture was still running; neither is claimed as PASS. Unified HTTP tests were then isolated from real self-host
-  enumeration with a bounded synthetic relation fixture (production code unchanged). Formal Checkpoint rerun passed
-  96/96 in 84.808322s, and the final current-diff rerun passed 96/96 in 78.812261s; the unchanged Maintenance test
-  remained the dominant cost.
-- Graph-correction dry-run selected 91 Fast tests and passed CI contract validation. Four formal Fast attempts reached
-  the unchanged 15s budget after only passing assertions; no correction assertion failed. Two formal Checkpoint
-  attempts reached the unchanged 90s budget while
-  `test_minimal_git_incremental_refresh_and_target_preflight_checkpoint` was still running. That exact test then PASSed
-  independently in 95.385s, proving the observed failure is the fixed aggregate timing gate rather than a functional
-  assertion. These failed formal receipts are retained and are not claimed as correction PASS; central integration
-  must rerun Fast/Checkpoint on the clean Candidate host before exact-SHA Promotion.
-- `validate_ci.py --all` and repository gates passed; the latter reported 729 repository paths, 394 Markdown files,
-  1054 local links and no forbidden runtime/generated artifact. Isolated `package_release.py` and
-  `package_codex_adapter.py` dry builds succeeded; archive listings contain no Git-private capture/session state,
-  generated site, `.port`, credentials or API configuration. The release listing's sole broad-pattern match was the
-  intentional project-template `.gitignore` file, not a `.git` directory or private state. `git diff --check` passed.
+No previous Graph screenshot or Candidate closes this scope. Group hierarchy and route bundles are not relation facts,
+execution authority or public/release adoption.
 
-### Remaining boundary and integration order
+## 2026-08-30 partial-order and history-folding acceptance contract
 
-- This is not main, public, released or default-enabled. No full Promotion, push, tag, manifest rewrite, real
-  dual-machine confirmation, cloud relay, scheduler, remote execution or historical effective dependency backfill
-  was performed.
-- Central integration must first land exact authority commit `6315415075fb78b61d9a5bb835725bced0bc9ce1`, then this
-  W7.3 Candidate, reconcile only CI7's central test mapping, run Candidate/exact-SHA Windows+Ubuntu Promotion, and
-  only then consider main. Root PROGRESS/HANDOFF remain central-integrator-owned.
+Required evidence:
+
+- horizontal rank uses only effective current `derived_from`, confirmed succession and explicit series order;
+- dependency, absorbs, program membership, names/branches and timestamps cannot create left/right chronology;
+- incomparable tasks share one x-rank and stack vertically with stable in-rank ordering;
+- cluster eligibility requires closed/superseded/historical, non-tip, current evidence/scope, no pending/Unknown/stale/
+  conflict and no retained responsibility;
+- completed W5/W6 phase clusters and contiguous-chain clusters pass, while mixed/branched/ineligible collections fail;
+- clusters preserve member/endpoint/status/external-edge summaries and redirect typed external edges without losing
+  inspector identity;
+- expand restores exact members/edges near the clicked anchor without global recenter/rescale;
+- pipeline mechanically proves membership → folding → rank → placement → bundle → labels/selection;
+- 30%/100%/200% render the same information model; zoom never conditionally removes semantic content;
+- desktop/mobile Browser screenshots show default folded and expanded W phases, zero overflow/error and no fabricated
+  temporal order;
+- exact new task-description acknowledgment and Git-private scope revision 6 before resumed writes.
+
+This gate remains visual/Pending until the maintainer accepts the real page. Focused tests may support iteration; no
+routed Fast/Checkpoint may run before that acceptance.
+
+## 2026-08-30 component-local layout correction
+
+The global-rank interpretation is rejected. Required evidence now additionally proves:
+
+- horizontal rank is computed per relation-connected component, explicit series lane or accepted phase lane, with a
+  separate rank origin for each disconnected component;
+- incomparable nodes stack only within their local rank domain; disconnected roots are not collected into one global
+  x-column;
+- after local layout, independent component blocks are packed deterministically in two dimensions, with at least two
+  occupied block columns for a four-component fixture at both 1440px and 1280px;
+- A/CI/U series remain compact horizontal rows and W5/W6/W7 remain distinct phase blocks; block proximity never creates
+  chronology or a semantic edge;
+- a bundle belongs to one common endpoint and one source/destination block pair; cross-phase targets split by block or
+  use dedicated boundary channels;
+- no full-height global route bus spans unrelated series/program regions, no route crosses an unrelated block, and
+  block/route/card/label geometry remains readable without brittle exact-coordinate assertions;
+- the mechanical pipeline is membership → eligible folding → component partition → local rank → local layout → 2D
+  block packing → block-pair bundle routing → labels/selection;
+- a real default-100% screenshot shows multiple compact blocks/rows in the first viewport rather than one tall column;
+- exact corrected task-description acknowledgment and Git-private scope revision 7 precede resumed product writes.
+
+The prior partial-order, history eligibility, 30%–200% semantic invariance and visual-acceptance requirements remain
+in force. Focused layout tests may support iteration; routed Fast/Checkpoint remain blocked until maintainer screenshot
+acceptance.
+
+## 2026-08-30 module-scoped projection correction
+
+Required evidence additionally proves:
+
+- `全部模块` alone projects the complete eligible graph; each concrete module applies an exact stable-ID predicate to
+  explicit primary/affected subsystem facts before folding and layout;
+- Unknown/unregistered module facts appear only in `未归属` and are never broadcast into all concrete module views;
+- module and runtime/status selections use intersection semantics;
+- an out-of-scope endpoint connected to an in-scope task is a compact typed boundary stub by default, not a full task
+  card or a reason to import its series/program neighbors;
+- group/series/program/phase containers include only in-scope full cards plus required boundary stubs;
+- optional one-hop external context is explicit, default-off, bounded and cleared on module change;
+- module switching recomputes visible IDs, components, bounds, rank and bundles; hidden nodes cannot remain as layout
+  obstacles or invisible route endpoints, and an empty module never falls back to all tasks;
+- focused fixtures assert exact full-card and boundary-stub ID sets for Authority, Documentation, Context Routing and
+  Multi-worktree views, including one explicitly multi-module task and one cross-module edge;
+- real 1440px/1280px/390px screenshots show visibly different task counts/topologies across the four module views,
+  correct module+status intersection and a named empty state;
+- exact corrected task-description acknowledgment and Git-private scope revision 8 precede resumed product writes.
+
+This remains a derived read-only projection. It changes no module fact, relation, lifecycle, gate, history eligibility,
+confirmation authority or execution capability. Routed Fast/Checkpoint remain blocked until maintainer screenshot
+acceptance.
+
+## 2026-08-30 topology-first soft-grouping correction
+
+The revision-7 preview's single tall W container and page-scale intersecting routes are rejected. Required evidence
+additionally proves:
+
+- visible-edge connected components are constructed after module projection/folding and across organizational
+  boundaries; program/phase membership cannot remove endpoints from or split a topology component;
+- crossing-minimized local rank ordering and adjacency take precedence over compactness and stable-ID tie sorting;
+- W program membership uses repeated lightweight local labels/hulls rather than one rectangle enclosing every W task;
+- disconnected W5/W6/W7 components participate in two-dimensional packing, and phases with three or more incomparable
+  tasks do not form a one-card-wide vertical rail;
+- current W5C/W5D/W5E and W7.1/W7.2.2/W7.2.3/W7.3-INT/W7.3 are not stacked into one W tower; CI1/SH1/U1 remain
+  locally positioned with their actual related W endpoints;
+- shared route trunks are limited to the common endpoint's local gutter and at most 64px or one rank gap; every later
+  branch owns a separate obstacle-avoiding route;
+- declared bundles remain subject to stretch/bend/segment/label gates and cannot use block-pair membership as an
+  exemption;
+- actual self-host geometry, not only synthetic presence tests, records zero unmarked route crossings, zero
+  node/header/hull intersections, zero page-spanning trunks and no hull spanning disconnected components;
+- the verified pipeline is strict module projection → folding → cross-organization component partition → local rank
+  → crossing-minimized ordering → local layout → 2D packing → soft overlays → local fan-out routing;
+- the maintainer accepts a real default-100% 1440px/1280px page before routed Fast/Checkpoint;
+- exact corrected task-description acknowledgment and Git-private scope revision 9 precede resumed product writes.
+
+This correction changes presentation/layout only. ADR-0020 membership, ADR-0017 relation authority, privacy,
+read-only execution boundaries and revision 8 module filtering remain unchanged.
+
+## 2026-08-30 single-pass occupied-bounds correction
+
+The revision-9 preview's overlapping nodes/decorations/routes is rejected. Required evidence additionally proves:
+
+- one canonical local placement occurs before measurement; no node or decoration changes component-relative x/y after
+  global packing;
+- every component exposes immutable node/header-or-badge/route-gutter rectangles and one union `occupied_bounds`;
+- the packer translates whole measured components and derives final canvas bounds only after translation;
+- the superseded hard-program placement and post-pack coordinate rewrite are absent from shipped source;
+- default overview contains no program/phase enclosing SVG rectangles or per-node phase hulls; W membership uses one
+  measured component header or an in-card metadata label;
+- route and relation-label geometry is computed after final positions and remains inside reserved component bounds;
+  insufficient routing space triggers remeasure/repack before render;
+- exact geometry tests cover all pairwise node, component, header, label and route intersections with declared block
+  gap, non-negative coordinates and final canvas containment;
+- real self-host focused evidence reports zero node overlap, decoration/card overlap, component-bound overlap,
+  route/card/label intersection and unmarked route crossing before preview generation;
+- no duplicate phase decoration shares a coordinate, and selection/inspector/module switching cannot mutate layout
+  footprint;
+- a new 100% 1440px/1280px screenshot is presented only after these postconditions pass;
+- exact corrected task-description acknowledgment and Git-private scope revision 10 precede resumed product writes.
+
+Revisions 8 and 9 remain effective. This correction changes no facts, relations, group authority, privacy, execution
+boundary or release state; routed Fast/Checkpoint remain blocked until maintainer screenshot acceptance.
+
+## 2026-08-30 ELK.js layout-only adoption contract
+
+Governing sources:
+
+- [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md)
+- [Approved ELK Graph Design](../design/elkjs-workstream-graph-layout-and-rendering.md)
+- [GX2 Evaluation](2026-08-30-gx2-elk-layout-engine-evaluation.md)
+
+Required evidence:
+
+- completed GX2 exact artifact/ref/version/SHA-256/size/license and local compound/cross-hierarchy capability;
+- recoverable preservation of rejected Graph geometry plus retained W7.3 Core/schema/capture/authority/inbox work;
+- no handwritten Python or Browser node placement, packing, edge routing or label-placement fallback remains active;
+- one immutable Orrery LayoutInput and pinned ELK LayoutResult with exact node/edge ID and input-hash equality;
+- primary-only concrete module full cards, separate affected/context layers, bounded non-series one-hop context and
+  `未归属`;
+- dependency full nodes equal scoped `depends_on` endpoints, with zero program/series/active-tip singleton;
+- W/W5/W6/W7 compound containment and real CI/SH/U cross-hierarchy edges without membership-as-edge;
+- existing SVG card/control typography, tokens, semantic states, selection, inspector and themes preserved;
+- ELK edge-label coordinates or inspector-only fallback, with zero floating component-corner text;
+- local pinned asset, license/provenance/package-data inventory, zero runtime network and failure-to-ledger behavior;
+- actual ELK Browser output proves finite/in-bounds geometry, containment, zero card/container/label overlap and no
+  edge-through-node for self-host and stress fixtures;
+- 1440×900, 1280×800 and 390×844 screenshots cover succession, W compound, Project Structure and dependency plus
+  filter/select/inspector/reset/failure interactions;
+- maintainer visual acceptance before exactly one routed Fast and one Checkpoint;
+- exact task-description acknowledgment and Git-private scope revision 12 before product writes.
+
+ADR acceptance does not mark any implementation or release item PASS. W7.3 remains Pending until reproducible product
+and Browser evidence is recorded.
+
+## 2026-08-30 preview-first and legacy-recovery contract
+
+Governing sources:
+
+- [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md)
+- [Approved Fallback Design](../design/elkjs-cutover-and-explicit-legacy-fallback.md)
+
+Current evidence gate:
+
+- GX2 alone may write; product/vendor/package/default changes remain zero;
+- all existing W7.3 dirty files and handwritten layout code remain present and recoverable;
+- GX2 provides actual offline ELK HTML, geometry report, exact provenance and 1440/1280/390 screenshots;
+- the maintainer reviews the ELK result before any later product task-description version exists;
+- exact task-description acknowledgment and Git-private scope revision 13 precede continued experiment writes.
+
+Future product acceptance must additionally prove one shared semantic input for ELK and legacy engines, explicit
+local engine selection, persistent `旧版兼容布局` labeling, ledger-first ELK failure, no silent fallback and bounded
+legacy rendering without fact divergence. These future checks do not authorize product writes in revision 13.
+
+## 2026-08-30 product ELK wiring preview gate
+
+GX2 visual direction is accepted, so scope revision 16 may create a product Candidate. Before any test workflow, the
+real Observatory must demonstrate:
+
+- exact local `elkjs@0.11.0` bundle/license/provenance hashes and zero runtime network;
+- one shared semantic projection and equal input IDs for ELK and frozen legacy engines;
+- primary-only module full cards, independent affected/semantic context and bounded `+N`;
+- dependency endpoints only and no isolated membership task;
+- W5/W6/W7 phase small multiples with typed external stubs and no duplicated/fabricated edges;
+- existing Orrery shell/cards/type/colors/controls/selection/inspector preserved; GX2 shell absent;
+- desktop default 100%, explicit fit, clipped card text and closed-by-default inspector;
+- ELK failure is ledger-first with explicit retry/manual legacy action; legacy is persistently labelled and never
+  automatic;
+- 1440×900, 1280×800 and 390×844 product screenshots plus central browser interaction for all listed states;
+- zero unittest/pytest/focused/geometry/repository/Fast/Checkpoint/Promotion/release commands before maintainer visual
+  acceptance;
+- exact task-description acknowledgment and Git-private scope revision 16 before product writes.
+
+This is a Pending preview gate. A later maintainer response and task-description version are required before tests or
+integration can resume.
+
+## 2026-08-30 maintainer visual acceptance and scope revision 17 gate
+
+The maintainer accepted the current real W7.3 ELK product preview as sufficient for v0.3.0 closeout and explicitly
+deferred any later visual defects or refinements. Central Browser inspection covered the current total succession
+overview, edge selection/inspector, W task scope, module/context controls, dependency admission, relation-revision
+aggregation and zoom behavior. No test workflow was run during the preview iterations.
+
+This acceptance has a deliberately narrow meaning:
+
+- it closes the human visual gate and freezes the current behavior for closeout;
+- it authorizes focused implementation checks and creation of a clean W7.3 Candidate;
+- it does not upgrade the dirty worktree based on `05c83b` into a Candidate, Validation PASS, Canonical source or
+  release capability;
+- earlier `5fee848`/`05c83b` test receipts do not cover the current pinned-ELK and presentation diff;
+- the generated loopback preview is ephemeral evidence and is not an exact-SHA release artifact.
+
+Required next evidence is one focused W7.3 closeout ledger, updated branch State/Validation/DEVLOG/indexes, a clean
+Candidate SHA and component inventory. Formal routed Fast/Checkpoint move to the new central fingerprint after W7.3
+and CI7 `111f4abc47b8122aee5469db4489ad6fb0dee75a` are integrated; they must each run once there and cannot reuse or
+substitute earlier receipts. The exact integrated page still requires final desktop/mobile maintainer acceptance
+before the v0.3.0 Final RC task may be registered.
+
+The implementation Agent must acknowledge the exact committed Plan/Validation sources and refresh Git-private scope
+to revision 17 before focused validation or closeout documentation writes. Promotion, public/default changes, push,
+tag, Release and publication remain unauthorized.
+
+## 2026-08-30 exact vendor whitespace exception gate
+
+Revision 17 implementation checks are green, but the complete staged diff check found the same five upstream
+trailing-whitespace lines in the experiment and product copies of the reviewed `elk.bundled.js`. The bundle bytes are
+part of the accepted provenance contract, so changing them to satisfy a generic whitespace fixer is invalid.
+
+Scope revision 18 may add only two exact root `.gitattributes` entries with `-whitespace`, one for each reviewed bundle
+path named in the Plan. Acceptance requires:
+
+- both paths report `whitespace: unset` through `git check-attr`;
+- both files retain SHA-256 `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`;
+- the complete staged `git diff --cached --check` passes;
+- no wildcard JavaScript/vendor exemption, byte rewrite, eol override or repeated focused/browser suite is introduced;
+- the final branch is clean after one W7.3 Candidate commit.
+
+This path-specific metadata exception is not a test waiver and does not turn upstream whitespace into an authored-file
+policy. All formal Fast/Checkpoint and integrated-page evidence remain assigned to the later central fingerprint.
+
+## 2026-08-30 revision 17 focused closeout ledger
+
+Fact scope: Worktree／Candidate preparation on `codex/w7-3-workstream-relation-capture-confirmation`, based on
+`05c83b75723a9e6681c0885dd090606060cb696e`. The exact task-description source is
+`4522a5beec5d2ffdd90022197cf8c78ad7ea7faa`; Git-private scope revision 17 binds Plan blob
+`b8539fb6a4d7ab6e5551edd352fdf87d4bfe3511` and Validation blob
+`89b7ceb5b788b2195755ecab9c329a7873269ee6`. Validation was run with GPT-5.6 Sol／medium after the maintainer froze
+the accepted preview. No routed Fast／Checkpoint／Promotion／release workflow ran in this closeout.
+
+### Focused implementation checks
+
+- `python -m unittest tests.test_workstream_program_hierarchy tests.test_workstream_relation_graph_observatory -v`
+  — PASS, final closeout rerun 13/13 in 8.276s. The first run exposed two stale test expectations (the pre-closeout context-menu copy and
+  Observatory 0.1.18); they were updated to the accepted UI contract. A targeted inventory rerun then correctly
+  exposed `packages/component-versions.json` still at Observatory 0.1.18; the inventory was aligned to 0.1.19 and the
+  unchanged focused command passed. No identical failing command was rerun without a corrective write.
+- Vendor inventory — PASS: pinned local `elkjs@0.11.0`, EPL-2.0, 1,627,496 bytes, SHA-256
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`; bundle, license, package metadata and
+  provenance are present in Observatory package data. The first read-only probe looked for a nonexistent top-level
+  `.sha256` field and was non-green; the corrected probe consumed the versioned provenance schema and passed.
+- `python -c "import sys; sys.path.insert(0, r'packages/project-orrery-observatory/src'); from
+  project_orrery_observatory.workstream_graph_presentation import WORKSTREAM_GRAPH_JS;
+  sys.stdout.buffer.write(WORKSTREAM_GRAPH_JS.encode('utf-8'))" | node --check` — PASS. An earlier text-mode pipe
+  stopped at Windows GBK encoding before Node received bytes; the byte-safe command above is the accepted result.
+- Component inventory — PASS after closeout alignment: Core 0.1.19, CLI 0.1.22, Observatory 0.1.19, Harness JSON
+  0.1.2; all remain unreleased and public v0.2.0 metadata is unchanged.
+- First complete `git diff --cached --check` — NON-GREEN and closeout stopped: both exact vendored copies of
+  `elk.bundled.js` contain the same five upstream trailing-whitespace lines (202, 214, 217, 6584 and 6609). Rewriting
+  those bytes would invalidate the recorded SHA-256 and provenance. The command was not repeated unchanged, no
+  whitespace exemption or `.gitattributes` policy was invented outside the registered scope, and no Candidate commit
+  was created. Authored-file `git diff --check` had passed before the untracked vendor asset entered the index.
+
+### Real browser evidence
+
+- Loopback product page: `http://127.0.0.1:8766/workstream-relations.html#workstream-relation-graph`, generated from
+  the current Worktree only; the preview is ephemeral evidence, not a release artifact.
+- 1440×900 succession overview — PASS: 19 rendered task nodes, 14 rendered relation/series edges, page overflow-x 0,
+  default 100%, explicit fit 46%, and reset rebuild returned to 19/14 at 100%. The reset briefly unloads SVG content;
+  the recorded assertion waited for the stable rebuilt state rather than treating the 150ms intermediate frame as a
+  result.
+- Pointer selection of `W6.1 → CI6` — PASS: the semantic cyan edge became 4px／opacity 1 and opened the read-only
+  evidence inspector; no white task-card selection outline or graph execution action was introduced.
+- 390×844 — PASS: 19 nodes and 14 edges share facts with the visible static-flow `<details>` relation ledger,
+  default zoom is 100%, document overflow-x is 0, and browser console warning/error output is empty.
+- No remote／Team／delete action was executed. The central `127.0.0.1:63203` service was not stopped, reused or
+  rewritten.
+
+### Evidence boundary and handoff
+
+The green evidence above, together with the revision-18 resolution below, covers only focused Worktree Candidate
+closeout. It does not
+claim Canonical integration, public/default enablement, release readiness, real remote confirmation or double-machine
+acceptance. Central integration must first combine this W7.3 Candidate with CI7
+`111f4abc47b8122aee5469db4489ad6fb0dee75a`, resolve the final test routing fingerprint, run exactly one routed Fast
+and one Checkpoint there, and obtain final desktop/mobile acceptance of that exact integrated page before registering
+the v0.3.0 Final RC task.
+
+## 2026-08-30 scope revision 18 blocker resolution
+
+- Exact authority acknowledgment — PASS: task-description
+  `1e2582282c1cc11ed32250cb6453168088d7980f`, Plan blob
+  `cbe43f49516bab30373a8ec634dad9bb00991dc6`, Validation blob
+  `e8028acbe73c4dbd9377f88d18635e3fdfc43539`, and Git-private scope revision 18 were bound before the metadata write.
+- Root `.gitattributes` contains exactly two new `-whitespace` paths, one for each reviewed bundle; no wildcard,
+  vendor-tree, text or EOL exception was added.
+- `git check-attr whitespace -- <both exact paths>` — PASS: both report `whitespace: unset`.
+- `Get-FileHash -Algorithm SHA256 <both exact paths>` — PASS: both remain
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`; vendor bytes were not rewritten.
+- Complete `git diff --cached --check` — PASS, exit 0 after staging all revision-18 metadata and closeout records.
+- Revision-17 focused tests, Browser review and JavaScript syntax were not rerun.

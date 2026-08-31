@@ -9,7 +9,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 单一 Git 仓库根为 `D:\coding warehouse\project-orrery`；protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`，产品 source baseline 为 `9ee831f`。
 - 项目作者权威根为 `AGENTS.md` 与 `docs/`；`.project-orrery.json` 选择 `authority_status: integrated` 和 `authority_model_version: 1`。
 - 当前公开 v0.2.0 的发布源仍是 `skills/project-orrery/`。tag／ZIP／checksum／release manifest 指向历史发布提交 `20fc95b`，不随 main 上的实验源码改变。
-- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。W7.3 Graph-native correction Candidate 声明 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18；Core API 为 1，组件总状态为 `unreleased`。
+- 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。W7.3 revision-17 Candidate 声明 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19；Core API 为 1，组件总状态为 `unreleased`。
 - 薄平台层位于 `adapters/{codex,harness-json,claude-code,deepseek-harness}/`，当前 source 版本均为 0.1.1、`experimental`／`unreleased`。Adapter 不拥有 canonical 作者模板、State、ADR 或 Authority 规则。
 - 自托管观测台位于根 `scripts/docsite/`。integrated Candidate 新增 `Start Orrery.vbs`／`start-orrery.bat --console`、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 仍为 root-only/default-off consumer，没有进入默认发布模板或 v0.2.0 managed tools。
 - ADR-0016 的生产 Unified Shell 已在 integrated Candidate 实现：一个用户可见 listener／URL／导航壳，Broker／Coordinator 等内部 capability 由 supervisor 隐藏管理；当前没有公开默认切换，`start-docsite.bat` 保持 whole-shell rollback。
@@ -20,7 +20,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - W1–W7 协作源码已经进入 main：Git-private Workstream session、Scope/finding、review/integration/cleanup、Personal／Team projection、workspace maintenance、LAN discovery／manual Host switch、stacked lineage、relation event/graph、apply/undo/recovery contract 和只读 Graph consumer 均存在。
 - W7.3 Candidate 已实现 ADR-0017 relation capture：versioned append-only Git-common-private proposal／confirmation／role／series store，exact same-project ancestry `derived_from` 自动写入，四类 gate `depends_on`、Integrator-only `absorbs`、Personal／Team human integrator CAS，以及 CLI／Harness suggest/inspect/decision 边界。Agent、session、remote central request 与旧 revision 均不能确认；旧 v1 无 gate 关系保持 Unknown。
 - 当前 self-host 已显式登记 Authority A、CI、Unified U 系列，并保留 A4→A3、CI7→CI6 为待确认修复建议；没有从名称前缀推断或回写 effective 历史。另有真实 `W7.3-integration-acceptance` linked worktree 从 exact W7.3 implementation commit 自动形成 `derived_from`，对 CI6 的 integration gate 仍是非阻塞 proposal。
-- Graph-native correction 将显式 series 作为只读 presentation connector 和画布内 lane；它不进入 Core relation DAG、gate 或生命周期。detached series strip 已移除，comparison 改为默认关闭 overlay／折叠 drawer，冲突 lens 仍只消费确认冲突事实。
+- Graph projection 使用显式 program／phase／series metadata 组织任务，但 membership 绝不创建 relation、gate、closure 或 ownership。一个共享 semantic projection 同时供本地固定 `elkjs@0.11.0` 与显式手动 legacy engine 消费；ELK 是默认只读布局，失败时先显示同事实 ledger，不静默 fallback。comparison 保持默认关闭，冲突 lens 只消费有证据的确认冲突事实。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
 - 非权威研究控制面位于 `experiments/context-routing/`；大型原始运行根为 `D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库或发布包。
@@ -70,7 +70,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 默认 docsite／Skill template 尚未启用 Unified Observatory 或 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。
 - 没有真实双机 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。
 - W7 relation store 没有 self-host native apply 记录；旧 session 到 post-main closure 的兼容收口仍需保守人工流程。
-- W7.3 仍未获得 exact non-main SHA 的 Windows／Ubuntu Promotion，也未进入 main／public／default。当前 self-host 三条 `depends_on` 均只是待人工确认 proposal；没有把它们宣称为 effective dependency。
+- W7.3 focused Candidate closeout 已通过；scope revision 18 只为两份 exact vendored ELK bundle 设置路径级 `-whitespace`，两路径属性、SHA-256 与完整 staged diff check 均 PASS。中央整合后的 routed Fast／Checkpoint、exact non-main SHA Windows／Ubuntu Promotion 与 main／public／default 均未发生。当前 self-host 三条 `depends_on` 均只是待人工确认 proposal；没有把它们宣称为 effective dependency。
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。
 - Claude Code 尚未完成认证后的真实模型路由；DeepSeek 与 Codex evidence 只覆盖各自记录的精确 runtime 范围。
 - 自动 R1 脱敏导出器、跨平台 byte-for-byte archive 与 Brownfield Adoption 研究／Plan 均未实现。
