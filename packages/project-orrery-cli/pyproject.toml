@@ -8,8 +8,8 @@ version = "0.1.22"
 description = "Platform-neutral command line interface for Orrery"
 requires-python = ">=3.10"
 dependencies = [
-  "project-orrery-core==0.1.18",
-  "project-orrery-observatory==0.1.0"
+  "project-orrery-core==0.1.19",
+  "project-orrery-observatory==0.1.19"
 ]
 
 [project.scripts]

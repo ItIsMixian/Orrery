@@ -254,13 +254,19 @@
         "packages/*/pyproject.toml",
         "packages/*/src/*/__init__.py",
         "packages/*/src/*/component.json",
+        "packages/project-orrery-core/src/project_orrery_core/data/release-v*.json",
+        "packages/project-orrery-core/src/project_orrery_core/manifests.py",
+        "packages/project-orrery-cli/src/project_orrery_cli/context.py",
+        "packages/project-orrery-cli/src/project_orrery_cli/scaffold.py",
         "packages/project-orrery-core/src/project_orrery_core/templates/**",
         "skills/project-orrery/**",
         "skills/orrery-dispatch/**",
         "scripts/package_*.py",
         "tests/test_project_orrery.py",
         "tests/test_cli_wheel_installation.py",
-        "tests/test_brand_contract.py"
+        "tests/test_brand_contract.py",
+        "tests/fixtures/platform_neutral_phase0_baseline.json",
+        "tests/fixtures/brand/orrery-brand-contract-v1.json"
       ],
       "subsystems": [
         "release-and-toolchain"

@@ -38,6 +38,16 @@ def template_assets(context: CliContext) -> Iterable[tuple[Path, Path]]:
         if relative in seen:
             raise ValueError(f"duplicate Core/Observatory template path: {relative.as_posix()}")
         yield relative, source
+        seen.add(relative)
+    if context.runtime_root is not None:
+        for relative in context.managed_runtime:
+            if relative in seen:
+                raise ValueError(f"duplicate managed runtime path: {relative.as_posix()}")
+            source = context.runtime_root / relative
+            if not source.is_file():
+                raise FileNotFoundError(f"missing managed runtime file: {source}")
+            seen.add(relative)
+            yield relative, source
 
 
 def backup_file(target_root: Path, relative: Path, stamp: str, dry_run: bool) -> Path:
@@ -174,14 +184,15 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
         sources = list(template_assets(context))
     except (FileNotFoundError, ValueError) as exc:
         return _failure(args, "template_inventory_invalid", str(exc))
+    managed_paths = set(MANAGED_TOOLS) | set(context.managed_runtime)
     for relative, source in sorted(sources):
         destination = target / relative
-        content = (
+        content = source.read_bytes() if relative in context.managed_runtime else (
             rendered_content(projected_bytes(relative, source), replacements)
             if relative in MANAGED_TOOLS
             else rendered_bytes(source, replacements)
         )
-        if relative in MANAGED_TOOLS:
+        if relative in managed_paths:
             expected_hashes[relative.as_posix()] = hashlib.sha256(content).hexdigest()
 
         if not destination.exists():
@@ -196,7 +207,7 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
             actions.append(_action("keep", relative.as_posix(), reason="unchanged"))
             continue
 
-        if args.upgrade_tools and relative in MANAGED_TOOLS:
+        if args.upgrade_tools and relative in managed_paths:
             backup = backup_file(target, relative, stamp, args.dry_run)
             backup_relative = backup.relative_to(target).as_posix()
             actions.append(_action("backup", backup_relative, source_path=relative.as_posix()))
@@ -206,7 +217,7 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
         else:
             actions.append(_action("skip", relative.as_posix(), reason="existing_authored_file"))
             preserved_authored.append(relative.as_posix())
-            if relative in MANAGED_TOOLS:
+            if relative in managed_paths:
                 mixed_tools.append(relative.as_posix())
 
     toolchain_version = context.release.version
@@ -220,7 +231,7 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
         today=today,
         toolchain_version=toolchain_version,
         toolchain_status="mixed" if mixed_tools else "current",
-        managed_tools=[path.as_posix() for path in MANAGED_TOOLS],
+        managed_tools=[path.as_posix() for path in sorted(managed_paths)],
         expected_tool_hashes=expected_hashes,
     )
     manifest_text = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"

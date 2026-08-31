@@ -170,11 +170,13 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertEqual(pyproject["project"]["version"], versions["components"][name]["version"])
 
         core_release = json.loads(
-            (CORE_ROOT / "src" / "project_orrery_core" / "data" / "release-v0.2.0.json").read_text(
+            (CORE_ROOT / "src" / "project_orrery_core" / "data" / "release-v0.3.0.json").read_text(
                 encoding="utf-8"
             )
         )
         self.assertEqual(core_release, json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8")))
+        self.assertEqual(core_release["status"], "release-candidate")
+        self.assertIsNone(core_release["released"])
 
         canonical_root = CORE_ROOT / "src" / "project_orrery_core" / "templates" / "authority"
         compatibility_root = SKILL_ROOT / "assets" / "project-template"
@@ -199,6 +201,9 @@ class ProjectOrreryTests(unittest.TestCase):
         for relative in observatory["managed_tools"]:
             self.assertTrue((REPOSITORY_ROOT / relative).is_file(), relative)
             self.assertTrue((compatibility_root / relative).is_file(), relative)
+        self.assertEqual(len(observatory["managed_runtime"]), 102)
+        for relative in observatory["managed_runtime"]:
+            self.assertTrue((REPOSITORY_ROOT / relative).is_file(), relative)
 
         for name in ("install_project_orrery.py", "validate_installation.py", "check_project_orrery_update.py"):
             wrapper = (SKILL_ROOT / "scripts" / name).read_text(encoding="utf-8")
@@ -293,6 +298,22 @@ class ProjectOrreryTests(unittest.TestCase):
             )
             validated = run_python(standalone / "scripts" / "validate_installation.py", "--target", str(target))
             self.assertEqual(validated.returncode, 0, validated.stdout + validated.stderr)
+            environment = {
+                key: value for key, value in os.environ.items()
+                if key not in {"PYTHONPATH", "PYTHONHOME"}
+            }
+            offline_runtime = subprocess.run(
+                [sys.executable, "-X", "utf8", str(target / "scripts/docsite/serve_orrery.py"), "--help"],
+                cwd=target,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(offline_runtime.returncode, 0, offline_runtime.stdout + offline_runtime.stderr)
+            self.assertIn("Unified Observatory", offline_runtime.stdout)
 
     def test_fresh_install_validates_and_builds(self) -> None:
         with tempfile.TemporaryDirectory(prefix="project-orrery-test-") as temporary:
@@ -445,6 +466,17 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertIn("project-orrery/release-manifest.json", names)
             self.assertIn("project-orrery/scripts/check_project_orrery_update.py", names)
             self.assertIn("project-orrery/assets/project-template/scripts/docsite/llm_broker.py", names)
+            self.assertIn("project-orrery/packages/project-orrery-core/src/project_orrery_core/manifests.py", names)
+            self.assertIn("project-orrery/packages/project-orrery-cli/src/project_orrery_cli/scaffold.py", names)
+            self.assertIn("project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py", names)
+            self.assertIn("project-orrery/adapters/harness-json/run_harness.py", names)
+            self.assertEqual(len(names), 162)
+            manifest = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
+            path_list = "".join(f"{name}\n" for name in sorted(names)).encode("utf-8")
+            self.assertEqual(
+                hashlib.sha256(path_list).hexdigest(),
+                manifest["distribution"]["archive_path_list_sha256"],
+            )
             self.assertFalse(any("__pycache__" in name or name.endswith((".pyc", ".pyo")) for name in names))
 
     def test_provider_config_persists_models_without_plaintext_key(self) -> None:
