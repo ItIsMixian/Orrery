@@ -40,6 +40,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 ## Worktree 与事实作用域
 
 - 一个 Workstream 使用一个独立 branch＋linked worktree／clone；主 worktree只用于唯一整合。linked worktree 共享 Git object store 和 refs，但拥有独立 HEAD、index 与工作目录。
+- `V0.3.0-final-rc` 已从 exact `88d80df...` 注册到独立 `codex/v0-3-0-final-rc` branch/worktree；scope revision 1
+  仅完成只读 archive inventory 后停写。中央任务说明 revision 2 提交并由该 Workstream 刷新 scope 前，不能
+  写产品、运行测试或把 Candidate/Worktree 状态称为 public release。
 - Canonical／Candidate／Worktree／Local-only／Unknown 必须分别表达。Candidate HEAD 被 main 包含不自动产生 review package、closure record 或作者 Validation。
 - Workstream session、review、closure、maintenance 与 relation transaction 存在 Git-private 区域；它们是协调证据，不进入作者文档或发布资产，也不能替代 State／ADR／Validation。
 - 本机旧 session 的 lifecycle 可能落后于 Git ancestry。maintenance 在缺少 current closure／review／Validation 时必须保护目标；不得凭目录前缀、年龄或 branch 已进入 main 自动删除。

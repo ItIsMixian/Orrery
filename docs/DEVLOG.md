@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Inventory Gate and Scope Revision 2 Authorized
+
+- 独立 Sol-medium `V0.3.0-final-rc` 从任务说明版本 `88d80df...` 注册，Git-private scope revision 1/current，
+  clean worktree；只读 inventory 后无产品写入、测试、打包或远端操作。
+- proposed archive 为 162 entries、root `project-orrery/`、path-list SHA-256 `26d65705...`。它只是实现输入，
+  尚不是 archive/receipt/Candidate PASS。
+- inventory 暴露 CLI 0.1.22 仍 pin Core 0.1.18、clean scaffold 缺 embedded runtime projection、release notes
+  缺权威路径三项 blocker。scope revision 2 以精确 files 和 offline/self-contained/author-preservation contract
+  收口；Agent 必须读取新 commit 并刷新 scope 后才可恢复。push/main/tag/assets/Release 仍未授权。
+
 ## 2026-08-31 — Phase 0 Exact Unified Page Accepted
 
 - 维护者接受 exact clean `a2d7737802be66714ff88064820685de6e231e95` 页面；1440×900/390×844 为 7

@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 COMPLETE on accepted page `a2d7737...`; Phase 1 Final RC dispatch ready; no release operation authorized
+Status: Phase 0 COMPLETE on accepted page `a2d7737...`; Phase 1 Final RC registered and scope revision 2 authorized; no release operation authorized
 
 Date: 2026-08-30
 
@@ -304,6 +304,72 @@ Before additional Skill assets, templates, launchers or package inventory are ch
 an exact self-contained archive inventory and request a dated scope amendment. Phase 1 may inspect/build locally but
 may not push a ref, modify main, create a tag, create/upload assets or publish a GitHub Release. Those remain separate
 Phase 3/4 maintainer authorizations.
+
+### 2026-08-31 Phase 1 scope revision 2 — archive inventory and self-contained scaffold blockers
+
+`V0.3.0-final-rc` was registered in an isolated linked worktree on branch `codex/v0-3-0-final-rc`, with code base and
+scope-revision-1 task-description version both at
+`88d80df2a19c15ac0b9de3f439e20edf8ff0d7e8`. The Sol-medium Agent acknowledged the source, registered its
+Git-private scope and returned without product writes, tests, packaging or remote operations.
+
+Its proposed deterministic archive inventory contains 162 entries under root `project-orrery/`; the sorted path-list
+SHA-256 is `26d6570585b3507880f83c652000bdcc857e7bac3ea59866f06ad40abdb0bf5c`. The baseline is the tracked
+`skills/project-orrery/**` tree with that prefix removed, `packages/component-versions.json`, all tracked
+Core/CLI/Observatory package blobs, the five tracked Harness JSON Adapter blobs and root `LICENSE`, plus the exact new
+release-contract and Unified-template entries listed below. This accepts the inventory as revision-2 implementation
+input only; it is not a built archive, entry receipt, Candidate PASS or release fact. Any materially different entry
+set, archive root or source class requires another committed amendment before writing it.
+
+Read-only inventory found three blockers inside the accepted ADR-0021 design:
+
+1. CLI 0.1.22 still pins Core 0.1.18 even though the release Candidate inventory declares Core 0.1.19. The candidate
+   must use one exact compatible component set and may not hide the mismatch in packaging.
+2. The new-project launcher will call the projected `scripts/docsite/serve_orrery.py`, which imports embedded
+   Core/CLI/Observatory source. A clean offline scaffold must therefore receive the exact tracked runtime source it
+   needs; it may not depend on the repository checkout, a developer `PYTHONPATH`, network install, wheel/PyPI release
+   or an unrelated machine package. Existing author documents remain create-only/preserved, and `--upgrade-tools`
+   may update only the declared managed runtime/launcher allowlist after backup.
+3. Phase 1 requires human release notes but had no authority path. The canonical author document is
+   `docs/implementation/v0.3.0-release-notes.md`.
+
+Scope revision 2 authorizes only these product/document surfaces:
+
+- release contract/build/workflow: `skills/project-orrery/release-manifest.json`, `scripts/package_release.py`,
+  `.github/workflows/release.yml`, `packages/project-orrery-core/src/project_orrery_core/data/release-v0.3.0.json`
+  and `packages/project-orrery-core/src/project_orrery_core/manifests.py`;
+- component/scaffold projection: `packages/project-orrery-cli/pyproject.toml`,
+  `packages/project-orrery-cli/src/project_orrery_cli/context.py`,
+  `packages/project-orrery-cli/src/project_orrery_cli/scaffold.py`, and
+  `packages/project-orrery-observatory/src/project_orrery_observatory/component.json`;
+- exact new managed template entries:
+  `skills/project-orrery/assets/project-template/Start Orrery.vbs`,
+  `skills/project-orrery/assets/project-template/start-orrery.bat`, and under
+  `skills/project-orrery/assets/project-template/scripts/docsite/` the exact files
+  `build_authority_projection.py`, `build_personal_observatory.py`, `build_unified_observatory.py`,
+  `build_workstream_relation_graph.py`, `serve_orrery_control.py`, `serve_orrery.py` and
+  `serve_team_observatory.py`;
+- author guidance: `docs/implementation/v0.3.0-release-notes.md`,
+  `docs/implementation/v0.3.0-onboarding.md` and `docs/implementation/v0.3.0-upgrade-rollback.md`;
+- existing release/scaffold/runtime owners only as needed:
+  `tests/test_project_orrery.py`, `tests/test_cli_wheel_installation.py`,
+  `tests/test_authority_release_candidate_gate.py`, `tests/test_authority_update_compatibility.py`,
+  `tests/test_unified_observatory.py`, `tests/test_brand_contract.py`,
+  `tests/fixtures/platform_neutral_phase0_baseline.json`,
+  `tests/fixtures/brand/orrery-brand-contract-v1.json`, and—only if CI7 dry-run proves a generic routing gap—
+  `scripts/ci/change-mapping.json`, `tests/fixtures/ci-validation/change-portfolios-v1.json` and
+  `tests/test_ci_validation.py`;
+- this Plan, matching Validation, affected subsystem State, PROGRESS, HANDOFF, DEVLOG and existing indexes.
+
+The embedded package trees and Harness JSON files are builder inputs from exact committed Git objects, not permission
+to edit every included blob. The builder must fail on untracked/dirty source, symlink, duplicate/case-collision,
+absolute/parent path, missing/extra inventory or private/generated inputs; it must emit a deterministic entry receipt
+and the single ZIP/checksum pair required by ADR-0021. DSH Store, `orrery` alias, scheduler, automatic deletion,
+PyPI/wheels, independent Adapter releases and any new remote/default authority remain excluded.
+
+Before the first resumed product write, the Agent must read this committed revision, acknowledge its exact SHA and
+refresh `V0.3.0-final-rc` to Git-private scope revision 2. After implementation, CI7 dry-run/explain precedes any
+formal test lease; child feature suites are not manually replayed. Scope revision 2 still authorizes no push, main
+mutation, tag, asset upload or GitHub Release.
 
 ## Phase 1 — register Final RC and freeze inputs
 

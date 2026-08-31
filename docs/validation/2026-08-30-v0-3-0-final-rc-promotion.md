@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Phase 0 PASS — exact page `a2d7737...` accepted; Phase 1 Final RC, Candidate, Promotion and publication Pending
+Status: Phase 0 PASS — exact page `a2d7737...` accepted; Phase 1 scope revision 2 authorized, implementation and all later gates Pending
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -302,3 +302,26 @@ help present, zero horizontal overflow and empty console. AI remained disabled; 
 This closes Phase 0 only. The next authority commit records the acceptance and dispatches `V0.3.0-final-rc`; it is not
 itself a reviewed page SHA. Final RC must bind Candidate/runtime/Promotion evidence to its own later exact SHA. Public
 manifest, ZIP, push, main, tag, assets and Release remain Pending and separately authorized.
+
+## 2026-08-31 Phase 1 inventory gate and scope revision 2 — Pending Validation
+
+The isolated Sol-medium `V0.3.0-final-rc` Workstream began from exact
+`88d80df2a19c15ac0b9de3f439e20edf8ff0d7e8`, registered Git-private scope revision 1 and returned a clean read-only
+inventory without product writes or test/package/release execution. Its proposed 162-entry archive uses root
+`project-orrery/` and sorted path-list SHA-256
+`26d6570585b3507880f83c652000bdcc857e7bac3ea59866f06ad40abdb0bf5c`.
+
+The inventory is accepted only as planned input. It is not an archive receipt or PASS. Validation remains Pending for:
+
+- exact CLI 0.1.22 → Core 0.1.19 dependency agreement and one component inventory;
+- an offline clean scaffold whose Unified launcher imports only the archive-projected tracked Core/CLI/Observatory
+  source, with no repository checkout, developer `PYTHONPATH`, network, wheel or ambient package dependency;
+- create-only author-document preservation and backup-before-replace for every managed runtime/launcher upgrade;
+- exact new template entries and `docs/implementation/v0.3.0-release-notes.md` from the Plan;
+- exact-Git-object 162-entry construction, entry receipt, twice-built byte equality, secret/private/generated-source
+  exclusion, local Candidate portfolios and final runtime gates;
+- CI7 dry-run/explain before any formal lease and no manual replay of unaffected child suites.
+
+The Agent must refresh to Git-private scope revision 2 from the new committed task-description version before its
+first product write. A material inventory change stops for another authority amendment. No push, main, tag, asset or
+GitHub Release operation is authorized by this section.
