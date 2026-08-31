@@ -376,3 +376,39 @@ The assertion expected the previous six generic fixture IDs, while the current v
 
 Pending scope revision 5 is one exact test-expectation line, followed by one new-fingerprint Candidate dry-run and—if
 allowed—one fresh Candidate. No mapping/fixture/product change or partial substitute is accepted.
+
+## 2026-08-31 scope revision 5 Candidate/build/offline gates — PASS
+
+The task registered exact task-description `368d6caec6ac12b87fca89d6a9253d2097d4fb2c` and Git-private scope
+revision 5 before writes. Merge `ba2305555e30ee34c88bd7622d13aa8d02930fb8` preserves the prior task history and
+central authority as parents. Its only test change adds exact `release-candidate-packaging` at the start of the
+existing generic fixture-ID expectation; no assertion, fixture, mapping, router, product, budget or inventory changed.
+
+The one new-fingerprint Candidate dry-run selected 81 tests and returned exit 0, acceptance `shadow-allow`, timing
+`allow`, `runner_errors=[]` and surface fingerprint
+`f45307138700d074b7bc05dbeadb81365b8dc2f8f0022dd07aa378e83c3b875b`. The one fresh Candidate then consumed lease
+`9e039e9bcecf9cd60051d3d3994b3b934f35a495956d68b276d6e54bf08b0460` and completed 81/81 PASS in
+11.679034s test runtime, with 6.524088s router/setup, zero reruns, no timeout/interruption/runner error and
+`evidence_eligible=true`.
+
+Two repository-external output roots independently built the same exact Git objects. Both builds returned exit 0 and
+produced 162 entries with path-list SHA-256
+`26d6570585b3507880f83c652000bdcc857e7bac3ea59866f06ad40abdb0bf5c`; ZIP, checksum-file and deterministic receipt
+bytes were pairwise equal:
+
+| Object | SHA-256 |
+| --- | --- |
+| ZIP | `7a0cf3dd2a0681f9f1552e3142c49b14a06deca444051d0c178b577f5e759c33` |
+| checksum file | `ee2b6c80850c01685ae8fba903954ff57b84bed2b93778b1e26ffd81cc57988d` |
+| deterministic receipt | `b8034731704ce59a177d106af848ac4c7042eb023def849c78ceaad2a67a9677` |
+
+One external new-project portfolio extracted build A, removed `PYTHONPATH`/`PYTHONHOME`, disabled AI, directed proxy
+traffic to a refusing loopback endpoint and used no checkout/wheel/PyPI dependency. Packaged scaffold, packaged
+validator and projected Unified launcher `--help` each returned exit 0; help identified Unified Observatory. The
+target declares installed version 0.3.0, Authority Model 1, 120 managed tools, migration-pending authority and created
+no `__pycache__` directories.
+
+Artifacts remain outside the repository under
+`C:\Users\1\AppData\Local\Temp\orrery-final-rc-rev5-1e3cdfe36c744f2d81a285acffe4687e`. This is local Candidate,
+deterministic-package and one new-project offline evidence only. It is not dual-platform final runtime, Promotion,
+main, tag, asset upload or GitHub Release evidence; none of those operations ran.
