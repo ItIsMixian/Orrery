@@ -486,6 +486,20 @@ is authorized to:
 The existing `v0.2.0` tag/assets remain immutable. No force update, tag move/reuse, branch deletion, credential
 change, Provider call, PyPI/wheel publication or independent Adapter release is authorized.
 
+### 2026-08-31 scope revision 7 — pre-runtime PowerShell variable correction
+
+The first scope-revision-6 runtime orchestration stopped before its first installation/discovery/Codex subprocess
+because PowerShell treats local `$home` as the read-only built-in `$HOME`. The external root contains only the
+extracted exact archive; no user-scope install, Provider call, credential/config read or user-state mutation occurred.
+The failed command is preserved and is not rerun unchanged.
+
+Scope revision 7 authorizes only a new external orchestration command that replaces the local `$home` identifier with
+a task-specific non-system variable such as `$runtimeHome`. It may not assign or repurpose `$HOME`, `$home` or
+`$CODEX_HOME`. No repository file, Candidate byte, test, manifest, archive or runtime expectation may change. After
+refreshing Git-private scope revision 7, execute the complete scope-revision-6 Codex/Harness matrix once from the
+existing exact archive. A new non-green result stops without retry; green resumes the already-authorized Promotion
+sequence. GitHub Release remains withheld.
+
 ## Phase 1 — register Final RC and freeze inputs
 
 1. Create an isolated Sol-medium Final RC Workstream from the accepted central SHA with precise expected writes.

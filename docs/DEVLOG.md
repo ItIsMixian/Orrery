@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-31 — Final Runtime Pre-install Variable Failure; Corrected Orchestration Authorized
+
+- scope revision 6 首个 Codex lifecycle orchestration 在第一条安装/发现命令前失败：PowerShell 局部 `$home`
+  与只读 `$HOME` 大小写不敏感冲突。失败命令不重放。
+- 外部根只有已解压 exact archive；无 user-scope install、Codex subprocess、Provider call、credential/config
+  read 或用户状态变化。
+- scope revision 7 只允许把局部变量改为任务专用非系统名并完整运行一次；不改 repo/product/test/archive。
+
 ## 2026-08-31 — Final RC Runtime Through Tag Authorized; GitHub Release Withheld
 
 - 维护者要求持续推进到最终发布动作前再停止；exact release Candidate 固定为 `ba230555...`，不以之后的

@@ -79,7 +79,8 @@ Updated: 2026-08-31
     dry-run non-evidence/reuse refusal 写成 run refusal。scope revision 5 只修 stale fixture-ID expectation；
     exact `ba230555...` 新 fingerprint Candidate 81/81、双根 package bytes 相同、external offline new-project
     portfolio PASS。scope revision 6 已授权 final runtime、exact non-main Promotion、同 SHA main 与 annotated
-    tag；必须停在 GitHub Release 创建/asset upload 前。
+    tag；首个 runtime orchestration 在安装前因 `$home`/`$HOME` 变量冲突停止，用户状态未改变。scope revision
+    7 只允许用任务专用变量重建 orchestration 并完整运行一次；必须停在 GitHub Release 创建/asset upload 前。
 
 ## 不得外推的边界
 

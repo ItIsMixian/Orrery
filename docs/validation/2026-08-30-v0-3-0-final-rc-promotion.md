@@ -429,3 +429,11 @@ Pending evidence, in order:
 
 No GitHub Release or remote asset upload is authorized. Any non-green or identity mismatch stops without retry,
 force-push, tag movement or waiver unless separately recorded.
+
+The first runtime orchestration stopped before its first `New-Item`: a local PowerShell `$home` assignment collided
+case-insensitively with read-only `$HOME`. No installation, discovery, Codex subprocess, Harness request, Provider
+call, credential/config read or user-state mutation occurred. The exact failed command is not replayed.
+
+Scope revision 7 is Pending for a command-only local-variable rename to a task-specific non-system name, followed by
+one complete runtime matrix attempt on the unchanged exact archive. No repository/product/test/archive change is
+authorized.
