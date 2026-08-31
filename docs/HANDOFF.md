@@ -22,17 +22,18 @@ Updated: 2026-08-30
 - W7.3 revisions 7–10 的全局 rank、hard/soft program grouping、手写 packing/routing/label 页面均已被拒绝。
   ADR-0022 选择 ELK layout-only；ADR-0023 又保留手写 geometry 为 frozen/manual/visibly-labelled legacy 后手，
   禁止自动回退。Orrery 继续拥有事实选择与现有 SVG/frontend。
-- ADR-0018 authority-first 继续生效：维护者已接受 GX2 ELK 0.11.0/W phase small-multiple 视觉方向并要求接线。
-  scope revision 16 允许 product/vendor/component inventory 与真实本机预览写入，保留 frozen/manual legacy；
-  真实产品页获维护者接受前继续禁止所有测试流程、集成和 public/default/release。自动 receipt／first-write
-  enforcement 尚未实现。
+- ADR-0018 authority-first 继续生效：维护者已接受当前 W7.3 ELK 真实产品页作为 v0.3.0 收口方向，并把以后
+  的视觉问题延期处理。scope revision 17 冻结现有产品行为，只允许聚焦检查、分支文档同步和 clean W7.3
+  Candidate；正式 Fast/Checkpoint 在 W7.3+CI7 新中央 fingerprint 各运行一次。当前 dirty worktree 与旧
+  `5fee848`/`05c83b` 回执仍不是 exact-SHA PASS、Canonical 或 Release。自动 receipt／first-write enforcement
+  尚未实现。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
 - A4/U2.3 已本地合流：LF canonical inventory hash 解决 Windows CRLF 漂移，Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25、A4/Adapter/wheel 15/15 及 390×844 Browser 通过。页面 help x=0/width=390、横向溢出 0、唯一功能 Ask Docs、console 0 warning/error；未 Promotion／push／public switch／release。
-- CI7 原 Candidate `a520ebc` 已完成 mapping 精度与 total-cost diagnostics；维护者现批准在原任务追加
-  acceptance policy v1。任务必须从该 clean Candidate 确认新任务说明版本，使用 Sol medium；实现组合 gates、
-  surface-bound receipt、validation lease 和 no-repeat/predictive refusal，不修改 15/90 预算或发布 Authority。
+- CI7 clean `111f4ab` 已完成 mapping/cost、组合 acceptance gates、surface-bound receipt、validation lease 和
+  no-repeat/predictive refusal，不修改 15/90 预算或发布 Authority。`290482f` Checkpoint 42/42 PASS；唯一 Fast
+  对 42>20 在加载前非绿拒绝且未重跑。中央合流必须对新 fingerprint 重新路由并取得 fresh Fast/Checkpoint。
 - ADR-0021 已接受 REL3 六项选择并纳入最新 W7.3/CI7 scope：0.3.0 使用单一 self-contained ZIP，新项目
   Unified/Model 1/Rules 1，旧项目显式迁移，Codex final runtime blocker，byte-identical 默认门，main/tag/Release
   分权。Final RC 尚未注册，等待 W7.3/CI7 和最终网页验收；DSH/alias/scheduler 明确延期 0.3.1。
@@ -50,12 +51,13 @@ Updated: 2026-08-30
 9. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 10. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
 11. **Unified Observatory Candidate：** W7.2.3 与 U2.2 联合页面已启动供维护者复验，包含单一连续侧栏、密集 Maintenance 队列和最终 Graph 交互／视觉修正；维护者接受后再冻结 exact-SHA Promotion Candidate，不切换 public template／managed tools／Release。完整英文模式仍未实现。
-12. **W7.3 relation capture：** 当前分支保留 Core/capture/authority/inbox 与 legacy geometry；scope revision
-    16 现在接 pinned ELK、shared projection、W phase small multiples 和显式 legacy 到真实 Observatory。先给
-    维护者看产品页面，确认前不运行测试或中央集成。
+12. **W7.3 relation capture：** 当前 dirty 分支已接 pinned ELK、shared projection、W phase small multiples
+    和显式 legacy；维护者已接受页面。按 scope revision 17 只做 focused closeout、branch State/Validation/
+    DEVLOG/index 同步和 clean Candidate，不在旧 CI6 fingerprint 重放正式 Fast/Checkpoint。
 13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
-14. **CI7 validation governance：** 原 `a520ebc` 保留；按最新 Plan amendment 机械阻断“未接受先重测”和
-    “同指纹反复跑”。旧任务 shadow-compatible，新任务声明组合 gates；未取得新 Candidate 前不得外推已实现。
+14. **CI7 validation governance：** clean `111f4ab` 已实现组合 gates、lease、predictive refusal 与 no-repeat；
+    现有 Fast 非绿、Checkpoint 绿不能互相替代。下一步由唯一整合者合入 W7.3 后对新实际 diff 运行一次
+    fresh Fast/Checkpoint，并保留任何 over-selection refusal。
 15. **v0.3.0 Final RC：** ADR-0021/Approved Design/blocked Plan 已进入中央 authority。依赖完成后创建独立
     Sol-medium RC；只消费 child receipts，运行 integration/package/runtime/Promotion-owned gates，不得提前改
     public manifest、push ref、tag 或 Release。

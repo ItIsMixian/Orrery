@@ -30,10 +30,11 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
 - `codex/u1-u2-integration-baseline` 已吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；联合 feature merge 为 `0eaad30`，当前组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它在维护者接受、exact-SHA 双平台门和后续推广前不冒充 `origin/main` Canonical。
 - ADR-0018 已接受 authority-first Workstream dispatch：U2.3 已按两次任务说明版本完成并本地集成，W7.3 也已确认其 scope revision；自动 receipt／first-write enforcement 尚未实现。
-- ADR-0022 已接受 ELK.js 作为 Workstream Graph 唯一 layout/routing engine；它不改变现有 Orrery 前端或
-  事实选择。GX2 exact asset/provenance 与 W7.3 产品接线仍未完成，不能冒充页面已修复或 Release 已包含。
-- ADR-0023 修正删除/切换策略：手写 renderer 保留为 frozen、manual、visibly-labelled legacy engine；当前
-  仅允许 GX2 预览，维护者看图接受前 scope revision 12 的产品写入权限已撤回。
+- ADR-0022 已接受 ELK.js 作为 Workstream Graph 唯一正常 layout/routing engine；它不改变现有 Orrery 前端或
+  事实选择。GX2 provenance 与 W7.3 dirty product wiring 已存在，维护者已接受当前真实页面作为收口方向；
+  尚无 clean exact-SHA Candidate、当前实现测试回执、中央合流或 Release 事实。
+- ADR-0023 保留 frozen、manual、visibly-labelled legacy engine 并禁止静默回退；W7.3 scope revision 17
+  现只允许聚焦收口和干净 Candidate，正式 Fast/Checkpoint 转由合入 CI7 后的新中央 fingerprint 各运行一次。
 - S0 `orrery-dispatch` 两文件 source 与 PO enforcement 已进入本地 integration line并安装到当前本机 Codex home；标准 Skill 校验、generic routing 与本地门通过。它未发布，也不是 S1 Conductor 或宿主级 first-write enforcement。
 - PO1 source Candidate `93ddfb7` 已进入本地 integration line：dispatch Skill 强制非整合任务使用 `PO-DEC-*`，repository gate 拒绝同树重复正式 ADR 编号；A4 已规范化为 ADR-0019。
 - A4/U2.3 local integration 现为 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18、Harness JSON 0.1.2；Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25 和 390px Browser 通过，仍不等于 public/default/release。
@@ -47,8 +48,8 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - [x] [S0 Orrery Dispatch Skill](implementation/plans/2026-08-30-s0-orrery-dispatch-skill.md)：两文件 source Candidate 与 PO enforcement 已本地集成，并只安装到当前本机 Codex home；未进入发布包，S1 Conductor 仍是独立后续事项。
 - [ ] [Authority-first Workstream Dispatch](implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)：人工 authority-before-dispatch 契约生效；先完成 U2.3／W7.3 exact-SHA acknowledgment，再另立自动 receipt／first-write enforcement 产品阶段。
 - [x] [U2.3 Navigation & Live Task Visibility](implementation/plans/2026-08-30-u2-3-navigation-live-task-visibility.md)：导航/help、轻量全活动任务、“问文档”说明和中央移动复验已完成并本地集成；Promotion/public/default 仍未发生。
-- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：GX2 方向已接受；scope revision 16 接真实 Observatory、pinned local ELK 与 frozen/manual legacy，先交产品页面复验。维护者确认前仍禁全部测试流程和集成。
-- [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：保留 `a520ebc` routing/cost Candidate；新增组合 acceptance gates、surface receipt、validation lease、predictive refusal 和 no-repeat 强制，仍不改变层级证据、15/90 秒预算或 main 推广门。
+- [ ] [W7.3 Workstream Relation Capture](implementation/plans/2026-08-29-w7-3-workstream-relation-capture.md)：维护者已接受当前 ELK 产品页作为收口方向；scope revision 17 冻结视觉行为，只允许聚焦检查、分支文档同步与 clean Candidate。正式 Fast/Checkpoint 留给 W7.3+CI7 中央 fingerprint。
+- [ ] [CI7 Validation Routing Precision & Total-Cost Diagnostics](implementation/plans/2026-08-29-ci7-validation-routing-precision-and-cost-diagnostics.md)：clean `111f4ab` 已实现 acceptance gates、surface receipt、validation lease、predictive refusal 与 no-repeat；`290482f` Checkpoint 42/42 PASS，但 Fast 按预测门非绿拒绝，必须在中央集成 fingerprint 重新路由并取得新证据。
 - [ ] [U2.2／W7.2 联合验收](validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)：本地联合 Candidate 已就绪；等待维护者真实体验，之后再决定 exact-SHA Promotion。
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
 - [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：基础体验返工已进入联合 Candidate；W7.2/U2.2 后的维护者复验、public/default transition 与 Release 尚未完成。

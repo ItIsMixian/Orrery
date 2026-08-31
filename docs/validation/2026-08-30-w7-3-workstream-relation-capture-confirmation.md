@@ -2,7 +2,8 @@
 
 Date: 2026-08-30
 
-Status: PENDING — Core/capture Candidate retained; `05c83b` Graph UX rejected pending readable re-layout and maintainer re-acceptance
+Status: PENDING — maintainer accepted the current ELK product preview for closeout; exact clean Candidate and fresh
+central integration evidence remain pending
 
 Authority sources:
 
@@ -291,3 +292,29 @@ real Observatory must demonstrate:
 
 This is a Pending preview gate. A later maintainer response and task-description version are required before tests or
 integration can resume.
+
+## 2026-08-30 maintainer visual acceptance and scope revision 17 gate
+
+The maintainer accepted the current real W7.3 ELK product preview as sufficient for v0.3.0 closeout and explicitly
+deferred any later visual defects or refinements. Central Browser inspection covered the current total succession
+overview, edge selection/inspector, W task scope, module/context controls, dependency admission, relation-revision
+aggregation and zoom behavior. No test workflow was run during the preview iterations.
+
+This acceptance has a deliberately narrow meaning:
+
+- it closes the human visual gate and freezes the current behavior for closeout;
+- it authorizes focused implementation checks and creation of a clean W7.3 Candidate;
+- it does not upgrade the dirty worktree based on `05c83b` into a Candidate, Validation PASS, Canonical source or
+  release capability;
+- earlier `5fee848`/`05c83b` test receipts do not cover the current pinned-ELK and presentation diff;
+- the generated loopback preview is ephemeral evidence and is not an exact-SHA release artifact.
+
+Required next evidence is one focused W7.3 closeout ledger, updated branch State/Validation/DEVLOG/indexes, a clean
+Candidate SHA and component inventory. Formal routed Fast/Checkpoint move to the new central fingerprint after W7.3
+and CI7 `111f4abc47b8122aee5469db4489ad6fb0dee75a` are integrated; they must each run once there and cannot reuse or
+substitute earlier receipts. The exact integrated page still requires final desktop/mobile maintainer acceptance
+before the v0.3.0 Final RC task may be registered.
+
+The implementation Agent must acknowledge the exact committed Plan/Validation sources and refresh Git-private scope
+to revision 17 before focused validation or closeout documentation writes. Promotion, public/default changes, push,
+tag, Release and publication remain unauthorized.

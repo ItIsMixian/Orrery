@@ -845,3 +845,49 @@ accepts the real product page.
 Continue the same W7.3 task/worktree and preserve all retained Core/capture/authority/inbox and rejected-geometry
 evidence. Refresh Git-private scope to revision 16 after reading this amendment and the matching Validation section.
 Use GPT-5.6 Sol medium. Produce the real product preview and stop for central/maintainer review; no test workflow.
+
+## 2026-08-30 Maintainer Acceptance — Product Preview Closeout and Central Validation Handoff
+
+The maintainer has accepted the current real W7.3 ELK product preview as the v0.3.0 closeout direction and has deferred
+any later visual refinement to a future correction. This closes revision 16's preview-only stop, but it does not turn
+the dirty worktree, an earlier `05c83b` receipt or the generated local HTML into an exact-SHA Validation or release
+fact.
+
+### Frozen closeout surface
+
+- [ ] Preserve the accepted current behavior: pinned local ELK normal engine, frozen/manual/visibly-labelled legacy
+  engine, no silent fallback, shared semantic projection, W phase small multiples, primary-only module view, bounded
+  context layers, dependency endpoint admission, relation-revision aggregation, zoom without ELK rerun and the current
+  low-noise total succession overview.
+- [ ] Do not begin another visual redesign during closeout. A deterministic product assertion failure may receive the
+  smallest compatibility correction; a new UX direction, fact change or authority change stops for a new maintainer
+  decision.
+- [ ] Preserve every current dirty product/Core/capture/authority/inbox/vendor file. Do not reset, discard or replace
+  the accepted preview with the earlier committed renderer.
+
+### W7.3 closeout validation and Candidate
+
+- [ ] Run only focused W7.3 checks needed to bind the current implementation: relation Graph/program semantic
+  projection, vendored asset/license/package inventory, JavaScript load/syntax, representative desktop/mobile Browser
+  interactions and `git diff --check`. Record every command and non-green result without retrying unchanged failures.
+- [ ] Update the affected subsystem State, W7.3 Validation, DEVLOG and indexes from actual results, then create one
+  clean W7.3 Candidate commit and report its exact SHA and component inventory. Do not edit root PROGRESS/HANDOFF from
+  the feature branch.
+- [ ] Do not run CI6 routed Fast/Checkpoint on the pre-CI7 feature fingerprint. The earlier requirement for one routed
+  Fast and one Checkpoint is assigned to the clean central integration fingerprint after W7.3 and CI7 are combined,
+  as required by the Final RC Plan. This prevents duplicate replay and avoids treating CI6 over-selection as product
+  evidence.
+
+### Central handoff
+
+- [ ] The unique integrator combines the clean W7.3 Candidate, CI7 exact `111f4abc47b8122aee5469db4489ad6fb0dee75a`
+  and the current A4/U2.3 integration line, then reconciles State/Validation/DEVLOG/indexes and component versions.
+- [ ] On that new integrated fingerprint, CI7 must resolve or explicitly report Fast over-selection and obtain one
+  fresh routed Fast plus one fresh routed Checkpoint. Earlier W7.3/CI7 receipts cannot authorize the new SHA.
+- [ ] Rebuild the complete Unified Observatory from the exact integrated SHA for final desktop/mobile maintainer
+  acceptance. Only that accepted SHA may unblock creation of the Sol-medium v0.3.0 Final RC Workstream.
+
+Continue the existing W7.3 task and worktree. Read this amendment and the matching Validation section from the exact
+committed task-description version, acknowledge it and refresh Git-private scope to revision 17 before running any
+focused check or writing closeout documentation. Use GPT-5.6 Sol medium. Do not push, integrate, modify public/default
+behavior, run Promotion/release validation or publish.
