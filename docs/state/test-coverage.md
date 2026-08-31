@@ -100,12 +100,12 @@ Updated: 2026-08-31
   `test_ci_validation.py` 的 fixture-ID 期望漏掉已存在的 `release-candidate-packaging`。scope revision 5 只修
   这一行；新 fingerprint `f4530713...` 的 dry-run allowed，唯一 fresh Candidate 在 `ba230555...` 以 81/81
   PASS、zero rerun、evidence-eligible 完成。旧失败未重试、拆批或改写。
+- corrected final runtime 的 Codex/Unified/upgrade/migration/dependency/Skill lifecycle 已通过，但 final ZIP
+  direct Harness validate 在 CLI JSON 前因 extracted `assets/project-template/` 未被 runtime context 解析而
+  non-green；invalid request 仍 exit 2。scope revision 8 修复后必须在新 SHA 重建 Candidate/package/runtime。
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
 - CI7 clean Candidate 与 fresh central Fast/Checkpoint 已完成；exact non-main Windows／Ubuntu Promotion 仍待 Final RC。本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。
-- scope revision 6 的首个 Codex lifecycle orchestration 在任何安装、discovery probe 或 Codex 子进程前因
-  PowerShell `$home`／只读 `$HOME` 名称冲突 non-green。该 fingerprint 未重试；Windows Harness JSON 与其余
-  runtime matrix 未运行，因此 Candidate/package PASS 不能外推为 runtime PASS。
 - Unified runtime composition test 当前用 full Personal fixture 替代真实 U2.3 lightweight panel，因此没有覆盖
   Relation Inbox 对已移除 `.po-foot` 的依赖；`807096d...` 页面在人工 DOM 检查中发现该缺口。revision 5
   必须先改为真实轻量契约并给维护者看页，之后才允许 fresh routed validation。

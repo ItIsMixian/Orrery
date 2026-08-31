@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Local Candidate/package/offline PASS on `ba230555...`; scope revision 6 runtime STOP; Promotion/main/tag not started
+Status: Final runtime PARTIAL / Harness blocker; scope revision 8 Pending; Promotion/main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -413,7 +413,7 @@ Artifacts remain outside the repository under
 deterministic-package and one new-project offline evidence only. It is not dual-platform final runtime, Promotion,
 main, tag, asset upload or GitHub Release evidence; none of those operations ran.
 
-## 2026-08-31 scope revision 6 runtime and Promotion authorization — STOP / non-green
+## 2026-08-31 scope revision 6 runtime and Promotion authorization — Pending Validation
 
 The maintainer authorized continuous progression through final runtime, exact non-main Promotion, same-SHA protected
 main, annotated tag and immutable tag rebuild, with an explicit stop before GitHub Release creation or asset upload.
@@ -430,20 +430,34 @@ Pending evidence, in order:
 No GitHub Release or remote asset upload is authorized. Any non-green or identity mismatch stops without retry,
 force-push, tag movement or waiver unless separately recorded.
 
-The task registered exact task-description `0070645943ad8dd880c250ab97dd18ae949c615e`, refreshed Git-private scope
-revision 6 and merged that authority without changing the frozen Candidate release tree. Before runtime execution it
-recomputed the existing archive as 162 entries and SHA-256
-`7a0cf3dd2a0681f9f1552e3142c49b14a06deca444051d0c178b577f5e759c33`; the extracted runtime root is
-`C:\Users\1\AppData\Local\Temp\orrery-final-runtime-rev6-52a90b26ef11443d9746903356bd88b8`.
+The first runtime orchestration stopped before its first `New-Item`: a local PowerShell `$home` assignment collided
+case-insensitively with read-only `$HOME`. No installation, discovery, Codex subprocess, Harness request, Provider
+call, credential/config read or user-state mutation occurred. The exact failed command is not replayed.
 
-The first Codex lifecycle orchestration returned non-green before any installation, discovery probe or Codex
-subprocess. PowerShell rejected assignment to `$home` because names are case-insensitive and built-in `$HOME` is
-read-only (`Cannot overwrite variable HOME because it is read-only or constant`). Command setup stopped before its
-first `New-Item`; the external root therefore contains only the extracted archive. The task did not rename the
-variable and retry. It made zero Provider calls, did not inspect/copy credentials or real user configuration, did not
-create a temporary user-scope installation and had no user state to restore.
+Scope revision 7 is Pending for a command-only local-variable rename to a task-specific non-system name, followed by
+one complete runtime matrix attempt on the unchanged exact archive. No repository/product/test/archive change is
+authorized.
 
-Consequently final Codex lifecycle/runtime, Unified start/stop/restart, 0.2 update, migration/rollback, dependency
-failure, uninstall/reinstall and bounded Windows Harness JSON remain unvalidated. Per the exact no-retry rule,
-Promotion, push, main, tag, asset upload and GitHub Release were not attempted. A new task-description/scope decision
-is required before any runtime replay.
+## 2026-08-31 corrected runtime through Harness blocker — Pending Validation
+
+The corrected external orchestration retained exact `ba230555...` archive identity and did not modify the real user
+Skill/config or inspect credentials. Current completed checks are:
+
+- unique repo candidate discovery with the user Skill disabled per invocation;
+- real explicit Skill invocation with expected migration-pending integrated-gate refusal;
+- real implicit Skill selection with ordinary validator exit 0;
+- Unified start/HTTP 200/stop/restart twice with AI disabled;
+- v0.2→0.3 managed upgrade dry-run/apply with eight backups and byte-identical custom `AGENTS.md`;
+- Authority Model migrate/apply and receipt-bound restore to the original manifest hash;
+- missing embedded package failure closure;
+- repo Skill uninstall/reinstall discovery 1→0→1 with equal tree/trash hashes;
+- Harness invalid-argv exit 2, `launch=false`, and no environment sentinel leak.
+
+The normal bundled Harness validate request is non-green: the CLI child exits before JSON because the extracted
+archive's managed assets live at `assets/project-template/`, while `observatory_asset_root()` recognizes only wheel
+assets or source-checkout root tools. Direct CLI stderr ends with
+`RuntimeError: cannot locate packaged or source Observatory managed assets`; the Adapter correctly reports
+`cli_protocol_error`/exit 3.
+
+Scope revision 8 must fix only extracted release-root asset/runtime binding and add the exact final-archive Harness
+regression. Candidate/ZIP/runtime/Promotion evidence must be recreated on the new SHA; no prior PASS is reused.

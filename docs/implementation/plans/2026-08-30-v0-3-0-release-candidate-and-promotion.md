@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Local Candidate PASS on `ba230555...`; scope revision 6 runtime STOP after first non-green; remote actions not started
+Status: Scope revision 8 fixing final-archive Harness runtime blocker; Promotion/main/tag pending; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -486,15 +486,56 @@ is authorized to:
 The existing `v0.2.0` tag/assets remain immutable. No force update, tag move/reuse, branch deletion, credential
 change, Provider call, PyPI/wheel publication or independent Adapter release is authorized.
 
-#### Scope revision 6 execution stop
+### 2026-08-31 scope revision 7 — pre-runtime PowerShell variable correction
 
-The Final RC task registered exact task-description `0070645943ad8dd880c250ab97dd18ae949c615e` and refreshed its
-Git-private scope revision 6 before runtime work. It verified the frozen 162-entry archive SHA-256
-`7a0cf3dd2a0681f9f1552e3142c49b14a06deca444051d0c178b577f5e759c33` and extracted it to a repository-external
-root. The first Codex lifecycle orchestration then failed before installation or a Codex subprocess because its
-PowerShell variable `$home` collided with the read-only built-in `$HOME`. Per the no-retry rule, the task stopped
-without correcting and replaying the command. Harness JSON, Unified lifecycle, migration/rollback and all remote
-actions were not run. No Provider, credential, real user configuration or temporary user installation was touched.
+The first scope-revision-6 runtime orchestration stopped before its first installation/discovery/Codex subprocess
+because PowerShell treats local `$home` as the read-only built-in `$HOME`. The external root contains only the
+extracted exact archive; no user-scope install, Provider call, credential/config read or user-state mutation occurred.
+The failed command is preserved and is not rerun unchanged.
+
+Scope revision 7 authorizes only a new external orchestration command that replaces the local `$home` identifier with
+a task-specific non-system variable such as `$runtimeHome`. It may not assign or repurpose `$HOME`, `$home` or
+`$CODEX_HOME`. No repository file, Candidate byte, test, manifest, archive or runtime expectation may change. After
+refreshing Git-private scope revision 7, execute the complete scope-revision-6 Codex/Harness matrix once from the
+existing exact archive. A new non-green result stops without retry; green resumes the already-authorized Promotion
+sequence. GitHub Release remains withheld.
+
+### 2026-08-31 scope revision 8 — extracted release-root runtime resolution
+
+The coordinator completed the corrected external runtime orchestration through the first real product blocker.
+Exact archive identity remained 162 entries and ZIP SHA-256 `7a0cf3dd...`. On Codex CLI 0.151.0-alpha.7.2 with
+GPT-5.6 Sol medium, isolated repo discovery exposed exactly one candidate Skill; explicit invocation correctly failed
+closed on `--require-integrated` for a migration-pending scaffold, while implicit invocation selected the Skill and
+ordinary validation returned 0. Unified twice completed start→HTTP 200→stop/restart; v0.2 tool upgrade backed up all
+eight replaced tools and preserved the custom author-file hash; migration/apply/receipt-bound restore, dependency
+failure, and recoverable Skill discovery 1→0→1 all behaved as designed without changing the real user Skill.
+
+The bounded Harness invalid-argv request returned exit 2 and leaked no environment sentinel. The normal final-bundle
+validate request returned `cli_protocol_error` because its CLI subprocess crashed before JSON: from extracted root
+`project-orrery/packages/...`, `observatory_asset_root()` only searches package-local wheel assets or managed tools at
+the repository root. The final archive stores those tools under `assets/project-template/`; consequently direct
+embedded-source `repository_context()` cannot bind the Observatory asset root or release runtime root. This is a real
+self-contained runtime defect; Promotion remains blocked.
+
+Scope revision 8 authorizes only:
+
+- `packages/project-orrery-observatory/src/project_orrery_observatory/inventory.py`: recognize an extracted release
+  root only when its `release-manifest.json`, `packages/component-versions.json` and complete
+  `assets/project-template/` managed inventory all agree; preserve existing wheel and source-checkout resolution;
+- `packages/project-orrery-cli/src/project_orrery_cli/context.py`: when the resolved Observatory assets are the
+  extracted `assets/project-template/`, bind `runtime_root` to that exact release root so managed runtime projection
+  remains available;
+- `tests/test_project_orrery.py`: extend an existing release-package owner to invoke the bundled Harness JSON validate
+  request directly from an extracted archive, proving JSON exit 0 without checkout/wheel/PyPI or ambient package
+  dependency; keep invalid-argv failure closure and source/wheel behavior unchanged;
+- matching Plan/Validation/State/PROGRESS/HANDOFF/DEVLOG/index records and generic CI mapping only if dry-run finds an
+  unmapped exact path.
+
+No manifest/archive inventory/version/default/authority/UI/Adapter capability or test budget change is authorized.
+After the fix, a new exact SHA requires one Candidate dry-run/run, two-root deterministic rebuild, external offline
+portfolio and the full corrected final runtime matrix once. Any non-green result stops without retry. The previous
+`ba230555...` evidence remains immutable history and cannot be promoted. Remote operations and GitHub Release remain
+blocked until the new exact SHA is green.
 
 ## Phase 1 — register Final RC and freeze inputs
 

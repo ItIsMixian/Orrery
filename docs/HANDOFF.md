@@ -6,8 +6,7 @@ Updated: 2026-08-31
 
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
 - `V0.3.0-final-rc` exact `ba230555...` 已完成 Candidate 81/81、双根 byte-identical package 和一次外部
-  offline new-project scaffold/validate/Unified-help PASS；scope revision 6 首个 Codex lifecycle orchestration
-  在安装前因 PowerShell `$home`／只读 `$HOME` 冲突 non-green，未重试；其余 runtime matrix、Promotion 与发布操作未运行。
+  offline new-project scaffold/validate/Unified-help PASS；final runtime matrix、Promotion 与发布操作未运行。
 - 维护者已授权持续推进 final runtime、exact non-main Promotion、同 SHA protected main 与 annotated v0.3.0
   tag；GitHub Release 创建/asset upload 明确保留为最终停止门。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
@@ -80,8 +79,10 @@ Updated: 2026-08-31
     dry-run non-evidence/reuse refusal 写成 run refusal。scope revision 5 只修 stale fixture-ID expectation；
     exact `ba230555...` 新 fingerprint Candidate 81/81、双根 package bytes 相同、external offline new-project
     portfolio PASS。scope revision 6 已授权 final runtime、exact non-main Promotion、同 SHA main 与 annotated
-    tag，但首个 runtime orchestration 已 non-green 并按规则停止。新 task-description/scope decision 前不得
-    修正命令重试；Promotion/main/tag/GitHub Release 均未发生。
+    tag；首个 runtime orchestration 在安装前因 `$home`/`$HOME` 变量冲突停止，用户状态未改变。scope revision
+    7 corrected runtime 已通过 Codex/Unified/upgrade/migration/Skill lifecycle，但 final ZIP direct Harness validate
+    暴露 extracted asset/runtime root resolution defect。scope revision 8 精确修复后必须重建全部 exact-SHA
+    evidence；Promotion 未开始，最终仍停在 GitHub Release 创建/asset upload 前。
 
 ## 不得外推的边界
 
