@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Scope revision 9 Candidate/runtime PASS on `4556db3...`; second Promotion run authorized; GitHub Release withheld
+Status: Promotion run `33451288289` failed on exact `4556db3...`; scope revision 10 remediation authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -574,6 +574,55 @@ Scope revision 9 completed on exact `4556db3a8b75e9b92e3e2cfe9d229273b203ab33`. 
 `_common` module-name collision; it was not retried. The final regression uses a subprocess black-box and object-bound
 mock targets, preserving all 421 unittest IDs. Candidate 42/42, two-root package identity and the complete final
 runtime matrix are green. The promotion ref may now fast-forward from `e120aaa...` to `4556db3...` exactly once.
+
+### 2026-08-31 scope revision 10 — Promotion integration-drift remediation
+
+Remote Promotion run `33451288289` bound the checkout and inventory to exact
+`4556db3a8b75e9b92e3e2cfe9d229273b203ab33`. Preflight and both repository-gate jobs passed. Both OS aggregates
+recorded all 451 tests across 27 logical shards and 10 lanes, then failed closed: Ubuntu had 33 failing/error test IDs
+and Windows had the same 33 plus three Windows-only failures, for 36 unique failing IDs. The run is immutable and is
+not replayed.
+
+Downloaded receipts reduce those 36 failures to five bounded causes rather than 36 unrelated defects:
+
+1. source-checkout Skill wrappers now request managed release runtime from the Skill directory even though the
+   runtime lives at the repository root; the final extracted archive path remains correct;
+2. Windows `strftime` receives Chinese literal characters and can raise a locale encoding error while rendering the
+   Maintenance page;
+3. the experimental Authority candidate gate treats the mutable current 0.3.0 candidate manifest as the last
+   published release instead of the frozen bundled v0.2.0 contract;
+4. Promotion/tag workflows do not install the test-only `jsonschema` dependency required by two schema tests;
+5. existing tests still freeze pre-0.3 component versions, the English lineage label, pre-W7.3 legacy-session fixture
+   behavior, a partial wheel staging fixture, the pre-release managed-tool list, and mutable-current-manifest
+   assumptions.
+
+This revision authorizes only the following implementation surfaces:
+
+- `packages/project-orrery-cli/src/project_orrery_cli/context.py` for repository-root runtime resolution from a
+  source-checkout Skill while preserving extracted-root and wheel behavior;
+- `packages/project-orrery-observatory/src/project_orrery_observatory/personal_observatory.py` for locale-independent
+  Chinese activity labels;
+- `scripts/authority_release_candidate_gate.py` for an explicit frozen v0.2 published baseline and isolated legacy
+  scaffold;
+- `.github/workflows/validate.yml` and `.github/workflows/release.yml` for test-only `jsonschema` installation;
+- the existing failing owner files in `tests/`: `test_project_orrery.py`, `test_cli_wheel_installation.py`,
+  `test_collaboration_contract.py`, `test_collaboration_w3.py`, `test_collaboration_lineage.py`,
+  `test_workstream_relation_execution.py`, `test_authority_model_migration.py`,
+  `test_authority_model_restore.py`, `test_authority_update_compatibility.py`,
+  `test_workstream_relation_graph_observatory.py`, `test_authority_model_projection.py` and
+  `test_authority_observatory_shadow.py`;
+- matching Plan/Validation/State/PROGRESS/HANDOFF/DEVLOG/index records.
+
+No new unittest ID, inventory member, lane, budget, required-check name, public default, archive path, component
+version or release asset is authorized. The Workstream execution fixture may suppress automatic capture only inside
+its legacy-discovery fixture and must restore exact lineage bytes instead of bypassing production CAS. Existing
+product semantics must not be weakened to satisfy stale assertions.
+
+After implementation, run one Candidate dry-run against exact `4556db3...`; only an allowed fresh fingerprint may
+run once. A green Candidate is followed by two exact-Git builds, the existing bounded final-archive runtime matrix and
+one fast-forward Promotion update/run on the new SHA. No same-SHA rerun, per-lane retry or split substitute is
+allowed. Main, tag and GitHub Release remain blocked until both required checks are green; final publication still
+stops before GitHub Release creation or asset upload.
 
 ## Phase 1 — register Final RC and freeze inputs
 

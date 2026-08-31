@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Candidate/package/runtime PASS on `4556db3...`; second Promotion run Pending; main/tag not started
+Status: Promotion run `33451288289` FAIL on `4556db3...`; scope revision 10 remediation Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -550,3 +550,30 @@ The ZIP/checksum bytes exactly equal `e120aaa...`; only the source-bound receipt
 Two pre-formal local diagnostics omitted AI-disable and reached the configured provider path; neither is evidence and
 Provider cost may have occurred. All Candidate/runtime commands above explicitly disabled AI where applicable.
 Exact `4556db3...` is ready for one fast-forward update of `promotion/v0.3.0-rc` and one new Promotion run.
+
+## 2026-08-31 Promotion run `33451288289` — FAIL; scope revision 10 Pending
+
+The remote promotion ref and checkout both resolved to exact
+`4556db3a8b75e9b92e3e2cfe9d229273b203ab33`. Preflight passed with machine-only inventory output, and the Windows
+and Ubuntu repository gates both passed. Each aggregate consumed all 10 lane artifacts, 27 logical shards and 451
+recorded tests. The matrix then failed closed:
+
+- Ubuntu: 33 failing/error test IDs;
+- Windows: the same 33 plus three Windows-only failures;
+- union: 36 unique IDs; no missing lane, shard or test record.
+
+The Windows-only failures share one locale exception: Chinese literals were passed through `datetime.strftime`,
+which raised `UnicodeEncodeError` while rendering Maintenance. The common failures cluster as source-Skill runtime
+root resolution, a mutable-current-manifest baseline in the historical Authority gate, absent test-only
+`jsonschema`, and stale assertions/fixtures for current component versions, localized lineage, W7.3 automatic
+capture, release managed tools and 0.3 compatibility. These are actual receipt facts; no lane was retried.
+
+Raw remote evidence remains at GitHub Actions run `33451288289`. Downloaded aggregate receipts report
+`matrix_result=failure`, `gate_result=success`, exact SHA `4556db3...`, inventory SHA-256
+`895ca3c8a1dd6e15587392f9d937a2d5bfd8be4b42999ffbcc9be1c0e4f664d4`, manifest SHA-256
+`0499564622a9b6f6598f61c17f690ae4da7c6ab9503a1599e960ac7fa8ab3673` and mapping-registry SHA-256
+`7e0b17f7cfc1837096374a34bfa95854e4e5d1bc4c65e908445acfc5430bb683` on both OSes.
+
+Scope revision 10 is Pending. It may correct only the exact product/workflow/test surfaces listed in the Plan, must
+retain all test IDs and Promotion coverage, and must create a new SHA. `main`, `v0.3.0`, GitHub Release and asset
+upload have not started.
