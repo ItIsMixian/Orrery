@@ -42,3 +42,7 @@ are not routed Fast/Checkpoint evidence. Required next evidence is a versioned G
 human gate receipt, stable Fast/Checkpoint dry-run plans, one formal receipt for each stage, additive State/Validation/
 DEVLOG reconciliation, and final desktop/mobile review of the resulting clean exact SHA. Candidate/Promotion,
 manifest/package/runtime, push/main/tag/Release and publication remain out of scope.
+
+Initial runtime inspection found Core and Observatory `__version__` still at 0.1.18 while their merged pyproject,
+component and root inventory declare 0.1.19. Scope revision 2 must authorize the two exact `__init__.py` writes and
+record their alignment before CI7 computes the stable integrated fingerprint. No routed stage has started.

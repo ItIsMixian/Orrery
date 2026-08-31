@@ -43,6 +43,10 @@ until the merged source receives fresh CI7 evidence and exact-SHA webpage accept
   writes are limited to central State/Validation/DEVLOG/index reconciliation, component inventory, and a narrow
   `scripts/ci/change-mapping.json` correction plus its existing CI fixture/test only if the integrated dry-run proves
   over-selection. No product feature or release input may be added in this Workstream.
+- [ ] Reconcile runtime component constants with the merged inventory: Core and Observatory pyproject/component
+  metadata already declare 0.1.19, so the exact `packages/project-orrery-core/src/project_orrery_core/__init__.py` and
+  `packages/project-orrery-observatory/src/project_orrery_observatory/__init__.py` version constants must also be
+  0.1.19 before routing. This is inventory alignment only; no API/default/release change is authorized.
 - [ ] Create a Git-private human-experience gate receipt for the maintainer's accepted W7.3 product direction and this
   Phase 0 integration contract. The receipt grants validation entry only; it is not release operation authorization.
 - [ ] Run Fast and Checkpoint dry-run/explain first. A predictive or unknown-timing refusal is resolved or reported
