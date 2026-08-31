@@ -362,3 +362,25 @@ Branch commit `b9f9c82...` is preserved as the task's mistaken classification an
 revision 4 must append a correction, issue exactly one fresh Candidate lease/run for the already selected 81 tests,
 and—only after green—run the same-SHA deterministic build/offline portfolio. No second dry-run, router change, retry,
 manual split or substitute evidence is authorized.
+
+## 2026-08-31 scope revision 4 fresh Candidate — FAILED; STOP
+
+The task registered exact task-description `0508aec80a8f679e6804a8f634da8b7050342a14` and Git-private scope
+revision 4 before document reconciliation. Merge `ac44630c84afc84d887a63bd43541e41ecc0a38c` preserves both
+`b9f9c82...` and `0508aec...` as parents; its non-documentation product paths equal `ef145180...`.
+
+Exactly one fresh Candidate ran against explicit base `17bb70ba861c8f1f4be18fa11863e3cac7fc5c87`, task phase
+`candidate`, with AI disabled and without `--reuse`. Lease
+`60cb5ea140422731ae423f714b39d4b85082298c5da8b97461d1d1a0d34e7c20` was issued and consumed. The receipt
+binds surface fingerprint `09dde573a7bf981e57da8fdfe2f4790996273cd93796871f207acd568d5ebcd9`.
+
+Candidate completed 81 tests in 12.0614s with 80 successes and one failure; runner setup plus routing was 7.952336s,
+`runner_errors=[]`, no timeout/interruption, exit code 1, `outcome=failed`, `successful=false` and
+`evidence_eligible=false`. The sole failure was
+`test_ci_validation.CIValidationTests.test_generic_router_selects_docs_authority_and_collaboration_portfolios`:
+the actual generic portfolio list begins with existing `release-candidate-packaging`, while the hardcoded expected
+list begins with `docs-only` and omits that one entry.
+
+The failure is retained without retry, router/mapping/test/product/budget change or substitute test list. Per scope
+revision 4, no deterministic rebuild, external offline portfolio, Promotion, push, main, tag, asset or GitHub Release
+operation followed.

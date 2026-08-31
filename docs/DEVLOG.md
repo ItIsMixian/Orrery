@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Fresh Candidate Failed Once and Stopped
+
+- task 在首次纠正文档合并前登记 `0508aec...` 与 Git-private scope revision 4；merge `ac44630...` 保留
+  `b9f9c82...` 历史及中央纠正父链，非文档产品路径仍等于 `ef145180...`。
+- 唯一 fresh Candidate 使用 base `17bb70b...`、AI disabled、无 `--reuse`，消费 one-run lease 后执行 81 项：
+  80 success、1 failure、12.0614s test runtime、`runner_errors=[]`、exit 1、非 evidence-eligible。
+- failure 为 generic CI portfolio 的硬编码期望遗漏现有 `release-candidate-packaging`。按 revision 4 未重跑或
+  修改 router/mapping/test/product/budget；未运行 build/offline runtime、Promotion 或任何远端／发布动作。
+
 ## 2026-08-31 — Candidate Dry-run Non-evidence Correctly Distinguished from Refusal
 
 - REL4 merge `0f82d565...` 的唯一 Candidate dry-run 选择 81 tests，exit 0、acceptance shadow-allow、timing

@@ -3,9 +3,9 @@
 Validation records reproducible evidence for implementation and documentation claims.
 
 - [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — Phase 0 PASS;
-  release inputs are centrally integrated; the sole Candidate preview allowed a fresh run, while its fixed dry-run
-  non-evidence fields and reuse refusal were previously misclassified. Scope revision 4 authorizes exactly one fresh
-  Candidate; runtime, dual-platform Promotion, main, tag and Release remain Pending.
+  release inputs are centrally integrated; the preview classification was corrected, then the sole fresh Candidate
+  completed 81 tests with one CI registry expectation failure and stopped non-evidence-eligible. Runtime,
+  dual-platform Promotion, main, tag and Release remain Pending.
 - [2026-08-30 CI7 Validation Routing Precision & Total-Cost Diagnostics](2026-08-30-ci7-validation-routing-precision-total-cost.md) — clean Candidate and fresh central Fast/Checkpoint validate acceptance gates, validation leases, predictive refusal and no-repeat enforcement; prior refusal/failure evidence remains preserved.
 
 For each validation, record:

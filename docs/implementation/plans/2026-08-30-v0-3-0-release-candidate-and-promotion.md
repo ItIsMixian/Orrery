@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 COMPLETE; Phase 1 release inputs centrally integrated; scope revision 3 authorizes one Candidate dry-run path; no release operation authorized
+Status: Phase 0 COMPLETE; Phase 1 release inputs integrated; scope revision 4 fresh Candidate non-green and stopped; no release operation authorized
 
 Date: 2026-08-30
 
@@ -429,6 +429,10 @@ Candidate lease/run for the already selected 81 tests. No router, mapping, test,
 authorized. If Candidate is green, continue the already-authorized two-root deterministic build and external offline
 new-project portfolio on that same SHA. A non-green Candidate/build/runtime result stops without retry or substitute
 evidence. Push, main, tag, asset upload and GitHub Release remain forbidden at this scope.
+
+The authorized fresh Candidate ran exactly once on clean merge `ac44630c84afc84d887a63bd43541e41ecc0a38c`.
+It executed all 81 selected tests and failed one existing CI registry expectation, so scope revision 4 stopped before
+the two-root build or offline portfolio. This result is recorded in Validation; it does not authorize a retry or fix.
 
 ## Phase 1 — register Final RC and freeze inputs
 
