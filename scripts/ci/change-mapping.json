@@ -3008,7 +3008,6 @@
       "owner_surface": "Authority/Core",
       "owner_shard": "authority-core",
       "allowed_stages": [
-        "fast",
         "checkpoint",
         "candidate",
         "promotion"
@@ -3019,7 +3018,7 @@
         "ci-control",
         "ci-mapping-registry"
       ],
-      "reason": "actual-path precedence and fail-closed scope mutation contract"
+      "reason": "Checkpoint deep evidence for actual-path precedence and fail-closed overlap; Fast retains inventory and registry-mutation sentinels"
     },
     {
       "test_id": "test_ci_validation.CIValidationTests.test_aggregate_accepts_complete_once_only_results",
