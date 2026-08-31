@@ -51,6 +51,10 @@ until the merged source receives fresh CI7 evidence and exact-SHA webpage accept
   `vendor/...` entries from exact
   `packages/project-orrery-observatory/src/project_orrery_observatory/component.json`; do not copy vendor bytes into
   the repository root or Skill project template, and do not alter package-data inclusion, hashes or provenance.
+- [ ] Preserve the A4/U2.3 help-surface vocabulary during W7.3 integration. Exact
+  `packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py` must expose the existing
+  “事实与规则” label inside the read-only help/status panel while keeping the standalone Authority navigation absent.
+  This is copy reconciliation only; it adds no page, authority selection or action.
 - [ ] Create a Git-private human-experience gate receipt for the maintainer's accepted W7.3 product direction and this
   Phase 0 integration contract. The receipt grants validation entry only; it is not release operation authorization.
 - [ ] Run Fast and Checkpoint dry-run/explain first. A predictive or unknown-timing refusal is resolved or reported

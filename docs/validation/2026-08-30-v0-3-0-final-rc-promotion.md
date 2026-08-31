@@ -71,3 +71,9 @@ an incorrect test class name (the targets did not run), and one real component-b
 that W7.3 had listed package-local `vendor/...` files as root `managed_tools`; that contract would require nonexistent
 root/Skill-template duplicates even though the Graph correctly reads the package vendor directory. Scope revision 3
 must remove only those four manifest entries while preserving the package bytes and package-data configuration.
+
+After that correction, the exact component-boundary test and Unified host/origin/cookie safety test pass. The
+corrected Unified composition method runs but fails because the merged help panel omits the intended literal
+“事实与规则”; project principles and operating-rule content remain present. Scope revision 4 may restore that label
+in the existing help heading only. The two Harness PASS methods and already-green component/security methods are not
+rerun unchanged.
