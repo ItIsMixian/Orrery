@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Mechanical-derived Authority Correction Authorized
+
+- revision 6 已用三条 append-only `superseded` events 将 7 pending 收敛为 4；未删除历史、未确认关系。
+- 390px 实页显示剩余 Unknown lineage 卡仍有 Accept 和伪 dependency gate，违反 ADR-0017 的 Core-only
+  mechanical `derived_from` authority。revision 7 先登记后写入：Core 硬拒绝 human accept，Personal 只留
+  defer/reject；depends_on、Team request-only 与 Graph read-only 不变。
+- 新页面交给维护者前继续禁止 unittest/Fast/Checkpoint/Candidate/Promotion。
+
 ## 2026-08-31 — Phase 0 Automatic Unknown Lineage Supersession Authorized
 
 - revision-5 动态页恢复七入口与 Personal/Team 两个 inbox，但 7 条 pending 中有 4 条是同一个 Phase 0→U1-U2

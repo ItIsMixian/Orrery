@@ -14,7 +14,7 @@ A completed checklist is not evidence by itself; implementation, validation, and
 
 ## Plans
 
-- [2026-08-30 Orrery v0.3.0 Final RC and Promotion](plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md) — accepted release contract under ADR-0021; scope revision 6 adds append-only supersession for obsolete automatic Unknown lineage proposals and requires a repaired four-proposal preview before fresh routed validation or RC registration.
+- [2026-08-30 Orrery v0.3.0 Final RC and Promotion](plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md) — accepted release contract under ADR-0021; scope revision 7 restores Core-only effective `derived_from` authority and requires a four-proposal preview before fresh routed validation or RC registration.
 - [2026-08-30 GX1 Fireworks Tech Graph Evaluation](plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md) — isolated Candidate `f5fd5af` scored 8/12; accepted only as W7.3 design/geometry assistance and selective reimplementation evidence.
 - [2026-08-30 PO1 Provisional Decision Allocation Enforcement](plans/2026-08-30-po-decision-allocation-enforcement.md) — complete locally: dispatch-level ADR-0007 PO enforcement, duplicate numeric ADR repository refusal and A4 normalization to ADR-0019.
 - [2026-08-30 S0 Orrery Dispatch Skill](plans/2026-08-30-s0-orrery-dispatch-skill.md) — implemented two-file source Candidate for authority-first task creation and rescoping; not installed/released and not the future Conductor.

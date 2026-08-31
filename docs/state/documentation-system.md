@@ -84,4 +84,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
   但 Personal 被 quarantine。scope revision 5 已先登记，修复页面由维护者预览前禁止运行测试流程。
 - revision-5 动态预览已恢复 Personal/Team inbox placement，但显示四个同端点 automatic Unknown lineage
   proposals。revision 6 修 Core append-only supersession，而不是在 UI 中隐藏重复；维护者看修复页前仍禁测试。
+- revision-6 新服务已把 pending 收敛为四条，但 lineage 卡片仍显示不适用的 Accept/gate 控件。revision 7
+  保留人类 defer/reject，同时把 effective `derived_from` 恢复为 Core-only；页面确认前继续禁测试。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

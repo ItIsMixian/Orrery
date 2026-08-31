@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — scope revision 6 lineage-proposal supersession correction authorized; preview and fresh routing required
+Status: PENDING — scope revision 7 mechanical-derived authority correction authorized; preview and fresh routing required
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -177,3 +177,15 @@ Scope revision 6 is Pending until Core appends `superseded` to only the obsolete
 keeps one current proposal, preserves all history and leaves manual/effective relations untouched. A bounded
 self-host session refresh may exercise only that mechanical cleanup. Before the maintainer reviews the repaired four-
 proposal page, tests and formal validation remain prohibited; the old `f41b659...` receipts remain historical only.
+
+## 2026-08-31 mechanical `derived_from` authority mismatch — Pending Validation
+
+The revision-6 store repair is mechanically complete: three obsolete automatic proposal IDs received append-only
+`superseded` events and the new server projects four pending rows. Desktop and 390×844 DOM inspection show two inboxes,
+zero Team action buttons and zero document overflow. The lineage card still exposes Accept/change-gate controls even
+though ADR-0017 assigns effective authority exclusively to Core ancestry verification and the capture schema forbids a
+gate on `derived_from`.
+
+Scope revision 7 must prove the Core endpoint refuses human acceptance before role/evidence evaluation and the real
+Personal page exposes only defer/reject for this card. Dependency and Team behavior must remain unchanged. No tests,
+formal lease or release operation may run before the corrected preview is presented.

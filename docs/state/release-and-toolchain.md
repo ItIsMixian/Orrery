@@ -46,8 +46,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   与 Checkpoint 4/4 PASS，均 zero rerun；旧 fingerprint 的 Checkpoint failure 保留。此证据不等于 Candidate、
   Promotion 或 public release。
 - `807096d...` 的 full-page build 在接受前发现 lightweight Personal/Relation Inbox composition blocker；
-  revision 5 预览已恢复组合，revision 6 继续收口同端点 automatic Unknown proposal supersession。维护者接受
-  修复页并取得新 fingerprint 证据前，`f41b659...` receipts 不授权后续 source。
+  revision 5 已恢复组合，revision 6 已收口同端点 automatic Unknown proposals，revision 7 正在恢复
+  Core-only `derived_from` effective authority。维护者接受修复页并取得新 fingerprint 证据前，`f41b659...`
+  receipts 不授权后续 source。
 
 ## 兼容与安全边界
 

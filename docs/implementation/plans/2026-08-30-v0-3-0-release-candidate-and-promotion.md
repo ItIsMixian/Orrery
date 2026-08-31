@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 scope revision 6 lineage-proposal supersession correction authorized; preview required before fresh routed validation; no RC task registered
+Status: Phase 0 scope revision 7 mechanical-derived authority correction authorized; preview required before fresh routed validation; no RC task registered
 
 Date: 2026-08-30
 
@@ -134,6 +134,30 @@ gate remains unchanged: before the maintainer sees the repaired page, no unittes
 Candidate/Promotion/release command may run. The preview must show four pending proposals total—one current automatic
 Unknown lineage proposal plus the three distinct existing dependency proposals—while Personal local confirmation,
 Team request-only and Graph read-only boundaries remain unchanged.
+
+### 2026-08-31 scope revision 7 — mechanical `derived_from` cannot be human-confirmed
+
+The four-proposal mobile preview shows the remaining automatic Unknown `derived_from` card with “接受”, a dependency-
+gate selector defaulting to “实现完成前”, and “更改阶段”. This violates ADR-0017: effective `derived_from` authority
+belongs only to Core after exact ancestry verification, and only `depends_on` carries `required_for`. Existing Core
+would let a local task owner reach `accept_proposal()` for `derived_from`; later evidence checks usually fail closed,
+but the authority route and UI affordance are still wrong.
+
+Revision 7 enforces the already accepted authority matrix without adding an ADR or schema version:
+
+- `accept_proposal()` rejects every `derived_from` before role or evidence evaluation with an explicit mechanical-
+  authority error; no human role can override ancestry;
+- local capability remains sufficient to defer/reject an Unknown observation, but the Personal inbox renders only
+  `暂缓／Unknown` and `拒绝` for `derived_from`; it renders no Accept, gate selector or change-gate action;
+- `depends_on` and `absorbs` retain their existing authorized actions, Team remains request-only, and Graph remains
+  action-free;
+- Core and Unified regression contracts record the refusal/UI split, but no test command runs before the next real
+  desktop/mobile preview.
+
+Authorized paths remain the four revision-5/6 product/test files and the listed authority/evidence documents. The
+preview gate now additionally requires one lineage card with two local actions, three dependency cards with their
+existing gate controls, zero Team decision buttons, four total pending proposals and zero document horizontal
+overflow.
 
 ## Phase 1 — register Final RC and freeze inputs
 

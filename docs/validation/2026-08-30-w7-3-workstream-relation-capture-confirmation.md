@@ -439,3 +439,10 @@ are historical task-base observations, not four semantic decisions. Phase 0 revi
 append-only `superseded` lifecycle for obsolete tool-owned Unknown lineage proposals, preserves every event and leaves
 one current proposal. Human proposals, confirmations and effective relations remain out of scope. The maintainer must
 see four total pending rows after bounded self-host repair before any post-correction test runs.
+
+## 2026-08-31 mechanical-derived authority blocker
+
+After supersession, the one remaining Unknown lineage card incorrectly exposes human Accept and dependency-gate
+controls. ADR-0017 makes verified Core ancestry the only effective authority for `derived_from`. Phase 0 revision 7
+therefore hard-refuses human acceptance and limits the Personal card to defer/reject; Team and Graph stay action-free.
+This is Pending until the real page shows the corrected controls, before any tests run.
