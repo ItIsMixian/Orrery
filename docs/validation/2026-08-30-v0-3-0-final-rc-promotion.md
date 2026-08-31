@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — revision-11 mapping deep-check tier correction required before a new fingerprint can receive formal leases
+Status: PENDING — Phase 0 product/mapping routed evidence PASS; final exact-SHA page and Final RC remain incomplete
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -262,3 +262,31 @@ router setup p95 is 9.320101s and the actual-path mapping deep check is 0.817371
 
 Revision 11 moves only that existing test to Checkpoint; two mapping Fast sentinels remain. Expected Fast is 19 with
 predicted p95 below 10 seconds; Checkpoint stays 30. Formal runs remain zero for this fingerprint.
+
+## 2026-08-31 final Phase 0 product/mapping receipts
+
+Policy v5 first attempted to bind the no-policy fingerprint; formal Fast refused before lease because policy-expanded
+owner-test paths changed the effective fingerprint. Policy/receipt v6 then bound exact fingerprint
+`4b4c56c5cef2998674712ef6bbb203e3defae7955b69f1561c93a05b97d6e06f`; both policy dry runs reported human gate
+`receipt-verified` and timing `allow`.
+
+| Stage | Result | Test runtime | Router setup | Runner setup | Lease |
+| --- | --- | ---: | ---: | ---: | --- |
+| Fast | 19/19 PASS | 0.170343s | 4.990714s | 4.047859s | `3f3a4b5d1efb99e01520b4810d43b3108b974511c75eb73428d8a558f8d4ca28` |
+| Checkpoint | 30/30 PASS | 7.119383s | 5.003357s | 4.165602s | `cb33b55640c8af1f7b575bc2cf19875b511d105e6154386bae7fe0e94ec3b8db` |
+
+Both receipts bind head `74afb9894aeee21c1131f3f8f3c70556563eba13`, explicit base `2aa1c614...`, report
+zero reruns and are evidence-eligible. AI remained disabled. Exact Git-private outputs are
+`.git/orrery/ci-validation/phase0/fast-formal-rev11-v6.json` and
+`.git/orrery/ci-validation/phase0/checkpoint-formal-rev11-v6.json`; they are not release assets.
+
+Evidence boundary:
+
+- the revision-9 Fast 20/20 PASS and Checkpoint 29/30 failure remain immutable old-fingerprint receipts;
+- the later 41/51 and 20/30 predictive refusals loaded no tests;
+- the exact direct Core focused process is `Unknown`, not PASS, because its final exit code was not retained; no rerun;
+- the current exact Core owner is Promotion-only and remains required in Final RC Promotion;
+- this upcoming docs-only reconciliation is not retroactively folded into the `74afb...` product receipt. The final
+  page must bind the docs SHA, and Final RC Candidate must validate the complete release-input SHA.
+
+No Candidate, packaging/runtime, remote push, Promotion, main, tag, asset or Release operation has run.

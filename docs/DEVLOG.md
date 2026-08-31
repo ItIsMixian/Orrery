@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Revision-11 Routed Evidence Complete
+
+- policy/receipt v6 绑定 `74afb989...`、scope 11 与 fingerprint `4b4c56c...`；AI disabled，human/timing gates
+  均 allow。
+- unique Fast 19/19 PASS（0.170343s test runtime，9.038573s setup/build）；unique Checkpoint 30/30 PASS
+  （7.119383s，9.168959s setup/build）；均 evidence-eligible、zero rerun。
+- revision-9 Fast green/Checkpoint failure、policy stale refusal、41/51 与 20/30 predictive refusal继续保留。
+  direct Core focused outcome 为 Unknown，未重跑，Promotion 仍持有 exact owner。
+- Phase 0 只剩 docs-only evidence commit 与其 exact-SHA final page acceptance；未注册 Final RC。
+
 ## 2026-08-31 — Phase 0 Revision-11 Mapping Deep-check Tier Correction
 
 - revision-10 rollback 恢复真实窗口 20/30；Checkpoint 14.991s allowed，Fast 10.300s refused。

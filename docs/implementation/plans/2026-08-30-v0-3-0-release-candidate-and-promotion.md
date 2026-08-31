@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 revision-11 mapping deep-check tier correction authorized; no RC task registered
+Status: Phase 0 product/mapping routed evidence PASS; final exact-SHA webpage acceptance pending; no RC task registered
 
 Date: 2026-08-30
 
@@ -16,8 +16,8 @@ Approved Design: [v0.3.0 Release Scope and Default Matrix](../../design/v0-3-0-r
   complete; only the exact integrated page acceptance remains open.
 - [x] CI7 acceptance gates/validation lease/no-repeat/predictive refusal has integrated State/Validation.
 - [x] A4/U2.3 current central source and component versions are reconciled against final W7.3/CI7.
-- [ ] Child receipts are current for exact integrated surfaces; the `f41b659...` receipts remain valid historical
-  evidence but do not cover the real lightweight Personal/Relation Inbox composition blocker found on `807096d...`.
+- [x] Child and Phase 0 receipts are current for their exact product/mapping surfaces. Current Fast/Checkpoint bind
+  `74afb9894aeee21c1131f3f8f3c70556563eba13`; final docs/page SHA remains a separate pending gate.
 - [x] ADR-0021/default/distribution matrix remains unchanged.
 
 Until all gates pass, do not register Final RC, modify public manifest/components/workflow, push a ref, create a tag or
@@ -27,9 +27,8 @@ build release assets.
 
 1. [x] Unique integrator merges accepted dependencies into a clean central descendant and reconciles State/Validation/
    DEVLOG/indexes additively.
-2. [ ] Run CI7-selected integration Fast and Checkpoint once. The `f41b659...` run is preserved; after the revision-5
-   product correction and maintainer preview acceptance, route the corrected exact source once without replaying
-   unaffected child suites.
+2. [x] Run CI7-selected integration Fast and Checkpoint once on the final product/mapping fingerprint without replaying
+   unaffected child suites. Current result is Fast 19/19 and Checkpoint 30/30 PASS on `74afb989...`.
 3. [ ] Start the exact integrated Unified page; maintainer accepts all primary pages at 1440×900 and 390×844, including
    global stop/rollback, zero overflow and zero console warning/error.
 4. [ ] Bind acceptance to the source SHA. Any change after acceptance requires a new page review.
@@ -258,6 +257,22 @@ Fast to Checkpoint/Candidate/Promotion. Fast retains exact inventory-staleness a
 sentinels; Checkpoint retains all three plus the generic portfolio gate. No ID, assertion, budget, mapping, required
 check or Promotion coverage changes. Expected new plan is Fast 19 below 10 seconds and Checkpoint 30; refusal stops
 without a lease.
+
+### 2026-08-31 revision-11 final Phase 0 routed evidence
+
+Final product/mapping source `74afb9894aeee21c1131f3f8f3c70556563eba13`, base `2aa1c614...`, policy v6 and
+fingerprint `4b4c56c5cef2998674712ef6bbb203e3defae7955b69f1561c93a05b97d6e06f` produced:
+
+- Fast 19/19 PASS, 0.170343s test runtime, 9.038573s setup/build, zero reruns, evidence-eligible;
+- Checkpoint 30/30 PASS, 7.119383s test runtime, 9.168959s setup/build, zero reruns, evidence-eligible.
+
+The earlier revision-9 Fast PASS and Checkpoint failure remain historical; neither was reused. The direct Core focused
+process has Unknown final status because its execution channel lost the exit code and was not rerun. Its exact owner
+remains Promotion-only and will run in Final RC Promotion.
+
+The next commit changes only author evidence records. It does not rewrite the product/mapping receipt SHA. Build the
+Unified page from that clean docs SHA and obtain final desktop/mobile maintainer acceptance; Final RC registration
+remains blocked until then. Final RC Candidate later validates the complete release-input SHA including these records.
 
 ## Phase 1 — register Final RC and freeze inputs
 

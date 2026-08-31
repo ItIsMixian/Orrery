@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS (CI7 feature Candidate); Phase 0 revision-11 tier correction and new-fingerprint evidence remain Pending
+Status: PASS — CI7 feature Candidate and Phase 0 revision-11 product/mapping Fast/Checkpoint evidence are green
 
 Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
 `3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
@@ -144,3 +144,8 @@ new fingerprint; the failed lease remains blocked and is never retried.
 Revision-10 rollback restores 20/30, but Fast's 9.320s setup p95 plus the 0.817s actual-path deep check exceeds the
 10-second predictive cap. Revision 11 moves that one existing check to Checkpoint while preserving two Fast mapping
 sentinels and all higher-stage coverage; it does not raise a budget or weaken Promotion.
+
+Current Phase 0 exact `74afb989...` / fingerprint `4b4c56c...` completes one Fast 19/19 and one Checkpoint 30/30,
+both evidence-eligible with zero reruns. The actual-path deep check runs in Checkpoint; Fast retains inventory and
+registry-mutation sentinels. Formal test runtimes are 0.170343s and 7.119383s. Prior refusal/failure receipts remain
+unchanged, and complete Promotion is still owned by Final RC.

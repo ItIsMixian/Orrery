@@ -2,8 +2,8 @@
 
 Date: 2026-08-30
 
-Status: PASS (focused Candidate); central revision-7 correction preview accepted, fresh routed evidence Pending under
-v0.3.0 Phase 0. Prior routed receipts do not cover corrected source.
+Status: PASS — focused Candidate, revision-7 corrected preview and Phase 0 product/mapping routed evidence are green;
+final exact-SHA page remains owned by v0.3.0 Phase 0.
 
 Authority sources:
 
@@ -450,3 +450,7 @@ This is Pending until the real page shows the corrected controls, before any tes
 The maintainer subsequently confirmed the real revision-7 page with four pending rows, lineage defer/reject only,
 dependency gate controls preserved, Team request-only and zero desktop/mobile overflow. This authorizes source freeze
 and fresh CI7 routing; it is not final exact-SHA page or release acceptance.
+
+Final Phase 0 source `74afb989...` completes Fast 19/19 and Checkpoint 30/30 under fingerprint `4b4c56c...`, both
+evidence-eligible and zero rerun. The Core exact lineage/supersession owner remains Promotion-only; its direct focused
+attempt is Unknown and was not repeated. Final RC Promotion must execute it before release.

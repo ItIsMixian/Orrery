@@ -31,7 +31,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - revision-6 self-host repair 已给三个旧 automatic Unknown proposals 追加 `superseded`，当前 pending 为一个
   Unknown lineage 加三个 distinct dependencies。现有 Core/UI 仍错误暴露 human Accept/gate 给
   `derived_from`；revision 7 Worktree correction 已恢复 Core-only mechanical authority，页面获维护者确认，
-  但源码尚待冻结提交和 fresh routed evidence。
+  source 已冻结并在 `74afb989...` 取得 Fast 19/19、Checkpoint 30/30；最终 docs-SHA 页面仍待确认。
 - Graph projection 使用显式 program／phase／series metadata 组织任务，但 membership 绝不创建 relation、gate、closure 或 ownership。一个共享 semantic projection 同时供本地固定 `elkjs@0.11.0` 与显式手动 legacy engine 消费；ELK 是默认只读布局，失败时先显示同事实 ledger，不静默 fallback。comparison 保持默认关闭，冲突 lens 只消费有证据的确认冲突事实。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
