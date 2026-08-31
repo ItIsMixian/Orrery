@@ -91,7 +91,6 @@ def tree_entries(source_sha: str) -> list[dict[str, Any]]:
                 "content": content,
             }
         )
-    entries.sort(key=lambda item: item["archive_path"].casefold())
     names = [entry["archive_path"] for entry in entries]
     if len(names) != len(set(names)) or len(names) != len({name.casefold() for name in names}):
         raise ValueError("duplicate or case-colliding archive paths")
@@ -128,7 +127,21 @@ def main() -> int:
             raise ValueError("release manifest builder contract does not match this builder")
 
         entries = tree_entries(source_sha)
-        path_list = "".join(f"{entry['archive_path']}\n" for entry in entries).encode("utf-8")
+        configured_paths = manifest["distribution"].get("archive_paths")
+        if not isinstance(configured_paths, list) or not all(isinstance(path, str) for path in configured_paths):
+            raise ValueError("release manifest archive_paths must be an ordered string array")
+        if (
+            len(configured_paths) != len(set(configured_paths))
+            or len(configured_paths) != len({path.casefold() for path in configured_paths})
+        ):
+            raise ValueError("release manifest archive_paths contain duplicates or case collisions")
+        entries_by_path = {entry["archive_path"]: entry for entry in entries}
+        if set(entries_by_path) != set(configured_paths):
+            missing = sorted(set(configured_paths) - set(entries_by_path))
+            extra = sorted(set(entries_by_path) - set(configured_paths))
+            raise ValueError(f"archive inventory path mismatch: missing={missing}, extra={extra}")
+        entries = [entries_by_path[path] for path in configured_paths]
+        path_list = "".join(f"{path}\n" for path in configured_paths).encode("utf-8")
         path_list_hash = sha256(path_list)
         expected_count = int(manifest["distribution"]["archive_entries"])
         expected_paths = str(manifest["distribution"]["archive_path_list_sha256"])
