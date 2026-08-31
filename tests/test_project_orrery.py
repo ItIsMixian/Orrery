@@ -315,6 +315,44 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertEqual(offline_runtime.returncode, 0, offline_runtime.stdout + offline_runtime.stderr)
             self.assertIn("Unified Observatory", offline_runtime.stdout)
 
+            harness_request = root / "harness-validate-request.json"
+            harness_request.write_text(
+                json.dumps({
+                    "schema_version": 1,
+                    "command": "validate",
+                    "arguments": {"target": str(target)},
+                }),
+                encoding="utf-8",
+            )
+            harness = subprocess.run(
+                [
+                    sys.executable,
+                    "-X",
+                    "utf8",
+                    str(standalone / "adapters" / "harness-json" / "run_harness.py"),
+                    "--request",
+                    str(harness_request),
+                    "--python-path",
+                    str(standalone / "packages" / "project-orrery-core" / "src"),
+                    "--python-path",
+                    str(standalone / "packages" / "project-orrery-observatory" / "src"),
+                    "--python-path",
+                    str(standalone / "packages" / "project-orrery-cli" / "src"),
+                ],
+                cwd=root,
+                env=environment,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            self.assertEqual(harness.returncode, 0, harness.stdout + harness.stderr)
+            harness_payload = json.loads(harness.stdout)
+            self.assertEqual(harness_payload["status"], "ok")
+            self.assertEqual(harness_payload["command"], "validate")
+            self.assertTrue(harness_payload["data"]["valid"])
+
     def test_fresh_install_validates_and_builds(self) -> None:
         with tempfile.TemporaryDirectory(prefix="project-orrery-test-") as temporary:
             target = Path(temporary)

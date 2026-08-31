@@ -23,6 +23,10 @@ class CliContext:
 def repository_context() -> CliContext:
     asset_root = observatory_asset_root()
     runtime_root = asset_root if (asset_root / "packages" / "component-versions.json").is_file() else None
+    if asset_root.name == "project-template" and asset_root.parent.name == "assets":
+        release_root = asset_root.parent.parent
+        if (release_root / "packages" / "component-versions.json").is_file():
+            runtime_root = release_root
     return CliContext(
         release=default_release_contract(),
         authority_root=authority_template_root(),
