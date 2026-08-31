@@ -103,6 +103,9 @@ Updated: 2026-08-31
 - relation capture 还缺少“任何 human role 都不能接受 `derived_from`”的明确回归，Unified 也未断言 lineage
   卡片无 gate/accept。revision 7 已写入这两项契约且页面获维护者确认；测试尚未执行，下一步只走 CI7
   dry-run 和 current-fingerprint one-run leases。
+- post-freeze 两组 dry-run 均在加载测试前失败关闭：先发现两个未登记新 ID，折叠后再发现
+  `relation_inbox.py` unmapped。revision 8 不增 test ID，而是建立 exact relation-capture surface、把 inbox
+  归入 Unified shell，并用 data-only portfolios 防止错误选择 slow Maintenance fixture。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

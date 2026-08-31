@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Revision-8 Precise Routing Authorized
+
+- revision-7 source 冻结后，首对 dry-run 因两个新增 unittest ID 未登记而在加载前拒绝；断言随即折叠进
+  existing owners，inventory 不增长。第二对 dry-run 又因 exact `relation_inbox.py` unmapped 拒绝；仍无测试。
+- revision 8 只做 data-only generic mapping：relation capture 从 coarse Maintenance 拆出，inbox 归 Unified
+  shell，existing exact owner 进入 Fast/Checkpoint，并用 portfolios 禁止 slow Maintenance/Graph 误选。
+- 15/90 budgets、stage authority、421 final IDs、Promotion、required checks 与 release 权限均不变。
+
 ## 2026-08-31 — Phase 0 Revision-7 Preview Accepted
 
 - 维护者确认 `127.0.0.1:8770` 修复页：7 个入口、4 条 pending、lineage 仅 defer/reject、三条 dependency

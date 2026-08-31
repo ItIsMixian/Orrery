@@ -41,7 +41,8 @@ Updated: 2026-08-31
   Personal/Relation Inbox 锚点不兼容。revision 5 预览已恢复组合；同页的四个同端点 automatic Unknown
   lineage proposals 已由 revision 6 append-only supersession 收敛为一个。lineage 卡仍错误显示 Accept/gate，
   revision 7 已恢复 Core-only effective authority；维护者确认修复页，现在只允许冻结 source 和 fresh CI7
-  route，不得手工重放 child suites。
+  route，不得手工重放 child suites。source `15f013b` 保持 421 final IDs；两次 dry-run 均在 test loading 前
+  拒绝，revision 8 仅补 precise generic mapping。
 
 ## 当前可继续的线路
 
@@ -62,8 +63,8 @@ Updated: 2026-08-31
 13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 与 current fingerprint fresh Fast 3/3、Checkpoint 4/4
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
-15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` 进入 scope revision 7；先让唯一 lineage
-    卡只保留 defer/reject、Core 拒绝 human accept；维护者已确认四条待确认页面。现在冻结源码并 fresh route、同步
+15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` 进入 scope revision 8；revision-7 页面已确认，
+    现在先修 unmapped/coarse relation surfaces 并重新 dry-run，不运行未获 lease 的测试。允许后才 fresh route、同步
     evidence、重建 final docs SHA；全部通过后才创建独立 Sol-medium RC；
     RC 只消费 child receipts 并运行 integration/package/runtime/Promotion-owned gates，不得提前改 public
     manifest、push ref、tag 或 Release。

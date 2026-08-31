@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 revision-7 preview accepted; source freeze and fresh routed validation authorized; no RC task registered
+Status: Phase 0 revision-8 precise CI mapping correction authorized after dry-run refusal; no RC task registered
 
 Date: 2026-08-30
 
@@ -169,6 +169,34 @@ Accepted preview facts are: seven navigation identities, no unavailable primary 
 cards, one lineage card with only defer/reject and no select, three dependency cards with existing gate controls, zero
 Team decision buttons, and zero document horizontal overflow at 1280×720 and 390×844. This acceptance is not the final
 exact-SHA page gate, Candidate, Promotion or release authorization. No test ran before the confirmation.
+
+### 2026-08-31 scope revision 8 — precise relation capture and inbox validation routing
+
+After source freeze, both Fast and Checkpoint dry runs refused before issuing a plan or loading tests. The first pair
+found two new unittest IDs; their assertions were folded into existing owner tests so the final inventory does not
+grow. The second pair then found exact `relation_inbox.py` unmapped. It also confirms the existing
+`collaboration-maintenance` `workstream_*.py` glob would route a relation-capture-only correction through unrelated
+slow workspace-maintenance evidence.
+
+Revision 8 authorizes a data-only generic mapping correction, not a task-specific router branch:
+
+- add exact `collaboration-relation-capture` for `workstream_relation_capture.py`, its v2 schema/fixture and existing
+  `test_workstream_relation_capture.py`; remove only those exact items from `collaboration-maintenance` while leaving
+  other collaboration, relation execution/graph/program and maintenance coverage unchanged;
+- add exact `relation_inbox.py` to the existing `observatory-shell` surface because it is composed and secured by the
+  single Unified shell; do not map it to Graph or Maintenance;
+- move existing relation-capture test dependencies to the new surface. Keep every existing test ID; allow the existing
+  `test_registration_auto_derived_from_is_exact_and_idempotent` owner at Fast/Checkpoint/Candidate/Promotion so the
+  new supersession and mechanical-authority assertions receive direct evidence without adding a test;
+- add versioned routing portfolios proving capture changes exclude the slow maintenance fixture and inbox changes
+  select the existing Unified owner without Graph/Maintenance expansion;
+- modify only `scripts/ci/change-mapping.json` and
+  `tests/fixtures/ci-validation/change-portfolios-v1.json`; `tests/test_ci_validation.py` may change only if the
+  existing data-driven portfolio reader cannot consume the new entries.
+
+No new product, schema, budget, stage meaning, required check or Promotion inventory is authorized. After the mapping
+commit, rerun Fast/Checkpoint dry-run only. If timing is Unknown, use at most one CI7 bounded focused triage for the
+exact owner before issuing formal leases; otherwise issue one fresh Fast and one fresh Checkpoint as already accepted.
 
 ## Phase 1 — register Final RC and freeze inputs
 

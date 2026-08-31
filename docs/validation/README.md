@@ -2,7 +2,7 @@
 
 Validation records reproducible evidence for implementation and documentation claims.
 
-- [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — ADR-0021 and revision-7 preview are accepted; fresh routing, final exact-SHA webpage, manifest, packaging, runtime, Promotion, main, tag and Release remain Pending.
+- [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — ADR-0021 and revision-7 preview are accepted; precise revision-8 mapping, fresh routing, final exact-SHA webpage, manifest, packaging, runtime, Promotion, main, tag and Release remain Pending.
 - [2026-08-30 CI7 Validation Routing Precision & Total-Cost Diagnostics](2026-08-30-ci7-validation-routing-precision-total-cost.md) — clean Candidate and fresh central Fast/Checkpoint validate acceptance gates, validation leases, predictive refusal and no-repeat enforcement; prior refusal/failure evidence remains preserved.
 
 For each validation, record:

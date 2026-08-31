@@ -49,6 +49,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   revision 5 已恢复组合，revision 6 已收口同端点 automatic Unknown proposals，revision 7 正在恢复
   Core-only `derived_from` effective authority。维护者已接受修复预览；取得新 fingerprint 证据前，
   `f41b659...` receipts 仍不授权后续 source。
+- revision-7 source 已冻结，但 fresh CI7 dry-run 因 unregistered temporary IDs／unmapped inbox 两次在测试加载
+  前拒绝；IDs 已折叠，revision 8 只补 precise generic mapping。当前仍无 Final RC 或 release input。
 
 ## 兼容与安全边界
 

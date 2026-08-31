@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS (clean Candidate plus fresh central routed evidence); prior exact-SHA Fast refusal and old-fingerprint Checkpoint failure remain preserved
+Status: PASS (CI7 feature Candidate); new Phase 0 product source requires revision-8 precise mapping and fresh routed evidence
 
 Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
 `3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
@@ -122,3 +122,11 @@ This closes fresh central Fast/Checkpoint evidence, not Candidate or Promotion. 
 requires exact-SHA desktop/mobile Unified acceptance before Final RC registration. A later Final RC must run only
 release-owned gates, then push an exact non-main SHA and obtain both hosted required checks; this local integration
 does not promote main, change public manifest/defaults, tag or publish a Release.
+
+## 2026-08-31 Phase 0 revision-8 mapping intake
+
+Post-preview source introduces no new final unittest IDs after folding assertions into existing owners. Dry-run
+correctly refuses exact unmapped `relation_inbox.py`; no lease or test loaded. Revision 8 may split relation capture
+from the coarse maintenance surface and map inbox to Unified shell using generic paths plus data-only portfolios. It
+must not change 15/90 budgets, stage authority, required-check names or Promotion inventory. Fresh Fast/Checkpoint
+remain Pending until the corrected dry-run allows them.

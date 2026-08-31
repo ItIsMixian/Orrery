@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — revision-7 preview accepted; source freeze and fresh routed validation required
+Status: PENDING — revision-8 precise CI mapping correction required after dry-run refusal
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -207,3 +207,19 @@ formal lease or release operation may run before the corrected preview is presen
 
 The preview acceptance authorizes source freeze and fresh routed validation. It does not close the final exact-SHA
 page gate or authorize Final RC registration.
+
+## 2026-08-31 post-freeze routing refusals — Pending Validation
+
+Frozen product source began at `6c585f904fdd59529934ac8716972f7c04c44ac3`; the two new regression bodies were
+then folded into existing owner methods at `15f013bfb474d252f9650b3d76d69762c5659b20` so no unittest ID was added.
+No test loaded in either step.
+
+- First Fast/Checkpoint dry-run pair: refused because the two temporary new method IDs were unregistered. No output
+  plan, lease or test run was produced.
+- Second pair after folding: refused because exact product path
+  `packages/project-orrery-observatory/src/project_orrery_observatory/relation_inbox.py` and its expected-write entry
+  were unmapped. Again no plan, lease or test run occurred.
+
+Revision 8 is Pending until generic relation-capture/inbox mappings and data-only portfolios are committed. It must
+avoid selecting the unrelated slow maintenance fixture and preserve all Promotion coverage. Formal runs remain zero
+for the post-correction source.
