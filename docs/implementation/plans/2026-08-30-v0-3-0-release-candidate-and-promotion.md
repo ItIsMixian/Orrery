@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 COMPLETE; Phase 1 release inputs centrally integrated; scope revision 3 authorizes one Candidate dry-run path; no release operation authorized
+Status: Local Candidate PASS on `ba230555...`; scope revision 6 authorizes runtime through annotated tag; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -450,6 +450,41 @@ Scope revision 5 completed on exact `ba2305555e30ee34c88bd7622d13aa8d02930fb8`: 
 two-root deterministic build and external offline new-project portfolio are green. These results close only the
 bounded local gates authorized above; Phase 2's remaining migration/runtime matrix and all Promotion/publication
 authority remain open.
+
+### 2026-08-31 scope revision 6 — final runtime, Promotion, main and tag authorization
+
+The maintainer instructed the coordinator to continue without stopping until the final publication action is next.
+This is action-time authorization for all intermediate gates below, while explicitly withholding GitHub Release
+creation/upload. Exact frozen Candidate is `ba2305555e30ee34c88bd7622d13aa8d02930fb8`; later evidence-only authority
+commits are not substituted for it.
+
+Before any remote mutation, the existing Sol-medium Final RC task may run the remaining Phase 2 runtime matrix from
+the exact Candidate archive only:
+
+- bounded real Codex install/discovery/explicit-and-implicit invocation, Unified start/stop/restart, 0.2 update,
+  migration/rollback, dependency failure, uninstall/reinstall and author-file preservation;
+- Harness JSON Windows request/failure/remove with `launch=false`, no Provider secret exposure and no source-checkout
+  dependency; Ubuntu execution remains owned by exact-SHA Promotion;
+- any temporary user-scope installation must have an exact recoverable backup and restore the pre-run state;
+  credentials are neither copied nor inspected. A safe isolation failure is non-green, not permission to weaken the
+  runtime claim.
+
+No code/test/manifest/archive change is authorized. A runtime failure stops for a new SHA or explicit scope decision;
+no unchanged retry or partial-runtime substitution is allowed. If the runtime matrix is green, the unique integrator
+is authorized to:
+
+1. push only exact Candidate `ba230555...` to `refs/heads/promotion/v0.3.0-rc`, verify remote equality and allow the
+   existing Promotion workflow to run once;
+2. require both `smoke-test (windows-latest)` and `smoke-test (ubuntu-latest)` plus exact inventory/package receipts
+   on that SHA; any non-green run stops without force-push or same-SHA replay;
+3. after both required checks pass, fast-forward protected `main` to the same SHA and verify remote equality;
+4. create and push one annotated `v0.3.0` tag targeting the same SHA, wait for its read-only verification workflow,
+   rebuild the ZIP/checksum/entry receipt from the immutable tag and compare identities;
+5. stop before `gh release create`, Release asset upload or any equivalent GitHub Release mutation, and present the
+   complete evidence/known-limitations package to the maintainer.
+
+The existing `v0.2.0` tag/assets remain immutable. No force update, tag move/reuse, branch deletion, credential
+change, Provider call, PyPI/wheel publication or independent Adapter release is authorized.
 
 ## Phase 1 — register Final RC and freeze inputs
 

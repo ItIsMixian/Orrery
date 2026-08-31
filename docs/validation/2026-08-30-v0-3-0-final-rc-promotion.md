@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Phase 0 PASS; Phase 1 release inputs centrally integrated; exact Candidate/runtime, Promotion and publication Pending
+Status: Local Candidate/package/offline PASS on `ba230555...`; final runtime, Promotion, main and tag Pending; GitHub Release withheld
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -412,3 +412,20 @@ Artifacts remain outside the repository under
 `C:\Users\1\AppData\Local\Temp\orrery-final-rc-rev5-1e3cdfe36c744f2d81a285acffe4687e`. This is local Candidate,
 deterministic-package and one new-project offline evidence only. It is not dual-platform final runtime, Promotion,
 main, tag, asset upload or GitHub Release evidence; none of those operations ran.
+
+## 2026-08-31 scope revision 6 runtime and Promotion authorization — Pending Validation
+
+The maintainer authorized continuous progression through final runtime, exact non-main Promotion, same-SHA protected
+main, annotated tag and immutable tag rebuild, with an explicit stop before GitHub Release creation or asset upload.
+The only release Candidate remains exact `ba2305555e30ee34c88bd7622d13aa8d02930fb8`.
+
+Pending evidence, in order:
+
+- final-archive Codex lifecycle/runtime matrix and bounded Windows Harness JSON, with temporary user state restored;
+- remote `promotion/v0.3.0-rc` equality to the Candidate SHA;
+- one Promotion run with both named required checks and exact Windows/Ubuntu inventory/package receipts green;
+- protected `main` equality to the same SHA;
+- immutable annotated `v0.3.0` tag target, green tag verification workflow and tag rebuild identities.
+
+No GitHub Release or remote asset upload is authorized. Any non-green or identity mismatch stops without retry,
+force-push, tag movement or waiver unless separately recorded.

@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Runtime Through Tag Authorized; GitHub Release Withheld
+
+- 维护者要求持续推进到最终发布动作前再停止；exact release Candidate 固定为 `ba230555...`，不以之后的
+  evidence-only commit 替换。
+- scope revision 6 依次授权 final Codex/Harness runtime、`promotion/v0.3.0-rc` exact push、双 required checks、
+  同 SHA protected main、annotated `v0.3.0` tag 与 immutable tag rebuild。
+- `gh release create`、asset upload 或等价 GitHub Release mutation 明确未授权；任一 non-green/identity mismatch
+  均停止且不 force/retry/move tag。
+
 ## 2026-08-31 — Final RC Scope Revision 5 Local Gates PASS
 
 - 登记 task-description `368d6ca...`／Git-private scope revision 5 后，merge `ba230555...` 只在既有 generic

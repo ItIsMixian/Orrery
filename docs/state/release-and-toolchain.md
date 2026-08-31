@@ -13,6 +13,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   evidence；exact `ac44630...` 的 stale expectation 已在 scope revision 5 单行修正。`ba230555...` 已取得
   Candidate 81/81、双根 byte-identical package 与一次 external offline new-project PASS，但仍无
   dual-platform Promotion/public evidence。
+- scope revision 6 已获得 final runtime、exact non-main Promotion、同 SHA protected main 与 annotated tag 的
+  action-time authorization；GitHub Release create/upload 仍未授权。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。
