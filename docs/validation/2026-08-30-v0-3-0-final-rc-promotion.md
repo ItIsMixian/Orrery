@@ -46,3 +46,7 @@ manifest/package/runtime, push/main/tag/Release and publication remain out of sc
 Initial runtime inspection found Core and Observatory `__version__` still at 0.1.18 while their merged pyproject,
 component and root inventory declare 0.1.19. Scope revision 2 must authorize the two exact `__init__.py` writes and
 record their alignment before CI7 computes the stable integrated fingerprint. No routed stage has started.
+
+Scope revision 2 alignment is complete: a direct source import reports Core 0.1.19, CLI 0.1.22 and Observatory
+0.1.19, exactly matching `packages/component-versions.json`; `git diff --check` is clean. This is a component inventory
+check, not routed stage evidence.
