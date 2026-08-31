@@ -3265,7 +3265,6 @@
       "owner_surface": "Authority/Core",
       "owner_shard": "authority-core",
       "allowed_stages": [
-        "fast",
         "checkpoint",
         "candidate",
         "promotion"
