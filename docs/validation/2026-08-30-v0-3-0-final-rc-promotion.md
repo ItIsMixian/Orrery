@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Phase 0 PASS — exact page `a2d7737...` accepted; Phase 1 scope revision 2 authorized, implementation and all later gates Pending
+Status: Phase 0 PASS; Phase 1 release inputs centrally integrated; exact Candidate/runtime, Promotion and publication Pending
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -325,3 +325,27 @@ The inventory is accepted only as planned input. It is not an archive receipt or
 The Agent must refresh to Git-private scope revision 2 from the new committed task-description version before its
 first product write. A material inventory change stops for another authority amendment. No push, main, tag, asset or
 GitHub Release operation is authorized by this section.
+
+## 2026-08-31 Phase 1 central integration and CI7 refusal — Pending Validation
+
+The unique integrator applied only task product commits `29d0a6f`, `d54ff95` and `56f4aca` onto committed authority
+baseline `17bb70b`, producing central equivalents `e677c73`, `68ab9be` and `552378b`. It deliberately excluded task
+documentation commit `b0412f0`, whose Plan/PROGRESS/HANDOFF predated scope revision 2. Exact central product baseline
+`ef145180ff3a093b65c5b293148783155e77bacb` additionally removes one VBS trailing blank line exposed by
+`git diff --check`; the central worktree is clean.
+
+The task-authored Validation reports that earlier branch SHA `56f4aca...` produced a 162-entry archive twice with
+identical ZIP/checksum/entry-receipt bytes and passed one repository-external offline new-project scaffold, packaged
+validator and Unified `--help` import. Those claims are useful provenance but are not exact evidence for the central
+candidate because both commit ancestry and one packaged launcher byte changed. No central archive hash is PASS yet.
+
+Git-private CI7 receipts corroborate that the branch dry-runs selected 75 Fast and 81 Checkpoint tests with zero
+unknown paths, issued no lease, loaded no test and were not evidence-eligible. Fast refused count and Unknown timing;
+Checkpoint refused Unknown timing. The single bounded Focused attempt also stopped before test loading on task-phase
+policy and was not repeated. No Fast/Checkpoint/Candidate suite, Windows/Ubuntu final runtime, Promotion, push, main,
+tag, asset or Release operation has occurred for these release inputs.
+
+Pending evidence is now exactly the scope-revision-3 path: merge central authority/product state into the existing
+task without new product behavior; run one Candidate dry-run against base `17bb70b...`; only an allowed plan may
+receive one formal Candidate run, one two-root deterministic rebuild and one external offline new-project portfolio.
+Any refusal or non-green result stops without retry or substitute evidence.

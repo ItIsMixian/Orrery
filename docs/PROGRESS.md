@@ -45,10 +45,14 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
   inventory 返回 162 条、path-list SHA-256 `26d65705...`，且在任何产品写入／测试前发现 CLI→Core pin、
   offline scaffold runtime projection 与 release-notes path 三个 blocker。中央 scope revision 2 已授权精确
   修复面；public manifest、ZIP、push、main、tag、asset 与 Release 仍未发生。
+- REL4 的三个产品提交已选择性落到中央任务说明 `17bb70b...` 之后；中央 product baseline 为
+  `ef145180...`，包含 0.3.0 candidate manifest、162-entry exact-Git builder、自包含 runtime/template 和三份
+  发布指南。任务分支旧 `56f4aca...` 的重复构建／offline probe 不能作为中央 exact-SHA evidence。CI7 已在
+  测试加载前拒绝 Fast 75／Checkpoint 81；Candidate、Promotion 与 publication 仍 Pending。
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 COMPLETE；独立 Sol-medium Final RC 已注册。scope revision 2 接受 162-entry inventory 为实现输入并修复三项 blocker，下一步由 Agent 从新任务说明版本恢复、实现 release inputs，再由 CI7 dry-run 选择 RC-owned gates；push/main/tag/Release 仍分别授权。
+- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 COMPLETE；release inputs 已选择性进入中央 `ef145180...`。scope revision 3 禁止重试 Fast/Checkpoint 大包，只允许同一 REL4 合并中央状态后做一次 Candidate dry-run；允许才运行一次 Candidate。push/main/tag/Release 仍分别授权。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
@@ -92,5 +96,5 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 完成 `V0.3.0-final-rc` scope revision 2 的 manifest、自包含 archive/scaffold 与 release guidance，实现后先做 CI7 dry-run，再运行 Candidate/runtime-owned gates。
+1. 让 `V0.3.0-final-rc` 读取 scope revision 3、合并中央 exact state，并只执行一次 Candidate dry-run；允许才运行一次 Candidate 与同 SHA build/offline gates。
 2. Candidate 通过后才请求 non-main exact-SHA Promotion；main、annotated tag 与 GitHub Release 继续分别授权。

@@ -43,6 +43,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - `V0.3.0-final-rc` 已从 exact `88d80df...` 注册到独立 `codex/v0-3-0-final-rc` branch/worktree；scope revision 1
   仅完成只读 archive inventory 后停写。中央任务说明 revision 2 提交并由该 Workstream 刷新 scope 前，不能
   写产品、运行测试或把 Candidate/Worktree 状态称为 public release。
+- release-input 产品提交已由唯一整合者选择性落到中央 `ef145180...`，没有合并任务分支的旧全局入口文档。
+  任务分支和中央分支都保留；后续必须非破坏地汇合并由唯一整合者收口 State/PROGRESS/HANDOFF。
 - Canonical／Candidate／Worktree／Local-only／Unknown 必须分别表达。Candidate HEAD 被 main 包含不自动产生 review package、closure record 或作者 Validation。
 - Workstream session、review、closure、maintenance 与 relation transaction 存在 Git-private 区域；它们是协调证据，不进入作者文档或发布资产，也不能替代 State／ADR／Validation。
 - 本机旧 session 的 lifecycle 可能落后于 Git ancestry。maintenance 在缺少 current closure／review／Validation 时必须保护目标；不得凭目录前缀、年龄或 branch 已进入 main 自动删除。

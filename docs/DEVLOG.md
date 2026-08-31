@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Release Inputs Centrally Integrated; Candidate Path Narrowed
+
+- 唯一整合者只选择 REL4 产品提交 `29d0a6f`、`d54ff95`、`56f4aca`，在任务说明 `17bb70b...` 后形成
+  中央 `e677c73`、`68ab9be`、`552378b`；没有合并携带旧全局入口的 `b0412f0`。
+- `git diff --check` 暴露新 VBS launcher 的尾部空行，中央 `ef145180...` 已修复。任务分支 `56f4aca...`
+  的 ZIP/receipt/offline probe 只保留为历史 provenance，不能复用为新 exact SHA evidence。
+- Git-private receipts 证实 Fast 75／Checkpoint 81 均在加载测试前拒绝且未发 lease；bounded Focused 也在
+  加载前拒绝且未重试。scope revision 3 禁止拆批/重试，只允许先做一次 Candidate dry-run，允许后才跑
+  一次 Candidate 与同 SHA build/offline gates。无 push/main/tag/assets/Release。
+
 ## 2026-08-31 — Final RC Inventory Gate and Scope Revision 2 Authorized
 
 - 独立 Sol-medium `V0.3.0-final-rc` 从任务说明版本 `88d80df...` 注册，Git-private scope revision 1/current，

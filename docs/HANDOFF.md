@@ -69,9 +69,10 @@ Updated: 2026-08-31
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
 15. **v0.3.0 Final RC：** `V0.3.0-final-rc` 已从 exact `88d80df...` 注册在独立 branch/worktree。revision 1
     只读返回 162-entry inventory（path-list SHA-256 `26d65705...`）并在零写入／零测试状态停下；中央 revision 2
-    已授权 CLI→Core 0.1.19 pin、自包含 offline scaffold runtime projection 与 canonical release notes path。
-    下一步由同一 Agent 读取新任务说明版本、刷新 Git-private scope revision 2 后实现。不得表述为公开生效，
-    也不得 push ref、改 main、tag、上传 asset 或创建 Release。
+    已授权并实现 CLI→Core 0.1.19 pin、自包含 offline scaffold runtime projection 与 canonical release notes。
+    三个产品提交已选择性进入中央，中央 baseline 为 `ef145180...`；任务分支 75/81 CI7 dry-run 在加载测试前
+    拒绝。下一步由同一 Agent 读取 scope revision 3、非破坏地合并中央状态并只做一次 Candidate dry-run；
+    不得表述为公开生效，也不得 push ref、改 main、tag、上传 asset 或创建 Release。
 
 ## 不得外推的边界
 

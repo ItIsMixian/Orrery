@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 COMPLETE on accepted page `a2d7737...`; Phase 1 Final RC registered and scope revision 2 authorized; no release operation authorized
+Status: Phase 0 COMPLETE; Phase 1 release inputs centrally integrated; scope revision 3 authorizes one Candidate dry-run path; no release operation authorized
 
 Date: 2026-08-30
 
@@ -370,6 +370,44 @@ Before the first resumed product write, the Agent must read this committed revis
 refresh `V0.3.0-final-rc` to Git-private scope revision 2. After implementation, CI7 dry-run/explain precedes any
 formal test lease; child feature suites are not manually replayed. Scope revision 2 still authorizes no push, main
 mutation, tag, asset upload or GitHub Release.
+
+### 2026-08-31 scope revision 3 — central integration and single Candidate path
+
+The unique integrator selected only the three release-input product commits from `codex/v0-3-0-final-rc` and applied
+them on top of task-description version `17bb70ba861c8f1f4be18fa11863e3cac7fc5c87`; it did not merge the task's
+stale global-entry documentation commit. Central commits are `e677c73`, `68ab9be` and `552378b`. A subsequent
+`git diff --check` found one trailing blank line in the new VBS launcher, fixed in exact product baseline
+`ef145180ff3a093b65c5b293148783155e77bacb`. The central worktree is clean.
+
+The task branch records two byte-identical builds and one repository-external offline scaffold/validator/launcher
+probe on its earlier exact `56f4aca4a4a9120a1bd292cf17d8669f86061457`. Those hashes remain branch-scoped
+historical evidence: the central launcher byte and commit ancestry changed, so none may be reused as exact Candidate
+evidence. Central must rebuild from the later frozen Candidate SHA.
+
+CI7 dry-run/explain on the task branch eliminated unknown paths but conservatively refused Fast 75 (>20 and Unknown
+timing) and Checkpoint 81 (Unknown timing) before issuing a lease or loading a test. The only bounded Focused request
+also refused before test loading because the session had entered `validating`; it was not retried. This is a release-
+wide selection, not permission to weaken Fast/Checkpoint budgets, split the same set into manual batches or replay
+unaffected child suites.
+
+Scope revision 3 authorizes the existing Sol-medium `V0.3.0-final-rc` task to:
+
+1. incorporate the new central task-description commit into its existing branch without rewriting or deleting its
+   prior commits, resolve documentation in favor of the central Plan/PROGRESS/HANDOFF plus the additive branch build
+   record, and refresh Git-private scope revision 3 before the first merge-resolution write;
+2. make no new product change; its release-input tree must equal central product baseline `ef145180...` for every
+   non-authority path before validation;
+3. run exactly one CI7 Candidate dry-run/explain against explicit base `17bb70b...` and task phase `candidate`;
+4. only if that exact plan is allowed, issue one Candidate lease/run, then perform one two-root deterministic build
+   comparison and one repository-external offline new-project scaffold/validate/Unified-import portfolio on the same
+   frozen SHA;
+5. if Candidate dry-run refuses, or any Candidate/build/runtime gate is non-green, stop and record the result without
+   retry, human-override receipt, smaller substitute base, hand-written test list or additional product fix.
+
+Authorized writes are merge/reconciliation of the already listed scope-revision-2 surfaces plus this Plan, matching
+Validation, affected State, PROGRESS, HANDOFF, DEVLOG and indexes. No new code/test/fixture/mapping behavior is
+authorized. A needed product or routing correction requires another committed amendment. Scope revision 3 still
+forbids push, main mutation, tag, asset upload and GitHub Release.
 
 ## Phase 1 — register Final RC and freeze inputs
 
