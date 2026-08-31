@@ -18,6 +18,7 @@ CI_SCRIPTS = ROOT / "scripts" / "ci"
 sys.path.insert(0, str(CI_SCRIPTS))
 
 import _common as ci_common  # noqa: E402
+import test_inventory as inventory_cli  # noqa: E402
 from _common import (  # noqa: E402
     CIValidationError,
     DEFAULT_MANIFEST,
@@ -190,6 +191,35 @@ class CIValidationTests(unittest.TestCase):
         )
         self.assertNotIn(minimal_git, checkpoint_ids)
         self.assertIn(minimal_git, assignments["team-relations-execution"])
+
+        inventory = {
+            "lanes": [{"id": "lane-01"}, {"id": "lane-02"}],
+            "shards": [{"id": "shard-a"}, {"id": "shard-b"}],
+        }
+
+        def noisy_inventory(_manifest: Path) -> dict[str, object]:
+            self.assertEqual(os.environ.get("DOCSITE_AI_ENABLED"), "0")
+            print("building reader…")
+            return inventory
+
+        for flag, expected in (
+            ("--lane-list", ["lane-01", "lane-02"]),
+            ("--shard-list", ["shard-a", "shard-b"]),
+        ):
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with self.subTest(flag=flag), mock.patch.object(
+                inventory_cli, "build_inventory", side_effect=noisy_inventory,
+            ), mock.patch.dict(
+                os.environ, {"DOCSITE_AI_ENABLED": "1"}, clear=False,
+            ), mock.patch.object(
+                sys, "argv", ["test_inventory.py", flag],
+            ), mock.patch.object(
+                sys, "stdout", stdout,
+            ), mock.patch.object(sys, "stderr", stderr):
+                self.assertEqual(inventory_cli.main(), 0)
+            self.assertEqual(stdout.getvalue().splitlines(), [json.dumps(expected, separators=(",", ":"))])
+            self.assertIn("building reader…", stderr.getvalue())
 
     def test_machine_inventory_gives_every_test_owner_stage_cost_budget_and_reason(self) -> None:
         inventory = machine_inventory(self.manifest)

@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import platform
 import sys
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from _common import (
@@ -70,14 +72,19 @@ def main() -> int:
     parser.add_argument("--shard-list", action="store_true", help="print the JSON shard-id array")
     parser.add_argument("--lane-list", action="store_true", help="print the JSON Promotion lane-id array")
     arguments = parser.parse_args()
+    if arguments.shard_list and arguments.lane_list:
+        parser.error("--shard-list and --lane-list are mutually exclusive")
+    os.environ["DOCSITE_AI_ENABLED"] = "0"
     try:
-        inventory = build_inventory(arguments.manifest.resolve())
+        if arguments.shard_list or arguments.lane_list:
+            with redirect_stdout(sys.stderr):
+                inventory = build_inventory(arguments.manifest.resolve())
+        else:
+            inventory = build_inventory(arguments.manifest.resolve())
         if arguments.output:
             from _common import atomic_write_json
 
             atomic_write_json(arguments.output.resolve(), inventory)
-        if arguments.shard_list and arguments.lane_list:
-            parser.error("--shard-list and --lane-list are mutually exclusive")
         if arguments.shard_list:
             print(json.dumps([item["id"] for item in inventory["shards"]], separators=(",", ":")))
         elif arguments.lane_list:
