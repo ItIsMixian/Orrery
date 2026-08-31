@@ -101,7 +101,8 @@ Updated: 2026-08-31
 - relation capture 现有 idempotence 只覆盖 same exact base，不覆盖 task-base A→B 时旧 automatic Unknown
   proposal 的 supersession。revision 6 增加 exact lifecycle regression；测试代码可先写，但维护者预览前不得执行。
 - relation capture 还缺少“任何 human role 都不能接受 `derived_from`”的明确回归，Unified 也未断言 lineage
-  卡片无 gate/accept。revision 7 写入这两项契约，但测试执行继续等待维护者预览。
+  卡片无 gate/accept。revision 7 已写入这两项契约且页面获维护者确认；测试尚未执行，下一步只走 CI7
+  dry-run 和 current-fingerprint one-run leases。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

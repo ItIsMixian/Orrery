@@ -2,8 +2,8 @@
 
 Date: 2026-08-30
 
-Status: PASS (focused Candidate); central lightweight composition and obsolete automatic Unknown proposal correction
-are Pending under v0.3.0 Phase 0 scope revision 6. Prior routed receipts do not cover corrected source.
+Status: PASS (focused Candidate); central revision-7 correction preview accepted, fresh routed evidence Pending under
+v0.3.0 Phase 0. Prior routed receipts do not cover corrected source.
 
 Authority sources:
 
@@ -446,3 +446,7 @@ After supersession, the one remaining Unknown lineage card incorrectly exposes h
 controls. ADR-0017 makes verified Core ancestry the only effective authority for `derived_from`. Phase 0 revision 7
 therefore hard-refuses human acceptance and limits the Personal card to defer/reject; Team and Graph stay action-free.
 This is Pending until the real page shows the corrected controls, before any tests run.
+
+The maintainer subsequently confirmed the real revision-7 page with four pending rows, lineage defer/reject only,
+dependency gate controls preserved, Team request-only and zero desktop/mobile overflow. This authorizes source freeze
+and fresh CI7 routing; it is not final exact-SHA page or release acceptance.

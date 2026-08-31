@@ -47,8 +47,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   Promotion 或 public release。
 - `807096d...` 的 full-page build 在接受前发现 lightweight Personal/Relation Inbox composition blocker；
   revision 5 已恢复组合，revision 6 已收口同端点 automatic Unknown proposals，revision 7 正在恢复
-  Core-only `derived_from` effective authority。维护者接受修复页并取得新 fingerprint 证据前，`f41b659...`
-  receipts 不授权后续 source。
+  Core-only `derived_from` effective authority。维护者已接受修复预览；取得新 fingerprint 证据前，
+  `f41b659...` receipts 仍不授权后续 source。
 
 ## 兼容与安全边界
 

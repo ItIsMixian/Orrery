@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 scope revision 7 mechanical-derived authority correction authorized; preview required before fresh routed validation; no RC task registered
+Status: Phase 0 revision-7 preview accepted; source freeze and fresh routed validation authorized; no RC task registered
 
 Date: 2026-08-30
 
@@ -158,6 +158,17 @@ Authorized paths remain the four revision-5/6 product/test files and the listed 
 preview gate now additionally requires one lineage card with two local actions, three dependency cards with their
 existing gate controls, zero Team decision buttons, four total pending proposals and zero document horizontal
 overflow.
+
+### 2026-08-31 maintainer preview acceptance after revision 7
+
+The maintainer explicitly confirmed the revision-7 page. This closes the pre-test preview gate only and authorizes the
+unique integrator to commit/freeze the four product/test files, refresh the Git-private session to that exact SHA, run
+CI7 Fast/Checkpoint dry-run/explain, and—only if the plans are allowed—issue one fresh lease/run for each stage.
+
+Accepted preview facts are: seven navigation identities, no unavailable primary consumer, two inboxes, four pending
+cards, one lineage card with only defer/reject and no select, three dependency cards with existing gate controls, zero
+Team decision buttons, and zero document horizontal overflow at 1280×720 and 390×844. This acceptance is not the final
+exact-SHA page gate, Candidate, Promotion or release authorization. No test ran before the confirmation.
 
 ## Phase 1 — register Final RC and freeze inputs
 

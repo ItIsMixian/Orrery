@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — scope revision 7 mechanical-derived authority correction authorized; preview and fresh routing required
+Status: PENDING — revision-7 preview accepted; source freeze and fresh routed validation required
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -189,3 +189,21 @@ gate on `derived_from`.
 Scope revision 7 must prove the Core endpoint refuses human acceptance before role/evidence evaluation and the real
 Personal page exposes only defer/reject for this card. Dependency and Team behavior must remain unchanged. No tests,
 formal lease or release operation may run before the corrected preview is presented.
+
+### Revision-7 preview evidence and maintainer acceptance
+
+- Git-private self-host repair appended `superseded` to exact obsolete IDs
+  `auto-derived-unknown-26faea336dc866822df1`, `auto-derived-unknown-752aea67f53dcfaae1fc` and
+  `auto-derived-unknown-e9cbc05f07f5ffd8b485`; current `auto-derived-unknown-930a5fc0e4e94ff6fa1a` remains proposed.
+- New AI-disabled loopback preview `http://127.0.0.1:8770/` projects four pending rows: one Unknown lineage and three
+  distinct integration dependencies. All four earlier proposal histories remain readable; no human decision or
+  effective relation was created.
+- 1280×720 DOM: seven navigation identities, two inboxes, four cards, no unavailable consumer, zero overflow. The
+  lineage card has `暂缓／Unknown` and `拒绝` only; each dependency has Accept/change-gate/defer/reject; Team has zero
+  decision buttons.
+- 390×844 DOM and screenshot: the same four-card/action contract, zero Team actions and zero document overflow.
+- The maintainer confirmed this page. No unittest, pytest, Fast, Checkpoint, Candidate, Promotion or release command
+  ran before confirmation.
+
+The preview acceptance authorizes source freeze and fresh routed validation. It does not close the final exact-SHA
+page gate or authorize Final RC registration.

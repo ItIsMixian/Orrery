@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Revision-7 Preview Accepted
+
+- 维护者确认 `127.0.0.1:8770` 修复页：7 个入口、4 条 pending、lineage 仅 defer/reject、三条 dependency
+  gate 控件保留、Team 0 决定按钮、1280×720/390×844 零横向溢出。
+- 该确认只关闭 pre-test preview gate；它授权冻结四份产品/测试文件并按 CI7 dry-run 后各运行一次 fresh
+  Fast/Checkpoint，不是 final exact-SHA、Candidate、Promotion 或 Release acceptance。
+- 确认前没有运行任何测试命令；AI 在全部 revision-5/6/7 预览中保持关闭。
+
 ## 2026-08-31 — Phase 0 Mechanical-derived Authority Correction Authorized
 
 - revision 6 已用三条 append-only `superseded` events 将 7 pending 收敛为 4；未删除历史、未确认关系。
