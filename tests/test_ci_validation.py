@@ -268,7 +268,7 @@ class CIValidationTests(unittest.TestCase):
             if portfolio["id"] != "w6-1-regression"
         ]
         self.assertEqual([item["id"] for item in generic], [
-            "docs-only", "authority-a4-class", "collaboration-maintenance",
+            "release-candidate-packaging", "docs-only", "authority-a4-class", "collaboration-maintenance",
             "w7-2-graph-only", "u2-2-maintenance", "unified-common-security",
         ])
         for portfolio in generic:

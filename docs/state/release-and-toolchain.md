@@ -9,8 +9,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Orrery v0.2.0 是唯一公开 Release。annotated tag 指向 `20fc95b`；ZIP SHA-256 为 `13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`。
 - local central `ef145180...` 已包含 v0.3.0 release-input Candidate：release-candidate manifest、162-entry
   exact-Git builder、自包含 Core/CLI/Observatory runtime、Unified template launchers 和人工 publication 边界。
-  task merge `ac44630...` 的唯一 fresh Candidate 执行 81 tests 后因一项 CI registry 固定列表断言失败，
-  `evidence_eligible=false`；scope revision 4 已停止，仍无 exact-SHA Candidate/Promotion/public evidence。
+  task merge `0f82d565...` 的 Candidate preview 已允许 fresh run，但尚无 exact-SHA Candidate/Promotion/public
+  evidence；随后 exact `ac44630...` Candidate 为 80/81，唯一 failure 是 stale CI fixture-ID expectation。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。

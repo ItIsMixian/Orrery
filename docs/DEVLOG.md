@@ -1,13 +1,13 @@
 # 开发日志
 
-## 2026-08-31 — Final RC Fresh Candidate Failed Once and Stopped
+## 2026-08-31 — Final RC Candidate 80/81; One Stale Portfolio Expectation
 
-- task 在首次纠正文档合并前登记 `0508aec...` 与 Git-private scope revision 4；merge `ac44630...` 保留
-  `b9f9c82...` 历史及中央纠正父链，非文档产品路径仍等于 `ef145180...`。
-- 唯一 fresh Candidate 使用 base `17bb70b...`、AI disabled、无 `--reuse`，消费 one-run lease 后执行 81 项：
-  80 success、1 failure、12.0614s test runtime、`runner_errors=[]`、exit 1、非 evidence-eligible。
-- failure 为 generic CI portfolio 的硬编码期望遗漏现有 `release-candidate-packaging`。按 revision 4 未重跑或
-  修改 router/mapping/test/product/budget；未运行 build/offline runtime、Promotion 或任何远端／发布动作。
+- exact `ac44630...` 使用唯一 Candidate lease 完成 81 tests／12.061400s；80 success，1 failure，无 timeout 或
+  runner error，receipt 非 evidence-eligible 且旧 fingerprint 不重试。
+- 唯一失败是 `test_generic_router_selects_docs_authority_and_collaboration_portfolios` 的硬编码列表漏掉已进入
+  versioned fixture 的 `release-candidate-packaging`；不是产品、mapping 或 router failure。
+- scope revision 5 只允许补这一项 ID 并在新 fingerprint 运行一次 Candidate；不改 assertion 语义、fixture、
+  mapping、预算或产品，也不做部分替代。
 
 ## 2026-08-31 — Candidate Dry-run Non-evidence Correctly Distinguished from Refusal
 
