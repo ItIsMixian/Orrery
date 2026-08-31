@@ -5,9 +5,6 @@ Updated: 2026-08-31
 ## 当前停止点
 
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
-- `V0.3.0-final-rc` 已在 merge `0f82d565...` 非破坏性吸收中央 `dc5ff6e...`；其树与中央一致、产品路径与
-  `ef145180...` 一致。scope revision 3 唯一 Candidate dry-run 被 reuse contract 拒绝且非 evidence-eligible，
-  因而已停止；没有 formal Candidate、重建、离线 runtime 或远端／发布动作。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
 - CI5 exact `9ee831f` 的 Fast 与 Promotion 已完成：Promotion run `33235992711` 为 25/25 jobs PASS，双平台 required checks 均通过，Windows／Ubuntu 各聚合 390 tests／27 logical shards；同一 SHA 已进入 main。
 - 当前本地 integrated Candidate 的未发布组件为 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19；Harness JSON 为 0.1.2，其余 Adapter 为 0.1.1，支持状态仍为 `experimental`／`unreleased`。
@@ -70,11 +67,13 @@ Updated: 2026-08-31
 13. **U2.3 shell closeout：** 已完成、本地集成并进入 Phase 0 accepted page；只读/zero-network/无全 worktree 重扫描边界保持。后续只在 Final RC 做 public-template/final-archive runtime，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 与 current fingerprint fresh Fast 3/3、Checkpoint 4/4
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
-15. **v0.3.0 Final RC：** `V0.3.0-final-rc` 已在 scope revision 3 形成 merge `0f82d565...`，保留原任务父链并
-    精确吸收中央 `dc5ff6e...`／产品 `ef145180...`。唯一 Candidate dry-run 选择 81 tests，但 reuse contract 以
-    Candidate reuse 未启用、高风险 surface 及 reuse 仅限 Fast/Checkpoint 拒绝；`successful=false`、无 lease、
-    无 test、非 evidence-eligible。当前必须停在这里，除非唯一协调者先提交新的 authority amendment；不得
-    重试／拆批／Focused 替代，也不得 push ref、改 main、tag、上传 asset 或创建 Release。
+15. **v0.3.0 Final RC：** `V0.3.0-final-rc` 已从 exact `88d80df...` 注册在独立 branch/worktree。revision 1
+    只读返回 162-entry inventory（path-list SHA-256 `26d65705...`）并在零写入／零测试状态停下；中央 revision 2
+    已授权并实现 CLI→Core 0.1.19 pin、自包含 offline scaffold runtime projection 与 canonical release notes。
+    三个产品提交已选择性进入中央，中央 baseline 为 `ef145180...`；任务分支 75/81 CI7 dry-run 在加载测试前
+    拒绝。Candidate preview 随后在 `0f82d565...` 选择 81 tests，acceptance/timing 均 allow，但任务误把固定
+    dry-run non-evidence/reuse refusal 写成 run refusal。scope revision 4 已纠正语义并允许唯一 fresh Candidate；
+    不得表述为公开生效，也不得 push ref、改 main、tag、上传 asset 或创建 Release。
 
 ## 不得外推的边界
 

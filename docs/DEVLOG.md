@@ -1,14 +1,13 @@
 # 开发日志
 
-## 2026-08-31 — Final RC Scope Revision 3 Candidate Dry-run Refused
+## 2026-08-31 — Candidate Dry-run Non-evidence Correctly Distinguished from Refusal
 
-- `V0.3.0-final-rc` 在产品／文档写入前登记 task-description `dc5ff6e...` 与 Git-private scope revision 3，随后
-  以 merge `0f82d565...` 保留 `b0412f0...` 父链并精确吸收中央树；非文档产品路径与 `ef145180...` 相同。
-- 唯一获准的 Candidate dry-run 使用 base `17bb70b...`、task phase `candidate`，选择 81 tests；reuse contract
-  以仅支持 Fast/Checkpoint、security-high-risk surface 和 Candidate reuse 未启用为由拒绝。最终
-  `successful=false`、`evidence_eligible=false`，无 lease、无 test。
-- scope revision 3 的停止规则已执行：没有 formal Candidate、build/offline runtime、Focused/拆批替代、
-  Promotion、push、main、tag、asset 或 GitHub Release。继续需要新的 committed authority amendment。
+- REL4 merge `0f82d565...` 的唯一 Candidate dry-run 选择 81 tests，exit 0、acceptance shadow-allow、timing
+  allow、runner errors 为空；它不是 refusal。
+- task commit `b9f9c82...` 把 `_dry_receipt()` 固定的 `successful=false/evidence_eligible=false` 和 Candidate
+  reuse refusal 误判为 fresh-run refusal。该提交保留为历史，不重写。
+- scope revision 4 只纠正分类并授权唯一 fresh Candidate；不改 router/mapping/test/product/budget，也不重新
+  dry-run。非绿即停，push/main/tag/assets/Release 仍未授权。
 
 ## 2026-08-31 — Final RC Release Inputs Centrally Integrated; Candidate Path Narrowed
 

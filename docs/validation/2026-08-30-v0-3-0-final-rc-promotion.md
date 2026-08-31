@@ -350,27 +350,15 @@ task without new product behavior; run one Candidate dry-run against base `17bb7
 receive one formal Candidate run, one two-root deterministic rebuild and one external offline new-project portfolio.
 Any refusal or non-green result stops without retry or substitute evidence.
 
-## 2026-08-31 scope revision 3 Candidate dry-run refusal — STOP
+## 2026-08-31 Candidate dry-run interpretation correction — Pending Validation
 
-The existing task branch registered Git-private scope revision 3 against task-description commit
-`dc5ff6ea3cde4bedd9ca5bd29b7368a679647e20`, then merged that central state without rewriting prior task commits.
-Merge `0f82d565f53f46ad1b3ae846437bd631a184fdd7` has parents `b0412f0...` and `dc5ff6e...`; its complete tree equals
-`dc5ff6e...`, and every non-documentation product path equals exact central product baseline `ef145180...`.
+Task merge `0f82d565...` produced a valid Candidate preview, not a router refusal. The machine receipt has
+`outcome=dry-run`, exit code 0, `completed=true`, `runner_errors=[]`, acceptance `shadow-allow` and timing `allow`.
+Its `successful=false` and `evidence_eligible=false` are the fixed `_dry_receipt()` contract for every preview. The
+separate reuse block correctly refuses prior-receipt reuse for Candidate/high-risk inputs; no `--reuse` request was
+made, so it cannot be used as a fresh-run gate.
 
-Exactly one authorized command was issued with `DOCSITE_AI_ENABLED=0`:
-
-```text
-python -X utf8 scripts/ci/validate_change.py --stage candidate --base 17bb70ba861c8f1f4be18fa11863e3cac7fc5c87 --task-phase candidate --dry-run --explain
-```
-
-The process returned exit code 0 because the dry-run completed, but its machine result was non-green:
-
-- reuse contract: `decision=refused`, `eligible_inputs=false`;
-- refusal reasons: `reuse-is-limited-to-fast-and-checkpoint`, `security-high-risk-surface`, and
-  `reuse-execution-not-enabled-by-contract-v1`;
-- selector: 81 tests, zero listed selector reasons, but total and single-test p95 remained `Unknown`;
-- final receipt: `outcome=dry-run`, `successful=false`, `evidence_eligible=false`, no lease and no loaded test;
-- surface fingerprint: `162bb11efe8d3c1388fbd66d540e7f05f6cc02cfdd36a2edddcc28a415707fcc`.
-
-Per scope revision 3 this refusal stops the line. No formal Candidate run, two-root rebuild, external offline runtime,
-Focused/manual substitute, Promotion, push, main, tag, asset or GitHub Release operation followed.
+Branch commit `b9f9c82...` is preserved as the task's mistaken classification and is not Candidate evidence. Scope
+revision 4 must append a correction, issue exactly one fresh Candidate lease/run for the already selected 81 tests,
+and—only after green—run the same-SHA deterministic build/offline portfolio. No second dry-run, router change, retry,
+manual split or substitute evidence is authorized.
