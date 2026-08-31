@@ -6669,6 +6669,18 @@
       "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_versioned_positive_and_negative_schema_fixtures", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["collaboration-maintenance"], "reason": "low W7.3 schema fixture evidence via collaboration-maintenance"
     },
     {
+      "test_id": "test_workstream_program_hierarchy.WorkstreamProgramHierarchyTests.test_schema_human_authority_cas_and_path_fail_closed", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 program hierarchy authority, CAS, and path-boundary evidence"
+    },
+    {
+      "test_id": "test_workstream_program_hierarchy.WorkstreamProgramHierarchyTests.test_exact_self_host_repair_is_idempotent_and_never_uses_prefix_inference", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "medium", "budget_seconds": 90.0, "dependencies": ["collaboration-maintenance"], "reason": "medium W7.3 exact self-host hierarchy repair and no-prefix-inference evidence"
+    },
+    {
+      "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_program_membership_is_containment_only_and_same_semantics_bundle_is_declared", "owner_surface": "Team/LAN", "owner_shard": "team-ui-server", "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["observatory-graph"], "reason": "low deterministic Graph evidence for containment-only membership and declared same-semantics bundles"
+    },
+    {
+      "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_component_local_packing_and_module_boundary_projection", "owner_surface": "Team/LAN", "owner_shard": "team-ui-server", "allowed_stages": ["fast", "checkpoint", "candidate", "promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["observatory-graph"], "reason": "low deterministic Graph evidence for component-local packing and strict module boundary projection"
+    },
+    {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_plain_chinese_status_taxonomy_has_no_generic_pending_fallback", "owner_surface": "Team/LAN", "owner_shard": "team-ui-server", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["observatory-graph"], "reason": "low W7.3 Observatory taxonomy evidence via the provider-neutral observatory-graph surface"
     }
   ],

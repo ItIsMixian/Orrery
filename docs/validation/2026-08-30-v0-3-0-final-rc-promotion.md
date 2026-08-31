@@ -60,3 +60,8 @@ The registry correction maps the Graph-native series/conflict test and the promo
 test to exact provider-neutral `observatory-graph`; it does not restore broad `test_workstream*.py` or Maintenance
 dependencies. Phase 0 lineage must also rebind from the pre-merge source to task base `86a4660`, because this
 Workstream consumes the W7.3/CI7 child receipts and validates only integration-owned reconciliation after the merge.
+
+After the exact lineage rebind, the second Fast/Checkpoint dry-run pair refused before plan creation because final
+unittest discovery contained four W7.3 IDs missing from the registry. No lease or test run occurred. The registry now
+adds the two program-hierarchy IDs as promotion-only `collaboration-maintenance` evidence and the two pure Graph IDs
+as low-cost `observatory-graph` evidence. It does not add broad Workstream globs or Graph→Maintenance dependencies.
