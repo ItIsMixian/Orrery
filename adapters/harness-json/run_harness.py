@@ -41,13 +41,45 @@ COMMAND_ARGUMENTS: dict[str, dict[str, type | tuple[type, ...]]] = {
         "offline": bool,
         "cache_hours": (int, float),
     },
+    "relations-suggest": {
+        "target": str, "proposal_id": str, "relation_type": str,
+        "source_workstream_id": str, "target_workstream_id": str,
+        "required_for": str, "rationale": str, "consequence": str,
+        "proposer_id": str, "platform_session_id": str,
+        "evidence_category": str, "evidence_fact_scope": str,
+        "evidence_hash": str, "evidence_ref": str,
+    },
+    "relations-inspect": {"target": str},
+    "relations-accept": {
+        "target": str, "proposal_id": str, "expected_revision": int,
+        "confirmer_id": str, "confirmer_role": str,
+    },
+    "relations-change-gate": {
+        "target": str, "proposal_id": str, "expected_revision": int,
+        "required_for": str, "actor_id": str, "reason": str,
+    },
+    "relations-defer": {
+        "target": str, "proposal_id": str, "expected_revision": int,
+        "actor_id": str, "reason": str,
+    },
+    "relations-reject": {
+        "target": str, "proposal_id": str, "expected_revision": int,
+        "actor_id": str, "reason": str,
+    },
 }
 REQUIRED_ARGUMENTS = {
     "operating-rules-inspect": set(),
     "authority-route-preflight": {"target", "query"},
-    "scaffold": {"target"},
-    "validate": {"target"},
-    "check-update": set(),
+    "scaffold": {"target"}, "validate": {"target"}, "check-update": set(),
+    "relations-suggest": {
+        "target", "proposal_id", "relation_type", "source_workstream_id",
+        "target_workstream_id", "required_for", "rationale", "consequence", "proposer_id",
+    },
+    "relations-inspect": {"target"},
+    "relations-accept": {"target", "proposal_id", "expected_revision", "confirmer_id", "confirmer_role"},
+    "relations-change-gate": {"target", "proposal_id", "expected_revision", "required_for", "actor_id", "reason"},
+    "relations-defer": {"target", "proposal_id", "expected_revision", "actor_id", "reason"},
+    "relations-reject": {"target", "proposal_id", "expected_revision", "actor_id", "reason"},
 }
 SANITIZED_ENVIRONMENT = {
     "CODEX_HOME",
@@ -107,6 +139,12 @@ COMMAND_DATA_REQUIRED = {
         "skill_url",
         "reasons",
     },
+    "relations-suggest": {"event", "writes_performed", "effective_relation_created"},
+    "relations-inspect": {"capture", "graph_status", "pending_recovery_transaction_ids"},
+    "relations-accept": set(),
+    "relations-change-gate": set(),
+    "relations-defer": set(),
+    "relations-reject": set(),
 }
 
 
@@ -180,6 +218,17 @@ def load_request(path: Path | None) -> dict[str, Any]:
             raise RequestError(f"argument {name!r} must not be empty")
         if name == "cache_hours" and value < 0:
             raise RequestError("argument 'cache_hours' must be non-negative")
+    if command.startswith("relations-"):
+        if "expected_revision" in arguments and arguments["expected_revision"] < 1:
+            raise RequestError("expected_revision must be positive")
+        if arguments.get("required_for") not in {None, "implementation", "validation", "integration", "release"}:
+            raise RequestError("required_for is not a supported dependency gate")
+        if command == "relations-suggest" and arguments.get("relation_type") != "depends_on":
+            raise RequestError("Harness JSON v1 only suggests semantic depends_on proposals")
+        evidence_fields = {"evidence_category", "evidence_fact_scope", "evidence_hash", "evidence_ref"}
+        supplied = evidence_fields.intersection(arguments)
+        if supplied and supplied != evidence_fields:
+            raise RequestError("relation evidence requires category, fact scope, hash, and ref together")
     return payload
 
 
@@ -190,6 +239,8 @@ def cli_arguments(request: Mapping[str, Any]) -> list[str]:
         arguments = ["operating-rules", "inspect"]
     elif command == "authority-route-preflight":
         arguments = ["operating-rules", "route"]
+    elif command.startswith("relations-"):
+        arguments = ["relations", command.removeprefix("relations-")]
     else:
         arguments = [command]
     flag_order = {
@@ -198,17 +249,40 @@ def cli_arguments(request: Mapping[str, Any]) -> list[str]:
         "scaffold": ("target", "title", "upgrade_tools", "dry_run"),
         "validate": ("target", "build", "require_integrated"),
         "check-update": ("target", "manifest_url", "manifest_file", "cache_hours", "offline"),
+        "relations-suggest": (
+            "target", "proposal_id", "relation_type", "source_workstream_id",
+            "target_workstream_id", "required_for", "rationale", "consequence",
+            "proposer_id", "platform_session_id",
+        ),
+        "relations-inspect": ("target",),
+        "relations-accept": ("target", "proposal_id", "expected_revision", "confirmer_id", "confirmer_role"),
+        "relations-change-gate": ("target", "proposal_id", "expected_revision", "required_for", "actor_id", "reason"),
+        "relations-defer": ("target", "proposal_id", "expected_revision", "actor_id", "reason"),
+        "relations-reject": ("target", "proposal_id", "expected_revision", "actor_id", "reason"),
     }
     for name in flag_order[command]:
         if name not in values:
             continue
         value = values[name]
-        flag = "--" + name.replace("_", "-")
+        cli_name = {
+            "relation_type": "type", "source_workstream_id": "source",
+            "target_workstream_id": "target-workstream",
+        }.get(name, name.replace("_", "-"))
+        flag = "--" + cli_name
         if isinstance(value, bool):
             if value:
                 arguments.append(flag)
         else:
             arguments.extend((flag, str(value)))
+    if command == "relations-suggest":
+        arguments.extend(("--proposer-kind", "harness"))
+        evidence_fields = ("evidence_category", "evidence_fact_scope", "evidence_hash", "evidence_ref")
+        if any(field in values for field in evidence_fields):
+            if not all(field in values for field in evidence_fields):
+                raise RequestError("relation evidence requires category, fact scope, hash, and ref together")
+            arguments.extend(("--evidence", ",".join(str(values[field]) for field in evidence_fields)))
+    if command in {"relations-accept", "relations-change-gate", "relations-defer", "relations-reject"}:
+        arguments.extend(("--caller-kind", "harness", "--caller-context", "remote"))
     arguments.append("--json")
     return arguments
 
@@ -231,7 +305,8 @@ def validate_response(payload: Any, command: str, returncode: int) -> str | None
         return "CLI response fields do not match response schema v1"
     if payload.get("schema_version") != SCHEMA_VERSION:
         return "CLI response schema_version does not match request"
-    if payload.get("command") != command:
+    expected_command = "workstream-relation-" + command.removeprefix("relations-") if command.startswith("relations-") else command
+    if payload.get("command") != expected_command:
         return "CLI response command does not match request"
     if payload.get("status") not in {"ok", "warning", "error"}:
         return "CLI response has an invalid status"
@@ -243,7 +318,7 @@ def validate_response(payload: Any, command: str, returncode: int) -> str | None
     data = payload.get("data")
     if not isinstance(data, dict):
         return "CLI response data is not an object"
-    if not COMMAND_DATA_REQUIRED[command].issubset(data):
+    if payload.get("status") != "error" and not COMMAND_DATA_REQUIRED[command].issubset(data):
         return "CLI response data are missing required command fields"
     for field in ("warnings", "errors"):
         values = payload.get(field)
@@ -264,7 +339,12 @@ def main(argv: list[str] | None = None) -> int:
         _emit(_adapter_error(command, 2, "invalid_request", str(exc)))
         return 2
 
-    invocation = [args.python, "-X", "utf8", "-m", "project_orrery_cli", *cli_arguments(request)]
+    try:
+        command_arguments = cli_arguments(request)
+    except RequestError as exc:
+        _emit(_adapter_error(command, 2, "invalid_request", str(exc)))
+        return 2
+    invocation = [args.python, "-X", "utf8", "-m", "project_orrery_cli", *command_arguments]
     try:
         completed = subprocess.run(
             invocation,

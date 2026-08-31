@@ -222,6 +222,60 @@
 - Focused 25/25, integrated installation, repository gates, release dry build/private exclusion and diff checks pass. Real projection found 22 worktrees in 834.872 ms with 104,370 session bytes and zero source reads. Browser covered 1440×900, 1280×800 and 390×844 with zero document overflow/console warnings; a final mobile help border-box fix is mechanically covered but needs one central Browser replay because Browser policy blocked the rebuilt local tab.
 - Formal Fast/Checkpoint remain ineligible only on the inherited A4 operating-rules CRLF/hash baseline (Checkpoint 99/102 in 54.589s). A4.1 must merge first; U2.3 then replays gates/browser before W7.3 is assessed against the final shell. No Promotion, push, main, release, network, Team join or delete occurred.
 
+## 2026-08-30 — W7.3 Workstream Relation Capture & Confirmation Candidate
+
+- 维护者接受真实 pinned-ELK 产品预览后，task-description
+  `4522a5beec5d2ffdd90022197cf8c78ad7ea7faa` 将行为冻结为 scope revision 17。收口保留一个共享 semantic
+  projection、固定本地 `elkjs@0.11.0` 默认布局、显式 legacy 选择、ledger-first failure 和只读 Graph；没有把
+  program／phase／series membership 升级为 relation、gate、closure 或 ownership。
+- Core／Observatory 同步推进到 0.1.19，CLI 保持 0.1.22，Harness JSON 保持 0.1.2，全部仍为 unreleased；ELK
+  bundle/license/package/provenance 随 Observatory package data 固定，运行时不访问网络。focused program/Graph
+  13/13、JS syntax、vendor/component inventory 与真实 1440×900／390×844 浏览器通过；桌面 100%／fit 46%／
+  reset 100%，移动 same-fact ledger 与页面均无横向溢出，console 为空。
+- 完整 staged diff check 曾在两份 exact upstream ELK bundle 的五处相同行尾空格非绿并停止。scope revision 18
+  只增加两个精确路径的 `.gitattributes -whitespace`；两路径均报告 unset，bundle hash 保持
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`，最终 staged diff check PASS。
+  CI7 `111f4abc47b8122aee5469db4489ad6fb0dee75a` 合入后的新 fingerprint 才运行
+  一次 routed Fast／Checkpoint，并由中央对 exact integrated desktop/mobile page 做最终接受；本轮不运行
+  Promotion／release、不 push／main／public／default，也不修改根 PROGRESS／HANDOFF。
+
+- 维护者以 task-description version `2ab5c465ec28d7a472ad3f5ebbb324a565bbe57a` 重开 Graph UX；实现前逐字读取
+  Plan blob `a77ace7f42f091aabf81be55d4395465b0847a7c` 与 Validation blob
+  `dd0c3eb1f7da48eec23ca47f0772aec8caa3b547`，并把 retained `5fee848` Candidate、Sol／medium 与新增验证面
+  登记为 Git-private scope revision 4。Core/capture 与 relation inbox 证据保留，未把旧 Graph 视觉验收冒充通过。
+- Observatory 0.1.18 移除 detached series strip，将 Authority A、CI、Unified U 变成画布内固定横向 lane 与
+  presentation-only “同系列演进（展示关系）”连接器；A3/A4、CI6/CI7、U1/U2/U2.2 保持同 lane。dependency
+  proposal 仍是独立黄色虚线；comparison 改为默认关闭 dotted overlay／折叠 drawer；零冲突 lens 为 0 红线空态。
+- 新增 deterministic per-edge port/track geometry：4+ confirmed conflict fixture 检查 node overlap、edge-through-node、
+  coincident segment、arrow／label。Graph focused 9/9、Unified 11/11、Core/capture 15/15 通过；Browser 在
+  1440×900、1280×800、390×844 验证零横向溢出、同事实移动 ledger、键盘 inspector 与空 console。
+- 一组额外 W7B execution 诊断在 lineage fixture setup 阶段报 8 个错误；同一错误可在未改动 clean
+  `5fee848` worktree 单测复现，故记录为 retained baseline limitation，不在本次 presentation-only correction
+  中修改 Core。最终 CI6／repository evidence 以本 Validation 的 correction ledger 为准。
+- Correction dry-run 精确选择 91 项；CI contract、repository gate（729 paths／394 Markdown／1054 links）、
+  release/Codex adapter 隔离 dry build、archive listing 与 diff gate 通过。正式 Fast 四次在固定 15 秒达到
+  budget，Checkpoint 两次在既有 Maintenance 测试运行中达到固定 90 秒；该 exact Maintenance 测试随后
+  95.385 秒独立 PASS，故失败回执如实保留且不冒充 correction PASS。`5fee848` 的 90/90 Fast 与 96/96
+  Checkpoint 仍是 Core/capture retained evidence；中央须在 clean Candidate host 重跑本次校正门。
+
+- 从 exact `codex/u1-u2-integration-baseline@3fc7e7a` 建立独立 worktree，并在产品写入前登记 Git-private
+  `W7.3-workstream-relation-capture-confirmation`。暂停期间只保留安全工作树；恢复前用 `git show` 逐一核对
+  authority commit `6315415` 的八个指定 blob，并把 OID、expected writes 与 validation surfaces 登记为 scope
+  revision 3。实现阶段使用 GPT-5.6 Sol／medium；未读取或写入 A4.1 worktree，也未改动中央 63203 服务。
+- Core 0.1.18／CLI 0.1.22／Observatory 0.1.17／Harness JSON 0.1.2 实现 versioned append-only relation
+  proposal／confirmation／role／series store、exact mechanical `derived_from`、四类 dependency gate、Integrator-only
+  `absorbs`、CAS 与本机人类权限门。Agent／Harness 只能 suggest，central／remote／session spoof 失败关闭；旧 v1
+  无 gate dependency 保持 Unknown，proposal/deferred/Unknown 不阻塞 lifecycle。
+- Unified Observatory 增加 Personal 可授权／Team request-only 的“关系待确认”收件箱；Graph 继续只读，增加结构化
+  A／CI／U series lane、机械中文状态 taxonomy，并把 comparison suggestions 与 evidence-backed conflict facts 分离。
+  真实 self-host A4→A3、CI7→CI6 只写 proposal；新 `W7.3-integration-acceptance` 从 exact `84e1c0a` 自动形成
+  `derived_from`，对 CI6 的 integration requirement 仍待 integrator 确认。最终投影 27 nodes／13 edges、15
+  comparisons、0 conflicts、3 pending capture proposals。
+- 相关回归 41/41、最终 Fast 90/90（10.488559s）与最终 Checkpoint 96/96（78.812261s）通过。前两次 Checkpoint
+  在既有 Maintenance fixture 处 90 秒超时，未冒充通过；Unified test setup 改用有界合成 capture 后重跑。
+  Browser 1440×900／390×844 的 Personal／Team／Graph 均无横向溢出或 console warning/error，Graph 无确认按钮。
+  repository/release/archive/diff 门通过；不运行 Promotion、不 push main、不发布、不改 v0.2.0。
+
 ## 2026-08-29 — U2.2／W7.2 Unified Observatory Joint Acceptance Candidate
 
 - 唯一整合者从 clean `codex/u1-u2-integration-baseline@6166d15` 先合入 W7.2.3 exact `30d44ff`，再合入 U2.2 exact `70e6ac9`；两条产品文件集合无直接重叠。中央 CI7／ADR-0017 与 W7.2 的 DEVLOG、State、Validation index 只做加法协调，联合 feature merge 为 `0eaad30`。

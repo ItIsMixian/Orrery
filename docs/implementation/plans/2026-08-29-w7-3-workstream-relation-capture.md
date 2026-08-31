@@ -901,16 +901,16 @@ hygiene beyond the accepted dependency and is not authorized.
 
 ### Exact exception
 
-- [ ] Add root `.gitattributes` entries for exactly these two files and set only their Git `whitespace` attribute to
+- [x] Add root `.gitattributes` entries for exactly these two files and set only their Git `whitespace` attribute to
   unset (`-whitespace`):
   - `packages/project-orrery-observatory/src/project_orrery_observatory/vendor/elk.bundled.js`;
   - `experiments/workstream-graph-elk-evaluation/vendor/elk.bundled.js`.
-- [ ] Do not add `*.js`, `vendor/**` or another pattern exemption; do not change text/eol attributes for these files;
+- [x] Do not add `*.js`, `vendor/**` or another pattern exemption; do not change text/eol attributes for these files;
   do not rewrite, format or regenerate either reviewed bundle.
-- [ ] Verify `git check-attr whitespace -- <both exact paths>` reports `unset`, both SHA-256 values remain
+- [x] Verify `git check-attr whitespace -- <both exact paths>` reports `unset`, both SHA-256 values remain
   `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`, and the complete staged
   `git diff --cached --check` passes while authored files remain covered by the normal repository rules.
-- [ ] Do not rerun the already green 13 focused tests, Browser review or JavaScript check merely because this metadata
+- [x] Do not rerun the already green 13 focused tests, Browser review or JavaScript check merely because this metadata
   line was added. Record only the attribute/hash/diff evidence, then create the single clean W7.3 Candidate.
 
 Continue the same W7.3 task/worktree and preserve its staged index and all dirty files. Read this amendment and its

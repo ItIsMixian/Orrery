@@ -30,6 +30,18 @@ from project_orrery_core.workstream_relations import (
     default_relation_evidence,
     load_relation_graph,
 )
+from project_orrery_core.workstream_relation_capture import (
+    DEPENDENCY_GATES,
+    accept_proposal,
+    change_integrator_role,
+    change_proposal_gate,
+    defer_proposal,
+    evidence_reference,
+    inspect_integrator_roles,
+    inspect_relation_capture,
+    reject_proposal,
+    suggest_relation,
+)
 
 from .protocol import JsonExitCode, emit, issue, response
 
@@ -122,6 +134,75 @@ def build_parser() -> argparse.ArgumentParser:
     receipt = actions.add_parser("receipt", help="load and validate one deterministic execution receipt")
     _add_target(receipt)
     receipt.add_argument("--receipt-id", required=True)
+
+    suggest = actions.add_parser("suggest", help="append one bounded W7.3 relation proposal")
+    _add_target(suggest)
+    suggest.add_argument("--proposal-id", required=True)
+    suggest.add_argument("--type", required=True, choices=RELATION_TYPES, dest="relation_type")
+    suggest.add_argument("--source", required=True, dest="source_workstream_id")
+    suggest.add_argument("--target-workstream", required=True, dest="target_workstream_id")
+    suggest.add_argument("--required-for", choices=DEPENDENCY_GATES)
+    suggest.add_argument("--rationale", required=True)
+    suggest.add_argument("--consequence", required=True)
+    suggest.add_argument("--proposer-kind", required=True, choices=("agent", "conductor", "harness", "human", "tool"))
+    suggest.add_argument("--proposer-id", required=True)
+    suggest.add_argument("--platform-session-id")
+    suggest.add_argument("--fact-scope", default="worktree", choices=("canonical", "candidate", "worktree", "local-only", "historical", "unknown"))
+    suggest.add_argument("--evidence", action="append", default=[], metavar="CATEGORY,FACT_SCOPE,HASH,REF")
+    suggest.add_argument("--target-closure", choices=("closed", "integrated", "open", "unknown"))
+    suggest.add_argument("--validation-ref", action="append", default=[])
+    suggest.add_argument("--scope-ref", action="append", default=[])
+    suggest.add_argument("--unfinished-responsibility", action="append", default=[])
+    suggest.add_argument("--recorded-at")
+
+    accept = actions.add_parser("accept", help="locally confirm one exact proposal revision")
+    _add_target(accept)
+    accept.add_argument("--proposal-id", required=True)
+    accept.add_argument("--expected-revision", required=True, type=int)
+    accept.add_argument("--confirmer-id", required=True)
+    accept.add_argument("--confirmer-role", required=True, choices=("task-owner", "integrator"))
+    accept.add_argument("--caller-kind", default="human", choices=("human", "agent", "harness", "session", "conductor"))
+    accept.add_argument("--caller-context", default="local", choices=("local", "central-request", "remote"))
+    accept.add_argument("--confirm-local", action="store_true")
+    accept.add_argument("--recorded-at")
+
+    change_gate = actions.add_parser("change-gate", help="append a new gate proposal revision")
+    _add_target(change_gate)
+    change_gate.add_argument("--proposal-id", required=True)
+    change_gate.add_argument("--expected-revision", required=True, type=int)
+    change_gate.add_argument("--required-for", required=True, choices=DEPENDENCY_GATES)
+    change_gate.add_argument("--actor-id", required=True)
+    change_gate.add_argument("--reason", required=True)
+    change_gate.add_argument("--caller-kind", default="human", choices=("human", "agent", "harness", "session", "conductor"))
+    change_gate.add_argument("--caller-context", default="local", choices=("local", "central-request", "remote"))
+    change_gate.add_argument("--confirm-local", action="store_true")
+    change_gate.add_argument("--recorded-at")
+
+    for name in ("defer", "reject"):
+        decision = actions.add_parser(name, help=f"append one {name} proposal decision")
+        _add_target(decision)
+        decision.add_argument("--proposal-id", required=True)
+        decision.add_argument("--expected-revision", required=True, type=int)
+        decision.add_argument("--actor-id", required=True)
+        decision.add_argument("--reason", required=True)
+        decision.add_argument("--caller-kind", default="human", choices=("human", "agent", "harness", "session", "conductor"))
+        decision.add_argument("--caller-context", default="local", choices=("local", "central-request", "remote"))
+        decision.add_argument("--confirm-local", action="store_true")
+        decision.add_argument("--recorded-at")
+
+    roles = actions.add_parser("roles", help="inspect or change the human integrator registry")
+    role_actions = roles.add_subparsers(dest="role_action", required=True)
+    role_inspect = role_actions.add_parser("inspect")
+    _add_target(role_inspect)
+    for name in ("grant", "revoke"):
+        role = role_actions.add_parser(name)
+        _add_target(role)
+        role.add_argument("--member-id", required=True)
+        role.add_argument("--actor-id", required=True)
+        role.add_argument("--expected-revision", required=True, type=int)
+        role.add_argument("--caller-kind", default="human", choices=("human", "agent", "session", "conductor"))
+        role.add_argument("--caller-context", default="local", choices=("local", "central-request", "remote"))
+        role.add_argument("--recorded-at")
     return parser
 
 
@@ -152,6 +233,19 @@ def _source_links(values: list[str]) -> list[dict[str, str]]:
     return result
 
 
+def _capture_evidence(values: list[str]) -> list[dict[str, str]]:
+    result: list[dict[str, str]] = []
+    for value in values:
+        parts = value.split(",", 3)
+        if len(parts) != 4 or any(not part for part in parts):
+            raise ValueError("--evidence must use CATEGORY,FACT_SCOPE,HASH,REF")
+        category, fact_scope, digest, reference = parts
+        result.append(evidence_reference(
+            category=category, reference=reference, fact_scope=fact_scope, digest=digest,
+        ))
+    return result
+
+
 def _mapping(values: list[str], label: str) -> dict[str, str]:
     result: dict[str, str] = {}
     for value in values:
@@ -162,7 +256,7 @@ def _mapping(values: list[str], label: str) -> dict[str, str]:
     return result
 
 
-def _failure(command: str, json_output: bool, exc: ValueError) -> int:
+def _failure(command: str, json_output: bool, exc: ValueError | PermissionError) -> int:
     code = "workstream_relation_recovery_required" if isinstance(exc, RecoveryRequiredError) else "workstream_relation_operation_failed"
     if json_output:
         emit(response(command, status="error", exit_code=JsonExitCode.OPERATION_FAILED, errors=[issue(code, str(exc))]))
@@ -259,6 +353,82 @@ def main(argv: list[str] | None = None) -> int:
             print("Storage: git-common-private append-only")
         return int(JsonExitCode.OK)
 
+    if arguments.action in {"suggest", "accept", "change-gate", "defer", "reject", "roles"}:
+        command = f"workstream-relation-{arguments.action}"
+        if arguments.action == "roles":
+            command = f"workstream-relation-roles-{arguments.role_action}"
+        try:
+            if arguments.action == "suggest":
+                absorbs_context = None
+                if arguments.relation_type == "absorbs":
+                    absorbs_context = {
+                        "target_closure": arguments.target_closure or "unknown",
+                        "validation_refs": arguments.validation_ref,
+                        "scope_refs": arguments.scope_ref,
+                        "unfinished_responsibilities": arguments.unfinished_responsibility,
+                    }
+                data = suggest_relation(
+                    arguments.target, proposal_id=arguments.proposal_id,
+                    relation_type=arguments.relation_type,
+                    source_workstream_id=arguments.source_workstream_id,
+                    target_workstream_id=arguments.target_workstream_id,
+                    required_for=arguments.required_for, rationale=arguments.rationale,
+                    consequence=arguments.consequence, proposer_kind=arguments.proposer_kind,
+                    proposer_id=arguments.proposer_id, fact_scope=arguments.fact_scope,
+                    platform_session_id=arguments.platform_session_id,
+                    evidence=_capture_evidence(arguments.evidence),
+                    absorbs_context=absorbs_context, recorded_at=arguments.recorded_at,
+                )
+            elif arguments.action == "accept":
+                data = accept_proposal(
+                    arguments.target, arguments.proposal_id,
+                    expected_revision=arguments.expected_revision,
+                    confirmer_id=arguments.confirmer_id,
+                    confirmer_role=arguments.confirmer_role,
+                    caller_kind=arguments.caller_kind,
+                    caller_context=arguments.caller_context,
+                    local_confirmation=arguments.confirm_local,
+                    recorded_at=arguments.recorded_at,
+                )
+            elif arguments.action == "change-gate":
+                data = change_proposal_gate(
+                    arguments.target, arguments.proposal_id,
+                    expected_revision=arguments.expected_revision,
+                    required_for=arguments.required_for, actor_id=arguments.actor_id,
+                    reason=arguments.reason, caller_kind=arguments.caller_kind,
+                    caller_context=arguments.caller_context, local_confirmation=arguments.confirm_local,
+                    recorded_at=arguments.recorded_at,
+                )
+            elif arguments.action == "defer":
+                data = defer_proposal(
+                    arguments.target, arguments.proposal_id,
+                    expected_revision=arguments.expected_revision, actor_id=arguments.actor_id,
+                    reason=arguments.reason, caller_kind=arguments.caller_kind,
+                    caller_context=arguments.caller_context, local_confirmation=arguments.confirm_local,
+                    recorded_at=arguments.recorded_at,
+                )
+            elif arguments.action == "reject":
+                data = reject_proposal(
+                    arguments.target, arguments.proposal_id,
+                    expected_revision=arguments.expected_revision, actor_id=arguments.actor_id,
+                    reason=arguments.reason, caller_kind=arguments.caller_kind,
+                    caller_context=arguments.caller_context, local_confirmation=arguments.confirm_local,
+                    recorded_at=arguments.recorded_at,
+                )
+            elif arguments.role_action == "inspect":
+                data = inspect_integrator_roles(arguments.target)
+            else:
+                data = change_integrator_role(
+                    arguments.target, member_id=arguments.member_id,
+                    action=arguments.role_action, actor_id=arguments.actor_id,
+                    expected_revision=arguments.expected_revision,
+                    caller_kind=arguments.caller_kind, caller_context=arguments.caller_context,
+                    recorded_at=arguments.recorded_at,
+                )
+        except (ValueError, PermissionError) as exc:
+            return _failure(command, arguments.json_output, exc)
+        return _emit_result(command, data, arguments.json_output)
+
     command = f"workstream-relation-{arguments.action}"
     try:
         if arguments.action == "discover":
@@ -296,6 +466,7 @@ def main(argv: list[str] | None = None) -> int:
                 recovered = recover_transaction(arguments.target, arguments.recover, actor_id=arguments.actor_id, occurred_at=arguments.occurred_at)
                 return _emit_result(command, {"recovery": recovered, "inspection": inspect_execution_state(arguments.target)}, arguments.json_output)
             data = inspect_execution_state(arguments.target)
+            data["capture"] = inspect_relation_capture(arguments.target)
             blocked = bool(data["pending_recovery_transaction_ids"])
             return _emit_result(command, data, arguments.json_output, exit_code=JsonExitCode.COMPATIBILITY_FAILED if blocked else JsonExitCode.OK, warning="transaction recovery required" if blocked else None)
         if arguments.action == "receipt":
@@ -322,7 +493,7 @@ def main(argv: list[str] | None = None) -> int:
             if arguments.confirm_local:
                 result["confirmation"] = issue_local_undo_confirmation(arguments.target, plan, actor_id=arguments.actor_id)
             return _emit_result(command, result, arguments.json_output)
-    except ValueError as exc:
+    except (ValueError, PermissionError) as exc:
         return _failure(command, arguments.json_output, exc)
     raise AssertionError("unreachable relation action")
 

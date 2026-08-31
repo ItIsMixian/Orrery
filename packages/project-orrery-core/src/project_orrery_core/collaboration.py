@@ -878,9 +878,21 @@ def build_workstream_session(
     captured_at: str | None = None,
     base_workstream_id: str | None = None,
     task_base_oid: str | None = None,
+    series_id: str | None = None,
+    task_code: str | None = None,
+    series_order: int | None = None,
+    series_predecessor_workstream_id: str | None = None,
+    series_predecessor_required_for: str | None = None,
 ) -> dict[str, Any]:
     """Build a session bound to current Git facts without writing it."""
     root = Path(project_root).expanduser().absolute()
+    series_values = (series_id, task_code, series_order)
+    if any(value is not None for value in series_values) and not all(value is not None for value in series_values):
+        raise ValueError("task series registration requires series_id, task_code, and series_order together")
+    if series_predecessor_workstream_id is not None and series_id is None:
+        raise ValueError("task series predecessor requires explicit task series metadata")
+    if series_predecessor_workstream_id is not None and series_predecessor_required_for is None:
+        raise ValueError("task series predecessor requires an explicit suggested gate")
     config = load_collaboration_config(root)
     identity = inspect_worktree_identity(root, config, member_id=member_id, host_id=host_id)
     lineage = _stacked_lineage(
@@ -988,7 +1000,133 @@ def write_workstream_session(project_root: Path, **session_fields: Any) -> dict[
     """Atomically persist one reconstructable session under the private Git path."""
     root = Path(project_root).expanduser().absolute()
     session = build_workstream_session(root, **session_fields)
-    return _write_private_session(root, session)
+    existing = _read_workstream_session(worktree_session_path(root))
+    if isinstance(existing, Mapping):
+        old_lineage = existing.get("lineage") if isinstance(existing.get("lineage"), Mapping) else {}
+        new_lineage = session.get("lineage") if isinstance(session.get("lineage"), Mapping) else {}
+        old_binding = (old_lineage.get("base_workstream_id"), old_lineage.get("task_base_oid"))
+        new_binding = (new_lineage.get("base_workstream_id"), new_lineage.get("task_base_oid"))
+        if old_binding != new_binding:
+            raise ValueError("Workstream lineage changed; use explicit session rebind with revision/CAS")
+    result = _write_private_session(root, session)
+    from .workstream_relation_capture import auto_capture_derived_from
+
+    result["relation_capture"] = auto_capture_derived_from(root, session)
+    if session_fields.get("series_id") is not None:
+        from .workstream_relation_capture import register_task_series
+
+        result["task_series"] = register_task_series(
+            root,
+            workstream_id=str(session["workstream_id"]),
+            series_id=str(session_fields["series_id"]),
+            task_code=str(session_fields["task_code"]),
+            series_order=int(session_fields["series_order"]),
+            series_predecessor_workstream_id=session_fields.get("series_predecessor_workstream_id"),
+            suggested_required_for=session_fields.get("series_predecessor_required_for"),
+        )
+    return result
+
+
+def rebind_workstream_lineage(
+    project_root: Path,
+    *,
+    base_workstream_id: str,
+    task_base_oid: str,
+    expected_lifecycle_revision: int,
+    reason: str,
+    occurred_at: str | None = None,
+) -> dict[str, Any]:
+    """Explicitly replace one exact lineage binding using session and relation CAS."""
+    if not reason.strip():
+        raise ValueError("lineage rebind requires a bounded reason")
+    root = Path(project_root).expanduser().absolute()
+    status = inspect_worktree_status(root)
+    if status["session"]["state"] != "current":
+        raise ValueError("lineage rebind requires a current Workstream session")
+    session = dict(status["session"]["record"])
+    if session["lifecycle_phase"] in {"integrated", "closed"}:
+        raise ValueError("finished Workstream lineage cannot be rebound")
+    if session.get("lifecycle_revision") != expected_lifecycle_revision:
+        raise ValueError("Workstream lifecycle revision changed; refresh and retry")
+    current_lineage = session.get("lineage") if isinstance(session.get("lineage"), Mapping) else {}
+    requested = _stacked_lineage(
+        root,
+        workstream_id=str(session["workstream_id"]),
+        head=str(session["head"]),
+        base_workstream_id=base_workstream_id,
+        task_base_oid=task_base_oid,
+    )
+    if (
+        current_lineage.get("base_workstream_id") == requested["base_workstream_id"]
+        and current_lineage.get("task_base_oid") == requested["task_base_oid"]
+        and current_lineage.get("status") == requested["status"]
+    ):
+        from .workstream_relation_capture import auto_capture_derived_from
+
+        return {
+            "session": session,
+            "relation_capture": auto_capture_derived_from(root, session, recorded_at=occurred_at),
+            "writes_performed": False,
+            "idempotent": True,
+        }
+
+    from .workstream_relations import (
+        append_relation_event,
+        build_relation_record,
+        load_relation_history,
+    )
+
+    current_records = list(load_relation_history(root)["current_records"])
+    current_parent = next((
+        item for item in current_records
+        if item["relation_type"] == "derived_from"
+        and item["source_workstream_id"] == session["workstream_id"]
+        and item["lifecycle"] not in {"cancelled", "stale"}
+    ), None)
+    timestamp = occurred_at or dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
+    superseded_event = None
+    if current_parent is not None:
+        superseded_event = build_relation_record(
+            relation_id=current_parent["relation_id"],
+            event_id=f"rebind-{hashlib.sha256((current_parent['event_id'] + timestamp).encode('utf-8')).hexdigest()[:24]}",
+            revision=int(current_parent["revision"]) + 1,
+            relation_type="derived_from",
+            source_workstream_id=current_parent["source_workstream_id"],
+            target_workstream_id=current_parent["target_workstream_id"],
+            lifecycle="stale",
+            recorded_at=timestamp,
+            actor_kind="human",
+            actor_id=str(session["member_id"]),
+            origin="native",
+            reason=reason.strip(),
+            evidence=current_parent["evidence"],
+            source_links=current_parent["source_links"],
+            writes_performed=True,
+        )
+        append_relation_event(root, superseded_event)
+    session["lineage"] = requested
+    session["lifecycle_revision"] = expected_lifecycle_revision + 1
+    session["captured_at"] = timestamp
+    session["last_transition"] = {
+        "from_phase": session["lifecycle_phase"],
+        "to_phase": session["lifecycle_phase"],
+        "reason": "explicit-lineage-rebind",
+        "occurred_at": timestamp,
+    }
+    written = _write_private_session(root, session)
+    from .workstream_relation_capture import auto_capture_derived_from
+
+    capture = auto_capture_derived_from(root, session, recorded_at=timestamp)
+    if capture.get("status") != "effective":
+        raise ValueError("lineage rebind did not produce an effective exact derived_from relation")
+    return {
+        "session": written["session"],
+        "session_path": written["session_path"],
+        "superseded_relation_event": superseded_event,
+        "relation_capture": capture,
+        "writes_performed": True,
+        "network_performed": False,
+    }
 
 
 def transition_workstream_session(
@@ -1015,6 +1153,15 @@ def transition_workstream_session(
         raise ValueError("unknown Workstream lifecycle phase")
     if new_phase != old_phase and new_phase not in _LIFECYCLE_TRANSITIONS[old_phase]:
         raise ValueError(f"illegal Workstream lifecycle transition: {old_phase} -> {new_phase}")
+    relation_gate = None
+    if new_phase == "validating" and old_phase in {"created", "investigating", "implementing"}:
+        from .workstream_relation_capture import relation_gate_eligibility
+
+        relation_gate = relation_gate_eligibility(
+            root, source_workstream_id=str(session["workstream_id"]), required_for="implementation"
+        )
+        if not relation_gate["eligible"]:
+            raise ValueError("effective implementation dependency blocks transition to validation")
     if new_phase == "review-ready" and old_phase != "review-ready":
         raise ValueError("review-ready transition requires the future executable review gate")
     if new_phase == "integrated" and old_phase != "integrated":
@@ -1068,6 +1215,8 @@ def transition_workstream_session(
                 "error_type": type(error).__name__,
                 "lifecycle_transition_affected": False,
             }
+    if relation_gate is not None:
+        result["relation_gate_eligibility"] = relation_gate
     return result
 
 
@@ -1316,8 +1465,18 @@ def create_worktree(
     host_id: str = "local-host",
     base_workstream_id: str | None = None,
     task_base_oid: str | None = None,
+    series_id: str | None = None,
+    task_code: str | None = None,
+    series_order: int | None = None,
+    series_predecessor_workstream_id: str | None = None,
+    series_predecessor_required_for: str | None = None,
 ) -> dict[str, Any]:
     """Create one linked worktree at an exact local integration OID and initialize its session."""
+    series_values = (series_id, task_code, series_order)
+    if any(value is not None for value in series_values) and not all(value is not None for value in series_values):
+        raise ValueError("task series creation requires series_id, task_code, and series_order together")
+    if series_predecessor_workstream_id is not None and series_predecessor_required_for is None:
+        raise ValueError("task series predecessor requires an explicit suggested gate")
     source_text = str(_run_git(Path(project_root), "rev-parse", "--show-toplevel")).strip()
     source_root = Path(os.path.abspath(source_text))
     config = load_collaboration_config(source_root)
@@ -1388,6 +1547,11 @@ def create_worktree(
             host_id=host_id,
             base_workstream_id=base_workstream_id,
             task_base_oid=task_base_oid,
+            series_id=series_id,
+            task_code=task_code,
+            series_order=series_order,
+            series_predecessor_workstream_id=series_predecessor_workstream_id,
+            series_predecessor_required_for=series_predecessor_required_for,
         )
         if session_result["session"]["integration_oid"] != integration_oid:
             raise ValueError("integration ref changed while the worktree was being created")

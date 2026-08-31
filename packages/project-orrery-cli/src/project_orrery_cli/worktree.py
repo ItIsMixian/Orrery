@@ -15,6 +15,7 @@ from project_orrery_core.collaboration import (
     inspect_worktree_overlap,
     inspect_worktree_status,
     plan_adapter_session_route,
+    rebind_workstream_lineage,
     refresh_workstream_scope,
     transition_workstream_session,
     write_workstream_session,
@@ -80,6 +81,11 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--validation-surface", action="append", default=[])
     create.add_argument("--base-workstream-id")
     create.add_argument("--task-base-oid")
+    create.add_argument("--series-id")
+    create.add_argument("--task-code")
+    create.add_argument("--series-order", type=int)
+    create.add_argument("--series-predecessor-workstream-id")
+    create.add_argument("--series-predecessor-required-for", choices=("implementation", "validation", "integration", "release"))
 
     session = actions.add_parser("session", help="manage the private Workstream session")
     session_actions = session.add_subparsers(dest="session_action", required=True)
@@ -94,6 +100,21 @@ def build_parser() -> argparse.ArgumentParser:
     write.add_argument("--scope-revision", type=int, default=1)
     write.add_argument("--base-workstream-id")
     write.add_argument("--task-base-oid")
+    write.add_argument("--series-id")
+    write.add_argument("--task-code")
+    write.add_argument("--series-order", type=int)
+    write.add_argument("--series-predecessor-workstream-id")
+    write.add_argument("--series-predecessor-required-for", choices=("implementation", "validation", "integration", "release"))
+
+    rebind_lineage = session_actions.add_parser(
+        "rebind-lineage", help="explicitly replace one exact task-base binding with CAS"
+    )
+    _add_common_target(rebind_lineage)
+    rebind_lineage.add_argument("--base-workstream-id", required=True)
+    rebind_lineage.add_argument("--task-base-oid", required=True)
+    rebind_lineage.add_argument("--expected-revision", required=True, type=int)
+    rebind_lineage.add_argument("--reason", required=True)
+    rebind_lineage.add_argument("--occurred-at")
 
     transition = session_actions.add_parser("transition", help="apply one legal lifecycle transition")
     _add_common_target(transition)
@@ -341,6 +362,11 @@ def main(argv: list[str] | None = None) -> int:
                 validation_surfaces=arguments.validation_surface,
                 base_workstream_id=arguments.base_workstream_id,
                 task_base_oid=arguments.task_base_oid,
+                series_id=arguments.series_id,
+                task_code=arguments.task_code,
+                series_order=arguments.series_order,
+                series_predecessor_workstream_id=arguments.series_predecessor_workstream_id,
+                series_predecessor_required_for=arguments.series_predecessor_required_for,
             )
         except ValueError as exc:
             return _failure(command, arguments.json_output, exc)
@@ -394,6 +420,27 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Platform session: {attached['adapter']}:{attached['session_id']}")
         return int(JsonExitCode.OK)
 
+    if arguments.session_action == "rebind-lineage":
+        command = "worktree-session-rebind-lineage"
+        try:
+            data = rebind_workstream_lineage(
+                arguments.target,
+                base_workstream_id=arguments.base_workstream_id,
+                task_base_oid=arguments.task_base_oid,
+                expected_lifecycle_revision=arguments.expected_revision,
+                reason=arguments.reason,
+                occurred_at=arguments.occurred_at,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        if arguments.json_output:
+            emit(response(command, status="ok", exit_code=JsonExitCode.OK, data=data))
+        else:
+            print(f"Lineage parent: {data['session']['lineage']['base_workstream_id']}")
+            print(f"Task base: {data['session']['lineage']['task_base_oid']}")
+            print(f"Mechanical relation: {data['relation_capture']['status']}")
+        return int(JsonExitCode.OK)
+
     command = "worktree-session-write"
     try:
         data = write_workstream_session(
@@ -407,6 +454,11 @@ def main(argv: list[str] | None = None) -> int:
             scope_revision=arguments.scope_revision,
             base_workstream_id=arguments.base_workstream_id,
             task_base_oid=arguments.task_base_oid,
+            series_id=arguments.series_id,
+            task_code=arguments.task_code,
+            series_order=arguments.series_order,
+            series_predecessor_workstream_id=arguments.series_predecessor_workstream_id,
+            series_predecessor_required_for=arguments.series_predecessor_required_for,
         )
     except ValueError as exc:
         return _failure(command, arguments.json_output, exc)

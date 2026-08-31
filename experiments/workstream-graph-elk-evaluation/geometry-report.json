@@ -1,0 +1,326 @@
+{
+  "schema": "orrery-gx2-geometry-report-v1",
+  "task_description": "01ff835de3f2611929c8c0766a621108d03ae72e",
+  "engine": {
+    "name": "elkjs",
+    "version": "0.11.0",
+    "bundle_sha256": "cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8",
+    "bundle_size_bytes": 1627496,
+    "license": "EPL-2.0"
+  },
+  "generated_at": "2026-08-30T22:46:00.319Z",
+  "attempts": [
+    {
+      "round": "initial",
+      "configuration": "layered LTR root + orthogonal + compound program DOWN",
+      "outcome": "completed",
+      "finding": "W compound produced one unmarked crossing and long cross-hierarchy routes"
+    },
+    {
+      "round": "focused-correction",
+      "configuration": "compound program RIGHT + stable model order",
+      "outcome": "failed",
+      "error": "ELK TypeError: Cannot read properties of undefined (reading 'a')",
+      "restored_initial_configuration": true
+    }
+  ],
+  "views": {
+    "succession": {
+      "view": "succession",
+      "layers": {
+        "affected": false,
+        "semantic": false
+      },
+      "input_full_card_ids": [
+        "A3-authority-managed-consumer-contract",
+        "A4-portable-meta-rules-bootstrap-contract",
+        "CI6-local-validation-router-tier-enforcement",
+        "CI7-validation-routing-precision-total-cost",
+        "U1-unified-observatory-architecture",
+        "U2-unified-observatory-production-integration",
+        "U2.2-unified-navigation-workspace-maintenance-ux",
+        "W7.3-workstream-relation-capture-confirmation",
+        "W7.3-integration-acceptance"
+      ],
+      "input_boundary_ids": [],
+      "input_edge_ids": [
+        "series-a3-a4",
+        "series-ci6-ci7",
+        "series-u1-u2",
+        "series-u2-u22",
+        "effective-w73"
+      ],
+      "output_bounds": {
+        "width": 1394,
+        "height": 644
+      },
+      "layout_time_ms": 15.1,
+      "node_node_overlaps": [],
+      "container_external_node_overlaps": [],
+      "label_node_overlaps": [],
+      "route_node_intersections": [],
+      "unmarked_crossings": [],
+      "route_stretch": [
+        {
+          "edge_id": "series-a3-a4",
+          "ratio": 1,
+          "route_length": 294
+        },
+        {
+          "edge_id": "series-ci6-ci7",
+          "ratio": 1,
+          "route_length": 294
+        },
+        {
+          "edge_id": "series-u1-u2",
+          "ratio": 1,
+          "route_length": 294
+        },
+        {
+          "edge_id": "series-u2-u22",
+          "ratio": 1,
+          "route_length": 294
+        },
+        {
+          "edge_id": "effective-w73",
+          "ratio": 1,
+          "route_length": 294
+        }
+      ],
+      "external_network_requests": [],
+      "post_processed_coordinates": false,
+      "engine_owned_fact_set_changes": false
+    },
+    "w_compound": {
+      "view": "w_compound",
+      "layers": {
+        "affected": false,
+        "semantic": false
+      },
+      "input_full_card_ids": [
+        "W5C-team-observatory-ux",
+        "W5D-lan-collaboration-harness",
+        "W5E-team-observatory-ui-closeout",
+        "W6.1-incremental-maintenance-quick-remove",
+        "W7.1-archived-session-relation-projection",
+        "W7.2.2-graph-arrow-scrollbar-visual-integration",
+        "W7.2.3-workstream-graph-density-correction",
+        "W7.3-workstream-relation-capture-confirmation",
+        "W7.3-integration-acceptance",
+        "CI1-tiered-parallel-validation",
+        "CI6-local-validation-router-tier-enforcement",
+        "SH1-real-self-host-collaboration-acceptance"
+      ],
+      "input_boundary_ids": [],
+      "input_edge_ids": [
+        "legacy-w5d-ci1",
+        "legacy-ci1-w5e",
+        "legacy-w61-ci6",
+        "legacy-sh1-w71",
+        "legacy-w722-w723",
+        "effective-w73-compound",
+        "proposal-ci6-w73"
+      ],
+      "output_bounds": {
+        "width": 1961,
+        "height": 1383
+      },
+      "layout_time_ms": 39.5,
+      "node_node_overlaps": [],
+      "container_external_node_overlaps": [],
+      "label_node_overlaps": [],
+      "route_node_intersections": [],
+      "unmarked_crossings": [
+        [
+          "legacy-ci1-w5e",
+          "legacy-sh1-w71"
+        ]
+      ],
+      "route_stretch": [
+        {
+          "edge_id": "legacy-w5d-ci1",
+          "ratio": 1,
+          "route_length": 555.5
+        },
+        {
+          "edge_id": "legacy-ci1-w5e",
+          "ratio": 2.846,
+          "route_length": 3812.5
+        },
+        {
+          "edge_id": "legacy-w61-ci6",
+          "ratio": 1,
+          "route_length": 378
+        },
+        {
+          "edge_id": "legacy-sh1-w71",
+          "ratio": 1,
+          "route_length": 354
+        },
+        {
+          "edge_id": "legacy-w722-w723",
+          "ratio": 1,
+          "route_length": 110
+        },
+        {
+          "edge_id": "effective-w73-compound",
+          "ratio": 1,
+          "route_length": 110
+        },
+        {
+          "edge_id": "proposal-ci6-w73",
+          "ratio": 1.926,
+          "route_length": 2633
+        }
+      ],
+      "external_network_requests": [],
+      "post_processed_coordinates": false,
+      "engine_owned_fact_set_changes": false
+    },
+    "project_structure_default": {
+      "view": "project_structure",
+      "layers": {
+        "affected": false,
+        "semantic": false
+      },
+      "input_full_card_ids": [
+        "SH1-real-self-host-collaboration-acceptance"
+      ],
+      "input_boundary_ids": [],
+      "input_edge_ids": [],
+      "output_bounds": {
+        "width": 306,
+        "height": 164
+      },
+      "layout_time_ms": 8.3,
+      "node_node_overlaps": [],
+      "container_external_node_overlaps": [],
+      "label_node_overlaps": [],
+      "route_node_intersections": [],
+      "unmarked_crossings": [],
+      "route_stretch": [],
+      "external_network_requests": [],
+      "post_processed_coordinates": false,
+      "engine_owned_fact_set_changes": false
+    },
+    "dependency": {
+      "view": "dependency",
+      "layers": {
+        "affected": false,
+        "semantic": false
+      },
+      "input_full_card_ids": [
+        "A3-authority-managed-consumer-contract",
+        "A4-portable-meta-rules-bootstrap-contract",
+        "CI6-local-validation-router-tier-enforcement",
+        "CI7-validation-routing-precision-total-cost",
+        "W7.3-integration-acceptance"
+      ],
+      "input_boundary_ids": [],
+      "input_edge_ids": [
+        "depends-a3-a4",
+        "depends-ci6-ci7",
+        "depends-ci6-w73"
+      ],
+      "output_bounds": {
+        "width": 876,
+        "height": 484
+      },
+      "layout_time_ms": 11.3,
+      "node_node_overlaps": [],
+      "container_external_node_overlaps": [],
+      "label_node_overlaps": [],
+      "route_node_intersections": [],
+      "unmarked_crossings": [],
+      "route_stretch": [
+        {
+          "edge_id": "depends-a3-a4",
+          "ratio": 1,
+          "route_length": 320
+        },
+        {
+          "edge_id": "depends-ci6-ci7",
+          "ratio": 1,
+          "route_length": 358
+        },
+        {
+          "edge_id": "depends-ci6-w73",
+          "ratio": 1,
+          "route_length": 442
+        }
+      ],
+      "external_network_requests": [],
+      "post_processed_coordinates": false,
+      "engine_owned_fact_set_changes": false
+    },
+    "project_structure_context": {
+      "view": "project_structure",
+      "layers": {
+        "affected": true,
+        "semantic": true
+      },
+      "input_full_card_ids": [
+        "SH1-real-self-host-collaboration-acceptance",
+        "W7.1-archived-session-relation-projection",
+        "A4-portable-meta-rules-bootstrap-contract",
+        "CI1-tiered-parallel-validation",
+        "CI5-promotion-throughput-optimization",
+        "CI7-validation-routing-precision-total-cost",
+        "G1-github-front-door-static-v1",
+        "REL3-v0-3-0-release-scope-default-matrix",
+        "S0-orrery-dispatch-skill",
+        "SC1-canonical-state-closeout",
+        "U2-unified-observatory-production-integration",
+        "U2.2-unified-navigation-workspace-maintenance-ux",
+        "U2.3-unified-navigation-live-task-visibility"
+      ],
+      "input_boundary_ids": [
+        "context-overflow+5"
+      ],
+      "input_edge_ids": [
+        "legacy-sh1-w71-context"
+      ],
+      "output_bounds": {
+        "width": 850,
+        "height": 2030
+      },
+      "layout_time_ms": 10.3,
+      "node_node_overlaps": [],
+      "container_external_node_overlaps": [],
+      "label_node_overlaps": [],
+      "route_node_intersections": [],
+      "unmarked_crossings": [],
+      "route_stretch": [
+        {
+          "edge_id": "legacy-sh1-w71-context",
+          "ratio": 1,
+          "route_length": 294
+        }
+      ],
+      "external_network_requests": [],
+      "post_processed_coordinates": false,
+      "engine_owned_fact_set_changes": false
+    }
+  },
+  "browser": {
+    "viewports": [
+      "1440x900",
+      "1280x800",
+      "390x844"
+    ],
+    "console_warnings_or_errors": [],
+    "external_network_requests": 0,
+    "mobile_document_horizontal_overflow": false
+  },
+  "verdict": {
+    "acceptance_pass": false,
+    "flat_views_viable": true,
+    "w_compound_acceptance": false,
+    "blocking_findings": [
+      "w_compound has 1 unmarked crossing",
+      "legacy-ci1-w5e route stretch ratio 2.846",
+      "focused correction crashes ELK 0.11.0"
+    ],
+    "recommendation": "Stop GX2 tuning. Keep the isolated artifact for maintainer review; do not begin product wiring from this result without the pending authority amendment."
+  }
+}

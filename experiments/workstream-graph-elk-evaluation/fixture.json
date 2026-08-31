@@ -1,0 +1,928 @@
+{
+  "schema": "orrery-gx2-sanitized-fixture-v1",
+  "authority": "derived-read-only-experiment",
+  "source_projection_sha256": "5cc24214973607bab10c1e05074be71e3da782a8147aeef2c3cc02d51fd68f53",
+  "captured_task_description": "01ff835de3f2611929c8c0766a621108d03ae72e",
+  "privacy": {
+    "contains_absolute_paths": false,
+    "contains_prompts_or_transcripts": false,
+    "contains_source_or_diff": false,
+    "contains_credentials": false,
+    "contains_raw_private_evidence": false
+  },
+  "nodes": [
+    {
+      "id": "A3-authority-managed-consumer-contract",
+      "code": "A3",
+      "title": "权威 · 受管 · 消费者 · 契约",
+      "status": "正在进行",
+      "status_code": "in-progress",
+      "lifecycle": "validating",
+      "runtime": "active",
+      "evidence": "current",
+      "scope": "current",
+      "primary_subsystem": "authority-meta-model",
+      "affected_subsystems": [
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": "authority-a",
+      "series_order": 3,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "A4-portable-meta-rules-bootstrap-contract",
+      "code": "A4",
+      "title": "契约",
+      "status": "正在进行",
+      "status_code": "in-progress",
+      "lifecycle": "validating",
+      "runtime": "active",
+      "evidence": "current",
+      "scope": "current",
+      "primary_subsystem": "authority-meta-model",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": "authority-a",
+      "series_order": 4,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "CI1-tiered-parallel-validation",
+      "code": "CI1",
+      "title": "分层 · 并行 · 验证",
+      "status": "等待人工确认",
+      "status_code": "human-confirmation-pending",
+      "lifecycle": "validating",
+      "runtime": "waiting-for-user",
+      "evidence": "current",
+      "scope": "stale",
+      "primary_subsystem": "test-coverage",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "CI5-promotion-throughput-optimization",
+      "code": "CI5",
+      "title": "推广 · 吞吐 · 优化",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "validating",
+      "runtime": "offline",
+      "evidence": "current",
+      "scope": "stale",
+      "primary_subsystem": "test-coverage",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "CI6-local-validation-router-tier-enforcement",
+      "code": "CI6",
+      "title": "本地 · 验证 · 路由",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "test-coverage",
+      "affected_subsystems": [
+        "multi-worktree-collaboration",
+        "release-and-toolchain"
+      ],
+      "series_id": "ci",
+      "series_order": 6,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "CI7-validation-routing-precision-total-cost",
+      "code": "CI7",
+      "title": "验证",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "validating",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "current",
+      "primary_subsystem": "test-coverage",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain"
+      ],
+      "series_id": "ci",
+      "series_order": 7,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "G1-github-front-door-static-v1",
+      "code": "G1",
+      "title": "前端",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "GX1-fireworks-graph-skill-evaluation",
+      "code": "GX1",
+      "title": "关系图",
+      "status": "等待人工确认",
+      "status_code": "human-confirmation-pending",
+      "lifecycle": "validating",
+      "runtime": "waiting-for-user",
+      "evidence": "current",
+      "scope": "current",
+      "primary_subsystem": "context-routing-research",
+      "affected_subsystems": [
+        "documentation-system",
+        "multi-worktree-collaboration",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "PO1-decision-allocation-enforcement",
+      "code": "PO1",
+      "title": "任务记录",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "multi-worktree-collaboration",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "REL3-v0-3-0-release-scope-default-matrix",
+      "code": "REL3",
+      "title": "任务记录",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "implementing",
+      "runtime": "blocked-by-conflict",
+      "evidence": "unknown",
+      "scope": "current",
+      "primary_subsystem": "release-and-toolchain",
+      "affected_subsystems": [
+        "authority-meta-model",
+        "documentation-system",
+        "project-structure",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "S0-orrery-dispatch-skill",
+      "code": "S0",
+      "title": "任务记录",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "current",
+      "primary_subsystem": "release-and-toolchain",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "SC1-canonical-state-closeout",
+      "code": "SC1",
+      "title": "权威 · 状态 · 收口",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "validating",
+      "runtime": "active",
+      "evidence": "current",
+      "scope": "stale",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "multi-worktree-collaboration",
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "SH1-real-self-host-collaboration-acceptance",
+      "code": "SH1",
+      "title": "真实 · 自 · 托管 · 协作 · 验收",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "project-structure",
+      "affected_subsystems": [
+        "documentation-system",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "U1-U2-integration-baseline",
+      "code": "U1",
+      "title": "整合 · 基线",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "unknown",
+      "runtime": "unknown",
+      "evidence": "unknown",
+      "scope": "unknown",
+      "primary_subsystem": "unknown",
+      "affected_subsystems": [],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "U1-unified-observatory-architecture",
+      "code": "U1",
+      "title": "统一 · 观测台 · 架构",
+      "status": "等待人工确认",
+      "status_code": "human-confirmation-pending",
+      "lifecycle": "validating",
+      "runtime": "waiting-for-user",
+      "evidence": "current",
+      "scope": "current",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "authority-meta-model",
+        "multi-worktree-collaboration"
+      ],
+      "series_id": "unified-u",
+      "series_order": 1,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "U2-unified-observatory-production-integration",
+      "code": "U2",
+      "title": "统一 · 观测台 · 生产 · 整合",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": "unified-u",
+      "series_order": 2,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "U2.1-unified-observatory-ux-acceptance-fixes",
+      "code": "U2.1",
+      "title": "统一 · 观测台 · 体验 · 验收 · 修复",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "unknown",
+      "runtime": "unknown",
+      "evidence": "unknown",
+      "scope": "unknown",
+      "primary_subsystem": "unknown",
+      "affected_subsystems": [],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "U2.2-unified-navigation-workspace-maintenance-ux",
+      "code": "U2.2",
+      "title": "统一 · 维护 · 体验",
+      "status": "正在进行",
+      "status_code": "in-progress",
+      "lifecycle": "validating",
+      "runtime": "active",
+      "evidence": "current",
+      "scope": "current",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "project-structure",
+        "test-coverage"
+      ],
+      "series_id": "unified-u",
+      "series_order": 22,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "U2.3-unified-navigation-live-task-visibility",
+      "code": "U2.3",
+      "title": "统一",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "validating",
+      "runtime": "active",
+      "evidence": "stale",
+      "scope": "current",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "authority-meta-model",
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": null,
+      "phase_id": null
+    },
+    {
+      "id": "W5C-team-observatory-ux",
+      "code": "W5C",
+      "title": "团队 · 观测台 · 体验",
+      "status": "等待人工确认",
+      "status_code": "human-confirmation-pending",
+      "lifecycle": "validating",
+      "runtime": "waiting-for-user",
+      "evidence": "current",
+      "scope": "stale",
+      "primary_subsystem": "multi-worktree-collaboration",
+      "affected_subsystems": [
+        "documentation-system",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w5"
+    },
+    {
+      "id": "W5D-lan-collaboration-harness",
+      "code": "W5D",
+      "title": "局域网 · 协作 · 验证",
+      "status": "历史任务",
+      "status_code": "historical",
+      "lifecycle": "closed",
+      "runtime": "offline",
+      "evidence": "current",
+      "scope": "current",
+      "primary_subsystem": "multi-worktree-collaboration",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w5"
+    },
+    {
+      "id": "W5E-team-observatory-ui-closeout",
+      "code": "W5E",
+      "title": "团队 · 观测台 · 界面 · 收口",
+      "status": "等待人工确认",
+      "status_code": "human-confirmation-pending",
+      "lifecycle": "validating",
+      "runtime": "waiting-for-user",
+      "evidence": "current",
+      "scope": "stale",
+      "primary_subsystem": "multi-worktree-collaboration",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w5"
+    },
+    {
+      "id": "W6.1-incremental-maintenance-quick-remove",
+      "code": "W6.1",
+      "title": "增量 · 维护 · 快速 · 删除",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "current",
+      "primary_subsystem": "multi-worktree-collaboration",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w6"
+    },
+    {
+      "id": "W7.1-archived-session-relation-projection",
+      "code": "W7.1",
+      "title": "归档 · 会话 · 关系 · 投影",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "multi-worktree-collaboration",
+      "affected_subsystems": [
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w7"
+    },
+    {
+      "id": "W7.2.2-graph-arrow-scrollbar-visual-integration",
+      "code": "W7.2.2",
+      "title": "关系图 · 整合",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "unknown",
+      "runtime": "unknown",
+      "evidence": "unknown",
+      "scope": "unknown",
+      "primary_subsystem": "unknown",
+      "affected_subsystems": [],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w7"
+    },
+    {
+      "id": "W7.2.3-workstream-graph-density-correction",
+      "code": "W7.2.3",
+      "title": "任务流 · 关系图",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "documentation-system",
+      "affected_subsystems": [
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w7"
+    },
+    {
+      "id": "W7.3-integration-acceptance",
+      "code": "W7.3",
+      "title": "整合 · 验收",
+      "status": "关系证据不足",
+      "status_code": "relation-evidence-insufficient",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "current",
+      "primary_subsystem": "multi-worktree-collaboration",
+      "affected_subsystems": [
+        "documentation-system",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": "w7-integration",
+      "series_order": 1,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w7"
+    },
+    {
+      "id": "W7.3-workstream-relation-capture-confirmation",
+      "code": "W7.3",
+      "title": "任务流 · 关系",
+      "status": "状态待刷新／证据过期",
+      "status_code": "stale-evidence",
+      "lifecycle": "implementing",
+      "runtime": "active",
+      "evidence": "unknown",
+      "scope": "stale",
+      "primary_subsystem": "multi-worktree-collaboration",
+      "affected_subsystems": [
+        "documentation-system",
+        "project-structure",
+        "release-and-toolchain",
+        "test-coverage"
+      ],
+      "series_id": null,
+      "series_order": null,
+      "program_id": "workstream-w",
+      "phase_id": "workstream-w7"
+    }
+  ],
+  "views": {
+    "succession": {
+      "label": "接续总览",
+      "description": "仅包含 effective 接续与显式展示系列；系列不是因果边。",
+      "full_card_ids": [
+        "A3-authority-managed-consumer-contract",
+        "A4-portable-meta-rules-bootstrap-contract",
+        "CI6-local-validation-router-tier-enforcement",
+        "CI7-validation-routing-precision-total-cost",
+        "U1-unified-observatory-architecture",
+        "U2-unified-observatory-production-integration",
+        "U2.2-unified-navigation-workspace-maintenance-ux",
+        "W7.3-workstream-relation-capture-confirmation",
+        "W7.3-integration-acceptance"
+      ],
+      "boundary_ids": [],
+      "groups": [],
+      "edges": [
+        {
+          "id": "series-a3-a4",
+          "source": "A3-authority-managed-consumer-contract",
+          "target": "A4-portable-meta-rules-bootstrap-contract",
+          "kind": "series",
+          "label": "系列演进",
+          "certainty": "display-only"
+        },
+        {
+          "id": "series-ci6-ci7",
+          "source": "CI6-local-validation-router-tier-enforcement",
+          "target": "CI7-validation-routing-precision-total-cost",
+          "kind": "series",
+          "label": "系列演进",
+          "certainty": "display-only"
+        },
+        {
+          "id": "series-u1-u2",
+          "source": "U1-unified-observatory-architecture",
+          "target": "U2-unified-observatory-production-integration",
+          "kind": "series",
+          "label": "系列演进",
+          "certainty": "display-only"
+        },
+        {
+          "id": "series-u2-u22",
+          "source": "U2-unified-observatory-production-integration",
+          "target": "U2.2-unified-navigation-workspace-maintenance-ux",
+          "kind": "series",
+          "label": "系列演进",
+          "certainty": "display-only"
+        },
+        {
+          "id": "effective-w73",
+          "source": "W7.3-workstream-relation-capture-confirmation",
+          "target": "W7.3-integration-acceptance",
+          "kind": "succession",
+          "label": "接续",
+          "certainty": "confirmed"
+        }
+      ]
+    },
+    "w_compound": {
+      "label": "W 复合视图",
+      "description": "W program / W5–W7 phase 只提供 containment；跨层关系保持真实边。",
+      "full_card_ids": [
+        "W5C-team-observatory-ux",
+        "W5D-lan-collaboration-harness",
+        "W5E-team-observatory-ui-closeout",
+        "W6.1-incremental-maintenance-quick-remove",
+        "W7.1-archived-session-relation-projection",
+        "W7.2.2-graph-arrow-scrollbar-visual-integration",
+        "W7.2.3-workstream-graph-density-correction",
+        "W7.3-workstream-relation-capture-confirmation",
+        "W7.3-integration-acceptance"
+      ],
+      "boundary_ids": [],
+      "groups": [
+        {
+          "id": "workstream-w",
+          "label": "W · 多 Workstream 协作",
+          "kind": "program",
+          "parent": null
+        },
+        {
+          "id": "workstream-w5",
+          "label": "W5 · Team collaboration",
+          "kind": "phase",
+          "parent": "workstream-w"
+        },
+        {
+          "id": "workstream-w6",
+          "label": "W6 · Workspace maintenance",
+          "kind": "phase",
+          "parent": "workstream-w"
+        },
+        {
+          "id": "workstream-w7",
+          "label": "W7 · Relations / integration",
+          "kind": "phase",
+          "parent": "workstream-w"
+        }
+      ],
+      "edges": [
+        {
+          "id": "legacy-w5d-ci1",
+          "source": "W5D-lan-collaboration-harness",
+          "target": "CI1-tiered-parallel-validation",
+          "kind": "succession",
+          "label": "接续过期",
+          "certainty": "stale"
+        },
+        {
+          "id": "legacy-ci1-w5e",
+          "source": "CI1-tiered-parallel-validation",
+          "target": "W5E-team-observatory-ui-closeout",
+          "kind": "succession",
+          "label": "接续过期",
+          "certainty": "stale"
+        },
+        {
+          "id": "legacy-w61-ci6",
+          "source": "W6.1-incremental-maintenance-quick-remove",
+          "target": "CI6-local-validation-router-tier-enforcement",
+          "kind": "succession",
+          "label": "接续过期",
+          "certainty": "stale"
+        },
+        {
+          "id": "legacy-sh1-w71",
+          "source": "SH1-real-self-host-collaboration-acceptance",
+          "target": "W7.1-archived-session-relation-projection",
+          "kind": "succession",
+          "label": "接续过期",
+          "certainty": "stale"
+        },
+        {
+          "id": "legacy-w722-w723",
+          "source": "W7.2.2-graph-arrow-scrollbar-visual-integration",
+          "target": "W7.2.3-workstream-graph-density-correction",
+          "kind": "succession",
+          "label": "接续过期",
+          "certainty": "stale"
+        },
+        {
+          "id": "effective-w73-compound",
+          "source": "W7.3-workstream-relation-capture-confirmation",
+          "target": "W7.3-integration-acceptance",
+          "kind": "succession",
+          "label": "接续",
+          "certainty": "confirmed"
+        },
+        {
+          "id": "proposal-ci6-w73",
+          "source": "CI6-local-validation-router-tier-enforcement",
+          "target": "W7.3-integration-acceptance",
+          "kind": "dependency",
+          "label": "整合门待确认",
+          "certainty": "proposed"
+        }
+      ],
+      "external_context_ids": [
+        "CI1-tiered-parallel-validation",
+        "CI6-local-validation-router-tier-enforcement",
+        "SH1-real-self-host-collaboration-acceptance"
+      ],
+      "boundary_stubs": [
+        {
+          "id": "stub-ci1",
+          "endpoint_id": "CI1-tiered-parallel-validation",
+          "label": "CI1 · 外部验证",
+          "kind": "external-ci"
+        },
+        {
+          "id": "stub-ci6",
+          "endpoint_id": "CI6-local-validation-router-tier-enforcement",
+          "label": "CI6 · 外部验证",
+          "kind": "external-ci"
+        },
+        {
+          "id": "stub-sh1",
+          "endpoint_id": "SH1-real-self-host-collaboration-acceptance",
+          "label": "SH1 · 外部验收",
+          "kind": "external-sh"
+        }
+      ],
+      "phase_panels": [
+        {
+          "id": "panel-w5",
+          "phase_id": "workstream-w5",
+          "direction": "DOWN",
+          "member_ids": [
+            "W5C-team-observatory-ux",
+            "W5D-lan-collaboration-harness",
+            "W5E-team-observatory-ui-closeout"
+          ],
+          "boundary_stubs": [
+            {
+              "id": "stub-w5-ci1",
+              "endpoint_id": "CI1-tiered-parallel-validation",
+              "label": "CI1 · 外部验证",
+              "kind": "external-ci"
+            }
+          ],
+          "edge_ids": [
+            "legacy-w5d-ci1",
+            "legacy-ci1-w5e"
+          ]
+        },
+        {
+          "id": "panel-w6",
+          "phase_id": "workstream-w6",
+          "direction": "DOWN",
+          "member_ids": [
+            "W6.1-incremental-maintenance-quick-remove"
+          ],
+          "boundary_stubs": [
+            {
+              "id": "stub-w6-ci6",
+              "endpoint_id": "CI6-local-validation-router-tier-enforcement",
+              "label": "CI6 · 外部验证",
+              "kind": "external-ci"
+            }
+          ],
+          "edge_ids": [
+            "legacy-w61-ci6"
+          ]
+        },
+        {
+          "id": "panel-w7",
+          "phase_id": "workstream-w7",
+          "direction": "RIGHT",
+          "member_ids": [
+            "W7.1-archived-session-relation-projection",
+            "W7.2.2-graph-arrow-scrollbar-visual-integration",
+            "W7.2.3-workstream-graph-density-correction",
+            "W7.3-workstream-relation-capture-confirmation",
+            "W7.3-integration-acceptance"
+          ],
+          "boundary_stubs": [
+            {
+              "id": "stub-w7-sh1",
+              "endpoint_id": "SH1-real-self-host-collaboration-acceptance",
+              "label": "SH1 · 外部验收",
+              "kind": "external-sh"
+            },
+            {
+              "id": "stub-w7-ci6",
+              "endpoint_id": "CI6-local-validation-router-tier-enforcement",
+              "label": "CI6 · 外部验证",
+              "kind": "external-ci"
+            }
+          ],
+          "edge_ids": [
+            "legacy-sh1-w71",
+            "legacy-w722-w723",
+            "effective-w73-compound",
+            "proposal-ci6-w73"
+          ]
+        }
+      ]
+    },
+    "project_structure": {
+      "label": "Project Structure 模块",
+      "description": "默认只显示 primary；affected 与一跳语义上下文均为独立、默认关闭的层。",
+      "full_card_ids": [
+        "SH1-real-self-host-collaboration-acceptance"
+      ],
+      "affected_context_ids": [
+        "A4-portable-meta-rules-bootstrap-contract",
+        "CI1-tiered-parallel-validation",
+        "CI5-promotion-throughput-optimization",
+        "CI7-validation-routing-precision-total-cost",
+        "G1-github-front-door-static-v1",
+        "REL3-v0-3-0-release-scope-default-matrix",
+        "S0-orrery-dispatch-skill",
+        "SC1-canonical-state-closeout",
+        "U2-unified-observatory-production-integration",
+        "U2.2-unified-navigation-workspace-maintenance-ux",
+        "U2.3-unified-navigation-live-task-visibility",
+        "W5D-lan-collaboration-harness"
+      ],
+      "semantic_context_ids": [
+        "W7.1-archived-session-relation-projection"
+      ],
+      "boundary_ids": "affected-overflow+4",
+      "groups": [],
+      "edges": [
+        {
+          "id": "legacy-sh1-w71-context",
+          "source": "SH1-real-self-host-collaboration-acceptance",
+          "target": "W7.1-archived-session-relation-projection",
+          "kind": "succession",
+          "label": "接续过期",
+          "certainty": "stale"
+        }
+      ]
+    },
+    "dependency": {
+      "label": "依赖视图",
+      "description": "完整节点严格等于 scoped depends_on proposal 的端点；不收入孤立 series/program/active-tip 节点。",
+      "full_card_ids": [
+        "A3-authority-managed-consumer-contract",
+        "A4-portable-meta-rules-bootstrap-contract",
+        "CI6-local-validation-router-tier-enforcement",
+        "CI7-validation-routing-precision-total-cost",
+        "W7.3-integration-acceptance"
+      ],
+      "boundary_ids": [],
+      "groups": [],
+      "edges": [
+        {
+          "id": "depends-a3-a4",
+          "source": "A3-authority-managed-consumer-contract",
+          "target": "A4-portable-meta-rules-bootstrap-contract",
+          "kind": "dependency",
+          "label": "整合门待确认",
+          "certainty": "proposed"
+        },
+        {
+          "id": "depends-ci6-ci7",
+          "source": "CI6-local-validation-router-tier-enforcement",
+          "target": "CI7-validation-routing-precision-total-cost",
+          "kind": "dependency",
+          "label": "整合门待确认",
+          "certainty": "proposed"
+        },
+        {
+          "id": "depends-ci6-w73",
+          "source": "CI6-local-validation-router-tier-enforcement",
+          "target": "W7.3-integration-acceptance",
+          "kind": "dependency",
+          "label": "整合门待确认",
+          "certainty": "proposed"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schemas/workstream-relation-capture-v2.json",
+  "title": "Orrery Workstream relation capture v2",
+  "oneOf": [
+    {"$ref": "#/$defs/proposal_event"},
+    {"$ref": "#/$defs/confirmation_event"},
+    {"$ref": "#/$defs/role_event"},
+    {"$ref": "#/$defs/task_series_event"}
+  ],
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "oid": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nullable_hash": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "format": "date-time", "maxLength": 64},
+    "bounded_text": {"type": "string", "minLength": 1, "maxLength": 2048, "pattern": "^[^\\r\\n\\u0000]+$"},
+    "fact_scope": {"enum": ["canonical", "candidate", "worktree", "local-only", "historical", "unknown"]},
+    "required_for": {"enum": ["implementation", "validation", "integration", "release"]},
+    "evidence": {
+      "type": "object",
+      "required": ["category", "ref", "hash", "fact_scope"],
+      "properties": {
+        "category": {"enum": ["closure", "git-ancestry", "harness", "human-or-agent-assertion", "plan", "scope", "validation", "workstream-session"]},
+        "ref": {"type": "string", "minLength": 1, "maxLength": 512, "pattern": "^(?![A-Za-z]:)(?!/)(?!~)(?!.*://)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n\\u0000]+$"},
+        "hash": {"$ref": "#/$defs/hash"},
+        "fact_scope": {"$ref": "#/$defs/fact_scope"}
+      },
+      "additionalProperties": false
+    },
+    "absorbs_context": {
+      "type": ["object", "null"],
+      "required": ["target_closure", "validation_refs", "scope_refs", "unfinished_responsibilities"],
+      "properties": {
+        "target_closure": {"enum": ["closed", "integrated", "open", "unknown"]},
+        "validation_refs": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "maxLength": 512}},
+        "scope_refs": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "maxLength": 512}},
+        "unfinished_responsibilities": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "maxLength": 512}}
+      },
+      "additionalProperties": false
+    },
+    "proposal_event": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "event_id", "event_hash", "proposal_id", "relation_id", "revision", "event_kind", "status", "relation_type", "source_workstream_id", "target_workstream_id", "required_for", "rationale", "consequence", "fact_scope", "proposer", "evidence", "source_head_oid", "target_head_oid", "absorbs_context", "recorded_at", "prior_event_hash", "writes_performed"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "workstream-relation-proposal-event"},
+        "event_id": {"$ref": "#/$defs/id"},
+        "event_hash": {"$ref": "#/$defs/hash"},
+        "proposal_id": {"$ref": "#/$defs/id"},
+        "relation_id": {"$ref": "#/$defs/id"},
+        "revision": {"type": "integer", "minimum": 1},
+        "event_kind": {"enum": ["accepted", "deferred", "evidence-updated", "gate-changed", "rejected", "suggested", "superseded"]},
+        "status": {"enum": ["accepted", "deferred-unknown", "proposed", "rejected", "superseded"]},
+        "relation_type": {"enum": ["derived_from", "depends_on", "absorbs"]},
+        "source_workstream_id": {"$ref": "#/$defs/id"},
+        "target_workstream_id": {"$ref": "#/$defs/id"},
+        "required_for": {"oneOf": [{"$ref": "#/$defs/required_for"}, {"type": "null"}]},
+        "rationale": {"$ref": "#/$defs/bounded_text"},
+        "consequence": {"$ref": "#/$defs/bounded_text"},
+        "fact_scope": {"$ref": "#/$defs/fact_scope"},
+        "proposer": {
+          "type": "object",
+          "required": ["kind", "id", "platform_session_id"],
+          "properties": {
+            "kind": {"enum": ["agent", "conductor", "harness", "human", "tool"]},
+            "id": {"$ref": "#/$defs/id"},
+            "platform_session_id": {"oneOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]}
+          },
+          "additionalProperties": false
+        },
+        "evidence": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"$ref": "#/$defs/evidence"}},
+        "source_head_oid": {"$ref": "#/$defs/oid"},
+        "target_head_oid": {"$ref": "#/$defs/oid"},
+        "absorbs_context": {"$ref": "#/$defs/absorbs_context"},
+        "recorded_at": {"$ref": "#/$defs/timestamp"},
+        "prior_event_hash": {"$ref": "#/$defs/nullable_hash"},
+        "writes_performed": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"relation_type": {"const": "depends_on"}}},
+          "then": {"properties": {"required_for": {"$ref": "#/$defs/required_for"}}},
+          "else": {"properties": {"required_for": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"relation_type": {"const": "absorbs"}}},
+          "then": {"properties": {"absorbs_context": {"type": "object"}}},
+          "else": {"properties": {"absorbs_context": {"type": "null"}}}
+        }
+      ],
+      "additionalProperties": false
+    },
+    "confirmation_event": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "confirmation_id", "event_hash", "proposal_id", "proposal_revision", "proposal_event_hash", "decision", "relation_type", "required_for", "confirmer", "evidence_snapshot_hash", "effective_relation_id", "effective_relation_event_id", "effective_relation_hash", "confirmed_at", "writes_performed"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "workstream-relation-confirmation-event"},
+        "confirmation_id": {"$ref": "#/$defs/id"},
+        "event_hash": {"$ref": "#/$defs/hash"},
+        "proposal_id": {"$ref": "#/$defs/id"},
+        "proposal_revision": {"type": "integer", "minimum": 1},
+        "proposal_event_hash": {"$ref": "#/$defs/hash"},
+        "decision": {"const": "accept"},
+        "relation_type": {"enum": ["derived_from", "depends_on", "absorbs"]},
+        "required_for": {"oneOf": [{"$ref": "#/$defs/required_for"}, {"type": "null"}]},
+        "confirmer": {
+          "type": "object",
+          "required": ["kind", "member_id", "role", "host_id", "project_id", "authority_revision", "local"],
+          "properties": {
+            "kind": {"const": "human"},
+            "member_id": {"$ref": "#/$defs/id"},
+            "role": {"enum": ["task-owner", "integrator"]},
+            "host_id": {"$ref": "#/$defs/id"},
+            "project_id": {"$ref": "#/$defs/hash"},
+            "authority_revision": {"type": "integer", "minimum": 0},
+            "local": {"const": true}
+          },
+          "additionalProperties": false
+        },
+        "evidence_snapshot_hash": {"$ref": "#/$defs/hash"},
+        "effective_relation_id": {"$ref": "#/$defs/id"},
+        "effective_relation_event_id": {"$ref": "#/$defs/id"},
+        "effective_relation_hash": {"$ref": "#/$defs/hash"},
+        "confirmed_at": {"$ref": "#/$defs/timestamp"},
+        "writes_performed": {"const": true}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"relation_type": {"const": "depends_on"}}},
+          "then": {"properties": {"required_for": {"$ref": "#/$defs/required_for"}}},
+          "else": {"properties": {"required_for": {"type": "null"}}}
+        }
+      ],
+      "additionalProperties": false
+    },
+    "role_event": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "event_id", "event_hash", "revision", "member_id", "role", "status", "project_id", "project_mode", "actor", "recorded_at", "prior_event_hash", "writes_performed"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "human-integrator-role-event"},
+        "event_id": {"$ref": "#/$defs/id"},
+        "event_hash": {"$ref": "#/$defs/hash"},
+        "revision": {"type": "integer", "minimum": 1},
+        "member_id": {"$ref": "#/$defs/id"},
+        "role": {"const": "integrator"},
+        "status": {"enum": ["granted", "revoked"]},
+        "project_id": {"$ref": "#/$defs/hash"},
+        "project_mode": {"const": "team"},
+        "actor": {
+          "type": "object",
+          "required": ["kind", "member_id", "host_id", "local"],
+          "properties": {
+            "kind": {"const": "human"},
+            "member_id": {"$ref": "#/$defs/id"},
+            "host_id": {"$ref": "#/$defs/id"},
+            "local": {"const": true}
+          },
+          "additionalProperties": false
+        },
+        "recorded_at": {"$ref": "#/$defs/timestamp"},
+        "prior_event_hash": {"$ref": "#/$defs/nullable_hash"},
+        "writes_performed": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "task_series_event": {
+      "type": "object",
+      "required": ["schema_version", "contract_type", "event_id", "event_hash", "revision", "workstream_id", "series_id", "task_code", "series_order", "series_predecessor_workstream_id", "suggested_required_for", "actor", "recorded_at", "prior_event_hash", "writes_performed"],
+      "properties": {
+        "schema_version": {"const": 2},
+        "contract_type": {"const": "workstream-task-series-event"},
+        "event_id": {"$ref": "#/$defs/id"},
+        "event_hash": {"$ref": "#/$defs/hash"},
+        "revision": {"type": "integer", "minimum": 1},
+        "workstream_id": {"$ref": "#/$defs/id"},
+        "series_id": {"$ref": "#/$defs/id"},
+        "task_code": {"$ref": "#/$defs/id"},
+        "series_order": {"type": "integer", "minimum": 0, "maximum": 1000000},
+        "series_predecessor_workstream_id": {"oneOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+        "suggested_required_for": {"oneOf": [{"$ref": "#/$defs/required_for"}, {"type": "null"}]},
+        "actor": {"$ref": "#/$defs/id"},
+        "recorded_at": {"$ref": "#/$defs/timestamp"},
+        "prior_event_hash": {"$ref": "#/$defs/nullable_hash"},
+        "writes_performed": {"const": true}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -237,7 +237,8 @@ class CIValidationTests(unittest.TestCase):
         ]
         self.assertEqual(len(regression_ids), 24)
         self.assertGreaterEqual(len(promotion_only), 20)
-        self.assertLess(plan["selected_test_count"], 24)
+        selected_regression = set(regression_ids) & set(plan["selected_test_ids"])
+        self.assertLess(len(selected_regression), len(regression_ids))
         self.assertFalse(set(promotion_only) & set(plan["selected_test_ids"]))
         self.assertTrue(all(assigned.count(test_id) == 1 for test_id in promotion_only))
 

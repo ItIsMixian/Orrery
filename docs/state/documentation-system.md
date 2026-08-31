@@ -24,13 +24,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - U2.3 local integrated Candidate 将 app rail 收敛为七个固定入口，把路线与趋势从作者文档树移入 app 区，并以唯一 floating Ask Docs 和顶栏只读帮助／系统状态面板替代独立问答／Authority 页面。Personal 使用 Git registry、Git-common-private 有界 session metadata 与现有 Maintenance cache 的轻量 active-task projection；启动不逐 worktree 读取源码、Scope、ignored 或 diff，重证据只在目标详情／刷新时读取。
 - W7.2.3 integrated Candidate 将真实只读 Graph 改为单一从左到右 DAG：固定可读卡片、中文 rank lane、工程图式实线／虚线／复合线、固定 10px 箭头、每链独立展开和收起、锚点式 `Ctrl + 滚轮` 缩放，以及默认关闭的画布内技术详情抽屉。dependency／conflict 只从各自真实端点建图；空 dependency 不显示孤立 active tips。桌面以 88px rank 通道和 44px 独立链间隔显示主图并保留 1×1px 语义 ledger，390px 用同事实列表替代微型图；文档根、侧栏、画布与详情滚动条共享深浅主题变量。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
-- ADR-0017 已接受 Git-private relation proposal／confirmation 的职责边界：Agent、Harness 与未来 Conductor 只能提出带来源和证据的建议；任务 owner 确认 implementation／validation gate，human integrator 确认 integration／release gate 与 `absorbs`。中央调度只是可选交互形态，不是权限来源；当前产品尚无 relation inbox 或这些确认入口。
-- ADR-0020 把 program/phase membership 纳入版本化权威链并与 series/relation 分离；当前只有 Accepted
-  decision/Approved Design/Plan，不能把 W7.3 worktree 的未提交布局表述为已实现层级。
-- ADR-0022 已接受 ELK.js 仅替换 Graph layout/routing；Orrery 的事实选择、现有 SVG/card 视觉、交互与 ledger
-  不变。exact vendor provenance 与产品实现仍 Pending，不能把架构选择写成页面已经修复。
-- ADR-0023 保留 frozen legacy renderer 作为显式本地后手，并把 GX2 页面人工接受放在任何产品写入之前；
-  legacy 与 ELK 共用一份语义输入，失败不得静默切换。
+- ADR-0017 的 Git-private relation proposal／confirmation 已在 W7.3 Candidate 实现。Unified Observatory 的 Personal／Team 页面增加“关系待确认”收件箱：Personal 仅在本机 human role capability 成立时显示 accept/change-gate/defer/reject，Team／central 始终 request-only；Graph 继续只读，只投影 effective／proposed 与 gate。
+- Graph projection schema 2 将 program／phase／series 作为只读分组元数据，不把 membership 当因果边；主状态机械区分正在进行、等待人工确认、状态待刷新／证据过期、历史任务、缺少任务记录、未登记和关系证据不足。当前 Candidate 用固定本地 ELK 布局同一 semantic projection，桌面图与移动 ledger 保持同事实；Core `compare_pairs` 只作为默认关闭的黄色 comparison review，红色 conflict lens 只接受带 location／impact／source 的明确冲突证据。画布不含确认／应用／撤销动作。
 - 动态 docsite 的模型调用统一经过 Broker。Provider 配置与凭据按端点绑定，同源 POST、body gate、预算、缓存和错误脱敏已实现；同用户本机 Broker 不宣称秘密隔离。
 - 当前展示品牌为 Orrery；目标项目标题仍由模板 token 定制。历史 `Project Orrery` 与稳定 `project-orrery` 技术标识按 ADR-0015 保留。
 - A4 local integrated Candidate 不增加第九个一级导航；既有 `authority` 身份显示“事实与规则”，分栏投影目标项目 Seed 与 Core-owned Orrery 工作规则，legacy/managed/readiness 技术状态默认折叠。Ask Docs 在 root Unified 宿主中先消费 route receipt；Skill template 只能 advisory。
@@ -71,6 +66,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - [Authority-first Dispatch Contract](../validation/2026-08-30-authority-first-workstream-dispatch.md)
 - [S0 Orrery Dispatch Skill Validation](../validation/2026-08-30-s0-orrery-dispatch-skill.md)
 - [PO1 Decision Allocation Validation](../validation/2026-08-30-po-decision-allocation-enforcement.md)
+- [W7.3 Relation Capture & Confirmation Validation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
 
 ## 已知缺口
 
@@ -81,8 +77,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Personal／Team／Maintenance／Graph 尚未接入默认 docsite、Skill template 或公开 release。
 - Unified Observatory 仍只是本地 root-only/default-off integrated Candidate；尚未进入默认 docsite、Skill template、managed-tool inventory、installer 或公开 Release。`start-docsite.bat`／`serve.py` 继续作为 legacy rollback 与当前公开兼容入口。
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
-- W7.3 relation capture/inbox/confirmation 只存在于未集成 Worktree Candidate；其手写 Graph UX 被维护者
-  拒绝。修正版必须按 ADR-0022 使用 pinned local ELK geometry，同时保留现有 Orrery UI 和只读事实边界。
 - authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
 - `orrery-dispatch` 已在当前本机安装但未发布；它只能指导宿主遵守流程，不能机械阻断绕过 Skill 的写入，也不能外推为其他主机可用。
+- W7.3 relation capture 仍是 root-only/default-off Candidate；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收。
 - Brownfield Adoption 只有保守接入边界，没有研究结论、Approved Design 或 Implementation Plan。

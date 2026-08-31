@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schema/workstream-program-hierarchy-v1.json",
+  "title": "Project Orrery Workstream Program Hierarchy v1",
+  "oneOf": [
+    {"$ref": "#/$defs/group_event"},
+    {"$ref": "#/$defs/membership_event"}
+  ],
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "actor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "id", "role"],
+      "properties": {
+        "kind": {"enum": ["agent", "human", "tool"]},
+        "id": {"$ref": "#/$defs/id"},
+        "role": {"enum": ["integrator", "proposer"]}
+      }
+    },
+    "common": {
+      "type": "object",
+      "properties": {
+        "schema_version": {"const": 1},
+        "event_id": {"$ref": "#/$defs/id"},
+        "event_hash": {"$ref": "#/$defs/hash"},
+        "revision": {"type": "integer", "minimum": 1},
+        "event_kind": {"enum": ["accepted", "archived", "proposed", "rejected", "superseded"]},
+        "lifecycle": {"enum": ["active", "archived", "proposed", "rejected", "superseded"]},
+        "actor": {"$ref": "#/$defs/actor"},
+        "source_links": {"type": "array", "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 512}, "uniqueItems": true},
+        "recorded_at": {"type": "string", "format": "date-time", "maxLength": 64},
+        "prior_event_hash": {"oneOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]},
+        "writes_performed": {"type": "boolean"}
+      }
+    },
+    "group_event": {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["schema_version", "contract_type", "event_id", "event_hash", "revision", "event_kind", "group_id", "group_kind", "parent_group_id", "display_label", "order", "lifecycle", "actor", "source_links", "recorded_at", "prior_event_hash", "writes_performed"],
+          "properties": {
+            "schema_version": {}, "contract_type": {"const": "workstream-group-event"}, "event_id": {}, "event_hash": {}, "revision": {}, "event_kind": {},
+            "group_id": {"$ref": "#/$defs/id"}, "group_kind": {"enum": ["program", "phase"]},
+            "parent_group_id": {"oneOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+            "display_label": {"type": "string", "minLength": 1, "maxLength": 160}, "order": {"type": "integer"},
+            "lifecycle": {}, "actor": {}, "source_links": {}, "recorded_at": {}, "prior_event_hash": {}, "writes_performed": {}
+          }
+        }
+      ]
+    },
+    "membership_event": {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["schema_version", "contract_type", "event_id", "event_hash", "revision", "event_kind", "membership_id", "workstream_id", "group_path", "lifecycle", "actor", "source_links", "recorded_at", "prior_event_hash", "writes_performed"],
+          "properties": {
+            "schema_version": {}, "contract_type": {"const": "workstream-group-membership-event"}, "event_id": {}, "event_hash": {}, "revision": {}, "event_kind": {},
+            "membership_id": {"$ref": "#/$defs/id"}, "workstream_id": {"$ref": "#/$defs/id"},
+            "group_path": {"type": "array", "prefixItems": [{"$ref": "#/$defs/id"}, {"$ref": "#/$defs/id"}], "items": false, "minItems": 2, "maxItems": 2},
+            "lifecycle": {}, "actor": {}, "source_links": {}, "recorded_at": {}, "prior_event_hash": {}, "writes_performed": {}
+          }
+        }
+      ]
+    }
+  }
+}

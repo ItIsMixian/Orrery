@@ -43,6 +43,8 @@ Updated: 2026-08-30
 - ADR-0021 Final RC 只消费 current child receipts 并运行 integration/release-owned gates；默认手工重放全部
   A4/W7.3/CI7 suites 被禁止。RC 专属门是 manifest、migration/restore、deterministic package、final runtime、
   dual-platform Promotion 与 publication identity，且同 fingerprint 遵守 CI7 no-repeat。
+- W7.3 registry 覆盖 relation schema/fixture、exact-base 幂等 lineage、cycle、role spoof、CAS、stale、legacy、privacy、zero-network、Harness bounded JSON、program/phase/series non-authority、status taxonomy、comparison/conflict 分离以及 pinned-ELK semantic/layout contract。revision-17 focused program/Graph suites为 13/13 PASS；JS byte-safe syntax、vendor inventory和组件版本清点 PASS。scope revision 18 的两条 exact `-whitespace` 属性、vendor SHA-256 与完整 staged diff check 均 PASS。
+- W7.3 当前 total succession 自托管投影在桌面/移动均为 19 nodes／14 edges。Browser focused closeout 覆盖 1440×900 默认 100%／fit 46%／reset 100%、语义色 edge selection 与只读 inspector，以及 390×844 same-fact ledger；两端页面横向 overflow 为 0，console warning/error 为 0。中央整合后的 routed Fast／Checkpoint 尚未运行，不能用本 focused receipt 替代。
 
 ## 覆盖面
 
@@ -75,6 +77,7 @@ Updated: 2026-08-30
 - [U2.1 Unified Observatory UX Acceptance Fixes](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
 - [W7.2 Workstream Graph Readability](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
+- [W7.3 Workstream Relation Capture & Confirmation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
 - [CI5 Promotion Throughput Optimization](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [CI4 opaque token reliability](../validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)
 - [R3 brand-only closeout](../validation/2026-08-28-r3-orrery-brand-only-closeout.md)
@@ -90,6 +93,6 @@ Updated: 2026-08-30
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。
-- Claude 认证后真实模型路由、真实双机 LAN、self-host relation apply、自动 worktree removal 与 OS scheduler 没有验收证据。
+- Claude 认证后真实模型路由、真实双机 LAN、远程／中央 relation confirmation、自动 worktree removal 与 OS scheduler 没有验收证据。
 - Unified Observatory／Authority 没有默认 production consumer 或公开 release evidence；Documentation D2 scanner／CLI 尚未实现。
 - 纯 Skill 指令仍没有强制 pre-model hook；A4 只机械保证 Core/CLI/Harness 与 root Unified Ask Docs 路径，其他宿主保持 advisory/Unknown。

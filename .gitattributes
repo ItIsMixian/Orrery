@@ -5,3 +5,5 @@
 *.yml text eol=lf
 *.bat text eol=crlf
 experiments/context-routing/oracles/oracle-v0.2/fixture-source/** text eol=lf
+packages/project-orrery-observatory/src/project_orrery_observatory/vendor/elk.bundled.js -whitespace
+experiments/workstream-graph-elk-evaluation/vendor/elk.bundled.js -whitespace

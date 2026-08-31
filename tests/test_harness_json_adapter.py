@@ -364,6 +364,65 @@ class HarnessJsonAdapterTests(unittest.TestCase):
         self.assertEqual(invalid["command"], "harness")
         self.assertEqual(invalid["errors"][0]["code"], "invalid_request")
 
+    def test_relation_harness_can_suggest_and_inspect_but_remote_decisions_fail_closed(self) -> None:
+        for source in PACKAGE_SOURCES:
+            if str(source) not in sys.path:
+                sys.path.insert(0, str(source))
+        from project_orrery_core.collaboration import write_workstream_session
+        from tests.fixtures.collaboration.git_fixture import CollaborationGitFixture
+
+        with CollaborationGitFixture() as fixture:
+            write_workstream_session(
+                fixture.worktree_a, workstream_id="harness-source",
+                primary_subsystem_id="project-structure", evidence_freshness="current",
+            )
+            write_workstream_session(
+                fixture.worktree_b, workstream_id="harness-target",
+                primary_subsystem_id="test-coverage", evidence_freshness="current",
+            )
+            suggested = self.assert_response(run_harness({
+                "schema_version": 1,
+                "command": "relations-suggest",
+                "arguments": {
+                    "target": str(fixture.worktree_a),
+                    "proposal_id": "harness-validation-proposal",
+                    "relation_type": "depends_on",
+                    "source_workstream_id": "harness-source",
+                    "target_workstream_id": "harness-target",
+                    "required_for": "validation",
+                    "rationale": "target owns the validation evidence",
+                    "consequence": "source validation remains incomplete",
+                    "proposer_id": "bounded-harness",
+                    "platform_session_id": "harness-session",
+                    "evidence_category": "harness",
+                    "evidence_fact_scope": "candidate",
+                    "evidence_hash": "a" * 64,
+                    "evidence_ref": "fixture:harness-validation",
+                },
+            }), 0)
+            self.assertEqual(suggested["data"]["event"]["proposer"]["kind"], "harness")
+            self.assertFalse(suggested["data"]["effective_relation_created"])
+
+            inspected = self.assert_response(run_harness({
+                "schema_version": 1,
+                "command": "relations-inspect",
+                "arguments": {"target": str(fixture.worktree_a)},
+            }), 0)
+            self.assertEqual(inspected["data"]["capture"]["counts"]["pending"], 1)
+
+            refused = self.assert_response(run_harness({
+                "schema_version": 1,
+                "command": "relations-accept",
+                "arguments": {
+                    "target": str(fixture.worktree_a),
+                    "proposal_id": "harness-validation-proposal",
+                    "expected_revision": 1,
+                    "confirmer_id": "local-owner",
+                    "confirmer_role": "task-owner",
+                },
+            }), 3)
+            self.assertIn("Agent/session/remote", refused["errors"][0]["message"])
+
 
 if __name__ == "__main__":
     unittest.main()

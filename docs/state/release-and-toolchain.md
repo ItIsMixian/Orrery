@@ -21,8 +21,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前 Canonical source
 
 - protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- A4/U2.3 local integrated Candidate 声明 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18、Harness JSON Adapter 0.1.2。Core API、CLI/Harness JSON schema version 仍为 1，组件总状态为 `unreleased`。
-- Codex、Claude Code 与 DeepSeek Harness Adapter source 为 0.1.1；Harness JSON 因 A4 inspect/route 增至 0.1.2。它们均为 `experimental`／`unreleased`，且 runtime evidence 不能互相外推。
+- A4/U2.3/W7.3 local integrated Candidate 声明 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19；内部 relation capture schema 2 与 Graph projection schema 2 不变，组件总状态仍为 `unreleased`，Core API／CLI 顶层 JSON schema 仍为 1。Observatory 随包携带固定 `elkjs@0.11.0` bundle、EPL-2.0 license、package metadata 与 hash-bound provenance，运行时保持 zero-network。
+- Codex、Claude Code 与 DeepSeek Harness Adapter source 保持 0.1.1；Harness JSON 因新增有界 relation `suggest`／`inspect` 请求推进到 0.1.2。各 Adapter 的 runtime evidence 继续不能互相外推，Harness 不获得 confirmation 权限。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。
 - Claude Code 2.1.87 只完成 Plugin／Skill 发现与认证前失败关闭；没有成功模型路由。Harness JSON 证明 subprocess JSON 合约，不证明第三方 Agent runtime 兼容。
@@ -65,6 +65,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [U2.3 Navigation & Live Task Visibility](../validation/2026-08-30-u2-3-navigation-live-task-visibility.md)
 - [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
+- [W7.3 Relation Capture & Confirmation Validation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [Platform-neutral Plan](../implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)
 
@@ -74,7 +75,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - 维护者尚未选择下一 SemVer／candidate manifest；Authority `release_ready` 保持 false。
 - Claude 认证后模型路由未完成；其他 Adapter／OS／runtime／模型范围不得继承已有 evidence。
 - v0.2.0 archive 在 Windows／Linux 重建尚非 byte-for-byte 一致。
-- Unified／Collaboration／Maintenance／Graph 没有默认 consumer 或 public release；self-host relation apply、真实双机与 scheduler 不受支持。
+- Unified／Collaboration／Maintenance／Graph／relation inbox 没有默认 consumer 或 public release；真实双机与 scheduler 不受支持。W7.3 只允许本机确认并将 effective relation 交给现有 lifecycle consumer，不提供中央 apply。
 - R4 alias、R5 optional default transition 和最早 0.4.0 cleanup review 均未启动。
 - `orrery-dispatch` 只在当前本机安装，尚未打包或发布；未来是否进入任何公开版本必须由独立 release Plan/Validation 决定。
 - ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 仍未进入产品 source；在

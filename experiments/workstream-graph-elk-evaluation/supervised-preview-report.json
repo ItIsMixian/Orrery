@@ -1,0 +1,155 @@
+{
+  "schema": "orrery-gx2-supervised-preview-v1",
+  "task_description": "f4b1687582e7b11130334ea6c0c6cb683df80f4f",
+  "scope_revision": 14,
+  "engine": {
+    "name": "elkjs",
+    "version": "0.11.0",
+    "bundle_sha256": "cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8"
+  },
+  "constraints": {
+    "experiment_only": true,
+    "test_workflows_run": false,
+    "product_vendor_package_default_writes": false,
+    "legacy_files_moved_or_deleted": false,
+    "desktop_default_zoom": "100%"
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "change": "W external CI/SH endpoints became compact typed boundary stubs; nested layered containers retained",
+      "result": "rendered",
+      "bounds": {
+        "width": 1821,
+        "height": 1383
+      },
+      "visible_findings": [
+        "compound remains taller than one viewport",
+        "some boundary stubs and their cross-hierarchy routes remain separated across scroll regions"
+      ]
+    },
+    {
+      "iteration": 2,
+      "change": "containment-only phase/program containers changed to ELK box while root stayed layered",
+      "result": "rejected",
+      "error": "UnsupportedGraphException: cross-hierarchy edge endpoint could not be found across mixed layout algorithms",
+      "restored_iteration": 1
+    }
+  ],
+  "passive_w_diagnostics": {
+    "view": "w_compound",
+    "layers": {
+      "affected": false,
+      "semantic": false,
+      "external": false
+    },
+    "input_full_card_ids": [
+      "W5C-team-observatory-ux",
+      "W5D-lan-collaboration-harness",
+      "W5E-team-observatory-ui-closeout",
+      "W6.1-incremental-maintenance-quick-remove",
+      "W7.1-archived-session-relation-projection",
+      "W7.2.2-graph-arrow-scrollbar-visual-integration",
+      "W7.2.3-workstream-graph-density-correction",
+      "W7.3-workstream-relation-capture-confirmation",
+      "W7.3-integration-acceptance"
+    ],
+    "input_boundary_ids": [
+      "stub-ci1",
+      "stub-ci6",
+      "stub-sh1"
+    ],
+    "input_edge_ids": [
+      "legacy-w5d-ci1",
+      "legacy-ci1-w5e",
+      "legacy-w61-ci6",
+      "legacy-sh1-w71",
+      "legacy-w722-w723",
+      "effective-w73-compound",
+      "proposal-ci6-w73"
+    ],
+    "output_bounds": {
+      "width": 1821,
+      "height": 1383
+    },
+    "layout_time_ms": 26.5,
+    "node_node_overlaps": [],
+    "container_external_node_overlaps": [],
+    "label_node_overlaps": [],
+    "route_node_intersections": [],
+    "unmarked_crossings": [
+      [
+        "legacy-ci1-w5e",
+        "legacy-sh1-w71"
+      ]
+    ],
+    "route_stretch": [
+      {
+        "edge_id": "legacy-w5d-ci1",
+        "ratio": 1,
+        "route_length": 555.5
+      },
+      {
+        "edge_id": "legacy-ci1-w5e",
+        "ratio": 2.948,
+        "route_length": 3742.5
+      },
+      {
+        "edge_id": "legacy-w61-ci6",
+        "ratio": 1,
+        "route_length": 378
+      },
+      {
+        "edge_id": "legacy-sh1-w71",
+        "ratio": 1,
+        "route_length": 354
+      },
+      {
+        "edge_id": "legacy-w722-w723",
+        "ratio": 1,
+        "route_length": 110
+      },
+      {
+        "edge_id": "effective-w73-compound",
+        "ratio": 1,
+        "route_length": 110
+      },
+      {
+        "edge_id": "proposal-ci6-w73",
+        "ratio": 1.976,
+        "route_length": 2563
+      }
+    ],
+    "external_network_requests": [],
+    "post_processed_coordinates": false,
+    "engine_owned_fact_set_changes": false
+  },
+  "screenshots": {
+    "root": "screenshots/revision-14",
+    "viewports": [
+      "1440x900",
+      "1280x800",
+      "390x844"
+    ],
+    "desktop_tabs": [
+      "succession",
+      "w_compound",
+      "project_structure",
+      "dependency"
+    ],
+    "additional": [
+      "project_structure-semantic-only-1440x900.png",
+      "project_structure-affected-only-1440x900.png"
+    ]
+  },
+  "mobile": {
+    "same_fact_ledger": true,
+    "desktop_canvas_hidden": true,
+    "document_horizontal_overflow": false
+  },
+  "visual_readiness": {
+    "ready": false,
+    "claim_pass": false,
+    "reason": "Two supervised iterations are exhausted; W compound remains multi-viewport at 100%, while mixed-algorithm compact packing is unsupported for the required cross-hierarchy edges."
+  }
+}

@@ -2,8 +2,9 @@
 
 Date: 2026-08-30
 
-Status: PENDING — maintainer accepted the current ELK product preview for closeout; exact clean Candidate and fresh
-central integration evidence remain pending
+Status: PASS (focused Candidate closeout) — maintainer accepted the current ELK product preview; revision-17 focused
+checks and revision-18 exact attribute/hash/complete-staged-diff gates are green. The clean Candidate SHA is reported
+in the task receipt; central integration evidence remains pending.
 
 Authority sources:
 
@@ -336,3 +337,73 @@ path named in the Plan. Acceptance requires:
 
 This path-specific metadata exception is not a test waiver and does not turn upstream whitespace into an authored-file
 policy. All formal Fast/Checkpoint and integrated-page evidence remain assigned to the later central fingerprint.
+## 2026-08-30 revision 17 focused closeout ledger
+
+Fact scope: Worktree／Candidate preparation on `codex/w7-3-workstream-relation-capture-confirmation`, based on
+`05c83b75723a9e6681c0885dd090606060cb696e`. The exact task-description source is
+`4522a5beec5d2ffdd90022197cf8c78ad7ea7faa`; Git-private scope revision 17 binds Plan blob
+`b8539fb6a4d7ab6e5551edd352fdf87d4bfe3511` and Validation blob
+`89b7ceb5b788b2195755ecab9c329a7873269ee6`. Validation was run with GPT-5.6 Sol／medium after the maintainer froze
+the accepted preview. No routed Fast／Checkpoint／Promotion／release workflow ran in this closeout.
+
+### Focused implementation checks
+
+- `python -m unittest tests.test_workstream_program_hierarchy tests.test_workstream_relation_graph_observatory -v`
+  — PASS, final closeout rerun 13/13 in 8.276s. The first run exposed two stale test expectations (the pre-closeout context-menu copy and
+  Observatory 0.1.18); they were updated to the accepted UI contract. A targeted inventory rerun then correctly
+  exposed `packages/component-versions.json` still at Observatory 0.1.18; the inventory was aligned to 0.1.19 and the
+  unchanged focused command passed. No identical failing command was rerun without a corrective write.
+- Vendor inventory — PASS: pinned local `elkjs@0.11.0`, EPL-2.0, 1,627,496 bytes, SHA-256
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`; bundle, license, package metadata and
+  provenance are present in Observatory package data. The first read-only probe looked for a nonexistent top-level
+  `.sha256` field and was non-green; the corrected probe consumed the versioned provenance schema and passed.
+- `python -c "import sys; sys.path.insert(0, r'packages/project-orrery-observatory/src'); from
+  project_orrery_observatory.workstream_graph_presentation import WORKSTREAM_GRAPH_JS;
+  sys.stdout.buffer.write(WORKSTREAM_GRAPH_JS.encode('utf-8'))" | node --check` — PASS. An earlier text-mode pipe
+  stopped at Windows GBK encoding before Node received bytes; the byte-safe command above is the accepted result.
+- Component inventory — PASS after closeout alignment: Core 0.1.19, CLI 0.1.22, Observatory 0.1.19, Harness JSON
+  0.1.2; all remain unreleased and public v0.2.0 metadata is unchanged.
+- First complete `git diff --cached --check` — NON-GREEN and closeout stopped: both exact vendored copies of
+  `elk.bundled.js` contain the same five upstream trailing-whitespace lines (202, 214, 217, 6584 and 6609). Rewriting
+  those bytes would invalidate the recorded SHA-256 and provenance. The command was not repeated unchanged, no
+  whitespace exemption or `.gitattributes` policy was invented outside the registered scope, and no Candidate commit
+  was created. Authored-file `git diff --check` had passed before the untracked vendor asset entered the index.
+
+### Real browser evidence
+
+- Loopback product page: `http://127.0.0.1:8766/workstream-relations.html#workstream-relation-graph`, generated from
+  the current Worktree only; the preview is ephemeral evidence, not a release artifact.
+- 1440×900 succession overview — PASS: 19 rendered task nodes, 14 rendered relation/series edges, page overflow-x 0,
+  default 100%, explicit fit 46%, and reset rebuild returned to 19/14 at 100%. The reset briefly unloads SVG content;
+  the recorded assertion waited for the stable rebuilt state rather than treating the 150ms intermediate frame as a
+  result.
+- Pointer selection of `W6.1 → CI6` — PASS: the semantic cyan edge became 4px／opacity 1 and opened the read-only
+  evidence inspector; no white task-card selection outline or graph execution action was introduced.
+- 390×844 — PASS: 19 nodes and 14 edges share facts with the visible static-flow `<details>` relation ledger,
+  default zoom is 100%, document overflow-x is 0, and browser console warning/error output is empty.
+- No remote／Team／delete action was executed. The central `127.0.0.1:63203` service was not stopped, reused or
+  rewritten.
+
+### Evidence boundary and handoff
+
+The green evidence above, together with the revision-18 resolution below, covers only focused Worktree Candidate
+closeout. It does not
+claim Canonical integration, public/default enablement, release readiness, real remote confirmation or double-machine
+acceptance. Central integration must first combine this W7.3 Candidate with CI7
+`111f4abc47b8122aee5469db4489ad6fb0dee75a`, resolve the final test routing fingerprint, run exactly one routed Fast
+and one Checkpoint there, and obtain final desktop/mobile acceptance of that exact integrated page before registering
+the v0.3.0 Final RC task.
+
+## 2026-08-30 scope revision 18 blocker resolution
+
+- Exact authority acknowledgment — PASS: task-description
+  `1e2582282c1cc11ed32250cb6453168088d7980f`, Plan blob
+  `cbe43f49516bab30373a8ec634dad9bb00991dc6`, Validation blob
+  `e8028acbe73c4dbd9377f88d18635e3fdfc43539`, and Git-private scope revision 18 were bound before the metadata write.
+- Root `.gitattributes` contains exactly two new `-whitespace` paths, one for each reviewed bundle; no wildcard,
+  vendor-tree, text or EOL exception was added.
+- `git check-attr whitespace -- <both exact paths>` — PASS: both report `whitespace: unset`.
+- `Get-FileHash -Algorithm SHA256 <both exact paths>` — PASS: both remain
+  `cbf61b0182e9085d36dcd5b392f57cc816273169ac40bde80b52b808444c5cf8`; vendor bytes were not rewritten.
+- Complete `git diff --cached --check` — PASS, exit 0 after staging all revision-18 metadata and closeout records.
+- Revision-17 focused tests, Browser review and JavaScript syntax were not rerun.
