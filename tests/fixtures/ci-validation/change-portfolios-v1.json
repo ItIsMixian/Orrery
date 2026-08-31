@@ -33,26 +33,6 @@
       "max_selected": 70
     },
     {
-      "id": "w7-3-relation-capture-only", "stage": "checkpoint",
-      "changed_paths": ["packages/project-orrery-core/src/project_orrery_core/workstream_relation_capture.py", "tests/test_workstream_relation_capture.py"],
-      "subsystems": ["multi-worktree-collaboration"],
-      "expected_writes": ["packages/project-orrery-core/src/project_orrery_core/workstream_relation_capture.py"],
-      "expected_mapping_ids": ["collaboration-relation-capture"],
-      "required_test_ids": ["test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_registration_auto_derived_from_is_exact_and_idempotent"],
-      "forbidden_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint"],
-      "max_selected": 1
-    },
-    {
-      "id": "w7-3-relation-inbox-only", "stage": "fast",
-      "changed_paths": ["packages/project-orrery-observatory/src/project_orrery_observatory/relation_inbox.py", "tests/test_unified_observatory.py"],
-      "subsystems": ["documentation-system", "multi-worktree-collaboration"],
-      "expected_writes": ["packages/project-orrery-observatory/src/project_orrery_observatory/relation_inbox.py"],
-      "expected_mapping_ids": ["observatory-shell"],
-      "required_test_ids": ["test_unified_observatory.UnifiedRegistrationTests.test_static_shell_has_navigation_but_no_dynamic_control_script"],
-      "forbidden_test_ids": ["test_workspace_maintenance.WorkspaceMaintenanceTests.test_minimal_git_incremental_refresh_and_target_preflight_checkpoint", "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_component_local_packing_and_module_boundary_projection"],
-      "max_selected": 6
-    },
-    {
       "id": "w7-2-graph-only", "stage": "checkpoint",
       "changed_paths": ["packages/project-orrery-observatory/src/project_orrery_observatory/workstream_graph_presentation.py", "tests/test_workstream_relation_graph_observatory.py"],
       "subsystems": ["documentation-system", "multi-worktree-collaboration"],

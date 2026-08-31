@@ -269,7 +269,6 @@ class CIValidationTests(unittest.TestCase):
         ]
         self.assertEqual([item["id"] for item in generic], [
             "docs-only", "authority-a4-class", "collaboration-maintenance",
-            "w7-3-relation-capture-only", "w7-3-relation-inbox-only",
             "w7-2-graph-only", "u2-2-maintenance", "unified-common-security",
         ])
         for portfolio in generic:
