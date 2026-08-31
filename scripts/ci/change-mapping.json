@@ -6079,8 +6079,7 @@
       "cost_class": "low",
       "budget_seconds": 15.0,
       "dependencies": [
-        "collaboration-maintenance",
-        "observatory-ui"
+        "observatory-graph"
       ],
       "reason": "low deterministic geometry evidence for Graph-native series, comparison overlay, and conflict routing"
     },
@@ -6670,7 +6669,7 @@
       "test_id": "test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_versioned_positive_and_negative_schema_fixtures", "owner_surface": "Team/LAN", "owner_shard": "team-lan-core", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["collaboration-maintenance"], "reason": "low W7.3 schema fixture evidence via collaboration-maintenance"
     },
     {
-      "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_plain_chinese_status_taxonomy_has_no_generic_pending_fallback", "owner_surface": "Team/LAN", "owner_shard": "team-ui-server", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["collaboration-maintenance", "observatory-ui"], "reason": "low W7.3 Observatory taxonomy evidence via collaboration-maintenance and observatory-ui"
+      "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_plain_chinese_status_taxonomy_has_no_generic_pending_fallback", "owner_surface": "Team/LAN", "owner_shard": "team-ui-server", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["observatory-graph"], "reason": "low W7.3 Observatory taxonomy evidence via the provider-neutral observatory-graph surface"
     }
   ],
   "reuse": {

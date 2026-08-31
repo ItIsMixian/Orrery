@@ -50,3 +50,13 @@ record their alignment before CI7 computes the stable integrated fingerprint. No
 Scope revision 2 alignment is complete: a direct source import reports Core 0.1.19, CLI 0.1.22 and Observatory
 0.1.19, exactly matching `packages/component-versions.json`; `git diff --check` is clean. This is a component inventory
 check, not routed stage evidence.
+
+The first Fast and Checkpoint dry runs both refused before a selection plan because two merged W7.3 registry entries
+still depended on removed surface ID `observatory-ui`. No lease was issued and no test loaded. The router inventory
+build also invoked the locally configured briefing/roadmap/milestone Provider; that was an unintended dry-run setup
+cost, not test evidence. Subsequent dry runs set `DOCSITE_AI_ENABLED=0`.
+
+The registry correction maps the Graph-native series/conflict test and the promotion-only Chinese status taxonomy
+test to exact provider-neutral `observatory-graph`; it does not restore broad `test_workstream*.py` or Maintenance
+dependencies. Phase 0 lineage must also rebind from the pre-merge source to task base `86a4660`, because this
+Workstream consumes the W7.3/CI7 child receipts and validates only integration-owned reconciliation after the merge.
