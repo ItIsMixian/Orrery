@@ -1,5 +1,13 @@
 # 开发日志
 
+## 2026-08-31 — Phase 0 Revision-9 Real-window Cost Correction Authorized
+
+- revision-8 已让全部产品路径可映射；真实 base dry-run 为 Fast 25/Checkpoint 31，唯一 Unknown 是新 Core
+  owner。短 base 虽为 3/4 allowed，但只测 mapping，明确弃用。
+- revision 9 保留真实窗口：exact Core owner 只做一次 non-evidence focused 并恢复 Promotion-only；Brand 保留
+  两个 Fast 哨兵，四个深检移到 Checkpoint。预计 20/30，不删测试、不涨预算、不减 Promotion。
+- formal run count 仍为 0；任何新 dry-run refusal 都立即停止。
+
 ## 2026-08-31 — Phase 0 Revision-8 Precise Routing Authorized
 
 - revision-7 source 冻结后，首对 dry-run 因两个新增 unittest ID 未登记而在加载前拒绝；断言随即折叠进

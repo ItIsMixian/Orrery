@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Phase 0 revision-8 precise CI mapping correction authorized after dry-run refusal; no RC task registered
+Status: Phase 0 revision-9 bounded owner check and Brand tier correction authorized; no RC task registered
 
 Date: 2026-08-30
 
@@ -197,6 +197,29 @@ Revision 8 authorizes a data-only generic mapping correction, not a task-specifi
 No new product, schema, budget, stage meaning, required check or Promotion inventory is authorized. After the mapping
 commit, rerun Fast/Checkpoint dry-run only. If timing is Unknown, use at most one CI7 bounded focused triage for the
 exact owner before issuing formal leases; otherwise issue one fresh Fast and one fresh Checkpoint as already accepted.
+
+### 2026-08-31 scope revision 9 — keep the real product window without Fast over-selection
+
+Revision-8 mapping is committed at `6ffc305f7dec3fda129a142869f14bd5b9fb9afc`. Dry-run against the real pre-
+implementation authority base `2aa1c61...` now has no unknown path or registry drift, but selects Fast 25 and
+Checkpoint 31 under fingerprint `5bc31c...`. Fast refuses at count >20 and both stages refuse because the newly
+expanded Core owner has no CI timing history. A shorter `cb3c6e4...` base selects only 3/4 mapping tests and is allowed,
+but it omits the actual product surfaces; it is rejected as insufficient and must not be used for formal evidence.
+
+Revision 9 preserves the real `2aa1c61...` validation window and authorizes only:
+
+- one direct, non-evidence focused invocation of existing owner
+  `test_workstream_relation_capture.WorkstreamRelationCaptureTests.test_registration_auto_derived_from_is_exact_and_idempotent`;
+  it verifies the new Core body once but does not become Fast/Checkpoint evidence or a reusable receipt;
+- return that owner to its prior Promotion-only stage after the focused check, so unknown timing does not force a broad
+  formal run; Final RC Promotion still executes it on the release SHA;
+- keep `test_current_brand_surfaces_use_orrery_and_current_repository` and
+  `test_protocol_and_historical_hash_denylists_are_unchanged` as Fast brand sentinels; move the other four existing
+  Brand contract tests to Checkpoint/Candidate/Promotion. No Brand test or coverage is removed;
+- modify only `scripts/ci/change-mapping.json`; rerun real-window dry-run after commit. Expected selection is Fast 20
+  and Checkpoint 30 with known timing. Budgets, stage meanings, final IDs, required checks and Promotion remain fixed.
+
+If either new dry-run still refuses, stop and record it; do not issue a formal lease or repeat the focused owner.
 
 ## Phase 1 — register Final RC and freeze inputs
 

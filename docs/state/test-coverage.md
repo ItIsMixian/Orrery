@@ -106,6 +106,9 @@ Updated: 2026-08-31
 - post-freeze 两组 dry-run 均在加载测试前失败关闭：先发现两个未登记新 ID，折叠后再发现
   `relation_inbox.py` unmapped。revision 8 不增 test ID，而是建立 exact relation-capture surface、把 inbox
   归入 Unified shell，并用 data-only portfolios 防止错误选择 slow Maintenance fixture。
+- revision-8 real-window dry-run 已无 unmapped/registry drift，但 Fast 25 超 20，且 exact Core owner timing
+  Unknown；mapping-only 3/4 窗口因漏掉产品而弃用。revision 9 只运行一次非证据 Core owner，并把四个现有
+  Brand 深检移到 Checkpoint、保留两个 Fast 哨兵；预计 20/30，Promotion 覆盖不变。
 - CI6 已有保守自动影响分析；Fast／Checkpoint evidence reuse 当前只实现 versioned refusal contract，跨 SHA Promotion reuse 与远端 runner cache 仍不存在。
 - Context-routing 没有实时 Hook、自动 R1 脱敏导出或异地 raw evidence backup。
 - v0.2.0 archive 尚无 Windows／Linux byte-for-byte 一致性门。

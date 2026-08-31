@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PASS (CI7 feature Candidate); new Phase 0 product source requires revision-8 precise mapping and fresh routed evidence
+Status: PASS (CI7 feature Candidate); Phase 0 revision-9 tier correction and fresh routed evidence remain Pending
 
 Fact scope: `codex/ci7-validation-routing-precision-total-cost`, exact base
 `3fc7e7aacedafa8fbd20f9f79ddb8cf5784a0ef3`. Implementation and validation used GPT-5.6 Sol with medium reasoning.
@@ -130,3 +130,8 @@ correctly refuses exact unmapped `relation_inbox.py`; no lease or test loaded. R
 from the coarse maintenance surface and map inbox to Unified shell using generic paths plus data-only portfolios. It
 must not change 15/90 budgets, stage authority, required-check names or Promotion inventory. Fresh Fast/Checkpoint
 remain Pending until the corrected dry-run allows them.
+
+Revision-8 real-window dry-run proves exact product paths are now mapped but Fast 25 exceeds the 20-test headroom and
+the new Core owner timing is Unknown. The 3/4 mapping-only short window is not accepted as product evidence. Revision 9
+uses one bounded non-evidence owner check and moves four existing Brand deep checks to Checkpoint while retaining two
+Fast sentinels; no coverage, IDs, budgets or Promotion tests are removed.

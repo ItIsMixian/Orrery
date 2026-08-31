@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: PENDING — revision-8 precise CI mapping correction required after dry-run refusal
+Status: PENDING — revision-9 bounded owner check and Brand tier correction required before formal leases
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -223,3 +223,16 @@ No test loaded in either step.
 Revision 8 is Pending until generic relation-capture/inbox mappings and data-only portfolios are committed. It must
 avoid selecting the unrelated slow maintenance fixture and preserve all Promotion coverage. Formal runs remain zero
 for the post-correction source.
+
+## 2026-08-31 revision-8 dry-run result and real-window decision — Pending Validation
+
+- Real base `2aa1c61...`: Fast 25 and Checkpoint 31; mapping IDs are `ci-mapping-registry`,
+  `collaboration-relation-capture`, `documentation`, `observatory-shell`; no unknown paths. Fingerprint
+  `5bc31c75017d2374f1b4d909a65a15dc804803ab5f0d8dbeea802ba8ab053e40`. Fast refuses count >20; both refuse
+  Unknown timing for the expanded exact Core owner. No lease/test ran.
+- Short base `cb3c6e4...`: Fast 3 and Checkpoint 4, fingerprint `7a1da3...`, both predictions allow—but only
+  `ci-mapping-registry` is selected. This window is intentionally rejected as insufficient product evidence.
+
+Revision 9 keeps the real window, permits one non-evidence exact Core focused run, restores that owner to Promotion-
+only and moves four existing low-frequency Brand tests from Fast to Checkpoint while retaining two Fast sentinels.
+Expected formal selections are 20/30 with no deleted test or raised budget. Formal run count remains zero.
