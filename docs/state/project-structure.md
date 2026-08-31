@@ -82,6 +82,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 
 ## 已知缺口
 
+- branch-scoped v0.3.0 Candidate archive 以 `project-orrery/` 为唯一根，包含 162 个版本化 Git blob；三组件
+  runtime 与 Harness JSON 是明确 allowlist，不包含 Git-private state、凭据、缓存、生成站点或本机 benchmark。
+  该结构尚未 Promotion 或发布，不能作为 Canonical/public inventory。
+
 - Core／CLI／Observatory 尚无独立公开发行物、多组件 release pipeline 或 manifest v2。
 - 默认 docsite／Skill template 尚未启用 Unified Observatory 或 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。
 - 没有真实双机 LAN、自动 Coordinator 选主、云 relay、多设备迁移或远程 shell／Agent／merge／delete。

@@ -70,6 +70,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 ## 已知缺口
 
+- v0.3.0 Worktree Candidate 新增 release notes、onboarding 与 upgrade/rollback 三份作者指南；它们记录
+  create-only、managed backup、offline runtime 和 publication 分权，不产生 release/Validation 事实。
+
 - D2 scanner／CLI、真实项目 soft-budget 配置、finding acknowledge／defer persistence、State／实现链接时效检查与自动修复均未实现。
 - HANDOFF 已完成职责压缩，但没有自动治理工具；后续仍需人工确认安全边界的当前有效性。
 - 完整国际化未实施，U2.1 只完成 zh-CN 主界面与集中 display vocabulary；没有完整英文模式。

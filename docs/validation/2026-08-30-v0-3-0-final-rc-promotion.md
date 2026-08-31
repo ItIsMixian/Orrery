@@ -28,6 +28,48 @@ Validation records actual wall/setup/runtime cost and any explicit packaging wai
 
 No public manifest, main, tag, asset or Release fact is PASS until the exact evidence is recorded here.
 
+## 2026-08-31 Phase 1 release-input Worktree Candidate
+
+Workstream `V0.3.0-final-rc` acknowledged task-description commit
+`17bb70ba861c8f1f4be18fa11863e3cac7fc5c87`, registered Git-private scope revision 2 before resumed product writes,
+and preserved the accepted 162-entry inventory and sorted path-list SHA-256
+`26d6570585b3507880f83c652000bdcc857e7bac3ea59866f06ad40abdb0bf5c`. Product commits are `29d0a6f`,
+`d54ff95` and final clean candidate `56f4aca4a4a9120a1bd292cf17d8669f86061457`.
+
+Implemented candidate facts:
+
+- `release-manifest.json` and the bundled Core contract declare v0.3.0, Model 1/Rules 1, exact component versions,
+  explicit default/deferred/unsupported boundaries, two release assets and no release date or publication claim;
+- the archive contract freezes all 162 ordered paths, while the builder reads exact committed blobs, rejects dirty,
+  symlink, unsafe, missing/extra and case-colliding inputs, writes fixed-metadata stored ZIP entries and emits a
+  deterministic source/manifest/builder/entry receipt;
+- CLI 0.1.22 now pins Core/Observatory 0.1.19. The Skill template carries the exact Unified launchers/builders and a
+  102-file managed runtime allowlist; default scaffold remains create-only, while `--upgrade-tools` backs up before
+  replacing only declared managed paths;
+- the tag workflow has read-only contents permission and verifies the package/checksum. It no longer creates or
+  uploads a GitHub Release; publication remains a separate maintainer action.
+
+Two independent external-root builds from exact `56f4aca...` were byte-identical:
+
+| Object | SHA-256 |
+| --- | --- |
+| ZIP | `160b8419a5b763b889c350cf58f3fd0a24ddaf2c48c4312b9830a277bf2504f4` |
+| checksum file | `c730478923b3309c7e40175e272ddb7d4b84dbd5e7669da8a93b142ab2bf1b2f` |
+| deterministic entry receipt | `76bd557bb6906f31ea0843a2c18a2c9980c6607dc687242f8326bcad6051fe3a` |
+
+The receipt reports 162 entries, the accepted path-list hash and archive hash above. A repository-external offline
+acceptance cleared `PYTHONPATH`/`PYTHONHOME`, extracted the ZIP, scaffolded a new project, ran the packaged validator
+and imported the projected Unified launcher through `--help`: PASS. The target manifest declared v0.3.0, Authority
+Model 1 and 120 managed paths. No network, wheel/PyPI, checkout runtime, tag, upload or remote operation was used.
+
+CI7 dry-run first exposed a real generic mapping gap for the new release-contract/scaffold paths. The bounded
+`release-packaging` mapping and data-only portfolio removed all unknown paths. Against explicit task base `88d80df...`,
+Fast selected 75 and refused count >20 plus Unknown timing; Checkpoint selected 81 and refused Unknown timing. No
+Fast/Checkpoint lease or test was issued. The one permitted bounded focused request was also refused before loading a
+test because the session was already in `validating` and Focused is debug-only for `iterating`; it was not retried.
+Accordingly this record claims deterministic build and offline runtime PASS, but not Candidate suite, Windows/Ubuntu
+runtime, Promotion or publication PASS.
+
 ## Phase 0 central integration acceptance — routed validation PASS; exact-SHA page pending
 
 Current local merge facts before formal validation:

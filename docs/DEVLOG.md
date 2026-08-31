@@ -1153,3 +1153,14 @@
   原始 `a520ebc` focused 5/5、CI contract、完整 CI suite 25/25、pre-amendment 开发树 Fast 42/42
   （8.057895s）与 Checkpoint 42/42（7.526136s）通过；这些不替代上方 amendment exact-SHA non-green Fast
   事实。完整 Promotion 不作开发循环；新 final fingerprint 的 hosted checks 留给中央整合。
+## 2026-08-31 — v0.3.0 Final RC release-input Candidate
+
+- Registered `V0.3.0-final-rc` scope revision 2 from authority commit `17bb70b...` before product writes and retained
+  the accepted 162-entry archive/path-list contract. Final clean product SHA is `56f4aca...`.
+- Added the v0.3.0 candidate contract, exact-Git deterministic builder/receipt, self-contained managed runtime,
+  Unified template launchers, manual-publication workflow boundary and three author guides. Public v0.2.0 remains
+  unchanged; no ref push, main mutation, tag, upload or GitHub Release occurred.
+- Two independent builds were byte-identical (ZIP `160b8419...`), and a checkout/PYTHONPATH/network-independent
+  scaffold/validate/launcher import passed. CI7 eliminated unknown paths but refused 75-test Fast and 81-test
+  Checkpoint plans on count/Unknown timing; the sole bounded Focused request refused pre-test on phase policy and was
+  not repeated. Candidate/Promotion evidence therefore remains pending.

@@ -7,6 +7,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前公开发布
 
 - Orrery v0.2.0 是唯一公开 Release。annotated tag 指向 `20fc95b`；ZIP SHA-256 为 `13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`。
+- `codex/v0-3-0-final-rc` 的 branch-scoped Worktree Candidate 已冻结 v0.3.0 manifest、162-entry exact-Git builder、
+  self-contained managed runtime 和人工发布边界；它尚未进入 Canonical main、tag 或 GitHub Release。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。
@@ -91,7 +93,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 已知缺口
 
 - 没有 Core／CLI／Observatory 独立公开发行物、多组件 release workflow、manifest v2 或公共支持矩阵。
-- 维护者尚未选择下一 SemVer／candidate manifest；Authority `release_ready` 保持 false。
+- v0.3.0 SemVer／candidate manifest 已在独立 Worktree Candidate 中选择；Authority/public `release_ready` 仍为 false，
+  且 non-main 双平台 Promotion、main、tag 与 GitHub Release 均未发生。
 - Claude 认证后模型路由未完成；其他 Adapter／OS／runtime／模型范围不得继承已有 evidence。
 - v0.2.0 archive 在 Windows／Linux 重建尚非 byte-for-byte 一致。
 - Unified／Collaboration／Maintenance／Graph／relation inbox 没有默认 consumer 或 public release；真实双机与 scheduler 不受支持。W7.3 只允许本机确认并将 effective relation 交给现有 lifecycle consumer，不提供中央 apply。
