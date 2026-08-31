@@ -103,6 +103,9 @@ Updated: 2026-08-31
 
 - 动态图形 reader 依赖测试默认可跳过；高风险 UI／HTTP 改动仍需显式动态与浏览器验证。
 - CI7 clean Candidate 与 fresh central Fast/Checkpoint 已完成；exact non-main Windows／Ubuntu Promotion 仍待 Final RC。本地 cost diagnostics 只证明机械测量与 advisory 计算，不证明宿主 token usage、未来节省或整体 ROI。Hosted/public acceptance enforcement 未启用，仍须维护者另行决定。
+- scope revision 6 的首个 Codex lifecycle orchestration 在任何安装、discovery probe 或 Codex 子进程前因
+  PowerShell `$home`／只读 `$HOME` 名称冲突 non-green。该 fingerprint 未重试；Windows Harness JSON 与其余
+  runtime matrix 未运行，因此 Candidate/package PASS 不能外推为 runtime PASS。
 - Unified runtime composition test 当前用 full Personal fixture 替代真实 U2.3 lightweight panel，因此没有覆盖
   Relation Inbox 对已移除 `.po-foot` 的依赖；`807096d...` 页面在人工 DOM 检查中发现该缺口。revision 5
   必须先改为真实轻量契约并给维护者看页，之后才允许 fresh routed validation。

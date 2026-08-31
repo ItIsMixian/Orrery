@@ -4,7 +4,8 @@ Validation records reproducible evidence for implementation and documentation cl
 
 - [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — Phase 0 PASS;
   scope revision 5 exact `ba230555...` has Candidate 81/81, two-root byte-identical package and one external offline
-  new-project PASS. Remaining final runtime matrix, dual-platform Promotion, main, tag and Release remain Pending.
+  new-project PASS. Scope revision 6 stopped on its first pre-install Codex lifecycle orchestration non-green without
+  retry; remaining runtime matrix, dual-platform Promotion, main, tag and Release remain Pending.
 - [2026-08-30 CI7 Validation Routing Precision & Total-Cost Diagnostics](2026-08-30-ci7-validation-routing-precision-total-cost.md) — clean Candidate and fresh central Fast/Checkpoint validate acceptance gates, validation leases, predictive refusal and no-repeat enforcement; prior refusal/failure evidence remains preserved.
 
 For each validation, record:

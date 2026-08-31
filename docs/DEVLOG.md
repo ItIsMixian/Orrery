@@ -1,5 +1,14 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Scope Revision 6 Runtime Stopped Before Installation
+
+- 登记 task-description `0070645943ad8dd880c250ab97dd18ae949c615e` 并刷新 Git-private scope revision 6；
+  authority merge 只改文档，exact release Candidate 仍为 `ba230555...`。
+- final archive 复核为 162 entries／ZIP SHA-256 `7a0cf3dd...`，并解压到仓库外隔离根。首个 Codex lifecycle
+  orchestration 因 PowerShell `$home` 与只读 `$HOME` 名称冲突，在安装／discovery／Codex 子进程前失败。
+- 按 non-green 不重试规则立即停止；没有 Provider 调用、凭据/真实用户配置读取、临时用户安装或待恢复用户
+  状态。Harness JSON、其余 runtime、Promotion、push、main、tag、asset 与 GitHub Release 均未运行。
+
 ## 2026-08-31 — Final RC Runtime Through Tag Authorized; GitHub Release Withheld
 
 - 维护者要求持续推进到最终发布动作前再停止；exact release Candidate 固定为 `ba230555...`，不以之后的

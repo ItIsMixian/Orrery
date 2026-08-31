@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Local Candidate PASS on `ba230555...`; scope revision 6 authorizes runtime through annotated tag; GitHub Release withheld
+Status: Local Candidate PASS on `ba230555...`; scope revision 6 runtime STOP after first non-green; remote actions not started
 
 Date: 2026-08-30
 
@@ -485,6 +485,16 @@ is authorized to:
 
 The existing `v0.2.0` tag/assets remain immutable. No force update, tag move/reuse, branch deletion, credential
 change, Provider call, PyPI/wheel publication or independent Adapter release is authorized.
+
+#### Scope revision 6 execution stop
+
+The Final RC task registered exact task-description `0070645943ad8dd880c250ab97dd18ae949c615e` and refreshed its
+Git-private scope revision 6 before runtime work. It verified the frozen 162-entry archive SHA-256
+`7a0cf3dd2a0681f9f1552e3142c49b14a06deca444051d0c178b577f5e759c33` and extracted it to a repository-external
+root. The first Codex lifecycle orchestration then failed before installation or a Codex subprocess because its
+PowerShell variable `$home` collided with the read-only built-in `$HOME`. Per the no-retry rule, the task stopped
+without correcting and replaying the command. Harness JSON, Unified lifecycle, migration/rollback and all remote
+actions were not run. No Provider, credential, real user configuration or temporary user installation was touched.
 
 ## Phase 1 — register Final RC and freeze inputs
 

@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Local Candidate/package/offline PASS on `ba230555...`; final runtime, Promotion, main and tag Pending; GitHub Release withheld
+Status: Local Candidate/package/offline PASS on `ba230555...`; scope revision 6 runtime STOP; Promotion/main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -413,7 +413,7 @@ Artifacts remain outside the repository under
 deterministic-package and one new-project offline evidence only. It is not dual-platform final runtime, Promotion,
 main, tag, asset upload or GitHub Release evidence; none of those operations ran.
 
-## 2026-08-31 scope revision 6 runtime and Promotion authorization — Pending Validation
+## 2026-08-31 scope revision 6 runtime and Promotion authorization — STOP / non-green
 
 The maintainer authorized continuous progression through final runtime, exact non-main Promotion, same-SHA protected
 main, annotated tag and immutable tag rebuild, with an explicit stop before GitHub Release creation or asset upload.
@@ -429,3 +429,21 @@ Pending evidence, in order:
 
 No GitHub Release or remote asset upload is authorized. Any non-green or identity mismatch stops without retry,
 force-push, tag movement or waiver unless separately recorded.
+
+The task registered exact task-description `0070645943ad8dd880c250ab97dd18ae949c615e`, refreshed Git-private scope
+revision 6 and merged that authority without changing the frozen Candidate release tree. Before runtime execution it
+recomputed the existing archive as 162 entries and SHA-256
+`7a0cf3dd2a0681f9f1552e3142c49b14a06deca444051d0c178b577f5e759c33`; the extracted runtime root is
+`C:\Users\1\AppData\Local\Temp\orrery-final-runtime-rev6-52a90b26ef11443d9746903356bd88b8`.
+
+The first Codex lifecycle orchestration returned non-green before any installation, discovery probe or Codex
+subprocess. PowerShell rejected assignment to `$home` because names are case-insensitive and built-in `$HOME` is
+read-only (`Cannot overwrite variable HOME because it is read-only or constant`). Command setup stopped before its
+first `New-Item`; the external root therefore contains only the extracted archive. The task did not rename the
+variable and retry. It made zero Provider calls, did not inspect/copy credentials or real user configuration, did not
+create a temporary user-scope installation and had no user state to restore.
+
+Consequently final Codex lifecycle/runtime, Unified start/stop/restart, 0.2 update, migration/rollback, dependency
+failure, uninstall/reinstall and bounded Windows Harness JSON remain unvalidated. Per the exact no-retry rule,
+Promotion, push, main, tag, asset upload and GitHub Release were not attempted. A new task-description/scope decision
+is required before any runtime replay.

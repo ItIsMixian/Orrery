@@ -14,7 +14,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   Candidate 81/81、双根 byte-identical package 与一次 external offline new-project PASS，但仍无
   dual-platform Promotion/public evidence。
 - scope revision 6 已获得 final runtime、exact non-main Promotion、同 SHA protected main 与 annotated tag 的
-  action-time authorization；GitHub Release create/upload 仍未授权。
+  action-time authorization；首个 Codex lifecycle orchestration 在安装／子进程前因 PowerShell `$HOME` 只读变量
+  冲突 non-green，按规则未重试，后续 runtime/Harness/Promotion/main/tag 均未运行。GitHub Release create/upload
+  仍未授权。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。
@@ -110,3 +112,5 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `orrery-dispatch` 只在当前本机安装，尚未打包或发布；未来是否进入任何公开版本必须由独立 release Plan/Validation 决定。
 - ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 已进入未发布本地 source；
   在 final ZIP／runtime／Promotion／publication evidence 完成前不得写成 v0.3.0 已公开包含。
+- final archive 身份仍为 162 entries／ZIP SHA-256 `7a0cf3dd...`；scope revision 6 只完成只读身份核验与外部
+  解压。Codex/Harness runtime 没有 PASS，必须由新的显式 scope decision 才能重放。
