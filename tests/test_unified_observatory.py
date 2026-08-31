@@ -159,7 +159,6 @@ class UnifiedRegistrationTests(unittest.TestCase):
         self.assertIn("prefers-reduced-motion:reduce", page)
         self.assertIn("left:0;right:0;top:var(--hh);bottom:0;width:100vw;max-width:none;box-sizing:border-box", page)
 
-    def test_relation_inbox_composes_with_real_lightweight_personal_panel(self) -> None:
         page, _stats, _authority = _bounded_docsite()
         projection = {
             "contract_type": "orrery-active-task-projection-v1",

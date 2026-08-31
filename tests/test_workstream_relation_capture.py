@@ -382,7 +382,6 @@ class WorkstreamRelationCaptureTests(unittest.TestCase):
             self.assertFalse(refreshed["relation_capture"]["writes_performed"])
             self.assertEqual(len(load_relation_history(child)["current_records"]), len(records))
 
-    def test_unknown_lineage_supersedes_only_obsolete_automatic_proposals(self) -> None:
         with CollaborationGitFixture() as fixture:
             def unknown_session(task_base: str, scope_revision: int) -> dict:
                 return {
