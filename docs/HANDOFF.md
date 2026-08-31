@@ -24,7 +24,7 @@ Updated: 2026-08-31
   禁止自动回退。Orrery 继续拥有事实选择与现有 SVG/frontend。
 - ADR-0018 authority-first 继续生效：维护者接受的 W7.3 ELK 产品方向已形成 clean Candidate 并完成中央
   routed evidence；旧 `5fee848`/`05c83b` 回执只保留历史 provenance。自动 receipt／first-write enforcement
-  尚未实现，最终 exact-SHA 全页接受仍待维护者。
+  尚未实现；Phase 0 exact-SHA 全页已经维护者接受。
 - S0 `orrery-dispatch` 初始 source Candidate `9294902` 只包含 `SKILL.md`／`agents/openai.yaml`；首次 unmapped-path refusal 经任务说明 amendment 收口为 generic `release-packaging` mapping，Fast 44/44 与本地门通过。公共 v0.2.0／v0.3.0 与未来 S1 Conductor 状态未改变。
 - PO enforcement local integration `8b73f26` 后，更新的 S0 两文件已安装到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，source/installed hashes 一致。它仍未发布，不改变 release manifest／v0.3.0／S1 Conductor。
 - A4 Candidate 与中央 authority-first 曾同时使用 `ADR-0018`。PO1 enforcement 已本地集成；当前线保留 authority-first `ADR-0018`，A4 已规范化为 `ADR-0019`，duplicate-number gate 与链接门通过。
@@ -35,7 +35,7 @@ Updated: 2026-08-31
   fresh Fast 3/3、Checkpoint 4/4 PASS，均 evidence-eligible、zero rerun。
 - ADR-0021 已接受 REL3 六项选择并纳入最新 W7.3/CI7 scope：0.3.0 使用单一 self-contained ZIP，新项目
   Unified/Model 1/Rules 1，旧项目显式迁移，Codex final runtime blocker，byte-identical 默认门，main/tag/Release
-  分权。Final RC 尚未注册，等待 W7.3/CI7 和最终网页验收；DSH/alias/scheduler 明确延期 0.3.1。
+  分权。Final RC 已在独立 Sol-medium worktree 注册；DSH/alias/scheduler 明确延期 0.3.1。
 - W7.3 clean `44ea200` 已通过 focused closeout，中央 merge 为 `ae90974`；CI7 clean `111f4ab` 的中央合流为
   `079de74`。`f41b659` 的唯一正式 Fast/Checkpoint 保留，但 `807096d...` 实页在接受前暴露 lightweight
   Personal/Relation Inbox 锚点不兼容。revision 5 预览已恢复组合；同页的四个同端点 automatic Unknown
@@ -60,17 +60,19 @@ Updated: 2026-08-31
 8. **Context C2：** C1 只满足设计申请条件。没有 Pilot 010 控制包、模型运行授权或 treatment 采纳。
 9. **Platform：** Claude 仍缺成功认证／模型路由；DeepSeek 只保留 rc.8 精确验证范围。发行与新 runtime matrix 另立 Workstream。
 10. **Workspace maintenance：** Phase 0–2 已在 source；Phase 3 自动 worktree removal 与 Phase 4 scheduler unsupported。
-11. **Unified Observatory Candidate：** A4/U2.3/W7.3 已在本地中央 source 组合为单一连续侧栏、规则帮助、轻量活动任务、关系待确认、密集 Maintenance 和最终 Graph；下一步只从干净 docs SHA 生成整页供维护者做 1440/390 验收，不切换 public template／managed tools／Release。完整英文模式仍未实现。
+11. **Unified Observatory Candidate：** A4/U2.3/W7.3 已在本地中央 source 组合为单一连续侧栏、规则帮助、轻量活动任务、关系待确认、密集 Maintenance 和最终 Graph；`a2d7737...` 的 1440/390 exact page 已接受。下一步由 Final RC 投影 public template／managed runtime 并验证 final archive，不直接切换 Release。完整英文模式仍未实现。
 12. **W7.3 relation capture：** pinned ELK、shared projection、W phase small multiples、显式 legacy、clean
     `44ea200`、中央 merge `ae90974` 与 current routed Fast/Checkpoint 均已完成。W7.3 不再单独跑 feature
-    suites；最终整页 gate 由 v0.3.0 Phase 0 持有。
-13. **U2.3 shell closeout：** 已完成并本地集成；只读/zero-network/无全 worktree 重扫描边界保持。后续与 W7.3 合流后做最终整页体验和 Promotion，不单独继续 U2.3。
+    suites；最终整页 gate 已由 v0.3.0 Phase 0 完成。
+13. **U2.3 shell closeout：** 已完成、本地集成并进入 Phase 0 accepted page；只读/zero-network/无全 worktree 重扫描边界保持。后续只在 Final RC 做 public-template/final-archive runtime，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 与 current fingerprint fresh Fast 3/3、Checkpoint 4/4
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
-15. **v0.3.0 Final RC：** `V0.3.0-central-integration-acceptance` Phase 0 已完成；现在创建独立 Sol-medium
-    `V0.3.0-final-rc` worktree，先做 manifest/archive/runtime Candidate；
-    RC 只消费 child receipts 并运行 integration/package/runtime/Promotion-owned gates；可在隔离 worktree 准备
-    candidate manifest，但不得表述为公开生效，也不得 push ref、改 main、tag 或创建 Release。
+15. **v0.3.0 Final RC：** `V0.3.0-final-rc` 已从 exact `88d80df...` 注册在独立 branch/worktree。revision 1
+    只读返回 162-entry inventory（path-list SHA-256 `26d65705...`）并在零写入／零测试状态停下；中央 revision 2
+    已授权并实现 CLI→Core 0.1.19 pin、自包含 offline scaffold runtime projection 与 canonical release notes。
+    三个产品提交已选择性进入中央，中央 baseline 为 `ef145180...`；任务分支 75/81 CI7 dry-run 在加载测试前
+    拒绝。下一步由同一 Agent 读取 scope revision 3、非破坏地合并中央状态并只做一次 Candidate dry-run；
+    不得表述为公开生效，也不得 push ref、改 main、tag、上传 asset 或创建 Release。
 
 ## 不得外推的边界
 

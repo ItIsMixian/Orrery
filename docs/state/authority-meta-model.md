@@ -64,6 +64,6 @@ Active Plan: [A4 Portable Operating Rules 与 Authority Route Preflight](../impl
 - CLI collector 当前只覆盖有界 self-host index/State/ADR/Design/implementation/distribution/release 路径；任意第三方项目的通用 Markdown/Git collector 仍未成为稳定公共管线。
 - M2.1 bundle 仍未成为公共 report，legacy `entrance_mapped`、`pending_marker`、`integrated` heuristics 和退出码没有迁移。
 - root Unified Authority/Ask Docs 已消费 A4 projection/preflight；公开默认 docsite、v0.2.0 资产和所有 Agent 宿主仍未消费。
-- v0.3.0 Worktree Candidate manifest 已选择 Authority Model 1 离散支持集，新项目 scaffold 会记录模型 1；
-  公开 v0.2.0、既有项目和默认 public consumer 未改变，M2.3/public `release_ready` 仍为 false。
+- v0.3.0 local central Candidate manifest 已选择 Authority Model 1 离散支持集，新项目 scaffold 会记录模型 1；
+  公开 v0.2.0、既有项目与默认 public consumer 未改变，M2.3/public `release_ready` 保持 false。
 - Harness JSON Adapter 未暴露 Authority migration／restore；没有 Canonical runtime release Validation 或稳定 API 兼容承诺。

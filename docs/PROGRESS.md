@@ -14,8 +14,8 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
-| 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate | 只完成 exact-SHA Unified 整页验收；不在 Phase 0 重跑 feature suites |
-| Unified Observatory | A4/U2.3/W7.3 已组合为本地 root-only/default-off Candidate：七入口导航、只读帮助/规则、轻量活动任务、关系待确认、密集维护和只读 Graph 共存；公开默认仍未切换 | 从干净 docs SHA 生成最终桌面/移动页面并由维护者接受，再注册 Final RC |
+| 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate，Phase 0 exact page 已接受 | Final RC 只消费当前 child receipts；不手工重跑 feature suites |
+| Unified Observatory | A4/U2.3/W7.3 已组合为本地 root-only/default-off Candidate；Phase 0 exact page `a2d7737...` 已接受，公开默认仍未切换 | 在 Final RC 中完成 self-contained template、offline scaffold 与 final-archive runtime gate |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
 | 文档治理 | D1 已冻结只读 finding contract、规则 registry 与 synthetic fixture；当前没有 `docs audit` 产品入口 | 维护者另行决定是否启动 D2 scanner／CLI；不自动改写 Markdown 或启用长度硬门 |
@@ -41,10 +41,18 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - 当前中央组件为 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19、Harness JSON 0.1.2。W7.3 `44ea200` 与
   CI7 `111f4ab` 已合流；current fingerprint `0eea7f...` 在 `f41b659...` 上一次 Fast 3/3、一次 Checkpoint
   4/4 PASS，均 evidence-eligible、zero rerun。旧 fingerprint 的 Checkpoint failure 保留。
+- `V0.3.0-final-rc` 已从任务说明版本 `88d80df...` 注册到独立 Sol-medium worktree。scope revision 1 只读
+  inventory 返回 162 条、path-list SHA-256 `26d65705...`，且在任何产品写入／测试前发现 CLI→Core pin、
+  offline scaffold runtime projection 与 release-notes path 三个 blocker。中央 scope revision 2 已授权精确
+  修复面；public manifest、ZIP、push、main、tag、asset 与 Release 仍未发生。
+- REL4 的三个产品提交已选择性落到中央任务说明 `17bb70b...` 之后；中央 product baseline 为
+  `ef145180...`，包含 0.3.0 candidate manifest、162-entry exact-Git builder、自包含 runtime/template 和三份
+  发布指南。任务分支旧 `56f4aca...` 的重复构建／offline probe 不能作为中央 exact-SHA evidence。CI7 已在
+  测试加载前拒绝 Fast 75／Checkpoint 81；Candidate、Promotion 与 publication 仍 Pending。
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 COMPLETE：`74afb989...` Fast 19/19 + Checkpoint 30/30，`a2d7737...` exact Unified 页面已由维护者接受。下一步注册独立 Sol-medium Final RC，先冻结 manifest/archive/runtime inputs；push/main/tag/Release 仍分别授权。
+- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：Phase 0 COMPLETE；release inputs 已选择性进入中央 `ef145180...`。scope revision 3 禁止重试 Fast/Checkpoint 大包，只允许同一 REL4 合并中央状态后做一次 Candidate dry-run；允许才运行一次 Candidate。push/main/tag/Release 仍分别授权。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
@@ -88,5 +96,5 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 对 Canonical W7/W6 做真实 self-host read-only／dry-run，先补 lifecycle／closure 证据再讨论删除或自动化。
-2. 选择 Authority managed consumer，或批准 D2／C2／Claude 其中一条独立线路；不得把多个发布／安全决策绑在一次未经审阅的切换中。
+1. 让 `V0.3.0-final-rc` 读取 scope revision 3、合并中央 exact state，并只执行一次 Candidate dry-run；允许才运行一次 Candidate 与同 SHA build/offline gates。
+2. Candidate 通过后才请求 non-main exact-SHA Promotion；main、annotated tag 与 GitHub Release 继续分别授权。

@@ -16,4 +16,3 @@ command = Chr(34) & pythonw & Chr(34) & " -X utf8 " & _
   Chr(34) & root & "\scripts\docsite\serve_orrery.py" & Chr(34)
 shell.CurrentDirectory = root
 shell.Run command, 0, False
-

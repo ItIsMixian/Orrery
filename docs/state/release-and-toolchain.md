@@ -7,14 +7,15 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 当前公开发布
 
 - Orrery v0.2.0 是唯一公开 Release。annotated tag 指向 `20fc95b`；ZIP SHA-256 为 `13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`。
-- `codex/v0-3-0-final-rc` 的 branch-scoped Worktree Candidate 已冻结 v0.3.0 manifest、162-entry exact-Git builder、
-  self-contained managed runtime 和人工发布边界；它尚未进入 Canonical main、tag 或 GitHub Release。
+- local central `ef145180...` 已包含 v0.3.0 release-input Candidate：release-candidate manifest、162-entry
+  exact-Git builder、自包含 Core/CLI/Observatory runtime、Unified template launchers 和人工 publication 边界。
+  它尚无 exact-SHA Candidate/Promotion/public evidence。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。
 - ADR-0021 已接受 0.3.0 release/default/distribution contract：新项目 Unified/Model 1/Rules 1，旧项目 legacy
   until explicit migration，单一 self-contained ZIP + checksum，Codex final runtime blocker，tag/Release 分权。
-  W7.3/CI7 本地中央合流与 routed Fast/Checkpoint 已完成；最终 exact-SHA 网页尚未接受，Final RC 未注册，
+  W7.3/CI7 本地中央合流、routed Fast/Checkpoint 与 exact page `a2d7737...` 接受均已完成；Final RC 已注册，
   public manifest/tag/assets 均仍为 0.2.0。
 - ADR-0022 的 pinned local ELK.js layout-only engine、vendor/license/provenance 与产品接线已进入本地 source；
   它们尚未进入 final self-contained ZIP、deterministic receipt 或公开资产。
@@ -52,16 +53,17 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   Core-only `derived_from` effective authority。维护者已接受修复预览；取得新 fingerprint 证据前，
   `f41b659...` receipts 仍不授权后续 source。
 - revision-7 source 已冻结，但 fresh CI7 dry-run 因 unregistered temporary IDs／unmapped inbox 两次在测试加载
-  前拒绝；IDs 已折叠，revision 8 只补 precise generic mapping。当前仍无 Final RC 或 release input。
+  前拒绝；IDs 已折叠，revision 8 只补 precise generic mapping。那两次 refusal 没有创建 release input。
 - revision-8 mapping 已消除 unmapped path；真实产品窗口仍因 Fast 25 和一个 Unknown owner timing 拒绝。
   revision 9 保留真实窗口，以一次 focused owner + Brand 2-fast/4-checkpoint 分层收敛成本，不改变 release 门。
 - revision-9 unique Fast 20/20 PASS；Checkpoint 因新增 portfolio 未同步 hardcoded list 而 29/30。修 list 后
-  Fast 又因 ci-control 41 项拒绝。revision 10 撤回新增 examples/list，等待新 fingerprint；Final RC 仍未注册。
+  Fast 又因 ci-control 41 项拒绝。revision 10 随后撤回新增 examples/list；这些旧 fingerprint 结果不用于 Final RC。
 - revision-10 rollback fingerprint 的 Checkpoint 预测允许，Fast 仅因 setup+actual-path deep check 为 10.300s
-  拒绝。revision 11 做单项 tier correction，不改变 release authority；仍无 Final RC。
+  拒绝。revision 11 做单项 tier correction，不改变 release authority。
 - revision-11 product/mapping exact `74afb989...` 已通过 Fast 19/19 与 Checkpoint 30/30；下一安全动作仅是
-  docs evidence commit + exact-SHA final page acceptance。`a2d7737...` 页面现已接受；Phase 1 Final RC 可注册，
-  Candidate/Promotion/public release 尚未开始。
+  docs evidence commit + exact-SHA final page acceptance。`a2d7737...` 页面现已接受；Phase 1 Final RC 已从
+  `88d80df...` 注册并只读返回 162-entry inventory。scope revision 2 正在修复 CLI/Core pin、offline scaffold
+  runtime projection 和 release-notes authority path；Candidate/Promotion/public release 尚未开始。
 
 ## 兼容与安全边界
 
@@ -93,8 +95,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 ## 已知缺口
 
 - 没有 Core／CLI／Observatory 独立公开发行物、多组件 release workflow、manifest v2 或公共支持矩阵。
-- v0.3.0 SemVer／candidate manifest 已在独立 Worktree Candidate 中选择；Authority/public `release_ready` 仍为 false，
-  且 non-main 双平台 Promotion、main、tag 与 GitHub Release 均未发生。
+- SemVer 已由 ADR-0021 固定为 0.3.0，candidate manifest 已在本地中央实现但尚未通过 exact Candidate；
+  `released` 仍为 null，Authority/public
+  `release_ready` 保持 false。
 - Claude 认证后模型路由未完成；其他 Adapter／OS／runtime／模型范围不得继承已有 evidence。
 - v0.2.0 archive 在 Windows／Linux 重建尚非 byte-for-byte 一致。
 - Unified／Collaboration／Maintenance／Graph／relation inbox 没有默认 consumer 或 public release；真实双机与 scheduler 不受支持。W7.3 只允许本机确认并将 effective relation 交给现有 lifecycle consumer，不提供中央 apply。

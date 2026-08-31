@@ -1,5 +1,25 @@
 # 开发日志
 
+## 2026-08-31 — Final RC Release Inputs Centrally Integrated; Candidate Path Narrowed
+
+- 唯一整合者只选择 REL4 产品提交 `29d0a6f`、`d54ff95`、`56f4aca`，在任务说明 `17bb70b...` 后形成
+  中央 `e677c73`、`68ab9be`、`552378b`；没有合并携带旧全局入口的 `b0412f0`。
+- `git diff --check` 暴露新 VBS launcher 的尾部空行，中央 `ef145180...` 已修复。任务分支 `56f4aca...`
+  的 ZIP/receipt/offline probe 只保留为历史 provenance，不能复用为新 exact SHA evidence。
+- Git-private receipts 证实 Fast 75／Checkpoint 81 均在加载测试前拒绝且未发 lease；bounded Focused 也在
+  加载前拒绝且未重试。scope revision 3 禁止拆批/重试，只允许先做一次 Candidate dry-run，允许后才跑
+  一次 Candidate 与同 SHA build/offline gates。无 push/main/tag/assets/Release。
+
+## 2026-08-31 — Final RC Inventory Gate and Scope Revision 2 Authorized
+
+- 独立 Sol-medium `V0.3.0-final-rc` 从任务说明版本 `88d80df...` 注册，Git-private scope revision 1/current，
+  clean worktree；只读 inventory 后无产品写入、测试、打包或远端操作。
+- proposed archive 为 162 entries、root `project-orrery/`、path-list SHA-256 `26d65705...`。它只是实现输入，
+  尚不是 archive/receipt/Candidate PASS。
+- inventory 暴露 CLI 0.1.22 仍 pin Core 0.1.18、clean scaffold 缺 embedded runtime projection、release notes
+  缺权威路径三项 blocker。scope revision 2 以精确 files 和 offline/self-contained/author-preservation contract
+  收口；Agent 必须读取新 commit 并刷新 scope 后才可恢复。push/main/tag/assets/Release 仍未授权。
+
 ## 2026-08-31 — Phase 0 Exact Unified Page Accepted
 
 - 维护者接受 exact clean `a2d7737802be66714ff88064820685de6e231e95` 页面；1440×900/390×844 为 7
@@ -1153,14 +1173,3 @@
   原始 `a520ebc` focused 5/5、CI contract、完整 CI suite 25/25、pre-amendment 开发树 Fast 42/42
   （8.057895s）与 Checkpoint 42/42（7.526136s）通过；这些不替代上方 amendment exact-SHA non-green Fast
   事实。完整 Promotion 不作开发循环；新 final fingerprint 的 hosted checks 留给中央整合。
-## 2026-08-31 — v0.3.0 Final RC release-input Candidate
-
-- Registered `V0.3.0-final-rc` scope revision 2 from authority commit `17bb70b...` before product writes and retained
-  the accepted 162-entry archive/path-list contract. Final clean product SHA is `56f4aca...`.
-- Added the v0.3.0 candidate contract, exact-Git deterministic builder/receipt, self-contained managed runtime,
-  Unified template launchers, manual-publication workflow boundary and three author guides. Public v0.2.0 remains
-  unchanged; no ref push, main mutation, tag, upload or GitHub Release occurred.
-- Two independent builds were byte-identical (ZIP `160b8419...`), and a checkout/PYTHONPATH/network-independent
-  scaffold/validate/launcher import passed. CI7 eliminated unknown paths but refused 75-test Fast and 81-test
-  Checkpoint plans on count/Unknown timing; the sole bounded Focused request refused pre-test on phase policy and was
-  not repeated. Candidate/Promotion evidence therefore remains pending.

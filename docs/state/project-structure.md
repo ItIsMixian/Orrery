@@ -40,6 +40,11 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 ## Worktree 与事实作用域
 
 - 一个 Workstream 使用一个独立 branch＋linked worktree／clone；主 worktree只用于唯一整合。linked worktree 共享 Git object store 和 refs，但拥有独立 HEAD、index 与工作目录。
+- `V0.3.0-final-rc` 已从 exact `88d80df...` 注册到独立 `codex/v0-3-0-final-rc` branch/worktree；scope revision 1
+  仅完成只读 archive inventory 后停写。中央任务说明 revision 2 提交并由该 Workstream 刷新 scope 前，不能
+  写产品、运行测试或把 Candidate/Worktree 状态称为 public release。
+- release-input 产品提交已由唯一整合者选择性落到中央 `ef145180...`，没有合并任务分支的旧全局入口文档。
+  任务分支和中央分支都保留；后续必须非破坏地汇合并由唯一整合者收口 State/PROGRESS/HANDOFF。
 - Canonical／Candidate／Worktree／Local-only／Unknown 必须分别表达。Candidate HEAD 被 main 包含不自动产生 review package、closure record 或作者 Validation。
 - Workstream session、review、closure、maintenance 与 relation transaction 存在 Git-private 区域；它们是协调证据，不进入作者文档或发布资产，也不能替代 State／ADR／Validation。
 - 本机旧 session 的 lifecycle 可能落后于 Git ancestry。maintenance 在缺少 current closure／review／Validation 时必须保护目标；不得凭目录前缀、年龄或 branch 已进入 main 自动删除。
@@ -81,10 +86,6 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 
 ## 已知缺口
-
-- branch-scoped v0.3.0 Candidate archive 以 `project-orrery/` 为唯一根，包含 162 个版本化 Git blob；三组件
-  runtime 与 Harness JSON 是明确 allowlist，不包含 Git-private state、凭据、缓存、生成站点或本机 benchmark。
-  该结构尚未 Promotion 或发布，不能作为 Canonical/public inventory。
 
 - Core／CLI／Observatory 尚无独立公开发行物、多组件 release pipeline 或 manifest v2。
 - 默认 docsite／Skill template 尚未启用 Unified Observatory 或 Personal／Team／Maintenance／Graph；公开 v0.2.0 不包含这些能力。

@@ -70,8 +70,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 ## 已知缺口
 
-- v0.3.0 Worktree Candidate 新增 release notes、onboarding 与 upgrade/rollback 三份作者指南；它们记录
-  create-only、managed backup、offline runtime 和 publication 分权，不产生 release/Validation 事实。
+- 本地中央 v0.3.0 Candidate 新增 release notes、onboarding 与 upgrade/rollback 三份作者指南；它们只说明
+  create-only、managed backup、offline runtime 和 publication 分权，不产生 release 或 Validation PASS。
 
 - D2 scanner／CLI、真实项目 soft-budget 配置、finding acknowledge／defer persistence、State／实现链接时效检查与自动修复均未实现。
 - HANDOFF 已完成职责压缩，但没有自动治理工具；后续仍需人工确认安全边界的当前有效性。
@@ -82,7 +82,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
 - authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
 - `orrery-dispatch` 已在当前本机安装但未发布；它只能指导宿主遵守流程，不能机械阻断绕过 Skill 的写入，也不能外推为其他主机可用。
-- W7.3 relation capture 已进入 root-only/default-off 本地中央 Candidate；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收，最终 exact-SHA 整页仍待维护者接受。
+- W7.3 relation capture 已进入 root-only/default-off 本地中央 Candidate，exact page `a2d7737...` 已由维护者接受；没有 public/default consumer、远程 confirmation、中央执行或真实双机验收。public template 与 final-archive runtime 现在由独立 Final RC 持有。
 - `807096d...` 的真实静态构建暴露 U2.3 lightweight Personal 与 W7.3 Relation Inbox 的锚点不兼容：导航仍在，
   但 Personal 被 quarantine。scope revision 5 已先登记，修复页面由维护者预览前禁止运行测试流程。
 - revision-5 动态预览已恢复 Personal/Team inbox placement，但显示四个同端点 automatic Unknown lineage
