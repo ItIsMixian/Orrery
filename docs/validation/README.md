@@ -3,8 +3,8 @@
 Validation records reproducible evidence for implementation and documentation claims.
 
 - [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — Phase 0 PASS;
-  release inputs are centrally integrated, while exact Candidate/runtime, dual-platform Promotion, main, tag and
-  Release remain Pending after CI7 refused the 75/81 Fast/Checkpoint plans before test loading.
+  release inputs are centrally integrated; the sole scope-revision-3 Candidate dry-run was refused and
+  non-evidence-eligible, so Candidate/runtime, dual-platform Promotion, main, tag and Release remain Pending.
 - [2026-08-30 CI7 Validation Routing Precision & Total-Cost Diagnostics](2026-08-30-ci7-validation-routing-precision-total-cost.md) — clean Candidate and fresh central Fast/Checkpoint validate acceptance gates, validation leases, predictive refusal and no-repeat enforcement; prior refusal/failure evidence remains preserved.
 
 For each validation, record:
