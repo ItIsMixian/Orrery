@@ -292,7 +292,7 @@ def _help_panel(
     return (
         '<div class="uo-help-backdrop" data-uo-help-backdrop hidden></div>'
         '<section class="uo-help-panel" data-uo-help-panel role="dialog" aria-modal="false" aria-labelledby="uo-help-title" hidden>'
-        '<header class="uo-help-head"><div><span class="uo-topline">帮助 / 系统状态 · 只读</span><h2 id="uo-help-title">Orrery 如何解释项目事实</h2><p>三层来源保持独立；此处没有编辑、批准、启用或执行能力。</p></div>'
+        '<header class="uo-help-head"><div><span class="uo-topline">帮助 / 系统状态 · 只读</span><h2 id="uo-help-title">事实与规则 · Orrery 如何解释项目事实</h2><p>三层来源保持独立；此处没有编辑、批准、启用或执行能力。</p></div>'
         '<button class="uo-help-close" type="button" data-uo-help-close aria-label="关闭帮助与系统状态">×</button></header>'
         '<section class="uo-authority" data-authority="derived-read-only" data-contract="authority-managed-consumer-v1">'
         '<div class="uo-authority-grid"><section class="uo-layer"><div class="uo-layer-head"><div><h3>项目原则</h3><p>目标项目选择的方向与约束</p></div><span class="uo-source">来源：项目文档</span></div>'
@@ -418,6 +418,12 @@ def inject_unified_shell(
     )
     def compose_sidebar(match: re.Match[str]) -> str:
         top, document_tree = match.group(1), match.group(2)
+        document_tree = re.sub(
+            r'<a(?=[^>]*data-target="dashboard")[^>]*>.*?</a>',
+            "",
+            document_tree,
+            flags=re.DOTALL,
+        )
         documents = (
             '<div class="nav-group expanded uo-documents" data-project-documents>'
             '<div class="nav-title" data-project-documents-toggle aria-expanded="true">'

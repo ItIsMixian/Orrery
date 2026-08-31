@@ -77,3 +77,10 @@ corrected Unified composition method runs but fails because the merged help pane
 “事实与规则”; project principles and operating-rule content remain present. Scope revision 4 may restore that label
 in the existing help heading only. The two Harness PASS methods and already-green component/security methods are not
 rerun unchanged.
+
+Scopes 3–4 are now resolved. The component manifest no longer treats package-local ELK files as root managed tools;
+the package-data declarations and vendor hashes are unchanged, and the component-boundary test passes. Unified keeps
+one app-level Documentation entry, removes only the duplicate root `dashboard` anchor from the nested project tree,
+and exposes “事实与规则” in the existing help panel without restoring an Authority navigation item. The corrected
+composition method passes; the host/origin/cookie method remains green. Across the final unique non-formal integration
+set, both Harness methods, two Unified methods and the component-boundary method pass. No formal lease has been issued.

@@ -13,10 +13,6 @@
     }
   },
   "managed_tools": [
-    "vendor/elk.bundled.js",
-    "vendor/LICENSE.elkjs.md",
-    "vendor/package.elkjs.json",
-    "vendor/PROVENANCE.elkjs.json",
     "start-docsite.bat",
     "scripts/docsite/_llm.py",
     "scripts/docsite/build_docsite.py",
