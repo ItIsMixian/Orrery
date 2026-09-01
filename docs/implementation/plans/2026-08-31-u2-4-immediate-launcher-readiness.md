@@ -58,3 +58,21 @@ degrade independently. This task corrects the implementation order; it does not 
 
 Do not run Fast, Checkpoint, Candidate or Promotion during implementation. Publication, if requested, receives a new
 patch-release Plan after this Candidate is accepted.
+
+## 2026-08-31 scope revision 2 — quarantine only out-of-graph program memberships
+
+The delayed-start page eventually rendered, but its embedded Workstream Graph projection was
+`status=unavailable / invalid-provider` while the live Core provider remained valid with 32 nodes and 12
+`derived_from` edges. Direct projection reproduced `Program membership path is invalid.` The exact mismatch is one
+explicit program membership for `W5D-lan-collaboration-harness`; that Workstream is not present in the current graph
+node set. All four program/phase groups and the other eight memberships are structurally valid.
+
+Revision 2 authorizes the Observatory adapter to ignore explicit program memberships whose Workstream is outside the
+current relation graph node set, matching the existing task-series projection behavior. Duplicate memberships,
+non-two-element paths and unresolved program/phase groups for nodes that are in the graph must still fail closed. Do
+not create a placeholder W5D node, relation, membership, lifecycle fact or inferred group.
+
+Add one focused regression proving an out-of-graph membership is omitted while the 32-node/12-edge provider remains
+renderable, plus a negative control proving an invalid membership for an in-graph node still quarantines the Graph.
+The current self-host page must project the existing edges with their honest proposed/stale labels instead of showing
+an empty unavailable graph. Core relation/program stores and confirmation authority remain unchanged.

@@ -29,3 +29,14 @@ This proves the delayed-entry defect; it does not validate a correction.
 ## Result
 
 Pending. No product code has changed under this task-description version.
+
+## 2026-08-31 empty Graph projection blocker
+
+- live provider: valid, 32 nodes, 12 `derived_from` edges, 9 program memberships;
+- embedded page projection: `unavailable / invalid-provider`, 0 nodes/edges;
+- direct exception: `Program membership path is invalid.`;
+- exact mismatch: `W5D-lan-collaboration-harness → workstream-w/workstream-w5` references a Workstream outside the
+  current graph node set; no other membership shape/group error was found.
+
+Revision 2 is Pending until the adapter omits only out-of-graph memberships, preserves in-graph negative controls and
+the current self-host Graph renders the remaining honest relation facts without inventing W5D.
