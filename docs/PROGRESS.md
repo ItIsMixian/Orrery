@@ -55,11 +55,10 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 
 ## 活动计划与待办
 
-- [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：已接受 ADR-0026；以 U2.4 Candidate `00b2eb4...` 为观察基线，补独立 closed-task history index、完整历史折叠/展开和人话关系确认卡。先给维护者真实预览，接受前不跑自动测试。
+- [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：已接受 ADR-0026；首版真实预览只恢复 6 条 closed task，维护者拒绝。当前继续完整 archive/history 数量对账与投影修正，接受前不跑自动测试。
 - [ ] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
-  v0.3.1 Windows 冷启动在约 95 秒完整 render 后才绑定/打开页面；先在 3 秒内提供同一 URL 的 starting page，
-  后台激活完整视图。revision 3 又登记了本机归档边界恢复和两个明确 Windows 启动入口；只跑 focused
-  lifecycle/archive/launcher smoke，发布另立任务。
+  Agent 已回报 clean Worktree Candidate `00b2eb4...`，包含即时 starting page、归档边界恢复和两个明确
+  Windows 启动入口，focused 10/10；尚未中央整合、Promotion 或发布。closed-task 完整历史由 W7.4 持有。
 - [x] [v0.3.1 Windows 启动器紧急发布](implementation/plans/2026-08-31-v0-3-1-launcher-hotfix-release.md)：
   exact `1d9223c...` 的 package/runtime、Promotion、main/tag/Release、远端哈希复核与 v0.3.0 warning 已完成；
   旧失败 SHA/run 均保留且未重试。
@@ -79,7 +78,7 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 - [ ] [Authority Meta Model Plan](implementation/plans/2026-08-21-authority-meta-model-conformance-and-extraction.md)：production consumer 与真实 release 选择仍未完成。
 - [ ] [U2.1 Unified Observatory UX Acceptance](implementation/plans/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)：基础体验返工已进入联合 Candidate；W7.2/U2.2 后的维护者复验、public/default transition 与 Release 尚未完成。
 - [ ] [多 Workstream 协作 Plan](implementation/plans/2026-08-19-multi-worktree-collaboration-protocol.md)：Phase 5 self-host／发布未完成；真实多机、云 relay 与自动选主也不在当前支持范围。
-- [ ] [Workspace Maintenance Plan](implementation/plans/2026-08-27-workspace-maintenance-and-scheduled-cleanup.md)：Phase 0–2 已进入 Canonical source；Phase 3 自动 worktree removal、Phase 4 scheduler 与 Phase 5 显式所有权临时目录生命周期均未开始。
+- [ ] [Workspace Maintenance Plan](implementation/plans/2026-08-27-workspace-maintenance-and-scheduled-cleanup.md)：Phase 0–2 已进入 Canonical source；Phase 3 自动 worktree removal、Phase 4 scheduler 与 Phase 5 显式所有权临时目录生命周期均未开始。W6.2 仅预留且被 W7.4 完整历史验收硬阻塞，没有任务或 worktree。
 - [ ] [Context-routing State](state/context-routing-research.md)：C2／Pilot 010 尚未获批。
 - [ ] [平台 Plan](implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)：Claude 成功认证／模型路由和所有组件独立发行仍未完成。
 - [ ] [文档治理 Plan](implementation/plans/2026-08-21-document-governance-and-audit.md)：D2 scanner／CLI 尚未批准。

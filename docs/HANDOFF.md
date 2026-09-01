@@ -1,18 +1,17 @@
 # 跨会话交接
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
 ## 当前停止点
 
-- ADR-0026、Approved Design、W7.4 Plan/Pending Validation 已登记，等待 authority-only commit 后分发独立
-  `W7.4 · 历史任务与关系确认可理解性`。它以 U2.4 Worktree Candidate `00b2eb4...` 为观察基线，负责让
-  零关系的已关闭任务在 worktree 清理后仍可从历史展开，并把 Personal relation inbox 改成先说明问题、原因
-  和接受/拒绝后果；不继续塞入 U2.4，也不包含 W6 自动清理。
-- U2.4 在 2026-09-01 revision 3 前暂停产品写入／测试：本机清理把 13 份完整 Git-private metadata subtree
-  放进只允许单个 `worktree.json` 的 retired-session relation archive；分离后又暴露一份 126,892-byte session
-  超过 64 KiB 上限。两者导致当前 Graph Unavailable，同时运行中页面仍显示旧 20-worktree snapshot。
-  revision 3 要先把 extras／超限记录原样移出 active archive、恢复当前 Graph，再把根启动面收口为
-  `Start Orrery.vbs` 与 `Start Orrery Console.bat` 两个明确入口；发布仍另立任务。
+- W6.2 自动清理只登记未分发：必须等待 W7.4 完整 history index、数量对账和维护者预览接受；当前仅恢复
+  6 条历史记录不能作为 `history_snapshot_ready`，不得创建 W6.2 任务或自动清理工作区。
+- W7.4 已在独立 branch/worktree 分发。首版真实预览只把 6 条 closed task 写入 history index，维护者明确
+  拒绝；它必须继续对完整 bounded archive/history 输入做总数、有效、去重、投影和逐项排除原因对账，再给
+  新预览。维护者接受前不得运行自动化测试，也不得把 6 条样本冒充完整历史。
+- U2.4 Agent 已回报 Worktree Candidate `00b2eb4fa28a606cdb532c7938e46482950e8233`：归档布局可逆分离、
+  Graph 恢复和两个 Windows 启动入口已实现，focused 10/10 与轻量检查通过，分支干净。该信息仍是 Agent
+  回执；Candidate 尚未中央整合、Promotion 或发布，历史任务完整投影由独立 W7.4 持有。
 - v0.3.1 用户实测暴露第二个 launcher 问题：首次进程 23:37:41 启动，23:39:16 才 ready，期间没有页面或
   进度。只读 profile 为 85.013 秒/751 subprocess，主要由 Graph/relation/legacy-session 投影造成；U2.4
   Immediate Launcher Readiness Plan/Pending Validation 已登记，尚无实现或 patch Release。

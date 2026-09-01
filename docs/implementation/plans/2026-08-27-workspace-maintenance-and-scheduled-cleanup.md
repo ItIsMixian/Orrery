@@ -277,6 +277,14 @@ stage／docsite／adapter／evidence 临时目录散落。后续实现必须：
 
 本节只登记后续范围，没有启动 Phase 5、没有授权广域扫描或自动删除。
 
+### 2026-09-01 W6.2 dispatch hold
+
+- `W6.2 · 任务结束自动清理` 只是预留任务身份；当前没有任务、会话、分支或 worktree。
+- W7.4 的完整 closed-task history index、真实 self-host 历史数量对账和维护者预览接受是硬前置条件。
+- 在 `history_snapshot_ready` 能证明所有有界闭合任务已独立于 worktree 保存之前，不得启动自动删除实现，
+  也不得用当前仅恢复部分历史的页面作为清理安全证据。
+- W7.4 未接受期间，本节只保留需求和依赖，不分发 W6.2、不预建工作区、不运行清理测试。
+
 ## 11. Validation 矩阵
 
 | 场景 | 必须结果 |
