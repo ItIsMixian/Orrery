@@ -27,6 +27,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Promotion run `33454661325` 将旧失败集缩到 5 个 ID 后仍失败关闭。revisions 16–18 完成 current-version
   test、VBS byte parity、multiline ADR relation、UTF-8 CLI 和 Observatory parser 收口；exact `a0a728b...` 的
   Candidate 56/56、双根 package、完整 final runtime 与剩余 2-ID closure PASS。下一动作是该 SHA Promotion。
+- exact `a0a728b...` Promotion run `33456504779` 已 PASS：Windows／Ubuntu 各完整聚合 451 tests、27 shards、
+  10 lanes，repository gates 与两个 required checks 均 green。下一动作是同 SHA protected main；tag/Release
+  仍未发生。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。

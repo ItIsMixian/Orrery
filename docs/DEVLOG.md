@@ -1273,3 +1273,5 @@
   parity、CLI/Observatory relation continuation 与 UTF-8 protocol；精确 5-ID 本地复现为 3/5 后，revision 18
   只补剩余 phase0 update fragments 和 Observatory parser，再以 2/2 关闭。exact `a0a728b...` Candidate
   56/56、双根 package 与完整 final runtime PASS；前三个远端失败 run 均保留。
+- exact `a0a728b...` Promotion run `33456504779` 最终双平台 green：每端 451 tests/27 shards/10 lanes，两个
+  repository gates 与 required smoke checks PASS。此证据只授权同 SHA main/tag 流程，不授权 GitHub Release。

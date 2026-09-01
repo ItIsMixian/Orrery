@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Candidate/package/final runtime PASS on `a0a728b...`; exact-SHA Promotion Pending; main/tag not started
+Status: Exact `a0a728b...` Promotion PASS; protected main Pending; tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -739,3 +739,18 @@ implicit Sol-medium Codex exact tokens, two HTTP-200/202 Unified start-stop cycl
 exact migration restore, missing-package exit 1 and Skill 1→0→1 with 162 canonical files. The two IDs left failing by
 the prior 3/5 reproduction then passed 2/2 in 0.771s; the other three were not replayed. Exact `a0a728b...` is ready
 for one non-main Promotion; main/tag/Release remain unchanged.
+
+## 2026-08-31 Promotion run `33456504779` — PASS
+
+Remote `promotion/v0.3.0-rc` and every checkout resolved to exact
+`a0a728b1f096650e475a1327d29973f2a1f9e267`. Preflight, Windows/Ubuntu repository gates and both required checks
+completed successfully. Downloaded aggregate receipts are identical in identity and complete on each OS:
+
+- `matrix_result=success`, `gate_result=success`, `complete=true`;
+- 451 recorded tests, 27 logical shards and 10 lane artifacts;
+- zero aggregate errors;
+- required checks `smoke-test (windows-latest)` and `smoke-test (ubuntu-latest)` both `success`.
+
+Run URL: `https://github.com/ItIsMixian/Orrery/actions/runs/33456504779`. The promotion ref still equals
+`a0a728b...`; `main` and `v0.3.0` remain unchanged at this evidence point. Same-SHA main promotion is now authorized;
+GitHub Release creation and asset upload are still explicitly withheld.

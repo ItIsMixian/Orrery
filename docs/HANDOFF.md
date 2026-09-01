@@ -6,7 +6,7 @@ Updated: 2026-08-31
 
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
 - `V0.3.0-final-rc` exact `a0a728b...` 已完成 Candidate 56/56、双根 byte-identical package、完整
-  Windows final runtime 与剩余 2-ID closure；前三个 Promotion run FAIL 保留，新 SHA 尚未 Promotion。
+  Windows final runtime 与剩余 2-ID closure；前三个 Promotion run FAIL 保留，run `33456504779` 双平台 PASS。
 - 维护者已授权持续推进 final runtime、exact non-main Promotion、同 SHA protected main 与 annotated v0.3.0
   tag；GitHub Release 创建/asset upload 明确保留为最终停止门。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
@@ -85,7 +85,7 @@ Updated: 2026-08-31
     Promotion run `33449930707` 在 lanes 前因 machine lane-list stdout 被 docsite 日志污染而失败关闭；run
     `33451288289` 完整执行但暴露 36 个集成漂移 ID；`33454661325` 将其缩到 5 个仍 non-green。scope revision
     18 exact `a0a728b...` 已完成 Candidate 56/56、双根 package、完整 final runtime 与 2-ID closure PASS；
-    现在只可 fast-forward Promotion ref 并运行一次新矩阵。
+    run `33456504779` 已双平台 PASS，现在只可推广同 SHA 到 protected main。
     最终仍停在 GitHub Release 创建/asset upload 前。
 
 ## 不得外推的边界

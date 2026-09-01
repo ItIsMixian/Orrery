@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 18 Candidate/package/final runtime PASS on `a0a728b...`; exact-SHA Promotion authorized; GitHub Release withheld
+Status: Exact `a0a728b...` Promotion PASS; same-SHA protected main authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -755,6 +755,12 @@ Revision 18 completed on exact `a0a728b1f096650e475a1327d29973f2a1f9e267`: Candi
 deterministic package, complete final runtime and the exact remaining two-ID reproduction 2/2 are green. The three
 IDs already green on `c29572b...` were not replayed locally. The promotion ref may now fast-forward from
 `76a6961...` to `a0a728b...` for one new run; later evidence-only commits are not Candidate inputs.
+
+Promotion run `33456504779` completed successfully on exact `a0a728b...`. Windows and Ubuntu repository gates and
+named smoke checks are green; each aggregate is complete with 451 tests, 27 shards, 10 lanes and zero errors. The
+already-authorized next action is to push this exact SHA—not the later evidence commits—to protected `main`, verify
+remote equality, then create the separate annotated `v0.3.0` tag and wait for tag verification. GitHub Release and
+asset upload remain withheld.
 
 ## Phase 1 — register Final RC and freeze inputs
 
