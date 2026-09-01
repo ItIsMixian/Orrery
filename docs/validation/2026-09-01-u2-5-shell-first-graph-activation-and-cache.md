@@ -1,0 +1,54 @@
+# Validation: U2.5 Shell-first Graph Activation and Incremental Cache
+
+Status: Pending implementation and maintainer preview
+
+Date: 2026-09-01
+
+Plan: [U2.5 Shell-first Graph Activation and Incremental Cache](../implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)
+
+## Baseline evidence
+
+- Public v0.3.1 opens no usable page until the complete Unified render finishes; the recorded self-host delay was
+  roughly 95 seconds.
+- U2.4 local Candidate binds a startup page in 701 ms and completes the full page after 55.317 seconds, but the browser
+  remains globally blocked by `Orrery 正在启动` during that interval.
+- The U2.4 profile recorded 751 child processes, about 63.991 seconds in the Graph provider and about 2.561 seconds in
+  the base docsite.
+- Dynamic `GET /api/v1/workstreams/graph` currently serves an in-memory `startup-cached-projection` only after the full
+  render. The payload is discarded on stop, and the next cold start recomputes the Graph.
+- W7.4 Graph/history product work is currently dirty and uncommitted; U2.5 has no accepted exact presentation
+  dependency yet. This record must not treat that worktree as Canonical or a clean Candidate.
+
+These observations prove the gap. They do not prove any correction.
+
+## Pending maintainer preview
+
+- one shell/URL with no full-page Graph startup gate;
+- non-Graph navigation usable while Graph alone is loading;
+- Graph-local empty/current/stale/refreshing/failed states and atomic visual swap;
+- unchanged restart uses a validated Git-private cache with zero full provider runs;
+- one bounded input change creates exactly one refresh and visibly stale last-known data until completion;
+- accepted W7.4 full/compact semantics and evidence remain unchanged;
+- stop during refresh reclaims runtime/worker state;
+- no Computer Use, external network, automated test suite or release operation before acceptance.
+
+## Pending focused mechanical evidence after preview acceptance
+
+- existing Unified lifecycle/delivery owner assertions;
+- existing Graph owner assertions affected by dynamic hydration;
+- cache schema/fingerprint/atomic-write/corruption/single-flight negative controls;
+- static eager-build and dynamic lazy-delivery separation;
+- root/project-template parity, syntax checks and `git diff --check`;
+- exact commands, elapsed times, provider invocation counts, cache generation/hash and clean Candidate SHA.
+
+## Evidence boundaries
+
+- A fast listener or shell skeleton alone does not prove the non-Graph product is usable.
+- A cache hit does not prove relation/history facts are current unless the versioned input fingerprint matches.
+- Cached/stale presentation is a derived view, not relation, closure, Validation or cleanup authority.
+- Synthetic fixtures do not replace a real self-host preview using the accepted W7.4 graph.
+- Focused local evidence does not authorize Fast, Checkpoint, Candidate, Promotion, main, version, tag, asset or Release.
+
+## Result
+
+Pending. No product implementation or automated validation is claimed by this task-description version.

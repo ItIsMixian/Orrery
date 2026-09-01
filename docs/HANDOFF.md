@@ -4,6 +4,9 @@ Updated: 2026-09-01
 
 ## 当前停止点
 
+- ADR-0028 与 U2.5 Design/Plan/Pending Validation 已获维护者接受，准备按既有 `unified-u` task series
+  Workstream 分发。Phase A 只允许修改与 W7.4 不重叠的 Shell／Git-private Graph cache 基础设施；Phase B
+  的 Graph hydration/展示接线必须等待 accepted clean W7.4 exact Candidate。维护者预览前不得跑自动测试。
 - W6.2 自动清理只登记未分发：必须等待 W7.4 history index、archived-lineage 恢复和维护者预览接受；当前
   被拒绝的 W7.4 预览不能作为 `history_snapshot_ready`，不得创建 W6.2 任务或自动清理工作区。
 - W7.4 再次暂停等待 task-description revision 2：维护者拒绝新“完整历史目录”和 bulk card grid，并指出原
@@ -74,8 +77,9 @@ Updated: 2026-09-01
 
 ## 当前可继续的线路
 
-- **当前优先：U2.4 immediate launcher readiness。** 先绑定同一 loopback URL 并显示 starting page，再后台
-  完成重关系视图；保留 v0.3.1 no-window/reuse/安全边界，只跑 focused lifecycle evidence，不自动发布。
+- **当前并行控制：W7.4 + U2.5 Phase A。** W7.4 继续等待 compact preview 接受/clean Candidate；U2.5 可先
+  实现 Shell-first 与缓存基础设施，但不得触碰 W7.4-owned presentation/relation surfaces。U2.5 Phase B、W6.2
+  都等待 W7.4 的 exact accepted dependency；三者不得合成一个任务。
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
 2. **GX2 ELK layout evaluation：** 隔离视觉方向已获维护者接受并冻结 exact provenance；不再继续修改实验。

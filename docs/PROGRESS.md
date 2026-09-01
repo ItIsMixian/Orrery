@@ -10,12 +10,16 @@ Orrery v0.3.1 已于 2026-09-01 公开发布；protected `main`、annotated tag 
 Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority revision `1776629...` 与已发布产品
 历史共同纳入 Canonical main；不产生新的产品版本或资产。
 
+维护者已接受 ADR-0028 并授权独立 U2.5 开发：目标是先激活可导航的 Unified Shell，再异步加载
+Workstream Graph，并以 Git-private、可验证、事件失效的缓存避免 unchanged restart 全量重扫。U2.5 可先做
+与 W7.4 不重叠的 Shell／缓存基础设施；Graph 展示接线必须等待 W7.4 的 accepted clean exact Candidate。
+
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Release／工具链 | v0.3.1 Latest Release 已验证并发布；Windows launcher 闪窗与健康 runtime 复用缺陷关闭，v0.3.0 历史资产未替换 | 仅完成本次 docs closeout；后续通用 release 简化必须另立 Plan |
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate，Phase 0 exact page 已接受 | Final RC 只消费当前 child receipts；不手工重跑 feature suites |
-| Unified Observatory | A4/U2.3/W7.3 已组合为本地 root-only/default-off Candidate；Phase 0 exact page `a2d7737...` 已接受，公开默认仍未切换 | 在 Final RC 中完成 self-contained template、offline scaffold 与 final-archive runtime gate |
+| Unified Observatory | U2.4 已本地整合并提供即时 listener/启动页与两个明确入口，但 Graph 仍阻塞整个页面且每次冷启动重算；ADR-0028/U2.5 已获授权 | 先分发 U2.5 的 Shell／缓存基础设施；待 W7.4 clean Candidate 后接入异步 Graph 并给维护者预览 |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
 | 文档治理 | D1 已冻结只读 finding contract、规则 registry 与 synthetic fixture；当前没有 `docs audit` 产品入口 | 维护者另行决定是否启动 D2 scanner／CLI；不自动改写 Markdown 或启用长度硬门 |
@@ -55,6 +59,7 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 
 ## 活动计划与待办
 
+- [ ] [U2.5 Shell-first Graph Activation and Incremental Cache](implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)：已批准分发；Phase A 只做不与 W7.4 重叠的 Shell／Git-private cache 基础设施，Phase B 等待 accepted clean W7.4 exact Candidate。维护者预览前不跑 unittest/Fast/Checkpoint/Candidate/Promotion。
 - [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：完整关系恢复已获维护者接受；revision 5 冻结该图为默认 `显示完整关系`，新增同画布 `折叠历史` 预览。只折叠深层无待办历史链，不新增UI；接受前不跑自动测试。
 - [x] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
   exact `00b2eb4...` 已进入当前本地 integration branch，包含即时 starting page、归档边界恢复和两个明确
@@ -110,6 +115,6 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 
 ## 下一里程碑
 
-1. 完成本次 v0.3.1 docs-only closeout merge，并保持 release tag/assets 不再变化。
-2. 后续如需精简通用发布流程，另立 ADR／Design／Plan 与 Pending Validation。
-3. alias、scheduler、auto-delete、独立组件发行与新 UI 继续按现有边界延期。
+1. 完成并接受 W7.4 compact preview，冻结 clean exact Candidate；W6.2 继续等待该历史快照门。
+2. 分发 U2.5，先完成不重叠的 Shell／缓存基础设施，再消费 W7.4 exact Candidate 做 Graph 异步接线与真实预览。
+3. 后续如需发布 U2.4/U2.5、精简通用发布流程或启动 W6.2，分别建立独立推广／实现任务；alias、scheduler 与独立组件发行继续延期。

@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0028: Shell-first Observatory and Incremental Workstream Graph Cache](0028-shell-first-observatory-and-incremental-graph-cache.md) — Accepted; makes the shell/non-Graph consumers usable without waiting for Graph and adds a validated Git-private, event-invalidated Graph cache without changing relation/history authority.
 - [ADR-0027: Retain History without Bulk UI and Recover Archived Lineage](0027-retain-history-without-bulk-ui-and-recover-archived-lineage.md) — Accepted; stores all closed identities without a new bulk-history UI and restores only mechanically validated archived lineage/series relationships into the existing Graph.
 - [ADR-0026: Durable Workstream History and Human-readable Relation Decisions](0026-durable-workstream-history-and-human-readable-relation-decisions.md) — Accepted and amended by ADR-0027; closed task identity survives worktree removal and actionable relation cards explain consequences, while bulk history display is no longer required.
 - [ADR-0025: Two Explicit Windows Launchers](0025-two-explicit-windows-launchers.md) — Accepted; the next Candidate exposes only `Start Orrery.vbs` for hidden-console launch and `Start Orrery Console.bat` for one-console diagnostics, while internalizing redundant control/legacy helpers and preserving historical release assets.
@@ -45,7 +46,7 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-- No active proposal is awaiting maintainer review; ADR-0018–0027 are Accepted. ADR-0024 carries the maintainer's
+- No active proposal is awaiting maintainer review; ADR-0018–0028 are Accepted. ADR-0024 carries the maintainer's
   explicit request to proceed through the green v0.3.1 publication sequence without another pause.
 - `PO-DEC-AUTH-002` was integrated as ADR-0011.
 - `PO-DEC-REL-003` at REL3 exact `ec2b09b` was accepted and normalized into ADR-0021 plus the current Approved Design/blocked Final RC Plan.
