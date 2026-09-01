@@ -37,3 +37,10 @@ The first release worktree metadata invocation completed one test and failed one
 
 No commit, package, Promotion, tag, Release or v0.3.0 remote edit occurred. Revision 2 may correct only the stale
 cardinality to 104 and run the same two tests once on a new fingerprint. All later evidence remains Pending.
+
+## 2026-08-31 revision-2 PASS and package command parse stop
+
+Release-input `41fcc0f751d694b7be873dbc6113ecbc00d0869a` completed the two direct metadata tests 2/2 PASS.
+The subsequent PowerShell package command failed parsing at `$name:` before either exact-Git builder started. No
+package output, remote action or repository change occurred. Revision 3 may correct only the external interpolation
+syntax and continue the two-build gate on the same release-input SHA; no metadata test is repeated.

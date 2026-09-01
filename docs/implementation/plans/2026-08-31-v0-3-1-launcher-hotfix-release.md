@@ -48,3 +48,13 @@ Revision 2 authorizes only changing that existing `tests/test_project_orrery.py`
 new authority version is acknowledged and Git-private scope is refreshed, make the one-line correction, create a new
 release-input commit/fingerprint, and run the same two direct metadata tests once. No other test expectation, product
 code, Plan step or validation scope changes; the failed fingerprint is not retried.
+
+## 2026-08-31 scope revision 3 — package orchestration parse correction
+
+Release-input exact `41fcc0f751d694b7be873dbc6113ecbc00d0869a` passed both metadata tests. The first package
+orchestration was rejected by the PowerShell parser before either builder started because a diagnostic string used
+`$name:` instead of a delimited variable such as `${name}:`.
+
+Revision 3 authorizes only correcting that external command text and executing the two-build package gate on unchanged
+`41fcc0f...`. This is not a retry of a builder, package fingerprint or test: neither build process began and no output
+directory was created. Do not modify repository files, rerun metadata tests or add another validation step.
