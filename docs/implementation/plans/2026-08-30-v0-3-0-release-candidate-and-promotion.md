@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Promotion run `33454661325` failed on exact `76a6961...`; scope revision 16 remediation authorized; GitHub Release withheld
+Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 17 Codex token correction authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -723,6 +723,18 @@ Revision 16 authorizes only:
 No accepted ADR, frozen v0.2 fixture, test ID, workflow, dependency, budget, lane, public default or component version
 may change. Commit a new SHA, run one Candidate dry-run/run, rebuild twice, repeat the exact final runtime matrix, then
 fast-forward the non-main promotion ref and run once. `76a6961...` and run `33454661325` are not retried.
+
+### 2026-08-31 scope revision 17 — preserve the exact Authority status token
+
+Revision-16 exact `c29572bbf9608175d731c893ec548415fe96d9a9` completed Candidate 73/73, deterministic
+two-root package, source/extracted install, Harness and cp1252 CLI emission. Its first explicit Sol-medium Codex
+invocation ran the expected integrated-gate path and reported `VALIDATE_EXIT=1`, but summarized the manifest state as
+`pending` instead of the exact protocol token `migration_pending`. No file changed; the output remains non-green.
+
+Revision 17 authorizes one new explicit Codex invocation on the unchanged isolated tree/output path pair, requiring
+the Agent to copy `authority_status` verbatim from `.project-orrery.json` after running validation. Keep Sol medium,
+ephemeral read-only sandbox, local Skill and a new output file. Do not replay or overwrite the prior prompt/output.
+If green, continue the unchanged implicit/lifecycle/upgrade matrix; no Candidate or package rebuild is required.
 
 ## Phase 1 — register Final RC and freeze inputs
 

@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Promotion run `33454661325` FAIL on `76a6961...`; scope revision 16 Pending; main/tag not started
+Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 17 Codex token correction Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -699,3 +699,16 @@ Ubuntu had four failing IDs; Windows had the same four plus one locale-only whee
 
 Both required checks failed closed; `main`, tag and Release remain unchanged. Scope revision 16 is Pending for the
 exact surfaces in the Plan. The run and its five failures are immutable and will not be replayed on the same SHA.
+
+### Revision-16 local gates and exact-token stop
+
+Exact `c29572bbf9608175d731c893ec548415fe96d9a9` Candidate dry-run selected 73 tests with zero unknown and
+allowed timing. Its one fresh Candidate completed 73/73 PASS in 6.643034s. Two 162-entry builds matched pairwise:
+ZIP `6ab3d03eaf33687e00a634df8d27414ff61cb201947f3db0a6caaaddf1bf5f6b`, checksum-file
+`217ef9ea2d24197ce6713998ece5eed104b62b23a08be1b06d2ad0e62c8f008c`, entry receipt
+`73da9f72a5148ea41d03e83881099a044cfa093e25b98785a47f80c196e67955`.
+
+Source/extracted installs, direct Harness and a `PYTHONIOENCODING=cp1252` CLI JSON probe passed. The first explicit
+Sol-medium Codex result was `EXPLICIT_SKILL=project-orrery VALIDATE_EXIT=1 AUTHORITY_STATUS=pending`; because the
+status token is not exact, this is retained as non-green rather than inferred. Revision 17 is Pending for a stricter
+new prompt/output only.
