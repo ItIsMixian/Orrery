@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0025: Two Explicit Windows Launchers](0025-two-explicit-windows-launchers.md) — Accepted; the next Candidate exposes only `Start Orrery.vbs` for hidden-console launch and `Start Orrery Console.bat` for one-console diagnostics, while internalizing redundant control/legacy helpers and preserving historical release assets.
 - [ADR-0024: Orrery v0.3.1 Emergency Launcher Hotfix Release](0024-v0-3-1-emergency-launcher-hotfix-release.md) — Accepted; ships only the Windows launcher correction through one short exact-SHA patch gate, preserves v0.3.0 assets and moves alias/scheduler/DSH out of the emergency release.
 - [ADR-0023: Explicit Legacy Graph Layout Fallback and Preview-first Cutover](0023-explicit-legacy-graph-layout-fallback.md) — Accepted; preserves the handwritten renderer as a frozen, visibly labeled manual recovery engine, forbids silent fallback and blocks ELK product integration until the maintainer first accepts the isolated GX2 page.
 - [ADR-0022: ELK.js as the Workstream Graph Layout Engine](0022-elkjs-workstream-graph-layout-engine.md) — Accepted and amended by ADR-0023; selects pinned local ELK layout-only while Orrery retains fact selection and existing SVG/frontend design.
@@ -42,7 +43,7 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-- No active proposal is awaiting maintainer review; ADR-0018–0024 are Accepted. ADR-0024 carries the maintainer's
+- No active proposal is awaiting maintainer review; ADR-0018–0025 are Accepted. ADR-0024 carries the maintainer's
   explicit request to proceed through the green v0.3.1 publication sequence without another pause.
 - `PO-DEC-AUTH-002` was integrated as ADR-0011.
 - `PO-DEC-REL-003` at REL3 exact `ec2b09b` was accepted and normalized into ADR-0021 plus the current Approved Design/blocked Final RC Plan.

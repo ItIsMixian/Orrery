@@ -40,3 +40,16 @@ Pending. No product code has changed under this task-description version.
 
 Revision 2 is Pending until the adapter omits only out-of-graph memberships, preserves in-graph negative controls and
 the current self-host Graph renders the remaining honest relation facts without inventing W5D.
+
+## 2026-09-01 archive/launcher acceptance — Pending
+
+- all 38 current dated relation archive entries contain exactly one direct regular `worktree.json`; the 13 unrelated
+  metadata subtrees are preserved under a separate Git-private namespace and no branch/commit/evidence bytes are lost;
+- a fresh direct self-host provider/Graph projection is ready and the Unified page no longer shows the archive-layout
+  exception or the stale 20-worktree snapshot;
+- the project root and new-project template expose exactly two supported Orrery launch files:
+  `Start Orrery.vbs` and `Start Orrery Console.bat`;
+- hidden launch shows no command window; console launch shows one console; both reuse one PID/port/URL and preserve
+  starting/ready/failed/stop behavior;
+- redundant public root launchers are absent, legacy/control recovery is internal, root/template parity holds, and no
+  full validation or release action runs before maintainer UI acceptance.

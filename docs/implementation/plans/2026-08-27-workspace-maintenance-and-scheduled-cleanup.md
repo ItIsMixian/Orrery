@@ -1,7 +1,7 @@
 # Workspace Maintenance 与定时清理实施计划
 
 Date: 2026-08-27
-Status: Phase 0–2 implemented and contained in Canonical main；Phase 3／4 未开始
+Status: Phase 0–2 implemented and contained in Canonical main；Phase 3／4 与 owned-transient lifecycle extension 未开始
 Suggested task code: W6（仅在正式注册实现任务时生效）
 Governing decisions: [ADR-0007](../../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md)
 Approved design: [Multi-worktree collaboration protocol — 集成后的保守清理](../../design/multi-worktree-collaboration-protocol.md#集成后的保守清理)
@@ -261,6 +261,21 @@ Personal Observatory 增加“工作区维护”入口，而不是继续扩大�
 - [ ] scheduler 只能运行固定 scan，不拥有 execute capability；
 - [ ] 项目移动、CLI 版本变化或权限失效时失败关闭并提示修复；
 - [ ] installer／release 适配与跨平台 matrix 通过后才进入公开支持声明。
+
+### Phase 5 — 显式所有权的临时目录生命周期
+
+2026-09-01 的本机清理证明 Phase 3／4 只处理 registered worktree，不能阻止 Codex 镜像目录和
+stage／docsite／adapter／evidence 临时目录散落。后续实现必须：
+
+- [ ] 创建目录时写入 task／thread、类型、exact root、保留策略和清理动作的 host-local ownership receipt；
+- [ ] 任务收口时把可恢复内容立即归拢到单一 quarantine root，而不是继续散落在工作区或磁盘根；
+- [ ] 只对已登记、身份未漂移且到期的 quarantine 项执行本机 purge，禁止按名称前缀扫描或认领目录；
+- [ ] 将 relation archive 的 dated-entry-v1 根严格限定为单个 `worktree.json`，其他 `runtime`、
+  `ci-validation`、`task-bindings` 元数据进入独立 Git-private namespace；
+- [ ] dirty、unique commit、未知 ownership、benchmark、credential 和未收口 evidence 继续保护；
+- [ ] Codex／其他宿主创建的镜像目录只有在宿主提供明确 ownership/lifecycle receipt 时才可自动处理。
+
+本节只登记后续范围，没有启动 Phase 5、没有授权广域扫描或自动删除。
 
 ## 11. Validation 矩阵
 

@@ -76,3 +76,32 @@ Add one focused regression proving an out-of-graph membership is omitted while t
 renderable, plus a negative control proving an invalid membership for an in-graph node still quarantines the Graph.
 The current self-host page must project the existing edges with their honest proposed/stale labels instead of showing
 an empty unavailable graph. Core relation/program stores and confirmation authority remain unchanged.
+
+## 2026-09-01 scope revision 3 — restore archive boundary and reduce launcher surface
+
+After local worktree cleanup, the running self-host page froze the Workstream Graph as Unavailable with
+`archive session directory must contain exactly one worktree.json regular file`. Read-only inspection found 38 dated
+archive entries; 13 entries created on 2026-09-01 contained a valid direct `worktree.json` plus unrelated
+`ci-validation`, `runtime` or `task-bindings` directories. This violated the W7.1 dated-entry-v1 boundary. The same
+running page retained a stale 20-worktree Maintenance snapshot although the Git registry now contains four worktrees.
+
+This revision authorizes:
+
+1. a reversible Git-private self-host repair that leaves every dated relation archive entry with exactly one direct
+   `worktree.json` and moves all other preserved metadata into a separate Git-private extras namespace; no evidence
+   bytes, branch, commit or author document may be deleted;
+2. one direct self-host projection check after repair proving the relation provider/Graph is renderable from current
+   live plus valid archived evidence, followed by one normal Unified refresh/restart so stale generated state is not
+   presented as current;
+3. implementation of [ADR-0025](../../decisions/0025-two-explicit-windows-launchers.md): the root and project template
+   expose only `Start Orrery.vbs` (hidden console) and `Start Orrery Console.bat` (one console), both using the same
+   Unified supervisor; `start-orrery.bat`, `start-orrery-control.bat` and root `start-docsite.bat` are not public root
+   entries;
+4. preservation of legacy/control behavior under `scripts/docsite/` only where still required for explicit recovery,
+   with exact-hash managed migration for old root files deferred to the patch-release task;
+5. a focused archive-layout regression, a focused two-launcher inventory/behavior check, root/template parity and
+   `git diff --check` only. Do not start Fast, Checkpoint, Candidate, Promotion or release work before maintainer UI
+   acceptance.
+
+The archive reader remains bounded, zero-write and fail-closed for unsafe input. This revision does not authorize
+invented relation facts, branch deletion, broad filesystem cleanup, version changes or publication.

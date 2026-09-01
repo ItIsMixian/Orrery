@@ -262,6 +262,18 @@ adoption. The compatibility entry must not open two URLs or require users to sta
 final implementation may use a hidden script host, `pythonw`, packaged launcher or equivalent; U1 does not choose the
 shipping mechanism.
 
+### 2026-09-01 launcher surface amendment
+
+[ADR-0025](../decisions/0025-two-explicit-windows-launchers.md) resolves the final file identities. A new project root
+has exactly two supported Orrery launch files: `Start Orrery.vbs` for the normal hidden-console experience and
+`Start Orrery Console.bat` for one-console diagnostics. Both route to the same Unified supervisor and reuse the same
+PID, port and URL.
+
+The Maintenance-only launcher and the ambiguous argument-dependent batch launcher are not separate public entries.
+Legacy docsite/control commands may remain under `scripts/docsite/` for explicit recovery and diagnostics, but not as
+additional root launch files. Managed upgrade removes old root launchers only after exact-hash ownership is proven;
+unknown/customized files are preserved and reported.
+
 ## 11. Versioning, rollback and public-template boundary
 
 - Shell contract/API: `unified-observatory-shell-v1` and `/api/v1`.
