@@ -14,6 +14,7 @@
   "authority_status": "integrated",
   "toolchain_status": "current",
   "collaboration": {
+    "integration_ref": "refs/heads/codex/u1-u2-integration-baseline",
     "workspace_maintenance": {
       "policy_version": 1,
       "scan_on_observatory_start": true,
