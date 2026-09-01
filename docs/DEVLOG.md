@@ -1,5 +1,22 @@
 # 开发日志
 
+## 2026-09-01 — U2.4 Scope Revision 3 Archive and Launcher Surface
+
+- 确认 exact task-description `2dc22cb...` 并刷新 Git-private scope revision 3；既有 product commit
+  `74e3ae6...` 与所有旧 evidence 保留。未使用 Computer Use，未运行任何正式验证或发布阶段。
+- active retired-session archive 现为 37/37 份 exact bounded `worktree.json`；已分离的 13 份 metadata
+  roots 保留 74 files/2,309,661 bytes。唯一 126,892-byte oversized session 以整目录可逆移入
+  extras，移动前后 SHA-256 均为 `fd08c4ea...f6f22b`。
+- Graph adapter 仅放行 Core 已定义的 archive/conflict/unresolved `sha256` opaque refs，留存格式负控；
+  out-of-graph pending proposal 不作为 dangling Graph edge，但仍由独立 Relation Inbox 保留。真实
+  self-host 投影恢复为 ready 7 nodes/7 edges，当前活动任务为 4 registered worktrees。
+- root/template 只保留 `Start Orrery.vbs` 与 `Start Orrery Console.bat`，同步 managed-tool inventory、
+  scaffold schema 和 onboarding；两者共用 supervisor。direct console-path reuse 296ms，实际 batch 1005ms，
+  均退出 0 并保持 exact PID/port/instance；双根 runtime SHA-256 为 `4d1b23a6...a2f49a193`。旧
+  root launchers 从 source/template 移除，但历史 release 资产与未来 exact-hash upgrade removal 均未改变。
+- existing focused owner IDs 10/10 PASS（4.557s），Python compile 通过；fresh hidden runtime 留在
+  `http://127.0.0.1:8765/` 供维护者审阅。
+
 ## 2026-09-01 — U2.4 Immediate Launcher Readiness Worktree Candidate
 
 - exact task-description `aa44e7d...`／scope revision 1 先登记 starting/ready/failed、同实例复用、后台 render、

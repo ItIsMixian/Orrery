@@ -1220,7 +1220,7 @@ function loadBriefing(){
     const u=document.getElementById('brf-upd'); if(u) u.textContent=fmtTs(d._ts);
     if(d.error){ briefingUnavailable('态势综述生成失败：'+(d.detail||d.error)); return; }
     fillBriefing(d);
-  }).catch(()=>{ _brfDone=true; briefingUnavailable('项目态势需通过 start-docsite.bat 启动，并保持服务窗口打开。'); });
+  }).catch(()=>{ _brfDone=true; briefingUnavailable('项目态势需通过 Start Orrery.vbs 启动本地观测台。'); });
 }
 function refreshBriefing(){ _brfDone=false; const m=document.getElementById('brf-main');
   if(m) m.innerHTML='<div class="brf-loading">更新中…（约 30–60 秒）</div>';
@@ -1241,7 +1241,7 @@ function loadRoadmap(){
     const fill=(id,arr)=>{const el=document.getElementById(id); if(!el)return;
       el.innerHTML=(arr&&arr.length)?('<ul>'+arr.map(o=>'<li>'+esc1(o.text)+_cites(o.cites)+'</li>').join('')+'</ul>'):'<div class="brf-note" style="padding:4px 0">暂无近期项</div>';};
     fill('rm-week',d.week); fill('rm-month',d.month); fill('rm-quarter',d.quarter); fill('rm-year',d.year);
-  }).catch(()=>{ _rmDone=true; roadmapUnavailable('路线图需通过 start-docsite.bat 启动，并保持服务窗口打开。'); });
+  }).catch(()=>{ _rmDone=true; roadmapUnavailable('路线图需通过 Start Orrery.vbs 启动本地观测台。'); });
 }
 function refreshRoadmap(){ _rmDone=false; const w=document.getElementById('rm-week');
   if(w) w.innerHTML='<div class="brf-loading">更新中…（约 30–60 秒）</div>';
@@ -1437,7 +1437,7 @@ def build_page(title, sidebar, pages_html, graph_json, search_json):
         'font:14px/1.55 system-ui,sans-serif">'
         '⚠️ 这是直接打开的静态 HTML，只能浏览文档；<b>AI 功能</b>'
         '（项目此刻 / 问答 / 开发路线）需要本地服务。请双击项目根目录的<b>启动脚本</b>'
-        '（<code style="background:rgba(255,255,255,.22);padding:1px 6px;border-radius:4px">start-docsite.bat</code>），'
+        '（<code style="background:rgba(255,255,255,.22);padding:1px 6px;border-radius:4px">Start Orrery.vbs</code>），'
         '它会启动服务并自动打开可用版本。</div>'
         "<script>if(location.protocol==='file:'){var b=document.getElementById('fileBanner');if(b)b.style.display='block';}</script>"
     )

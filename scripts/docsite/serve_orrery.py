@@ -891,14 +891,13 @@ def main(argv: list[str] | None = None) -> int:
     logger = _logger(identity, console=arguments.console)
     server: UnifiedServer | None = None
     try:
-        if not arguments.console:
-            existing_url = identity.reusable_url()
-            if existing_url is not None:
-                url = f"{existing_url}#overview"
-                logger.info("reusing healthy runtime url=%s visible_urls=1", url)
-                if not arguments.no_browser:
-                    webbrowser.open(url)
-                return 0
+        existing_url = identity.reusable_url()
+        if existing_url is not None:
+            url = f"{existing_url}#overview"
+            logger.info("reusing healthy runtime url=%s visible_urls=1", url)
+            if not arguments.no_browser:
+                webbrowser.open(url)
+            return 0
         identity.recover()
         state = UnifiedState(identity=identity, logger=logger)
         server = _bind_server(state, arguments.port)

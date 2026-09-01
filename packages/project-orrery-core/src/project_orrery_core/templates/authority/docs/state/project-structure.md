@@ -14,7 +14,8 @@ Governing ADRs: pending project adoption
 
 - `AGENTS.md`
 - `scripts/docsite/build_docsite.py`
-- `start-docsite.bat`
+- `Start Orrery.vbs`
+- `Start Orrery Console.bat`
 
 ## Validation evidence
 

@@ -72,3 +72,31 @@ nodes and 13 edges—the active U2.4 Git-private session adds one node/edge over
 projection with 33 nodes, 20 honestly labelled effective/proposed/stale edges and
 `placeholder_w5d=false`. No provider command was repeated after that evidence; Core relation/program stores,
 memberships and confirmation authority were not modified.
+
+## 2026-09-01 archive boundary and two-launcher result
+
+Revision 3 passed at Worktree Candidate scope; maintainer UI acceptance and any patch publication remain separate.
+
+- Git-private archive inventory now has 37 dated session entries; all 37 contain exactly one direct regular
+  `worktree.json` at or below 64 KiB. The separate extras namespace retains 13 metadata roots, 74 files and
+  2,309,661 bytes. The oversized historical session was moved as one directory without rewriting its file:
+  126,892 bytes, SHA-256 `fd08c4ea5b0947a61e9dc6791b261d34c69914fe565fbd0906efe2b32fb6f22b` before and after.
+- The first post-repair direct projection exposed two bounded adapter compatibility gaps rather than changing Core
+  facts: Core's fixed archive conflict/unresolved hash references were outside the frontend safe whitelist, and
+  pending relation proposals whose endpoints are absent from the current graph were treated as graph edges. The
+  adapter now accepts only the three exact `sha256` archive reference prefixes, still rejects malformed/remote
+  links, and omits out-of-graph pending proposals from Graph while the separate Relation Inbox retains them.
+- Final direct self-host projection was `ready`: Core provider 7 nodes/5 edges, Graph 7 nodes/7 edges, all seven
+  current axes honestly Unknown. The fresh Unified page returned HTTP 200 with the embedded Graph payload
+  `ready`, no archive-layout error, and the active-task API reported the current four registered worktrees.
+- Root and project template now expose exactly `Start Orrery.vbs` and `Start Orrery Console.bat`. Both call the same
+  `serve_orrery.py`; the former uses hidden `pythonw`, while the latter owns one diagnostic console. The ambiguous
+  `start-orrery.bat`, Maintenance-only `start-orrery-control.bat` and root `start-docsite.bat` are absent. Legacy
+  rollback remains the internal `serve_orrery.py --legacy` command; exact-hash upgrade removal is deferred.
+- Existing focused owner IDs remained unchanged. Python compile plus Unified lifecycle/launcher 7, Graph safety 2
+  and archive read-only 1 completed 10/10 PASS in 4.557 seconds. A real console-path reuse returned exit 0 in 296 ms
+  and preserved PID `106156`, port `8765` and instance `81e01424181b4532a21ca4ffcc87d931`; invoking the actual
+  `Start Orrery Console.bat` returned exit 0 in 1005 ms with the same identity. The final root/template runtime copies
+  are byte-identical at SHA-256 `4d1b23a66f44478c67fd5c894ea6eb58284f70e8fbff20393d86136a2f49a193`.
+- The refreshed hidden runtime remains ready on `http://127.0.0.1:8765/` for maintainer review. No Computer Use,
+  Fast, Checkpoint, Candidate, Promotion, version, tag, asset or Release operation ran.

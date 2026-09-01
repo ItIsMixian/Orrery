@@ -13,7 +13,8 @@
     "scripts/docsite/build_docsite.py",
     "scripts/docsite/llm_broker.py",
     "scripts/docsite/serve.py",
-    "start-docsite.bat"
+    "Start Orrery.vbs",
+    "Start Orrery Console.bat"
   ],
   "authority_roles": [
     "seed",

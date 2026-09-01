@@ -29,8 +29,7 @@
     "scripts/docsite/serve.py",
     "scripts/docsite/set_key.py",
     "Start Orrery.vbs",
-    "start-docsite.bat",
-    "start-orrery.bat"
+    "Start Orrery Console.bat"
   ],
   "managed_runtime": [
     "packages/component-versions.json",

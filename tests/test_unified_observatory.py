@@ -779,7 +779,7 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
                     identity.reusable_url()
             self.assertTrue(identity.marker.exists())
 
-    def test_normal_main_reuses_before_render_and_console_legacy_keeps_console(self) -> None:
+    def test_both_launchers_reuse_before_render_and_console_legacy_keeps_console(self) -> None:
         identity = mock.Mock()
         identity.reusable_url.return_value = "http://127.0.0.1:18765/"
         logger = mock.Mock()
@@ -796,6 +796,19 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
         browser.assert_called_once_with("http://127.0.0.1:18765/#overview")
         identity.recover.assert_not_called()
         identity.cleanup.assert_called_once_with()
+        with (
+            mock.patch.object(serve_orrery, "RuntimeIdentity", return_value=identity),
+            mock.patch.object(serve_orrery, "_logger", return_value=logger),
+            mock.patch.object(serve_orrery.webbrowser, "open") as console_browser,
+            mock.patch.object(
+                serve_orrery, "_load_runtime_components",
+                side_effect=AssertionError("console reuse must precede runtime imports"),
+            ),
+        ):
+            self.assertEqual(serve_orrery.main(["--console", "--no-browser"]), 0)
+        console_browser.assert_not_called()
+        identity.recover.assert_not_called()
+        self.assertEqual(identity.cleanup.call_count, 2)
 
         serve_orrery._load_runtime_components()
         order: list[str] = []
@@ -839,13 +852,45 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
 
     def test_headless_launcher_console_debug_and_legacy_rollback_are_explicit(self) -> None:
         vbs = (ROOT / "Start Orrery.vbs").read_text(encoding="utf-8")
-        batch = (ROOT / "start-orrery.bat").read_text(encoding="utf-8")
-        legacy = (ROOT / "start-docsite.bat").read_text(encoding="utf-8")
+        batch = (ROOT / "Start Orrery Console.bat").read_text(encoding="utf-8")
         self.assertIn("pythonw.exe", vbs)
         self.assertIn("shell.Run command, 0, False", vbs)
-        self.assertIn('if /I "%~1"=="--console"', batch)
+        self.assertIn("scripts\\docsite\\serve_orrery.py", vbs)
         self.assertIn("serve_orrery.py\" --console", batch)
-        self.assertIn("scripts\\docsite\\serve.py", legacy)
+        self.assertNotIn("wscript.exe", batch.lower())
+        self.assertEqual(
+            {path.name for path in ROOT.glob("Start Orrery*") if path.is_file()},
+            {"Start Orrery.vbs", "Start Orrery Console.bat"},
+        )
+        for retired in ("start-orrery.bat", "start-orrery-control.bat", "start-docsite.bat"):
+            self.assertFalse((ROOT / retired).exists(), retired)
+        template = ROOT / "skills" / "project-orrery" / "assets" / "project-template"
+        self.assertEqual(
+            {path.name for path in template.glob("Start Orrery*") if path.is_file()},
+            {"Start Orrery.vbs", "Start Orrery Console.bat"},
+        )
+        for launcher in ("Start Orrery.vbs", "Start Orrery Console.bat"):
+            self.assertEqual((ROOT / launcher).read_bytes(), (template / launcher).read_bytes())
+        for retired in ("start-orrery.bat", "start-orrery-control.bat", "start-docsite.bat"):
+            self.assertFalse((template / retired).exists(), retired)
+        component = json.loads((
+            ROOT / "packages" / "project-orrery-observatory" / "src"
+            / "project_orrery_observatory" / "component.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(
+            {Path(path).name for path in component["managed_tools"] if "Orrery" in Path(path).name},
+            {"Start Orrery.vbs", "Start Orrery Console.bat"},
+        )
+        self.assertFalse({"start-orrery.bat", "start-docsite.bat"} & set(component["managed_tools"]))
+        authority_schema = json.loads((
+            ROOT / "packages" / "project-orrery-core" / "src" / "project_orrery_core"
+            / "schema" / "authority-v1.json"
+        ).read_text(encoding="utf-8"))
+        self.assertTrue(
+            {"Start Orrery.vbs", "Start Orrery Console.bat"}
+            .issubset(authority_schema["required_scaffold_files"])
+        )
+        self.assertNotIn("start-docsite.bat", authority_schema["required_scaffold_files"])
         with mock.patch.object(serve_orrery, "_legacy", return_value=7) as rollback:
             self.assertEqual(serve_orrery.main(["--legacy", "--no-browser"]), 7)
         rollback.assert_called_once_with(False, True)

@@ -2,7 +2,7 @@
 
 Updated: 2026-08-31
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0024](../decisions/0024-v0-3-1-emergency-launcher-hotfix-release.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0024](../decisions/0024-v0-3-1-emergency-launcher-hotfix-release.md), [ADR-0025](../decisions/0025-two-explicit-windows-launchers.md)
 
 ## 当前公开发布
 
@@ -48,6 +48,14 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - U2.4 Worktree Candidate 仅在 Observatory adapter 省略 graph node set 外的显式 program membership；node set
   内 duplicate／坏 path／未解析 group 继续失败关闭。self-host projection 为 ready 33 nodes/20 edges 且未创建
   W5D placeholder；Core relation/program store、Team/Authority 权限、组件版本和发布契约均未改变。
+- U2.4 revision 3 Worktree Candidate 已将 active retired-session archive 收口为 37 份 bounded
+  `worktree.json`；13 份 metadata subtree 和一份 126,892-byte oversized session 原字节保留在分离的
+  Git-private extras namespace。当前 self-host Graph 从 7-node/5-edge Core provider 完整投影为 ready
+  7 nodes/7 edges，缺失 endpoint 仍是 Unknown，不生成 placeholder 或 relation fact。
+- 同一 Worktree Candidate 的 root/template 只暴露 `Start Orrery.vbs` 和 `Start Orrery Console.bat`；
+  两者共用 Unified supervisor 并在已运行时复用 exact PID/port/instance。旧的模糊 batch、Maintenance-only
+  batch 与 root legacy batch 不再是 source/template 公开入口；exact-hash upgrade removal 与 next release
+  manifest 仍属于独立 patch-release 任务。
 
 ## CI 与推广门
 
@@ -94,6 +102,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `.github/workflows/fast-validation.yml`, `.github/workflows/validate.yml`
 - `scripts/ci/`, `tests/test_ci_validation.py`
 - `scripts/docsite/build_unified_observatory.py`, `scripts/docsite/serve_orrery.py`
+- `Start Orrery.vbs`, `Start Orrery Console.bat`
 - `packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py`
 - [Windows launcher console-flash hotfix Validation](../validation/2026-08-31-windows-launcher-console-flash-hotfix.md)
 - [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
@@ -116,5 +125,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Unified／Collaboration／Maintenance／Graph／relation inbox 没有默认 consumer 或 public release；真实双机与 scheduler 不受支持。W7.3 只允许本机确认并将 effective relation 交给现有 lifecycle consumer，不提供中央 apply。
 - R4 alias、R5 optional default transition 和最早 0.4.0 cleanup review 均未启动。
 - `orrery-dispatch` 只在当前本机安装，尚未打包或发布；未来是否进入任何公开版本必须由独立 release Plan/Validation 决定。
+- U2.4 revision 3 尚未经维护者 UI 接受、exact-hash 旧 launcher migration、Candidate/Promotion 或 patch
+  publication；公开 v0.3.1 仍包含历史三入口文件与延迟首页行为。
 - ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 已进入未发布本地 source；
   在 final ZIP／runtime／Promotion／publication evidence 完成前不得写成 v0.3.0 已公开包含。

@@ -23,4 +23,5 @@
 
 详细实验 Prompt、Runner、Oracle 和可发布结果留在 `experiments/`；大型隔离仓库与 JSONL 留在仓库外本地 benchmark 根。Docs 保存当前结论、风险和可复现验证，不复制全部原始数据。
 
-运行 `start-docsite.bat` 可打开本地观测台。`docs/_site/index.html` 是生成物，禁止手工编辑。
+Windows 正常启动使用根目录 `Start Orrery.vbs`；需要诊断日志时使用 `Start Orrery Console.bat`。
+两者复用同一个 Unified supervisor、PID、端口和本机 URL。`docs/_site/index.html` 是生成物，禁止手工编辑。
