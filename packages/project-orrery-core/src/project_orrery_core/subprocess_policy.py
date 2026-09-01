@@ -6,7 +6,6 @@ import os
 import subprocess
 import sys
 import time
-from pathlib import Path
 from typing import Any
 
 
@@ -22,12 +21,12 @@ def _audit(options: dict[str, Any], *, enabled: bool) -> None:
         "os_name": os.name,
         "enabled": enabled,
         "creationflags": int(options.get("creationflags", 0)),
-        "caller_file": Path(caller.f_code.co_filename).name,
+        "caller_file": os.path.basename(caller.f_code.co_filename),
         "caller_function": caller.f_code.co_name,
         "recorded_at": time.time(),
     }
     try:
-        with Path(target).open("a", encoding="utf-8", newline="\n") as stream:
+        with open(target, "a", encoding="utf-8", newline="\n") as stream:
             stream.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
     except OSError:
         pass

@@ -454,8 +454,8 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
 
             compatible = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
-            compatible["version"] = "0.3.1"
-            compatible["distribution"]["tag"] = "v0.3.1"
+            compatible["version"] = "0.3.2"
+            compatible["distribution"]["tag"] = "v0.3.2"
             compatible_path = root / "compatible.json"
             compatible_path.write_text(json.dumps(compatible), encoding="utf-8")
             checked = run_python(
