@@ -328,6 +328,51 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             "ref": "git-private-session:CI6-local-validation-router-tier-enforcement@e5ee31c418fa4d2d81f3df792f683064a0a9c5d0",
         })
         self.assertIsNone(private_session["href"])
+        for disposition in ("archive", "archive-conflict", "archive-unresolved"):
+            archived = graph_ui._safe_source_link({
+                "kind": "other",
+                "ref": f"retired-session-{disposition}:sha256:" + "a" * 64,
+            })
+            self.assertIsNone(archived["href"])
+        with self.assertRaisesRegex(graph_ui.RelationGraphUnavailable, "safe whitelist"):
+            graph_ui._safe_source_link({
+                "kind": "other",
+                "ref": "retired-session-archive-unresolved:sha256:not-a-hash",
+            })
+
+        out_of_graph_capture = copy.deepcopy(self.provider)
+        proposal = {
+            "contract_type": "workstream-relation-proposal-event",
+            "relation_id": "relation-outside-current-graph",
+            "proposal_id": "proposal-outside-current-graph",
+            "revision": 1,
+            "source_workstream_id": "archived-task-outside-current-graph",
+            "target_workstream_id": "W5E",
+            "relation_type": "depends_on",
+            "required_for": "integration",
+            "evidence": [{"category": "workstream-session", "ref": "git-private:archived-task"}],
+            "rationale": "preserved in the separate Relation Inbox",
+            "consequence": "not projected as a dangling Graph edge",
+        }
+        out_of_graph_capture["relation_capture"] = {
+            "schema_version": 2,
+            "effective_relations": [],
+            "pending_proposals": [{"current": proposal}],
+        }
+        projected = graph_ui.project_core_relation_graph(lambda: out_of_graph_capture)
+        self.assertEqual(projected["status"], "ready")
+        self.assertNotIn(
+            "relation-outside-current-graph",
+            {item["relation_id"] for item in projected["edges"]},
+        )
+
+        malformed_out_of_graph = copy.deepcopy(out_of_graph_capture)
+        malformed_out_of_graph["relation_capture"]["pending_proposals"][0]["current"]["evidence"] = [
+            {"category": "validation", "ref": "https://example.invalid/private"}
+        ]
+        malformed = graph_ui.project_core_relation_graph(lambda: malformed_out_of_graph)
+        self.assertEqual(malformed["status"], "unavailable")
+        self.assertEqual(malformed["error"]["code"], "unsafe-source-link")
 
         cases: list[tuple[str, dict, str]] = []
         old_provider = copy.deepcopy(self.provider)
@@ -520,6 +565,28 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertEqual(layout["program_bands"], [])
         self.assertTrue(layout["geometry_postconditions"]["passed"])
         self.assertEqual(len(projection["edges"]), before_relations)
+
+        provider["program_hierarchy"]["memberships"].append({
+            "membership_id": "member-out-of-graph",
+            "workstream_id": "W5D-lan-collaboration-harness",
+            "group_path": ["program-w", "phase-w5"],
+        })
+        quarantined_membership = graph_ui.project_core_relation_graph(lambda: provider)
+        self.assertEqual(quarantined_membership["status"], "ready")
+        self.assertEqual(len(quarantined_membership["nodes"]), len(projection["nodes"]))
+        self.assertEqual(len(quarantined_membership["edges"]), before_relations)
+        self.assertNotIn(
+            "W5D-lan-collaboration-harness",
+            {item["workstream_id"] for item in quarantined_membership["nodes"]},
+        )
+
+        invalid_in_graph = copy.deepcopy(provider)
+        invalid_in_graph["program_hierarchy"]["memberships"][0]["group_path"] = ["program-w"]
+        failed = graph_ui.project_core_relation_graph(lambda: invalid_in_graph)
+        self.assertEqual(failed["status"], "unavailable")
+        self.assertEqual(failed["error"]["code"], "invalid-provider")
+        self.assertEqual(failed["nodes"], [])
+        self.assertEqual(failed["edges"], [])
 
         bundled = copy.deepcopy(self.projection)
         ids = [item["workstream_id"] for item in bundled["nodes"] if item.get("evidence_freshness") == "current" and item.get("scope_status") == "current"][:4]

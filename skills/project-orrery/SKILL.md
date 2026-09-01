@@ -79,7 +79,7 @@ To update the installed Skill, fetch the exact tagged release into a temporary l
 
 ## Upgrade viewer tooling
 
-Run the installer with `--upgrade-tools`. It may replace only the viewer paths on Orrery's upgrade whitelist under `scripts/docsite/` and `start-docsite.bat`; it backs up differing copies under `.project-orrery-backup/<timestamp>/` first. A matching path does not prove Orrery originally created the file, so review the dry run and backup location.
+Run the installer with `--upgrade-tools`. It may replace only the viewer paths on Orrery's upgrade whitelist under `scripts/docsite/` and the two managed Windows launchers; it backs up differing copies under `.project-orrery-backup/<timestamp>/` first. A matching path does not prove Orrery originally created the file, so review the dry run and backup location. Older root launchers are preserved until an exact-hash managed migration explicitly owns their removal.
 
 Never bulk-overwrite `AGENTS.md` or authored files under `docs/`. Migrate those semantically, one authority layer at a time.
 
@@ -105,8 +105,9 @@ After implementation or validation, update `PROGRESS`, append `DEVLOG`, update a
 
 ## Run the observatory
 
-- Windows: `<repo>/start-docsite.bat`
-- Cross-platform: `python -X utf8 <repo>/scripts/docsite/serve.py`
+- Windows normal: `<repo>/Start Orrery.vbs`
+- Windows diagnostics: `<repo>/Start Orrery Console.bat`
+- Cross-platform diagnostics: `python -X utf8 <repo>/scripts/docsite/serve_orrery.py --console`
 - Static build only: `python -X utf8 <repo>/scripts/docsite/build_docsite.py`
 
 The AI and radar features are optional. In the dynamic local observatory, open Ask Docs and use its settings button to configure OpenAI, DeepSeek, a loopback Broker, or another OpenAI-compatible provider. Provider keys are bound to the selected Provider and explicit Base URL in separate OS credential slots; the panel saves only non-secret settings, an enabled flag, and a binding fingerprint in the gitignored project-root `ai-config.json`. Saving enables the validated configuration without a separate connection-test call; normal dashboard generation may then begin. Testing a connection is optional and may incur a small provider charge. `python scripts/docsite/set_key.py --provider ... --base-url ...` remains the terminal fallback.

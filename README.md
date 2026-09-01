@@ -125,10 +125,13 @@ From the target repository:
 
 ```bash
 python -m pip install -r scripts/docsite/requirements.txt
-python -X utf8 scripts/docsite/serve.py
+python -X utf8 scripts/docsite/serve_orrery.py --console
 ```
 
-On Windows, `start-docsite.bat` provides the same entry point. The server binds to the loopback interface and opens an available port from `8765` to `8784`.
+On Windows, use `Start Orrery.vbs` for the normal hidden-console launch or
+`Start Orrery Console.bat` for one diagnostic console. Both start or reuse the same Unified supervisor,
+PID, port, and loopback URL. Legacy recovery remains available as the internal
+`python -X utf8 scripts/docsite/serve_orrery.py --legacy` command.
 
 #### Configure optional AI features
 

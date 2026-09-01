@@ -1,14 +1,15 @@
 # 发布与工具链 State
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0024](../decisions/0024-v0-3-1-emergency-launcher-hotfix-release.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0024](../decisions/0024-v0-3-1-emergency-launcher-hotfix-release.md), [ADR-0025](../decisions/0025-two-explicit-windows-launchers.md)
 
 ## 当前公开发布
 
-- v0.3.1 修复了 Windows console-child 闪窗与重复 supervisor，但 self-host 冷启动仍在完整 Unified render 后才
-  绑定/打开页面。2026-08-31 实测约 95 秒无可见反馈；服务最终 HTTP 200。U2.4 已登记为未实现 Candidate，
-  目标是先提供同 PID/port 的本地 starting page，再后台完成重关系视图；当前公开资产尚无该修复。
+- v0.3.1 修复了 Windows console-child 闪窗与重复 supervisor，但公开资产的 self-host 冷启动仍在完整 Unified
+  render 后才绑定/打开页面。2026-08-31 实测约 95 秒无可见反馈；服务最终 HTTP 200。U2.4 exact
+  `00b2eb4...` 已进入当前本地 integration branch，实现同 PID/port 的 starting page、后台原子 ready/failed
+  与三态 stop，真实首个 HTTP 为 701 ms；它尚未进入 protected main、patch 版本或公开资产。
 - Orrery v0.3.1 是当前 Latest Release。protected `main`、annotated tag `v0.3.1` 与公开 Release source 都绑定
   exact `1d9223cb07b94674b58471e0c19addf748b16221`。ZIP SHA-256 为
   `2970fc208d529022b0ac33c2b6a35e9874ef87fa90d67bd0dafb52fc5d2b6445`；checksum 文件 SHA-256 为
@@ -44,6 +45,17 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - PO1 在同一 `SKILL.md` 内补充 ADR-0007 PO allocation；仍无新 Skill 文件或发布资产。local integration `8b73f26` 后，两文件已按 SHA-256 一致性校验复制到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，但没有进入 release manifest 或公共分发。
 - v0.3.1 release manifest、tag、ZIP、checksum 与 phase fixture 已同步；Git-private session、cache、凭据与
   生成站点继续排除。U2.3/CI7 的测试路由策略没有因 launcher patch 改变。
+- U2.4 exact `00b2eb4...` 已本地整合；其 Observatory adapter 仅省略 graph node set 外的显式 program membership；node set
+  内 duplicate／坏 path／未解析 group 继续失败关闭。self-host projection 为 ready 33 nodes/20 edges 且未创建
+  W5D placeholder；Core relation/program store、Team/Authority 权限、组件版本和发布契约均未改变。
+- U2.4 revision 3 本地整合内容已将 active retired-session archive 收口为 37 份 bounded
+  `worktree.json`；13 份 metadata subtree 和一份 126,892-byte oversized session 原字节保留在分离的
+  Git-private extras namespace。当前 self-host Graph 从 7-node/5-edge Core provider 完整投影为 ready
+  7 nodes/7 edges，缺失 endpoint 仍是 Unknown，不生成 placeholder 或 relation fact。
+- 同一本地整合内容的 root/template 只暴露 `Start Orrery.vbs` 和 `Start Orrery Console.bat`；
+  两者共用 Unified supervisor 并在已运行时复用 exact PID/port/instance。旧的模糊 batch、Maintenance-only
+  batch 与 root legacy batch 不再是 source/template 公开入口；exact-hash upgrade removal 与 next release
+  manifest 仍属于独立 patch-release 任务。
 
 ## CI 与推广门
 
@@ -90,6 +102,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `.github/workflows/fast-validation.yml`, `.github/workflows/validate.yml`
 - `scripts/ci/`, `tests/test_ci_validation.py`
 - `scripts/docsite/build_unified_observatory.py`, `scripts/docsite/serve_orrery.py`
+- `Start Orrery.vbs`, `Start Orrery Console.bat`
 - `packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py`
 - [Windows launcher console-flash hotfix Validation](../validation/2026-08-31-windows-launcher-console-flash-hotfix.md)
 - [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
@@ -112,5 +125,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Unified／Collaboration／Maintenance／Graph／relation inbox 没有默认 consumer 或 public release；真实双机与 scheduler 不受支持。W7.3 只允许本机确认并将 effective relation 交给现有 lifecycle consumer，不提供中央 apply。
 - R4 alias、R5 optional default transition 和最早 0.4.0 cleanup review 均未启动。
 - `orrery-dispatch` 只在当前本机安装，尚未打包或发布；未来是否进入任何公开版本必须由独立 release Plan/Validation 决定。
+- 维护者已明确授权 U2.4 本地整合；exact-hash 旧 launcher migration、protected-main Promotion 与 patch
+  publication 仍未发生。公开 v0.3.1 继续包含历史三入口文件与延迟首页行为。
 - ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 已进入未发布本地 source；
   在 final ZIP／runtime／Promotion／publication evidence 完成前不得写成 v0.3.0 已公开包含。

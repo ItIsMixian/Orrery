@@ -1,6 +1,6 @@
 # 当前进度
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
 ## 当前阶段
 
@@ -56,9 +56,10 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 ## 活动计划与待办
 
 - [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：已接受 ADR-0026；首版真实预览只恢复 6 条 closed task，维护者拒绝。当前继续完整 archive/history 数量对账与投影修正，接受前不跑自动测试。
-- [ ] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
-  Agent 已回报 clean Worktree Candidate `00b2eb4...`，包含即时 starting page、归档边界恢复和两个明确
-  Windows 启动入口，focused 10/10；尚未中央整合、Promotion 或发布。closed-task 完整历史由 W7.4 持有。
+- [x] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
+  exact `00b2eb4...` 已进入当前本地 integration branch，包含即时 starting page、归档边界恢复和两个明确
+  Windows 启动入口；产品树与 Candidate 一致，未重跑 unittest。protected main、Promotion 与发布未发生；
+  closed-task 完整历史仍由 W7.4 持有。
 - [x] [v0.3.1 Windows 启动器紧急发布](implementation/plans/2026-08-31-v0-3-1-launcher-hotfix-release.md)：
   exact `1d9223c...` 的 package/runtime、Promotion、main/tag/Release、远端哈希复核与 v0.3.0 warning 已完成；
   旧失败 SHA/run 均保留且未重试。

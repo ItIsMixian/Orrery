@@ -1,6 +1,6 @@
 # 项目结构 State
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
 Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0026](../decisions/0026-durable-workstream-history-and-human-readable-relation-decisions.md)
 
@@ -15,8 +15,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - 当前本机 Codex home 有一份从 local integration `8b73f26` 复制的 `orrery-dispatch` 两文件安装；该外部本机副本不属于 Git tree 或发布资产。
 - 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。A4/U2.3/W7.3 local integrated Candidate 声明 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19。Core API 为 1，组件总状态为 `unreleased`。
 - 薄平台层位于 `adapters/{codex,harness-json,claude-code,deepseek-harness}/`；Harness JSON 0.1.2 同时提供 A4 inspect/route 与 W7.3 有界 relation suggest/inspect/decision 请求，其余 Adapter 为 0.1.1，均 `experimental`／`unreleased`。Adapter 不拥有 canonical 作者模板、State、ADR、route semantics 或 Authority 规则。
-- 自托管观测台位于根 `scripts/docsite/`。integrated Candidate 新增 `Start Orrery.vbs`／`start-orrery.bat --console`、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 仍为 root-only/default-off consumer，没有进入默认发布模板或 v0.2.0 managed tools。
-- ADR-0016 的生产 Unified Shell 已在 integrated Candidate 实现：一个用户可见 listener／URL／导航壳，Broker／Coordinator 等内部 capability 由 supervisor 隐藏管理；当前没有公开默认切换，`start-docsite.bat` 保持 whole-shell rollback。
+- 自托管观测台位于根 `scripts/docsite/`。本地 integrated Candidate 只保留 `Start Orrery.vbs`（隐藏控制台）与 `Start Orrery Console.bat`（单控制台）两个根启动入口、统一静态 builder 与单 loopback supervisor；Personal／Team／Maintenance／Workstream Graph 保持受管 consumer。
+- ADR-0016／ADR-0025 的生产 Unified Shell 已在本地 integrated Candidate 实现：一个用户可见 listener／URL／导航壳，Broker／Coordinator 等内部 capability 由 supervisor 隐藏管理；legacy whole-shell rollback 改为内部 `serve_orrery.py --legacy`，不再作为第三个根启动文件。公开 v0.3.1 仍未切换到这组 U2.4 bytes。
 - U2.1 integrated Candidate 修复首轮体验：中文 app 导航、全页 stop、历史 Maintenance 证据降级和 W7.1 legacy/archive graph 显示；它没有创建 relation root、赋予 archive 执行权或放宽 Quick Remove 当前资格。
 - W7.2.3 integrated Candidate 只重构 Observatory Graph presentation：从左到右的确定性 rank、固定可读节点、按 connected component 对齐的工程图路线、按链双向展开／收起、三 lens 真实端点、画布内 inspector 与移动 relation ledger。关系由实线／虚线／复合线和固定视觉尺寸箭头表达，不在线路上覆盖文字；画布支持锚点式 `Ctrl + 滚轮` 缩放。rank 通道为 88px，独立链只保留 44px 分组空隙；全站滚动条使用深浅主题适配。Core relation schema／facts、W7.1 archive 证据与执行边界未改。
 - U2.2 integrated Candidate 把 app 入口和作者文档树组合进一个连续 sidebar/scroll rail，并把 Maintenance 改为 header refresh、四类筛选、8 行分页、折叠技术详情与仅 eligible 行可见的安全删除入口。它只改变展示和有界浏览器状态，不复制或改变 Core eligibility／preflight／authorization／receipt，也没有执行删除。

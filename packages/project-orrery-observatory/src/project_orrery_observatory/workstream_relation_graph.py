@@ -29,6 +29,11 @@ OPAQUE_LINK_PREFIXES = (
     "git-private:", "git-private-series:", "git-private-session:",
     "git-common:", "fixture:", "opaque:",
 )
+ARCHIVE_LINK_PREFIXES = (
+    "retired-session-archive:sha256:",
+    "retired-session-archive-conflict:sha256:",
+    "retired-session-archive-unresolved:sha256:",
+)
 OID = re.compile(r"^[0-9a-f]{40}$")
 HASH = re.compile(r"^[0-9a-f]{64}$")
 SAFE_TOKEN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,511}$")
@@ -146,9 +151,9 @@ def _safe_source_link(value: Any) -> dict[str, Any]:
         raise RelationGraphUnavailable("unsafe-source-link", "Core evidence link is outside the safe whitelist.")
     href = _document_href(str(kind), reference)
     if href is None:
-        archive_prefix = "retired-session-archive:sha256:"
-        allowed_archive = reference.startswith(archive_prefix) and bool(
-            HASH.fullmatch(reference.removeprefix(archive_prefix))
+        allowed_archive = any(
+            reference.startswith(prefix) and bool(HASH.fullmatch(reference.removeprefix(prefix)))
+            for prefix in ARCHIVE_LINK_PREFIXES
         )
         allowed_opaque = allowed_archive or reference.startswith(OPAQUE_LINK_PREFIXES) or (
             kind == "git-commit" and OID.fullmatch(reference)
@@ -336,12 +341,12 @@ def _sanitize_edge(value: Any, node_ids: set[str]) -> dict[str, Any]:
     }
 
 
-def _capture_proposal_edge(value: Any, node_ids: set[str]) -> dict[str, Any]:
+def _capture_proposal_edge(value: Any, node_ids: set[str]) -> dict[str, Any] | None:
     if not isinstance(value, Mapping) or value.get("contract_type") != "workstream-relation-proposal-event":
         raise RelationGraphUnavailable("invalid-provider", "Relation capture proposal is malformed.")
     source = _bounded_identifier(value.get("source_workstream_id"), "capture proposal source")
     target = _bounded_identifier(value.get("target_workstream_id"), "capture proposal target")
-    if source == target or source not in node_ids or target not in node_ids:
+    if source == target:
         raise RelationGraphUnavailable("dangling-node", "Relation capture proposal references a missing Workstream.")
     relation_type = value.get("relation_type")
     required_for = value.get("required_for")
@@ -350,8 +355,11 @@ def _capture_proposal_edge(value: Any, node_ids: set[str]) -> dict[str, Any]:
     if relation_type == "depends_on" and required_for not in {"implementation", "validation", "integration", "release"}:
         raise RelationGraphUnavailable("invalid-provider", "Capture dependency proposal has no explicit gate.")
     evidence = value.get("evidence")
-    if not isinstance(evidence, list):
+    if not isinstance(evidence, list) or any(not isinstance(item, Mapping) for item in evidence):
         raise RelationGraphUnavailable("invalid-provider", "Capture proposal evidence is malformed.")
+    source_links = _safe_links([{"kind": item.get("category"), "ref": item.get("ref")} for item in evidence])
+    if source not in node_ids or target not in node_ids:
+        return None
     return {
         "relation_id": _bounded_identifier(value.get("relation_id"), "capture relation_id"),
         "proposal_id": _bounded_identifier(value.get("proposal_id"), "capture proposal_id"),
@@ -365,7 +373,7 @@ def _capture_proposal_edge(value: Any, node_ids: set[str]) -> dict[str, Any]:
         "evidence_status": "unknown",
         "evidence": {"status": "unknown", "capture_revision": value.get("revision")},
         "evidence_reason_codes": ["human-confirmation-pending"],
-        "source_links": _safe_links([{"kind": item.get("category"), "ref": item.get("ref")} for item in evidence]),
+        "source_links": source_links,
         "origin": "capture-v2-proposal",
         "rationale": str(value.get("rationale", "")),
         "consequence": str(value.get("consequence", "")),
@@ -440,7 +448,11 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         for edge in edges:
             if edge["relation_id"] in capture_gate_by_relation:
                 edge["required_for"] = capture_gate_by_relation[edge["relation_id"]]
-        edges.extend(_capture_proposal_edge(item.get("current"), node_ids) for item in pending_values if isinstance(item, Mapping))
+        projected_proposals = (
+            _capture_proposal_edge(item.get("current"), node_ids)
+            for item in pending_values if isinstance(item, Mapping)
+        )
+        edges.extend(item for item in projected_proposals if item is not None)
     edge_ids = {item["relation_id"] for item in edges}
     if len(edge_ids) != len(edges):
         raise RelationGraphUnavailable("invalid-core-payload", "Core relation identity is duplicated.")
@@ -510,8 +522,10 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         if not isinstance(raw_membership, Mapping):
             raise RelationGraphUnavailable("invalid-provider", "Program membership is malformed.")
         workstream_id = _bounded_identifier(raw_membership.get("workstream_id"), "membership workstream_id")
+        if workstream_id not in node_ids:
+            continue
         path = raw_membership.get("group_path")
-        if workstream_id not in node_ids or workstream_id in memberships_by_workstream or not isinstance(path, list) or len(path) != 2:
+        if workstream_id in memberships_by_workstream or not isinstance(path, list) or len(path) != 2:
             raise RelationGraphUnavailable("invalid-provider", "Program membership path is invalid.")
         program_id, phase_id = (_bounded_identifier(item, "group_path") for item in path)
         program, phase = groups_by_id.get(program_id), groups_by_id.get(phase_id)

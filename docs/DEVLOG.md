@@ -1,5 +1,35 @@
 # 开发日志
 
+## 2026-09-01 — U2.4 Scope Revision 3 Archive and Launcher Surface
+
+- 确认 exact task-description `2dc22cb...` 并刷新 Git-private scope revision 3；既有 product commit
+  `74e3ae6...` 与所有旧 evidence 保留。未使用 Computer Use，未运行任何正式验证或发布阶段。
+- active retired-session archive 现为 37/37 份 exact bounded `worktree.json`；已分离的 13 份 metadata
+  roots 保留 74 files/2,309,661 bytes。唯一 126,892-byte oversized session 以整目录可逆移入
+  extras，移动前后 SHA-256 均为 `fd08c4ea...f6f22b`。
+- Graph adapter 仅放行 Core 已定义的 archive/conflict/unresolved `sha256` opaque refs，留存格式负控；
+  out-of-graph pending proposal 不作为 dangling Graph edge，但仍由独立 Relation Inbox 保留。真实
+  self-host 投影恢复为 ready 7 nodes/7 edges，当前活动任务为 4 registered worktrees。
+- root/template 只保留 `Start Orrery.vbs` 与 `Start Orrery Console.bat`，同步 managed-tool inventory、
+  scaffold schema 和 onboarding；两者共用 supervisor。direct console-path reuse 296ms，实际 batch 1005ms，
+  均退出 0 并保持 exact PID/port/instance；双根 runtime SHA-256 为 `4d1b23a6...a2f49a193`。旧
+  root launchers 从 source/template 移除，但历史 release 资产与未来 exact-hash upgrade removal 均未改变。
+- existing focused owner IDs 10/10 PASS（4.557s），Python compile 通过；fresh hidden runtime 留在
+  `http://127.0.0.1:8765/` 供维护者审阅。
+
+## 2026-09-01 — U2.4 Immediate Launcher Readiness Worktree Candidate
+
+- exact task-description `aa44e7d...`／scope revision 1 先登记 starting/ready/failed、同实例复用、后台 render、
+  三态 stop、root/template parity 与 Git-private timings；`b0a3352...`／scope revision 2 只追加 out-of-graph
+  program membership quarantine，Core store 与关系/Authority/Team 语义不变。
+- 首轮真实启动虽显示 starting 并复用实例，但外部首个 HTTP 为 3304 ms，超过 3 秒门。既有 `serve.py`
+  reader/corpus import 随后移入同一后台 worker；修正后首个 HTTP 701 ms、复用 319 ms、ready 55.317 秒，
+  ready-stop 与 separate starting-stop 均 202 且 marker/listener/process 归零。
+- Graph 既有 owner 正控省略 node set 外 W5D membership，负控保持 in-graph 坏 path fail-closed。唯一 self-host
+  evidence 为 provider 33 nodes/13 edges → projection ready 33 nodes/20 edges、无 placeholder W5D；未重跑 provider。
+- focused Unified/Graph/parity 18/18、compile、双根 runtime SHA-256 parity 和 diff check 通过。未使用 Computer
+  Use，未运行 Fast/Checkpoint/Candidate/Promotion，也未改版本、tag、asset、Release 或公共 v0.3.1。
+
 ## 2026-08-31 — Scope Revision 9 Final Candidate/Runtime PASS
 
 - `14f771f...` Candidate 41/42 暴露 in-process inventory import 与 Anaconda bare `_common` collision；旧失败不
@@ -1311,3 +1341,8 @@
 - v0.3.0 tag 仍为 `a0a728b...`，两个历史资产 digest/size 未改；只在 Release 正文顶部增加 Windows 严重警告
   与 v0.3.1 链接。integration closeout 合并 exact authority revision `1776629...` 与 release ancestry，后续只
   同步 State／Validation／全局入口，不再改产品或发布资产。
+- 2026-09-01: Maintainer authorized local U2.4 integration. The unique integration worktree merged exact
+  `00b2eb4fa28a606cdb532c7938e46482950e8233`, preserved newer ADR-0026/W7.4 authority, and resolved only the ADR index
+  plus U2.4 Validation conflicts. Integrated product/test/template bytes match the Candidate; compile, JSON,
+  root/template runtime parity and diff checks passed without replaying the focused unittest suite. No push/main,
+  Promotion or release action ran.

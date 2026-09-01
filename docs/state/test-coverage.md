@@ -1,6 +1,6 @@
 # 测试覆盖 State
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
 ## 当前验证体系
 
@@ -19,6 +19,20 @@ Updated: 2026-08-31
 
 ## 当前通过证据
 
+- U2.4 Worktree Candidate 保持既有 owner IDs：Unified 16、Graph membership 正负 1、root/template parity 1，
+  合计 18/18 focused PASS；Python compile、双根 runtime SHA-256 parity 与 `git diff --check` 通过。修正后真实
+  cold start 701 ms 返回 starting，第二启动复用 exact PID/port/instance，55.317 秒后完整 ready；ready-stop 与
+  独立 starting-stop 都为 202，marker/listener/process 全回收。self-host provider/projection 唯一运行确认
+  33/13 → ready 33/20、无 W5D placeholder。没有运行正式 Fast/Checkpoint/Candidate/Promotion。
+- U2.4 revision 3 沿用既有 owner IDs：Unified lifecycle/launcher 7、Graph safety 2、archive read-only 1，
+  10/10 focused PASS（2026-09-01，4.557s）；compile 通过。active archive 是 37/37 exact bounded entries，
+  extras 保留 13 roots/74 files/2,309,661 bytes，oversized session 保持 126,892 bytes 与 SHA-256
+  `fd08c4ea...f6f22b`。direct Graph 为 7-node/5-edge provider → ready 7-node/7-edge projection；fresh Unified
+  活动任务数为当前 4 worktrees。direct console-path reuse 296ms，真实 batch 1005ms 返回，两者的
+  PID/port/instance 均不变；双根 runtime SHA-256 为 `4d1b23a6...a2f49a193`。
+- 2026-09-01 本地 integration 没有重跑上述 unittest：合流后的产品／测试／模板树与 exact `00b2eb4...`
+  byte-for-byte Git diff 一致；冲突只在 ADR index 与 U2.4 Validation。合流执行 conflict-marker、cached
+  diff-check、三个 Python owner compile、三个 JSON decode 与双根 runtime SHA-256 parity，全部 PASS。
 - v0.3.1 release exact `1d9223cb07b94674b58471e0c19addf748b16221` 的六个失败 ID 一次运行 6/6 PASS；
   两个 fresh root 的 164-entry exact-Git build byte-identical，ZIP SHA-256 为 `2970fc208d529022b0ac33c2b6a35e9874ef87fa90d67bd0dafb52fc5d2b6445`，
   checksum 文件 SHA-256 为 `1650f51f76b8f24362aeb6929eb0ebac6166b7e20239d400c085d9bd3b440e78`，
@@ -117,9 +131,11 @@ Updated: 2026-08-31
 
 ## 已知缺口
 
-- v0.3.1 launcher smoke 验证了最终 ready/reuse/stop，却没有约束首次可见 HTTP 的时间；因此允许完整关系图
-  先阻塞约 95 秒。U2.4 Pending Validation 新增 starting-page `<3s`、starting-state reuse、background activation
-  与 starting-stop reclamation，仅用 focused lifecycle evidence，不重跑发布矩阵。
+- v0.3.1 launcher smoke 验证了最终 ready/reuse/stop，却没有约束首次可见 HTTP 的时间；因此公开版本仍允许
+  完整关系图先阻塞约 95 秒。U2.4 Worktree Candidate 已用 701 ms starting-page、starting-state reuse、后台
+  activation 与 starting-stop 回收关闭本地机械缺口；它未运行发布矩阵，也尚未形成公开 patch evidence。
+- revision 3 的两入口文件与 archive/Graph 恢复只有 focused mechanical evidence；不包含前台双击的
+  人类感知验收、exact-hash 旧文件升级删除或发布矩阵。
 - v0.3.0 final runtime 没有捕获公开 Windows launcher 的连续闪窗缺陷。后续 hotfix Worktree Candidate 已用
   Windows `CREATE_NO_WINDOW` audit 和第二次正常启动的 exact PID／port／instance 复用关闭机械覆盖缺口；没有
   使用桌面自动化或记录人类肉眼闪窗感知，因此主观可见体验仍可由维护者在 patch publication 前手动双击确认。

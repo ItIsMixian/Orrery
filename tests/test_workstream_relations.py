@@ -1010,6 +1010,17 @@ class WorkstreamRelationTests(unittest.TestCase):
             self.assertIsInstance(archive_file, Path)
             self.assertIsInstance(archive_root, Path)
             before = archive_file.read_bytes()
+            extras_file = (
+                archive_root.parent
+                / "retired-worktree-session-extras"
+                / "2026-09-01"
+                / "archived-fixture-extras"
+                / "ci-validation"
+                / "receipt.json"
+            )
+            extras_file.parent.mkdir(parents=True)
+            extras_file.write_bytes(b'{"preserved":true}\n')
+            extras_before = extras_file.read_bytes()
             author_status = repository.git("status", "--short").stdout
             with mock.patch.object(socket.socket, "connect", side_effect=AssertionError("network forbidden")):
                 index = load_archived_session_index(
@@ -1022,6 +1033,7 @@ class WorkstreamRelationTests(unittest.TestCase):
             self.assertEqual(index["destructive_actions"], [])
             self.assertEqual(index["resolved_workstream_ids"], ["W5D-lan-collaboration-harness"])
             self.assertEqual(archive_file.read_bytes(), before)
+            self.assertEqual(extras_file.read_bytes(), extras_before)
             self.assertEqual(repository.git("status", "--short").stdout, author_status)
             serialized = json.dumps(index, sort_keys=True)
             self.assertNotIn(str(archive_root), serialized)

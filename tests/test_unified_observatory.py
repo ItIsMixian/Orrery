@@ -45,6 +45,10 @@ class FakeIdentity:
         self.log_path = root / "unified.log"
         self.log_path.write_text("test runtime\n", encoding="utf-8")
         self.cleaned = False
+        self.published: list[tuple[int, str]] = []
+
+    def publish(self, *, port: int, status: str) -> None:
+        self.published.append((port, status))
 
     def cleanup(self) -> None:
         self.cleaned = True
@@ -556,54 +560,75 @@ class UnifiedRuntimeTests(unittest.TestCase):
         self.assertNotIn(str(ROOT), second_body.decode("utf-8"))
 
     def test_close_reclaims_owned_state_and_bound_port(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="orrery-unified-close-") as temporary:
-            identity = FakeIdentity(Path(temporary))
-            logger = logging.getLogger("orrery-unified-close-test")
-            logger.handlers.clear()
-            logger.addHandler(logging.NullHandler())
-            state = serve_orrery.UnifiedState(
-                page=self.rendered_page,
-                registrations=self.server.state.registrations,
-                authority_status=self.server.state.authority_status,
-                graph_provider_payload=self.server.state.graph_provider_payload,
-                fact_rules_projection=self.server.state.fact_rules_projection,
-                identity=identity,
-                logger=logger,
-            )
-            server = serve_orrery.UnifiedServer(("127.0.0.1", 0), state)
-            port = int(server.server_address[1])
-            thread = threading.Thread(target=server.serve_forever, daemon=True)
-            thread.start()
-            try:
-                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
-                connection.request("GET", "/", headers={"Host": f"127.0.0.1:{port}"})
-                response = connection.getresponse()
-                response.read()
-                cookie = dict(response.getheaders())["Set-Cookie"].split(";", 1)[0]
-                connection.close()
-                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
-                connection.request(
-                    "POST", "/api/v1/shell/stop", body=b"{}",
-                    headers={
-                        "Host": f"127.0.0.1:{port}", "Origin": f"http://127.0.0.1:{port}",
-                        "Sec-Fetch-Site": "same-origin", "Cookie": cookie,
-                        "Content-Type": "application/json", "Accept": "application/json",
-                    },
-                )
-                response = connection.getresponse()
-                self.assertEqual(response.status, 202)
-                self.assertEqual(json.loads(response.read()), {"status": "stopping"})
-                connection.close()
-                thread.join(timeout=5)
-                self.assertFalse(thread.is_alive())
-                self.assertTrue(identity.cleaned)
-                with self.assertRaises(OSError):
-                    socket.create_connection(("127.0.0.1", port), timeout=0.5)
-            finally:
-                if thread.is_alive():
-                    server.shutdown()
-                    server.server_close()
+        for expected_status in ("ready", "starting", "failed"):
+            with self.subTest(expected_status=expected_status), tempfile.TemporaryDirectory(prefix="orrery-unified-close-") as temporary:
+                identity = FakeIdentity(Path(temporary))
+                logger = logging.getLogger(f"orrery-unified-close-test-{expected_status}")
+                logger.handlers.clear()
+                logger.addHandler(logging.NullHandler())
+                if expected_status == "ready":
+                    state = serve_orrery.UnifiedState(
+                        page=self.rendered_page,
+                        registrations=self.server.state.registrations,
+                        authority_status=self.server.state.authority_status,
+                        graph_provider_payload=self.server.state.graph_provider_payload,
+                        fact_rules_projection=self.server.state.fact_rules_projection,
+                        identity=identity,
+                        logger=logger,
+                    )
+                else:
+                    state = serve_orrery.UnifiedState(identity=identity, logger=logger)
+                server = serve_orrery.UnifiedServer(("127.0.0.1", 0), state)
+                port = int(server.server_address[1])
+                if expected_status != "ready":
+                    state.bind_runtime(port=port)
+                if expected_status == "failed":
+                    state.fail_render()
+                thread = threading.Thread(target=server.serve_forever, daemon=True)
+                thread.start()
+                try:
+                    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                    connection.request("GET", "/", headers={"Host": f"127.0.0.1:{port}"})
+                    response = connection.getresponse()
+                    body = response.read().decode("utf-8")
+                    cookie = dict(response.getheaders())["Set-Cookie"].split(";", 1)[0]
+                    self.assertEqual(response.status, 200)
+                    if expected_status != "ready":
+                        self.assertIn(f'data-orrery-runtime-state="{expected_status}"', body)
+                        self.assertNotIn(str(ROOT), body)
+                    if expected_status == "starting":
+                        self.assertIn("/api/v1/health", body)
+                        self.assertIn("location.replace('/#overview')", body)
+                        self.assertIn("const maxDelay=2000", body)
+                    connection.close()
+                    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                    connection.request("GET", "/api/v1/health", headers={"Host": f"127.0.0.1:{port}"})
+                    response = connection.getresponse()
+                    self.assertEqual(json.loads(response.read())["status"], expected_status)
+                    connection.close()
+                    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                    connection.request(
+                        "POST", "/api/v1/shell/stop", body=b"{}",
+                        headers={
+                            "Host": f"127.0.0.1:{port}", "Origin": f"http://127.0.0.1:{port}",
+                            "Sec-Fetch-Site": "same-origin", "Cookie": cookie,
+                            "Content-Type": "application/json", "Accept": "application/json",
+                        },
+                    )
+                    response = connection.getresponse()
+                    self.assertEqual(response.status, 202)
+                    self.assertEqual(json.loads(response.read()), {"status": "stopping"})
+                    connection.close()
                     thread.join(timeout=5)
+                    self.assertFalse(thread.is_alive())
+                    self.assertTrue(identity.cleaned)
+                    with self.assertRaises(OSError):
+                        socket.create_connection(("127.0.0.1", port), timeout=0.5)
+                finally:
+                    if thread.is_alive():
+                        server.shutdown()
+                        server.server_close()
+                        thread.join(timeout=5)
 
 
 class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
@@ -705,12 +730,56 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
                 self.assertEqual(identity.reusable_url(), f"http://127.0.0.1:{port}/")
             self.assertEqual(opened.call_args.args[0].full_url, f"http://127.0.0.1:{port}/api/v1/health")
 
+            identity.marker.write_text(json.dumps({
+                "schema_version": 1,
+                "contract_type": "unified-observatory-runtime-identity-v1",
+                "instance_id": "starting-instance",
+                "pid": os.getpid(),
+                "host": "127.0.0.1",
+                "port": port,
+                "url": f"http://127.0.0.1:{port}/",
+                "status": "starting",
+                "ready": False,
+            }), encoding="utf-8")
+            response.read.return_value = json.dumps({
+                "contract_type": "unified-observatory-health-v1",
+                "status": "starting",
+                "single_visible_url": True,
+            }).encode("utf-8")
+            with mock.patch.object(serve_orrery, "urlopen", return_value=response):
+                self.assertEqual(identity.reusable_url(), f"http://127.0.0.1:{port}/")
+
+            identity.marker.write_text(json.dumps({
+                "schema_version": 1,
+                "contract_type": "unified-observatory-runtime-identity-v1",
+                "instance_id": "failed-instance",
+                "pid": os.getpid(),
+                "host": "127.0.0.1",
+                "port": port,
+                "url": f"http://127.0.0.1:{port}/",
+                "status": "failed",
+                "ready": False,
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "invalid"):
+                identity.reusable_url()
+
             with mock.patch.object(serve_orrery, "urlopen", side_effect=OSError("offline")):
                 with self.assertRaisesRegex(RuntimeError, "unhealthy"):
+                    identity.marker.write_text(json.dumps({
+                        "schema_version": 1,
+                        "contract_type": "unified-observatory-runtime-identity-v1",
+                        "instance_id": "ready-instance",
+                        "pid": os.getpid(),
+                        "host": "127.0.0.1",
+                        "port": port,
+                        "url": f"http://127.0.0.1:{port}/",
+                        "status": "ready",
+                        "ready": True,
+                    }), encoding="utf-8")
                     identity.reusable_url()
             self.assertTrue(identity.marker.exists())
 
-    def test_normal_main_reuses_before_render_and_console_legacy_keeps_console(self) -> None:
+    def test_both_launchers_reuse_before_render_and_console_legacy_keeps_console(self) -> None:
         identity = mock.Mock()
         identity.reusable_url.return_value = "http://127.0.0.1:18765/"
         logger = mock.Mock()
@@ -719,15 +788,63 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
             mock.patch.object(serve_orrery, "_logger", return_value=logger),
             mock.patch.object(serve_orrery.webbrowser, "open") as browser,
             mock.patch.object(
-                serve_orrery.build_unified_observatory, "render_unified_site",
-                side_effect=AssertionError("healthy reuse must precede construction"),
+                serve_orrery, "_load_runtime_components",
+                side_effect=AssertionError("healthy reuse must precede runtime imports"),
             ),
-            mock.patch.object(serve_orrery.legacy_serve, "_stop_managed_broker"),
         ):
             self.assertEqual(serve_orrery.main([]), 0)
         browser.assert_called_once_with("http://127.0.0.1:18765/#overview")
         identity.recover.assert_not_called()
         identity.cleanup.assert_called_once_with()
+        with (
+            mock.patch.object(serve_orrery, "RuntimeIdentity", return_value=identity),
+            mock.patch.object(serve_orrery, "_logger", return_value=logger),
+            mock.patch.object(serve_orrery.webbrowser, "open") as console_browser,
+            mock.patch.object(
+                serve_orrery, "_load_runtime_components",
+                side_effect=AssertionError("console reuse must precede runtime imports"),
+            ),
+        ):
+            self.assertEqual(serve_orrery.main(["--console", "--no-browser"]), 0)
+        console_browser.assert_not_called()
+        identity.recover.assert_not_called()
+        self.assertEqual(identity.cleanup.call_count, 2)
+
+        serve_orrery._load_runtime_components()
+        order: list[str] = []
+        ready = threading.Event()
+        identity = mock.Mock()
+        identity.reusable_url.return_value = None
+
+        def publish(*, port: int, status: str) -> None:
+            order.append(f"publish-{status}-{port}")
+            if status == "ready":
+                ready.set()
+
+        identity.publish.side_effect = publish
+        server = mock.Mock()
+        server.server_address = ("127.0.0.1", 18766)
+        server.serve_forever.side_effect = lambda **_kwargs: self.assertTrue(ready.wait(timeout=5))
+
+        def render(*_args, **_kwargs):
+            order.append("render")
+            page, stats, authority = _bounded_docsite()
+            return page, stats, build_unified_observatory.default_registrations(mode="dynamic"), authority, {}, {}
+
+        with (
+            mock.patch.object(serve_orrery, "RuntimeIdentity", return_value=identity),
+            mock.patch.object(serve_orrery, "_logger", return_value=mock.Mock()),
+            mock.patch.object(serve_orrery, "_bind_server", return_value=server),
+            mock.patch.object(
+                serve_orrery, "build_unified_observatory",
+                mock.Mock(render_unified_site=mock.Mock(side_effect=render)),
+            ),
+            mock.patch.object(serve_orrery.legacy_serve, "_stop_managed_broker"),
+        ):
+            self.assertEqual(serve_orrery.main(["--no-browser"]), 0)
+        self.assertEqual(order, ["publish-starting-18766", "render", "publish-ready-18766"])
+        identity.recover.assert_called_once_with()
+        server.serve_forever.assert_called_once_with(poll_interval=0.1)
 
         with mock.patch.object(serve_orrery.subprocess, "call", return_value=0) as child:
             self.assertEqual(serve_orrery._legacy(True, True), 0)
@@ -735,13 +852,45 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
 
     def test_headless_launcher_console_debug_and_legacy_rollback_are_explicit(self) -> None:
         vbs = (ROOT / "Start Orrery.vbs").read_text(encoding="utf-8")
-        batch = (ROOT / "start-orrery.bat").read_text(encoding="utf-8")
-        legacy = (ROOT / "start-docsite.bat").read_text(encoding="utf-8")
+        batch = (ROOT / "Start Orrery Console.bat").read_text(encoding="utf-8")
         self.assertIn("pythonw.exe", vbs)
         self.assertIn("shell.Run command, 0, False", vbs)
-        self.assertIn('if /I "%~1"=="--console"', batch)
+        self.assertIn("scripts\\docsite\\serve_orrery.py", vbs)
         self.assertIn("serve_orrery.py\" --console", batch)
-        self.assertIn("scripts\\docsite\\serve.py", legacy)
+        self.assertNotIn("wscript.exe", batch.lower())
+        self.assertEqual(
+            {path.name for path in ROOT.glob("Start Orrery*") if path.is_file()},
+            {"Start Orrery.vbs", "Start Orrery Console.bat"},
+        )
+        for retired in ("start-orrery.bat", "start-orrery-control.bat", "start-docsite.bat"):
+            self.assertFalse((ROOT / retired).exists(), retired)
+        template = ROOT / "skills" / "project-orrery" / "assets" / "project-template"
+        self.assertEqual(
+            {path.name for path in template.glob("Start Orrery*") if path.is_file()},
+            {"Start Orrery.vbs", "Start Orrery Console.bat"},
+        )
+        for launcher in ("Start Orrery.vbs", "Start Orrery Console.bat"):
+            self.assertEqual((ROOT / launcher).read_bytes(), (template / launcher).read_bytes())
+        for retired in ("start-orrery.bat", "start-orrery-control.bat", "start-docsite.bat"):
+            self.assertFalse((template / retired).exists(), retired)
+        component = json.loads((
+            ROOT / "packages" / "project-orrery-observatory" / "src"
+            / "project_orrery_observatory" / "component.json"
+        ).read_text(encoding="utf-8"))
+        self.assertEqual(
+            {Path(path).name for path in component["managed_tools"] if "Orrery" in Path(path).name},
+            {"Start Orrery.vbs", "Start Orrery Console.bat"},
+        )
+        self.assertFalse({"start-orrery.bat", "start-docsite.bat"} & set(component["managed_tools"]))
+        authority_schema = json.loads((
+            ROOT / "packages" / "project-orrery-core" / "src" / "project_orrery_core"
+            / "schema" / "authority-v1.json"
+        ).read_text(encoding="utf-8"))
+        self.assertTrue(
+            {"Start Orrery.vbs", "Start Orrery Console.bat"}
+            .issubset(authority_schema["required_scaffold_files"])
+        )
+        self.assertNotIn("start-docsite.bat", authority_schema["required_scaffold_files"])
         with mock.patch.object(serve_orrery, "_legacy", return_value=7) as rollback:
             self.assertEqual(serve_orrery.main(["--legacy", "--no-browser"]), 7)
         rollback.assert_called_once_with(False, True)

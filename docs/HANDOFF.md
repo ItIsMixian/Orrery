@@ -9,12 +9,10 @@ Updated: 2026-09-01
 - W7.4 已在独立 branch/worktree 分发。首版真实预览只把 6 条 closed task 写入 history index，维护者明确
   拒绝；它必须继续对完整 bounded archive/history 输入做总数、有效、去重、投影和逐项排除原因对账，再给
   新预览。维护者接受前不得运行自动化测试，也不得把 6 条样本冒充完整历史。
-- U2.4 Agent 已回报 Worktree Candidate `00b2eb4fa28a606cdb532c7938e46482950e8233`：归档布局可逆分离、
-  Graph 恢复和两个 Windows 启动入口已实现，focused 10/10 与轻量检查通过，分支干净。该信息仍是 Agent
-  回执；Candidate 尚未中央整合、Promotion 或发布，历史任务完整投影由独立 W7.4 持有。
-- v0.3.1 用户实测暴露第二个 launcher 问题：首次进程 23:37:41 启动，23:39:16 才 ready，期间没有页面或
-  进度。只读 profile 为 85.013 秒/751 subprocess，主要由 Graph/relation/legacy-session 投影造成；U2.4
-  Immediate Launcher Readiness Plan/Pending Validation 已登记，尚无实现或 patch Release。
+- U2.4 exact `00b2eb4fa28a606cdb532c7938e46482950e8233` 已按维护者指令进入当前本地 integration branch：
+  归档布局恢复、即时 starting page 和两个 Windows 启动入口均已合入。合流产品树与 exact Candidate 一致，
+  只做 compile/JSON/parity/diff 轻量检查，没有重跑 unittest。protected main、Promotion 和发布未发生；
+  历史任务完整投影由独立 W7.4 持有。
 - Orrery v0.3.1 已公开发布为 Latest Release；protected `main`、annotated tag、Release source 均绑定 exact
   `1d9223cb07b94674b58471e0c19addf748b16221`。Promotion run `33465321477` 与 tag workflow
   `33465760947` 全绿，远端 ZIP/checksum 哈希与 exact-Git build 一致。
