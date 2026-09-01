@@ -116,8 +116,8 @@ class ReleaseContract:
 
 
 def default_release_contract() -> ReleaseContract:
-    """Return the bundled v0.3.0 release-candidate contract."""
-    resource = files("project_orrery_core").joinpath("data", "release-v0.3.0.json")
+    """Return the bundled v0.3.1 release-candidate contract."""
+    resource = files("project_orrery_core").joinpath("data", "release-v0.3.1.json")
     payload = json.loads(resource.read_text(encoding="utf-8"))
     if not isinstance(payload, dict) or payload.get("name") != "project-orrery":
         raise ValueError("invalid bundled Project Orrery release bridge contract")
