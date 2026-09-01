@@ -617,6 +617,25 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
         with mock.patch.object(subprocess_policy.os, "name", "posix"):
             self.assertEqual(subprocess_policy.no_window_options(), {})
 
+    def test_child_policy_audit_is_explicit_bounded_and_records_windows_flags(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-child-policy-") as temporary:
+            audit = Path(temporary) / "audit.jsonl"
+            with (
+                mock.patch.dict(os.environ, {"ORRERY_CHILD_POLICY_AUDIT_PATH": str(audit)}),
+                mock.patch.object(subprocess_policy.os, "name", "nt"),
+            ):
+                subprocess_policy.no_window_options()
+            record = json.loads(audit.read_text(encoding="utf-8"))
+            self.assertEqual(record["contract_type"], "orrery-child-process-policy-audit-v1")
+            self.assertEqual(record["creationflags"], getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000))
+            self.assertEqual(record["caller_function"], "test_child_policy_audit_is_explicit_bounded_and_records_windows_flags")
+            self.assertEqual(record["os_name"], "nt")
+
+            audit.unlink()
+            with mock.patch.dict(os.environ, {}, clear=True):
+                subprocess_policy.no_window_options()
+            self.assertFalse(audit.exists())
+
     def test_unified_startup_and_refresh_git_sites_use_shared_child_policy(self) -> None:
         required_counts = {
             "packages/project-orrery-core/src/project_orrery_core/collaboration.py": 5,
