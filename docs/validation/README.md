@@ -2,6 +2,7 @@
 
 Validation records reproducible evidence for implementation and documentation claims.
 
+- [2026-09-01 W7.4 Workstream History and Relation Decision UX](2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md) — Pending; requires a real self-host preview of complete folded history and human-readable dependency/Unknown cards before any automated test stage.
 - [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — exact
   `a0a728b...` Candidate 56/56、双根 byte-identical package 与完整 Windows final runtime PASS；旧 Promotion
   runs `33449930707`／`33451288289`／`33454661325` 的失败保留；run `33456504779` 双平台 Promotion PASS。

@@ -1,0 +1,82 @@
+# Implementation Plan: W7.4 Workstream History and Relation Decision UX
+
+Status: Approved for implementation; visual/semantic preview precedes automated validation
+
+Date: 2026-09-01
+
+Task code: W7.4
+
+Program path: `workstream-w / workstream-w7`
+
+Governing decision: [ADR-0026](../../decisions/0026-durable-workstream-history-and-human-readable-relation-decisions.md)
+
+Approved Design: [Durable Workstream History and Relation Decision UX](../../design/durable-workstream-history-and-relation-decision-ux.md)
+
+Observed product base: U2.4 Worktree Candidate
+`00b2eb4fa28a606cdb532c7938e46482950e8233`; this is a Candidate dependency, not Canonical/main fact.
+
+## Objective
+
+Make closed Workstreams survive worktree cleanup as usable project history and make every relation confirmation
+understandable before the maintainer can act. This is one W7 task because both failures arise from the same Workstream
+history/relation provider and its Personal/Graph projections. Workspace deletion policy remains W6 and launcher/runtime
+behavior remains U2.4.
+
+## Authorized implementation
+
+1. Register W7.4 in an independent branch/worktree from the exact observed U2.4 Candidate, bind the explicitly approved
+   `workstream-w/workstream-w7` classification in its scope, and acknowledge the exact task-description version before
+   product writes. Do not fabricate a human membership event; if the current store needs a separate integrator action,
+   leave a bounded proposal for local confirmation.
+2. Add Core `workstream-history-index-v1` contracts, validation and append-only atomic storage independent of worktree
+   paths. Provide verified closure snapshot and read-only legacy archive migration preview/apply boundaries.
+3. Expose a bounded `history_snapshot_ready` result that a later W6 task can require before automatic cleanup. Do not
+   change current W6 eligibility or implement automatic deletion in this task.
+4. Extend the relation/Graph provider to include all bounded closed history summaries, including zero-relation tasks.
+   Default-fold them by accepted program/phase/series and keep “其他历史任务” for ungrouped records.
+5. Make expand/collapse/filter behavior operate on the complete history identity set. Preserve real relations,
+   historical non-execution and ELK/explicit-legacy boundaries.
+6. Add a deterministic Core-owned relation decision presentation model and replace the current technical-first inbox
+   cards with question/reason/accept-effect/reject-effect/evidence-warning/actions/technical-details order.
+7. Keep `derived_from` Unknown non-accepting, keep task-owner/integrator/CAS authority unchanged, and make incomplete
+   explanations non-actionable rather than falling back to raw controls.
+8. Maintain root/project-template behavior parity where the affected Observatory code is shipped. Update subsystem
+   State, this Validation and DEVLOG in the task branch; do not rewrite root PROGRESS/HANDOFF there.
+
+## Preview-first sequence
+
+1. Read current live/archive/history inputs and record a zero-write baseline showing which closed tasks are omitted.
+2. Implement the smallest complete history/provider/decision-view path.
+3. Render the real self-host page on a separate local loopback preview without Computer Use.
+4. Stop and ask the maintainer to inspect history folding/expansion and the dependency/Unknown decision cards.
+5. Before that acceptance, do not run unittest suites, Fast, Checkpoint, Candidate or Promotion. Syntax/import checks
+   needed to start the preview are allowed but are not acceptance evidence.
+6. After maintainer acceptance, run only the focused Core/Observatory owners plus root/template parity and
+   `git diff --check`. Broader validation and publication require a later explicit instruction.
+
+## Expected implementation surfaces
+
+- `packages/project-orrery-core/src/project_orrery_core/` history, relation and schema owners;
+- `packages/project-orrery-observatory/src/project_orrery_observatory/` Graph and relation-inbox projections;
+- root/project-template docsite adapters only where parity requires them;
+- focused Workstream relation/history/Observatory tests after visual acceptance;
+- `docs/state/project-structure.md`, `docs/state/documentation-system.md`, this Validation and `docs/DEVLOG.md`.
+
+## Hard boundaries
+
+- no deletion, branch cleanup, archive rewrite/truncation or existing relation-history rewrite;
+- no automatic relation confirmation, prefix/name inference or AI-generated decision semantics;
+- no Prompt/transcript/source/diff/credential/private-path persistence or Team synchronization;
+- no Computer Use, external network, release/version/tag/asset/main/push operation;
+- no Fast/Checkpoint/full matrix before maintainer acceptance;
+- U2.4 remains a separate Candidate dependency and W6 Phase 5 remains a separate cleanup task.
+
+## Completion definition
+
+- every bounded closed self-host task is present in the history index and reachable from Graph history, including
+  tasks with no relation edges;
+- default Graph remains readable through history folding and expansion reveals the full historical set;
+- the maintainer can explain the decision and consequence of each sampled card without opening technical details;
+- Unknown lineage cannot be accepted and dependency authority/gates/CAS remain unchanged;
+- focused post-acceptance checks pass and the task branch is clean;
+- no integration, release or public capability is claimed.

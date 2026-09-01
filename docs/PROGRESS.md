@@ -55,6 +55,7 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 
 ## 活动计划与待办
 
+- [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：已接受 ADR-0026；以 U2.4 Candidate `00b2eb4...` 为观察基线，补独立 closed-task history index、完整历史折叠/展开和人话关系确认卡。先给维护者真实预览，接受前不跑自动测试。
 - [ ] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
   v0.3.1 Windows 冷启动在约 95 秒完整 render 后才绑定/打开页面；先在 3 秒内提供同一 URL 的 starting page，
   后台激活完整视图。revision 3 又登记了本机归档边界恢复和两个明确 Windows 启动入口；只跑 focused

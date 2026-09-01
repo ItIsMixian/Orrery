@@ -4,6 +4,10 @@ Updated: 2026-08-31
 
 ## 当前停止点
 
+- ADR-0026、Approved Design、W7.4 Plan/Pending Validation 已登记，等待 authority-only commit 后分发独立
+  `W7.4 · 历史任务与关系确认可理解性`。它以 U2.4 Worktree Candidate `00b2eb4...` 为观察基线，负责让
+  零关系的已关闭任务在 worktree 清理后仍可从历史展开，并把 Personal relation inbox 改成先说明问题、原因
+  和接受/拒绝后果；不继续塞入 U2.4，也不包含 W6 自动清理。
 - U2.4 在 2026-09-01 revision 3 前暂停产品写入／测试：本机清理把 13 份完整 Git-private metadata subtree
   放进只允许单个 `worktree.json` 的 retired-session relation archive；分离后又暴露一份 126,892-byte session
   超过 64 KiB 上限。两者导致当前 Graph Unavailable，同时运行中页面仍显示旧 20-worktree snapshot。
