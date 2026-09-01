@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schema/workstream-history-index-v1.json",
+  "title": "Orrery bounded Workstream history summary",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_type",
+    "workstream_id",
+    "display",
+    "classification",
+    "historical_state",
+    "git",
+    "lineage",
+    "references",
+    "visibility",
+    "revision"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_type": {"const": "workstream-history-summary"},
+    "workstream_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "display": {
+      "type": "object",
+      "required": ["task_code", "label"],
+      "properties": {
+        "task_code": {"type": ["string", "null"], "maxLength": 64},
+        "label": {"type": "string", "minLength": 1, "maxLength": 200}
+      },
+      "additionalProperties": false
+    },
+    "classification": {
+      "type": "object",
+      "required": ["primary_subsystem_id", "program_path", "series_id", "series_order"],
+      "properties": {
+        "primary_subsystem_id": {"type": ["string", "null"], "maxLength": 128},
+        "program_path": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 128},
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "series_id": {"type": ["string", "null"], "maxLength": 128},
+        "series_order": {"type": ["integer", "null"], "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "historical_state": {
+      "type": "object",
+      "required": ["record_kind", "observed_lifecycle_phase", "runtime_condition", "closure_reason", "captured_at"],
+      "properties": {
+        "record_kind": {"enum": ["closed-workstream", "retired-session"]},
+        "observed_lifecycle_phase": {
+          "enum": ["created", "investigating", "implementing", "validating", "review-ready", "integrated", "closed"]
+        },
+        "runtime_condition": {
+          "enum": ["active", "waiting-for-user", "paused", "blocked-by-conflict", "failed", "offline", "stale-unknown"]
+        },
+        "closure_reason": {"type": ["string", "null"], "enum": ["integrated", "abandoned", "superseded", "duplicate", null]},
+        "captured_at": {"type": "string", "format": "date-time"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"observed_lifecycle_phase": {"const": "closed"}}, "required": ["observed_lifecycle_phase"]},
+          "then": {
+            "properties": {
+              "record_kind": {"const": "closed-workstream"},
+              "closure_reason": {"enum": ["integrated", "abandoned", "superseded", "duplicate"]}
+            }
+          },
+          "else": {
+            "properties": {
+              "record_kind": {"const": "retired-session"},
+              "closure_reason": {"const": null}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "git": {
+      "type": "object",
+      "required": ["final_head_oid", "branch_ref"],
+      "properties": {
+        "final_head_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "branch_ref": {"type": "string", "pattern": "^refs/heads/[A-Za-z0-9._/-]+$"}
+      },
+      "additionalProperties": false
+    },
+    "lineage": {
+      "type": ["object", "null"],
+      "properties": {
+        "status": {"enum": ["current", "legacy-unknown", "parent-unverified-unknown"]},
+        "base_workstream_id": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "task_base_oid": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+        "validated_head": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"}
+      },
+      "required": ["status", "base_workstream_id", "task_base_oid", "validated_head"],
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "current"}}, "required": ["status"]},
+          "then": {
+            "properties": {
+              "base_workstream_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+              "task_base_oid": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+              "validated_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "references": {
+      "type": "object",
+      "required": ["validation_refs", "relation_ids", "source_evidence_ids"],
+      "properties": {
+        "validation_refs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 400},
+          "maxItems": 128,
+          "uniqueItems": true
+        },
+        "relation_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 128},
+          "maxItems": 128,
+          "uniqueItems": true
+        },
+        "source_evidence_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 400},
+          "maxItems": 128,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "visibility": {"const": "git-private-local-only"},
+    "revision": {"type": "integer", "minimum": 1}
+  },
+  "additionalProperties": false
+}
