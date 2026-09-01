@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 12 runtime command correction Pending; main/tag not started
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 13 Codex policy correction Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -612,3 +612,17 @@ External source-checkout and extracted-archive installer/validator paths both re
 The first Harness orchestration command did not invoke Harness: PowerShell rejected a comma-separated `Join-Path`
 array while assembling arguments. No target or user state changed. Revision 12 is Pending for a command-only variable
 correction; no failed Harness result is being retried or reclassified.
+
+### Revision-12 Harness PASS and explicit Codex NOT_RUN
+
+The corrected exact-archive Harness validate returned exit 0, `status=warning`, `valid=true`, `integrated=false`;
+the invalid arbitrary-argv request returned exit 2 with `invalid_request`. Neither launched a child for the invalid
+request, and the synthetic environment sentinel was absent from both outputs.
+
+The following explicit Codex attempt is non-green and retained separately: Codex CLI 0.151.0-alpha.7.2 started
+GPT-5.6 Sol medium, identified the repository `project-orrery` Skill, then rejected every PowerShell/cmd read before
+execution because `--ignore-user-config` removed the host execution policy. Final output was
+`VALIDATE_EXIT=126 AUTHORITY_STATUS=NOT_RUN`; validator execution count is zero and no file changed.
+
+Revision 13 is Pending for one new output-bound invocation that restores only host configuration while retaining the
+explicit model/reasoning/read-only/workdir/Skill constraints. The failed output is not overwritten or called PASS.

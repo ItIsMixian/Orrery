@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 12 runtime command correction authorized; GitHub Release withheld
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 13 Codex policy correction authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -649,6 +649,21 @@ Revision 12 authorizes only a corrected external command that assigns the Core, 
 three independent task-specific variables before constructing the Harness argument array. It changes no repository
 product, test, workflow, package or runtime target. Do not replay the malformed command. Continue the already
 authorized exact-archive runtime matrix from the first unexecuted Harness step on unchanged `76a6961...` bytes.
+
+### 2026-08-31 scope revision 13 — preserve read-only Codex exec policy
+
+The corrected Harness pair passed. The next explicit Codex invocation loaded GPT-5.6 Sol medium and the repository
+Skill, but `--ignore-user-config` also removed the host's read-only PowerShell execution policy. All three attempted
+shell commands were rejected before execution; Codex returned
+`EXPLICIT_SKILL=project-orrery VALIDATE_EXIT=126 AUTHORITY_STATUS=NOT_RUN`. No validator or product command ran and no
+file changed. This output remains non-green evidence.
+
+Revision 13 authorizes one new explicit Codex invocation on the same isolated runtime tree, with the same Sol-medium,
+ephemeral, read-only sandbox and no-write prompt, but without `--ignore-user-config`. Local
+`.agents/skills/project-orrery` must remain byte-identical to the exact archive and the result must use a new output
+file. User configuration may supply only the host execution policy/authentication; it cannot change model, reasoning,
+sandbox, working directory or the requested local Skill. If this invocation is non-green, stop without another
+Codex retry.
 
 ## Phase 1 — register Final RC and freeze inputs
 
