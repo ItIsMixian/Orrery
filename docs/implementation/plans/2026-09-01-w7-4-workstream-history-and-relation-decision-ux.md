@@ -114,3 +114,24 @@ timestamps, adding another history UI, changing confirmation authority, or start
 
 Revision-2 completion supersedes the earlier bullets requiring zero-relation tasks to be reachable from Graph UI.
 Those identities must remain stored, but they need not be rendered.
+
+## 2026-09-01 scope revision 3 — bind the actual local integration ref
+
+After the obsolete G1/U2/U2.4 registered worktrees were preserved and retired, scope refresh reported zero active
+peer findings but still returned `L3 / Allowed: no`. The remaining cause was a stale project baseline: the session
+resolved `refs/heads/main@d07e1a15...`, while the unique local integration worktree is
+`refs/heads/codex/u1-u2-integration-baseline@208ae29...`. Consequently, already integrated U2.4 release/schema paths
+were misclassified as new W7.4 expansion.
+
+ADR-0007 already permits a project override of the default integration ref. Revision 3 authorizes:
+
+1. the self-host `.project-orrery.json` to bind `collaboration.integration_ref` to
+   `refs/heads/codex/u1-u2-integration-baseline` for this local integration phase;
+2. W7.4 to import that exact one-file configuration correction as a separate bootstrap commit while preserving all
+   existing dirty product work, then rerun scope refresh;
+3. product writes to resume only if the refreshed guard returns allowed against the actual integration ref;
+4. the future protected-main/Promotion task to restore the public/default integration ref to `refs/heads/main` before
+   any push to main or release packaging.
+
+This is a baseline correction, not an L3 bypass. It does not authorize ignoring peer findings, changing branch
+protection, pushing the local integration branch or starting W6.2.

@@ -51,3 +51,12 @@ Status: Rejected by maintainer; scope revision 2 Pending
 The next preview is acceptable only when the bulk history UI is absent, valid archived lineage relationships are
 recovered into the existing Graph, invalid/Unknown lineage stays edge-free with technical reasons, and no archive or
 relation history is rewritten. Automated tests remain forbidden before that preview is accepted.
+
+## 2026-09-01 scope-baseline correction — Pending
+
+- obsolete peer worktrees were preserved and removed from the registry; refreshed peer findings became zero;
+- scope still failed L3 because `refs/heads/main@d07e1a15...` was not the actual local integration baseline;
+- `.project-orrery.json` now explicitly selects `refs/heads/codex/u1-u2-integration-baseline` under the existing
+  ADR-0007 configuration contract;
+- W7.4 must import the exact correction and obtain an allowed scope refresh before product writes resume;
+- no test, product write, main update, push or release is accepted as evidence under the stale baseline.

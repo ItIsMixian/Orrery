@@ -9,6 +9,9 @@ Updated: 2026-09-01
 - W7.4 再次暂停等待 task-description revision 2：维护者拒绝新“完整历史目录”和 bulk card grid，并指出原
   Graph 关系仍未找回。中央盘点为 37 records／33 lineage／14 current／至少 11 个 archived-to-archived exact
   pair；新范围要求删除 bulk UI、从 archived lineage 恢复可验证关系并保留 Unknown。接受前不得运行测试。
+- G1、旧 U2 与 U2.4 worktree 已先保全 branch/commit/session 后退出 registry；scope peer findings 为零。剩余
+  L3 来自 stale `main@d07e1a...` baseline。task-description revision 3 显式绑定实际本地 integration ref；
+  W7.4 必须导入该配置并取得 allowed refresh 后才能继续。
 - U2.4 exact `00b2eb4fa28a606cdb532c7938e46482950e8233` 已按维护者指令进入当前本地 integration branch：
   归档布局恢复、即时 starting page 和两个 Windows 启动入口均已合入。合流产品树与 exact Candidate 一致，
   只做 compile/JSON/parity/diff 轻量检查，没有重跑 unittest。protected main、Promotion 和发布未发生；
