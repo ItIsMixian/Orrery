@@ -106,3 +106,28 @@ Commit a new SHA, run `python scripts/ci/validate_ci.py --all` once as registry/
 suites, then perform the already-established two-build and installed-project runtime gates once on that exact SHA.
 Only after those pass may `promotion/v0.3.1-rc` fast-forward and trigger one new Promotion. Run `33464068810` and SHA
 `6a018319...` are not retried.
+
+## 2026-08-31 scope revision 7 — close the six exact Promotion failures
+
+Promotion run `33464450752` passed preflight and both repository gates on exact
+`606dafc282eda6fd499a28e4701c3dc9174873fe`, then failed in lanes 03/05/09 on both platforms. Downloaded lane
+artifacts reduce the result to six unique failing test IDs and three bounded causes:
+
+1. four existing assertions still freeze Core/Observatory `0.1.19` although the v0.3.1 release input declares
+   `0.1.20` (`test_collaboration_contract.py` twice, `test_collaboration_w3.py` once and
+   `test_workstream_relation_graph_observatory.py` once with two values);
+2. `test_project_orrery.py` uses `0.3.1` as a synthetic newer compatible release, which is now equal to the installed
+   version and correctly returns `up_to_date`; the synthetic version/tag must become `0.3.2`;
+3. the opt-in audit helper constructs `Path(...)` after its Linux test temporarily sets `os.name="nt"`; this makes
+   `pathlib` choose unsupported `WindowsPath`. Use the already platform-bound `os.path.basename` for caller names and
+   built-in `open(target, ...)` for the audit file, preserving the same JSONL contract and fail-closed `OSError` path.
+
+Revision 7 authorizes only those exact edits in
+`packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py`,
+`tests/test_project_orrery.py`, `tests/test_collaboration_contract.py`, `tests/test_collaboration_w3.py`, and
+`tests/test_workstream_relation_graph_observatory.py`. Do not change versions, manifests, product behavior outside the
+audit write implementation, test IDs, registry, budgets or workflows.
+
+Commit a new SHA and run only the six previously failing IDs once locally. If green, perform two exact-Git builds and
+one installed-project runtime smoke on that SHA, then fast-forward the promotion ref and run one new Promotion. Do not
+replay successful lanes, the complete local suite, SHA `606dafc...` or run `33464450752`.

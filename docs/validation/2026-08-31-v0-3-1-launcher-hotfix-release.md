@@ -72,3 +72,15 @@ failed closed and no publication action occurred.
 Revision 6 may add only those five IDs with the exact common ownership/stage/cost/dependency metadata in the Plan,
 run one local registry self-check, then create package/runtime evidence and one Promotion on a new SHA. The failed run
 and old SHA are preserved and not retried.
+
+## 2026-08-31 Promotion lane failure set
+
+Exact `606dafc...` passed registry preflight, Windows/Ubuntu repository gates, local two-build and installed-project
+runtime gates. Run `33464450752` then failed in lanes 03/05/09. Downloaded Windows/Ubuntu artifacts identify six unique
+test IDs: one update-checker fixture, three collaboration version fixtures, one Graph component-version fixture and
+the cross-platform child-policy audit. The five newly registered hotfix tests were discovered and four passed on both
+platforms; only the audit-path implementation failed on Linux under its explicit Windows simulation.
+
+Revision 7 may apply only the exact three-cause correction in the Plan, execute those six IDs once on a new SHA, and
+then recreate package/runtime/Promotion evidence. No main/tag/Release or v0.3.0 edit occurred; the old run is immutable
+and not retried.
