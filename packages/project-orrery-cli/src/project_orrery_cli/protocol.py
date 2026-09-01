@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from enum import IntEnum
 from typing import Any, Iterable, Mapping
 
@@ -61,4 +62,10 @@ def response(
 
 
 def emit(payload: Mapping[str, Any]) -> None:
-    print(json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True))
+    text = json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    buffer = getattr(sys.stdout, "buffer", None)
+    if buffer is None:
+        print(text, end="")
+        return
+    buffer.write(text.encode("utf-8"))
+    buffer.flush()

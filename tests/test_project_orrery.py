@@ -125,7 +125,10 @@ class ProjectOrreryTests(unittest.TestCase):
                 "--dry-run",
             )
             self.assertEqual(preview.returncode, 0, preview.stdout + preview.stderr)
+            self.assertIn(f"Project Orrery {CURRENT_VERSION} ->", preview.stdout)
             for fragment in fragments["installer_dry_run"]:
+                if fragment.startswith("Project Orrery "):
+                    continue
                 self.assertIn(fragment, preview.stdout)
 
             installed = run_python(
@@ -431,8 +434,8 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
 
             compatible = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
-            compatible["version"] = "0.3.0"
-            compatible["distribution"]["tag"] = "v0.3.0"
+            compatible["version"] = "0.3.1"
+            compatible["distribution"]["tag"] = "v0.3.1"
             compatible_path = root / "compatible.json"
             compatible_path.write_text(json.dumps(compatible), encoding="utf-8")
             checked = run_python(

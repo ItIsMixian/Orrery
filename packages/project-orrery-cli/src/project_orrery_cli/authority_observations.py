@@ -76,14 +76,21 @@ def _source_sha256(path: Path) -> str:
 
 def _header_metadata(path: Path) -> dict[str, list[str]]:
     metadata: dict[str, list[str]] = {}
+    continuation_key: str | None = None
     for line in path.read_text(encoding="utf-8").splitlines():
         if H2_RE.match(line):
             break
         match = META_RE.match(line)
         if match:
-            metadata.setdefault(match.group(1).strip().casefold(), []).append(
-                match.group(2).strip()
-            )
+            continuation_key = match.group(1).strip().casefold()
+            metadata.setdefault(continuation_key, []).append(match.group(2).strip())
+        elif (
+            continuation_key in {"amends", "supersedes"}
+            and line.lstrip().startswith("[ADR-")
+        ):
+            metadata[continuation_key][-1] += " " + line.strip()
+        else:
+            continuation_key = None
     return metadata
 
 

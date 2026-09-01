@@ -257,6 +257,7 @@
         "packages/project-orrery-core/src/project_orrery_core/data/release-v*.json",
         "packages/project-orrery-core/src/project_orrery_core/manifests.py",
         "packages/project-orrery-cli/src/project_orrery_cli/context.py",
+        "packages/project-orrery-cli/src/project_orrery_cli/protocol.py",
         "packages/project-orrery-cli/src/project_orrery_cli/scaffold.py",
         "packages/project-orrery-core/src/project_orrery_core/templates/**",
         "skills/project-orrery/**",
