@@ -12,6 +12,8 @@ Updated: 2026-09-01
 - G1、旧 U2 与 U2.4 worktree 已先保全 branch/commit/session 后退出 registry；scope peer findings 为零。剩余
   L3 来自 stale `main@d07e1a...` baseline。task-description revision 3 显式绑定实际本地 integration ref；
   W7.4 必须导入该配置并取得 allowed refresh 后才能继续。
+- integration-ref 修正后唯一剩余 L3 是 W7.4 未跟踪 history schema。中央已拒绝其“任意 object＋全部 closed”
+  草稿，并以 revision 4 bootstrap strict schema；W7.4 必须删除任务草稿、合入中央 schema，再刷新守卫。
 - U2.4 exact `00b2eb4fa28a606cdb532c7938e46482950e8233` 已按维护者指令进入当前本地 integration branch：
   归档布局恢复、即时 starting page 和两个 Windows 启动入口均已合入。合流产品树与 exact Candidate 一致，
   只做 compile/JSON/parity/diff 轻量检查，没有重跑 unittest。protected main、Promotion 和发布未发生；

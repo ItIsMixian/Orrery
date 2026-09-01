@@ -135,3 +135,22 @@ ADR-0007 already permits a project override of the default integration ref. Revi
 
 This is a baseline correction, not an L3 bypass. It does not authorize ignoring peer findings, changing branch
 protection, pushing the local integration branch or starting W6.2.
+
+## 2026-09-01 scope revision 4 — integrator-owned strict history schema bootstrap
+
+With the actual integration ref configured, scope refresh had zero peer findings but correctly retained an exclusive
+`schema-migration` L3 for the untracked W7.4 schema Candidate. Central review rejected that draft because
+`display`／`classification`／`references` allowed arbitrary objects and every archive was forced to lifecycle
+`closed`. The real bounded archive contains only 6 closed sessions; the other 31 are 12 implementing, 18 validating
+and 1 review-ready session.
+
+The unique integrator now owns the strict `workstream-history-index-v1.json` bootstrap. Revision 4 authorizes W7.4 to:
+
+1. verify its untracked schema is not committed, remove that task-owned draft after preserving any relevant design
+   intent already captured in code, and merge the exact central schema-bootstrap commit;
+2. preserve observed lifecycle honestly through `closed-workstream` versus `retired-session` records;
+3. rerun scope refresh against an integration baseline that already owns the schema;
+4. resume product writes only when the exclusive schema path is absent from W7.4's diff and the guard returns allowed.
+
+W7.4 must not loosen the strict central schema or reintroduce arbitrary objects to fit existing code. Any required
+schema amendment returns to the unique integrator before product writes continue.

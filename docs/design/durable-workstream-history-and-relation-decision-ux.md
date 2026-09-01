@@ -173,3 +173,10 @@ parts of sections 3 and 7 that required every stored closed task to be reachable
   user-facing history list.
 - The accepted preview must show recovered archived relationship chains in the original relation canvas and no bulk
   historical inventory UI.
+
+### Historical identity is not closure
+
+The history contract preserves the source session's observed lifecycle. A retired worktree with an `implementing`,
+`validating`, `review-ready` or `integrated` session is recorded as `retired-session`; it is never rewritten as a
+closed task. Only a source session whose lifecycle is exactly `closed` and has a valid closure reason becomes
+`closed-workstream`. The schema keeps closure state, Git identity and lineage evidence as separate required objects.

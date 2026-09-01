@@ -60,3 +60,12 @@ relation history is rewritten. Automated tests remain forbidden before that prev
   ADR-0007 configuration contract;
 - W7.4 must import the exact correction and obtain an allowed scope refresh before product writes resume;
 - no test, product write, main update, push or release is accepted as evidence under the stale baseline.
+
+## 2026-09-01 strict schema bootstrap — Pending
+
+- the task-owned schema draft was not accepted or committed;
+- central archive facts are 6 closed, 12 implementing, 18 validating and 1 review-ready session;
+- the integrator bootstrap schema forbids arbitrary properties and separates historical record kind, observed
+  lifecycle, closure reason, Git identity, lineage and bounded references;
+- W7.4 must merge the exact central schema commit and obtain an allowed scope refresh before resuming product work;
+- no schema weakening, test or product completion is accepted before that gate.

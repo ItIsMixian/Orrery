@@ -19,6 +19,8 @@ Updated: 2026-09-01
 
 ## 当前通过证据
 
+- W7.4 history schema bootstrap 只完成 JSON decode 与 Draft 2020-12 schema self-check；没有运行产品 unittest，
+  也不证明 W7.4 writer、migration、archived-lineage projection 或 UI 已实现。
 - U2.4 Worktree Candidate 保持既有 owner IDs：Unified 16、Graph membership 正负 1、root/template parity 1，
   合计 18/18 focused PASS；Python compile、双根 runtime SHA-256 parity 与 `git diff --check` 通过。修正后真实
   cold start 701 ms 返回 starting，第二启动复用 exact PID/port/instance，55.317 秒后完整 ready；ready-stop 与
