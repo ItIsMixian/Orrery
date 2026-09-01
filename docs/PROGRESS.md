@@ -55,6 +55,9 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 
 ## 活动计划与待办
 
+- [ ] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
+  v0.3.1 Windows 冷启动在约 95 秒完整 render 后才绑定/打开页面；先在 3 秒内提供同一 URL 的 starting page，
+  后台激活完整视图。只跑 focused lifecycle smoke，发布另立任务。
 - [x] [v0.3.1 Windows 启动器紧急发布](implementation/plans/2026-08-31-v0-3-1-launcher-hotfix-release.md)：
   exact `1d9223c...` 的 package/runtime、Promotion、main/tag/Release、远端哈希复核与 v0.3.0 warning 已完成；
   旧失败 SHA/run 均保留且未重试。

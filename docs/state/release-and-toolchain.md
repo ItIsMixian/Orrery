@@ -6,6 +6,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前公开发布
 
+- v0.3.1 修复了 Windows console-child 闪窗与重复 supervisor，但 self-host 冷启动仍在完整 Unified render 后才
+  绑定/打开页面。2026-08-31 实测约 95 秒无可见反馈；服务最终 HTTP 200。U2.4 已登记为未实现 Candidate，
+  目标是先提供同 PID/port 的本地 starting page，再后台完成重关系视图；当前公开资产尚无该修复。
 - Orrery v0.3.1 是当前 Latest Release。protected `main`、annotated tag `v0.3.1` 与公开 Release source 都绑定
   exact `1d9223cb07b94674b58471e0c19addf748b16221`。ZIP SHA-256 为
   `2970fc208d529022b0ac33c2b6a35e9874ef87fa90d67bd0dafb52fc5d2b6445`；checksum 文件 SHA-256 为

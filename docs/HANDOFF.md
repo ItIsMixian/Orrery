@@ -4,6 +4,9 @@ Updated: 2026-08-31
 
 ## 当前停止点
 
+- v0.3.1 用户实测暴露第二个 launcher 问题：首次进程 23:37:41 启动，23:39:16 才 ready，期间没有页面或
+  进度。只读 profile 为 85.013 秒/751 subprocess，主要由 Graph/relation/legacy-session 投影造成；U2.4
+  Immediate Launcher Readiness Plan/Pending Validation 已登记，尚无实现或 patch Release。
 - Orrery v0.3.1 已公开发布为 Latest Release；protected `main`、annotated tag、Release source 均绑定 exact
   `1d9223cb07b94674b58471e0c19addf748b16221`。Promotion run `33465321477` 与 tag workflow
   `33465760947` 全绿，远端 ZIP/checksum 哈希与 exact-Git build 一致。
@@ -58,8 +61,8 @@ Updated: 2026-08-31
 
 ## 当前可继续的线路
 
-- **当前优先：v0.3.1 docs closeout。** 只完成 State／Validation／DEVLOG 与全局入口同步、文档门和 main
-  fast-forward；不得再改产品、tag、Release assets 或重跑已绿 Promotion。
+- **当前优先：U2.4 immediate launcher readiness。** 先绑定同一 loopback URL 并显示 starting page，再后台
+  完成重关系视图；保留 v0.3.1 no-window/reuse/安全边界，只跑 focused lifecycle evidence，不自动发布。
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
 2. **GX2 ELK layout evaluation：** 隔离视觉方向已获维护者接受并冻结 exact provenance；不再继续修改实验。

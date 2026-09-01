@@ -117,6 +117,9 @@ Updated: 2026-08-31
 
 ## 已知缺口
 
+- v0.3.1 launcher smoke 验证了最终 ready/reuse/stop，却没有约束首次可见 HTTP 的时间；因此允许完整关系图
+  先阻塞约 95 秒。U2.4 Pending Validation 新增 starting-page `<3s`、starting-state reuse、background activation
+  与 starting-stop reclamation，仅用 focused lifecycle evidence，不重跑发布矩阵。
 - v0.3.0 final runtime 没有捕获公开 Windows launcher 的连续闪窗缺陷。后续 hotfix Worktree Candidate 已用
   Windows `CREATE_NO_WINDOW` audit 和第二次正常启动的 exact PID／port／instance 复用关闭机械覆盖缺口；没有
   使用桌面自动化或记录人类肉眼闪窗感知，因此主观可见体验仍可由维护者在 patch publication 前手动双击确认。

@@ -19,6 +19,8 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-31 U2.4 Immediate Launcher Readiness](2026-08-31-u2-4-immediate-launcher-readiness.md) — Pending；
+  约束首次 HTTP/loading page、starting-state reuse、后台激活和 starting-stop，避免 v0.3.1 的 95 秒无反馈。
 - [2026-08-31 v0.3.1 Windows Launcher Hotfix Release](2026-08-31-v0-3-1-launcher-hotfix-release.md) — Validated；
   只允许一次 package/runtime/hosted Promotion 链，禁止重放无关套件或覆盖 v0.3.0 资产。
 - [2026-08-31 Windows 启动器闪窗热修](2026-08-31-windows-launcher-console-flash-hotfix.md) — Pending；约束
