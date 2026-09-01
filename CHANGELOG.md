@@ -4,6 +4,16 @@ Project Orrery follows Semantic Versioning for the distributed Skill. Compatibil
 
 Project Orrery 的 Skill 发布遵循语义化版本；与既有项目能否直接兼容，以机器可读的发布清单为准，而不能只看版本号。
 
+## 0.3.1 — 2026-09-01
+
+- Fix repeated Windows command-window flashes by applying the no-window child-process policy throughout the default headless runtime.
+- Reuse an already healthy Orrery supervisor on repeated normal launch instead of starting a duplicate attempt.
+- Preserve explicit `--console` behavior, all existing defaults, and the v0.3.0 compatibility contract.
+
+- 修复 Windows 默认启动时反复闪现命令窗口的问题，为无界面运行链统一应用子进程隐藏策略。
+- 重复正常启动时复用已经健康运行的 Orrery 服务，不再发起第二个 supervisor 尝试。
+- 保持显式 `--console` 行为、现有默认值与 v0.3.0 兼容契约不变。
+
 ## 0.2.0 — 2026-08-18
 
 - Add a stable release manifest with separate Skill, target toolchain, project-manifest, and document-schema versions.

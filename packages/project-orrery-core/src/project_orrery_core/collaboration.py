@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .schema import COLLABORATION_SCHEMA
+from .subprocess_policy import no_window_options
 
 
 COLLABORATION_SCHEMA_VERSION = 1
@@ -337,6 +338,7 @@ def _run_git(repository: Path, *arguments: str, binary: bool = False) -> str | b
         encoding=None if binary else "utf-8",
         errors=None if binary else "replace",
         check=False,
+        **no_window_options(),
         env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
     )
     if completed.returncode:
@@ -354,6 +356,7 @@ def _run_git_mutation(repository: Path, *arguments: str) -> None:
         encoding="utf-8",
         errors="replace",
         check=False,
+        **no_window_options(),
         env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
     )
     if completed.returncode:
@@ -369,6 +372,7 @@ def _git_succeeds(repository: Path, *arguments: str) -> bool:
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         check=False,
+        **no_window_options(),
         env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
     )
     return completed.returncode == 0
@@ -642,6 +646,7 @@ def inspect_worktree_identity(
         encoding="utf-8",
         errors="replace",
         check=False,
+        **no_window_options(),
         env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
     )
     if branch_result.returncode not in {0, 1}:
@@ -1423,6 +1428,7 @@ def _validate_new_branch(repository: Path, branch: str) -> str:
         encoding="utf-8",
         errors="replace",
         check=False,
+        **no_window_options(),
         env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
     )
     if completed.returncode:

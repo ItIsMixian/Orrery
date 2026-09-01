@@ -1,7 +1,7 @@
 {
   "manifest_format": 1,
   "name": "project-orrery-observatory",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "status": "unreleased",
   "legacy_toolchain_version": "0.2.0",
   "template_projection": {
@@ -66,6 +66,7 @@
     "packages/project-orrery-core/src/project_orrery_core/data/orrery-operating-rules-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/data/release-v0.2.0.json",
     "packages/project-orrery-core/src/project_orrery_core/data/release-v0.3.0.json",
+    "packages/project-orrery-core/src/project_orrery_core/data/release-v0.3.1.json",
     "packages/project-orrery-core/src/project_orrery_core/documentation_governance.py",
     "packages/project-orrery-core/src/project_orrery_core/maintenance_cache.py",
     "packages/project-orrery-core/src/project_orrery_core/maintenance.py",
@@ -87,6 +88,7 @@
     "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-capture-v2.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-execution-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relations-v1.json",
+    "packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py",
     "packages/project-orrery-core/src/project_orrery_core/team.py",
     "packages/project-orrery-core/src/project_orrery_core/templates.py",
     "packages/project-orrery-core/src/project_orrery_core/templates/authority/.gitignore",

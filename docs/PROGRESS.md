@@ -4,16 +4,15 @@ Updated: 2026-08-31
 
 ## 当前阶段
 
-Orrery v0.3.0 已于 2026-09-01 公开发布；annotated tag、受保护 `main` 与 Release 均绑定 exact
-`a0a728b1f096650e475a1327d29973f2a1f9e267`。此前受保护的 `origin/main` 包含 SC1 exact
-`a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 只收口文档，产品 source baseline
-`9ee831f0d6f64306fe821f8c70229df54648d3eb` 已经包含平台中立
-Core／CLI／Observatory、四个 Adapter、Broker-only docsite、Authority Meta Model M1／M2、
-W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能力仍为
-`experimental`／`unreleased` 源码，不等于新的公开 Release。
+Orrery v0.3.1 已于 2026-09-01 公开发布；protected `main`、annotated tag 与 Release source 均绑定 exact
+`1d9223cb07b94674b58471e0c19addf748b16221`。Promotion run `33465321477` 与 tag workflow
+`33465760947` 全绿，远端 ZIP/checksum 哈希已复核。v0.3.0 tag 与资产保持 immutable，其 Release 正文已将
+Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority revision `1776629...` 与已发布产品
+历史共同纳入 Canonical main；不产生新的产品版本或资产。
 
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
+| Release／工具链 | v0.3.1 Latest Release 已验证并发布；Windows launcher 闪窗与健康 runtime 复用缺陷关闭，v0.3.0 历史资产未替换 | 仅完成本次 docs closeout；后续通用 release 简化必须另立 Plan |
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate，Phase 0 exact page 已接受 | Final RC 只消费当前 child receipts；不手工重跑 feature suites |
 | Unified Observatory | A4/U2.3/W7.3 已组合为本地 root-only/default-off Candidate；Phase 0 exact page `a2d7737...` 已接受，公开默认仍未切换 | 在 Final RC 中完成 self-contained template、offline scaffold 与 final-archive runtime gate |
@@ -23,6 +22,9 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 当前结论
 
+- v0.3.1 exact `1d9223c...` 的六个 closure IDs 6/6、双根 deterministic package、installed-project
+  start→reuse→stop、双平台 Promotion、tag workflow 与远端资产复核全部 PASS；发布链完成且没有重试 unchanged
+  SHA、运行 full local suite 或使用 Computer Use。
 - CI5 exact SHA `9ee831f` 已完成 Fast 与 Promotion：Promotion run `33235992711` 为 25/25 jobs PASS，Windows／Ubuntu 均聚合 390 tests／27 logical shards；同一 SHA 已进入受保护 `main`。十 lane 合计 23.9 job-min，测试步骤 14.352 分钟，派生 overhead 约 40%，达到冻结目标。
 - self-host branch protection 继续要求 `smoke-test (windows-latest)` 与 `smoke-test (ubuntu-latest)`，并对管理员生效。普通 `main` push 只运行 Fast，不重复 Promotion。
 - Authority M2 的 `candidate_ready` 不等于 `release_ready`；公开 v0.2.0 manifest 仍不声明模型 1。
@@ -39,7 +41,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 - S0 `orrery-dispatch` 两文件 source 与 PO enforcement 已进入本地 integration line并安装到当前本机 Codex home；标准 Skill 校验、generic routing 与本地门通过。它未发布，也不是 S1 Conductor 或宿主级 first-write enforcement。
 - PO1 source Candidate `93ddfb7` 已进入本地 integration line：dispatch Skill 强制非整合任务使用 `PO-DEC-*`，repository gate 拒绝同树重复正式 ADR 编号；A4 已规范化为 ADR-0019。
 - A4/U2.3 在合入 W7.3 前的 local integration 为 Core 0.1.18、CLI 0.1.22、Observatory 0.1.18、Harness JSON 0.1.2；其 Fast 84/84、Checkpoint 89/89、Unified/Personal 25/25 和 390px Browser 回执作为 child evidence 保留，仍不等于 public/default/release。
-- 当前中央组件为 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19、Harness JSON 0.1.2。W7.3 `44ea200` 与
+- 当前发布组件为 Core 0.1.20、CLI 0.1.22、Observatory 0.1.20、Harness JSON 0.1.2。W7.3 `44ea200` 与
   CI7 `111f4ab` 已合流；current fingerprint `0eea7f...` 在 `f41b659...` 上一次 Fast 3/3、一次 Checkpoint
   4/4 PASS，均 evidence-eligible、zero rerun。旧 fingerprint 的 Checkpoint failure 保留。
 - `V0.3.0-final-rc` 已从任务说明版本 `88d80df...` 注册到独立 Sol-medium worktree。scope revision 1 只读
@@ -53,9 +55,9 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [v0.3.1 Windows 启动器紧急发布](implementation/plans/2026-08-31-v0-3-1-launcher-hotfix-release.md)：
-  ADR-0024 已接受单一短发布链；从 exact hotfix Candidate 出发，不重放无关套件，只做 package/runtime 与一次
-  hosted Promotion，green 后连续完成 main/tag/Release 和 v0.3.0 warning。
+- [x] [v0.3.1 Windows 启动器紧急发布](implementation/plans/2026-08-31-v0-3-1-launcher-hotfix-release.md)：
+  exact `1d9223c...` 的 package/runtime、Promotion、main/tag/Release、远端哈希复核与 v0.3.0 warning 已完成；
+  旧失败 SHA/run 均保留且未重试。
 - [x] [Windows 启动器闪窗热修](implementation/plans/2026-08-31-windows-launcher-console-flash-hotfix.md)：
   Worktree Candidate `8f60fac...`／product `06a277d...` 已通过 focused tests 与 Windows 机械 smoke；中央整合和
   patch publication 由 v0.3.1 Release Plan 持有。
@@ -103,6 +105,6 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 单次完成 v0.3.1 release-input/package/Windows smoke 与 exact-SHA hosted Promotion。
-2. Green 后直接发布 v0.3.1 为 Latest，并给 v0.3.0 添加升级警告；旧 tag/资产保持不变。
-3. 后续再单独精简通用发布流程；不阻塞本次紧急 patch。
+1. 完成本次 v0.3.1 docs-only closeout merge，并保持 release tag/assets 不再变化。
+2. 后续如需精简通用发布流程，另立 ADR／Design／Plan 与 Pending Validation。
+3. alias、scheduler、auto-delete、独立组件发行与新 UI 继续按现有边界延期。

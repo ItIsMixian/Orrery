@@ -1,6 +1,6 @@
 # Validation: Orrery v0.3.1 Launcher Hotfix Release
 
-Status: Pending Validation
+Status: Validated
 
 Date: 2026-08-31
 
@@ -8,15 +8,15 @@ Plan: [v0.3.1 Launcher Hotfix Release](../implementation/plans/2026-08-31-v0-3-1
 
 ## Required evidence — one pass each
 
-- [ ] exact hotfix Candidate `8f60fac...` and product `06a277d...` reviewed without additional product scope;
-- [ ] version/manifest/notes identify v0.3.1 and exclude alias/scheduler/DSH/auto-delete;
-- [ ] two exact-Git builds produce identical entry receipt, ZIP and checksum;
-- [ ] extracted Windows archive reaches HTTP 200, second normal launch reuses PID/port, and stop leaves no marker,
+- [x] exact hotfix Candidate `8f60fac...` and product `06a277d...` reviewed without additional product scope;
+- [x] version/manifest/notes identify v0.3.1 and exclude alias/scheduler/DSH/auto-delete;
+- [x] two exact-Git builds produce identical entry receipt, ZIP and checksum;
+- [x] extracted Windows archive reaches HTTP 200, second normal launch reuses PID/port, and stop leaves no marker,
   process or listener; no Computer Use is invoked;
-- [ ] one exact non-main Promotion run yields both required Windows/Ubuntu checks green;
-- [ ] protected main, annotated tag and Release assets all bind the same exact SHA;
-- [ ] remote ZIP/checksum verification passes;
-- [ ] v0.3.0 assets remain unchanged and its Release notes visibly direct Windows users to v0.3.1.
+- [x] one exact non-main Promotion run yields both required Windows/Ubuntu checks green;
+- [x] protected main, annotated tag and Release assets all bind the same exact SHA;
+- [x] remote ZIP/checksum verification passes;
+- [x] v0.3.0 assets remain unchanged and its Release notes visibly direct Windows users to v0.3.1.
 
 ## Cost/refusal record
 
@@ -25,7 +25,10 @@ retried; record the failed identity and stop for a new exact-SHA correction.
 
 ## Result
 
-Pending. No v0.3.1 manifest, tag, asset or remote Release exists under this task-description version.
+PASS. Orrery v0.3.1 is the verified Latest Release. Product/tag source exact
+`1d9223cb07b94674b58471e0c19addf748b16221`; Promotion run `33465321477` and tag workflow run `33465760947`
+are green. Remote ZIP/checksum hashes match the exact-Git build, and v0.3.0 retains its original tag/assets while
+visibly directing Windows users to v0.3.1.
 
 ## 2026-08-31 revision-1 metadata stop and revision-2 acceptance
 
@@ -84,3 +87,26 @@ platforms; only the audit-path implementation failed on Linux under its explicit
 Revision 7 may apply only the exact three-cause correction in the Plan, execute those six IDs once on a new SHA, and
 then recreate package/runtime/Promotion evidence. No main/tag/Release or v0.3.0 edit occurred; the old run is immutable
 and not retried.
+
+## 2026-09-01 final release evidence
+
+- revision-7 correction commit: `1d9223cb07b94674b58471e0c19addf748b16221`;
+- exact six-ID run: 6/6 PASS in 54.037 seconds, once;
+- deterministic build: two fresh 164-entry roots produced ZIP
+  `2970fc208d529022b0ac33c2b6a35e9874ef87fa90d67bd0dafb52fc5d2b6445`, checksum-file
+  `1650f51f76b8f24362aeb6929eb0ebac6166b7e20239d400c085d9bd3b440e78` and receipt
+  `926f98a489be29570b1a144bdd6ee7fd15f19f4d3de5fe22644d4f86e11c4ba9` byte-identically;
+- installed-project runtime: HTTP 200; second launch reused PID `212636`, port `8765` and instance
+  `f6438cedcca648b1a625078316fef2c0`; second exit 0; stop 202; marker/listener/PID/matching process all zero;
+- exact non-main Promotion: run `33465321477` PASS, including both named required checks;
+- protected main and annotated `v0.3.1`: exact `1d9223c...`; tag workflow `33465760947` PASS;
+- GitHub Release: `https://github.com/ItIsMixian/Orrery/releases/tag/v0.3.1`, non-draft/non-prerelease;
+- remote re-download: ZIP and checksum-file hashes match the deterministic build; checksum content declares the
+  same ZIP hash;
+- v0.3.0: annotated tag remains exact `a0a728b1f096650e475a1327d29973f2a1f9e267`; asset digests remain
+  `sha256:12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385` (ZIP) and
+  `sha256:599b416d5b03a74665e1e9c5864b4902ab13ba9037956d3ef04919a45737e011` (checksum file); only the Release
+  body gained the Windows warning/link.
+
+No Computer Use, retry of an unchanged non-green SHA, full local suite, manual lane replay, DSH/alias/scheduler/
+auto-delete scope or historical asset replacement occurred.

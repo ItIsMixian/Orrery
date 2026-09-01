@@ -4,9 +4,9 @@ Updated: 2026-08-31
 
 ## 当前验证体系
 
-- ADR-0024 的 v0.3.1 emergency patch 禁止重放无关 child suites 或本地完整 Candidate。它只消费 exact v0.3.0
-  Promotion 与 hotfix child receipts，新增两次快速 exact-Git build、一次 extracted Windows launcher smoke，
-  最终仍只运行一次 exact-SHA Windows/Ubuntu required Promotion；同 SHA non-green 不重试。
+- ADR-0024 的 v0.3.1 emergency patch 已完成。它没有重放无关 child suites 或本地完整 Candidate；最终 exact
+  `1d9223c...` 只运行六个旧 Promotion 失败 ID、两次 exact-Git build、一次 installed-project Windows launcher
+  smoke 与一次 exact-SHA Windows/Ubuntu Promotion。同 SHA non-green 没有重试。
 - 验证分为 `Fast → Checkpoint → Candidate → Promotion`。Fast 只提供局部反馈；Checkpoint 证明 Workstream checkpoint；Candidate 运行完整本地门；Promotion 绑定 non-main exact SHA、规定 OS 和 required checks。
 - Fast 使用 15 秒预算；Checkpoint 使用 90 秒预算；完整 Promotion 保留每个 final unittest ID、动态 build、结构／docsite／链接／发布包／diff gate 与安全预算。
 - CI6 integration baseline inventory 为 404 unique unittest IDs、27 logical shards、10 physical lanes/OS、88 Fast、89 Checkpoint；U2 登记后为 415，U2.1 将四组新断言折叠进既有 owner test IDs，registry inventory 保持 415。`team-relations-execution` 保持独立 300 秒 Promotion 预算。
@@ -19,6 +19,19 @@ Updated: 2026-08-31
 
 ## 当前通过证据
 
+- v0.3.1 release exact `1d9223cb07b94674b58471e0c19addf748b16221` 的六个失败 ID 一次运行 6/6 PASS；
+  两个 fresh root 的 164-entry exact-Git build byte-identical，ZIP SHA-256 为 `2970fc208d529022b0ac33c2b6a35e9874ef87fa90d67bd0dafb52fc5d2b6445`，
+  checksum 文件 SHA-256 为 `1650f51f76b8f24362aeb6929eb0ebac6166b7e20239d400c085d9bd3b440e78`，
+  receipt SHA-256 为 `926f98a489be29570b1a144bdd6ee7fd15f19f4d3de5fe22644d4f86e11c4ba9`。
+- 同一 exact archive 的 fresh installed-project smoke 为 HTTP 200；第二次正常启动复用 PID `212636`、port
+  `8765` 与 instance，exit 0；stop 为 202，marker/listener/PID/matching process 均归零。没有调用 Computer Use。
+- Promotion run `33465321477` 的 preflight、双平台 repository gates、20 个 lanes 与两个 required smoke checks
+  全部 PASS；tag workflow `33465760947` 的 portable installation、tagged package 与 checksum 也 PASS。
+- Windows launcher hotfix Worktree Candidate product exact `06a277d...` 已完成 Unified 16/16、template/runtime
+  inventory 1/1、source scaffold parity 1/1 与 Python compile／diff checks。一次 clean Windows VBS smoke 保持
+  PID／port／instance 全相同，记录单次 ready／单次 reuse；760 条两进程 audit 覆盖 11 个生产 child caller，
+  全部为 `CREATE_NO_WINDOW=134217728`，0 invalid。stop 后 marker／PID／listener 均回收。此为 focused mechanical
+  evidence，不是 Fast／Checkpoint／Candidate／Promotion 或发布证据。
 - CI5 本地 contract/mutation 17/17 PASS；inventory 为 390／27／10／57／81，无 missing、duplicate 或 dead selector。
 - CI5 本地 Fast 57/57 为 3.235952s；最终两次 Checkpoint 均为 81/81，42.806990s／43.071302s，预算未调高。120.961576s 的真实 Git journey 只保留在 Promotion。
 - exact SHA `9ee831f0d6f64306fe821f8c70229df54648d3eb` 的 Fast run `33235942078` 成功；Promotion run `33235992711` 为 25/25 jobs PASS，Windows／Ubuntu required checks 双 PASS，各自聚合 390 tests／27 shards。
@@ -104,10 +117,10 @@ Updated: 2026-08-31
 
 ## 已知缺口
 
-- v0.3.0 final runtime 验证证明了 start/HTTP/stop/restart 和 stale-marker recovery，但没有观测 Windows
-  GUI-parent 下 console-subsystem child 的可见窗口，也没有覆盖第二次正常点击应复用已运行 supervisor；因此
-  没有捕获公开 Windows launcher 的连续闪窗缺陷。新的热修只允许 focused contract 加一次真实 Windows
-  launcher smoke，完整 Candidate/Promotion 留给后续 patch-release scope。
+- v0.3.0 final runtime 没有捕获公开 Windows launcher 的连续闪窗缺陷。后续 hotfix Worktree Candidate 已用
+  Windows `CREATE_NO_WINDOW` audit 和第二次正常启动的 exact PID／port／instance 复用关闭机械覆盖缺口；没有
+  使用桌面自动化或记录人类肉眼闪窗感知，因此主观可见体验仍可由维护者在 patch publication 前手动双击确认。
+  完整 Candidate／Promotion 和 patch publication 仍属于后续 release scope。
 - v0.3.0 release-input Fast 75／Checkpoint 81 与 bounded Focused 均在测试加载前拒绝。后续 Candidate dry-run
   在 merge `0f82d565...` 上选择 81 tests，acceptance=`shadow-allow`、timing=`allow`、runner_errors=[]；
   `successful=false/evidence_eligible=false` 只是所有 dry-run 的固定非证据语义，reuse refusal 不阻止 fresh

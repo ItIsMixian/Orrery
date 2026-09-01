@@ -777,8 +777,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         )
         versions = json.loads((ROOT / "packages" / "component-versions.json").read_text(encoding="utf-8"))
         mapping = json.loads((ROOT / "scripts" / "ci" / "change-mapping.json").read_text(encoding="utf-8"))
-        self.assertEqual(component["version"], "0.1.19")
-        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.19")
+        self.assertEqual(component["version"], "0.1.20")
+        self.assertEqual(versions["components"]["observatory"]["version"], "0.1.20")
         test_ids = [item["test_id"] for item in mapping["tests"]]
         self.assertTrue(any(value.startswith("test_workstream_relation_graph_observatory.") for value in test_ids))
         self.assertTrue(any(value.startswith("test_workstream_graph_visual_prototype.") for value in test_ids))

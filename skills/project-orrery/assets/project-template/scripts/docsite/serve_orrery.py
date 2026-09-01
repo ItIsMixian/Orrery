@@ -20,7 +20,9 @@ from http.cookies import SimpleCookie
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.error import URLError
 from urllib.parse import parse_qs, urlsplit
+from urllib.request import Request, urlopen
 
 
 HERE = Path(__file__).resolve()
@@ -36,6 +38,7 @@ import build_unified_observatory  # noqa: E402
 import serve as legacy_serve  # noqa: E402
 from project_orrery_cli.operating_rules import preflight_repository_query  # noqa: E402
 from project_orrery_core.maintenance import maintenance_status  # noqa: E402
+from project_orrery_core.subprocess_policy import no_window_options  # noqa: E402
 from project_orrery_observatory.active_task_projection import (  # noqa: E402
     build_active_task_projection,
     collect_active_task_detail,
@@ -65,6 +68,7 @@ def _git_private_path(relative: str) -> Path:
     completed = subprocess.run(
         ["git", "rev-parse", "--git-path", relative], cwd=ROOT,
         capture_output=True, text=True, check=False,
+        **no_window_options(),
     )
     if completed.returncode != 0:
         raise RuntimeError("Unified Observatory requires an Orrery Git worktree")
@@ -120,6 +124,46 @@ class RuntimeIdentity:
         if _pid_alive(previous.get("pid")):
             raise RuntimeError("another Unified Observatory supervisor is already running")
         self.marker.unlink(missing_ok=True)
+
+    def reusable_url(self) -> str | None:
+        """Return one healthy live runtime URL, recover stale state, or fail closed."""
+        if not self.marker.exists():
+            return None
+        try:
+            previous = json.loads(self.marker.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise RuntimeError("runtime identity is corrupt; refusing replacement") from exc
+        pid = previous.get("pid")
+        if not _pid_alive(pid):
+            self.marker.unlink(missing_ok=True)
+            return None
+        port = previous.get("port")
+        expected_url = f"http://127.0.0.1:{port}/" if isinstance(port, int) else None
+        if (
+            previous.get("contract_type") != "unified-observatory-runtime-identity-v1"
+            or previous.get("host") != "127.0.0.1"
+            or not isinstance(port, int) or isinstance(port, bool) or not (1 <= port <= 65535)
+            or previous.get("url") != expected_url
+            or previous.get("ready") is not True
+        ):
+            raise RuntimeError("live runtime identity is invalid; refusing replacement")
+        health_url = f"http://127.0.0.1:{port}/api/v1/health"
+        request = Request(health_url, headers={"Host": f"127.0.0.1:{port}", "Accept": "application/json"})
+        try:
+            with urlopen(request, timeout=1.5) as response:
+                if response.status != HTTPStatus.OK:
+                    raise RuntimeError(f"health returned HTTP {response.status}")
+                payload = json.loads(response.read(BODY_LIMIT + 1).decode("utf-8"))
+        except (OSError, URLError, UnicodeDecodeError, json.JSONDecodeError, RuntimeError) as exc:
+            raise RuntimeError("live Unified Observatory is unhealthy; refusing replacement") from exc
+        if (
+            not isinstance(payload, dict)
+            or payload.get("contract_type") != "unified-observatory-health-v1"
+            or payload.get("status") != "ready"
+            or payload.get("single_visible_url") is not True
+        ):
+            raise RuntimeError("live Unified Observatory is unhealthy; refusing replacement")
+        return expected_url
 
     def ready(self, *, port: int) -> None:
         value = {
@@ -524,7 +568,10 @@ def _legacy(console: bool, no_browser: bool) -> int:
     if no_browser:
         environment["DOCSITE_NO_BROWSER"] = "1"
     command = [sys.executable, "-X", "utf8", str(HERE.parent / "serve.py")]
-    return subprocess.call(command, cwd=ROOT, env=environment)
+    return subprocess.call(
+        command, cwd=ROOT, env=environment,
+        **no_window_options(enabled=not console),
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -541,6 +588,14 @@ def main(argv: list[str] | None = None) -> int:
     logger = _logger(identity, console=arguments.console)
     server: UnifiedServer | None = None
     try:
+        if not arguments.console:
+            existing_url = identity.reusable_url()
+            if existing_url is not None:
+                url = f"{existing_url}#overview"
+                logger.info("reusing healthy runtime url=%s visible_urls=1", url)
+                if not arguments.no_browser:
+                    webbrowser.open(url)
+                return 0
         identity.recover()
         page, _stats, registrations, authority, graph_provider_payload, fact_rules_projection = build_unified_observatory.render_unified_site(
             ROOT, mode="dynamic", ai_available=legacy_serve.PROVIDER is not None,

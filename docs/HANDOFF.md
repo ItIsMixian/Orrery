@@ -4,13 +4,15 @@ Updated: 2026-08-31
 
 ## 当前停止点
 
-- v0.3.0 Windows launcher 严重闪窗/重复启动缺陷已有 clean Worktree Candidate `8f60fac...`，product exact
-  `06a277d...` 的 focused tests 与机械 Windows smoke PASS。ADR-0024 已接受 v0.3.1 紧急 patch 和单次短发布
-  链；尚未中央整合、Promotion 或发布，v0.3.0 tag/资产保持 immutable。
-- 公开版本现为 Orrery v0.3.0；tag/main 指向 exact `a0a728b...`，GitHub Release 与两个远端资产已验证。
-- `V0.3.0-final-rc` exact `a0a728b...` 已完成 Candidate 56/56、双根 byte-identical package、完整
-  Windows final runtime 与剩余 2-ID closure；前三个 Promotion run FAIL 保留，run `33456504779` 双平台 PASS。
-- v0.3.0 发布流程已完成；后续不得移动 tag、替换资产或把修复写回同一 Release，必须使用新的 patch 版本。
+- Orrery v0.3.1 已公开发布为 Latest Release；protected `main`、annotated tag、Release source 均绑定 exact
+  `1d9223cb07b94674b58471e0c19addf748b16221`。Promotion run `33465321477` 与 tag workflow
+  `33465760947` 全绿，远端 ZIP/checksum 哈希与 exact-Git build 一致。
+- v0.3.1 已关闭 Windows 默认 launcher 的 Git console child 闪窗与重复 supervisor 启动：installed-project
+  smoke 为 HTTP 200、同 PID/port/instance reuse、stop 202，随后 marker/listener/process 全部归零。
+- v0.3.0 tag 仍为 exact `a0a728b...`，历史 ZIP/checksum assets 未替换；其 Release 正文顶部已添加严重
+  Windows warning 和 v0.3.1 链接。v0.2.0 历史标识同样未改。
+- 当前 integration worktree 正在把 authority revision `1776629...` 与已发布 release ancestry `1d9223c...`
+  合并为 docs closeout；产品、tag、Release assets 与版本均不再改变。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
 - CI5 exact `9ee831f` 的 Fast 与 Promotion 已完成：Promotion run `33235992711` 为 25/25 jobs PASS，双平台 required checks 均通过，Windows／Ubuntu 各聚合 390 tests／27 logical shards；同一 SHA 已进入 main。
 - 当前本地 integrated Candidate 的未发布组件为 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19；Harness JSON 为 0.1.2，其余 Adapter 为 0.1.1，支持状态仍为 `experimental`／`unreleased`。
@@ -56,9 +58,8 @@ Updated: 2026-08-31
 
 ## 当前可继续的线路
 
-- **当前优先：v0.3.1 emergency patch。** 从 exact `8f60fac...` 建立独立 Sol-medium release worktree，只跑
-  release metadata、两次 package、一次 Windows smoke 和一次 hosted Promotion；green 后连续 main/tag/Release
-  并给 v0.3.0 加警告，不替换其资产。
+- **当前优先：v0.3.1 docs closeout。** 只完成 State／Validation／DEVLOG 与全局入口同步、文档门和 main
+  fast-forward；不得再改产品、tag、Release assets 或重跑已绿 Promotion。
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
 2. **GX2 ELK layout evaluation：** 隔离视觉方向已获维护者接受并冻结 exact provenance；不再继续修改实验。
@@ -77,7 +78,7 @@ Updated: 2026-08-31
 13. **U2.3 shell closeout：** 已完成、本地集成并进入 Phase 0 accepted page；只读/zero-network/无全 worktree 重扫描边界保持。后续只在 Final RC 做 public-template/final-archive runtime，不单独继续 U2.3。
 14. **CI7 validation governance：** clean `111f4ab` 与 current fingerprint fresh Fast 3/3、Checkpoint 4/4
     已完成；旧 refusal/failure 不被覆盖。下一步不再重跑 Phase 0 formal stages，Promotion 留给 Final RC。
-15. **v0.3.0 Final RC：** `V0.3.0-final-rc` 已从 exact `88d80df...` 注册在独立 branch/worktree。revision 1
+15. **v0.3.0 Final RC（历史已完成）：** `V0.3.0-final-rc` 已从 exact `88d80df...` 注册在独立 branch/worktree。revision 1
     只读返回 162-entry inventory（path-list SHA-256 `26d65705...`）并在零写入／零测试状态停下；中央 revision 2
     已授权并实现 CLI→Core 0.1.19 pin、自包含 offline scaffold runtime projection 与 canonical release notes。
     三个产品提交已选择性进入中央，中央 baseline 为 `ef145180...`；任务分支 75/81 CI7 dry-run 在加载测试前
@@ -91,8 +92,7 @@ Updated: 2026-08-31
     Promotion run `33449930707` 在 lanes 前因 machine lane-list stdout 被 docsite 日志污染而失败关闭；run
     `33451288289` 完整执行但暴露 36 个集成漂移 ID；`33454661325` 将其缩到 5 个仍 non-green。scope revision
     18 exact `a0a728b...` 已完成 Candidate 56/56、双根 package、完整 final runtime 与 2-ID closure PASS；
-    run `33456504779` 已双平台 PASS，现在只可推广同 SHA 到 protected main。
-    最终仍停在 GitHub Release 创建/asset upload 前。
+    run `33456504779` 已双平台 PASS；同 SHA main/tag/GitHub Release 与远端资产验证随后完成。该线不再继续。
 
 ## 不得外推的边界
 
@@ -115,7 +115,7 @@ Updated: 2026-08-31
 
 ## 发布与兼容边界
 
-- v0.2.0 release asset 继续使用 `project-orrery-v0.2.0.*`，checksum 为历史事实；首个新 Release 也必须遵守 ADR-0015 的稳定技术 ID 契约。
+- v0.3.1 是当前 Latest Release；v0.3.0/v0.2.0 资产与 checksum 保持历史事实。所有后续 Release 继续遵守 ADR-0015 的稳定技术 ID 契约。
 - Core／CLI／Observatory 尚未形成独立公开 wheel/release；Codex、Claude、DeepSeek、Harness JSON Adapter 均未独立发布。
 - Codex verified evidence 只覆盖记录的 Windows／runtime／Adapter 0.1.0／Core 0.1.0／CLI 0.1.0 范围；DeepSeek 只覆盖记录的 rc.8／Windows／Adapter 0.1.0／Core 0.1.0／CLI 0.1.1 wheel／模型范围。
 - v0.2.0 ZIP 在不同 OS 重建尚非 byte-for-byte 相同；不要宣称跨平台可重复打包已经解决。

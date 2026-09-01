@@ -15,6 +15,8 @@ import stat
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .subprocess_policy import no_window_options
+
 
 PROGRAM_SCHEMA_VERSION = 1
 GROUP_KINDS = ("program", "phase")
@@ -105,6 +107,7 @@ def hierarchy_storage_root(project_root: Path) -> Path:
         ["git", "-C", str(root), "rev-parse", "--git-common-dir"], capture_output=True,
         text=True, encoding="utf-8", errors="replace", check=False,
         env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
+        **no_window_options(),
     )
     if completed.returncode:
         raise ValueError("program hierarchy requires a local Git repository")

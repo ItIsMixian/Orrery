@@ -6,62 +6,41 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前公开发布
 
-- Orrery v0.3.0 是当前公开 Release。annotated tag 指向 exact `a0a728b1f096650e475a1327d29973f2a1f9e267`；
-  ZIP SHA-256 为 `12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385`。v0.2.0 tag、
-  ZIP 与历史 manifest 保持不变。
-- v0.3.0 Windows 默认入口存在一个已确认的启动体验缺陷。clean Worktree Candidate `8f60fac...`／product
-  `06a277d...` 已实现统一 no-window policy 与健康 runtime 复用，并完成 focused/机械 Windows smoke；它尚未
-  中央整合或发布。ADR-0024 选择 v0.3.1 紧急 patch，保持 v0.3.0 tag/资产不变并在新版本发布后追加警告。
-- local central `ef145180...` 已包含 v0.3.0 release-input Candidate：release-candidate manifest、162-entry
-  exact-Git builder、自包含 Core/CLI/Observatory runtime、Unified template launchers 和人工 publication 边界。
-  task merge `0f82d565...` 的 Candidate preview 已允许 fresh run，但尚无 exact-SHA Candidate/Promotion/public
-  evidence；exact `ac44630...` 的 stale expectation 已在 scope revision 5 单行修正。`ba230555...` 已取得
-  Candidate 81/81、双根 byte-identical package 与一次 external offline new-project PASS，但仍无
-  dual-platform Promotion/public evidence。
-- scope revision 6 已获得 final runtime、exact non-main Promotion、同 SHA protected main 与 annotated tag 的
-  action-time authorization；首个 runtime orchestration 在安装前因 PowerShell `$home`/`$HOME` 冲突停止且
-  未改变用户状态。corrected runtime 随后通过 Codex/Unified/upgrade/migration/Skill lifecycle，但 final ZIP
-  direct Harness validate 因 extracted release-root assets 无法解析而 exit 3。scope revision 8 exact
-  `e120aaa...` 已修复并完成 Candidate/package/final runtime PASS。Promotion run `33449930707` 在任何 lane 前因
-  lane-list stdout 污染 `$GITHUB_OUTPUT` 而 non-green。scope revision 9 exact `4556db3...` 的 Candidate/package/
-  runtime 已 PASS，可 fast-forward Promotion ref；GitHub Release create/upload 仍未授权。
-- Promotion run `33451288289` 在 exact `4556db3...` 上通过 preflight 与双平台 repository gates，但完整矩阵
-  暴露 36 个集成漂移测试并失败关闭。scope revisions 10–15 将三处产品缺口、test-only dependency、过期
-  fixture/断言和 release-gate mapping 收口到 exact `76a6961...`；该 SHA 的 Candidate 100/100、双根 package
-  与完整 final runtime 已 PASS。下一动作仅是 exact non-main Promotion；main/tag/Release 仍未发生。
-- Promotion run `33454661325` 将旧失败集缩到 5 个 ID 后仍失败关闭。revisions 16–18 完成 current-version
-  test、VBS byte parity、multiline ADR relation、UTF-8 CLI 和 Observatory parser 收口；exact `a0a728b...` 的
-  Candidate 56/56、双根 package、完整 final runtime 与剩余 2-ID closure PASS。下一动作是该 SHA Promotion。
-- exact `a0a728b...` Promotion run `33456504779` 已 PASS：Windows／Ubuntu 各完整聚合 451 tests、27 shards、
-  10 lanes，repository gates 与两个 required checks 均 green。下一动作是同 SHA protected main；tag/Release
-  仍未发生。
-- 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
-- v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
-- 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。
-- ADR-0021 已接受 0.3.0 release/default/distribution contract：新项目 Unified/Model 1/Rules 1，旧项目 legacy
-  until explicit migration，单一 self-contained ZIP + checksum，Codex final runtime blocker，tag/Release 分权。
-  W7.3/CI7 本地中央合流、routed Fast/Checkpoint 与 exact page `a2d7737...` 接受均已完成；Final RC 已注册，
-  public manifest/tag/assets 均仍为 0.2.0。
-- ADR-0022 的 pinned local ELK.js layout-only engine、vendor/license/provenance 与产品接线已进入本地 source；
-  它们尚未进入 final self-contained ZIP、deterministic receipt 或公开资产。
-- ADR-0023 的 frozen legacy geometry 作为显式本地兼容后手保留且禁止自动回退；维护者已接受 W7.3 收口
-  方向，最终整页 acceptance 仍与发布授权分离。
+- Orrery v0.3.1 是当前 Latest Release。protected `main`、annotated tag `v0.3.1` 与公开 Release source 都绑定
+  exact `1d9223cb07b94674b58471e0c19addf748b16221`。ZIP SHA-256 为
+  `2970fc208d529022b0ac33c2b6a35e9874ef87fa90d67bd0dafb52fc5d2b6445`；checksum 文件 SHA-256 为
+  `1650f51f76b8f24362aeb6929eb0ebac6166b7e20239d400c085d9bd3b440e78`。
+- v0.3.1 修复 Windows 默认 headless 启动链的 Git console child 闪窗，并在正常重复启动时复用健康
+  runtime。显式 `--console`、Personal 默认 zero-network、Team opt-in/request-only、schema 与协作语义不变。
+- v0.3.0 annotated tag 仍指向 exact `a0a728b1f096650e475a1327d29973f2a1f9e267`；历史 ZIP SHA-256 仍为
+  `12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385`。其两个资产未替换，Release 正文顶部
+  已增加 Windows 升级警告并链接 v0.3.1。v0.2.0 tag、资产与历史 manifest 同样保持不变。
+- 默认安装继续 create-only；`--upgrade-tools` 只处理白名单托管工具并先备份。作者文档、凭据、缓存、
+  Git-private state、生成站点和本机 benchmark 不进入发布包。
+- 当前展示品牌为 Orrery；`project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、
+  `.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 保持稳定。
 
 ## 当前 Canonical source
 
-- protected `origin/main` 已包含 docs-only SC1 exact `a9369dd`；产品 source baseline `9ee831f` 不对应新 tag 或 Release。
-- A4/U2.3/W7.3 local integrated Candidate 声明 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19；内部 relation capture schema 2 与 Graph projection schema 2 不变，组件总状态仍为 `unreleased`，Core API／CLI 顶层 JSON schema 仍为 1。Observatory 随包携带固定 `elkjs@0.11.0` bundle、EPL-2.0 license、package metadata 与 hash-bound provenance，运行时保持 zero-network。
+- protected `origin/main` 的 v0.3.1 产品 source baseline 为 exact `1d9223c...`；本 closeout 合并同时保留
+  exact authority revision `1776629...` 的原始提交历史。
+- 当前发布组件声明 Core 0.1.20、CLI 0.1.22、Observatory 0.1.20；内部 relation capture schema 2、Graph
+  projection schema 2 与 Core API／CLI 顶层 JSON schema 1 不变。Observatory 随包携带固定 `elkjs@0.11.0`
+  bundle、EPL-2.0 license、package metadata 与 hash-bound provenance，运行时保持 zero-network。
 - Codex、Claude Code 与 DeepSeek Harness Adapter source 保持 0.1.1；Harness JSON 因新增有界 relation `suggest`／`inspect` 请求推进到 0.1.2。各 Adapter 的 runtime evidence 继续不能互相外推，Harness 不获得 confirmation 权限。
 - Codex verified evidence 只覆盖记录的 Windows 11 build 26200、`codex-cli 0.148.0-alpha.21`、Adapter/Core/CLI 0.1.0、模型和审批范围。
 - DeepSeek verified evidence 只覆盖记录的 rc.8、Windows、Adapter 0.1.0、Core 0.1.0、CLI 0.1.1 wheel、`deepseek-official`／`deepseek-v4-flash` 与生命周期范围。
 - Claude Code 2.1.87 只完成 Plugin／Skill 发现与认证前失败关闭；没有成功模型路由。Harness JSON 证明 subprocess JSON 合约，不证明第三方 Agent runtime 兼容。
-- Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 local release-candidate gate 已进入 source；公开 manifest、standalone installer 和默认 managed Observatory 尚未声明或启用模型 1。
-- Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入 source，但没有进入默认 Skill template、managed-tool inventory 或 public release。
-- Unified Observatory 当前本地中央 Candidate 组合 A4/U2.3/W7.3，提供单一连续中文导航、规则帮助、轻量活动任务、关系待确认、全局 stop、密集 Maintenance、旧证据降级与 pinned-ELK/legacy 同事实 Graph。仍没有默认/public launcher、managed-tool/public-template/installer transition 或 Release。
+- Authority Model 1 fixture/evaluator、内部 CLI bundle、migration／restore、root-only projection 与 managed
+  Observatory 已进入 v0.3.1 public archive；它们仍不构成稳定公共 domain API 或独立组件发行。
+- Broker-only docsite、W1–W7 collaboration、Personal／Team／Maintenance／Graph root-only consumers 已进入
+  v0.3.1 Skill template 与 managed-tool inventory；旧项目仍需显式升级/迁移，Team 默认不启用。
+- Unified Observatory 的单一连续中文导航、规则帮助、轻量活动任务、关系待确认、全局 stop、Maintenance
+  与 pinned-ELK/explicit-legacy Graph 已公开包含在 v0.3.1；完整英文模式、scheduler 与自动删除仍不存在。
 - S0 新增未发布 `skills/orrery-dispatch/` source Candidate，只包含 `SKILL.md` 与 `agents/openai.yaml`。它把 ADR-0018 的 authority handoff 投影为 Codex Skill 指令，面向用户称“任务说明版本”；没有 script／asset／reference／service／schema／network，也未进入当前 `project-orrery` Skill、installer、release manifest 或 v0.3.0 范围。
 - PO1 在同一 `SKILL.md` 内补充 ADR-0007 PO allocation；仍无新 Skill 文件或发布资产。local integration `8b73f26` 后，两文件已按 SHA-256 一致性校验复制到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，但没有进入 release manifest 或公共分发。
-- U2.3 只更新 source Observatory 与 root self-host builder/server：发布 dry build 仍为冻结 v0.2.0 Skill archive，且排除 Git-private session、cache、凭据与生成站点。它没有修改 release manifest、proposal、tag、public/default consumer 或 CI routing policy。
-- 发布源码中的 Skill 已携带 A4 inventory 投影与 bootstrap/preflight 指令，但 `release-manifest.json`、tag、ZIP、checksum 和 phase-0 fixture 未改；因此“source 分发已接线”与“公开 v0.2.0 已发布”分别为 present/absent。
+- v0.3.1 release manifest、tag、ZIP、checksum 与 phase fixture 已同步；Git-private session、cache、凭据与
+  生成站点继续排除。U2.3/CI7 的测试路由策略没有因 launcher patch 改变。
 
 ## CI 与推广门
 
@@ -108,6 +87,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `.github/workflows/fast-validation.yml`, `.github/workflows/validate.yml`
 - `scripts/ci/`, `tests/test_ci_validation.py`
 - `scripts/docsite/build_unified_observatory.py`, `scripts/docsite/serve_orrery.py`
+- `packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py`
+- [Windows launcher console-flash hotfix Validation](../validation/2026-08-31-windows-launcher-console-flash-hotfix.md)
 - [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 UX Acceptance Fixes Validation](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)

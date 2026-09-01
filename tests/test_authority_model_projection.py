@@ -207,7 +207,7 @@ class AuthorityModelReleaseProjectionTests(unittest.TestCase):
         self.assertEqual(bundled["version"], "0.2.0")
         self.assertNotIn("authority_model_version", bundled)
         self.assertNotIn("authority_model_versions", bundled["compatibility"])
-        self.assertEqual(current["version"], "0.3.0")
+        self.assertEqual(current["version"], "0.3.1")
         self.assertEqual(current["authority_model_version"], 1)
         release = default_release_contract()
         self.assertEqual(release.authority_model_version, 1)
