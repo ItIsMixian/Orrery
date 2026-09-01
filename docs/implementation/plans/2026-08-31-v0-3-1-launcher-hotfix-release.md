@@ -83,3 +83,26 @@ root, run its `project-orrery/scripts/install_project_orrery.py` into a fresh ta
 target as a local Git repository, then execute the target's normal headless start→reuse→stop smoke. Do not rebuild,
 modify repository files, run a test suite or reuse the failed target directory. Continue to Promotion only if this
 single installed-project smoke is green.
+
+## 2026-08-31 scope revision 6 — register the five existing hotfix tests
+
+The installed-project runtime gate passed on `6a018319...`. Promotion run `33464068810` then failed in preflight before
+any test lane because final discovery contains five hotfix tests absent from the exact registry. Required checks failed
+closed from the missing inventory; no main/tag/Release action occurred.
+
+Revision 6 authorizes only adding these existing IDs to `scripts/ci/change-mapping.json`:
+
+- `test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_child_policy_audit_is_explicit_bounded_and_records_windows_flags`
+- `test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_live_healthy_identity_reuses_exact_loopback_runtime`
+- `test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_normal_main_reuses_before_render_and_console_legacy_keeps_console`
+- `test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_production_child_policy_is_windows_only_and_explicitly_disableable`
+- `test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_unified_startup_and_refresh_git_sites_use_shared_child_policy`
+
+Each entry uses owner surface `Packaging/Adapters/docsite`, shard `packaging-project`, allowed stage `promotion` only,
+cost class `low`, budget 15 seconds, dependency `observatory-shell`, and a narrow launcher-hotfix reason. Do not add or
+modify tests, budgets, lanes, existing entries or path mappings.
+
+Commit a new SHA, run `python scripts/ci/validate_ci.py --all` once as registry/inventory preflight without loading test
+suites, then perform the already-established two-build and installed-project runtime gates once on that exact SHA.
+Only after those pass may `promotion/v0.3.1-rc` fast-forward and trigger one new Promotion. Run `33464068810` and SHA
+`6a018319...` are not retried.

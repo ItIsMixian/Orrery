@@ -61,3 +61,14 @@ run an installer and therefore searched for an installed-project launcher under 
 returned file-not-found before supervisor startup. No marker, process, listener, push or remote action occurred.
 Revision 5 may install that exact archive into a fresh isolated Git target and run the one authorized launcher smoke;
 package evidence is retained and not repeated.
+
+## 2026-08-31 runtime PASS and Promotion preflight refusal
+
+The installed-project smoke on `6a018319...` passed: HTTP 200, second launch reused PID `167716` and port `8765`,
+stop returned 202, and marker/listener/matching processes all reached zero. Promotion run `33464068810` stopped in
+inventory preflight: exactly five existing hotfix test IDs were unregistered. No matrix lane ran; both required checks
+failed closed and no publication action occurred.
+
+Revision 6 may add only those five IDs with the exact common ownership/stage/cost/dependency metadata in the Plan,
+run one local registry self-check, then create package/runtime evidence and one Promotion on a new SHA. The failed run
+and old SHA are preserved and not retried.
