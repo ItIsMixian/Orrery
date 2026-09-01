@@ -4,6 +4,9 @@ Updated: 2026-08-31
 
 ## 当前验证体系
 
+- ADR-0024 的 v0.3.1 emergency patch 禁止重放无关 child suites 或本地完整 Candidate。它只消费 exact v0.3.0
+  Promotion 与 hotfix child receipts，新增两次快速 exact-Git build、一次 extracted Windows launcher smoke，
+  最终仍只运行一次 exact-SHA Windows/Ubuntu required Promotion；同 SHA non-green 不重试。
 - 验证分为 `Fast → Checkpoint → Candidate → Promotion`。Fast 只提供局部反馈；Checkpoint 证明 Workstream checkpoint；Candidate 运行完整本地门；Promotion 绑定 non-main exact SHA、规定 OS 和 required checks。
 - Fast 使用 15 秒预算；Checkpoint 使用 90 秒预算；完整 Promotion 保留每个 final unittest ID、动态 build、结构／docsite／链接／发布包／diff gate 与安全预算。
 - CI6 integration baseline inventory 为 404 unique unittest IDs、27 logical shards、10 physical lanes/OS、88 Fast、89 Checkpoint；U2 登记后为 415，U2.1 将四组新断言折叠进既有 owner test IDs，registry inventory 保持 415。`team-relations-execution` 保持独立 300 秒 Promotion 预算。

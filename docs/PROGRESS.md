@@ -53,9 +53,12 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [Windows 启动器闪窗热修](implementation/plans/2026-08-31-windows-launcher-console-flash-hotfix.md)：
-  v0.3.0 Windows 隐藏 supervisor 的 Git/helper 子进程缺少 no-window policy，重复点击也未复用已运行实例；
-  先做窄范围产品修复与一次真实 Windows smoke，随后另立 patch-release scope，禁止替换 v0.3.0 资产。
+- [ ] [v0.3.1 Windows 启动器紧急发布](implementation/plans/2026-08-31-v0-3-1-launcher-hotfix-release.md)：
+  ADR-0024 已接受单一短发布链；从 exact hotfix Candidate 出发，不重放无关套件，只做 package/runtime 与一次
+  hosted Promotion，green 后连续完成 main/tag/Release 和 v0.3.0 warning。
+- [x] [Windows 启动器闪窗热修](implementation/plans/2026-08-31-windows-launcher-console-flash-hotfix.md)：
+  Worktree Candidate `8f60fac...`／product `06a277d...` 已通过 focused tests 与 Windows 机械 smoke；中央整合和
+  patch publication 由 v0.3.1 Release Plan 持有。
 - [x] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：旧三次 FAIL 保留；exact `a0a728b...` Promotion、main Fast、annotated tag、tag workflow、GitHub Release 与远端资产哈希全部 PASS。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
@@ -100,6 +103,6 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 完成 Windows 启动器闪窗与重复启动复用热修的 clean Candidate 和一次真实 Windows smoke。
-2. 热修验收后另立 patch-release scope；不移动 v0.3.0 tag、不替换资产，也不夹带 alias/scheduler。
-3. 另开任务精简发布流程，把失败集合本地复现与必要/非必要门分类固化，避免再次重复全矩阵。
+1. 单次完成 v0.3.1 release-input/package/Windows smoke 与 exact-SHA hosted Promotion。
+2. Green 后直接发布 v0.3.1 为 Latest，并给 v0.3.0 添加升级警告；旧 tag/资产保持不变。
+3. 后续再单独精简通用发布流程；不阻塞本次紧急 patch。

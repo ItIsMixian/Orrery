@@ -19,6 +19,8 @@ The documentation observatory itself is validated by generating `docs/_site/inde
 
 ## Records
 
+- [2026-08-31 v0.3.1 Windows Launcher Hotfix Release](2026-08-31-v0-3-1-launcher-hotfix-release.md) — Pending；
+  只允许一次 package/runtime/hosted Promotion 链，禁止重放无关套件或覆盖 v0.3.0 资产。
 - [2026-08-31 Windows 启动器闪窗热修](2026-08-31-windows-launcher-console-flash-hotfix.md) — Pending；约束
   Windows headless 子进程、重复启动复用和一次真实启动 smoke，明确禁止在实现循环重跑完整发布矩阵。
 - [2026-08-30 GX1 Fireworks Tech Graph Evaluation](2026-08-30-gx1-fireworks-graph-skill-evaluation.md) — isolated 8/12 PASS; lane/routing techniques may assist W7.3, while the Skill/runtime/generated diagrams remain non-product and non-authoritative.
