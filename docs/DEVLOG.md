@@ -1269,3 +1269,7 @@
 - 中途 malformed PowerShell、policy-blocked Codex、non-Git Unified、系统中断 stale marker、wrong v0.2 root
   和 backup-field parser assertion 均按原结果保留；没有伪装成产品 PASS。下一步只运行 exact non-main
   `76a6961...` Promotion；main/tag/GitHub Release 未发生。
+- `76a6961...` Promotion run `33454661325` 把失败集缩到 5 个 ID。revision 16 修 current-version test、VBS
+  parity、CLI/Observatory relation continuation 与 UTF-8 protocol；精确 5-ID 本地复现为 3/5 后，revision 18
+  只补剩余 phase0 update fragments 和 Observatory parser，再以 2/2 关闭。exact `a0a728b...` Candidate
+  56/56、双根 package 与完整 final runtime PASS；前三个远端失败 run 均保留。

@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 18 two-test completion Pending; main/tag not started
+Status: Candidate/package/final runtime PASS on `a0a728b...`; exact-SHA Promotion Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -724,3 +724,18 @@ The one exact five-ID local reproduction ran 5 tests in 26.855s and ended 3 pass
 0.3.1 update and the wheel CLI cp1252 case pass. The remaining failures are the phase-0 test's second pair of frozen
 v0.2 fragments and the separate Observatory multiline relation parser. Revision 18 is Pending for only those two
 surfaces; the 3 passing IDs are not manually replayed.
+
+## 2026-08-31 revision-18 exact Candidate and runtime — PASS
+
+Exact `a0a728b1f096650e475a1327d29973f2a1f9e267` Candidate dry-run selected 56 tests with zero unknown and
+allowed timing; the one fresh Candidate completed 56/56 PASS in 2.096941s. Two 162-entry builds matched pairwise:
+
+- ZIP: `12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385`;
+- checksum file: `599b416d5b03a74665e1e9c5864b4902ab13ba9037956d3ef04919a45737e011`;
+- entry receipt: `a3d3732c6985c8ec242e4129efa50f04d9aeb5cf96af2c206defea19944923e3`.
+
+Complete exact-archive runtime repeated successfully: source/extracted install, Harness validate/invalid, explicit and
+implicit Sol-medium Codex exact tokens, two HTTP-200/202 Unified start-stop cycles, v0.2 upgrade with eight backups,
+exact migration restore, missing-package exit 1 and Skill 1→0→1 with 162 canonical files. The two IDs left failing by
+the prior 3/5 reproduction then passed 2/2 in 0.771s; the other three were not replayed. Exact `a0a728b...` is ready
+for one non-main Promotion; main/tag/Release remain unchanged.

@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 18 two-test completion authorized; GitHub Release withheld
+Status: Revision 18 Candidate/package/final runtime PASS on `a0a728b...`; exact-SHA Promotion authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -750,6 +750,11 @@ Revision 18 authorizes only `tests/test_project_orrery.py` to make those two upd
 and `packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py` to apply the same strict
 explicit `[ADR-` continuation rule already used by CLI. No other test from the 3/5 pass set is replayed locally.
 Commit a new SHA, run one Candidate dry-run/run, rebuild twice, and repeat the exact final runtime before Promotion.
+
+Revision 18 completed on exact `a0a728b1f096650e475a1327d29973f2a1f9e267`: Candidate 56/56, two-root
+deterministic package, complete final runtime and the exact remaining two-ID reproduction 2/2 are green. The three
+IDs already green on `c29572b...` were not replayed locally. The promotion ref may now fast-forward from
+`76a6961...` to `a0a728b...` for one new run; later evidence-only commits are not Candidate inputs.
 
 ## Phase 1 — register Final RC and freeze inputs
 

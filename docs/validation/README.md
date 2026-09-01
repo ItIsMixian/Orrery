@@ -3,8 +3,8 @@
 Validation records reproducible evidence for implementation and documentation claims.
 
 - [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — exact
-  `76a6961...` Candidate 100/100、双根 byte-identical package 与完整 Windows final runtime PASS；旧 Promotion
-  runs `33449930707`／`33451288289` 的失败保留。新 SHA dual-platform Promotion、main、tag 与 Release Pending。
+  `a0a728b...` Candidate 56/56、双根 byte-identical package 与完整 Windows final runtime PASS；旧 Promotion
+  runs `33449930707`／`33451288289`／`33454661325` 的失败保留。新 SHA Promotion、main、tag 与 Release Pending。
 - [2026-08-30 CI7 Validation Routing Precision & Total-Cost Diagnostics](2026-08-30-ci7-validation-routing-precision-total-cost.md) — clean Candidate and fresh central Fast/Checkpoint validate acceptance gates, validation leases, predictive refusal and no-repeat enforcement; prior refusal/failure evidence remains preserved.
 
 For each validation, record:

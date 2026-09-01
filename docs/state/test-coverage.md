@@ -52,6 +52,8 @@ Updated: 2026-08-31
   `404cbf0e...` 完成 100/100 PASS（66.346133s、zero rerun）。两次 exact-Git package byte-identical，完整
   Windows final runtime PASS。Promotion run `33451288289` 的 36 个失败 ID 保留为旧 SHA 证据；新 SHA 尚待
   Windows/Ubuntu Promotion，不用本地重复全量 451 项。
+- revision-18 exact `a0a728b...` 的 fresh Candidate 56/56（2.096941s）、双根 package 与完整 final runtime
+  PASS；run `33454661325` 最后 5 个 ID 的本地 closure 为先 3/5、再只跑剩余 2/2 PASS。新 SHA 尚待 Promotion。
 - 原始 `a520ebc` CI7 routing/cost 实现的 focused contract/portfolio 5/5、完整 `test_ci_validation` 25/25 与 CI contract PASS；当前 inventory 为 421 exact IDs／27 shards／10 lanes／92 Fast／98 Checkpoint。W7.2 Graph-only 从 CI6 的 `collaboration-maintenance + observatory-ui`／23 Checkpoint（含 Maintenance fixture）收敛为 `observatory-graph`／2（不含 fixture）；U2.2 Maintenance 为 22 项且保留真实 Git fixture；Unified security 为 4 项有界 adjacency。该 pre-amendment 开发树 routed Fast 42/42 为 8.057895s，Checkpoint 42/42 为 7.526136s；它们不替代下条 amendment exact-SHA 事实。
 - Amendment assertions 并入现有 CI7 final test ID，因此 Promotion inventory 仍为 421 而不是通过增加 final IDs 扩张；focused policy/lease/p95/no-repeat stable sweep 16/16 PASS。exact `290482f` 唯一 Fast 对 42>20 在 test loading 前 predictive refusal，保持 non-green 且未重试／未由 Checkpoint 替代；唯一 Checkpoint 42/42 PASS（16.417209s/90s，evidence-eligible）。中央旧 fingerprint 的 Fast 3/3 PASS 与 Checkpoint 组合门 failure 均保留；修正后 current fingerprint `0eea7f...` 在 `f41b659...` 上以 fresh lease 完成 Fast 3/3（0.804195s test runtime）和 Checkpoint 4/4（2.580301s），均 evidence-eligible、zero rerun。
 
