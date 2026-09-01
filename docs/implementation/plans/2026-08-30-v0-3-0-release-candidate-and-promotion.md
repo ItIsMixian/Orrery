@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 14 isolated-Git runtime correction authorized; GitHub Release withheld
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 15 v0.2 archive-root correction authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -676,6 +676,18 @@ external temporary runtime target, followed by the already-required two Unified 
 The commit contains only the generated scaffold and the byte-identical repository-local candidate Skill. It is not
 pushed and does not become release evidence or project authority. The failed precondition start is not replayed or
 reclassified.
+
+### 2026-08-31 scope revision 15 — historical v0.2 archive root
+
+The isolated Git correction allowed Unified to recover an interrupted stale marker and complete a clean
+start→HTTP 200→API stop cycle. The published v0.2.0 ZIP and checksum were then downloaded and matched their immutable
+GitHub digests. The first v0.2 installer command addressed the extraction directory itself, but the historical ZIP
+contains a nested `project-orrery/` root; Python returned file-not-found before installer code ran and the empty
+upgrade target was unchanged.
+
+Revision 15 authorizes only changing the external `v0.2.0-skill` variable to its nested `project-orrery` directory,
+then continuing the already-authorized upgrade/migrate/restore portfolio. Do not redownload the verified asset or
+replay the wrong-path command. No repository file or release Candidate changes.
 
 ## Phase 1 — register Final RC and freeze inputs
 

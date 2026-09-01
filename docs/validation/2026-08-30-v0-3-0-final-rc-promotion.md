@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 14 isolated-Git runtime correction Pending; main/tag not started
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 15 v0.2 archive-root correction Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -638,3 +638,17 @@ failed loopback-only attempts to `127.0.0.1:8080`; no external endpoint or proje
 The subsequent Unified process exited 1 because the external target had not been initialized as Git. Failure occurred
 before `RuntimeIdentity` could allocate Git-private ownership; no listener/helper/marker/browser existed. Revision 14
 is Pending for an isolated local Git initialization and the two original lifecycle cycles.
+
+### Revision-14 Unified lifecycle and historical-archive path stop
+
+After isolated Git initialization, one console-interrupt cycle served HTTP 200 and logged helper release; the
+terminal driver reported signal exit 1. A later system interruption killed a second server after readiness and left
+its Git-private marker. The next start recovered that stale marker, served the same 1,938,768-byte page and ready
+health contract, accepted local stop with HTTP 202, exited 0, removed the marker and released the port. These events
+prove startup, restart/stale-marker recovery and clean API stop without claiming the interrupted process passed.
+
+The downloaded public v0.2.0 ZIP matched
+`13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`; its checksum file hash matched
+`243a29b9caea9036620c8a31993b1994700bfc1e17539b7cc2fb6a2dfdd0f105`. The first installer command used the
+outer extraction directory instead of the archive's nested `project-orrery/` root and returned file-not-found before
+installer execution. The upgrade target remains empty. Revision 15 is Pending for that path-only correction.
