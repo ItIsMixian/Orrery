@@ -6,9 +6,10 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前公开发布
 
-- v0.3.1 修复了 Windows console-child 闪窗与重复 supervisor，但 self-host 冷启动仍在完整 Unified render 后才
-  绑定/打开页面。2026-08-31 实测约 95 秒无可见反馈；服务最终 HTTP 200。U2.4 已登记为未实现 Candidate，
-  目标是先提供同 PID/port 的本地 starting page，再后台完成重关系视图；当前公开资产尚无该修复。
+- v0.3.1 修复了 Windows console-child 闪窗与重复 supervisor，但公开资产的 self-host 冷启动仍在完整 Unified
+  render 后才绑定/打开页面。2026-08-31 实测约 95 秒无可见反馈；服务最终 HTTP 200。隔离的 U2.4 Worktree
+  Candidate 已实现同 PID/port 的 starting page、后台原子 ready/failed 与三态 stop，真实首个 HTTP 为 701 ms；
+  它尚未进入 Canonical source、patch 版本或公开资产。
 - Orrery v0.3.1 是当前 Latest Release。protected `main`、annotated tag `v0.3.1` 与公开 Release source 都绑定
   exact `1d9223cb07b94674b58471e0c19addf748b16221`。ZIP SHA-256 为
   `2970fc208d529022b0ac33c2b6a35e9874ef87fa90d67bd0dafb52fc5d2b6445`；checksum 文件 SHA-256 为
@@ -44,6 +45,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - PO1 在同一 `SKILL.md` 内补充 ADR-0007 PO allocation；仍无新 Skill 文件或发布资产。local integration `8b73f26` 后，两文件已按 SHA-256 一致性校验复制到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，但没有进入 release manifest 或公共分发。
 - v0.3.1 release manifest、tag、ZIP、checksum 与 phase fixture 已同步；Git-private session、cache、凭据与
   生成站点继续排除。U2.3/CI7 的测试路由策略没有因 launcher patch 改变。
+- U2.4 Worktree Candidate 仅在 Observatory adapter 省略 graph node set 外的显式 program membership；node set
+  内 duplicate／坏 path／未解析 group 继续失败关闭。self-host projection 为 ready 33 nodes/20 edges 且未创建
+  W5D placeholder；Core relation/program store、Team/Authority 权限、组件版本和发布契约均未改变。
 
 ## CI 与推广门
 

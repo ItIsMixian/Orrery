@@ -510,8 +510,10 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         if not isinstance(raw_membership, Mapping):
             raise RelationGraphUnavailable("invalid-provider", "Program membership is malformed.")
         workstream_id = _bounded_identifier(raw_membership.get("workstream_id"), "membership workstream_id")
+        if workstream_id not in node_ids:
+            continue
         path = raw_membership.get("group_path")
-        if workstream_id not in node_ids or workstream_id in memberships_by_workstream or not isinstance(path, list) or len(path) != 2:
+        if workstream_id in memberships_by_workstream or not isinstance(path, list) or len(path) != 2:
             raise RelationGraphUnavailable("invalid-provider", "Program membership path is invalid.")
         program_id, phase_id = (_bounded_identifier(item, "group_path") for item in path)
         program, phase = groups_by_id.get(program_id), groups_by_id.get(phase_id)

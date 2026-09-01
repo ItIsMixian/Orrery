@@ -1,5 +1,18 @@
 # 开发日志
 
+## 2026-09-01 — U2.4 Immediate Launcher Readiness Worktree Candidate
+
+- exact task-description `aa44e7d...`／scope revision 1 先登记 starting/ready/failed、同实例复用、后台 render、
+  三态 stop、root/template parity 与 Git-private timings；`b0a3352...`／scope revision 2 只追加 out-of-graph
+  program membership quarantine，Core store 与关系/Authority/Team 语义不变。
+- 首轮真实启动虽显示 starting 并复用实例，但外部首个 HTTP 为 3304 ms，超过 3 秒门。既有 `serve.py`
+  reader/corpus import 随后移入同一后台 worker；修正后首个 HTTP 701 ms、复用 319 ms、ready 55.317 秒，
+  ready-stop 与 separate starting-stop 均 202 且 marker/listener/process 归零。
+- Graph 既有 owner 正控省略 node set 外 W5D membership，负控保持 in-graph 坏 path fail-closed。唯一 self-host
+  evidence 为 provider 33 nodes/13 edges → projection ready 33 nodes/20 edges、无 placeholder W5D；未重跑 provider。
+- focused Unified/Graph/parity 18/18、compile、双根 runtime SHA-256 parity 和 diff check 通过。未使用 Computer
+  Use，未运行 Fast/Checkpoint/Candidate/Promotion，也未改版本、tag、asset、Release 或公共 v0.3.1。
+
 ## 2026-08-31 — Scope Revision 9 Final Candidate/Runtime PASS
 
 - `14f771f...` Candidate 41/42 暴露 in-process inventory import 与 Anaconda bare `_common` collision；旧失败不

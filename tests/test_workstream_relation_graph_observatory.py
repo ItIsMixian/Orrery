@@ -521,6 +521,28 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertTrue(layout["geometry_postconditions"]["passed"])
         self.assertEqual(len(projection["edges"]), before_relations)
 
+        provider["program_hierarchy"]["memberships"].append({
+            "membership_id": "member-out-of-graph",
+            "workstream_id": "W5D-lan-collaboration-harness",
+            "group_path": ["program-w", "phase-w5"],
+        })
+        quarantined_membership = graph_ui.project_core_relation_graph(lambda: provider)
+        self.assertEqual(quarantined_membership["status"], "ready")
+        self.assertEqual(len(quarantined_membership["nodes"]), len(projection["nodes"]))
+        self.assertEqual(len(quarantined_membership["edges"]), before_relations)
+        self.assertNotIn(
+            "W5D-lan-collaboration-harness",
+            {item["workstream_id"] for item in quarantined_membership["nodes"]},
+        )
+
+        invalid_in_graph = copy.deepcopy(provider)
+        invalid_in_graph["program_hierarchy"]["memberships"][0]["group_path"] = ["program-w"]
+        failed = graph_ui.project_core_relation_graph(lambda: invalid_in_graph)
+        self.assertEqual(failed["status"], "unavailable")
+        self.assertEqual(failed["error"]["code"], "invalid-provider")
+        self.assertEqual(failed["nodes"], [])
+        self.assertEqual(failed["edges"], [])
+
         bundled = copy.deepcopy(self.projection)
         ids = [item["workstream_id"] for item in bundled["nodes"] if item.get("evidence_freshness") == "current" and item.get("scope_status") == "current"][:4]
         self.assertEqual(len(ids), 4)
