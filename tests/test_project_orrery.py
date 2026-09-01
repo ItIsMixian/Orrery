@@ -536,7 +536,7 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertIn("project-orrery/packages/project-orrery-cli/src/project_orrery_cli/scaffold.py", names)
             self.assertIn("project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py", names)
             self.assertIn("project-orrery/adapters/harness-json/run_harness.py", names)
-            self.assertEqual(len(names), 163)
+            self.assertEqual(len(names), 164)
             manifest = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
             self.assertEqual(names, manifest["distribution"]["archive_paths"])
             path_list = "".join(f"{name}\n" for name in names).encode("utf-8")
