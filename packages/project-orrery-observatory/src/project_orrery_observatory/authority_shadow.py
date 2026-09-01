@@ -76,19 +76,24 @@ def _relation_metadata(path: Path) -> dict[str, list[str]]:
     """Read only explicit Amends/Supersedes metadata from an ADR header."""
 
     relations: dict[str, list[str]] = {}
+    continuation: str | None = None
     for line in path.read_text(encoding="utf-8").splitlines():
         if line.startswith("## "):
             break
         match = RELATION_META_RE.match(line)
-        if not match:
-            continue
-        relation = match.group(1).lower()
-        targets = [_decision_id(number) for number in ADR_TOKEN_RE.findall(match.group(2))]
-        if not targets:
-            raise AuthorityRelationParseError(
-                f"{path.name}: explicit {match.group(1)} metadata has no ADR target"
-            )
-        relations[relation] = sorted(set(relations.get(relation, []) + targets))
+        if match:
+            continuation = match.group(1).lower()
+            targets = [_decision_id(number) for number in ADR_TOKEN_RE.findall(match.group(2))]
+            if not targets:
+                raise AuthorityRelationParseError(
+                    f"{path.name}: explicit {match.group(1)} metadata has no ADR target"
+                )
+            relations[continuation] = sorted(set(relations.get(continuation, []) + targets))
+        elif continuation is not None and line.lstrip().startswith("[ADR-"):
+            targets = [_decision_id(number) for number in ADR_TOKEN_RE.findall(line)]
+            relations[continuation] = sorted(set(relations[continuation] + targets))
+        else:
+            continuation = None
     return relations
 
 

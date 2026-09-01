@@ -161,7 +161,11 @@ class ProjectOrreryTests(unittest.TestCase):
                 str(RELEASE_MANIFEST),
             )
             self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+            self.assertIn(f"- Local Skill: {CURRENT_VERSION}", checked.stdout)
+            self.assertIn(f"- Latest stable: {CURRENT_VERSION} (file)", checked.stdout)
             for fragment in fragments["update_checker"]:
+                if fragment.startswith(("- Local Skill:", "- Latest stable:")):
+                    continue
                 self.assertIn(fragment, checked.stdout)
 
     def test_phase1_component_boundaries_and_compatibility_projection(self) -> None:
