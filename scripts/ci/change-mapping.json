@@ -6430,6 +6430,20 @@
       "reason": "low evidence for Team/LAN via collaboration-maintenance"
     },
     {
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_child_policy_audit_is_explicit_bounded_and_records_windows_flags",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-shell"
+      ],
+      "reason": "v0.3.1 launcher-hotfix promotion-only regression"
+    },
+    {
       "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_headless_launcher_console_debug_and_legacy_rollback_are_explicit",
       "owner_surface": "Packaging/Adapters/docsite",
       "owner_shard": "packaging-project",
@@ -6446,6 +6460,48 @@
       "reason": "low-cost Unified Observatory launcher and rollback contract"
     },
     {
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_live_healthy_identity_reuses_exact_loopback_runtime",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-shell"
+      ],
+      "reason": "v0.3.1 launcher-hotfix promotion-only regression"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_normal_main_reuses_before_render_and_console_legacy_keeps_console",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-shell"
+      ],
+      "reason": "v0.3.1 launcher-hotfix promotion-only regression"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_production_child_policy_is_windows_only_and_explicitly_disableable",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-shell"
+      ],
+      "reason": "v0.3.1 launcher-hotfix promotion-only regression"
+    },
+    {
       "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_stale_identity_recovers_but_live_identity_fails_closed",
       "owner_surface": "Packaging/Adapters/docsite",
       "owner_shard": "packaging-project",
@@ -6460,6 +6516,20 @@
         "observatory-shell"
       ],
       "reason": "low-cost Unified Observatory crash-recovery identity contract"
+    },
+    {
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_unified_startup_and_refresh_git_sites_use_shared_child_policy",
+      "owner_surface": "Packaging/Adapters/docsite",
+      "owner_shard": "packaging-project",
+      "allowed_stages": [
+        "promotion"
+      ],
+      "cost_class": "low",
+      "budget_seconds": 15.0,
+      "dependencies": [
+        "observatory-shell"
+      ],
+      "reason": "v0.3.1 launcher-hotfix promotion-only regression"
     },
     {
       "test_id": "test_unified_observatory.UnifiedRegistrationTests.test_optional_failure_quarantines_only_one_consumer",
