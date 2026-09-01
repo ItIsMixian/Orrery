@@ -84,12 +84,15 @@ After local worktree cleanup, the running self-host page froze the Workstream Gr
 archive entries; 13 entries created on 2026-09-01 contained a valid direct `worktree.json` plus unrelated
 `ci-validation`, `runtime` or `task-bindings` directories. This violated the W7.1 dated-entry-v1 boundary. The same
 running page retained a stale 20-worktree Maintenance snapshot although the Git registry now contains four worktrees.
+After those extra directories were separated, the first direct projection exposed one further invalid historical
+entry: `codex-v0-3-0-final-rc-e120aaae27f9/worktree.json` is 126,892 bytes and exceeds W7.1's fixed 64 KiB limit.
+Its bytes must be preserved unchanged outside the active relation archive; they must not be truncated or rewritten.
 
 This revision authorizes:
 
-1. a reversible Git-private self-host repair that leaves every dated relation archive entry with exactly one direct
-   `worktree.json` and moves all other preserved metadata into a separate Git-private extras namespace; no evidence
-   bytes, branch, commit or author document may be deleted;
+1. a reversible Git-private self-host repair that leaves 37 bounded dated relation archive entries with exactly one
+   direct `worktree.json`, moves all unrelated metadata and the one oversized historical session unchanged into a
+   separate Git-private extras namespace, and deletes no evidence bytes, branch, commit or author document;
 2. one direct self-host projection check after repair proving the relation provider/Graph is renderable from current
    live plus valid archived evidence, followed by one normal Unified refresh/restart so stale generated state is not
    presented as current;

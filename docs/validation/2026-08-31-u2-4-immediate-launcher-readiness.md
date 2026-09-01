@@ -43,8 +43,9 @@ the current self-host Graph renders the remaining honest relation facts without 
 
 ## 2026-09-01 archive/launcher acceptance — Pending
 
-- all 38 current dated relation archive entries contain exactly one direct regular `worktree.json`; the 13 unrelated
-  metadata subtrees are preserved under a separate Git-private namespace and no branch/commit/evidence bytes are lost;
+- 37 bounded dated relation archive entries contain exactly one direct regular `worktree.json`; the 13 unrelated
+  metadata entries and the one 126,892-byte oversized historical session are preserved unchanged under a separate
+  Git-private namespace and no branch/commit/evidence bytes are lost;
 - a fresh direct self-host provider/Graph projection is ready and the Unified page no longer shows the archive-layout
   exception or the stale 20-worktree snapshot;
 - the project root and new-project template expose exactly two supported Orrery launch files:

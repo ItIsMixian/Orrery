@@ -5,8 +5,9 @@ Updated: 2026-08-31
 ## 当前停止点
 
 - U2.4 在 2026-09-01 revision 3 前暂停产品写入／测试：本机清理把 13 份完整 Git-private metadata subtree
-  放进只允许单个 `worktree.json` 的 retired-session relation archive，导致当前 Graph Unavailable，同时运行中
-  页面仍显示旧 20-worktree snapshot。revision 3 要先可逆分离 extras、恢复当前 Graph，再把根启动面收口为
+  放进只允许单个 `worktree.json` 的 retired-session relation archive；分离后又暴露一份 126,892-byte session
+  超过 64 KiB 上限。两者导致当前 Graph Unavailable，同时运行中页面仍显示旧 20-worktree snapshot。
+  revision 3 要先把 extras／超限记录原样移出 active archive、恢复当前 Graph，再把根启动面收口为
   `Start Orrery.vbs` 与 `Start Orrery Console.bat` 两个明确入口；发布仍另立任务。
 - v0.3.1 用户实测暴露第二个 launcher 问题：首次进程 23:37:41 启动，23:39:16 才 ready，期间没有页面或
   进度。只读 profile 为 85.013 秒/751 subprocess，主要由 Graph/relation/legacy-session 投影造成；U2.4
