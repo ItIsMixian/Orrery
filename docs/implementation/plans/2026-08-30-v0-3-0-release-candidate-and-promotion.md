@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 15 Candidate/package/final runtime PASS on `76a6961...`; exact-SHA Promotion authorized; GitHub Release withheld
+Status: Promotion run `33454661325` failed on exact `76a6961...`; scope revision 16 remediation authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -694,6 +694,35 @@ Revision 15 completed the exact `76a69612a1021dbebdcf5a5c2aaba0414e92a348` local
 Unified restart/stale recovery, v0.2 upgrade with eight backups, receipt-bound migration/restore, missing-package
 failure and candidate Skill 1→0→1 are green. The exact SHA is now eligible for one fast-forward update of
 `promotion/v0.3.0-rc` and one new Promotion run. Evidence-only commits after `76a6961...` are not Candidate inputs.
+
+### 2026-08-31 scope revision 16 — five remaining Promotion failures
+
+Promotion run `33454661325` bound exact `76a6961...`, passed preflight and both repository gates, and recorded all
+451 tests/27 shards/10 lanes on each OS. It failed closed on five unique IDs: Ubuntu had four, Windows had those four
+plus the wheel CLI's cp1252 output failure. The prior 36-ID set is otherwise closed.
+
+The remaining causes are bounded:
+
+- two `test_project_orrery` expectations still treat the current 0.3.0 source as v0.2 or as a newer synthetic update;
+- root `Start Orrery.vbs` has one extra terminal newline compared with the packaged Skill asset;
+- Authority observation metadata reads only the first line of ADR-0020's explicit multiline `Amends` declaration;
+- machine JSON emission uses locale stdout and cannot encode Chinese on a cp1252 wheel entry point.
+
+Revision 16 authorizes only:
+
+- `tests/test_project_orrery.py` to preserve the frozen v0.2 fixture while asserting the live `CURRENT_VERSION`, and
+  to use synthetic 0.3.1 for a newer compatible update;
+- root `Start Orrery.vbs` to remove its extra terminal blank line and match the already-packaged Skill asset;
+- `packages/project-orrery-cli/src/project_orrery_cli/authority_observations.py` to continue only explicit wrapped
+  `Amends`/`Supersedes` header lines beginning with an ADR link;
+- `packages/project-orrery-cli/src/project_orrery_cli/protocol.py` to emit the versioned JSON contract as UTF-8 bytes
+  when stdout exposes a binary buffer, retaining redirected text-stream behavior;
+- `scripts/ci/change-mapping.json` to add exact `protocol.py` to existing `release-packaging`;
+- matching authority/evidence records.
+
+No accepted ADR, frozen v0.2 fixture, test ID, workflow, dependency, budget, lane, public default or component version
+may change. Commit a new SHA, run one Candidate dry-run/run, rebuild twice, repeat the exact final runtime matrix, then
+fast-forward the non-main promotion ref and run once. `76a6961...` and run `33454661325` are not retried.
 
 ## Phase 1 — register Final RC and freeze inputs
 

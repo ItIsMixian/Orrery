@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Candidate/package/final runtime PASS on `76a6961...`; exact-SHA Promotion Pending; main/tag not started
+Status: Promotion run `33454661325` FAIL on `76a6961...`; scope revision 16 Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -679,3 +679,23 @@ The malformed command, policy-blocked Codex attempt, non-Git Unified start, inte
 post-upgrade backup-field parser assertion remain recorded as non-green orchestration evidence; none is rewritten as
 PASS or rerun unchanged. Exact `76a6961...` is ready for one new non-main Promotion run. `main`, tag and GitHub
 Release remain untouched.
+
+## 2026-08-31 Promotion run `33454661325` — FAIL; scope revision 16 Pending
+
+The remote ref and checkout matched exact `76a69612a1021dbebdcf5a5c2aaba0414e92a348`. Preflight and both repository
+gates passed. Each OS aggregate consumed 451 tests, 27 shards and 10 lanes with identical inventory/manifest hashes.
+Ubuntu had four failing IDs; Windows had the same four plus one locale-only wheel failure:
+
+- `test_phase0_human_cli_output_and_template_entry_are_stable` expects frozen text `Project Orrery 0.2.0` from the
+  live 0.3.0 source wrapper;
+- `test_phase1_neutral_cli_matches_legacy_paths_and_preserves_authored_files` finds one extra terminal newline in
+  root `Start Orrery.vbs` versus the packaged Skill asset;
+- `test_update_checker_distinguishes_compatible_and_migrating_releases` uses synthetic 0.3.0 as “newer” than local
+  0.3.0 and therefore correctly receives `up_to_date`;
+- `test_repository_amendments_have_explicit_core_relations` shows ADR-0020's wrapped `Amends` metadata loses the two
+  continuation targets;
+- Windows `test_wheel_contains_observatory_assets_and_runs_without_source_repository` reaches the installed CLI but
+  `protocol.emit` raises `UnicodeEncodeError` on cp1252 while printing Chinese JSON.
+
+Both required checks failed closed; `main`, tag and Release remain unchanged. Scope revision 16 is Pending for the
+exact surfaces in the Plan. The run and its five failures are immutable and will not be replayed on the same SHA.
