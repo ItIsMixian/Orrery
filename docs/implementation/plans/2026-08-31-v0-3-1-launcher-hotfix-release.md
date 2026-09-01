@@ -35,3 +35,16 @@ Approved Design: [v0.3.1 Launcher Hotfix Release](../../design/v0-3-1-launcher-h
 
 Complete means v0.3.1 is the verified Latest Release, its remote assets match the exact tagged SHA, and v0.3.0 visibly
 links Windows users to it while retaining immutable assets.
+
+## 2026-08-31 scope revision 2 — managed-runtime cardinality fixture
+
+The first direct metadata run stopped after 1 PASS / 1 FAIL, before commit, packaging or any remote action. The
+Observatory manifest correctly contains 104 managed-runtime entries because the accepted hotfix adds exactly
+`project_orrery_core/subprocess_policy.py`; the same test already asserts that exact path is present but still freezes
+the pre-hotfix total of 103.
+
+Revision 2 authorizes only changing that existing `tests/test_project_orrery.py` cardinality expectation from 103 to
+104. Preserve the explicit path assertion and every release-input edit already in the dirty task worktree. After the
+new authority version is acknowledged and Git-private scope is refreshed, make the one-line correction, create a new
+release-input commit/fingerprint, and run the same two direct metadata tests once. No other test expectation, product
+code, Plan step or validation scope changes; the failed fingerprint is not retried.

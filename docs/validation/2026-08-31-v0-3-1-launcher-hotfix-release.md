@@ -26,3 +26,14 @@ retried; record the failed identity and stop for a new exact-SHA correction.
 ## Result
 
 Pending. No v0.3.1 manifest, tag, asset or remote Release exists under this task-description version.
+
+## 2026-08-31 revision-1 metadata stop and revision-2 acceptance
+
+The first release worktree metadata invocation completed one test and failed one:
+
+- PASS: frozen v0.2 contracts remain historical;
+- FAIL: `test_phase1_component_boundaries_and_compatibility_projection` expected 103 managed-runtime entries while
+  the inspected manifest contains 104 and explicitly includes the new hotfix `subprocess_policy.py` path.
+
+No commit, package, Promotion, tag, Release or v0.3.0 remote edit occurred. Revision 2 may correct only the stale
+cardinality to 104 and run the same two tests once on a new fingerprint. All later evidence remains Pending.
