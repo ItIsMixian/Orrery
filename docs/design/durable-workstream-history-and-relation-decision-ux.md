@@ -180,3 +180,44 @@ The history contract preserves the source session's observed lifecycle. A retire
 `validating`, `review-ready` or `integrated` session is recorded as `retired-session`; it is never rewritten as a
 closed task. Only a source session whose lifecycle is exactly `closed` and has a valid closure reason becomes
 `closed-workstream`. The schema keeps closure state, Git identity and lineage evidence as separate required objects.
+
+## 2026-09-01 revision 4 — full relation and compact-history modes
+
+The maintainer accepts the restored evidence-backed relation graph as the **full relation** baseline. Compact mode is
+an alternate projection of the same Graph, not a new page, directory, list or source of facts.
+
+### Modes
+
+- `显示完整关系`: default; preserves the accepted full node/edge set, including all validated archived lineage,
+  explicit series connectors and current pending proposals.
+- `折叠历史`: preserves current/attention context while replacing deep, read-only historical subgraphs with compact
+  summary nodes inside the same canvas.
+
+### Nodes that compact mode must keep visible
+
+- every non-historical/current task;
+- every endpoint of a pending proposal, Unknown lineage, dependency, confirmed conflict or other item requiring human
+  attention;
+- the nearest one-hop historical predecessor/successor needed to explain each visible current/attention node;
+- the selected/focused node and its directly connected evidence path.
+
+### Fold eligibility
+
+A node may fold only when it is historical/retired, non-executable, not awaiting a decision, not an Unknown/conflict
+endpoint and deeper than one relationship hop from all protected visible nodes. Eligible nodes are folded by maximal
+connected historical subgraph, never by task-name similarity. Accepted program/phase/series metadata may label or
+partition a fold but may not invent an edge.
+
+A fold summary is a presentation object, not a Workstream. It shows task count, retained relation counts/types and
+entry/exit context. Every external connector remains traceable to its underlying edge. Branched historical subgraphs
+retain distinct entry/exit ports rather than being flattened into a fake linear relation.
+
+### Interaction
+
+- clicking a fold summary expands only that historical subgraph in place; it does not open a new history UI;
+- the expanded subgraph can be folded again without changing facts or other groups;
+- switching global modes and local expansion uses an offscreen ELK result with an atomic canvas swap, avoiding a
+  visible blank/flash and preserving zoom/anchor where practical;
+- fully historical connected components remain as one compact summary each in compact mode rather than disappearing;
+- identity-only records with no validated relation remain stored internally and are not introduced into either graph
+  mode.

@@ -14,6 +14,8 @@ Updated: 2026-09-01
   W7.4 必须导入该配置并取得 allowed refresh 后才能继续。
 - integration-ref 修正后唯一剩余 L3 是 W7.4 未跟踪 history schema。中央已拒绝其“任意 object＋全部 closed”
   草稿，并以 revision 4 bootstrap strict schema；W7.4 必须删除任务草稿、合入中央 schema，再刷新守卫。
+- 维护者已接受 W7.4 恢复后的完整关系图；revision 5 只增加同画布 `折叠历史` 模式。默认完整图冻结，精简
+  模式保留当前/待确认/Unknown/冲突与一跳历史上下文，只折叠更深的有证据历史子图；W6.2继续等待。
 - U2.4 exact `00b2eb4fa28a606cdb532c7938e46482950e8233` 已按维护者指令进入当前本地 integration branch：
   归档布局恢复、即时 starting page 和两个 Windows 启动入口均已合入。合流产品树与 exact Candidate 一致，
   只做 compile/JSON/parity/diff 轻量检查，没有重跑 unittest。protected main、Promotion 和发布未发生；

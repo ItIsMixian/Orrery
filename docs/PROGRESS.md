@@ -55,7 +55,7 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 
 ## 活动计划与待办
 
-- [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：ADR-0027 要求移除 bulk history UI 并恢复至少 11 个可验证 archived pair；实际 integration ref 已修正，strict history schema 由唯一 integrator bootstrap。W7.4 必须合入该schema并取得 allowed refresh 后才恢复写入，接受前不跑自动测试。
+- [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：完整关系恢复已获维护者接受；revision 5 冻结该图为默认 `显示完整关系`，新增同画布 `折叠历史` 预览。只折叠深层无待办历史链，不新增UI；接受前不跑自动测试。
 - [x] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
   exact `00b2eb4...` 已进入当前本地 integration branch，包含即时 starting page、归档边界恢复和两个明确
   Windows 启动入口；产品树与 Candidate 一致，未重跑 unittest。protected main、Promotion 与发布未发生；

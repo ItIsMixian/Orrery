@@ -69,3 +69,25 @@ relation history is rewritten. Automated tests remain forbidden before that prev
   lifecycle, closure reason, Git identity, lineage and bounded references;
 - W7.4 must merge the exact central schema commit and obtain an allowed scope refresh before resuming product work;
 - no schema weakening, test or product completion is accepted before that gate.
+
+## 2026-09-01 full relation acceptance and compact-mode preview — Pending
+
+Maintainer acceptance:
+
+- the restored full relation graph is accepted as the baseline;
+- bulk history UI remains rejected and absent;
+- compact mode may now be prototyped inside the same relation canvas.
+
+Pending compact-mode acceptance:
+
+- the page opens in `显示完整关系` and matches the accepted full relation graph;
+- `折叠历史` keeps current/attention nodes and one-hop historical context while materially reducing deep historical
+  nodes;
+- fold summaries preserve underlying edge counts/types and branched entry/exit context;
+- pending proposals, Unknown/conflict endpoints and selected paths never disappear into a fold;
+- expanding one summary occurs in place and folding it restores the same compact graph;
+- neither mode shows identity-only bulk history records or introduces a new history directory/panel/list;
+- switching modes produces no visible blank/flash and keeps a useful zoom/anchor;
+- no relation fact, confirmation state, archive byte or history record changes due to presentation state.
+
+Automated tests remain forbidden until the maintainer accepts this real preview.

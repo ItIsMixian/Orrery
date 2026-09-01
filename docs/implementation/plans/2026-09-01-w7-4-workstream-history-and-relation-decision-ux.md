@@ -154,3 +154,29 @@ The unique integrator now owns the strict `workstream-history-index-v1.json` boo
 
 W7.4 must not loosen the strict central schema or reintroduce arbitrary objects to fit existing code. Any required
 schema amendment returns to the unique integrator before product writes continue.
+
+## 2026-09-01 scope revision 5 — compact the accepted relation graph in place
+
+The maintainer accepts the restored full relation graph and requests one experimental compact mode before W7.4
+closeout. The accepted full graph is frozen as the default and must not regress.
+
+Revision 5 authorizes W7.4 to:
+
+1. add exactly two same-canvas modes: `显示完整关系` and `折叠历史`; full is the default and matches the accepted
+   evidence-backed graph;
+2. in compact mode, keep all current tasks, attention/pending/Unknown/dependency/conflict endpoints, selected context
+   and one-hop historical context visible;
+3. collapse only deeper read-only historical nodes into maximal connected-subgraph summaries, preserving real
+   entry/exit edges, relation types and branching;
+4. use program/phase/series only to label/partition summaries, never to create causality;
+5. allow a summary to expand/fold in place without a new directory, panel, card grid or bulk history UI;
+6. preserve all 11 validated archived lineage edges, the three rejected lineage diagnostics, existing series lines
+   and all seven pending proposals across both modes;
+7. compute layout offscreen and swap atomically so mode/fold changes do not flash or blank the canvas; preserve the
+   current zoom anchor where feasible;
+8. build a real preview that opens in full mode, demonstrates compact mode and one local group expansion, then stops
+   for maintainer acceptance before automated tests.
+
+Identity-only records remain stored but absent from both graph modes. Revision 5 does not authorize a new UI surface,
+relation inference, semantic confirmation, W6.2, or any unittest/Fast/Checkpoint/Candidate/Promotion before preview
+acceptance.
