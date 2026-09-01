@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 17 Codex token correction authorized; GitHub Release withheld
+Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 18 two-test completion authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -735,6 +735,21 @@ Revision 17 authorizes one new explicit Codex invocation on the unchanged isolat
 the Agent to copy `authority_status` verbatim from `.project-orrery.json` after running validation. Keep Sol medium,
 ephemeral read-only sandbox, local Skill and a new output file. Do not replay or overwrite the prior prompt/output.
 If green, continue the unchanged implicit/lifecycle/upgrade matrix; no Candidate or package rebuild is required.
+
+### 2026-08-31 scope revision 18 — complete the exact five-ID closure
+
+The revision-17 explicit Codex output is exact. A single non-formal reproduction of the five remote failing IDs on
+`c29572b...` completed 3/5: VBS parity, synthetic newer update and cp1252 wheel CLI passed. Two failures remained:
+
+- the phase-0 test's update-checker section still consumes frozen v0.2 Local/Latest text after the installer section
+  was made current-version aware;
+- the self-host authority shadow uses Observatory `_relation_metadata`, not CLI `_header_metadata`, so ADR-0020's two
+  wrapped continuation targets are still absent from the product projection.
+
+Revision 18 authorizes only `tests/test_project_orrery.py` to make those two update-checker version lines dynamic,
+and `packages/project-orrery-observatory/src/project_orrery_observatory/authority_shadow.py` to apply the same strict
+explicit `[ADR-` continuation rule already used by CLI. No other test from the 3/5 pass set is replayed locally.
+Commit a new SHA, run one Candidate dry-run/run, rebuild twice, and repeat the exact final runtime before Promotion.
 
 ## Phase 1 — register Final RC and freeze inputs
 

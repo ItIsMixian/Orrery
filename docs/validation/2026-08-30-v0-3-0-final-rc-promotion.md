@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 17 Codex token correction Pending; main/tag not started
+Status: Revision 16 Candidate/package PASS on `c29572b...`; revision 18 two-test completion Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -712,3 +712,15 @@ Source/extracted installs, direct Harness and a `PYTHONIOENCODING=cp1252` CLI JS
 Sol-medium Codex result was `EXPLICIT_SKILL=project-orrery VALIDATE_EXIT=1 AUTHORITY_STATUS=pending`; because the
 status token is not exact, this is retained as non-green rather than inferred. Revision 17 is Pending for a stricter
 new prompt/output only.
+
+### Revision-17 Codex exact token and five-ID local reproduction
+
+The new explicit output is exact: `EXPLICIT_SKILL=project-orrery VALIDATE_EXIT=1
+AUTHORITY_STATUS=migration_pending`. The implicit run's final line is also exact with exit 0; its PowerShell wrapper
+then failed only because it compared the whole Agent message rather than the required final line. The output is not
+rerun or overwritten.
+
+The one exact five-ID local reproduction ran 5 tests in 26.855s and ended 3 pass/2 fail. VBS byte parity, synthetic
+0.3.1 update and the wheel CLI cp1252 case pass. The remaining failures are the phase-0 test's second pair of frozen
+v0.2 fragments and the separate Observatory multiline relation parser. Revision 18 is Pending for only those two
+surfaces; the 3 passing IDs are not manually replayed.
