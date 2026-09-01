@@ -17,6 +17,8 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from project_orrery_core.subprocess_policy import no_window_options
+
 
 PROJECTION_CONTRACT = "orrery-active-task-projection-v1"
 SESSION_LIMIT = 512 * 1024
@@ -31,6 +33,7 @@ def _normalized(value: object) -> str:
 def _git(root: Path, *arguments: str) -> str:
     completed = subprocess.run(
         ["git", *arguments], cwd=root, capture_output=True, text=True, check=False,
+        **no_window_options(),
     )
     if completed.returncode != 0:
         raise ValueError(completed.stderr.strip() or "Git worktree registry is unavailable")

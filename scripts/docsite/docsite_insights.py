@@ -19,7 +19,15 @@ from __future__ import annotations
 import datetime as _dt
 import re
 import subprocess
+import sys
 from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[2]
+_CORE_SOURCE = _ROOT / "packages" / "project-orrery-core" / "src"
+if str(_CORE_SOURCE) not in sys.path:
+    sys.path.insert(0, str(_CORE_SOURCE))
+
+from project_orrery_core.subprocess_policy import no_window_options
 
 _STATE_REF = re.compile(r"state/([a-z0-9_-]+)\.md")
 _CODE_REF = re.compile(
@@ -31,7 +39,8 @@ _CODE_REF = re.compile(
 def _git(root: Path, *args) -> str:
     try:
         r = subprocess.run(["git", "-C", str(root), *args],
-                           capture_output=True, text=True, timeout=12, encoding="utf-8")
+                           capture_output=True, text=True, timeout=12, encoding="utf-8",
+                           **no_window_options())
         return r.stdout.strip() if r.returncode == 0 else ""
     except Exception:
         return ""

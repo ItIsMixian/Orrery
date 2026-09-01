@@ -23,6 +23,7 @@ from .workstream_relations import (
     default_relation_evidence,
     load_relation_history,
 )
+from .subprocess_policy import no_window_options
 
 
 CAPTURE_SCHEMA_VERSION = 2
@@ -219,6 +220,7 @@ def capture_storage_root(project_root: Path) -> Path:
         ["git", "-C", str(root), "rev-parse", "--git-common-dir"],
         capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
         env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
+        **no_window_options(),
     )
     if completed.returncode:
         raise ValueError("relation capture requires a local Git repository")

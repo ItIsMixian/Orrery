@@ -208,9 +208,25 @@ class ProjectOrreryTests(unittest.TestCase):
         for relative in observatory["managed_tools"]:
             self.assertTrue((REPOSITORY_ROOT / relative).is_file(), relative)
             self.assertTrue((compatibility_root / relative).is_file(), relative)
-        self.assertEqual(len(observatory["managed_runtime"]), 102)
+        self.assertEqual(len(observatory["managed_runtime"]), 103)
+        self.assertIn(
+            "packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py",
+            observatory["managed_runtime"],
+        )
         for relative in observatory["managed_runtime"]:
             self.assertTrue((REPOSITORY_ROOT / relative).is_file(), relative)
+
+        for relative in (
+            "Start Orrery.vbs",
+            "start-orrery.bat",
+            "scripts/docsite/docsite_insights.py",
+            "scripts/docsite/serve_orrery.py",
+        ):
+            self.assertEqual(
+                (REPOSITORY_ROOT / relative).read_bytes(),
+                (compatibility_root / relative).read_bytes(),
+                relative,
+            )
 
         for name in ("install_project_orrery.py", "validate_installation.py", "check_project_orrery_update.py"):
             wrapper = (SKILL_ROOT / "scripts" / name).read_text(encoding="utf-8")

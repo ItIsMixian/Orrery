@@ -16,6 +16,8 @@ from itertools import combinations
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .subprocess_policy import no_window_options
+
 
 RELATION_SCHEMA_VERSION = 1
 ARCHIVE_LAYOUT_VERSION = 1
@@ -111,6 +113,7 @@ def _run_git(repository: Path, *arguments: str, check: bool = True) -> subproces
         errors="replace",
         env=environment,
         check=False,
+        **no_window_options(),
     )
     if check and result.returncode != 0:
         detail = (result.stderr or result.stdout).strip()

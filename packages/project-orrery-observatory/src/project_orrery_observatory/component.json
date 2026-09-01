@@ -87,6 +87,7 @@
     "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-capture-v2.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relation-execution-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/workstream-relations-v1.json",
+    "packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py",
     "packages/project-orrery-core/src/project_orrery_core/team.py",
     "packages/project-orrery-core/src/project_orrery_core/templates.py",
     "packages/project-orrery-core/src/project_orrery_core/templates/authority/.gitignore",

@@ -28,6 +28,7 @@ from .collaboration import (
     resolve_integration_oid,
     validate_collaboration_contract,
 )
+from .subprocess_policy import no_window_options
 
 
 REVIEW_SCHEMA_VERSION = 1
@@ -98,6 +99,7 @@ def _git(
         errors=None if binary else "replace",
         check=False,
         env=env,
+        **no_window_options(),
     )
     if check and completed.returncode:
         stderr = completed.stderr if isinstance(completed.stderr, str) else b""

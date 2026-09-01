@@ -35,6 +35,7 @@ from .collaboration import (
     bootstrap_maintainer,
     inspect_worktree_status,
 )
+from .subprocess_policy import no_window_options
 
 
 TEAM_SCHEMA_VERSION = 1
@@ -100,6 +101,7 @@ def _git(project_root: Path, *arguments: str) -> str:
         ["git", "-C", str(project_root), *arguments], stdin=subprocess.DEVNULL,
         capture_output=True, text=True, encoding="utf-8", errors="replace", check=False,
         env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", "GIT_TERMINAL_PROMPT": "0"},
+        **no_window_options(),
     )
     if completed.returncode:
         raise ValueError(f"cannot inspect Git team identity: {completed.stderr.strip() or completed.stdout.strip()}")

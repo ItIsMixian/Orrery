@@ -25,6 +25,7 @@ for source in (OBSERVATORY_SOURCE, CLI_SOURCE, CORE_SOURCE, DOCSITE):
 
 import build_unified_observatory  # noqa: E402
 import serve_orrery  # noqa: E402
+from project_orrery_core import subprocess_policy  # noqa: E402
 from project_orrery_observatory.unified_observatory import (  # noqa: E402
     ConsumerRegistration,
     RegistrationError,
@@ -606,6 +607,33 @@ class UnifiedRuntimeTests(unittest.TestCase):
 
 
 class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
+    def test_production_child_policy_is_windows_only_and_explicitly_disableable(self) -> None:
+        with mock.patch.object(subprocess_policy.os, "name", "nt"):
+            self.assertEqual(
+                subprocess_policy.no_window_options(),
+                {"creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)},
+            )
+            self.assertEqual(subprocess_policy.no_window_options(enabled=False), {})
+        with mock.patch.object(subprocess_policy.os, "name", "posix"):
+            self.assertEqual(subprocess_policy.no_window_options(), {})
+
+    def test_unified_startup_and_refresh_git_sites_use_shared_child_policy(self) -> None:
+        required_counts = {
+            "packages/project-orrery-core/src/project_orrery_core/collaboration.py": 5,
+            "packages/project-orrery-core/src/project_orrery_core/review.py": 1,
+            "packages/project-orrery-core/src/project_orrery_core/team.py": 1,
+            "packages/project-orrery-core/src/project_orrery_core/workstream_program_hierarchy.py": 1,
+            "packages/project-orrery-core/src/project_orrery_core/workstream_relations.py": 1,
+            "packages/project-orrery-core/src/project_orrery_core/workstream_relation_capture.py": 1,
+            "packages/project-orrery-observatory/src/project_orrery_observatory/active_task_projection.py": 1,
+            "scripts/docsite/docsite_insights.py": 1,
+            "scripts/docsite/serve_orrery.py": 1,
+        }
+        for relative, expected in required_counts.items():
+            source = (ROOT / relative).read_text(encoding="utf-8")
+            self.assertEqual(source.count("**no_window_options()"), expected, relative)
+        self.assertIn("**no_window_options(enabled=not console)", (ROOT / "scripts/docsite/serve_orrery.py").read_text(encoding="utf-8"))
+
     def test_stale_identity_recovers_but_live_identity_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory(prefix="orrery-unified-identity-") as temporary:
             root = Path(temporary)
@@ -627,6 +655,64 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
             identity.marker.write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
             with self.assertRaisesRegex(RuntimeError, "already running"):
                 identity.recover()
+
+    def test_live_healthy_identity_reuses_exact_loopback_runtime(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="orrery-unified-reuse-") as temporary:
+            root = Path(temporary)
+            identity = serve_orrery.RuntimeIdentity()
+            identity.root = root
+            identity.marker = root / "runtime.json"
+            identity.log_path = root / "unified.log"
+            port = 18765
+            identity.marker.write_text(json.dumps({
+                "schema_version": 1,
+                "contract_type": "unified-observatory-runtime-identity-v1",
+                "instance_id": "existing-instance",
+                "pid": os.getpid(),
+                "host": "127.0.0.1",
+                "port": port,
+                "url": f"http://127.0.0.1:{port}/",
+                "ready": True,
+            }), encoding="utf-8")
+            response = mock.MagicMock()
+            response.status = 200
+            response.read.return_value = json.dumps({
+                "contract_type": "unified-observatory-health-v1",
+                "status": "ready",
+                "single_visible_url": True,
+            }).encode("utf-8")
+            response.__enter__.return_value = response
+            with mock.patch.object(serve_orrery, "urlopen", return_value=response) as opened:
+                self.assertEqual(identity.reusable_url(), f"http://127.0.0.1:{port}/")
+            self.assertEqual(opened.call_args.args[0].full_url, f"http://127.0.0.1:{port}/api/v1/health")
+
+            with mock.patch.object(serve_orrery, "urlopen", side_effect=OSError("offline")):
+                with self.assertRaisesRegex(RuntimeError, "unhealthy"):
+                    identity.reusable_url()
+            self.assertTrue(identity.marker.exists())
+
+    def test_normal_main_reuses_before_render_and_console_legacy_keeps_console(self) -> None:
+        identity = mock.Mock()
+        identity.reusable_url.return_value = "http://127.0.0.1:18765/"
+        logger = mock.Mock()
+        with (
+            mock.patch.object(serve_orrery, "RuntimeIdentity", return_value=identity),
+            mock.patch.object(serve_orrery, "_logger", return_value=logger),
+            mock.patch.object(serve_orrery.webbrowser, "open") as browser,
+            mock.patch.object(
+                serve_orrery.build_unified_observatory, "render_unified_site",
+                side_effect=AssertionError("healthy reuse must precede construction"),
+            ),
+            mock.patch.object(serve_orrery.legacy_serve, "_stop_managed_broker"),
+        ):
+            self.assertEqual(serve_orrery.main([]), 0)
+        browser.assert_called_once_with("http://127.0.0.1:18765/#overview")
+        identity.recover.assert_not_called()
+        identity.cleanup.assert_called_once_with()
+
+        with mock.patch.object(serve_orrery.subprocess, "call", return_value=0) as child:
+            self.assertEqual(serve_orrery._legacy(True, True), 0)
+        self.assertNotIn("creationflags", child.call_args.kwargs)
 
     def test_headless_launcher_console_debug_and_legacy_rollback_are_explicit(self) -> None:
         vbs = (ROOT / "Start Orrery.vbs").read_text(encoding="utf-8")
