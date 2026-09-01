@@ -44,3 +44,11 @@ Release-input `41fcc0f751d694b7be873dbc6113ecbc00d0869a` completed the two direc
 The subsequent PowerShell package command failed parsing at `$name:` before either exact-Git builder started. No
 package output, remote action or repository change occurred. Revision 3 may correct only the external interpolation
 syntax and continue the two-build gate on the same release-input SHA; no metadata test is repeated.
+
+## 2026-08-31 first actual builder refusal
+
+The corrected orchestration started the first builder on `41fcc0f...`; it failed before archive creation with
+`missing=[]` and one extra tracked path: the accepted hotfix `subprocess_policy.py`. The v0.3.1 manifest and its Core
+mirror both contain 163 paths and omit that shipped module. The second build, runtime, push and every remote stage did
+not start. Revision 4 may add only that path, update the count/hash/mirror and its existing 163-count test expectation,
+then execute the two-build gate once on a new release-input SHA.

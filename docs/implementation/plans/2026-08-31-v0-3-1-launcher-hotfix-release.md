@@ -58,3 +58,15 @@ orchestration was rejected by the PowerShell parser before either builder starte
 Revision 3 authorizes only correcting that external command text and executing the two-build package gate on unchanged
 `41fcc0f...`. This is not a retry of a builder, package fingerprint or test: neither build process began and no output
 directory was created. Do not modify repository files, rerun metadata tests or add another validation step.
+
+## 2026-08-31 scope revision 4 — include the shipped subprocess policy in archive inventory
+
+The first actual exact-Git builder on `41fcc0f...` failed closed before archive creation: the tracked tree contains
+`project-orrery/packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py`, but the v0.3.1 archive
+allowlist omitted it. The second build did not start and no remote action occurred.
+
+Revision 4 authorizes only adding that exact path to the sorted v0.3.1 `archive_paths`, updating `archive_entries`
+from 163 to 164, recomputing the path-list SHA-256, keeping the Core `release-v0.3.1.json` mirror byte-equivalent, and
+changing the existing release-package count expectation from 163 to 164. Do not change any other allowlist member,
+product file, version or test. Commit a new release-input SHA; then run the two-build gate in fresh temporary roots.
+The failed `41fcc0f...` package identity is not retried, and no separate metadata or package test is added locally.
