@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Exact `a0a728b...` Promotion PASS; protected main Pending; tag not started
+Status: PASS — Orrery v0.3.0 published and remote assets verified
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -754,3 +754,16 @@ completed successfully. Downloaded aggregate receipts are identical in identity 
 Run URL: `https://github.com/ItIsMixian/Orrery/actions/runs/33456504779`. The promotion ref still equals
 `a0a728b...`; `main` and `v0.3.0` remain unchanged at this evidence point. Same-SHA main promotion is now authorized;
 GitHub Release creation and asset upload are still explicitly withheld.
+
+## 2026-09-01 protected main, tag and GitHub Release — PASS
+
+- protected `origin/main` was fast-forwarded to exact
+  `a0a728b1f096650e475a1327d29973f2a1f9e267`; main Fast run `33457059391` passed;
+- annotated `v0.3.0` was created and pushed; the peeled remote tag target is the same exact SHA;
+- tag workflow `33457361855` (`Verify Orrery Release Tag`) passed;
+- GitHub Release `v0.3.0` was created as a non-draft, non-prerelease latest release with exactly two assets;
+- remote re-download verified ZIP SHA-256
+  `12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385` and checksum-file SHA-256
+  `599b416d5b03a74665e1e9c5864b4902ab13ba9037956d3ef04919a45737e011`; the checksum file names the same ZIP hash.
+
+Release URL: `https://github.com/ItIsMixian/Orrery/releases/tag/v0.3.0`.

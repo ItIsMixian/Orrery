@@ -6,7 +6,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 当前公开发布
 
-- Orrery v0.2.0 是唯一公开 Release。annotated tag 指向 `20fc95b`；ZIP SHA-256 为 `13b71c8be0af16b5bb51edcab2c979a14625b773bad1b901fd449c20797b6394`。
+- Orrery v0.3.0 是当前公开 Release。annotated tag 指向 exact `a0a728b1f096650e475a1327d29973f2a1f9e267`；
+  ZIP SHA-256 为 `12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385`。v0.2.0 tag、
+  ZIP 与历史 manifest 保持不变。
 - local central `ef145180...` 已包含 v0.3.0 release-input Candidate：release-candidate manifest、162-entry
   exact-Git builder、自包含 Core/CLI/Observatory runtime、Unified template launchers 和人工 publication 边界。
   task merge `0f82d565...` 的 Candidate preview 已允许 fresh run，但尚无 exact-SHA Candidate/Promotion/public

@@ -4,7 +4,8 @@ Updated: 2026-08-31
 
 ## 当前阶段
 
-Orrery v0.2.0 仍是当前公开版本。受保护的 `origin/main` 已包含 SC1 exact
+Orrery v0.3.0 已于 2026-09-01 公开发布；annotated tag、受保护 `main` 与 Release 均绑定 exact
+`a0a728b1f096650e475a1327d29973f2a1f9e267`。此前受保护的 `origin/main` 包含 SC1 exact
 `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 只收口文档，产品 source baseline
 `9ee831f0d6f64306fe821f8c70229df54648d3eb` 已经包含平台中立
 Core／CLI／Observatory、四个 Adapter、Broker-only docsite、Authority Meta Model M1／M2、
@@ -52,7 +53,7 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 活动计划与待办
 
-- [ ] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：旧三次 FAIL 保留；exact `a0a728b...` run `33456504779` 双平台 Promotion PASS。下一步只推广同 SHA 到 protected main，再单独创建 annotated tag。GitHub Release withheld。
+- [x] [Orrery v0.3.0 Final RC and Promotion](implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)：旧三次 FAIL 保留；exact `a0a728b...` Promotion、main Fast、annotated tag、tag workflow、GitHub Release 与远端资产哈希全部 PASS。
 - [x] [GX1 Fireworks Tech Graph Evaluation](implementation/plans/2026-08-30-gx1-fireworks-graph-skill-evaluation.md)：隔离 Candidate `f5fd5af` 得分 8/12；仅接受为 W7.3 设计/几何辅助和选择性重写输入，不采纳第三方 runtime。
 - [x] [GX2 ELK Layout Engine Evaluation](implementation/plans/2026-08-30-gx2-elk-layout-engine-evaluation.md)：维护者接受 ELK 0.11.0、W phase small multiples、typed stubs、独立 context 与现有 Orrery 视觉方向用于产品接线；不等于产品/测试/Release PASS。
 - [x] [PO1 Decision Allocation Enforcement](implementation/plans/2026-08-30-po-decision-allocation-enforcement.md)：dispatch Skill、duplicate-number gate 与 A4→ADR-0019 中央规范化均已完成。
@@ -96,5 +97,5 @@ W1–W7 协作源、R3 品牌收口与 CI5 Promotion 优化。上述发布后能
 
 ## 下一里程碑
 
-1. 推送 exact `a0a728b...` 到 protected `main` 并核对远端 equality；不得推 evidence-only HEAD。
-2. 停在 GitHub Release 创建/asset upload 前，向维护者提交完整证据与已知限制。
+1. v0.3.0 发布工作已完成；后续修复使用新的 patch 版本，不移动 tag 或替换资产。
+2. 另开任务精简发布流程，把失败集合本地复现与必要/非必要门分类固化，避免再次重复全矩阵。

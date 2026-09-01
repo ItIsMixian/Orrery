@@ -1275,3 +1275,5 @@
   56/56、双根 package 与完整 final runtime PASS；前三个远端失败 run 均保留。
 - exact `a0a728b...` Promotion run `33456504779` 最终双平台 green：每端 451 tests/27 shards/10 lanes，两个
   repository gates 与 required smoke checks PASS。此证据只授权同 SHA main/tag 流程，不授权 GitHub Release。
+- 维护者随后明确授权立即发布。protected main、main Fast `33457059391`、annotated `v0.3.0`、tag workflow
+  `33457361855` 与 GitHub Release 均完成；远端下载的 ZIP/checksum hashes 与 exact `a0a728b...` 本地产物一致。

@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Exact `a0a728b...` Promotion PASS; same-SHA protected main authorized; GitHub Release withheld
+Status: Complete — exact `a0a728b...` main/tag/Release published and remotely verified
 
 Date: 2026-08-30
 
