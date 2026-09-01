@@ -9,6 +9,10 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - Orrery v0.3.0 是当前公开 Release。annotated tag 指向 exact `a0a728b1f096650e475a1327d29973f2a1f9e267`；
   ZIP SHA-256 为 `12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385`。v0.2.0 tag、
   ZIP 与历史 manifest 保持不变。
+- v0.3.0 Windows 默认入口存在一个已确认的启动体验缺陷：隐藏 `pythonw` supervisor 在 startup/refresh
+  路径创建 Git console children 时没有统一 no-window flag，可出现连续命令窗口闪现；重复点击还会创建一个
+  随后被 runtime guard 拒绝的隐藏 supervisor attempt。当前尚无修复 Candidate；v0.3.0 tag/资产不得替换，
+  修复只能进入后续 patch release。
 - local central `ef145180...` 已包含 v0.3.0 release-input Candidate：release-candidate manifest、162-entry
   exact-Git builder、自包含 Core/CLI/Observatory runtime、Unified template launchers 和人工 publication 边界。
   task merge `0f82d565...` 的 Candidate preview 已允许 fresh run，但尚无 exact-SHA Candidate/Promotion/public

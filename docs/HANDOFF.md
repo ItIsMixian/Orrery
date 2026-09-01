@@ -4,6 +4,10 @@ Updated: 2026-08-31
 
 ## 当前停止点
 
+- v0.3.0 Windows launcher 已发现严重体验缺陷：默认隐藏 `pythonw` 运行时的 production Git/helper
+  subprocess 未统一设置 no-window flag，可连续闪现命令窗口；重复点击会产生一个被 guard 拒绝的额外
+  supervisor attempt。修复 Plan/Pending Validation 已登记，尚无产品写入或修复证据；v0.3.0 tag/资产保持
+  immutable，后续只允许新 patch release。
 - 公开版本现为 Orrery v0.3.0；tag/main 指向 exact `a0a728b...`，GitHub Release 与两个远端资产已验证。
 - `V0.3.0-final-rc` exact `a0a728b...` 已完成 Candidate 56/56、双根 byte-identical package、完整
   Windows final runtime 与剩余 2-ID closure；前三个 Promotion run FAIL 保留，run `33456504779` 双平台 PASS。
@@ -52,6 +56,9 @@ Updated: 2026-08-31
   `a2d7737...` final page 已接受，Phase 0 COMPLETE。
 
 ## 当前可继续的线路
+
+- **当前优先：Windows launcher hotfix。** 先按 2026-08-31 Plan 实现 Windows headless child policy 与运行
+  实例复用，只跑 focused checks 和一次真实 launcher smoke；不在编辑循环跑完整矩阵，不替换 v0.3.0 资产。
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
 2. **GX2 ELK layout evaluation：** 隔离视觉方向已获维护者接受并冻结 exact provenance；不再继续修改实验。

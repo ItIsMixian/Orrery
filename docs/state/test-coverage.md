@@ -101,6 +101,10 @@ Updated: 2026-08-31
 
 ## 已知缺口
 
+- v0.3.0 final runtime 验证证明了 start/HTTP/stop/restart 和 stale-marker recovery，但没有观测 Windows
+  GUI-parent 下 console-subsystem child 的可见窗口，也没有覆盖第二次正常点击应复用已运行 supervisor；因此
+  没有捕获公开 Windows launcher 的连续闪窗缺陷。新的热修只允许 focused contract 加一次真实 Windows
+  launcher smoke，完整 Candidate/Promotion 留给后续 patch-release scope。
 - v0.3.0 release-input Fast 75／Checkpoint 81 与 bounded Focused 均在测试加载前拒绝。后续 Candidate dry-run
   在 merge `0f82d565...` 上选择 81 tests，acceptance=`shadow-allow`、timing=`allow`、runner_errors=[]；
   `successful=false/evidence_eligible=false` 只是所有 dry-run 的固定非证据语义，reuse refusal 不阻止 fresh
