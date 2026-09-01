@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 15 v0.2 archive-root correction Pending; main/tag not started
+Status: Candidate/package/final runtime PASS on `76a6961...`; exact-SHA Promotion Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -652,3 +652,30 @@ The downloaded public v0.2.0 ZIP matched
 `243a29b9caea9036620c8a31993b1994700bfc1e17539b7cc2fb6a2dfdd0f105`. The first installer command used the
 outer extraction directory instead of the archive's nested `project-orrery/` root and returned file-not-found before
 installer execution. The upgrade target remains empty. Revision 15 is Pending for that path-only correction.
+
+## 2026-08-31 revision-15 exact final runtime — PASS
+
+The corrected historical path completed the remaining matrix on exact Candidate
+`76a69612a1021dbebdcf5a5c2aaba0414e92a348`:
+
+- source-checkout and extracted-archive installers/validators exit 0; both produce 0.3.0, Authority Model 1,
+  migration-pending targets with 120 managed tools;
+- bundled Harness validate exits 0 with `warning/valid=true/integrated=false`; invalid arbitrary argv exits 2 with
+  `invalid_request`, no launch and no synthetic sentinel disclosure;
+- Codex CLI 0.151.0-alpha.7.2/GPT-5.6 Sol medium: explicit integrated gate exits 1 as `migration_pending`; implicit
+  ordinary validation selects `project-orrery` and exits 0;
+- Unified serves the 1,938,768-byte page and ready health on loopback, releases helpers/ports on console interrupt,
+  recovers the system-interrupted stale marker, then completes an HTTP-202 API stop with process exit 0 and no marker;
+- immutable public v0.2.0 assets match GitHub digests; v0.2 install then v0.3 dry-run/apply upgrades exactly eight
+  managed tools, creates eight backup files, preserves the authored `AGENTS.md` marker/hash and records 120 tools;
+- Authority migrate/apply selects model 1, and receipt-bound restore recovers the exact pre-migration manifest hash
+  `a9c9053908921806883ee3fff14638f7c922e3d08deee663b540be73b8bb71e5`;
+- a runtime copy without embedded packages fails closed with `ModuleNotFoundError`/exit 1;
+- repository-local Codex discovery is 1→0→1 across reversible move/restore; excluding `__pycache__`/bytecode, source
+  and restored Skill each contain 162 byte-identical files; the real user Skill retains write time
+  `2026-08-17T09:54:10.9782801Z`.
+
+The malformed command, policy-blocked Codex attempt, non-Git Unified start, interrupted server, wrong v0.2 path and
+post-upgrade backup-field parser assertion remain recorded as non-green orchestration evidence; none is rewritten as
+PASS or rerun unchanged. Exact `76a6961...` is ready for one new non-main Promotion run. `main`, tag and GitHub
+Release remain untouched.

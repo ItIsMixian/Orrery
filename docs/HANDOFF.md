@@ -5,8 +5,8 @@ Updated: 2026-08-31
 ## 当前停止点
 
 - 公开版本仍为 Orrery v0.2.0；tag 指向 `20fc95b`，ZIP／checksum 与历史 release manifest 不变。
-- `V0.3.0-final-rc` exact `ba230555...` 已完成 Candidate 81/81、双根 byte-identical package 和一次外部
-  offline new-project scaffold/validate/Unified-help PASS；final runtime matrix、Promotion 与发布操作未运行。
+- `V0.3.0-final-rc` exact `76a6961...` 已完成 Candidate 100/100、双根 byte-identical package 和完整
+  Windows final runtime；旧 Promotion runs `33449930707`／`33451288289` FAIL 保留，新 SHA 尚未 Promotion。
 - 维护者已授权持续推进 final runtime、exact non-main Promotion、同 SHA protected main 与 annotated v0.3.0
   tag；GitHub Release 创建/asset upload 明确保留为最终停止门。
 - protected `origin/main` 已包含 SC1 exact `a9369ddeee0e74d4ddbe4bfc23a86b510d400457`；SC1 的产品 source baseline 为 `9ee831f`，只修改权威文档。
@@ -82,9 +82,10 @@ Updated: 2026-08-31
     tag；首个 runtime orchestration 在安装前因 `$home`/`$HOME` 变量冲突停止，用户状态未改变。scope revision
     7 corrected runtime 暴露 extracted asset/runtime root defect；scope revision 8 exact `e120aaa...` 已修复并
     完成 Candidate 36/36、双根 package、final ZIP Harness、真实 Codex、Unified、upgrade/migration/Skill lifecycle。
-    Promotion run `33449930707` 在 lanes 前因 machine lane-list stdout 被 docsite 日志污染而失败关闭。scope
-    revision 9 exact `4556db3...` 已完成 Candidate 42/42、双根 package 和完整 final runtime PASS；现在只可
-    fast-forward Promotion ref 并运行一次新矩阵。最终仍停在 GitHub Release 创建/asset upload 前。
+    Promotion run `33449930707` 在 lanes 前因 machine lane-list stdout 被 docsite 日志污染而失败关闭；run
+    `33451288289` 完整执行但暴露 36 个集成漂移 ID。scope revision 15 exact `76a6961...` 已完成 Candidate
+    100/100、双根 package 和完整 final runtime PASS；现在只可 fast-forward Promotion ref 并运行一次新矩阵。
+    最终仍停在 GitHub Release 创建/asset upload 前。
 
 ## 不得外推的边界
 

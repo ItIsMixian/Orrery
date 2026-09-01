@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 15 v0.2 archive-root correction authorized; GitHub Release withheld
+Status: Revision 15 Candidate/package/final runtime PASS on `76a6961...`; exact-SHA Promotion authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -688,6 +688,12 @@ upgrade target was unchanged.
 Revision 15 authorizes only changing the external `v0.2.0-skill` variable to its nested `project-orrery` directory,
 then continuing the already-authorized upgrade/migrate/restore portfolio. Do not redownload the verified asset or
 replay the wrong-path command. No repository file or release Candidate changes.
+
+Revision 15 completed the exact `76a69612a1021dbebdcf5a5c2aaba0414e92a348` local release gates. Candidate
+100/100, two-root deterministic package, source/extracted install, direct Harness, real Codex explicit/implicit,
+Unified restart/stale recovery, v0.2 upgrade with eight backups, receipt-bound migration/restore, missing-package
+failure and candidate Skill 1→0→1 are green. The exact SHA is now eligible for one fast-forward update of
+`promotion/v0.3.0-rc` and one new Promotion run. Evidence-only commits after `76a6961...` are not Candidate inputs.
 
 ## Phase 1 — register Final RC and freeze inputs
 

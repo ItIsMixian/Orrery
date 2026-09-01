@@ -1255,3 +1255,17 @@
   原始 `a520ebc` focused 5/5、CI contract、完整 CI suite 25/25、pre-amendment 开发树 Fast 42/42
   （8.057895s）与 Checkpoint 42/42（7.526136s）通过；这些不替代上方 amendment exact-SHA non-green Fast
   事实。完整 Promotion 不作开发循环；新 final fingerprint 的 hosted checks 留给中央整合。
+
+## 2026-08-31 — v0.3.0 Promotion integration-drift remediation
+
+- exact `4556db3...` Promotion run `33451288289` 的 preflight 与双平台 repository gates PASS，但 451-test
+  matrices 在 Ubuntu 33／Windows 36 个 ID 失败关闭。下载全部 lane/aggregate receipts 后，将 36 个表象收敛为
+  source-Skill runtime root、Windows locale、historical candidate gate、缺 test-only `jsonschema` 与 stale fixture
+  五类原因；没有 per-lane 或 same-SHA 重跑。
+- scope revisions 10–15 只修三处产品逻辑、两处 workflow dependency、既有测试期望/fixture 和一条 generic
+  `release-packaging` path mapping。exact `76a6961...` 的唯一 Candidate 100/100 PASS，双根 162-entry package
+  byte-identical，完整 Windows final runtime 覆盖 Harness、Sol-medium Codex、Unified lifecycle、v0.2 upgrade、
+  Authority restore、缺包 failure closure 与 Skill 1→0→1。
+- 中途 malformed PowerShell、policy-blocked Codex、non-Git Unified、系统中断 stale marker、wrong v0.2 root
+  和 backup-field parser assertion 均按原结果保留；没有伪装成产品 PASS。下一步只运行 exact non-main
+  `76a6961...` Promotion；main/tag/GitHub Release 未发生。

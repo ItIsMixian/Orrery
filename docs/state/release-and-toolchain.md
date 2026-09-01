@@ -20,6 +20,10 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   `e120aaa...` 已修复并完成 Candidate/package/final runtime PASS。Promotion run `33449930707` 在任何 lane 前因
   lane-list stdout 污染 `$GITHUB_OUTPUT` 而 non-green。scope revision 9 exact `4556db3...` 的 Candidate/package/
   runtime 已 PASS，可 fast-forward Promotion ref；GitHub Release create/upload 仍未授权。
+- Promotion run `33451288289` 在 exact `4556db3...` 上通过 preflight 与双平台 repository gates，但完整矩阵
+  暴露 36 个集成漂移测试并失败关闭。scope revisions 10–15 将三处产品缺口、test-only dependency、过期
+  fixture/断言和 release-gate mapping 收口到 exact `76a6961...`；该 SHA 的 Candidate 100/100、双根 package
+  与完整 final runtime 已 PASS。下一动作仅是 exact non-main Promotion；main/tag/Release 仍未发生。
 - 发布资产继续使用 `project-orrery-v0.2.0.zip`／`.sha256`；release manifest、bundled bridge 与 phase-0 fixture 保持冻结。
 - v0.2.0 Skill 是当前唯一已发布集成。默认安装 create-only；`--upgrade-tools` 只处理白名单工具并先备份；作者文档、凭据、缓存和生成物不进入发布包。
 - 当前展示品牌为 Orrery，但 `project-orrery` Skill／distribution／CLI、`project_orrery_*` imports、`.project-orrery.json`、v1 protocol IDs 与 backup/keyring/cache namespaces 不变。
