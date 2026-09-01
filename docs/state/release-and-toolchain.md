@@ -10,9 +10,10 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   ZIP SHA-256 为 `12a7061227cd2f9137dc2923716523059fbc8b528df8b1c7a8cdd8283d7d2385`。v0.2.0 tag、
   ZIP 与历史 manifest 保持不变。
 - v0.3.0 Windows 默认入口存在一个已确认的启动体验缺陷：隐藏 `pythonw` supervisor 在 startup/refresh
-  路径创建 Git console children 时没有统一 no-window flag，可出现连续命令窗口闪现；重复点击还会创建一个
-  随后被 runtime guard 拒绝的隐藏 supervisor attempt。当前尚无修复 Candidate；v0.3.0 tag/资产不得替换，
-  修复只能进入后续 patch release。
+  路径创建 Git console children 时没有统一 no-window flag，且重复点击不复用健康 runtime。独立 Worktree
+  Candidate exact `06a277d...` 已增加共享 `CREATE_NO_WINDOW` policy、构建前健康实例复用、root/template parity
+  与 focused/真实机械 smoke evidence；它尚未中央整合或发布。v0.3.0 tag/资产保持 immutable，修复只能进入
+  后续 patch release。
 - local central `ef145180...` 已包含 v0.3.0 release-input Candidate：release-candidate manifest、162-entry
   exact-Git builder、自包含 Core/CLI/Observatory runtime、Unified template launchers 和人工 publication 边界。
   task merge `0f82d565...` 的 Candidate preview 已允许 fresh run，但尚无 exact-SHA Candidate/Promotion/public
@@ -109,6 +110,8 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `.github/workflows/fast-validation.yml`, `.github/workflows/validate.yml`
 - `scripts/ci/`, `tests/test_ci_validation.py`
 - `scripts/docsite/build_unified_observatory.py`, `scripts/docsite/serve_orrery.py`
+- `packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py`
+- [Windows launcher console-flash hotfix Validation](../validation/2026-08-31-windows-launcher-console-flash-hotfix.md)
 - [U2 Unified Observatory Validation](../validation/2026-08-29-u2-unified-observatory-production-integration.md)
 - [U2.1 UX Acceptance Fixes Validation](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)

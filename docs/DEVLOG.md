@@ -1277,3 +1277,20 @@
   repository gates 与 required smoke checks PASS。此证据只授权同 SHA main/tag 流程，不授权 GitHub Release。
 - 维护者随后明确授权立即发布。protected main、main Fast `33457059391`、annotated `v0.3.0`、tag workflow
   `33457361855` 与 GitHub Release 均完成；远端下载的 ZIP/checksum hashes 与 exact `a0a728b...` 本地产物一致。
+
+## 2026-08-31 — Windows launcher console-flash hotfix Worktree Candidate
+
+- 从 task-description/code exact `25454be1db26860f4d9874c73204d30ef68f962b` 建立独立
+  `codex/windows-launcher-console-flash-hotfix` Workstream，并在首次产品写入前登记 Git-private scope。实现只触及
+  Windows child-process policy、健康 runtime 复用、root/template parity 和直接 owner tests；根
+  PROGRESS/HANDOFF、v0.3.0 tag/资产、alias、scheduler、UI 与协作语义均未改。
+- product exact `06a277de3e380f7c8a957d76cba60c29db0fd3e1` 为 startup/page/refresh 可达 Git children 统一应用
+  `CREATE_NO_WINDOW`；正常 headless 点击在整页构建前验证 live marker + loopback health 并复用 exact URL，
+  stale 继续恢复、alive-unhealthy/invalid 继续失败关闭，显式 console legacy child 保留继承控制台。
+- focused Unified 16/16、template/runtime inventory 1/1、source scaffold parity 1/1、compile 与 diff checks PASS。
+  clean Windows VBS smoke 首次/第二次均为 PID `129012`、port `8765`、同一 instance，日志为 one ready/one reuse；
+  两个 launcher-process PID 的 760 条 opt-in audit 全部记录 `CREATE_NO_WINDOW=134217728`，0 invalid。stop 后
+  marker、PID 与 listener 全部回收。
+- 该证据是 Worktree-local mechanical validation，不是人类肉眼“无闪窗”感知、Canonical integration、
+  Fast/Checkpoint/Candidate/Promotion 或 patch Release。维护者可在后续发布前手动双击确认主观体验；完整发布门
+  由独立 patch-release scope 持有。

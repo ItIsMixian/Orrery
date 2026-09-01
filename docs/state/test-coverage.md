@@ -16,6 +16,11 @@ Updated: 2026-08-31
 
 ## 当前通过证据
 
+- Windows launcher hotfix Worktree Candidate product exact `06a277d...` 已完成 Unified 16/16、template/runtime
+  inventory 1/1、source scaffold parity 1/1 与 Python compile／diff checks。一次 clean Windows VBS smoke 保持
+  PID／port／instance 全相同，记录单次 ready／单次 reuse；760 条两进程 audit 覆盖 11 个生产 child caller，
+  全部为 `CREATE_NO_WINDOW=134217728`，0 invalid。stop 后 marker／PID／listener 均回收。此为 focused mechanical
+  evidence，不是 Fast／Checkpoint／Candidate／Promotion 或发布证据。
 - CI5 本地 contract/mutation 17/17 PASS；inventory 为 390／27／10／57／81，无 missing、duplicate 或 dead selector。
 - CI5 本地 Fast 57/57 为 3.235952s；最终两次 Checkpoint 均为 81/81，42.806990s／43.071302s，预算未调高。120.961576s 的真实 Git journey 只保留在 Promotion。
 - exact SHA `9ee831f0d6f64306fe821f8c70229df54648d3eb` 的 Fast run `33235942078` 成功；Promotion run `33235992711` 为 25/25 jobs PASS，Windows／Ubuntu required checks 双 PASS，各自聚合 390 tests／27 shards。
@@ -101,10 +106,10 @@ Updated: 2026-08-31
 
 ## 已知缺口
 
-- v0.3.0 final runtime 验证证明了 start/HTTP/stop/restart 和 stale-marker recovery，但没有观测 Windows
-  GUI-parent 下 console-subsystem child 的可见窗口，也没有覆盖第二次正常点击应复用已运行 supervisor；因此
-  没有捕获公开 Windows launcher 的连续闪窗缺陷。新的热修只允许 focused contract 加一次真实 Windows
-  launcher smoke，完整 Candidate/Promotion 留给后续 patch-release scope。
+- v0.3.0 final runtime 没有捕获公开 Windows launcher 的连续闪窗缺陷。后续 hotfix Worktree Candidate 已用
+  Windows `CREATE_NO_WINDOW` audit 和第二次正常启动的 exact PID／port／instance 复用关闭机械覆盖缺口；没有
+  使用桌面自动化或记录人类肉眼闪窗感知，因此主观可见体验仍可由维护者在 patch publication 前手动双击确认。
+  完整 Candidate／Promotion 和 patch publication 仍属于后续 release scope。
 - v0.3.0 release-input Fast 75／Checkpoint 81 与 bounded Focused 均在测试加载前拒绝。后续 Candidate dry-run
   在 merge `0f82d565...` 上选择 81 tests，acceptance=`shadow-allow`、timing=`allow`、runner_errors=[]；
   `successful=false/evidence_eligible=false` 只是所有 dry-run 的固定非证据语义，reuse refusal 不阻止 fresh
