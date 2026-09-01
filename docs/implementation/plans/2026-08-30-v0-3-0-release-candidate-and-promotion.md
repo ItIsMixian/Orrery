@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 13 Codex policy correction authorized; GitHub Release withheld
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 14 isolated-Git runtime correction authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -664,6 +664,18 @@ ephemeral, read-only sandbox and no-write prompt, but without `--ignore-user-con
 file. User configuration may supply only the host execution policy/authentication; it cannot change model, reasoning,
 sandbox, working directory or the requested local Skill. If this invocation is non-green, stop without another
 Codex retry.
+
+### 2026-08-31 scope revision 14 — initialize the isolated runtime as a Git project
+
+Revision-13 explicit and implicit Codex gates passed. The first Unified lifecycle start then exited 1 before runtime
+identity creation because the external scaffold target was not a Git worktree; Unified stores PID/port/log ownership
+under Git-private state by design. No listener, helper, marker or browser started.
+
+Revision 14 authorizes only local `git init`, repository-local test identity, add and initial commit inside the
+external temporary runtime target, followed by the already-required two Unified start→HTTP 200→console-stop cycles.
+The commit contains only the generated scaffold and the byte-identical repository-local candidate Skill. It is not
+pushed and does not become release evidence or project authority. The failed precondition start is not replayed or
+reclassified.
 
 ## Phase 1 — register Final RC and freeze inputs
 

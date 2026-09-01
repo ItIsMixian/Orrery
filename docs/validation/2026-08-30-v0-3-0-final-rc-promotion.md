@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 13 Codex policy correction Pending; main/tag not started
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 14 isolated-Git runtime correction Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -626,3 +626,15 @@ execution because `--ignore-user-config` removed the host execution policy. Fina
 
 Revision 13 is Pending for one new output-bound invocation that restores only host configuration while retaining the
 explicit model/reasoning/read-only/workdir/Skill constraints. The failed output is not overwritten or called PASS.
+
+### Revision-13 Codex PASS and Unified non-Git precondition FAIL
+
+With host execution policy restored, Codex CLI 0.151.0-alpha.7.2/GPT-5.6 Sol medium selected the local
+`project-orrery` Skill. The explicit integrated-authority validation returned the expected exit 1 and
+`migration_pending`; a separate implicit ordinary validation selected the same Skill and returned exit 0 with the
+same authority status. Both used an ephemeral read-only sandbox and changed no file. User-configured MCP startup made
+failed loopback-only attempts to `127.0.0.1:8080`; no external endpoint or project AI Provider was used.
+
+The subsequent Unified process exited 1 because the external target had not been initialized as Git. Failure occurred
+before `RuntimeIdentity` could allocate Git-private ownership; no listener/helper/marker/browser existed. Revision 14
+is Pending for an isolated local Git initialization and the two original lifecycle cycles.
