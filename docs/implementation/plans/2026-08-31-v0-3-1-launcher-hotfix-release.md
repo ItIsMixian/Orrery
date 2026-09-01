@@ -70,3 +70,16 @@ from 163 to 164, recomputing the path-list SHA-256, keeping the Core `release-v0
 changing the existing release-package count expectation from 163 to 164. Do not change any other allowlist member,
 product file, version or test. Commit a new release-input SHA; then run the two-build gate in fresh temporary roots.
 The failed `41fcc0f...` package identity is not retried, and no separate metadata or package test is added locally.
+
+## 2026-08-31 scope revision 5 — install the Skill archive before launcher smoke
+
+The two-build gate passed on `6a018319a52537b541cf0285bc45f529253f818b`; ZIP, checksum and full receipt are
+byte-identical. The first runtime command then treated the extracted Skill root as an installed project and looked for
+root `scripts/docsite/serve_orrery.py`. The file is correctly projected only after the bundled installer creates a
+target project. Python failed before supervisor start; no marker, listener or process was created.
+
+Revision 5 authorizes only corrected external runtime orchestration using the already verified ZIP: extract to a fresh
+root, run its `project-orrery/scripts/install_project_orrery.py` into a fresh target, initialize/commit that isolated
+target as a local Git repository, then execute the target's normal headless start→reuse→stop smoke. Do not rebuild,
+modify repository files, run a test suite or reuse the failed target directory. Continue to Promotion only if this
+single installed-project smoke is green.

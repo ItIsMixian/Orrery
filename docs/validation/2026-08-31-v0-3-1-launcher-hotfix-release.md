@@ -52,3 +52,12 @@ The corrected orchestration started the first builder on `41fcc0f...`; it failed
 mirror both contain 163 paths and omit that shipped module. The second build, runtime, push and every remote stage did
 not start. Revision 4 may add only that path, update the count/hash/mirror and its existing 163-count test expectation,
 then execute the two-build gate once on a new release-input SHA.
+
+## 2026-08-31 package PASS and uninstalled-root runtime stop
+
+Exact `6a018319a52537b541cf0285bc45f529253f818b` produced two byte-identical packages. ZIP SHA-256 is
+`e5a4fa548db0a091b3d359ce7d16d6e3ef1d211f75560aaea3c5283df5f1b6e5`. The first runtime command did not
+run an installer and therefore searched for an installed-project launcher under the extracted Skill root; Python
+returned file-not-found before supervisor startup. No marker, process, listener, push or remote action occurred.
+Revision 5 may install that exact archive into a fresh isolated Git target and run the one authorized launcher smoke;
+package evidence is retained and not repeated.
