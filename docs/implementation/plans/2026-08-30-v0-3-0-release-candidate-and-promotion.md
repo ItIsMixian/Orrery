@@ -1,6 +1,6 @@
 # Implementation Plan: Orrery v0.3.0 Final RC, Promotion and Publication
 
-Status: Scope revision 10 Candidate dry-run refused before tests; revision 11 mapping amendment authorized; GitHub Release withheld
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 12 runtime command correction authorized; GitHub Release withheld
 
 Date: 2026-08-30
 
@@ -636,6 +636,19 @@ Revision 11 authorizes only `scripts/ci/change-mapping.json` to add the exact sc
 dependency, portfolio, budget, lane or task-specific condition. The refused fingerprint is not retried. Commit the
 mapping as a new SHA, refresh the Git-private scope before the write, and generate one new Candidate dry-run against
 `4556db3...`; all later gates remain as specified by revision 10.
+
+### 2026-08-31 scope revision 12 — final-runtime PowerShell array correction
+
+Revision 11 exact `76a69612a1021dbebdcf5a5c2aaba0414e92a348` completed one Candidate 100/100 PASS and two
+byte-identical exact-Git builds. Source-checkout and extracted-archive installer/validator checks then passed. The
+next orchestration command stopped before launching Harness because comma-separated `Join-Path` expressions were
+parsed as one call with an object-array `AdditionalChildPath`. No Harness process, request, user-state mutation,
+Provider call or repository write occurred.
+
+Revision 12 authorizes only a corrected external command that assigns the Core, Observatory and CLI source paths to
+three independent task-specific variables before constructing the Harness argument array. It changes no repository
+product, test, workflow, package or runtime target. Do not replay the malformed command. Continue the already
+authorized exact-archive runtime matrix from the first unexecuted Harness step on unchanged `76a6961...` bytes.
 
 ## Phase 1 — register Final RC and freeze inputs
 

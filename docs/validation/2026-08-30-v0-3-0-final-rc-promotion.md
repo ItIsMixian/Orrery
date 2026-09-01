@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 
-Status: Scope revision 10 Candidate dry-run REFUSED before tests; revision 11 mapping Pending; main/tag not started
+Status: Revision 11 Candidate/package PASS on `76a6961...`; revision 12 runtime command correction Pending; main/tag not started
 
 Authority: [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md) and
 [Final RC Plan](../implementation/plans/2026-08-30-v0-3-0-release-candidate-and-promotion.md)
@@ -589,3 +589,26 @@ runner error is an unmapped actual/expected path:
 The existing `release-packaging` mapping already owns the gate's registered tests but does not list the script path.
 Revision 11 is Pending for that single exact pattern. This refused SHA/fingerprint is not rerun, and it supplies no
 Candidate evidence.
+
+## 2026-08-31 revision-11 Candidate/build and runtime start
+
+Exact `76a69612a1021dbebdcf5a5c2aaba0414e92a348` added only the existing release-gate path to
+`release-packaging`. Its Candidate dry-run selected 100 tests with zero unknown path/runner error and allowed timing;
+the one fresh lease `404cbf0e996cfee66aa8a330c4a54800a33c298a5728a97fb41ca49e639ecb95` completed 100/100 PASS in
+66.346133s, zero reruns, evidence-eligible.
+
+Two exact-Git builds each contained 162 entries and path-list SHA-256
+`26d6570585b3507880f83c652000bdcc857e7bac3ea59866f06ad40abdb0bf5c`; their ZIP, checksum file and entry
+receipt bytes matched pairwise. Hashes are:
+
+- ZIP: `b9d581ad3978b8b29030e0e390542555198556fbb4aec16b1e753cfe299fd0df`;
+- checksum file: `f562c300de99daa8ce290f5b2e4c5d6d007699778bbc3490d0a2459fe656951d`;
+- entry receipt: `0ab96de641719bfd68255db88e20aab2b5e4e819ddf896ca6cf17fafd5554e4e`.
+
+External source-checkout and extracted-archive installer/validator paths both returned exit 0; each new target records
+0.3.0, Authority Model 1, migration pending and 120 managed tools. Runtime root is
+`C:\Users\1\AppData\Local\Temp\orrery-final-runtime-rev11-6dc807046390419bb47957825dea3f0b`.
+
+The first Harness orchestration command did not invoke Harness: PowerShell rejected a comma-separated `Join-Path`
+array while assembling arguments. No target or user state changed. Revision 12 is Pending for a command-only variable
+correction; no failed Harness result is being retried or reclassified.
