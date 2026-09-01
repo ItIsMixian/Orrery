@@ -36,3 +36,18 @@ real self-host preview. After acceptance, only focused history/relation/Observat
 ## Result
 
 Pending. No W7.4 product implementation or validation evidence exists under this task-description version.
+
+## 2026-09-01 preview rejection 3 — identity storage is not relation recovery
+
+Status: Rejected by maintainer; scope revision 2 Pending
+
+- the preview added a new “完整历史目录” and bulk card grid that the maintainer did not request;
+- the original relation canvas still showed only a small subset of historical relationships;
+- the implementation labelled many tasks “关系未登记” after consulting the newer relation store, but central
+  inspection proves 33/37 archived sessions retain lineage objects and at least 11 current archived pairs bind exact
+  source/target/task-base/validated-head evidence;
+- identity-only storage and relationship projection were therefore conflated in both directions.
+
+The next preview is acceptable only when the bulk history UI is absent, valid archived lineage relationships are
+recovered into the existing Graph, invalid/Unknown lineage stays edge-free with technical reasons, and no archive or
+relation history is rewritten. Automated tests remain forbidden before that preview is accepted.

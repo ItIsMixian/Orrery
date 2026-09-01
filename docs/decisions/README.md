@@ -12,7 +12,8 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
-- [ADR-0026: Durable Workstream History and Human-readable Relation Decisions](0026-durable-workstream-history-and-human-readable-relation-decisions.md) — Accepted; closed task identity survives worktree removal in a compact Core-owned history index, Graph history includes zero-relation tasks, and actionable relation cards must explain the question and consequences before exposing controls.
+- [ADR-0027: Retain History without Bulk UI and Recover Archived Lineage](0027-retain-history-without-bulk-ui-and-recover-archived-lineage.md) — Accepted; stores all closed identities without a new bulk-history UI and restores only mechanically validated archived lineage/series relationships into the existing Graph.
+- [ADR-0026: Durable Workstream History and Human-readable Relation Decisions](0026-durable-workstream-history-and-human-readable-relation-decisions.md) — Accepted and amended by ADR-0027; closed task identity survives worktree removal and actionable relation cards explain consequences, while bulk history display is no longer required.
 - [ADR-0025: Two Explicit Windows Launchers](0025-two-explicit-windows-launchers.md) — Accepted; the next Candidate exposes only `Start Orrery.vbs` for hidden-console launch and `Start Orrery Console.bat` for one-console diagnostics, while internalizing redundant control/legacy helpers and preserving historical release assets.
 - [ADR-0024: Orrery v0.3.1 Emergency Launcher Hotfix Release](0024-v0-3-1-emergency-launcher-hotfix-release.md) — Accepted; ships only the Windows launcher correction through one short exact-SHA patch gate, preserves v0.3.0 assets and moves alias/scheduler/DSH out of the emergency release.
 - [ADR-0023: Explicit Legacy Graph Layout Fallback and Preview-first Cutover](0023-explicit-legacy-graph-layout-fallback.md) — Accepted; preserves the handwritten renderer as a frozen, visibly labeled manual recovery engine, forbids silent fallback and blocks ELK product integration until the maintainer first accepts the isolated GX2 page.
@@ -44,7 +45,7 @@ An accepted ADR constrains later Approved Design and implementation work. It doe
 
 ## Pending integration proposals
 
-- No active proposal is awaiting maintainer review; ADR-0018–0026 are Accepted. ADR-0024 carries the maintainer's
+- No active proposal is awaiting maintainer review; ADR-0018–0027 are Accepted. ADR-0024 carries the maintainer's
   explicit request to proceed through the green v0.3.1 publication sequence without another pause.
 - `PO-DEC-AUTH-002` was integrated as ADR-0011.
 - `PO-DEC-REL-003` at REL3 exact `ec2b09b` was accepted and normalized into ADR-0021 plus the current Approved Design/blocked Final RC Plan.

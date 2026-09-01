@@ -155,3 +155,21 @@ Before broad automated tests, the maintainer sees one real self-host preview pro
 
 Only after this visual/semantic acceptance may focused Core/Observatory tests run. Fast, Checkpoint, Candidate,
 Promotion and release remain separate later actions.
+
+## 2026-09-01 revision 2 — store all, project only evidence-backed relations
+
+[ADR-0027](../decisions/0027-retain-history-without-bulk-ui-and-recover-archived-lineage.md) supersedes the display
+parts of sections 3 and 7 that required every stored closed task to be reachable through a new full-history UI.
+
+- `workstream-history-index-v1` still retains every bounded closed identity independently of worktree cleanup.
+- The relation page does not add a complete-history directory, bulk card grid or second history application.
+- The existing Graph projects only current tasks and historical tasks connected by validated semantic or explicit
+  series evidence. Connected old chains retain existing compact fold/expand behavior.
+- Core evaluates archived session `lineage` as potential mechanical `derived_from` evidence using exact status,
+  source/target, task-base OID, validated HEAD and Git checks. It does not require a newer relation-store record when
+  the older session already contains valid mechanical evidence.
+- Unverified/missing/drifted/cyclic lineage remains stored but creates no edge and no default canvas node.
+- Technical diagnostics expose aggregate recovery/rejection counts and safe evidence references; they are not a new
+  user-facing history list.
+- The accepted preview must show recovered archived relationship chains in the original relation canvas and no bulk
+  historical inventory UI.

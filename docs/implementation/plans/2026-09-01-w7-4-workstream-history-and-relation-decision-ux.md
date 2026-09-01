@@ -80,3 +80,37 @@ behavior remains U2.4.
 - Unknown lineage cannot be accepted and dependency authority/gates/CAS remain unchanged;
 - focused post-acceptance checks pass and the task branch is clean;
 - no integration, release or public capability is claimed.
+
+## 2026-09-01 scope revision 2 — recover archived lineage and remove bulk history UI
+
+The maintainer rejected the second and third previews. Restoring 37 identities was necessary storage work, but the
+implementation still failed the product objective: it either dumped identity-only tasks into ELK or introduced a new
+“完整历史目录” card grid while the original Graph still lacked most historical relations.
+
+Central read-only evidence for this revision is fixed:
+
+- 37 bounded retired-session records;
+- 33 records with a `lineage` object;
+- lineage status counts: 14 `current`, 13 `legacy-unknown`, 6 `parent-unverified-unknown`, 4 absent;
+- at least 11 `current` archived source/target pairs resolve inside the bounded archive and bind exact task-base and
+  validated-head OIDs. The implementation must recompute and validate this count rather than hard-code it.
+
+This revision authorizes W7.4 to:
+
+1. remove the newly introduced complete-history directory, bulk historical cards and `history:all` archive-dump path;
+2. retain the full underlying history index without presenting it as a new user-facing application;
+3. extend the existing legacy/archive relation resolver so valid archived `lineage.status=current` records can produce
+   read-only historical `derived_from` projection edges after exact endpoint/OID/Git/cycle validation;
+4. preserve current relation-store/capture proposals and explicit task-series connectors, deduplicating equivalent
+   archived/native edges deterministically without suppressing distinct evidence;
+5. keep legacy/unverified/missing/drifted lineage as Unknown with a technical rejection reason and no invented edge;
+6. keep only evidence-connected historical tasks in the relation canvas, using existing connected-history folding;
+7. update the real self-host preview to prove the recoverable archived chains are visible in the original Graph, the
+   bulk history UI is absent and current decision-card improvements remain;
+8. stop again for maintainer inspection before any unittest/Fast/Checkpoint/Candidate/Promotion stage.
+
+This revision does not authorize rewriting archive/session/relation bytes, synthesizing relations from names or
+timestamps, adding another history UI, changing confirmation authority, or starting W6.2.
+
+Revision-2 completion supersedes the earlier bullets requiring zero-relation tasks to be reachable from Graph UI.
+Those identities must remain stored, but they need not be rendered.

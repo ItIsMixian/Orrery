@@ -4,11 +4,11 @@ Updated: 2026-09-01
 
 ## 当前停止点
 
-- W6.2 自动清理只登记未分发：必须等待 W7.4 完整 history index、数量对账和维护者预览接受；当前仅恢复
-  6 条历史记录不能作为 `history_snapshot_ready`，不得创建 W6.2 任务或自动清理工作区。
-- W7.4 已在独立 branch/worktree 分发。首版真实预览只把 6 条 closed task 写入 history index，维护者明确
-  拒绝；它必须继续对完整 bounded archive/history 输入做总数、有效、去重、投影和逐项排除原因对账，再给
-  新预览。维护者接受前不得运行自动化测试，也不得把 6 条样本冒充完整历史。
+- W6.2 自动清理只登记未分发：必须等待 W7.4 history index、archived-lineage 恢复和维护者预览接受；当前
+  被拒绝的 W7.4 预览不能作为 `history_snapshot_ready`，不得创建 W6.2 任务或自动清理工作区。
+- W7.4 再次暂停等待 task-description revision 2：维护者拒绝新“完整历史目录”和 bulk card grid，并指出原
+  Graph 关系仍未找回。中央盘点为 37 records／33 lineage／14 current／至少 11 个 archived-to-archived exact
+  pair；新范围要求删除 bulk UI、从 archived lineage 恢复可验证关系并保留 Unknown。接受前不得运行测试。
 - U2.4 exact `00b2eb4fa28a606cdb532c7938e46482950e8233` 已按维护者指令进入当前本地 integration branch：
   归档布局恢复、即时 starting page 和两个 Windows 启动入口均已合入。合流产品树与 exact Candidate 一致，
   只做 compile/JSON/parity/diff 轻量检查，没有重跑 unittest。protected main、Promotion 和发布未发生；
