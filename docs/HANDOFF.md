@@ -11,12 +11,12 @@ Updated: 2026-09-02
   `fe75fc238ebf876d8565cabda0c8e0f8cfb4cfdd`：strict history 为 6 closed／31 retired，11 条 recovered
   archived lineage，full 25 nodes／18 routes／0 overlaps，compact 15／8／0 overlaps。它诚实保持
   `candidate-frozen / validation-pending`，尚未整合、闭合或获得 cleanup authority。
-- U2.5 Phase A clean exact `6596a9f8e0e79cf0e5bc76b8ae46b0f323056040` 已获维护者继续授权。Phase B 现在可
-  精确导入上述 W7.4 Candidate，保留其全部历史／关系／full-compact 语义并生成 self-host preview；预览接受前
-  仍禁止 unittest/Fast/Checkpoint/Candidate/Promotion。
-- W3.1 已登记于独立分支，首轮因两个 receipt schema 属于中央独占 `schema-migration` 而正确停在 clean L3。
-  中央已按 scope revision 2 在 exact `c142f325d643827c47ce14fb7a489ea1ff39a295` 完成严格两-schema bootstrap；
-  W3.1 可精确导入、刷新 scope 后继续，schema 字段变更仍必须返回唯一整合者。
+- U2.5 已形成 clean frozen exact `f28cf6d1dc9ebb6fbf58a73071c705a4339337d1`：runtime receipt 覆盖
+  491ms first HTTP、2.939s usable shell、unchanged restart 零 provider run、single refresh/atomic publication、
+  W7.4 full/compact 零重叠与 stop cleanup；validation/integration 仍 Pending。
+- W3.1 infrastructure exact `6eab27964e22cb0e22b6ebb34ab175869a6505fc` 已完成 focused 7/7。维护者现授权
+  revision 5 精确导入 U2.5 Candidate，恢复此前延期的 Personal/Graph/Maintenance projection；不得改写 U2.5
+  delivery/cache 或 W7.4 history/relation 语义。
 - W6.2 自动清理仍未分发。W7.4 已形成 accepted frozen history/lineage Candidate，但其 validation/整合、真实
   `history_snapshot_ready` 消费和 W6.2 自身任务说明仍是独立门；本轮不得把 W3.1/U2.5 的继续授权扩成自动清理。
 - W7.4 再次暂停等待 task-description revision 2：维护者拒绝新“完整历史目录”和 bulk card grid，并指出原
@@ -87,9 +87,9 @@ Updated: 2026-09-02
 
 ## 当前可继续的线路
 
-- **当前并行控制：W3.1 + U2.5 Phase B。** 两者保留原独立 task series/worktree。W3.1 消费中央 receipt-schema
-  bootstrap 后实现快速冻结/异步验证；U2.5 消费 accepted frozen W7.4 exact Candidate 后完成 Graph 动态接线。
-  W7.4 validation、W7.5 分类和 W6.2 cleanup 仍是独立后续门，不得混入这两个任务。
+- **当前控制：恢复 W3.1 deferred projection。** U2.5 `f28cf6d...` 只作为 exact frozen common baseline；W3.1
+  在原独立 task/worktree 完成投影和 focused owners。U2.5/W7.4 validation、W7.5 分类和 W6.2 cleanup 仍是
+  独立后续门。
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
 2. **GX2 ELK layout evaluation：** 隔离视觉方向已获维护者接受并冻结 exact provenance；不再继续修改实验。

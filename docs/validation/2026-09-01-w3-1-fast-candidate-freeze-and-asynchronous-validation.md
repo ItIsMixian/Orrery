@@ -81,3 +81,10 @@ disjoint Workstream's own scope refresh. Current-task conflicts must remain fail
 Central bootstrap exact `33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7` preserves full topology diagnostics and filters only the
 per-Workstream refresh decision/session. The focused three-worktree regression completed 1/1 PASS in 19.308 seconds;
 `git diff --check` passed. No broader suite, peer deletion, scope bypass or W3.1 product implementation occurred.
+
+## 2026-09-02 deferred-projection resumption gate
+
+- W3.1 infrastructure Candidate `6eab27964e22cb0e22b6ebb34ab175869a6505fc` remains clean and unchanged;
+- U2.5 exact `f28cf6d1dc9ebb6fbf58a73071c705a4339337d1` is clean and frozen with validation Pending;
+- the maintainer explicitly authorized W3.1 to resume its deferred projection phase from that common baseline;
+- no projection implementation, focused evidence, integration or completion claim exists yet under revision 5.
