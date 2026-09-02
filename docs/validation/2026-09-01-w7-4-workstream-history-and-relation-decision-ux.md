@@ -91,3 +91,10 @@ Pending compact-mode acceptance:
 - no relation fact, confirmation state, archive byte or history record changes due to presentation state.
 
 Automated tests remain forbidden until the maintainer accepts this real preview.
+
+## Pending fast-freeze closeout amendment
+
+The maintainer accepted the corrected preview and then rejected multi-minute same-task closeout. Under ADR-0030 and
+Plan revision 6, the next W7.4 action is structural Candidate Freeze only. Completed post-acceptance commands retain
+their exact final-exit-code evidence; interrupted/missing-exit commands remain Unknown. No new test command runs during
+freeze. The resulting clean exact Candidate must be recorded as `validation-pending`, not validated/closed/cleanup-ready.

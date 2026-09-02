@@ -2,7 +2,7 @@
 
 Updated: 2026-09-01
 
-Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0024](../decisions/0024-v0-3-1-emergency-launcher-hotfix-release.md), [ADR-0025](../decisions/0025-two-explicit-windows-launchers.md), [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md)
+Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0011](../decisions/0011-authority-model-version-and-compatibility.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0024](../decisions/0024-v0-3-1-emergency-launcher-hotfix-release.md), [ADR-0025](../decisions/0025-two-explicit-windows-launchers.md), [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md), [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md)
 
 ## 当前公开发布
 
@@ -48,9 +48,12 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - U2.4 exact `00b2eb4...` 已本地整合；其 Observatory adapter 仅省略 graph node set 外的显式 program membership；node set
   内 duplicate／坏 path／未解析 group 继续失败关闭。self-host projection 为 ready 33 nodes/20 edges 且未创建
   W5D placeholder；Core relation/program store、Team/Authority 权限、组件版本和发布契约均未改变。
-- ADR-0028/U2.5 已获授权但尚无产品 Candidate：目标是 Shell 与 Graph readiness 解耦、unchanged restart
-  复用 Git-private validated Graph cache。它不改变当前 v0.3.1 assets、U2.4 exact bytes、组件版本、manifest
-  或发布契约；任何公共推广仍需独立 release task。
+- U2.5 Phase A clean Candidate `6596a9f...` 已实现 Shell/Graph readiness 解耦和 unchanged restart 的
+  Git-private validated cache reuse；它尚未合入当前 integration branch。维护者已授权 Phase B 消费 accepted
+  frozen W7.4 exact `fe75fc2...`，但 hydration preview、组件版本、manifest、protected-main/Promotion/publication
+  均未发生。
+- ADR-0029/W7.5 已获授权但尚未分发。后续 source `orrery-dispatch` 只负责传递完整 classification envelope
+  并拒绝遗漏，不拥有分类推断/确认；本地已安装副本、公开 Skill、manifest 与版本均未改变。
 - U2.4 revision 3 本地整合内容已将 active retired-session archive 收口为 37 份 bounded
   `worktree.json`；13 份 metadata subtree 和一份 126,892-byte oversized session 原字节保留在分离的
   Git-private extras namespace。当前 self-host Graph 从 7-node/5-edge Core provider 完整投影为 ready
@@ -130,7 +133,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - `orrery-dispatch` 只在当前本机安装，尚未打包或发布；未来是否进入任何公开版本必须由独立 release Plan/Validation 决定。
 - 维护者已明确授权 U2.4 本地整合；exact-hash 旧 launcher migration、protected-main Promotion 与 patch
   publication 仍未发生。公开 v0.3.1 继续包含历史三入口文件与延迟首页行为。
-- U2.5 尚未实现：当前本地 integrated runtime 仍让 Graph 完整渲染决定全页 ready，并只保留进程内
-  `startup-cached-projection`。没有跨进程 Graph cache、事件失效、非阻塞 hydration 或相关发布证据。
+- 当前本地 integrated runtime 仍让 Graph 完整渲染决定全页 ready；U2.5 Phase A 的跨进程 cache 与
+  per-consumer readiness 只存在于 `6596a9f...` Worktree。非阻塞 browser hydration 与相关发布证据仍不存在。
 - ELK.js vendor asset、license/provenance、package-data mapping 和 failure-to-ledger 已进入未发布本地 source；
   在 final ZIP／runtime／Promotion／publication evidence 完成前不得写成 v0.3.0 已公开包含。

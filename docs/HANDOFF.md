@@ -4,11 +4,18 @@ Updated: 2026-09-01
 
 ## 当前停止点
 
-- ADR-0028 与 U2.5 Design/Plan/Pending Validation 已获维护者接受，准备按既有 `unified-u` task series
-  Workstream 分发。Phase A 只允许修改与 W7.4 不重叠的 Shell／Git-private Graph cache 基础设施；Phase B
-  的 Graph hydration/展示接线必须等待 accepted clean W7.4 exact Candidate。维护者预览前不得跑自动测试。
-- W6.2 自动清理只登记未分发：必须等待 W7.4 history index、archived-lineage 恢复和维护者预览接受；当前
-  被拒绝的 W7.4 预览不能作为 `history_snapshot_ready`，不得创建 W6.2 任务或自动清理工作区。
+- W7.4 corrected preview 已接受并冻结为 clean exact
+  `fe75fc238ebf876d8565cabda0c8e0f8cfb4cfdd`：strict history 为 6 closed／31 retired，11 条 recovered
+  archived lineage，full 25 nodes／18 routes／0 overlaps，compact 15／8／0 overlaps。它诚实保持
+  `candidate-frozen / validation-pending`，尚未整合、闭合或获得 cleanup authority。
+- U2.5 Phase A clean exact `6596a9f8e0e79cf0e5bc76b8ae46b0f323056040` 已获维护者继续授权。Phase B 现在可
+  精确导入上述 W7.4 Candidate，保留其全部历史／关系／full-compact 语义并生成 self-host preview；预览接受前
+  仍禁止 unittest/Fast/Checkpoint/Candidate/Promotion。
+- W3.1 已登记于独立分支，首轮因两个 receipt schema 属于中央独占 `schema-migration` 而正确停在 clean L3。
+  中央已按 scope revision 2 在 exact `c142f325d643827c47ce14fb7a489ea1ff39a295` 完成严格两-schema bootstrap；
+  W3.1 可精确导入、刷新 scope 后继续，schema 字段变更仍必须返回唯一整合者。
+- W6.2 自动清理仍未分发。W7.4 已形成 accepted frozen history/lineage Candidate，但其 validation/整合、真实
+  `history_snapshot_ready` 消费和 W6.2 自身任务说明仍是独立门；本轮不得把 W3.1/U2.5 的继续授权扩成自动清理。
 - W7.4 再次暂停等待 task-description revision 2：维护者拒绝新“完整历史目录”和 bulk card grid，并指出原
   Graph 关系仍未找回。中央盘点为 37 records／33 lineage／14 current／至少 11 个 archived-to-archived exact
   pair；新范围要求删除 bulk UI、从 archived lineage 恢复可验证关系并保留 Unknown。接受前不得运行测试。
@@ -77,9 +84,9 @@ Updated: 2026-09-01
 
 ## 当前可继续的线路
 
-- **当前并行控制：W7.4 + U2.5 Phase A。** W7.4 继续等待 compact preview 接受/clean Candidate；U2.5 可先
-  实现 Shell-first 与缓存基础设施，但不得触碰 W7.4-owned presentation/relation surfaces。U2.5 Phase B、W6.2
-  都等待 W7.4 的 exact accepted dependency；三者不得合成一个任务。
+- **当前并行控制：W3.1 + U2.5 Phase B。** 两者保留原独立 task series/worktree。W3.1 消费中央 receipt-schema
+  bootstrap 后实现快速冻结/异步验证；U2.5 消费 accepted frozen W7.4 exact Candidate 后完成 Graph 动态接线。
+  W7.4 validation、W7.5 分类和 W6.2 cleanup 仍是独立后续门，不得混入这两个任务。
 
 1. **GX1 external graph Skill evaluation：** `f5fd5af` 已完成 8/12；维护者选择 assist／selective reimplementation，第三方 runtime／SVG／HTML 不进入产品。
 2. **GX2 ELK layout evaluation：** 隔离视觉方向已获维护者接受并冻结 exact provenance；不再继续修改实验。
