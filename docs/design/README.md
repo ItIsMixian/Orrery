@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Orrery Conductor Codex Right Panel](orrery-conductor-codex-right-panel.md) — makes Codex's existing right Browser Panel the primary S1 surface and retains inline MCP UI only as fallback, under ADR-0032.
 - [Orrery Conductor Codex Plugin Surface](orrery-conductor-codex-plugin-surface.md) — independent read-only Codex plugin, local MCP server and MCP UI adapter over the existing Orrery DAG, under ADR-0031.
 - [Fast Candidate Freeze and Asynchronous Validation Closeout](fast-candidate-freeze-and-asynchronous-validation.md) — sub-30-second structural freeze, honest validation-pending status and immutable-SHA asynchronous checks without weakening integration/release gates, under ADR-0030.
 - [Workstream Classification Calibration and Dispatch Registration](workstream-classification-calibration-and-dispatch-registration.md) — evidence-bound human calibration for missing program/series metadata plus explicit future dispatch envelopes, without name inference or relation/lifecycle effects, under ADR-0029.

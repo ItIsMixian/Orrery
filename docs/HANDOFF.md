@@ -149,9 +149,9 @@ Updated: 2026-09-01
 
 ## 未来交接（未启动）
 
-- **S1 Orrery Conductor：** ADR-0031/Design/Plan 已授权独立 `orrery-conductor` Phase A：只做 fixture-backed
-  Codex plugin、local MCP server 与 MCP UI，只读复用现有 DAG。live binding 等 accepted U2.5 exact envelope；
-  task/dispatch/relation/cleanup、remote repo 与 Release 均未授权。
+- **S1 Orrery Conductor：** 独立 Phase A `4e44d27...` 的 inline MCP UI 已被维护者拒绝；ADR-0032/revision 2
+  要求复用同一 fixture/server/UI，并以 Codex 既有 right Browser Panel 为主入口，inline 仅作回退。live binding
+  等 accepted U2.5 exact envelope；新 toolbar icon、Codex patch、执行能力、remote repo 与 Release 均未授权。
 - **Brownfield Adoption：** 目前只有保守迁移契约，区分 `scaffold installed`、`authority migration pending` 与 `authority integrated`。尚无研究结论或 Implementation Plan；不得批量覆盖作者文档或补造历史理由。
 - **R4/R5：** alias contract 与 optional default transition 未启动；`orrery` PyPI 名称存在第三方冲突，不能擅自创建同名 distribution/import。
 

@@ -77,3 +77,17 @@ plugin/repository/release.
 - closing the component stops refresh work;
 - the maintainer accepts the preview;
 - the branch is clean and no live/release capability is overclaimed.
+
+## 2026-09-02 scope revision 2 — right-panel primary, inline fallback
+
+The maintainer rejected the Phase A conversation-embedded component. Under ADR-0032, S1 must preserve its clean
+`4e44d276ecb16a2acd6e750db243866a11e03961` foundation and change only the host presentation boundary:
+
+1. reuse the existing fixture/schema/UI and expose it at one explicit loopback panel URL;
+2. make the Codex-specific Skill/adapter open that URL in the host's right Browser Panel;
+3. leave only a short status/link in the conversation and keep inline MCP UI as fallback, not default;
+4. use the existing top-right panel toggle rather than attempting to add a new toolbar icon;
+5. stop for a real right-panel preview before focused tests or live U2.5 binding.
+
+No Codex binary/private-state patch, second renderer, external network, broad validation, publication or live-data
+expansion is authorized.

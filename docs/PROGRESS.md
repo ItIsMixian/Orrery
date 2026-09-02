@@ -69,7 +69,7 @@ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c1
 
 ## 活动计划与待办
 
-- [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：已授权独立 fixture-backed Codex plugin/MCP UI Phase A；可与 W3.1/U2.5 并行，live binding 等待 accepted exact U2.5 envelope，任何执行/发布能力均不在本阶段。
+- [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：Phase A inline UI 已被拒绝；ADR-0032/revision 2 改为 Codex 既有 right Browser Panel 主入口，inline 仅回退。live binding 仍等待 accepted exact U2.5 envelope。
 - [ ] [W3.1 Fast Candidate Freeze and Asynchronous Validation](implementation/plans/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)：任务已登记；中央 strict receipt-schema bootstrap exact `c142f32...` 已解除 L3，等待原任务导入、scope refresh 后继续实现。
 - [ ] [W7.5 Workstream Classification Calibration](implementation/plans/2026-09-01-w7-5-workstream-classification-calibration.md)：已批准，等待 accepted clean W7.4 exact Candidate 后分发；先做只读分类审计和人类可理解预览，确认前不写分类事件或运行自动测试。
 - [ ] [U2.5 Shell-first Graph Activation and Incremental Cache](implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)：Phase A clean `6596a9f...` 已完成；维护者授权 Phase B 精确导入 W7.4 `fe75fc2...` 并先给出 self-host preview，接受前不跑自动测试。
