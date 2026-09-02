@@ -6,6 +6,7 @@ import json
 import sys
 from pathlib import Path
 
+from project_orrery_core.candidate_freeze import freeze_candidate
 from project_orrery_core.collaboration import (
     attach_platform_session,
     acknowledge_workstream_finding,
@@ -87,6 +88,19 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--series-predecessor-workstream-id")
     create.add_argument("--series-predecessor-required-for", choices=("implementation", "validation", "integration", "release"))
 
+    freeze = actions.add_parser(
+        "freeze-candidate", help="inspect or freeze an accepted Candidate without running validation"
+    )
+    _add_common_target(freeze)
+    freeze.add_argument("--task-description-sha", required=True)
+    freeze.add_argument("--accepted-surface-fingerprint")
+    freeze.add_argument("--accepted-surface-id", action="append", default=[])
+    freeze.add_argument("--exact-copy", action="append", default=[], metavar="LEFT=RIGHT")
+    freeze.add_argument("--message", default="Freeze accepted Candidate")
+    freeze_mode = freeze.add_mutually_exclusive_group()
+    freeze_mode.add_argument("--dry-run", action="store_true")
+    freeze_mode.add_argument("--apply", action="store_true")
+
     session = actions.add_parser("session", help="manage the private Workstream session")
     session_actions = session.add_subparsers(dest="session_action", required=True)
     write = session_actions.add_parser("write", help="write or refresh the private Workstream session")
@@ -165,6 +179,16 @@ def _load_peer_scopes(paths: list[Path]) -> list[dict[str, object]]:
             candidate = candidate["current_scope"]
         scopes.append(candidate)
     return scopes
+
+
+def _exact_copy_pairs(values: list[str]) -> list[tuple[str, str]]:
+    pairs: list[tuple[str, str]] = []
+    for value in values:
+        left, separator, right = value.partition("=")
+        if not separator or not left or not right:
+            raise ValueError("--exact-copy must use LEFT=RIGHT")
+        pairs.append((left, right))
+    return pairs
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -380,6 +404,30 @@ def main(argv: list[str] | None = None) -> int:
                 f"{data['source']['integration_oid']}"
             )
             print(f"Session: {data['session_path']}")
+        return int(JsonExitCode.OK)
+
+    if arguments.action == "freeze-candidate":
+        command = "worktree-freeze-candidate"
+        try:
+            data = freeze_candidate(
+                arguments.target,
+                task_description_sha=arguments.task_description_sha,
+                accepted_surface_fingerprint=arguments.accepted_surface_fingerprint,
+                accepted_surface_ids=arguments.accepted_surface_id,
+                exact_copy_pairs=_exact_copy_pairs(arguments.exact_copy),
+                message=arguments.message,
+                apply=arguments.apply,
+            )
+        except ValueError as exc:
+            return _failure(command, arguments.json_output, exc)
+        if arguments.json_output:
+            emit(response(command, status="ok", exit_code=JsonExitCode.OK, data=data))
+        else:
+            mode = "frozen" if arguments.apply else "dry-run"
+            print(f"Candidate {mode}: {data['accepted_surface_fingerprint']}")
+            if arguments.apply:
+                print(f"Candidate SHA: {data['candidate_sha']}")
+                print(f"Receipt: {data['receipt_path']}")
         return int(JsonExitCode.OK)
 
     if arguments.session_action == "transition":

@@ -38,9 +38,9 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
   program/phase、27 两者皆无；strict history 37 records 中 29 无 series、30 无 program/phase。W7.5 尚未
   创建任务或写分类事件，现有缺口继续诚实显示为未登记且不得从名称/lineage推断。
 - ADR-0030 已接受 fast Candidate freeze：实现任务在短结构检查/commit 后可停止为 validation-pending，耗时
-  exact-SHA validation 独立运行。W7.4 已以 clean `fe75fc2...` 手工采用；`freeze-candidate` command/async
-  orchestration 仍未实现。W3.1 已登记，中央 exact `c142f32...` 仅 bootstrap 两份严格 receipt schema；
-  worktree removal 仍由 W6/W6.2 独立持有。
+  exact-SHA validation 独立运行。W3.1 Worktree 已实现 `freeze-candidate`、Git-private freeze/validation receipt、
+  exact-SHA async request/result 与 Personal/Graph/Maintenance 只读状态投影；该实现尚未进入 Canonical 或公开
+  release。worktree removal 仍由 W6/W6.2 独立持有，validated 不等于 closed 或 cleanup-eligible。
 - U2.1 integrated Candidate 修复首轮体验：中文 app 导航、全页 stop、历史 Maintenance 证据降级和 W7.1 legacy/archive graph 显示；它没有创建 relation root、赋予 archive 执行权或放宽 Quick Remove 当前资格。
 - W7.2.3 integrated Candidate 只重构 Observatory Graph presentation：从左到右的确定性 rank、固定可读节点、按 connected component 对齐的工程图路线、按链双向展开／收起、三 lens 真实端点、画布内 inspector 与移动 relation ledger。关系由实线／虚线／复合线和固定视觉尺寸箭头表达，不在线路上覆盖文字；画布支持锚点式 `Ctrl + 滚轮` 缩放。rank 通道为 88px，独立链只保留 44px 分组空隙；全站滚动条使用深浅主题适配。Core relation schema／facts、W7.1 archive 证据与执行边界未改。
 - U2.2 integrated Candidate 把 app 入口和作者文档树组合进一个连续 sidebar/scroll rail，并把 Maintenance 改为 header refresh、四类筛选、8 行分页、折叠技术详情与仅 eligible 行可见的安全删除入口。它只改变展示和有界浏览器状态，不复制或改变 Core eligibility／preflight／authorization／receipt，也没有执行删除。
@@ -61,6 +61,32 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
   `derived_from`；revision 7 Worktree correction 已恢复 Core-only mechanical authority，页面获维护者确认，
   source 已冻结并在 `74afb989...` 取得 Fast 19/19、Checkpoint 30/30；最终 docs-SHA `a2d7737...` 页面已接受。
 - Graph projection 使用显式 program／phase／series metadata 组织任务，但 membership 绝不创建 relation、gate、closure 或 ownership。一个共享 semantic projection 同时供本地固定 `elkjs@0.11.0` 与显式手动 legacy engine 消费；ELK 是默认只读布局，失败时先显示同事实 ledger，不静默 fallback。comparison 保持默认关闭，冲突 lens 只消费有证据的确认冲突事实。
+- W7.4 Worktree Candidate 现在消费 integrator-owned strict `workstream-history-index-v1` schema。对 37 份 bounded
+  archive 的重新计算得到 6 条 `closed-workstream` 与 31 条 `retired-session`；后者保留 12 implementing、
+  18 validating、1 review-ready 的最后观察 lifecycle/runtime，而不再伪装为 closed。先前错误生成的 37 条
+  `closed-workstream-summary` bytes 仍原位保留且不参与 projection；修复只向独立 `strict-records/` 追加 37 条
+  strict records，并写入 hash-bound repair receipt。原 archive、branch、commit、relation/capture/series history
+  与 evidence 未改写或删除。
+- 同一 Candidate 已移除完整历史目录、bulk controls、identity-only cards 和目录入口。Graph 只投影具备原生
+  语义、明确系列或经精确归档 lineage 校验的历史任务。37 条归档中 14 条声明 current lineage，11 条通过端点、
+  OID、Git 祖先和无环校验恢复为只读 `derived_from`；3 条目标归档缺失／不唯一而保持无边。历史节点永久只读且
+  不进入 tip、gate、Review Ready 或执行面。Core 也为
+  relation proposal 生成确定性中文问题／原因／接受与拒绝后果／证据边界；Unknown `derived_from` 仍无 Accept。
+  ELK 只对没有跨组语义边的 series 保留 compound；触及跨组边的 series 在同一 component 层展示，避免外层边
+  引用内层叶子 port。历史端点不再从显式 series adjacency 中删除；真实浏览器默认 lens 显示恢复的归档链和
+  显式系列线，且不再提供 bulk history 入口。ELK 为 ready。这些事实仅属于当前 Worktree
+  preview；该完整关系基线随后取得维护者接受，但尚无自动测试证据。
+- 维护者已接受完整关系图为默认基线；revision 5 仅增加同画布 compact-history projection。完整模式仍保留全部
+  已验证归档 lineage、series 和 pending 输入；compact 以 maximal connected historical subgraph 生成纯展示摘要，
+  保护 current／attention／Unknown／dependency／conflict／selected／一跳上下文，并保留真实 entry/exit 边。
+  当前 Git-private U2.4/U2.5 输入使浏览器完整图增量成为 25 nodes／18 routes，但已接受的 23 nodes／15 routes
+  逐项保持为子集；compact 为 15 nodes／8 routes／3 summaries，展开一组为 23／16／2，最终恢复完整默认且 ELK ready。
+  full compound 顶层已由 ELK box 合成独立分量边界，避免 rectpacking 外框遗漏 nested-series 叶子伸展范围；
+  最终 SVG render postcondition 对全部可见节点矩形做 pairwise intersection，非零时禁止标记 ELK ready。真实
+  full 25／18 与 compact 15／8／3 均为 0 overlap pairs。
+  生命周期与组织分类保持独立：真实 provider 42 nodes 中 33 无 series、35 无 program/phase、27 两者皆无；
+  strict history 37 records 中分别 29／30 未登记。当前 full 可见 25 nodes 的只读诊断为 17／21／14，未登记卡片
+  明示“组织分类未登记”；未按编号、名称、视觉顺序或 lineage 推断，也未写 membership／series event。
 - CI5 将 27 个逻辑 Promotion shard 映射为每 OS 十个物理 lane；Fast 与 Promotion 分离，required check 名称保持不变。exact `9ee831f` 已通过 25-job 双平台 Promotion 并进入 main。
 - 当前展示品牌为 Orrery。`project-orrery`、`project_orrery`、`.project-orrery.json`、v1 schema／receipt／hash domain 和 v0.2.0 资产继续作为稳定技术或历史标识。
 - 非权威研究控制面位于 `experiments/context-routing/`；大型原始运行根为 `D:\coding warehouse\project-orrery-benchmark`，不属于 Git 仓库或发布包。
@@ -90,8 +116,9 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
 - W7B transaction 只写 Git-private confirmation／journal／receipt／compensation；真实 self-host 尚未执行 relation apply。Graph 只读，不提供 apply／undo／close／delete 按钮。
 - Workspace Maintenance Phase 0–2 已实现；Phase 3 自动 worktree removal 和 Phase 4 OS scheduler 尚未实现。没有后台默认删除、daemon 或远程执行。
 - authority-first 当前是作者流程硬边界；自动 Git-private dispatch receipt、CLI acknowledgment 和首次写入阻断尚未实现，不能把人工遵守写成宿主级强制执行。
-- fast Candidate freeze 当前也是人工流程；没有命令或 scheduler。冻结不等于 validated、closed、integrated
-  或 cleanup-eligible。
+- fast Candidate freeze 在 W3.1 Worktree 已有显式 CLI 命令与异步 receipt adapter，但没有 scheduler、默认
+  consumer 或中央自动执行。冻结不等于 validated、closed、integrated 或 cleanup-eligible；验证 PASS 仍须
+  独立 closure/integration 证据才能进入清理资格。
 
 ## 实现证据
 
@@ -110,6 +137,7 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
 - [U2.1 UX Acceptance Fixes Validation](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [U2.3 Navigation & Live Task Visibility](../validation/2026-08-30-u2-3-navigation-live-task-visibility.md)
+- [W3.1 Fast Candidate Freeze and Asynchronous Validation](../validation/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
 - [W7.2 Graph Readability](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [W7.3 Relation Capture & Confirmation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
@@ -133,6 +161,12 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
 - 当前 integrated U2.4 runtime 仍用全页 startup gate；U2.5 Phase A cache/input currentness/per-consumer
   readiness 只在 `6596a9f...` Worktree preview 有机械证据，browser hydration 尚未实现或验证。
 - 已有 accepted frozen W7.4 history/archived-lineage Candidate `fe75fc2...`，但其异步 validation、中央整合、
-  closure 与 cleanup authorization 均未完成。
+  closure 与 cleanup authorization 均未完成。该 Candidate 的 strict-history repair 计数为 37 archive、37 valid、
+  0 excluded、6 closed、31 retired；
+  旧错误索引 37 份 bytes 的 aggregate SHA-256 `9ee7925d...` 在修复前后不变。最新 loopback 预览继续显示
+  11 条恢复归档 lineage，ELK ready 且 bulk history UI 已移除；完整关系默认基线与同画布 compact-history
+  projection 均只保留其冻结 Candidate／preview 事实。在后续异步验收前未运行
+  unittest、Fast、Checkpoint、Candidate 或 Promotion。history snapshot 仅提供 later W6 可消费的 readiness contract，
+  不改变现有 cleanup eligibility。
 - Claude Code 尚未完成认证后的真实模型路由；DeepSeek 与 Codex evidence 只覆盖各自记录的精确 runtime 范围。
 - 自动 R1 脱敏导出器、跨平台 byte-for-byte archive 与 Brownfield Adoption 研究／Plan 均未实现。

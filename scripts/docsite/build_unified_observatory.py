@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import os
 import sys
 from dataclasses import replace
@@ -20,7 +21,6 @@ if str(HERE.parent) not in sys.path:
     sys.path.insert(0, str(HERE.parent))
 
 import build_personal_observatory  # noqa: E402
-import build_workstream_relation_graph  # noqa: E402
 from project_orrery_cli.authority_consumer import inspect_managed_consumer  # noqa: E402
 from project_orrery_core import inspect_operating_rules  # noqa: E402
 from project_orrery_observatory.display_vocabulary import NAVIGATION_LABELS  # noqa: E402
@@ -29,6 +29,7 @@ from project_orrery_observatory.fact_rules_projection import (  # noqa: E402
     project_project_principles,
 )
 from project_orrery_observatory.relation_inbox import inject_relation_inbox  # noqa: E402
+from project_orrery_observatory.personal_observatory import inject_personal_observatory  # noqa: E402
 from project_orrery_observatory.team_observatory import inject_team_observatory  # noqa: E402
 from project_orrery_observatory.unified_observatory import (  # noqa: E402
     ConsumerRegistration,
@@ -170,12 +171,181 @@ def relation_capture_payload(root: Path) -> dict[str, Any]:
     return capture
 
 
+def _dynamic_shell_base(
+    root: Path,
+    *,
+    title: str,
+    base_site: tuple[str, dict[str, Any], dict[str, Any] | None] | None = None,
+) -> tuple[str, dict[str, Any], dict[str, Any] | None, dict[str, Any]]:
+    """Compose the document shell with bounded local placeholders for slower consumers."""
+    if base_site is None:
+        page, stats, authority = build_personal_observatory._base_site(
+            root / "docs", root / "AGENTS.md", root, title,
+        )
+    else:
+        page, stats, authority = base_site
+    maintenance = {
+        "status": "loading",
+        "control_available": True,
+        "api_base": "/api/v1/maintenance",
+        "refresh_path": "/refresh",
+        "remove_path": "/remove-worktree",
+        "reload_after_action": False,
+        "cache": {"entries": []},
+        "queue": [],
+        "authorizations": [],
+        "receipts": [],
+        "protected_reasons": {},
+        "background_refresh": {"status": "pending"},
+    }
+    personal = {
+        "schema_version": 1,
+        "contract_type": "orrery-active-task-projection-v1",
+        "status": "loading",
+        "mode": "personal",
+        "network_performed": False,
+        "writes_performed": False,
+        "captured_at": "pending",
+        "revision": "pending",
+        "counts": {"registry_worktrees": 0, "current": 0, "history": 0, "primary": 0, "refresh_needed": 0},
+        "tasks": [],
+        "maintenance": maintenance,
+        "cache_summary_state": "unknown",
+        "maintenance_error": None,
+        "read_boundary": {
+            "registry_calls": 0, "session_files_attempted": 0, "session_bytes_read": 0,
+            "maintenance_cache_snapshots": 0, "worktree_source_files_read": 0,
+            "scope_observations": 0, "diff_reads": 0, "startup_full_scan": False, "elapsed_ms": 0,
+        },
+        "dynamic": True,
+    }
+    page = inject_personal_observatory(page, personal)
+    auto_refresh = (
+        '<script>window.setTimeout(()=>{const button=document.querySelector("[data-active-task-refresh]");'
+        'if(button&&!button.disabled)button.click()},0)</script>'
+    )
+    return page.replace("</body>", auto_refresh + "</body>", 1), stats, authority, personal
+
+
+def graph_provider_payload(root: Path) -> dict[str, Any]:
+    """Load the heavy Graph provider only inside explicit eager/background activation."""
+    module = importlib.import_module("build_workstream_relation_graph")
+    return module.core_relation_provider(root)
+
+
+_DYNAMIC_GRAPH_HYDRATION_JS = r"""
+(()=>{'use strict';
+const endpoint='/api/v1/workstreams/graph',styleId='orrery-workstream-graph-delivery-style';
+let appliedGeneration=-1,appliedHash='',pollCount=0,timer=null,stopped=false;
+const maxPolls=120;
+const runtimeReceipt=window.__orreryGraphDeliveryReceipt={schema_version:1,contract_type:'workstream-graph-browser-runtime-receipt-v1',delivery_attempts:0,offscreen_layouts:0,atomic_swaps:0,visual_samples:0,page_blank_samples:0,content_blank_samples:0,activation_failures:0,generations:[]};
+const receiptNode=document.createElement('script');receiptNode.type='application/json';receiptNode.dataset.wgRuntimeReceipt='';document.body.append(receiptNode);function publishReceipt(){receiptNode.textContent=JSON.stringify(runtimeReceipt)}publishReceipt();
+function slot(){return document.querySelector('#workstream-relation-graph')}
+function schedule(delay){if(stopped||pollCount>=maxPolls)return;clearTimeout(timer);timer=setTimeout(poll,delay)}
+function visible(element){if(!element)return false;const rect=element.getBoundingClientRect(),style=getComputedStyle(element);return rect.width>0&&rect.height>0&&style.display!=='none'&&style.visibility!=='hidden'&&style.opacity!=='0'}
+function sampleVisual(){const visiblePages=[...document.querySelectorAll('article.page')].filter(visible),shellVisible=visible(document.querySelector('header.top'))||visible(document.querySelector('.sidebar'));runtimeReceipt.visual_samples+=1;if(!shellVisible&&!visiblePages.length)runtimeReceipt.page_blank_samples+=1;if(!visiblePages.length)runtimeReceipt.content_blank_samples+=1}
+function remember(){
+  const graph=window.__orreryWorkstreamGraph,state=graph?.state,article=slot(),viewport=article?.querySelector('[data-wg-viewport]');
+  if(!state)return null;
+  const item=state.selection?.item||null;
+  return{lens:state.lens,graphMode:state.graphMode,expandedChains:[...(state.expandedChains||[])],expandedFolds:[...(state.expandedFolds||[])],scope:state.scope,subsystem:state.subsystem,runtime:state.runtime,zoom:state.zoom,comparisons:state.comparisons,externalContext:state.externalContext,affectedContext:state.affectedContext,selection:state.selection?{kind:state.selection.kind,id:item?.workstream_id||item?.displayEdgeId||item?.relation_id||item?.id||null,item}:null,scrollX:viewport&&viewport.scrollWidth>viewport.clientWidth?viewport.scrollLeft/(viewport.scrollWidth-viewport.clientWidth):0,scrollY:viewport&&viewport.scrollHeight>viewport.clientHeight?viewport.scrollTop/(viewport.scrollHeight-viewport.clientHeight):0};
+}
+function installStyle(text){let style=document.getElementById(styleId);if(!style){style=document.createElement('style');style.id=styleId;document.head.append(style)}if(style.textContent!==text)style.textContent=text}
+function run(text,label){const script=document.createElement('script');script.dataset.wgDeliveryAsset=label;script.textContent=text;document.body.append(script);script.remove()}
+function waitFor(test,timeout=45000){return new Promise((resolve,reject)=>{const started=performance.now();function check(){if(test())return resolve();if(performance.now()-started>timeout)return reject(new Error('Graph delivery layout timed out'));requestAnimationFrame(check)}check()})}
+function restore(article,saved){
+  if(!saved)return;
+  const current=window.__orreryWorkstreamGraph?.state;if(!current)return;
+  current.expandedChains=new Set(saved.expandedChains||[]);current.expandedFolds=new Set(saved.expandedFolds||[]);current.zoom=Number.isFinite(saved.zoom)?saved.zoom:1;current.comparisons=Boolean(saved.comparisons);current.externalContext=Boolean(saved.externalContext);current.affectedContext=Boolean(saved.affectedContext);current.viewportAnchor={x:saved.scrollX,y:saved.scrollY};
+  const mode=article.querySelector(`[data-wg-mode="${saved.graphMode||'full'}"]`);if(mode)mode.click();
+  for(const [selector,value] of [['[data-wg-scope]',saved.scope],['[data-wg-subsystem]',saved.subsystem],['[data-wg-runtime]',saved.runtime]]){const control=article.querySelector(selector);if(control&&[...control.options].some(option=>option.value===value)){control.value=value;control.dispatchEvent(new Event('change'))}}
+  for(const [selector,value] of [['[data-wg-semantic-context]',saved.externalContext],['[data-wg-affected-context]',saved.affectedContext]]){const control=article.querySelector(selector);if(control){control.checked=Boolean(value);control.dispatchEvent(new Event('change'))}}
+  const lens=article.querySelector(`[data-wg-lens="${saved.lens||'succession'}"]`);if(lens)lens.click();
+  if(saved.selection?.id){const node=article.querySelector(`[data-wg-node-id="${CSS.escape(saved.selection.id)}"]`),edge=article.querySelector(`[data-wg-edge-id="${CSS.escape(saved.selection.id)}"]`);(node||edge)?.dispatchEvent(new MouseEvent('click',{bubbles:true}))}
+}
+async function activate(envelope){
+  const delivery=envelope.browser_delivery;if(!delivery||delivery.contract_type!=='workstream-graph-browser-delivery-v1')return false;
+  const generation=Number(envelope.generation);if(!Number.isInteger(generation)||generation<appliedGeneration)return false;
+  if(generation===appliedGeneration&&delivery.projection_hash===appliedHash)return true;
+  const current=slot();if(!current)return false;const saved=remember(),priorId=current.id,wasActive=current.classList.contains('on');current.id='workstream-relation-graph-previous';
+  const template=document.createElement('template');template.innerHTML=delivery.panel_html.trim();const article=template.content.firstElementChild;
+  if(!article||article.tagName!=='ARTICLE'){current.id=priorId;throw new Error('Graph delivery panel is invalid')}
+  article.classList.add('wg-hydration-offscreen');article.dataset.wgDeliveryGeneration=String(generation);article.dataset.wgDeliveryStatus=envelope.status;current.after(article);runtimeReceipt.delivery_attempts+=1;runtimeReceipt.offscreen_layouts+=1;sampleVisual();const visualMonitor=setInterval(sampleVisual,16);
+  try{
+    installStyle(delivery.style_text);
+    if(typeof ELK!=='function')run(delivery.vendor_script,'elk');
+    run(delivery.presentation_script,'presentation');
+    await waitFor(()=>article.dataset.wgLayoutReady==='true'||!article.querySelector('[data-wg-layout-failure]')?.hidden);
+    restore(article,saved);
+    await waitFor(()=>article.dataset.wgLayoutReady==='true'||!article.querySelector('[data-wg-layout-failure]')?.hidden);
+    article.classList.remove('wg-hydration-offscreen');if(wasActive)article.classList.add('on');current.replaceWith(article);sampleVisual();clearInterval(visualMonitor);appliedGeneration=generation;appliedHash=delivery.projection_hash;runtimeReceipt.atomic_swaps+=1;runtimeReceipt.generations.push({generation,projection_hash:delivery.projection_hash,layout_ready:article.dataset.wgLayoutReady==='true',geometry_passed:article.dataset.wgGeometryPassed==='true',node_count:article.querySelectorAll('[data-wg-node-id]').length,edge_count:article.querySelectorAll('[data-wg-edge-id]').length});publishReceipt();return true;
+  }catch(error){clearInterval(visualMonitor);runtimeReceipt.activation_failures+=1;article.remove();current.id=priorId;sampleVisual();publishReceipt();throw error}
+}
+function fail(message){const current=slot();if(!current)return;current.dataset.wgDeliveryState='failed';const card=current.querySelector('.wg-activation-card');if(card)card.innerHTML=`<div><b>任务关系暂不可用</b><span>${message}</span></div>`}
+async function poll(){
+  if(stopped)return;pollCount+=1;
+  try{
+    const response=await fetch(endpoint,{cache:'no-store',headers:{Accept:'application/json'}});if(!response.ok)throw new Error('Graph delivery request failed');const envelope=await response.json();
+    const generation=Number(envelope.generation);if(Number.isInteger(generation)&&generation<appliedGeneration)return;
+    if(envelope.browser_delivery)await activate(envelope);
+    const current=slot();if(current){current.dataset.wgDeliveryState=envelope.status;current.dataset.wgCacheState=envelope.cache_state||'empty'}
+    if(envelope.status==='empty'||envelope.status==='refreshing'){schedule(Math.min(1500,250+pollCount*75));return}
+    if(envelope.status==='failed'&&!envelope.browser_delivery)fail('本机 Graph provider 未能生成完整投影；其他页面仍可使用。');
+  }catch(_error){if(pollCount<maxPolls)schedule(Math.min(1500,300+pollCount*100));else fail('本机 Graph delivery 超时；其他页面仍可使用。')}
+}
+addEventListener('pagehide',()=>{stopped=true;clearTimeout(timer)},{once:true});poll();
+})();
+"""
+
+
+def _inject_dynamic_graph_slot(page: str) -> tuple[str, dict[str, Any]]:
+    content_marker = '</main><aside class="toc" id="toc">'
+    nav_candidates = (
+        '<a class="nav-item" data-target="team-observatory"><span class="dot proposed"></span><span class="lbl">团队协作</span></a>',
+        '<a class="nav-item" data-target="personal-observatory"><span class="dot state"></span><span class="lbl">个人工作台</span></a>',
+    )
+    marker = next((item for item in nav_candidates if item in page), None)
+    if marker is None or content_marker not in page or "</style>" not in page:
+        raise ValueError("dynamic Graph slot composition markers are missing")
+    nav = '<a class="nav-item" data-target="workstream-relation-graph"><span class="dot proposed"></span><span class="lbl">任务关系</span></a>'
+    css = (
+        '.wg-activation-shell{margin:0 auto;max-width:1180px}.wg-activation-card{min-height:280px;display:grid;'
+        'place-items:center;padding:32px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);text-align:center}'
+        '.wg-activation-card b{display:block;margin-bottom:8px;font-size:18px}.wg-activation-card span{color:var(--mut);font-size:11px}'
+        '.wg-hydration-offscreen{position:fixed!important;left:-200vw!important;top:0!important;width:min(1180px,100vw)!important;visibility:hidden!important;pointer-events:none!important}'
+    )
+    panel = (
+        '<article class="page wide wg-activation-shell" id="workstream-relation-graph" '
+        'data-kind="workstream-relation-graph" data-title="任务关系" data-authority="derived-read-only" '
+        'data-read-only="true" data-wg-delivery-state="loading"><section class="wg-activation-card" role="status">'
+        '<div><b>任务关系正在本机加载</b><span>Orrery 其他页面已经可用；关系投影完成后仅更新本区域。</span></div>'
+        '</section></article>'
+    )
+    result = page.replace("</style>", css + "</style>", 1)
+    result = result.replace(marker, marker + nav, 1)
+    result = result.replace(content_marker, panel + content_marker, 1)
+    result = result.replace("</body>", "<script>" + _DYNAMIC_GRAPH_HYDRATION_JS + "</script></body>", 1)
+    projection = {
+        "projection_schema_version": 2,
+        "contract_type": "workstream-relation-graph-observatory",
+        "status": "loading",
+        "authority": "derived-read-only",
+        "read_only": True,
+        "writes_performed": False,
+        "network_performed": False,
+        "execution_capability": False,
+        "available_actions": [],
+    }
+    return result, projection
+
+
 def render_unified_site(
     project_root: Path,
     *,
     mode: str,
     title: str = "Orrery · Documentation",
     ai_available: bool | None = None,
+    base_site: tuple[str, dict[str, Any], dict[str, Any] | None] | None = None,
 ) -> tuple[
     str,
     dict[str, Any],
@@ -192,23 +362,28 @@ def render_unified_site(
     registrations = list(default_registrations(mode=mode, ai_available=ai_available))
     dynamic = mode == "dynamic"
 
-    previous_personal = os.environ.get("ORRERY_PERSONAL_OBSERVATORY_VIEW")
-    os.environ["ORRERY_PERSONAL_OBSERVATORY_VIEW"] = "1"
-    try:
-        page, stats, _legacy_authority, personal = build_personal_observatory.render_personal_site(
-            root / "docs", root / "AGENTS.md", root, title,
-            maintenance_control_available=dynamic,
-            maintenance_api_base="/api/v1/maintenance",
-            maintenance_refresh_path="/refresh",
-            maintenance_remove_path="/remove-worktree",
-            maintenance_reload_after_action=False,
-            lightweight_active_tasks=True,
+    if dynamic:
+        page, stats, _legacy_authority, personal = _dynamic_shell_base(
+            root, title=title, base_site=base_site,
         )
-    finally:
-        if previous_personal is None:
-            os.environ.pop("ORRERY_PERSONAL_OBSERVATORY_VIEW", None)
-        else:
-            os.environ["ORRERY_PERSONAL_OBSERVATORY_VIEW"] = previous_personal
+    else:
+        previous_personal = os.environ.get("ORRERY_PERSONAL_OBSERVATORY_VIEW")
+        os.environ["ORRERY_PERSONAL_OBSERVATORY_VIEW"] = "1"
+        try:
+            page, stats, _legacy_authority, personal = build_personal_observatory.render_personal_site(
+                root / "docs", root / "AGENTS.md", root, title,
+                maintenance_control_available=False,
+                maintenance_api_base="/api/v1/maintenance",
+                maintenance_refresh_path="/refresh",
+                maintenance_remove_path="/remove-worktree",
+                maintenance_reload_after_action=False,
+                lightweight_active_tasks=True,
+            )
+        finally:
+            if previous_personal is None:
+                os.environ.pop("ORRERY_PERSONAL_OBSERVATORY_VIEW", None)
+            else:
+                os.environ["ORRERY_PERSONAL_OBSERVATORY_VIEW"] = previous_personal
     if personal is None or personal.get("status") == "unavailable":
         item = next(value for value in registrations if value.consumer_id == "personal-observatory")
         _replace_registration(
@@ -226,28 +401,47 @@ def render_unified_site(
 
     capture_payload: dict[str, Any] | None = None
     try:
-        capture_payload = relation_capture_payload(root)
+        capture_payload = (
+            {
+                "schema_version": 2,
+                "contract_type": "workstream-relation-capture-inspection",
+                "status": "loading",
+                "pending_proposals": [],
+                "read_only": True,
+                "writes_performed": False,
+                "network_performed": False,
+                "local_actions_require_same_origin_cookie": True,
+                "central_request_only": True,
+            }
+            if dynamic else relation_capture_payload(root)
+        )
         page = inject_relation_inbox(page, capture_payload, dynamic=dynamic)
     except Exception as error:
         personal_item = next(value for value in registrations if value.consumer_id == "personal-observatory")
         _replace_registration(registrations, personal_item.consumer_id, quarantine(personal_item, error))
 
     graph_item = next(value for value in registrations if value.consumer_id == "workstream-graph")
-    graph_provider_payload: dict[str, Any] | None = None
+    graph_provider_payload: dict[str, Any] | None = (
+        {"relation_capture": capture_payload} if dynamic and capture_payload is not None else None
+    )
     previous_graph = os.environ.get("ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW")
     os.environ["ORRERY_WORKSTREAM_RELATION_GRAPH_VIEW"] = "1"
     try:
-        graph_provider_payload = build_workstream_relation_graph.core_relation_provider(root)
-        if capture_payload is not None:
-            graph_provider_payload["relation_capture"] = capture_payload
-        page, graph = build_workstream_relation_graph.inject_enabled_relation_graph(
-            page, root, provider=lambda: graph_provider_payload or {},
-        )
-        if graph is None or graph.get("status") == "unavailable":
-            _replace_registration(
-                registrations, graph_item.consumer_id,
-                replace(graph_item, status="unavailable", reason="当前没有可显示的完整任务关系证据。"),
+        if dynamic:
+            page, graph = _inject_dynamic_graph_slot(page)
+        else:
+            graph_builder = importlib.import_module("build_workstream_relation_graph")
+            graph_provider_payload = graph_builder.core_relation_provider(root)
+            if capture_payload is not None:
+                graph_provider_payload["relation_capture"] = capture_payload
+            page, graph = graph_builder.inject_enabled_relation_graph(
+                page, root, provider=lambda: graph_provider_payload or {},
             )
+            if graph is None or graph.get("status") == "unavailable":
+                _replace_registration(
+                    registrations, graph_item.consumer_id,
+                    replace(graph_item, status="unavailable", reason="当前没有可显示的完整任务关系证据。"),
+                )
     except Exception as error:
         _replace_registration(registrations, graph_item.consumer_id, quarantine(graph_item, error))
     finally:
@@ -263,18 +457,21 @@ def render_unified_site(
         operating_rules_capability=inspect_operating_rules(),
     )
     authority_item = next(value for value in registrations if value.consumer_id == "authority-managed")
-    try:
-        authority_status = inspect_managed_consumer(
-            root,
-            requested_selection="legacy",
-            selection_authority="system-default",
-            fact_scope="candidate",
-            evidence_visibility=("revision-content", "human-or-agent-assertion"),
-        )
-    except Exception as error:
-        quarantined = quarantine(authority_item, error)
-        _replace_registration(registrations, authority_item.consumer_id, quarantined)
-        authority_reason = quarantined.reason
+    if dynamic:
+        authority_reason = "管理状态将在首次打开时从本机权威输入加载。"
+    else:
+        try:
+            authority_status = inspect_managed_consumer(
+                root,
+                requested_selection="legacy",
+                selection_authority="system-default",
+                fact_scope="candidate",
+                evidence_visibility=("revision-content", "human-or-agent-assertion"),
+            )
+        except Exception as error:
+            quarantined = quarantine(authority_item, error)
+            _replace_registration(registrations, authority_item.consumer_id, quarantined)
+            authority_reason = quarantined.reason
 
     registrations = list(validate_registrations(registrations))
     page = inject_unified_shell(

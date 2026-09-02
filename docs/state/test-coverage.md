@@ -9,8 +9,8 @@ Updated: 2026-09-02
   或测试证据。角色化文档入口在新 context Pilot 通过前不得修改当前 `AGENTS.md` mandatory chain。
 - ADR-0030 将 Candidate Freeze 从验证执行中分离：freeze 目标 `<30s` 且禁止运行 unittest/Fast/Checkpoint/
   Candidate/Promotion、临时 Git fixture、site/package/provider scan；异步阶段继续使用现有 exact-SHA 路由、
-  budgets、leases 与 no-repeat。W3.1 automation 尚未实现；中央 `c142f32...` 只完成两份 receipt schema 的
-  JSON decode/Draft self-check。
+  budgets、leases 与 no-repeat。W3.1 Worktree 的 Core/CLI/adapter 与 Personal/Graph/Maintenance 投影已由四个
+  focused owners 验证；尚未运行 Fast/Checkpoint/Candidate/Promotion 或形成公开 release evidence。
 - ADR-0024 的 v0.3.1 emergency patch 已完成。它没有重放无关 child suites 或本地完整 Candidate；最终 exact
   `1d9223c...` 只运行六个旧 Promotion 失败 ID、两次 exact-Git build、一次 installed-project Windows launcher
   smoke 与一次 exact-SHA Windows/Ubuntu Promotion。同 SHA non-green 没有重试。
@@ -26,8 +26,9 @@ Updated: 2026-09-02
 
 ## 当前通过证据
 
-- W3.1 已登记但尚无 freeze command/receipt、asynchronous validator 或产品测试。首轮 L3 后中央
-  `c142f32...` 完成严格两-schema bootstrap；原任务需精确导入并刷新 allowed scope 后才可继续。
+- W3.1 已完成严格 receipt loader、freeze command、asynchronous result adapter 与三处只读状态投影的
+  Worktree 级 focused evidence：Candidate 7/7、Personal 14/14、Graph 12/12、Maintenance 8/8。这些结果
+  证明 pending／validated／failed／closed 分轴和清理 fail-closed，不等于 Candidate、Promotion 或 Canonical。
 - W7.5 当前只有 Accepted ADR、Approved Design、Implementation Plan 与 Pending Validation；没有任务/worktree、
   分类 proposal/event、产品写入、preview 或测试证据。accepted frozen W7.4 exact Candidate 已存在，但本轮没有
   获得创建 W7.5 任务的指令。
@@ -138,6 +139,7 @@ Updated: 2026-09-02
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
 - [W7.2 Workstream Graph Readability](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [W7.3 Workstream Relation Capture & Confirmation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
+- [W3.1 Fast Candidate Freeze and Asynchronous Validation](../validation/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)
 - [CI5 Promotion Throughput Optimization](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [CI4 opaque token reliability](../validation/2026-08-29-ci4-opaque-cli-token-argument-reliability.md)
 - [R3 brand-only closeout](../validation/2026-08-28-r3-orrery-brand-only-closeout.md)

@@ -99,10 +99,36 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             ({"session_state": "missing"}, ("缺少任务记录", "session-missing")),
             ({"status": "unregistered"}, ("未登记", "unregistered")),
             ({"evidence_freshness": "unknown"}, ("关系证据不足", "relation-evidence-insufficient")),
+            ({"candidate_status_code": "candidate-validation-pending"}, ("候选已冻结 · 等待验证", "candidate-validation-pending")),
+            ({"candidate_status_code": "candidate-validated"}, ("候选已验证 · 尚未关闭", "candidate-validated")),
+            ({"candidate_status_code": "candidate-validation-failed"}, ("候选验证失败 · 尚未关闭", "candidate-validation-failed")),
         )
         for axes, expected in cases:
             with self.subTest(axes=axes):
                 self.assertEqual(graph_ui._plain_state(axes), expected)
+
+    def test_candidate_lifecycle_is_supplemental_and_preserves_graph_semantics(self) -> None:
+        payload = json.loads(json.dumps(self.provider))
+        before = graph_ui.build_relation_graph_projection(payload)
+        candidate_head = next(
+            item["head_oid"] for item in before["nodes"] if item["workstream_id"] == "CI2-late"
+        )
+        payload["candidate_lifecycle"] = {
+            "CI2-late": {
+                "candidate_state": "candidate-frozen", "validation_status": "pending",
+                "closure_state": "open", "status_code": "candidate-validation-pending",
+                "candidate_sha": candidate_head,
+            }
+        }
+        after = graph_ui.build_relation_graph_projection(payload)
+        node = next(item for item in after["nodes"] if item["workstream_id"] == "CI2-late")
+        self.assertEqual(node["plain_status_code"], "candidate-validation-pending")
+        self.assertEqual(node["validation_status"], "pending")
+        self.assertEqual(
+            [(item["relation_id"], item["source_workstream_id"], item["target_workstream_id"]) for item in before["edges"]],
+            [(item["relation_id"], item["source_workstream_id"], item["target_workstream_id"]) for item in after["edges"]],
+        )
+        self.assertEqual(before["active_tip_workstream_ids"], after["active_tip_workstream_ids"])
 
     def test_core_payload_maps_three_lenses_and_independent_axes(self) -> None:
         projection = self.projection
@@ -138,7 +164,24 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertTrue(any(item["certainty"] == "proposed" for item in projection["edges"]))
         self.assertTrue(any(item["certainty"] == "stale" for item in projection["edges"]))
         self.assertIn("offline-unknown", projection["unknown_workstream_ids"])
-        self.assertGreaterEqual(len(projection["history_candidate_ids"]), 2)
+        self.assertEqual(projection["history_candidate_ids"], [])
+        self.assertEqual(projection["history_index"]["status"], "unavailable")
+        self.assertEqual(projection["history_index"]["record_count"], 0)
+        self.assertEqual(
+            projection["classification_inventory"],
+            {
+                "graph_node_count": 14,
+                "missing_series": 12,
+                "missing_program_phase": 14,
+                "missing_both": 12,
+                "history_record_count": 0,
+                "history_missing_series": 0,
+                "history_missing_program_phase": 0,
+                "authority": "explicit-metadata-only",
+                "name_inference_performed": False,
+                "lineage_inference_performed": False,
+            },
+        )
         self.assertEqual(nodes["CI1"]["series_id"], "CI")
         self.assertEqual(nodes["CI2-late"]["task_code"], "CI2")
         self.assertEqual(nodes["waiting-task"]["plain_status"], "等待人工确认")
@@ -278,7 +321,9 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
                 }
                 for source, target in (("old-2", "old-1"), ("direct", "old-2"), ("tip", "direct"))
             ],
-            "active_tip_workstream_ids": ["tip"], "history_candidate_ids": ["old-1", "old-2"],
+            # These are relation-connected predecessors, not strict archived
+            # history identities. Strict history is grouped independently.
+            "active_tip_workstream_ids": ["tip"], "history_candidate_ids": [],
             "comparison_suggestions": [], "conflicts": [], "program_groups": [],
         }
         collapsed = graph_ui.build_readability_layout(history_projection, lens="succession")
@@ -414,7 +459,7 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             lambda: (_ for _ in ()).throw(RuntimeError("C:/private/secret prompt body"))
         )
         self.assertEqual(failed["error"]["code"], "core-provider-failure")
-        self.assertNotIn("private", json.dumps(failed))
+        self.assertNotIn("C:/private/secret", json.dumps(failed))
         self.assertNotIn("prompt body", json.dumps(failed))
 
         legacy = copy.deepcopy(self.provider)
@@ -718,14 +763,16 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("{passive:false}", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("MIN_ZOOM=.3,MAX_ZOOM=2", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("Math.max(MIN_ZOOM,Math.min(1.15", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("history:all", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertNotIn("history:all", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("organizationalClassificationCounts", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("组织分类未登记", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("wg-overview", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertNotIn("wg-overview", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn(".wg-node:focus,.wg-node:focus-visible{outline:none!important}", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertNotIn("drop-shadow(0 0 4px color-mix", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn("expandedChains:new Set()", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("data-wg-expand-all", page)
-        self.assertIn("data-wg-collapse-all", page)
+        self.assertNotIn("data-wg-expand-all", page)
+        self.assertNotIn("data-wg-collapse-all", page)
         self.assertIn("data-wg-zoom-in", page)
         self.assertIn("data-wg-fit", page)
         self.assertIn("data-wg-inspector-close", page)
@@ -750,8 +797,8 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
         self.assertIn("compact?'系列演进'", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("lineEncoding", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("0 条依赖边 · 0 个孤立节点", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("点击展开，仅影响这条上游链", graph_ui.WORKSTREAM_GRAPH_JS)
-        self.assertIn("收起本链", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("有关系证据的上游任务，点击展开", graph_ui.WORKSTREAM_GRAPH_JS)
+        self.assertIn("收起历史", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("H${", graph_ui.WORKSTREAM_GRAPH_JS)
         self.assertIn("--wg-node-width:224px;--wg-node-height:96px", graph_ui.WORKSTREAM_GRAPH_CSS)
         self.assertIn("RANK_GAP=144,ROW_GAP=40,SERIES_GAP=88,SERIES_ROW_GAP=54", graph_ui.WORKSTREAM_GRAPH_JS)

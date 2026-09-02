@@ -10,6 +10,7 @@ import datetime as dt
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .candidate_freeze import inspect_candidate_lifecycle
 from .collaboration import resolve_integration_oid, validate_collaboration_contract
 from .review import (
     _common_git_dir,
@@ -370,6 +371,23 @@ def inventory_workspaces(
             if matches:
                 closure = sorted(matches, key=lambda item: str(item.get("closed_at")))[-1]
 
+        candidate_lifecycle = (
+            inspect_candidate_lifecycle(
+                Path(str(git["git_dir"])) / "orrery",
+                workstream_id=str(session.get("workstream_id", "")),
+                head_oid=str(git.get("head") or "") or None,
+                lifecycle_phase=str(session.get("lifecycle_phase", "unknown")),
+                closure_reason=str(closure.get("closure_reason")) if closure else None,
+            )
+            if session is not None and git.get("git_dir")
+            else {
+                "candidate_state": "unknown", "validation_status": "unknown",
+                "closure_state": "unknown", "status_code": "candidate-evidence-unknown",
+                "display_label": "候选证据待确认", "writes_performed": False,
+                "network_performed": False,
+            }
+        )
+
         explicit = explicit_classifications.get(key)
         phase = str(session.get("lifecycle_phase")) if session is not None else None
         is_primary = bool(worktree and worktree.get("is_primary"))
@@ -452,6 +470,7 @@ def inventory_workspaces(
                     "lifecycle_phase": phase,
                     "runtime_condition": session.get("runtime_condition") if session else None,
                 },
+                "candidate_lifecycle": candidate_lifecycle,
                 "closure": {
                     "closure_id": closure.get("closure_id") if closure else None,
                     "closure_reason": closure.get("closure_reason") if closure else None,
@@ -569,6 +588,13 @@ def compute_workspace_cleanup_eligibility(
         reasons.append("workstream-is-active")
     if entry["classification"] == "review-integration-pending":
         reasons.append("review-or-integration-is-pending")
+    candidate_status_code = str(entry.get("candidate_lifecycle", {}).get("status_code", "candidate-evidence-unknown"))
+    if candidate_status_code == "candidate-validation-pending":
+        reasons.append("candidate-validation-is-pending")
+    elif candidate_status_code == "candidate-validated":
+        reasons.append("candidate-is-validated-but-not-closed")
+    elif candidate_status_code == "candidate-validation-failed":
+        reasons.append("candidate-validation-failed")
     if entry["classification"] == "evidence-retained" or entry["protections"]:
         reasons.append("workspace-is-protected-or-retained")
     git = entry["git"]

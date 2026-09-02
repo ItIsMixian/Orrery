@@ -27,4 +27,6 @@ WORKSTREAM_RELATION_EXECUTION_SCHEMA = _read_schema("workstream-relation-executi
 WORKSTREAM_RELATION_CAPTURE_SCHEMA = _read_schema("workstream-relation-capture-v2.json")
 WORKSTREAM_PROGRAM_HIERARCHY_SCHEMA = _read_schema("workstream-program-hierarchy-v1.json")
 DOCUMENTATION_GOVERNANCE_FINDING_SCHEMA = _read_schema("documentation-governance-finding-v1.json")
+CANDIDATE_FREEZE_RECEIPT_SCHEMA = _read_schema("candidate-freeze-receipt-v1.json")
+CANDIDATE_VALIDATION_RECEIPT_SCHEMA = _read_schema("candidate-validation-receipt-v1.json")
 REQUIRED_SCAFFOLD_FILES = tuple(AUTHORITY_SCHEMA["required_scaffold_files"])

@@ -286,7 +286,9 @@ def validate_relation_record(record: Mapping[str, Any], *, project_root: Path | 
         raise ValueError("actor must match the v1 relation contract")
     if actor.get("actor_id") is not None:
         _validate_identifier(actor.get("actor_id"), "actor_id")
-    if record.get("origin") not in {"native", "legacy-session-projection", "discovery"}:
+    if record.get("origin") not in {
+        "native", "legacy-session-projection", "archived-session-lineage-projection", "discovery",
+    }:
         raise ValueError("unsupported relation origin")
     reason = record.get("reason")
     if not isinstance(reason, str) or not reason.strip() or len(reason) > 2048:
@@ -912,6 +914,234 @@ def _archived_node_from_session(session: Mapping[str, Any], evidence_id: str) ->
     return node
 
 
+def _archive_retirement_envelope(
+    project_root: Path,
+    *,
+    archive_date: str,
+    entry_name: str,
+    session: Mapping[str, Any],
+) -> dict[str, str]:
+    """Resolve the immutable archive entry identity without trusting a moved branch ref."""
+    try:
+        dt.date.fromisoformat(archive_date)
+    except ValueError as exc:
+        raise ValueError("archive date is invalid") from exc
+    branch_ref = session.get("branch")
+    if (
+        not isinstance(branch_ref, str)
+        or not branch_ref.startswith("refs/heads/")
+        or len(branch_ref) > 512
+        or any(character in branch_ref for character in "\r\n\0")
+    ):
+        raise ValueError("archive branch ref is invalid")
+    entry_slug, separator, head_prefix = entry_name.rpartition("-")
+    if (
+        not separator
+        or not 8 <= len(head_prefix) <= 40
+        or not re.fullmatch(r"[0-9a-f]+", head_prefix)
+        or entry_slug not in {
+            _archive_branch_slug(branch_ref, separator="-"),
+            _archive_branch_slug(branch_ref, separator="_"),
+        }
+    ):
+        raise ValueError("archive entry does not bind its branch identity")
+    result = _run_git(
+        project_root, "rev-parse", "--verify", "--end-of-options", f"{head_prefix}^{{commit}}", check=False,
+    )
+    retirement_head = result.stdout.strip().lower()
+    if result.returncode or not _OID.fullmatch(retirement_head) or not retirement_head.startswith(head_prefix):
+        raise ValueError("archive retirement HEAD does not resolve exactly")
+    return {
+        "branch_ref": branch_ref,
+        "retirement_head_oid": retirement_head,
+        "archive_day": f"{archive_date}T00:00:00Z",
+    }
+
+
+def load_archived_lineage_projection(project_root: Path) -> dict[str, Any]:
+    """Recover only exact, cycle-free lineage from the bounded retired-session archive."""
+    repository = Path(project_root).expanduser().absolute()
+    candidates: dict[str, list[dict[str, Any]]] = {}
+    rejection_counts: dict[str, int] = {}
+    rejections: list[dict[str, str]] = []
+    status_counts: dict[str, int] = {}
+
+    def reject(workstream_id: str, code: str) -> None:
+        rejection_counts[code] = rejection_counts.get(code, 0) + 1
+        rejections.append({"workstream_id": workstream_id, "code": code})
+
+    archive_files = _archive_session_files(repository)
+    for archive_date, entry_name, _path, content in archive_files:
+        try:
+            session = _decode_archive_session(content)
+            workstream_id = _validate_identifier(session.get("workstream_id"), "archived workstream_id")
+            envelope = _archive_retirement_envelope(
+                repository,
+                archive_date=archive_date,
+                entry_name=entry_name,
+                session=session,
+            )
+            semantic_hash = _digest(session)
+            candidates.setdefault(workstream_id, []).append({
+                "session": session,
+                "retirement_head_oid": envelope["retirement_head_oid"],
+                "evidence_id": f"retired-session-archive:sha256:{semantic_hash}",
+            })
+        except ValueError:
+            reject("unknown", "invalid-archive-envelope")
+
+    unique: dict[str, dict[str, Any]] = {}
+    for workstream_id, entries in sorted(candidates.items()):
+        signatures = {
+            (entry["evidence_id"], entry["retirement_head_oid"])
+            for entry in entries
+        }
+        if len(signatures) != 1:
+            reject(workstream_id, "duplicate-archive-identity")
+            continue
+        unique[workstream_id] = min(entries, key=lambda item: item["evidence_id"])
+
+    preliminary: list[dict[str, Any]] = []
+    for workstream_id, entry in sorted(unique.items()):
+        session = entry["session"]
+        lineage = session.get("lineage")
+        status = str(lineage.get("status")) if isinstance(lineage, Mapping) else "absent"
+        status_counts[status] = status_counts.get(status, 0) + 1
+        if not isinstance(lineage, Mapping):
+            continue
+        if status != "current":
+            reject(workstream_id, f"lineage-{status}")
+            continue
+        try:
+            target_id = _validate_identifier(lineage.get("base_workstream_id"), "archived lineage target")
+            validated_head = _validate_oid(lineage.get("validated_head"), "archived lineage validated_head")
+            task_base = _validate_oid(lineage.get("task_base_oid"), "archived lineage task_base_oid")
+        except ValueError:
+            reject(workstream_id, "invalid-lineage-fields")
+            continue
+        target = unique.get(target_id)
+        if target is None:
+            reject(workstream_id, "target-archive-missing-or-ambiguous")
+            continue
+        if workstream_id == target_id:
+            reject(workstream_id, "self-lineage")
+            continue
+        if (
+            validated_head is None
+            or task_base is None
+            or not _exact_commit(repository, validated_head)
+            or not _exact_commit(repository, task_base)
+            or not _is_ancestor(repository, task_base, validated_head)
+            or not _is_ancestor(repository, task_base, target["retirement_head_oid"])
+        ):
+            reject(workstream_id, "git-lineage-unconfirmed")
+            continue
+        preliminary.append({
+            "source": workstream_id,
+            "target": target_id,
+            "source_entry": entry,
+            "target_entry": target,
+            "validated_head": validated_head,
+            "task_base": task_base,
+        })
+
+    adjacency: dict[str, set[str]] = {}
+    for item in preliminary:
+        adjacency.setdefault(item["source"], set()).add(item["target"])
+
+    def reaches(source: str, target: str, seen: set[str]) -> bool:
+        if source == target:
+            return True
+        if source in seen:
+            return False
+        seen.add(source)
+        return any(reaches(child, target, seen) for child in adjacency.get(source, set()))
+
+    accepted = [
+        item for item in preliminary
+        if not reaches(item["target"], item["source"], set())
+    ]
+    cycle_sources = {item["source"] for item in preliminary} - {item["source"] for item in accepted}
+    for workstream_id in sorted(cycle_sources):
+        reject(workstream_id, "lineage-cycle")
+
+    records: list[dict[str, Any]] = []
+    node_entries: dict[str, dict[str, Any]] = {}
+    for item in accepted:
+        source_entry = item["source_entry"]
+        target_entry = item["target_entry"]
+        source_current = item["validated_head"] == source_entry["retirement_head_oid"]
+        target_current = item["task_base"] == target_entry["retirement_head_oid"]
+        target_count = _revision_count(repository, item["task_base"], target_entry["retirement_head_oid"])
+        evidence_status = "confirmed" if source_current and target_current else "stale"
+        relation_hash = _digest({
+            "source": item["source"], "target": item["target"],
+            "validated_head": item["validated_head"], "task_base": item["task_base"],
+            "source_evidence": source_entry["evidence_id"], "target_evidence": target_entry["evidence_id"],
+        })[:24]
+        records.append(build_relation_record(
+            relation_id=f"archive-lineage-{relation_hash}",
+            event_id=f"archive-lineage-{relation_hash}",
+            revision=1,
+            relation_type="derived_from",
+            source_workstream_id=item["source"],
+            target_workstream_id=item["target"],
+            lifecycle="active" if evidence_status == "confirmed" else "stale",
+            recorded_at=str(source_entry["session"].get("captured_at", "1970-01-01T00:00:00Z")),
+            actor_kind="import",
+            actor_id=None,
+            origin="archived-session-lineage-projection",
+            reason="read-only recovery of exact archived Workstream lineage",
+            evidence=default_relation_evidence(
+                status=evidence_status,
+                source_head_oid=item["validated_head"],
+                target_head_oid=target_entry["retirement_head_oid"],
+                task_base_oid=item["task_base"],
+                source_head_status="current" if source_current else "stale",
+                target_head_status="current" if target_current else "stale",
+                scope_status="current" if source_current and target_current else "stale",
+                ancestry_status="confirmed",
+                target_unique_commits_after_base=target_count,
+            ),
+            source_links=[
+                {"kind": "workstream-session", "ref": source_entry["evidence_id"]},
+                {"kind": "workstream-session", "ref": target_entry["evidence_id"]},
+            ],
+            writes_performed=False,
+        ))
+        node_entries[item["source"]] = source_entry
+        node_entries[item["target"]] = target_entry
+
+    nodes: list[dict[str, Any]] = []
+    for workstream_id, entry in sorted(node_entries.items()):
+        node = _node_from_session(entry["session"], "stale")
+        node.update({
+            "head_oid": entry["retirement_head_oid"],
+            "visibility": "git-private-local-only",
+            "observability": "retired-archive-local",
+            "source_links": [{"kind": "workstream-session", "ref": entry["evidence_id"]}],
+            "origin": "archived-session-lineage-projection",
+        })
+        nodes.append(node)
+    return {
+        "schema_version": RELATION_SCHEMA_VERSION,
+        "contract_type": "workstream-archived-lineage-projection",
+        "records": sorted(records, key=_record_sort_key),
+        "nodes": nodes,
+        "diagnostics": {
+            "archive_record_count": len(archive_files),
+            "unique_workstream_count": len(unique),
+            "lineage_status_counts": dict(sorted(status_counts.items())),
+            "recovered_edge_count": len(records),
+            "rejection_counts": dict(sorted(rejection_counts.items())),
+            "rejections": sorted(rejections, key=lambda item: (item["code"], item["workstream_id"])),
+        },
+        "read_only": True,
+        "writes_performed": False,
+        "network_performed": False,
+    }
+
+
 def _unresolved_archive_node(workstream_id: str, evidence_id: str) -> dict[str, Any]:
     return {
         "workstream_id": workstream_id,
@@ -1174,8 +1404,13 @@ def _normalize_node(node: Mapping[str, Any]) -> dict[str, Any]:
     ):
         raise ValueError("node status fields do not match the v1 graph contract")
     head = _validate_oid(node.get("head_oid"), "node head_oid")
+    origin = node.get("origin", "relation-only")
     closure_reason = node.get("closure_reason")
-    if closure_reason not in (*NODE_CLOSURE_REASONS, None):
+    allowed_closure_reasons = (
+        (*NODE_CLOSURE_REASONS, "unknown")
+        if origin == "workstream-history-index" else NODE_CLOSURE_REASONS
+    )
+    if closure_reason not in (*allowed_closure_reasons, None):
         raise ValueError("node closure_reason does not match the v1 graph contract")
     if (lifecycle_phase == "closed") != (closure_reason is not None):
         raise ValueError("node closed lifecycle and closure_reason disagree")
@@ -1200,8 +1435,11 @@ def _normalize_node(node: Mapping[str, Any]) -> dict[str, Any]:
     })
     visibility = _validate_identifier(node.get("visibility", "unknown"), "node visibility", filesystem_safe=True)
     observability = _validate_identifier(node.get("observability", "unknown"), "node observability", filesystem_safe=True)
-    origin = node.get("origin", "relation-only")
-    if origin not in {"native", "legacy-session-projection", "relation-only", "discovery"}:
+    if origin not in {
+        "native", "legacy-session-projection", "archived-session-lineage-projection",
+        "relation-only", "discovery",
+        "workstream-history-index",
+    }:
         raise ValueError("unsupported node origin")
     normalized = {
         "workstream_id": workstream_id,
@@ -1220,6 +1458,26 @@ def _normalize_node(node: Mapping[str, Any]) -> dict[str, Any]:
         "source_links": _normalize_source_links(node.get("source_links", [])),
         "origin": origin,
     }
+    if origin == "workstream-history-index":
+        closed_at = node.get("history_closed_at")
+        _parse_timestamp(closed_at)
+        relation_count = node.get("history_relation_count", 0)
+        if not isinstance(relation_count, int) or isinstance(relation_count, bool) or relation_count < 0:
+            raise ValueError("history node relation count is invalid")
+        normalized["history_closed_at"] = closed_at
+        normalized["history_relation_count"] = relation_count
+        record_kind = node.get("history_record_kind")
+        observed_lifecycle = node.get("history_observed_lifecycle_phase")
+        observed_runtime = node.get("history_observed_runtime_condition")
+        if record_kind not in {"closed-workstream", "retired-session"}:
+            raise ValueError("history node record kind is invalid")
+        if observed_lifecycle not in NODE_LIFECYCLE_PHASES or observed_runtime not in NODE_RUNTIME_CONDITIONS:
+            raise ValueError("history node observed state is invalid")
+        if (record_kind == "closed-workstream") != (observed_lifecycle == "closed"):
+            raise ValueError("history node kind and observed lifecycle disagree")
+        normalized["history_record_kind"] = record_kind
+        normalized["history_observed_lifecycle_phase"] = observed_lifecycle
+        normalized["history_observed_runtime_condition"] = observed_runtime
     return normalized
 
 
@@ -1301,7 +1559,8 @@ def _graph_diagnostics(
 
 def _node_is_active(node: Mapping[str, Any]) -> bool:
     return (
-        node.get("status") in {"active", "review-pending"}
+        node.get("origin") != "workstream-history-index"
+        and node.get("status") in {"active", "review-pending"}
         and node.get("session_state") == "current"
         and node.get("runtime_condition") == "active"
         and node.get("evidence_freshness") == "current"
@@ -1443,6 +1702,7 @@ def load_relation_graph(
     native = load_relation_history(project_root)
     records = list(native["current_records"])
     nodes: list[dict[str, Any]] = []
+    archived_lineage: dict[str, Any] | None = None
     if include_legacy:
         native_endpoints = sorted({
             workstream_id
@@ -1463,10 +1723,56 @@ def load_relation_graph(
             if (record["relation_type"], record["source_workstream_id"], record["target_workstream_id"]) not in native_triples
         )
         nodes.extend(legacy["nodes"])
+        archived_lineage = load_archived_lineage_projection(project_root)
+        existing_evidence = {
+            (
+                record["relation_type"], record["source_workstream_id"], record["target_workstream_id"],
+                record["evidence"].get("source_head_oid"), record["evidence"].get("target_head_oid"),
+                record["evidence"].get("task_base_oid"),
+            )
+            for record in records
+        }
+        records.extend(
+            record for record in archived_lineage["records"]
+            if (
+                record["relation_type"], record["source_workstream_id"], record["target_workstream_id"],
+                record["evidence"].get("source_head_oid"), record["evidence"].get("target_head_oid"),
+                record["evidence"].get("task_base_oid"),
+            ) not in existing_evidence
+        )
+        nodes.extend(archived_lineage["nodes"])
+    from .workstream_history import history_nodes, inspect_workstream_history
+
+    history = inspect_workstream_history(project_root)
+    existing_nodes = {str(item["workstream_id"]): item for item in nodes}
+    for item in history_nodes(project_root):
+        workstream_id = str(item["workstream_id"])
+        existing = existing_nodes.get(workstream_id)
+        if existing is None or existing.get("origin") == "relation-only":
+            existing_nodes[workstream_id] = item
+    nodes = list(existing_nodes.values())
     graph = build_relation_graph(records, nodes=nodes)
     graph["storage"] = native["storage"]
     graph["storage_ref"] = native["storage_ref"]
     graph["legacy_projection_included"] = include_legacy
+    graph["archived_lineage"] = (
+        archived_lineage["diagnostics"] if archived_lineage is not None else {
+            "archive_record_count": 0,
+            "unique_workstream_count": 0,
+            "lineage_status_counts": {},
+            "recovered_edge_count": 0,
+            "rejection_counts": {},
+            "rejections": [],
+        }
+    )
+    graph["workstream_history"] = {
+        "status": history["status"],
+        "record_count": history["counts"]["records"],
+        "storage": history["storage"],
+        "storage_ref": history["storage_ref"],
+        "read_only": True,
+        "writes_performed": False,
+    }
     graph["graph_hash"] = _digest({key: value for key, value in graph.items() if key != "graph_hash"})
     return graph
 
@@ -2161,6 +2467,7 @@ __all__ = [
     "discover_relation_candidates",
     "load_archived_session_index",
     "load_legacy_session_projection",
+    "load_archived_lineage_projection",
     "load_relation_graph",
     "load_relation_history",
     "project_legacy_session_relation",

@@ -95,6 +95,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 
 ## 兼容与安全边界
 
+- W3.1 Worktree 已实现显式 `worktree freeze-candidate` 与现有 CI7 路由兼容的异步 request/result adapter；
+  freeze 路径不运行测试或发布门，状态投影只读 Git-private receipts。它尚未进入组件版本、release manifest、
+  installer、默认 runtime 或公开发行物。
 - 旧 Skill wrapper 支持整个 0.3.x；最早到 0.4.0 才具备移除评审资格，且版本到达不自动删除。
 - `orrery` PyPI 名称存在无关第三方项目；R4/R5 未授权创建同名 distribution/import。任何 alias 必须路由同一 canonical implementation，并在冲突时失败关闭。
 - Authority migration/restore 只操作显式 receipt 绑定的项目 manifest；普通 scaffold／tool upgrade 不替已有项目选择模型。
@@ -120,6 +123,7 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
 - [U2.3 Navigation & Live Task Visibility](../validation/2026-08-30-u2-3-navigation-live-task-visibility.md)
 - [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [W7.3 Relation Capture & Confirmation Validation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
+- [W3.1 Fast Candidate Freeze and Asynchronous Validation](../validation/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)
 - [CI5 Validation](../validation/2026-08-29-ci5-promotion-throughput-optimization.md)
 - [Platform-neutral Plan](../implementation/plans/2026-08-19-platform-neutral-core-and-adapters.md)
 

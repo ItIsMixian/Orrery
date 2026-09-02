@@ -263,6 +263,23 @@ class PersonalObservatoryTests(unittest.TestCase):
             with mock.patch(
                 "project_orrery_core.collaboration.inspect_worktree_status",
                 side_effect=AssertionError("startup must not inspect each worktree"),
+            ), mock.patch(
+                "project_orrery_observatory.active_task_projection.inspect_candidate_lifecycle",
+                side_effect=lambda _private, **values: {
+                    "candidate_state": "candidate-frozen",
+                    "validation_status": "pending",
+                    "closure_state": "open",
+                    "status_code": "candidate-validation-pending",
+                    "display_label": "候选已冻结 · 等待验证",
+                    "candidate_sha": values.get("head_oid"),
+                    "freeze_receipt_id": "candidate-freeze-receipt-" + "1" * 24,
+                    "validation_receipt_ids": [],
+                    "receipt_files_read": 1,
+                    "receipt_bytes_read": 128,
+                    "broken_receipt_files": 0,
+                    "writes_performed": False,
+                    "network_performed": False,
+                },
             ):
                 first = build_active_task_projection(
                     root, registry_provider=registry, maintenance_loader=maintenance,
@@ -278,6 +295,12 @@ class PersonalObservatoryTests(unittest.TestCase):
             boundary = first["read_boundary"]
             self.assertEqual((boundary["worktree_source_files_read"], boundary["scope_observations"], boundary["diff_reads"]), (0, 0, 0))
             self.assertFalse(boundary["startup_full_scan"])
+            self.assertEqual(boundary["candidate_receipt_files_read"], 8)
+            self.assertTrue(all(
+                item["candidate_status_code"] == "candidate-validation-pending"
+                for item in first["tasks"] if item["session_status"] == "available"
+            ))
+            self.assertIn("候选已冻结 · 等待验证", render_active_task_panel(first, dynamic=True))
 
             write_session(records[10], "NEW-dynamic-session")
             second = build_active_task_projection(root, registry_provider=registry, maintenance_loader=maintenance)

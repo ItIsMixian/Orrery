@@ -52,6 +52,7 @@ def core_relation_provider(project_root: Path) -> dict[str, Any]:
         inspect_task_series,
     )
     from project_orrery_core.workstream_program_hierarchy import inspect_program_hierarchy
+    from project_orrery_core.workstream_history import inspect_workstream_history
 
     root = Path(project_root).resolve()
     relation_root_present = relation_storage_root(root).is_dir()
@@ -66,6 +67,7 @@ def core_relation_provider(project_root: Path) -> dict[str, Any]:
         "succession_plan": plan,
         "task_series": inspect_task_series(root),
         "program_hierarchy": inspect_program_hierarchy(root),
+        "workstream_history": inspect_workstream_history(root),
     }
     if capture_storage_root(root).is_dir():
         payload["relation_capture"] = inspect_relation_capture(root)
