@@ -90,3 +90,12 @@ Pending focused evidence.
 Central exact `4e64bbb88e2356c729bf69259a58ca96e0e44de3` passed the focused frozen-ancestor regression 1/1 in
 25.511 seconds: full topology retained the conflict, descendant scope refresh proceeded, and one subsequent dirty peer
 byte restored L3. No broader suite, U2.5 product write, peer closure or worktree removal ran.
+
+## 2026-09-02 acceptance-gate correction
+
+The maintainer rejected full-page visual inspection as evidence for U2.5's internal cache/delivery behavior and
+accepted a runtime-receipt-first gate. The task's recorded 491 ms first HTTP, 2.939 second usable shell, unchanged
+`cached-current` restart with zero provider runs, single generation refresh and atomic publication are eligible inputs
+to that receipt without rerun. Only bounded evidence for no page-wide blank/flash, semantic-layout preservation and
+stop-time cleanup remains to be completed before structural Candidate Freeze. No full-page subjective approval or
+broad automated tier is required.
