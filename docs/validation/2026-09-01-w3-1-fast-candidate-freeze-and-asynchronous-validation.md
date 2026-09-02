@@ -59,3 +59,14 @@ This is blocker evidence, not implementation or validation PASS.
 The unique integration branch subsequently added only the two approved strict JSON Schema resources at exact
 `c142f325d643827c47ce14fb7a489ea1ff39a295`; JSON decode and Draft 2020-12 schema self-check passed. This removes the
 bootstrap dependency but still proves no W3.1 command, receipt writer or validator behavior.
+
+## 2026-09-02 resumption observation — frozen-peer overlap
+
+- after importing the bootstrap, scope no longer failed on `schema-migration`;
+- the original broad scope still produced direct/L3 findings against W7.4's frozen Graph, shared owner tests and
+  task-local State/DEVLOG paths;
+- no W3.1 product byte was written, and neither peer was closed, deleted or overwritten;
+- Plan revision 3 limits the active implementation slice to new Core/CLI/CI infrastructure, one new focused owner and
+  this Validation document. Projection and shared-document evidence remain Pending for a later common baseline.
+
+The next admissible evidence is an allowed refreshed scope followed by implementation on only that disjoint slice.

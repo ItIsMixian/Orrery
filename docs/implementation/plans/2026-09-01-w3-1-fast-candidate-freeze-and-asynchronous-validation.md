@@ -120,3 +120,28 @@ All original W3.1 safety and validation boundaries remain in force.
 
 The unique integrator completed that strict two-file bootstrap at exact
 `c142f325d643827c47ce14fb7a489ea1ff39a295`. W3.1 may consume it only through the import/scope-refresh sequence above.
+
+## 2026-09-02 scope revision 3 — disjoint infrastructure first
+
+After importing the schema bootstrap, W3.1 correctly found that its original broad projection/test/document write set
+still overlapped the frozen W7.4 Candidate. A frozen validation-pending worktree must not be deleted or falsely closed
+merely to free paths, and W3.1 must not overwrite its accepted Graph/history bytes.
+
+W3.1 therefore resumes first on a disjoint infrastructure slice. Its current task-owned writes are limited to:
+
+- `packages/project-orrery-core/src/project_orrery_core/candidate_freeze.py`;
+- `packages/project-orrery-core/src/project_orrery_core/schema.py` only to load the two centrally owned schemas;
+- `packages/project-orrery-cli/src/project_orrery_cli/worktree.py`;
+- `scripts/ci/candidate_validation.py`;
+- `tests/test_candidate_freeze.py`;
+- its own Pending Validation document.
+
+The Personal/Graph/Maintenance projection work, existing shared owner tests, subsystem State and DEVLOG updates are
+deferred until W7.4/U2.5 provide a common integrated development baseline. This is sequencing, not removal from the
+accepted design. W3.1 must rewrite its Git-private expected-write and validation-surface sets to this exact slice,
+refresh scope, and resume product work only after all direct/L3 findings are retired. It must not import or edit W7.4
+or U2.5 product bytes for this phase.
+
+The disjoint Candidate may prove Core receipt validation, zero-write dry-run/one-commit apply, acceptance-drift and
+structural refusals, the zero-validation freeze boundary, and immutable-SHA asynchronous PASS/FAIL/no-repeat behavior.
+It cannot claim the deferred UI projections or full W3.1 completion.
