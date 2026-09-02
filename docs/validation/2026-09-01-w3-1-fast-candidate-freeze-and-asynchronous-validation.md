@@ -126,3 +126,10 @@ This remains **partial W3.1 Candidate evidence**, not full completion. Personal/
 owner tests, subsystem State/DEVLOG synchronization, W7.4 manual-adoption evidence and every
 Fast/Checkpoint/Candidate/Promotion/publication gate remain Pending for the common integrated baseline defined by Plan
 revision 3. No integration, push, release, closure, cleanup or worktree deletion occurred.
+
+## 2026-09-02 deferred-projection resumption gate
+
+- W3.1 infrastructure Candidate `6eab27964e22cb0e22b6ebb34ab175869a6505fc` remains clean and unchanged;
+- U2.5 exact `f28cf6d1dc9ebb6fbf58a73071c705a4339337d1` is clean and frozen with validation Pending;
+- the maintainer explicitly authorized W3.1 to resume its deferred projection phase from that common baseline;
+- no projection implementation, focused evidence, integration or completion claim exists yet under revision 5.

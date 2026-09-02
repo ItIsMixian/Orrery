@@ -1,8 +1,10 @@
 # 项目结构 State
 
-Updated: 2026-09-01
+Updated: 2026-09-02
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0026](../decisions/0026-durable-workstream-history-and-human-readable-relation-decisions.md), [ADR-0027](../decisions/0027-retain-history-without-bulk-ui-and-recover-archived-lineage.md), [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md), [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md), [ADR-0030](../decisions/0030-fast-candidate-freeze-and-asynchronous-validation.md), [ADR-0031](../decisions/0031-read-only-codex-plugin-surface-for-orrery-conductor.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0026](../decisions/0026-durable-workstream-history-and-human-readable-relation-decisions.md), [ADR-0027](../decisions/0027-retain-history-without-bulk-ui-and-recover-archived-lineage.md), [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md), [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md), [ADR-0030](../decisions/0030-fast-candidate-freeze-and-asynchronous-validation.md), [ADR-0031](../decisions/0031-read-only-codex-plugin-surface-for-orrery-conductor.md), [ADR-0033](../decisions/0033-dual-plane-event-driven-orrery-coordination.md)
+
+Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-primary-surface-for-orrery-conductor.md)
 
 ## 当前事实
 
@@ -14,6 +16,14 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - ADR-0031 已授权 S1 在独立 `orrery-conductor` repository 中实现只读 Codex plugin/MCP UI 兼容层。当前只有
   Project Orrery authority；外部 repository、实现、安装和 Release 尚未产生，live Graph binding 等待 accepted
   U2.5 delivery envelope。
+- S1 独立 repository 保留 clean Phase A `4e44d27...` 与 right-panel `3ac32ec...`；inline conversation UI 与
+  Browser Panel 均因不够原生被维护者拒绝。任务现长期暂停，等待受支持的 Codex native sidebar/toolbar
+  extension point；没有 live U2.5 binding、原生兼容、发布或 Release。
+- ADR-0033 已接受 Product/Decision 与 Execution Coordination 双平面、focus-safe 事件收件箱、provider-neutral
+  task/worktree 绑定和有界 control snapshot。未来 implementation 的 task code 与 repository owner 尚未由维护者
+  分配；没有创建 task、worktree、schema、runtime 或 Adapter，且该方向与只读 S1 DAG plugin 无依赖。
+- 当前 self-host 的两个同路径 Codex saved projects 是 Local-only 部署选择：项目级 1M 配置用于 Product/Decision，
+  实现项目用于调度与 Worker。它们不是两个 Git 仓库，也不创建 Workstream 关系或公共产品默认。
 - PO1 在不增加文件角色或号码服务的前提下，把 decision proposal/number allocation 边界投影进 dispatch Skill，并在 repository gate 检查当前树 numeric ADR 唯一性；它不扫描或锁定 peer Candidate 编号。
 - 当前本机 Codex home 有一份从 local integration `8b73f26` 复制的 `orrery-dispatch` 两文件安装；该外部本机副本不属于 Git tree 或发布资产。
 - 未发布的平台中立源码位于 `packages/project-orrery-{core,cli,observatory}/`。A4/U2.3/W7.3 local integrated Candidate 声明 Core 0.1.19、CLI 0.1.22、Observatory 0.1.19。Core API 为 1，组件总状态为 `unreleased`。

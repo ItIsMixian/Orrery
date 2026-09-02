@@ -1,6 +1,6 @@
 # 当前进度
 
-Updated: 2026-09-01
+Updated: 2026-09-02
 
 ## 当前阶段
 
@@ -10,9 +10,9 @@ Orrery v0.3.1 已于 2026-09-01 公开发布；protected `main`、annotated tag 
 Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority revision `1776629...` 与已发布产品
 历史共同纳入 Canonical main；不产生新的产品版本或资产。
 
-U2.5 Phase A 已冻结为 clean exact `6596a9f...`，实现可导航 Shell 与 Git-private Graph cache 基础设施。
-W7.4 accepted frozen exact `fe75fc2...` 已满足 Phase B 的开发依赖；维护者现已授权 U2.5 导入该精确 Candidate，
-完成非阻塞 hydration/invalidation 接线并在任何自动测试前提供 self-host preview。
+U2.5 已冻结为 clean exact `f28cf6d...`，完成 Shell-first、Git-private Graph cache、非阻塞 hydration、单次失效
+刷新与 runtime receipt；状态保持 validation-pending，尚未整合。该 exact Candidate 现在作为 W3.1 deferred
+projection 的共同开发基线。
 
 维护者已接受 W7.4 最终 full/compact 零重叠预览，并确认组织分类仍是独立缺口。ADR-0029/W7.5 已批准：
 当前 provider 42 个节点中 33 无 series、35 无 program/phase、27 两者皆无；W7.5 将以显式证据和人工确认
@@ -21,14 +21,20 @@ W7.4 accepted frozen exact `fe75fc2...` 已满足 Phase B 的开发依赖；维�
 维护者拒绝多分钟同任务 closeout。ADR-0030 已接受：预览接受后先在 `<30s` 目标内执行零测试的结构化
 Candidate Freeze，使实现任务停在 `候选已冻结／验证待执行`；耗时验证对 exact SHA 异步运行，PASS/FAIL、
 closure 与 worktree cleanup 保持独立。W7.4 已以 exact `fe75fc2...` 完成首次手工 freeze 并保持 validation
-Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c142f32...` 的严格两-schema bootstrap 解除，
-现可在原任务继续自动化实现。
+ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c142f32...` 的严格两-schema bootstrap 解除，
+ 现可在原任务继续自动化实现。
+
+维护者已接受 ADR-0033 的双平面协调方向：项目级 1M Codex 项目保留 Product/Decision 讨论，实施项目承载
+Execution Coordination 与 Worker；Worker 事件进入 focus-safe inbox，不插入活跃讨论。provider-neutral task
+binding、control snapshot、reference-only transport 和 role-aware context evaluation 当前只有
+authority/planning/Pending Validation；task identity 和 repository owner 尚未分配，与只读 S1 DAG plugin 无关。
 
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Release／工具链 | v0.3.1 Latest Release 已验证并发布；Windows launcher 闪窗与健康 runtime 复用缺陷关闭，v0.3.0 历史资产未替换 | 仅完成本次 docs closeout；后续通用 release 简化必须另立 Plan |
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate，Phase 0 exact page 已接受 | Final RC 只消费当前 child receipts；不手工重跑 feature suites |
+| 内部协调效率 | ADR-0033 已接受 Core／dispatch／host Adapter／Local-only profile 四层所有权；无 task identity 或 implementation | 由维护者先分配具体 task/repository owner；不从 S1/DAG plugin 推断 |
 | Unified Observatory | U2.5 Phase A clean `6596a9f...` 已完成 Shell/cache 基础设施；W7.4 accepted frozen `fe75fc2...` 可作为 Phase B 精确依赖 | 在原 U2.5 任务导入依赖并生成异步 Graph hydration self-host preview；接受前不跑自动测试 |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
@@ -47,6 +53,8 @@ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c1
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
 - `codex/u1-u2-integration-baseline` 曾在联合 feature merge `0eaad30` 吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；该历史节点组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它仍只作为后续中央 Candidate 的历史 child evidence。
 - ADR-0018 已接受 authority-first Workstream dispatch：U2.3 已按两次任务说明版本完成并本地集成，W7.3 也已确认其 scope revision；自动 receipt／first-write enforcement 尚未实现。
+- ADR-0033 已接受 Product/Decision 与 Execution Coordination 的职责、上下文和通知隔离；普通 dispatch 不持续
+  polling，task detail 按 summary→turn→command→full history 渐进展开。该方向当前没有产品实现或 release 事实。
 - ADR-0022 已接受 ELK.js 作为 Workstream Graph 唯一正常 layout/routing engine；它不改变现有 Orrery 前端或
   事实选择。GX2 provenance、W7.3 clean Candidate 与中央接线已完成，维护者接受的产品方向保持不变；
   公开 release/default 仍未发生。
@@ -69,10 +77,13 @@ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c1
 
 ## 活动计划与待办
 
-- [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：已授权独立 fixture-backed Codex plugin/MCP UI Phase A；可与 W3.1/U2.5 并行，live binding 等待 accepted exact U2.5 envelope，任何执行/发布能力均不在本阶段。
-- [ ] [W3.1 Fast Candidate Freeze and Asynchronous Validation](implementation/plans/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)：任务已登记；中央 strict receipt-schema bootstrap exact `c142f32...` 已解除 L3，等待原任务导入、scope refresh 后继续实现。
+- [ ] [Internal Coordination Efficiency](implementation/plans/2026-09-02-internal-coordination-efficiency.md)：
+  双平面、事件 inbox、provider-neutral task binding、control snapshot 和 role-aware context evaluation 已批准；
+  task code/repository owner 未分配，未创建任务/worktree，与只读 S1 DAG plugin 无依赖。
+- [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：长期暂停；clean `4e44d27...`/`3ac32ec...` 保留，等待未来官方 native sidebar/toolbar 扩展点和新的维护者授权，不继续 client/live binding/测试或发布。
+- [ ] [W3.1 Fast Candidate Freeze and Asynchronous Validation](implementation/plans/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)：infrastructure `6eab279...` 已完成；revision 5 已授权导入 U2.5 `f28cf6d...`，继续此前延期的 Personal/Graph/Maintenance 投影并只跑 focused owners。
 - [ ] [W7.5 Workstream Classification Calibration](implementation/plans/2026-09-01-w7-5-workstream-classification-calibration.md)：已批准，等待 accepted clean W7.4 exact Candidate 后分发；先做只读分类审计和人类可理解预览，确认前不写分类事件或运行自动测试。
-- [ ] [U2.5 Shell-first Graph Activation and Incremental Cache](implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)：Phase A clean `6596a9f...` 已完成；维护者授权 Phase B 精确导入 W7.4 `fe75fc2...` 并先给出 self-host preview，接受前不跑自动测试。
+- [ ] [U2.5 Shell-first Graph Activation and Incremental Cache](implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)：clean frozen `f28cf6d...` 已完成开发与 runtime receipt，validation/integration 仍 Pending；当前作为 W3.1 的精确共同基线。
 - [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：accepted preview 已冻结为 clean exact `fe75fc2...`，状态为 validation-pending；未整合、闭合或授权清理。
 - [x] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
   exact `00b2eb4...` 已进入当前本地 integration branch，包含即时 starting page、归档边界恢复和两个明确
@@ -128,6 +139,7 @@ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c1
 
 ## 下一里程碑
 
-1. 并行继续 W3.1 自动化与 U2.5 Phase B；U2.5 先交付真实 self-host preview，接受前不运行自动测试。
-2. W7.4 exact Candidate 的异步验证、W7.5 分类校准与 W6.2 cleanup 保持各自独立门，不并入当前两任务。
-3. 后续发布 U2.4/U2.5 或精简通用发布流程时另立任务；alias、scheduler 与独立组件发行继续延期。
+1. 恢复 W3.1 deferred projection phase，精确消费 U2.5 `f28cf6d...` 并形成自己的 clean Candidate。
+2. S1 只完成 ADR-0032 的 right-panel 修正版 preview；内部协调效率保持 docs-only，后续由维护者先分配 task/repository owner。
+3. W7.4 exact Candidate 的异步验证、W7.5 分类校准与 W6.2 cleanup 保持各自独立门，不并入当前两任务。
+4. 后续发布 U2.4/U2.5 或精简通用发布流程时另立任务；alias、scheduler 与独立组件发行继续延期。

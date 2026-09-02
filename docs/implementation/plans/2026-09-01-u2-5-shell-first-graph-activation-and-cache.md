@@ -184,3 +184,24 @@ integrate, close or remove the frozen peer.
 
 The unique integrator completed this correction at exact `4e64bbb88e2356c729bf69259a58ca96e0e44de3`. U2.5 must
 import it through the next exact task-description version and then rerun the full local-worktree refresh.
+
+## 2026-09-02 scope revision 5 — runtime receipt replaces full-page visual acceptance
+
+The maintainer confirmed that U2.5's essential change is runtime delivery/cache behavior and cannot be meaningfully
+accepted by inspecting a normal-looking page. The earlier full self-host preview gate therefore asked the human to
+judge facts that only counters, timings and lifecycle evidence can prove.
+
+U2.5 must now use a concise structured runtime acceptance receipt as the primary gate. It must report at least first
+HTTP, usable-shell time, cache state/currentness, provider runs on unchanged restart, invalidation generation, refresh
+single-flight count, atomic publication result and stop-time resource cleanup. Existing exact observations may be
+reused; unchanged scenarios must not be rerun merely to rewrite the receipt.
+
+The visible check is limited to two user-observable consequences: Graph does not block the whole shell, and generation
+replacement causes no page-wide blank/flash or relation-layout regression. This may be established by bounded browser
+instrumentation plus the already accepted W7.4 semantic counts; the maintainer is not required to infer cache or worker
+behavior from the page.
+
+Once the runtime receipt is complete and the two visible consequences have bounded evidence, U2.5 may perform the
+ADR-0030 structural Candidate Freeze immediately. It must not wait for a full-page subjective review, run broad test
+tiers, repeat unchanged evidence or expand into W7.4-owned semantics. Missing evidence remains Pending rather than
+being converted into a human visual gate.

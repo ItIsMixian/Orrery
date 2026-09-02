@@ -1,6 +1,7 @@
 # Validation
 
-- [S1 Orrery Conductor Codex Plugin Surface](2026-09-02-s1-orrery-conductor-codex-plugin-surface.md) — Pending; independent fixture-backed Codex plugin/MCP UI preview before live U2.5 binding or publication.
+- [Internal Coordination Efficiency](2026-09-02-internal-coordination-efficiency.md) — Pending; covers Core/dispatch/host-adapter ownership, provider-neutral task binding, quiet event delivery, focus-safe Product discussion, bounded control snapshots, reference-only dispatch and role-aware context evaluation; task identity remains unallocated.
+- [S1 Orrery Conductor Codex Plugin Surface](2026-09-02-s1-orrery-conductor-codex-plugin-surface.md) — Pending; inline Phase A was rejected, and the next fixture-backed preview must use Codex's existing right Browser Panel before live U2.5 binding or publication.
 
 Validation records reproducible evidence for implementation and documentation claims.
 

@@ -1,8 +1,8 @@
 # 文档系统 State
 
-Updated: 2026-08-31
+Updated: 2026-09-02
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md) | [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md) | [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md) | [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md) | [ADR-0030](../decisions/0030-fast-candidate-freeze-and-asynchronous-validation.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md) | [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md) | [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md) | [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md) | [ADR-0030](../decisions/0030-fast-candidate-freeze-and-asynchronous-validation.md) | [ADR-0031](../decisions/0031-read-only-codex-plugin-surface-for-orrery-conductor.md) | [ADR-0032](../decisions/0032-codex-right-panel-primary-surface-for-orrery-conductor.md) | [ADR-0033](../decisions/0033-dual-plane-event-driven-orrery-coordination.md)
 
 ## 当前事实
 
@@ -30,6 +30,11 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - ADR-0030 已把阻塞式 closeout 拆为快速 Candidate Freeze 与异步 Validation。冻结阶段只写最小 receipt/Pending
   指针；详细 Validation/State/DEVLOG 在异步结果或 integration 时事件驱动同步。W3.1 自动化尚未实现；中央
   `c142f32...` 只提供其 L3 所需的两份严格 receipt schema bootstrap。
+- ADR-0033 已接受一个人类入口、两个隔离上下文：Product/Decision 只处理讨论与权威，Execution Coordination
+  只处理 committed handoff、platform binding、事件收件箱和有界 control snapshot。Worker 状态变化不得插入
+  活跃维护者讨论；不变状态不重复播报。implementation task/repository owner 尚未分配，当前 `AGENTS.md` 全量入口继续生效。
+- 角色化文档入口只是经验证后的目标，不是当前产品事实。新的 context treatment 必须用独立 Pilot/Oracle
+  证明质量与安全后才能修改 `AGENTS.md` 或模板；Pilot 009 的 S 未采纳结论保持不变。
 - U2.3 local integrated Candidate 将 app rail 收敛为七个固定入口，把路线与趋势从作者文档树移入 app 区，并以唯一 floating Ask Docs 和顶栏只读帮助／系统状态面板替代独立问答／Authority 页面。Personal 使用 Git registry、Git-common-private 有界 session metadata 与现有 Maintenance cache 的轻量 active-task projection；启动不逐 worktree 读取源码、Scope、ignored 或 diff，重证据只在目标详情／刷新时读取。
 - W7.2.3 integrated Candidate 将真实只读 Graph 改为单一从左到右 DAG：固定可读卡片、中文 rank lane、工程图式实线／虚线／复合线、固定 10px 箭头、每链独立展开和收起、锚点式 `Ctrl + 滚轮` 缩放，以及默认关闭的画布内技术详情抽屉。dependency／conflict 只从各自真实端点建图；空 dependency 不显示孤立 active tips。桌面以 88px rank 通道和 44px 独立链间隔显示主图并保留 1×1px 语义 ledger，390px 用同事实列表替代微型图；文档根、侧栏、画布与详情滚动条共享深浅主题变量。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
@@ -75,6 +80,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - [W7.2 Graph Readability Validation](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [Authority-first Dispatch Plan](../implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)
 - [Authority-first Dispatch Contract](../validation/2026-08-30-authority-first-workstream-dispatch.md)
+- [Dual-plane Event-driven Coordination Design](../design/dual-plane-event-driven-orrery-coordination.md)
+- [Internal Coordination Efficiency Planning Record](../implementation/plans/2026-09-02-internal-coordination-efficiency.md)
+- [Internal Coordination Efficiency Pending Validation](../validation/2026-09-02-internal-coordination-efficiency.md)
+- [Central Coordination Context Audit](../snapshots/2026-09-02-central-coordination-context-audit.md)
 - [S0 Orrery Dispatch Skill Validation](../validation/2026-08-30-s0-orrery-dispatch-skill.md)
 - [PO1 Decision Allocation Validation](../validation/2026-08-30-po-decision-allocation-enforcement.md)
 - [W7.3 Relation Capture & Confirmation Validation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)

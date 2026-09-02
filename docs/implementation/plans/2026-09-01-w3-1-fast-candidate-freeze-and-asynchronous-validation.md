@@ -170,3 +170,20 @@ authorized recovery mechanisms.
 The unique integrator completed this narrow guard bootstrap at exact
 `33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7`. W3.1 must consume it through the normal exact task-description import and
 scope refresh; it is not a blanket conflict override.
+
+## 2026-09-02 scope revision 5 — resume deferred projections from U2.5 Candidate
+
+W3.1's disjoint infrastructure implementation is preserved at exact
+`6eab27964e22cb0e22b6ebb34ab175869a6505fc`. U2.5 has now produced clean frozen Candidate
+`f28cf6d1dc9ebb6fbf58a73071c705a4339337d1`, completing the common development baseline required by revision 3;
+both Candidates remain validation-pending and are not Canonical integration facts.
+
+W3.1 may import the exact U2.5 Candidate and resume the previously deferred Personal/Graph/Maintenance status
+projection, shared focused owners, subsystem State, its Validation and DEVLOG. It must preserve U2.5 delivery/cache
+behavior and W7.4 history/relation/full-compact semantics, and must not edit U2.5's Shell/cache/delivery owners.
+
+Before resumed product writes, W3.1 must import the new task-description version plus exact U2.5 Candidate, refresh its
+Git-private expected-write set and run the complete local-worktree scope guard. Exact frozen-ancestor handling may
+retire inherited findings; `--no-local-worktrees`, L3 acknowledgement, peer deletion and fabricated lineage remain
+prohibited. Only focused affected owners are allowed; no Fast/Checkpoint/Candidate/Promotion, integration, cleanup,
+push or release.
