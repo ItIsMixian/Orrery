@@ -2066,6 +2066,17 @@ def _add_path_provenance(
     ]
 
 
+def _findings_for_workstream(
+    findings: Sequence[Mapping[str, Any]], workstream_id: str
+) -> list[dict[str, Any]]:
+    """Return only findings that can constrain the named Workstream."""
+    return [
+        dict(finding)
+        for finding in findings
+        if workstream_id in finding.get("workstream_ids", ())
+    ]
+
+
 def collect_lineage_ancestry_proofs(
     repository: Path, scopes: Sequence[Mapping[str, Any]],
 ) -> dict[str, list[str]]:
@@ -2607,6 +2618,12 @@ def refresh_workstream_scope(
     overlap = inspect_worktree_overlap(
         root, peer_scopes=peer_scopes, include_local_worktrees=include_local_worktrees
     )
+    current_findings = reconcile_overlap_findings(
+        _findings_for_workstream(overlap["findings"], str(session["workstream_id"])),
+        session.get("findings", []),
+    )
+    overlap["findings"] = current_findings["active"]
+    overlap["retired_findings"] = current_findings["retired"]
     observation = overlap["current_scope"]
     decision = evaluate_scope_expansion(observation, session, overlap["findings"])
     timestamp = _utc_timestamp(occurred_at)
@@ -2634,7 +2651,12 @@ def refresh_workstream_scope(
             unavailable_peers=overlap["unavailable_peers"],
             lineage_ancestry_proofs=collect_lineage_ancestry_proofs(root, scopes),
         )
-        reconciled = reconcile_overlap_findings(recomputed["findings"], session.get("findings", []))
+        reconciled = reconcile_overlap_findings(
+            _findings_for_workstream(
+                recomputed["findings"], str(session["workstream_id"])
+            ),
+            session.get("findings", []),
+        )
         overlap["findings"] = reconciled["active"]
         overlap["retired_findings"] = reconciled["retired"]
         overlap["current_scope"] = observation

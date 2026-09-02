@@ -1254,6 +1254,52 @@ class CollaborationContractTests(unittest.TestCase):
         )
         self.assertEqual(custom.exclusive_resources[0]["resource_id"], "database-lock")
 
+    def test_scope_refresh_ignores_conflicts_between_other_local_workstreams(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            worktree_c = fixture.root / "worktree-c"
+            fixture.git(
+                fixture.repository,
+                "worktree",
+                "add",
+                "-b",
+                "codex/fixture-c",
+                str(worktree_c),
+                "main",
+            )
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W2-current",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/current-only.py"],
+            )
+            write_workstream_session(
+                fixture.worktree_a,
+                workstream_id="W2-peer-a",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/peer-shared.py"],
+            )
+            write_workstream_session(
+                worktree_c,
+                workstream_id="W2-peer-c",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/peer-shared.py"],
+            )
+
+            topology = inspect_worktree_overlap(fixture.worktree_b)
+            self.assertTrue(
+                any(
+                    set(finding["workstream_ids"]) == {"W2-peer-a", "W2-peer-c"}
+                    and finding["kind"] == "direct"
+                    for finding in topology["findings"]
+                )
+            )
+
+            refreshed = refresh_workstream_scope(fixture.worktree_b)
+            self.assertTrue(refreshed["expansion"]["allowed"])
+            self.assertTrue(refreshed["local_work_allowed"])
+            self.assertEqual(refreshed["findings"], [])
+            self.assertEqual(refreshed["session"]["runtime_condition"], "active")
+
     def test_w2_cross_member_ack_progress_stales_on_scope_change_and_resolves_mechanically(self) -> None:
         with CollaborationGitFixture() as fixture:
             for root, workstream, member, expected in (
