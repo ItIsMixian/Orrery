@@ -1300,6 +1300,56 @@ class CollaborationContractTests(unittest.TestCase):
             self.assertEqual(refreshed["findings"], [])
             self.assertEqual(refreshed["session"]["runtime_condition"], "active")
 
+    def test_shared_imported_commit_conflicts_only_when_both_workstreams_expect_writes(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            shared = fixture.worktree_a / "packages" / "shared.py"
+            shared.parent.mkdir()
+            shared.write_text("shared = True\n", encoding="utf-8")
+            fixture.git(fixture.worktree_a, "add", "packages/shared.py")
+            fixture.git(fixture.worktree_a, "commit", "-m", "shared candidate")
+            shared_oid = fixture.git(
+                fixture.worktree_a, "rev-parse", "HEAD"
+            ).stdout.strip()
+            fixture.git(fixture.worktree_b, "merge", "--ff-only", shared_oid)
+
+            write_workstream_session(
+                fixture.worktree_a,
+                workstream_id="W2-shared-source",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/shared.py"],
+            )
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W2-shared-consumer",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/consumer-only.py"],
+            )
+
+            refreshed = refresh_workstream_scope(fixture.worktree_b)
+            self.assertTrue(refreshed["local_work_allowed"])
+            self.assertFalse(
+                any("packages/shared.py" in item["path_evidence"] for item in refreshed["findings"])
+            )
+
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W2-shared-consumer",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/shared.py"],
+            )
+            blocked = refresh_workstream_scope(fixture.worktree_b)
+            self.assertEqual(blocked["expansion"]["level"], "l3")
+            self.assertFalse(blocked["local_work_allowed"])
+            shared_finding = next(
+                item
+                for item in blocked["findings"]
+                if item["kind"] == "direct" and "packages/shared.py" in item["path_evidence"]
+            )
+            self.assertEqual(
+                {tuple(item["sources"]) for item in shared_finding["path_provenance"]},
+                {("expected",)},
+            )
+
     def test_w2_cross_member_ack_progress_stales_on_scope_change_and_resolves_mechanically(self) -> None:
         with CollaborationGitFixture() as fixture:
             for root, workstream, member, expected in (

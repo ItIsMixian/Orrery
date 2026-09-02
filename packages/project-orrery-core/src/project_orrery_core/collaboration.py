@@ -2271,15 +2271,30 @@ def compute_overlap_findings(
                 )
             for left_entry in left_entries:
                 for right_entry in right_entries:
-                    if not _path_specs_overlap(left_entry, right_entry):
+                    effective_left = left_entry
+                    effective_right = right_entry
+                    left_oid = left_entry.get("committed_last_oid")
+                    right_oid = right_entry.get("committed_last_oid")
+                    if isinstance(left_oid, str) and left_oid == right_oid:
+                        effective_left = _without_inherited_committed_source(
+                            left_entry, {left_oid}
+                        )
+                        effective_right = _without_inherited_committed_source(
+                            right_entry, {left_oid}
+                        )
+                        if effective_left is None or effective_right is None:
+                            continue
+                    if not _path_specs_overlap(effective_left, effective_right):
                         continue
-                    evidence = sorted({left_entry["path"], right_entry["path"]})
+                    evidence = sorted({effective_left["path"], effective_right["path"]})
                     direct = _finding_material("direct", left, right, path_evidence=evidence)
-                    _add_path_provenance(direct, (left, left_entry), (right, right_entry))
+                    _add_path_provenance(
+                        direct, (left, effective_left), (right, effective_right)
+                    )
                     findings.append(direct)
                     shared_authority = sorted(
-                        set(left_entry["authority_surfaces"])
-                        & set(right_entry["authority_surfaces"])
+                        set(effective_left["authority_surfaces"])
+                        & set(effective_right["authority_surfaces"])
                     )
                     if shared_authority:
                         authority = _finding_material(
