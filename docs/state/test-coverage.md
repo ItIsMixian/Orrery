@@ -4,9 +4,9 @@ Updated: 2026-09-02
 
 ## 当前验证体系
 
-- ADR-0033/S2 当前只有 Accepted ADR、Approved Design、Plan、Pending Validation 和 dated audit Snapshot；没有
-  binding/event/inbox/control-snapshot schema、runtime、Adapter、task/worktree 或测试证据。角色化文档入口在新
-  context Pilot 通过前不得修改当前 `AGENTS.md` mandatory chain。
+- ADR-0033 当前只有 Accepted ADR、Approved Design、无 task identity 的 planning record、Pending Validation
+  和 dated audit Snapshot；没有 binding/event/inbox/control-snapshot schema、runtime、Adapter、task/worktree
+  或测试证据。角色化文档入口在新 context Pilot 通过前不得修改当前 `AGENTS.md` mandatory chain。
 - ADR-0030 将 Candidate Freeze 从验证执行中分离：freeze 目标 `<30s` 且禁止运行 unittest/Fast/Checkpoint/
   Candidate/Promotion、临时 Git fixture、site/package/provider scan；异步阶段继续使用现有 exact-SHA 路由、
   budgets、leases 与 no-repeat。W3.1 automation 尚未实现；中央 `c142f32...` 只完成两份 receipt schema 的

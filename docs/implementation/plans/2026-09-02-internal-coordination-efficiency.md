@@ -1,14 +1,10 @@
-# Implementation Plan: S2 Event-driven Execution Conductor
+# Implementation Planning Record: Internal Coordination Efficiency
 
-Status: Approved architecture; implementation not dispatched
+Status: Design-backed decomposition; task identity and implementation not authorized
 
 Date: 2026-09-02
 
-Task code: S2
-
-Program path: explicitly absent — independent coordination product phase
-
-Task series: `orrery-coordination`; intended order `2`; explicit predecessor `S1-orrery-conductor-codex-plugin-surface`
+Task identity, program/series classification and repository owner: pending explicit maintainer allocation
 
 Primary subsystem: `multi-worktree-collaboration`
 
@@ -24,15 +20,18 @@ Replace the long-lived conversational coordination loop with provider-neutral pl
 bounded control snapshot, while keeping product discussion, authority, Worker execution, validation and integration
 separate.
 
-## Dispatch prerequisites
+## Ownership before dispatch
 
-- The current S1 right-panel scope must freeze or close without absorbing S2.
-- The unique integrator must select exact Project Orrery and `orrery-conductor` code/authority baselines.
+- The maintainer must decide whether each implementation slice belongs to Project Orrery, `orrery-dispatch`, a host
+  coordination runtime/Adapter or another explicitly named repository.
+- The read-only Orrery DAG plugin is not a predecessor, owner or required delivery surface.
+- The unique integrator must select exact code/authority baselines for every chosen repository.
 - Any Core schema path must be bootstrapped by its permitted owner before a non-integrator task writes it.
-- U2.5/W3.1 ownership and accepted Candidates must be reconciled so S2 does not claim their files or semantics.
-- A dated scope revision must list exact expected writes and validation surfaces before any S2 task/worktree is created.
+- Existing Workstream ownership and accepted Candidates must be reconciled so the new work does not claim their files
+  or semantics.
+- A dated scope revision must list exact expected writes and validation surfaces before any task/worktree is created.
 
-No S2 task, worktree, external repository mutation or product write is authorized by this initial Plan.
+No task code, task/worktree, repository mutation or product write is authorized by this planning record.
 
 ## Phase A — contracts and projection
 
@@ -44,9 +43,10 @@ No S2 task, worktree, external repository mutation or product write is authorize
 5. Detect duplicate active platform bindings and missing/archived execution channels without automatic deletion,
    closure or reassignment.
 
-## Phase B — Codex event inbox
+## Phase B — host coordination runtime and Codex Adapter
 
-6. In `orrery-conductor`, add a Codex adapter over documented App Server task/status/turn events and current task APIs.
+6. In the maintainer-selected host coordination owner, add a Codex adapter over documented App Server
+   task/status/turn events and current task APIs. Do not assume the read-only DAG plugin repository owns this runtime.
 7. Deduplicate unchanged status and emit one logical event per transition.
 8. Implement the focus lease: events queue while Product/Decision is in an active turn and never steer or inject user
    input into that discussion.
@@ -73,7 +73,7 @@ No S2 task, worktree, external repository mutation or product write is authorize
 17. Amend `AGENTS.md` and templates only if the treatment meets its quality and safety gates. Otherwise keep the
     current mandatory chain and ship the coordination gains independently.
 
-## Phase E — additional adapters
+## Phase E — additional host adapters
 
 18. Extend the opaque binding/capability contract to Claude Code and DeepSeek Harness only after their real runtimes
     prove status/open/message/attach behavior individually.
@@ -97,7 +97,7 @@ No S2 task, worktree, external repository mutation or product write is authorize
 - no background model polling and no Worker event inserted as user input;
 - no new decision, approval, relation, validation, merge, cleanup or release authority in derived state;
 - no automatic task deletion, closure, rebind, retry, merge, main/tag/push or publication;
-- no scope expansion of the current S1, W3.1, U2.5, W7.4 or W7.5 tasks;
+- no scope expansion of any current task, including the read-only DAG plugin and active Project Orrery Workstreams;
 - no public/default switch or cross-provider support claim without independent evidence.
 
 ## Completion definition

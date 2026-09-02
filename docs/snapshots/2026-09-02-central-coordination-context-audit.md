@@ -40,8 +40,9 @@ copy Prompt or transcript bodies into this Snapshot.
 ## Interpretation
 
 The dominant problem is not worktree isolation or exact-SHA authority. It is the use of one long-lived conversational
-task as a manual substitute for a still-unimplemented Conductor. That task mixed product discussion, authority
-authoring, dispatch, synchronous monitoring, transcript replay, code/browser review and integration. Each scope
+task as a manual substitute for a still-unimplemented internal coordination runtime. That task mixed product
+discussion, authority authoring, dispatch, synchronous monitoring, transcript replay, code/browser review and
+integration. Each scope
 correction could therefore trigger another authority commit, message, import, read and scope refresh.
 
 The lowest-risk improvements are to end dispatch turns promptly, suppress unchanged progress messages, retrieve

@@ -43,9 +43,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   与 pinned-ELK/explicit-legacy Graph 已公开包含在 v0.3.1；完整英文模式、scheduler 与自动删除仍不存在。
 - S0 新增未发布 `skills/orrery-dispatch/` source Candidate，只包含 `SKILL.md` 与 `agents/openai.yaml`。它把 ADR-0018 的 authority handoff 投影为 Codex Skill 指令，面向用户称“任务说明版本”；没有 script／asset／reference／service／schema／network，也未进入当前 `project-orrery` Skill、installer、release manifest 或 v0.3.0 范围。
 - PO1 在同一 `SKILL.md` 内补充 ADR-0007 PO allocation；仍无新 Skill 文件或发布资产。local integration `8b73f26` 后，两文件已按 SHA-256 一致性校验复制到当前本机 `C:\Users\1\.codex\skills\orrery-dispatch`，但没有进入 release manifest 或公共分发。
-- ADR-0031/0032 的 S1 仍是独立、未发布的只读 Codex panel compatibility layer。ADR-0033 只批准未来 S2
-  provider-neutral binding/event/inbox/control-snapshot 方向；没有扩大当前 S1 scope、创建 S2 implementation、
-  修改 Adapter support matrix 或改变任何公开 release/default。
+- ADR-0031/0032 的 S1 仍是独立、未发布的只读 Codex panel compatibility layer。ADR-0033 另行批准内部协调
+  的 provider-neutral binding/event/inbox/control-snapshot 方向，但 task/repository owner 未分配；DAG plugin
+  不拥有该实现。没有修改 Adapter support matrix 或任何公开 release/default。
 - v0.3.1 release manifest、tag、ZIP、checksum 与 phase fixture 已同步；Git-private session、cache、凭据与
   生成站点继续排除。U2.3/CI7 的测试路由策略没有因 launcher patch 改变。
 - U2.4 exact `00b2eb4...` 已本地整合；其 Observatory adapter 仅省略 graph node set 外的显式 program membership；node set

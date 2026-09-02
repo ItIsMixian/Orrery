@@ -1368,5 +1368,8 @@
 - The maintainer clarified that two saved Codex projects over the same repository are intentional on the current host:
   the project-scoped 1M profile serves Product/Decision work and the implementation project serves coordination and
   Workers. The profile is not a second repository or public requirement.
-- S2 Plan and Pending Validation are documentation-only. No task/worktree was created, no current S1/W3.1/U2.5/W7.4/
-  W7.5 scope changed, and no product, plugin, remote or release action occurred.
+- The initial documentation commit incorrectly inferred the unapproved task identity `S2` from the unrelated S1 DAG
+  plugin sequence. The maintainer corrected that inference before implementation: task identity/repository ownership
+  remain unallocated, model selection is non-binding advice, and the DAG plugin is not a dependency or owner.
+- The corrected planning record and Pending Validation remain documentation-only. No task/worktree was created, no
+  existing task scope changed, and no product, plugin, remote or release action occurred.

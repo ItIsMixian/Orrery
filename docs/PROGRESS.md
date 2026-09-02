@@ -25,16 +25,16 @@ closure 与 worktree cleanup 保持独立。W7.4 已以 exact `fe75fc2...` 完�
  现可在原任务继续自动化实现。
 
 维护者已接受 ADR-0033 的双平面协调方向：项目级 1M Codex 项目保留 Product/Decision 讨论，实施项目承载
-Execution Conductor 与 Worker；Worker 事件进入 focus-safe inbox，不插入活跃讨论。provider-neutral task
-binding、control snapshot、reference-only transport 和 role-aware context evaluation 归入独立 S2；当前只有
-authority/Plan/Pending Validation，未分发、未实现，也不扩大 S1/W3.1/U2.5/W7.4/W7.5。
+Execution Coordination 与 Worker；Worker 事件进入 focus-safe inbox，不插入活跃讨论。provider-neutral task
+binding、control snapshot、reference-only transport 和 role-aware context evaluation 当前只有
+authority/planning/Pending Validation；task identity 和 repository owner 尚未分配，与只读 S1 DAG plugin 无关。
 
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Release／工具链 | v0.3.1 Latest Release 已验证并发布；Windows launcher 闪窗与健康 runtime 复用缺陷关闭，v0.3.0 历史资产未替换 | 仅完成本次 docs closeout；后续通用 release 简化必须另立 Plan |
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate，Phase 0 exact page 已接受 | Final RC 只消费当前 child receipts；不手工重跑 feature suites |
-| Orrery Conductor | S1 只读 right-panel foundation 已有独立 Phase A，inline UI 被拒绝；ADR-0033/S2 双平面与事件协调已接受但未分发 | 先完成 S1 修正版 preview；S2 另立 exact scope，不向当前 S1 注入 |
+| 内部协调效率 | ADR-0033 已接受 Core／dispatch／host Adapter／Local-only profile 四层所有权；无 task identity 或 implementation | 由维护者先分配具体 task/repository owner；不从 S1/DAG plugin 推断 |
 | Unified Observatory | U2.5 Phase A clean `6596a9f...` 已完成 Shell/cache 基础设施；W7.4 accepted frozen `fe75fc2...` 可作为 Phase B 精确依赖 | 在原 U2.5 任务导入依赖并生成异步 Graph hydration self-host preview；接受前不跑自动测试 |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
@@ -77,9 +77,9 @@ authority/Plan/Pending Validation，未分发、未实现，也不扩大 S1/W3.1
 
 ## 活动计划与待办
 
-- [ ] [S2 Event-driven Execution Conductor](implementation/plans/2026-09-02-s2-event-driven-execution-conductor.md)：
+- [ ] [Internal Coordination Efficiency](implementation/plans/2026-09-02-internal-coordination-efficiency.md)：
   双平面、事件 inbox、provider-neutral task binding、control snapshot 和 role-aware context evaluation 已批准；
-  未创建任务/worktree，必须等待独立 exact scope，不得扩大当前 S1。
+  task code/repository owner 未分配，未创建任务/worktree，与只读 S1 DAG plugin 无依赖。
 - [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：Phase A inline UI 已被拒绝；ADR-0032/revision 2 改为 Codex 既有 right Browser Panel 主入口，inline 仅回退。live binding 仍等待 accepted exact U2.5 envelope。
 - [ ] [W3.1 Fast Candidate Freeze and Asynchronous Validation](implementation/plans/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)：任务已登记；中央 strict receipt-schema bootstrap exact `c142f32...` 已解除 L3，等待原任务导入、scope refresh 后继续实现。
 - [ ] [W7.5 Workstream Classification Calibration](implementation/plans/2026-09-01-w7-5-workstream-classification-calibration.md)：已批准，等待 accepted clean W7.4 exact Candidate 后分发；先做只读分类审计和人类可理解预览，确认前不写分类事件或运行自动测试。
@@ -140,6 +140,6 @@ authority/Plan/Pending Validation，未分发、未实现，也不扩大 S1/W3.1
 ## 下一里程碑
 
 1. 并行继续 W3.1 自动化与 U2.5 Phase B；U2.5 先交付真实 self-host preview，接受前不运行自动测试。
-2. S1 只完成 ADR-0032 的 right-panel 修正版 preview；S2 保持 docs-only，后续以独立任务说明版本分发。
+2. S1 只完成 ADR-0032 的 right-panel 修正版 preview；内部协调效率保持 docs-only，后续由维护者先分配 task/repository owner。
 3. W7.4 exact Candidate 的异步验证、W7.5 分类校准与 W6.2 cleanup 保持各自独立门，不并入当前两任务。
 4. 后续发布 U2.4/U2.5 或精简通用发布流程时另立任务；alias、scheduler 与独立组件发行继续延期。

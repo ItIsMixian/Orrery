@@ -8,23 +8,23 @@ Maintainer acceptance: accepted on 2026-09-02 after the maintainer reviewed the 
 approved event-driven quiet monitoring and role separation, and clarified that the two current Codex projects are an
 intentional project-scoped context configuration rather than duplicate repositories.
 
-Amends: [ADR-0018](0018-authority-first-workstream-dispatch.md),
-[ADR-0031](0031-read-only-codex-plugin-surface-for-orrery-conductor.md)
+Amends: [ADR-0007](0007-multi-worktree-collaboration-and-branch-fact-scopes.md),
+[ADR-0018](0018-authority-first-workstream-dispatch.md)
 
 Preserves: [ADR-0007](0007-multi-worktree-collaboration-and-branch-fact-scopes.md),
 [ADR-0008](0008-local-first-team-coordination-and-cross-machine-metadata.md),
 [ADR-0014](0014-dynamic-workstream-succession-contract.md),
-[ADR-0030](0030-fast-candidate-freeze-and-asynchronous-validation.md),
-[ADR-0032](0032-codex-right-panel-primary-surface-for-orrery-conductor.md)
+[ADR-0030](0030-fast-candidate-freeze-and-asynchronous-validation.md)
 
 Evidence snapshot: [Central Coordination Context and Latency Audit](../snapshots/2026-09-02-central-coordination-context-audit.md)
 
 ## Context
 
 ADR-0018 made prompts transport rather than authority, and ADR-0030 separated Candidate freeze from expensive
-validation. S1 then established a read-only Codex panel over Orrery's DAG. None of those decisions implements the
-actual coordination loop: durable platform-task binding, quiet event collection, a bounded current-control summary or
-separation between the maintainer's product discussion and execution monitoring.
+validation. Neither decision implements the internal coordination loop: durable platform-task binding, quiet event
+collection, a bounded current-control summary or separation between the maintainer's product discussion and execution
+monitoring. This problem concerns communication and execution efficiency inside Orrery's coordination architecture;
+it is not a Workstream DAG plugin feature.
 
 In current self-host use, one long-lived central conversation manually filled that gap. It discussed product ideas,
 wrote authority documents, dispatched and polled Workers, replayed task outputs, reviewed code and browser state, and
@@ -74,13 +74,15 @@ sources.
     the execution project. This is deterministic host routing, not a Git split, DAG relation or public requirement.
     If the host later provides suitable per-session configuration, the two records may collapse without changing
     Orrery semantics.
-13. S1's accepted read-only right-panel scope remains unchanged. Full event-driven coordination is a separate S2
-    implementation and must not be injected into the current S1 task without a new exact authority handoff.
+13. The read-only Orrery DAG plugin is outside this decision's implementation scope. It may later consume the same
+    derived status as any other view, but it is neither an owner, predecessor nor required delivery surface for the
+    internal coordination changes.
 14. Codex is the first host adapter, not a Core dependency. Claude Code, DeepSeek Harness and other providers implement
     only the capabilities their runtime can prove; no Codex thread field enters provider-neutral Core semantics.
 15. Routine aggregation, deduplication and routing should be deterministic and model-free where possible. Model
-    strength is selected for the judgment being made; high reasoning is reserved for material product, architecture,
-    safety and integration decisions rather than polling or ID lookup.
+    selection is a non-binding deployment recommendation rather than a product constraint. The maintainer may keep the
+    Product/Decision central task at the highest available reasoning strength; no Orrery gate may lower or override
+    that preference merely for efficiency.
 
 ## Consequences
 
@@ -90,13 +92,14 @@ sources.
   edited as a second truth store.
 - Platform adapters require explicit capability work, but vendor-specific IDs and lifecycle differences remain out of
   Core.
-- Existing S1, W3.1, U2.5, W7.4 and W7.5 tasks receive no new scope from this decision.
+- Existing tasks receive no new scope from this decision. A future implementation task identity remains unallocated
+  until the maintainer explicitly names/registers it.
 - Current public releases, default consumers, remote execution and Team permissions do not change.
 
 ## Mapping
 
 - Approved Design: [Dual-plane Event-driven Orrery Coordination](../design/dual-plane-event-driven-orrery-coordination.md)
-- Future Plan: [S2 Event-driven Execution Conductor](../implementation/plans/2026-09-02-s2-event-driven-execution-conductor.md)
-- Pending Validation: [S2 Event-driven Execution Conductor](../validation/2026-09-02-s2-event-driven-execution-conductor.md)
+- Draft implementation decomposition: [Internal Coordination Efficiency](../implementation/plans/2026-09-02-internal-coordination-efficiency.md)
+- Pending Validation: [Internal Coordination Efficiency](../validation/2026-09-02-internal-coordination-efficiency.md)
 - Official Codex references: [Config basics](https://learn.chatgpt.com/docs/config-file/config-basic),
   [App Server](https://learn.chatgpt.com/docs/app-server)

@@ -1,10 +1,10 @@
-# Validation: S2 Event-driven Execution Conductor
+# Validation: Internal Coordination Efficiency
 
 Status: Pending implementation; documentation baseline accepted
 
 Date: 2026-09-02
 
-Plan: [S2 Event-driven Execution Conductor](../implementation/plans/2026-09-02-s2-event-driven-execution-conductor.md)
+Planning record: [Internal Coordination Efficiency](../implementation/plans/2026-09-02-internal-coordination-efficiency.md)
 
 Snapshot: [Central Coordination Context and Latency Audit](../snapshots/2026-09-02-central-coordination-context-audit.md)
 
@@ -19,7 +19,8 @@ Snapshot: [Central Coordination Context and Latency Audit](../snapshots/2026-09-
 - A compact control snapshot is derived and regenerable, not a manually maintained author truth source.
 - The self-host intentionally retains separate Product/Decision and implementation Codex projects because the current
   desktop workflow applies the 1M setting at project scope. This host profile is not a public default.
-- S1 remains the read-only right-panel foundation; no S2 implementation scope was sent to that task.
+- The read-only Workstream DAG plugin is unrelated to this implementation scope and receives no new authority.
+- A future task identity and repository ownership remain pending explicit maintainer allocation.
 
 ## Pending contract evidence
 
@@ -55,7 +56,7 @@ Snapshot: [Central Coordination Context and Latency Audit](../snapshots/2026-09-
 - validation pending/passed/failed, closed and cleanup-eligible remain distinct;
 - the self-host routes Product/Decision and Execution/Worker task creation to their intended saved Codex projects;
 - project/sidebar membership never creates a Workstream edge;
-- Codex binding evidence does not enable unsupported Claude/DeepSeek capabilities.
+- Codex binding evidence does not enable unsupported Claude/DeepSeek capabilities or make the DAG plugin an owner.
 
 ## Pending context evaluation
 
@@ -66,5 +67,5 @@ Snapshot: [Central Coordination Context and Latency Audit](../snapshots/2026-09-
 
 ## Current result
 
-Pending. ADR-0033 and the Approved Design record accepted product direction only. No S2 schema, runtime, adapter,
-inbox, binding, control snapshot, role-aware entrance, task/worktree, release or public support is claimed.
+Pending. ADR-0033 and the Approved Design record accepted product direction only. No task identity, schema, runtime,
+adapter, inbox, binding, control snapshot, role-aware entrance, task/worktree, release or public support is claimed.

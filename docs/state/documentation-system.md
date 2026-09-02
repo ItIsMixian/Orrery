@@ -32,7 +32,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
   `c142f32...` 只提供其 L3 所需的两份严格 receipt schema bootstrap。
 - ADR-0033 已接受一个人类入口、两个隔离上下文：Product/Decision 只处理讨论与权威，Execution Coordination
   只处理 committed handoff、platform binding、事件收件箱和有界 control snapshot。Worker 状态变化不得插入
-  活跃维护者讨论；不变状态不重复播报。S2 尚未分发，当前 `AGENTS.md` 全量入口继续生效。
+  活跃维护者讨论；不变状态不重复播报。implementation task/repository owner 尚未分配，当前 `AGENTS.md` 全量入口继续生效。
 - 角色化文档入口只是经验证后的目标，不是当前产品事实。新的 context treatment 必须用独立 Pilot/Oracle
   证明质量与安全后才能修改 `AGENTS.md` 或模板；Pilot 009 的 S 未采纳结论保持不变。
 - U2.3 local integrated Candidate 将 app rail 收敛为七个固定入口，把路线与趋势从作者文档树移入 app 区，并以唯一 floating Ask Docs 和顶栏只读帮助／系统状态面板替代独立问答／Authority 页面。Personal 使用 Git registry、Git-common-private 有界 session metadata 与现有 Maintenance cache 的轻量 active-task projection；启动不逐 worktree 读取源码、Scope、ignored 或 diff，重证据只在目标详情／刷新时读取。
@@ -81,8 +81,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - [Authority-first Dispatch Plan](../implementation/plans/2026-08-30-authority-first-workstream-dispatch.md)
 - [Authority-first Dispatch Contract](../validation/2026-08-30-authority-first-workstream-dispatch.md)
 - [Dual-plane Event-driven Coordination Design](../design/dual-plane-event-driven-orrery-coordination.md)
-- [S2 Event-driven Execution Conductor Plan](../implementation/plans/2026-09-02-s2-event-driven-execution-conductor.md)
-- [S2 Pending Validation](../validation/2026-09-02-s2-event-driven-execution-conductor.md)
+- [Internal Coordination Efficiency Planning Record](../implementation/plans/2026-09-02-internal-coordination-efficiency.md)
+- [Internal Coordination Efficiency Pending Validation](../validation/2026-09-02-internal-coordination-efficiency.md)
 - [Central Coordination Context Audit](../snapshots/2026-09-02-central-coordination-context-audit.md)
 - [S0 Orrery Dispatch Skill Validation](../validation/2026-08-30-s0-orrery-dispatch-skill.md)
 - [PO1 Decision Allocation Validation](../validation/2026-08-30-po-decision-allocation-enforcement.md)

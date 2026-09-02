@@ -19,8 +19,8 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
 - S1 Phase A 已在独立 repository 形成 clean `4e44d27...` 并安装本地开发插件，但其 inline conversation UI 被
   维护者拒绝。ADR-0032 现要求复用同一实现并以 Codex 既有 right Browser Panel 为主入口；修正版尚未实现。
 - ADR-0033 已接受 Product/Decision 与 Execution Coordination 双平面、focus-safe 事件收件箱、provider-neutral
-  task/worktree 绑定和有界 control snapshot。S2 只有 Plan/Pending Validation，尚未创建任务、worktree、schema、
-  runtime 或 Adapter；当前 S1、W3.1、U2.5、W7.4 与 W7.5 scope 均未扩大。
+  task/worktree 绑定和有界 control snapshot。未来 implementation 的 task code 与 repository owner 尚未由维护者
+  分配；没有创建 task、worktree、schema、runtime 或 Adapter，且该方向与只读 S1 DAG plugin 无依赖。
 - 当前 self-host 的两个同路径 Codex saved projects 是 Local-only 部署选择：项目级 1M 配置用于 Product/Decision，
   实现项目用于调度与 Worker。它们不是两个 Git 仓库，也不创建 Workstream 关系或公共产品默认。
 - PO1 在不增加文件角色或号码服务的前提下，把 decision proposal/number allocation 边界投影进 dispatch Skill，并在 repository gate 检查当前树 numeric ADR 唯一性；它不扫描或锁定 peer Candidate 编号。

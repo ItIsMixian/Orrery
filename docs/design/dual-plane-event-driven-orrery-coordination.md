@@ -19,6 +19,17 @@ An Integrator or Validator is a bounded phase/task, not a third permanent conver
 remain the maintainer's normal entry. It promotes work to Execution only after explicit implementation intent and an
 exact authority revision.
 
+### Ownership map
+
+| Capability | Primary owner | Why |
+|---|---|---|
+| Workstream/session schema, independent lifecycle axes, active write ownership and derived control facts | Project Orrery Core/CLI | provider-neutral coordination semantics already live here |
+| authority-before-dispatch, reference-only task notice, one-shot create/resume and immediate task-ID capture | `orrery-dispatch` | it is the bounded handoff entry, not a monitor |
+| Codex/Claude/DeepSeek lifecycle subscription, opaque task-ID resolution, event deduplication and focus-safe inbox | host coordination runtime plus platform Adapter | these are host capabilities, not author facts or DAG layout |
+| Product/Decision model strength and the current two-project 1M/implementation routing | Local-only maintainer profile | user preference and host configuration must not become a public product gate |
+| role-aware document entry | documentation system plus context-routing evaluation | it changes Agent input and requires quality evidence before activation |
+| read-only Workstream DAG plugin | no ownership of this change | it may consume the derived projection later, but is unrelated to implementation authority |
+
 ## 2. Control flow
 
 ```text
@@ -26,7 +37,7 @@ maintainer discussion
   -> Product/Decision plane
   -> accepted authority commit
   -> reference-only request
-  -> Execution Conductor
+  -> Execution Coordination runtime
   -> Worker in isolated worktree
   -> candidate/runtime event
   -> event inbox
@@ -157,14 +168,21 @@ relation. Both projects refer to the same repository authority and all concurren
 worktrees. If future Codex desktop versions expose suitable per-session context controls, this host profile may be
 simplified without changing the provider-neutral contracts.
 
-## 11. Model routing
+## 11. Non-binding model recommendation
 
 Status collection, event deduplication, ID resolution and snapshot assembly are deterministic. A model is optional for
-human-readable explanation. Product ideation and material architecture/integration decisions may use stronger
-reasoning selected for that bounded judgment. The Conductor does not keep a highest-effort model active merely to wait.
+human-readable explanation. It may be efficient to reserve stronger reasoning for product, architecture or integration
+judgment, but this is advice rather than a contract. The maintainer may keep Product/Decision at the highest available
+reasoning setting. Orrery governs what context and authority enter the task, not the maintainer's preferred model tier.
 
-## 12. Product and release boundary
+Current-host suggestion only: Product/Decision may use GPT-5.6 Sol at the maintainer's preferred highest reasoning
+setting; mechanical Execution coordination should remain model-free where possible and may use any cost/latency-
+appropriate model when explanation is needed. These names/settings are not schema fields, release defaults or gates.
 
-ADR-0033 does not expand the current S1 right-panel task. S2 begins only after an exact task-description handoff and
-must use independent worktrees/repositories for each owner. Personal remains zero-network; Team remains metadata-only
-and request-only. No event grants task creation, relation confirmation, merge, cleanup, release or destructive authority.
+## 12. Ownership and release boundary
+
+The internal coordination work has no implementation dependency on the read-only Orrery DAG plugin. Exact repository
+and task ownership must be allocated by the maintainer before implementation; no task code is inferred from existing S
+series names. Each implementation owner still uses an independent worktree/repository. Personal remains zero-network;
+Team remains metadata-only and request-only. No event grants task creation, relation confirmation, merge, cleanup,
+release or destructive authority.
