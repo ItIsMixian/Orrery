@@ -70,3 +70,10 @@ bootstrap dependency but still proves no W3.1 command, receipt writer or validat
   this Validation document. Projection and shared-document evidence remain Pending for a later common baseline.
 
 The next admissible evidence is an allowed refreshed scope followed by implementation on only that disjoint slice.
+
+## 2026-09-02 peer-only finding diagnosis
+
+The revision-3 refresh persisted 21 direct/authority findings, but every finding named only W7.4 and U2.5; none named
+W3.1. W3.1 therefore remained clean and correctly performed no product write. Plan revision 4 authorizes a focused
+regression proving that unrelated peer conflicts remain visible in topology inspection without blocking a third,
+disjoint Workstream's own scope refresh. Current-task conflicts must remain fail-closed.

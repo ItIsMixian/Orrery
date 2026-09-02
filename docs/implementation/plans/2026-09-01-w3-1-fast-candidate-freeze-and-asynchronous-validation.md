@@ -145,3 +145,24 @@ or U2.5 product bytes for this phase.
 The disjoint Candidate may prove Core receipt validation, zero-write dry-run/one-commit apply, acceptance-drift and
 structural refusals, the zero-validation freeze boundary, and immutable-SHA asynchronous PASS/FAIL/no-repeat behavior.
 It cannot claim the deferred UI projections or full W3.1 completion.
+
+## 2026-09-02 scope revision 4 — current-Workstream finding isolation bootstrap
+
+The revision-3 disjoint scope was still blocked by direct findings whose `workstream_ids` contained only W7.4 and
+U2.5. The current W3.1 Workstream touched none of those paths. `inspect_worktree_overlap` correctly reports the whole
+local topology, but `refresh_workstream_scope` incorrectly fed every peer-to-peer finding into W3.1's own expansion
+decision and session.
+
+The unique integrator is authorized to make one narrow safety correction in Core collaboration scope handling and its
+existing focused owner test:
+
+1. keep full pairwise diagnostics in `inspect_worktree_overlap`;
+2. before evaluating or persisting one Workstream's scope refresh, retain only findings whose `workstream_ids` include
+   that current Workstream;
+3. mechanically retire previously persisted peer-only findings from that Workstream session;
+4. continue to fail closed for every direct, L3, authority, semantic or Unknown finding that actually involves the
+   current Workstream.
+
+After the exact bootstrap commit, W3.1 must import the new task-description version and refresh the revision-3
+disjoint scope normally. `--no-local-worktrees`, L3 acknowledgement, peer deletion and fabricated lineage are not
+authorized recovery mechanisms.
