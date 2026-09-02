@@ -6,7 +6,9 @@ Date: 2026-09-01
 
 Task code: W3.1
 
-Program path: `workstream-w`
+Program path: explicitly absent — `classification-pending` because no accepted W3 phase group exists
+
+Task series: `workstream-lifecycle`; intended order `31`; explicit predecessor `W3-review-integration-cleanup`
 
 Primary subsystem: `multi-worktree-collaboration`
 
