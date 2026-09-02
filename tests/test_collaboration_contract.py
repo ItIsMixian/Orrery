@@ -1350,6 +1350,73 @@ class CollaborationContractTests(unittest.TestCase):
                 {("expected",)},
             )
 
+    def test_exact_clean_frozen_ancestor_does_not_block_descendant_scope_refresh(self) -> None:
+        with CollaborationGitFixture() as fixture:
+            (fixture.worktree_a / "untracked" / "same-path.txt").unlink()
+            shared = fixture.worktree_a / "packages" / "frozen.py"
+            shared.parent.mkdir()
+            shared.write_text("frozen = True\n", encoding="utf-8")
+            fixture.git(fixture.worktree_a, "add", "packages/frozen.py")
+            fixture.git(fixture.worktree_a, "commit", "-m", "frozen candidate")
+            frozen_oid = fixture.git(
+                fixture.worktree_a, "rev-parse", "HEAD"
+            ).stdout.strip()
+            fixture.git(fixture.worktree_b, "merge", "--ff-only", frozen_oid)
+
+            write_workstream_session(
+                fixture.worktree_a,
+                workstream_id="W2-frozen-source",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/frozen.py"],
+            )
+            write_workstream_session(
+                fixture.worktree_b,
+                workstream_id="W2-frozen-consumer",
+                primary_subsystem_id="release-and-toolchain",
+                expected_writes=["packages/frozen.py"],
+            )
+            git_dir = Path(
+                fixture.git(
+                    fixture.worktree_a, "rev-parse", "--absolute-git-dir"
+                ).stdout.strip()
+            )
+            receipt_dir = git_dir / "orrery" / "candidate-freeze"
+            receipt_dir.mkdir(parents=True)
+            (receipt_dir / f"{frozen_oid}.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "contract_type": "candidate-freeze-receipt-v1",
+                        "workstream_id": "W2-frozen-source",
+                        "branch": "refs/heads/codex/fixture-a",
+                        "candidate_sha": frozen_oid,
+                        "accepted_surface_fingerprint": "a" * 64,
+                        "validation_status": "pending",
+                        "closed": False,
+                        "cleanup_ready": False,
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            topology = inspect_worktree_overlap(fixture.worktree_b)
+            self.assertIn("W2-frozen-source", topology["inherited_frozen_ancestor_ids"])
+            self.assertTrue(
+                any("packages/frozen.py" in item["path_evidence"] for item in topology["findings"])
+            )
+            refreshed = refresh_workstream_scope(fixture.worktree_b)
+            self.assertTrue(refreshed["local_work_allowed"])
+            self.assertEqual(refreshed["findings"], [])
+
+            shared.write_text("frozen = False\n", encoding="utf-8")
+            blocked = refresh_workstream_scope(fixture.worktree_b)
+            self.assertEqual(blocked["expansion"]["level"], "l3")
+            self.assertFalse(blocked["local_work_allowed"])
+            self.assertTrue(
+                any("packages/frozen.py" in item["path_evidence"] for item in blocked["findings"])
+            )
+
     def test_w2_cross_member_ack_progress_stales_on_scope_change_and_resolves_mechanically(self) -> None:
         with CollaborationGitFixture() as fixture:
             for root, workstream, member, expected in (
