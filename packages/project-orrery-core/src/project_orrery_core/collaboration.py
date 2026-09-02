@@ -2066,6 +2066,17 @@ def _add_path_provenance(
     ]
 
 
+def _findings_for_workstream(
+    findings: Sequence[Mapping[str, Any]], workstream_id: str
+) -> list[dict[str, Any]]:
+    """Return only findings that can constrain the named Workstream."""
+    return [
+        dict(finding)
+        for finding in findings
+        if workstream_id in finding.get("workstream_ids", ())
+    ]
+
+
 def collect_lineage_ancestry_proofs(
     repository: Path, scopes: Sequence[Mapping[str, Any]],
 ) -> dict[str, list[str]]:
@@ -2260,15 +2271,30 @@ def compute_overlap_findings(
                 )
             for left_entry in left_entries:
                 for right_entry in right_entries:
-                    if not _path_specs_overlap(left_entry, right_entry):
+                    effective_left = left_entry
+                    effective_right = right_entry
+                    left_oid = left_entry.get("committed_last_oid")
+                    right_oid = right_entry.get("committed_last_oid")
+                    if isinstance(left_oid, str) and left_oid == right_oid:
+                        effective_left = _without_inherited_committed_source(
+                            left_entry, {left_oid}
+                        )
+                        effective_right = _without_inherited_committed_source(
+                            right_entry, {left_oid}
+                        )
+                        if effective_left is None or effective_right is None:
+                            continue
+                    if not _path_specs_overlap(effective_left, effective_right):
                         continue
-                    evidence = sorted({left_entry["path"], right_entry["path"]})
+                    evidence = sorted({effective_left["path"], effective_right["path"]})
                     direct = _finding_material("direct", left, right, path_evidence=evidence)
-                    _add_path_provenance(direct, (left, left_entry), (right, right_entry))
+                    _add_path_provenance(
+                        direct, (left, effective_left), (right, effective_right)
+                    )
                     findings.append(direct)
                     shared_authority = sorted(
-                        set(left_entry["authority_surfaces"])
-                        & set(right_entry["authority_surfaces"])
+                        set(effective_left["authority_surfaces"])
+                        & set(effective_right["authority_surfaces"])
                     )
                     if shared_authority:
                         authority = _finding_material(
@@ -2607,6 +2633,12 @@ def refresh_workstream_scope(
     overlap = inspect_worktree_overlap(
         root, peer_scopes=peer_scopes, include_local_worktrees=include_local_worktrees
     )
+    current_findings = reconcile_overlap_findings(
+        _findings_for_workstream(overlap["findings"], str(session["workstream_id"])),
+        session.get("findings", []),
+    )
+    overlap["findings"] = current_findings["active"]
+    overlap["retired_findings"] = current_findings["retired"]
     observation = overlap["current_scope"]
     decision = evaluate_scope_expansion(observation, session, overlap["findings"])
     timestamp = _utc_timestamp(occurred_at)
@@ -2634,7 +2666,12 @@ def refresh_workstream_scope(
             unavailable_peers=overlap["unavailable_peers"],
             lineage_ancestry_proofs=collect_lineage_ancestry_proofs(root, scopes),
         )
-        reconciled = reconcile_overlap_findings(recomputed["findings"], session.get("findings", []))
+        reconciled = reconcile_overlap_findings(
+            _findings_for_workstream(
+                recomputed["findings"], str(session["workstream_id"])
+            ),
+            session.get("findings", []),
+        )
         overlap["findings"] = reconciled["active"]
         overlap["retired_findings"] = reconciled["retired"]
         overlap["current_scope"] = observation

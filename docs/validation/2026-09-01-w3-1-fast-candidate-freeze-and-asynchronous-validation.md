@@ -59,3 +59,25 @@ This is blocker evidence, not implementation or validation PASS.
 The unique integration branch subsequently added only the two approved strict JSON Schema resources at exact
 `c142f325d643827c47ce14fb7a489ea1ff39a295`; JSON decode and Draft 2020-12 schema self-check passed. This removes the
 bootstrap dependency but still proves no W3.1 command, receipt writer or validator behavior.
+
+## 2026-09-02 resumption observation — frozen-peer overlap
+
+- after importing the bootstrap, scope no longer failed on `schema-migration`;
+- the original broad scope still produced direct/L3 findings against W7.4's frozen Graph, shared owner tests and
+  task-local State/DEVLOG paths;
+- no W3.1 product byte was written, and neither peer was closed, deleted or overwritten;
+- Plan revision 3 limits the active implementation slice to new Core/CLI/CI infrastructure, one new focused owner and
+  this Validation document. Projection and shared-document evidence remain Pending for a later common baseline.
+
+The next admissible evidence is an allowed refreshed scope followed by implementation on only that disjoint slice.
+
+## 2026-09-02 peer-only finding diagnosis
+
+The revision-3 refresh persisted 21 direct/authority findings, but every finding named only W7.4 and U2.5; none named
+W3.1. W3.1 therefore remained clean and correctly performed no product write. Plan revision 4 authorizes a focused
+regression proving that unrelated peer conflicts remain visible in topology inspection without blocking a third,
+disjoint Workstream's own scope refresh. Current-task conflicts must remain fail-closed.
+
+Central bootstrap exact `33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7` preserves full topology diagnostics and filters only the
+per-Workstream refresh decision/session. The focused three-worktree regression completed 1/1 PASS in 19.308 seconds;
+`git diff --check` passed. No broader suite, peer deletion, scope bypass or W3.1 product implementation occurred.

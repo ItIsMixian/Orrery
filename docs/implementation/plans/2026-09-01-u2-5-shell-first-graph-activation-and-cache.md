@@ -145,3 +145,27 @@ Because the dependency is frozen but not validated, neither task may claim valid
 release-ready status. A later W7.4 validation failure blocks integration and requires U2.5 to resynchronize. Before the
 maintainer accepts the Phase B preview, U2.5 may run only syntax/import checks needed to serve it—no unittest, Fast,
 Checkpoint, Candidate or Promotion.
+
+## 2026-09-02 scope revision 3 — shared-import-safe delivery slice
+
+U2.5 imported exact W7.4 Candidate `fe75fc238ebf876d8565cabda0c8e0f8cfb4cfdd` without changing its bytes. The scope
+guard then treated the same imported commit on both branches as a direct conflict, even where U2.5 declared no future
+write. This is not permission to ignore a real concurrent edit.
+
+The unique integrator is authorized to make one narrow scope correction: when two exact path entries name the same
+`committed_last_oid`, that shared committed source is removed from pairwise conflict material. Any remaining staged,
+unstaged, untracked or expected source still participates normally and remains fail-closed.
+
+After importing that correction, U2.5 resumes on a disjoint delivery slice limited to its Phase A Shell/cache files,
+a new delivery owner if needed, and its own Pending Validation. It must temporarily remove W7.4 Core relation/history,
+Graph presentation/adapters, shared mapping, shared owner tests, State and DEVLOG from expected writes. Those W7-owned
+invalidation/presentation edits remain deferred until a common integrated development baseline; they are not removed
+from the accepted Phase B design.
+
+U2.5 must use the full local-worktree refresh, retire only findings no longer involving its disjoint write set, obtain
+`allowed=true` and then begin the delivery implementation. `--no-local-worktrees`, L3 acknowledgement, peer deletion,
+fabricated lineage or editing W7.4's frozen branch are prohibited.
+
+The unique integrator completed the shared-import scope correction at exact
+`da923ff8ff1d411f8b42032886fae5d0a853fd8a`. U2.5 must consume it through the next exact task-description version;
+the correction does not suppress any expected/staged/unstaged/untracked overlap.

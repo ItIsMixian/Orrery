@@ -120,3 +120,53 @@ All original W3.1 safety and validation boundaries remain in force.
 
 The unique integrator completed that strict two-file bootstrap at exact
 `c142f325d643827c47ce14fb7a489ea1ff39a295`. W3.1 may consume it only through the import/scope-refresh sequence above.
+
+## 2026-09-02 scope revision 3 — disjoint infrastructure first
+
+After importing the schema bootstrap, W3.1 correctly found that its original broad projection/test/document write set
+still overlapped the frozen W7.4 Candidate. A frozen validation-pending worktree must not be deleted or falsely closed
+merely to free paths, and W3.1 must not overwrite its accepted Graph/history bytes.
+
+W3.1 therefore resumes first on a disjoint infrastructure slice. Its current task-owned writes are limited to:
+
+- `packages/project-orrery-core/src/project_orrery_core/candidate_freeze.py`;
+- `packages/project-orrery-core/src/project_orrery_core/schema.py` only to load the two centrally owned schemas;
+- `packages/project-orrery-cli/src/project_orrery_cli/worktree.py`;
+- `scripts/ci/candidate_validation.py`;
+- `tests/test_candidate_freeze.py`;
+- its own Pending Validation document.
+
+The Personal/Graph/Maintenance projection work, existing shared owner tests, subsystem State and DEVLOG updates are
+deferred until W7.4/U2.5 provide a common integrated development baseline. This is sequencing, not removal from the
+accepted design. W3.1 must rewrite its Git-private expected-write and validation-surface sets to this exact slice,
+refresh scope, and resume product work only after all direct/L3 findings are retired. It must not import or edit W7.4
+or U2.5 product bytes for this phase.
+
+The disjoint Candidate may prove Core receipt validation, zero-write dry-run/one-commit apply, acceptance-drift and
+structural refusals, the zero-validation freeze boundary, and immutable-SHA asynchronous PASS/FAIL/no-repeat behavior.
+It cannot claim the deferred UI projections or full W3.1 completion.
+
+## 2026-09-02 scope revision 4 — current-Workstream finding isolation bootstrap
+
+The revision-3 disjoint scope was still blocked by direct findings whose `workstream_ids` contained only W7.4 and
+U2.5. The current W3.1 Workstream touched none of those paths. `inspect_worktree_overlap` correctly reports the whole
+local topology, but `refresh_workstream_scope` incorrectly fed every peer-to-peer finding into W3.1's own expansion
+decision and session.
+
+The unique integrator is authorized to make one narrow safety correction in Core collaboration scope handling and its
+existing focused owner test:
+
+1. keep full pairwise diagnostics in `inspect_worktree_overlap`;
+2. before evaluating or persisting one Workstream's scope refresh, retain only findings whose `workstream_ids` include
+   that current Workstream;
+3. mechanically retire previously persisted peer-only findings from that Workstream session;
+4. continue to fail closed for every direct, L3, authority, semantic or Unknown finding that actually involves the
+   current Workstream.
+
+After the exact bootstrap commit, W3.1 must import the new task-description version and refresh the revision-3
+disjoint scope normally. `--no-local-worktrees`, L3 acknowledgement, peer deletion and fabricated lineage are not
+authorized recovery mechanisms.
+
+The unique integrator completed this narrow guard bootstrap at exact
+`33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7`. W3.1 must consume it through the normal exact task-description import and
+scope refresh; it is not a blanket conflict override.
