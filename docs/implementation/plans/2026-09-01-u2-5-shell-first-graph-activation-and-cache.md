@@ -165,3 +165,7 @@ from the accepted Phase B design.
 U2.5 must use the full local-worktree refresh, retire only findings no longer involving its disjoint write set, obtain
 `allowed=true` and then begin the delivery implementation. `--no-local-worktrees`, L3 acknowledgement, peer deletion,
 fabricated lineage or editing W7.4's frozen branch are prohibited.
+
+The unique integrator completed the shared-import scope correction at exact
+`da923ff8ff1d411f8b42032886fae5d0a853fd8a`. U2.5 must consume it through the next exact task-description version;
+the correction does not suppress any expected/staged/unstaged/untracked overlap.

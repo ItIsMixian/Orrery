@@ -76,3 +76,8 @@ accepted.
 
 This is blocker evidence only. The next admissible U2.5 evidence is an allowed full-local refresh followed by its first
 legal delivery-slice product write.
+
+Central exact `da923ff8ff1d411f8b42032886fae5d0a853fd8a` now removes only identical `committed_last_oid` material before
+pairwise comparison. A focused two-worktree regression proved shared import plus one writer remains allowed, while two
+expected writers still return L3; together with the peer-only isolation regression, 2/2 tests passed in 47.143 seconds.
+No broader suite or U2.5 product write ran.
