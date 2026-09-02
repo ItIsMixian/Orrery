@@ -105,6 +105,8 @@
         "packages/project-orrery-core/src/project_orrery_core/maintenance*.py",
         "packages/project-orrery-core/src/project_orrery_core/workspace_*.py",
         "packages/project-orrery-core/src/project_orrery_core/workstream_program_hierarchy.py",
+        "packages/project-orrery-core/src/project_orrery_core/workstream_history.py",
+        "packages/project-orrery-core/src/project_orrery_core/schema/workstream-history-index-v1.json",
         "packages/project-orrery-core/src/project_orrery_core/workstream_relation_execution.py",
         "packages/project-orrery-core/src/project_orrery_core/workstream_relations.py",
         "packages/project-orrery-core/src/project_orrery_core/review.py",

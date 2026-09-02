@@ -35,6 +35,23 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
 - ADR-0017 的 Git-private relation proposal／confirmation 已进入本地中央 source。Unified Observatory 的 Personal／Team 页面增加“关系待确认”收件箱：Personal 仅在本机 human role capability 成立时显示 accept/change-gate/defer/reject，Team／central 始终 request-only；Graph 继续只读，只投影 effective／proposed 与 gate。
 - Graph projection schema 2 将 program／phase／series 作为只读分组元数据，不把 membership 当因果边；主状态机械区分正在进行、等待人工确认、状态待刷新／证据过期、历史任务、缺少任务记录、未登记和关系证据不足。本地中央 Candidate 用固定本地 ELK 布局同一 semantic projection，桌面图与移动 ledger 保持同事实；Core `compare_pairs` 只作为默认关闭的黄色 comparison review，红色 conflict lens 只接受带 location／impact／source 的明确冲突证据。画布不含确认／应用／撤销动作。
+- W7.4 Worktree Candidate 的 active history projection 已切换到 strict schema：37 条记录重新分类为 6 closed
+  与 31 retired（12 implementing、18 validating、1 review-ready）；旧 37 条错误 closed-summary bytes 原位保全、
+  不再被 reader 接受。关系页面已移除完整历史目录、bulk controls、
+  identity-only cards 和目录入口；只投影具备语义 relation、明确 series 或严格 archived lineage 证据的任务。
+  14 条 current lineage 中 11 条恢复，3 条因目标归档证据不足保持无边。索引不可用时明确写“历史索引不可用”，
+  不把空白冒充已验证无历史。Relation Inbox 主卡改为 Core-owned 中文问题、建议原因、接受／拒绝后果与证据限制，
+  raw IDs、revision、enum、rationale 和 provenance 只在“技术详情”中显示。维护者截图发现的 ELK 跨层级端口
+  错误已按语义边界修正；随后又修复 history candidate blanket suppression，恢复四条显式 series 展示线。
+  当前页面不再提供历史目录或 identity-only 画布入口。真实浏览器完整默认态随 Git-private U2.4/U2.5
+  输入增量为 25 nodes／18 routes；已接受的 23 nodes／15 routes 逐项仍在，ELK ready 且 failure hidden。
+  同画布 compact 为 15 nodes／8 routes／3 summaries，展开一组为 23／16／2，之后可恢复完整默认。
+  full 模式的顶层 compound composition 使用 ELK box 而非会遗漏 nested-series 最终伸展范围的 rectpacking；
+  绘制后按最终 SVG rect 执行全节点 pairwise overlap postcondition，非零即 failure、不得宣称 ELK ready。
+  重启后的 full 与 compact 实测 overlap pairs 均为 0。
+  页面同时把 lifecycle 与 organizational classification 分轴：provider 42 nodes 的 missing series／program-phase／
+  both 为 33／35／27，strict history 37 records 的 missing series／program-phase 为 29／30；full 可见 25 nodes
+  显示 17／21／14。缺失项明确标记“未登记”，不从 task code、名称、布局或 lineage 推断分类。
 - 动态 docsite 的模型调用统一经过 Broker。Provider 配置与凭据按端点绑定，同源 POST、body gate、预算、缓存和错误脱敏已实现；同用户本机 Broker 不宣称秘密隔离。
 - 当前展示品牌为 Orrery；目标项目标题仍由模板 token 定制。历史 `Project Orrery` 与稳定 `project-orrery` 技术标识按 ADR-0015 保留。
 - A4 local integrated Candidate 不增加第九个一级导航；既有 `authority` 身份显示“事实与规则”，分栏投影目标项目 Seed 与 Core-owned Orrery 工作规则，legacy/managed/readiness 技术状态默认折叠。Ask Docs 在 root Unified 宿主中先消费 route receipt；Skill template 只能 advisory。
@@ -89,6 +106,14 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - 完整国际化未实施，U2.1 只完成 zh-CN 主界面与集中 display vocabulary；没有完整英文模式。
 - Authority portable inventory/route 已作为 A4 source Candidate 接线，但没有稳定公共 parser/domain API、默认 production projection、通用宿主 Hook 或公开模型 1 release。
 - Personal／Team／Maintenance／Graph 尚未接入默认 docsite、Skill template 或公开 release。
+- W7.4 root-only self-host preview 的首版六条历史、ELK 跨层级端口错误、历史 series 线缺失、37 卡散点和
+  后续独立历史目录均先后被维护者拒绝。当前 Worktree 已恢复 11 条严格归档 lineage 和显式系列线，删除所有
+  bulk-history UI；真实浏览器为 ELK ready、failure hidden，该完整关系基线已获维护者接受。
+- 维护者已接受上述完整关系图作为冻结默认。W7.4 revision 5 在同一画布新增 `显示完整关系`／`折叠历史`；
+  compact 只折叠深层只读历史连通子图，保留 current、attention、pending、Unknown、dependency、conflict、selected
+  与一跳历史上下文。摘要保留底层关系数／类型和真实 entry/exit，点击原地展开并可重新折叠；无新目录或列表。
+  公开默认、Team 同步、cleanup 自动门与任何 Release
+  均未改变。
 - Unified Observatory 仍只是本地 root-only/default-off integrated Candidate；尚未进入默认 docsite、Skill template、managed-tool inventory、installer 或公开 Release。`start-docsite.bat`／`serve.py` 继续作为 legacy rollback 与当前公开兼容入口。
 - 当前 integration branch 仍是 U2.4 的全页启动卡；U2.5 Phase A 产品只存在于 clean Worktree Candidate
   `6596a9f...`，未接入 integration/public runtime。Phase B Graph hydration、post-acceptance focused tests 与

@@ -221,6 +221,14 @@ def _explicit_conflict(pair: Mapping[str, Any]) -> dict[str, Any] | None:
 
 
 def _plain_state(node: Mapping[str, Any]) -> tuple[str, str]:
+    if node.get("origin") == "workstream-history-index":
+        if node.get("history_record_kind") == "retired-session":
+            lifecycle = {
+                "implementing": "实现中", "validating": "验证中", "review-ready": "待审阅",
+                "created": "已创建", "investigating": "调查中", "integrated": "已整合",
+            }.get(str(node.get("history_observed_lifecycle_phase")), "状态待确认")
+            return f"退役会话 · 末态{lifecycle}", "historical-retired-session"
+        return "历史任务", "historical"
     if node.get("runtime_condition") == "waiting-for-user":
         return "等待人工确认", "human-confirmation-pending"
     if node.get("status") in {"unregistered", "candidate-unregistered"}:
@@ -293,6 +301,25 @@ def _sanitize_node(value: Any, active_tip_ids: set[str]) -> dict[str, Any]:
         "origin": str(value.get("origin")),
         "is_active_tip": workstream_id in active_tip_ids,
     }
+    if node["origin"] == "workstream-history-index":
+        closed_at = value.get("history_closed_at")
+        relation_count = value.get("history_relation_count")
+        if not isinstance(closed_at, str) or not closed_at or not isinstance(relation_count, int) or isinstance(relation_count, bool) or relation_count < 0:
+            raise RelationGraphUnavailable("invalid-core-payload", "Core history node metadata is invalid.")
+        node["history_closed_at"] = closed_at
+        node["history_relation_count"] = relation_count
+        record_kind = value.get("history_record_kind")
+        observed_lifecycle = value.get("history_observed_lifecycle_phase")
+        observed_runtime = value.get("history_observed_runtime_condition")
+        if (
+            record_kind not in {"closed-workstream", "retired-session"}
+            or not isinstance(observed_lifecycle, str)
+            or not isinstance(observed_runtime, str)
+        ):
+            raise RelationGraphUnavailable("invalid-core-payload", "Core strict history classification is invalid.")
+        node["history_record_kind"] = record_kind
+        node["history_observed_lifecycle_phase"] = observed_lifecycle
+        node["history_observed_runtime_condition"] = observed_runtime
     if node["is_active_tip"] and not _node_is_active_tip(node):
         raise RelationGraphUnavailable("contradictory-active-tip", "Core active tip contradicts its state axes.")
     node["plain_status"], node["plain_status_code"] = _plain_state(node)
@@ -540,6 +567,34 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         node["program_id"] = membership["group_path"][0] if membership else None
         node["phase_id"] = membership["group_path"][1] if membership else None
         node["group_path"] = list(membership["group_path"]) if membership else []
+    history_payload = provider_payload.get("workstream_history", {
+        "schema_version": 1, "contract_type": "workstream-history-index-inspection",
+        "status": "unavailable", "records": [], "counts": {"records": 0, "revisions": 0},
+        "storage": "git-common-private-append-only",
+        "storage_ref": "git-common:orrery/workstream-history-index-v1",
+        "read_only": True, "writes_performed": False, "network_performed": False,
+        "execution_capability": False,
+    })
+    if (
+        not isinstance(history_payload, Mapping)
+        or history_payload.get("schema_version") != 1
+        or history_payload.get("contract_type") != "workstream-history-index-inspection"
+        or history_payload.get("status") not in {"ready", "unavailable"}
+        or history_payload.get("read_only") is not True
+        or history_payload.get("writes_performed") is not False
+        or history_payload.get("network_performed") is not False
+        or history_payload.get("execution_capability") is not False
+        or not isinstance(history_payload.get("counts"), Mapping)
+        or not isinstance(history_payload.get("records"), list)
+    ):
+        raise RelationGraphUnavailable("invalid-provider", "Workstream history projection is malformed.")
+    history_record_ids = {
+        str(item.get("workstream_id")) for item in history_payload["records"]
+        if isinstance(item, Mapping) and str(item.get("workstream_id")) in node_ids
+    }
+    if len(history_record_ids) != int(history_payload["counts"].get("records", 0)):
+        raise RelationGraphUnavailable("invalid-provider", "Workstream history identities are incomplete.")
+    active_tip_ids.difference_update(history_record_ids)
     unknown_values = plan.get("unknown_workstream_ids")
     if not isinstance(unknown_values, list) or any(item not in node_ids for item in unknown_values):
         raise RelationGraphUnavailable("dangling-node", "Core Unknown node list is invalid.")
@@ -549,11 +604,47 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         if edge["source_workstream_id"] in active_tip_ids or edge["target_workstream_id"] in active_tip_ids
         for endpoint in (edge["source_workstream_id"], edge["target_workstream_id"])
     }
-    historical = sorted(
-        item["workstream_id"] for item in nodes
-        if item["workstream_id"] not in active_tip_ids | direct_to_tip
-        and item["status"] in {"inactive", "completed", "cancelled"}
-    )
+    semantic_endpoint_ids = {
+        endpoint
+        for edge in edges
+        for endpoint in (edge["source_workstream_id"], edge["target_workstream_id"])
+    }
+    series_groups: dict[str, set[str]] = {}
+    for workstream_id, item in series_by_workstream.items():
+        series_groups.setdefault(str(item["series_id"]), set()).add(workstream_id)
+    explicit_series_ids = {
+        workstream_id
+        for members in series_groups.values() if len(members) >= 2
+        for workstream_id in members
+    }
+    def _missing_classification_counts(items: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+        return {
+            "missing_series": sum(1 for item in items if not item.get("series_id")),
+            "missing_program_phase": sum(
+                1 for item in items if not (item.get("program_id") and item.get("phase_id"))
+            ),
+            "missing_both": sum(
+                1 for item in items
+                if not item.get("series_id") and not (item.get("program_id") and item.get("phase_id"))
+            ),
+        }
+    history_inventory_nodes = [item for item in nodes if item["workstream_id"] in history_record_ids]
+    classification_inventory = {
+        "graph_node_count": len(nodes),
+        **_missing_classification_counts(nodes),
+        "history_record_count": len(history_inventory_nodes),
+        "history_missing_series": _missing_classification_counts(history_inventory_nodes)["missing_series"],
+        "history_missing_program_phase": _missing_classification_counts(history_inventory_nodes)["missing_program_phase"],
+        "authority": "explicit-metadata-only",
+        "name_inference_performed": False,
+        "lineage_inference_performed": False,
+    }
+    historical = sorted(history_record_ids & (semantic_endpoint_ids | explicit_series_ids))
+    projected_node_ids = (node_ids - history_record_ids) | set(historical)
+    nodes = [item for item in nodes if item["workstream_id"] in projected_node_ids]
+    archived_lineage = graph.get("archived_lineage", {})
+    if not isinstance(archived_lineage, Mapping):
+        raise RelationGraphUnavailable("invalid-provider", "Archived lineage diagnostics are malformed.")
     authority = str(provider_payload.get("authority", "derived-read-only"))
     if authority not in {"derived-read-only", "synthetic-non-authoritative"}:
         raise RelationGraphUnavailable("invalid-provider", "Core provider authority marker is unsupported.")
@@ -561,7 +652,7 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         str(item.get("origin", "unknown")) for item in [*nodes, *edges]
     })
     if authority == "derived-read-only" and not (
-        {"native", "legacy-session-projection"} & set(evidence_origins)
+        {"native", "legacy-session-projection", "archived-session-lineage-projection"} & set(evidence_origins)
     ):
         raise RelationGraphUnavailable(
             "relation-evidence-absent",
@@ -586,9 +677,26 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
         "suppressed_pairs": sorted(suppressed_pairs, key=lambda item: item["id"]),
         "task_series": sorted({str(item["series_id"]) for item in series_by_workstream.values()}),
         "program_groups": sorted(groups_by_id.values(), key=lambda item: (item["order"], item["group_id"])),
+        "classification_inventory": classification_inventory,
         "active_tip_workstream_ids": sorted(active_tip_ids),
-        "unknown_workstream_ids": sorted(unknown_values),
+        "unknown_workstream_ids": sorted(set(unknown_values) & projected_node_ids),
         "history_candidate_ids": historical,
+        "history_index": {
+            "status": str(history_payload["status"]),
+            "record_count": int(history_payload["counts"].get("records", 0)),
+            "closed_workstream_count": int(history_payload["counts"].get("closed_workstreams", 0)),
+            "retired_session_count": int(history_payload["counts"].get("retired_sessions", 0)),
+            "observed_lifecycle": dict(history_payload["counts"].get("observed_lifecycle", {})),
+            "storage": str(history_payload.get("storage")),
+            "read_only": True,
+        },
+        "archived_lineage": {
+            "archive_record_count": int(archived_lineage.get("archive_record_count", 0)),
+            "unique_workstream_count": int(archived_lineage.get("unique_workstream_count", 0)),
+            "lineage_status_counts": dict(archived_lineage.get("lineage_status_counts", {})),
+            "recovered_edge_count": int(archived_lineage.get("recovered_edge_count", 0)),
+            "rejection_counts": dict(archived_lineage.get("rejection_counts", {})),
+        },
         "blocking_dependencies": list(plan.get("blocking_dependencies", [])),
         "read_only": True,
         "writes_performed": False,
@@ -619,6 +727,8 @@ def unavailable_relation_graph_projection(error: Exception) -> dict[str, Any]:
         "error": {"code": code, "message": messages.get(code, "当前无法读取完整的任务关系，未生成不完整关系图。")},
         "nodes": [], "edges": [], "conflicts": [], "comparison_suggestions": [], "suppressed_pairs": [], "task_series": [], "program_groups": [], "active_tip_workstream_ids": [],
         "unknown_workstream_ids": [], "history_candidate_ids": [], "blocking_dependencies": [],
+        "history_index": {"status": "unavailable", "record_count": 0, "storage": "git-common-private-append-only", "read_only": True},
+        "archived_lineage": {"archive_record_count": 0, "unique_workstream_count": 0, "lineage_status_counts": {}, "recovered_edge_count": 0, "rejection_counts": {}},
         "read_only": True, "writes_performed": False, "network_performed": False,
         "execution_capability": False, "available_actions": [],
     }
@@ -879,6 +989,16 @@ def build_readability_layout(
     all_nodes_by_id = {str(item["workstream_id"]): dict(item) for item in projection.get("nodes", [])}
     semantic_edges = _lens_edges(projection, lens)
     series_edges = [] if lens == "conflict" else _series_display_edges(projection)
+    history_identity_ids = {str(item) for item in projection.get("history_candidate_ids", [])}
+    # This Python layout is a legacy/mechanical readiness approximation, not
+    # the browser ELK geometry oracle. Historical series routes remain in the
+    # real browser semantic input; omit them only here so legacy crossings do
+    # not fail-close an ELK layout that has its own explicit-port routing.
+    series_edges = [
+        item for item in series_edges
+        if str(item["display_from_id"]) not in history_identity_ids
+        and str(item["display_to_id"]) not in history_identity_ids
+    ]
     comparison_edges = (
         _comparison_display_edges(projection)
         if include_comparisons and lens != "conflict" else []
@@ -942,6 +1062,7 @@ def build_readability_layout(
         endpoint for item in edges
         for endpoint in (item["display_from_id"], item["display_to_id"])
     }
+    relation_endpoint_ids = set(endpoint_ids)
     program_endpoint_ids = {
         str(item["workstream_id"]) for item in projection.get("nodes", [])
         if isinstance(item, Mapping) and item.get("program_id") and item.get("phase_id")
@@ -950,6 +1071,11 @@ def build_readability_layout(
     history_candidate_ids = {
         str(item) for item in projection.get("history_candidate_ids", []) if str(item) in allowed_ids
     }
+    # Load historical identity before edge filtering so zero-relation closed
+    # tasks remain reachable through the history controls.
+    endpoint_ids.update(history_candidate_ids)
+    series_endpoint_ids.difference_update(history_candidate_ids)
+    program_endpoint_ids.difference_update(history_candidate_ids)
     active_tip_ids = {str(item) for item in projection.get("active_tip_workstream_ids", [])}
     fold_eligible_ids = {
         workstream_id for workstream_id, node in nodes_by_id.items()
@@ -979,7 +1105,10 @@ def build_readability_layout(
     if lens == "conflict":
         visible_ids.update(endpoint_ids)
     else:
-        tips = sorted(item for item in endpoint_ids if not outgoing.get(item))
+        tips = sorted(
+            item for item in endpoint_ids
+            if not outgoing.get(item) and item not in history_candidate_ids
+        )
         if lens == "succession":
             tips = sorted(set(tips) | (active_tip_ids & allowed_ids))
         for tip in tips:
@@ -991,6 +1120,7 @@ def build_readability_layout(
             older = [
                 item for item in _ordered_ancestors(tip, incoming)
                 if item not in default_ids and item not in claimed_history
+                and item not in history_candidate_ids
                 and item not in series_endpoint_ids and item not in program_endpoint_ids
                 and item in fold_eligible_ids
             ]
@@ -1008,23 +1138,13 @@ def build_readability_layout(
         visible_ids.update(series_endpoint_ids)
         visible_ids.update(program_endpoint_ids)
 
-    global_history_ids = sorted(
-        history_candidate_ids & fold_eligible_ids & endpoint_ids - claimed_history - protected_default_ids
-    )
-    if "history:all" in expanded:
-        visible_ids.update(global_history_ids)
-    else:
-        visible_ids.difference_update(global_history_ids)
+    global_history_ids = sorted(history_candidate_ids & endpoint_ids)
+    related_history_ids = history_candidate_ids & relation_endpoint_ids
+    folded_history_ids = sorted(set(global_history_ids) - related_history_ids)
+    visible_ids.update(related_history_ids)
+    visible_ids.difference_update(folded_history_ids)
 
     visible_nodes = [nodes_by_id[item] for item in sorted(visible_ids) if item in nodes_by_id]
-    if "history:all" in expanded and global_history_ids:
-        toggle_node = next(
-            (item for item in visible_nodes if item["workstream_id"] == global_history_ids[0]),
-            None,
-        )
-        if toggle_node is not None:
-            toggle_node["collapse_chain_id"] = "history:all"
-            toggle_node["expanded_history_count"] = len(global_history_ids)
     for chain in chains:
         if not chain["expanded"] or not chain["history_ids"]:
             continue
@@ -1041,28 +1161,51 @@ def build_readability_layout(
     cluster_nodes: list[dict[str, Any]] = []
     cluster_edges: list[dict[str, Any]] = []
     hidden_owner: dict[str, str] = {}
-    if global_history_ids and "history:all" not in expanded:
-        cluster_id = "history:all"
-        for item in global_history_ids:
-            hidden_owner[item] = cluster_id
-        cluster_nodes.append({
-            "workstream_id": cluster_id,
-            "display_prefix": f"+{len(global_history_ids)}",
-            "display_name": "历史任务",
-            "status": "inactive",
-            "runtime_condition": "collapsed",
-            "lifecycle_phase": "historical",
-            "evidence_freshness": "historical",
-            "scope_status": "historical",
-            "primary_subsystem_id": "历史任务",
-            "source_links": [],
-            "is_cluster": True,
-            "chain_id": "history:all",
-            "cluster_ids": list(global_history_ids),
-            "cluster_first_id": global_history_ids[0],
-            "cluster_last_id": global_history_ids[-1],
-            "cluster_tip_id": "",
-        })
+    if folded_history_ids:
+        groups_by_id = {str(item["group_id"]): item for item in projection.get("program_groups", [])}
+        grouped: dict[tuple[str, str], list[str]] = {}
+        for item in folded_history_ids:
+            node = nodes_by_id[item]
+            key = (
+                ("phase", str(node["phase_id"])) if node.get("phase_id") else
+                (("series", str(node["series_id"])) if node.get("series_id") else ("other", "ungrouped"))
+            )
+            grouped.setdefault(key, []).append(item)
+        for (kind, identifier), members in sorted(grouped.items()):
+            cluster_id = f"history:group:{kind}:{identifier}"
+            for item in members:
+                hidden_owner[item] = cluster_id
+            timestamps = sorted(
+                str(nodes_by_id[item].get("history_closed_at"))
+                for item in members if nodes_by_id[item].get("history_closed_at")
+            )
+            label = (
+                str(groups_by_id.get(identifier, {}).get("display_label", identifier))
+                if kind == "phase" else
+                (f"{identifier} · 系列历史" if kind == "series" else "其他历史任务")
+            )
+            cluster_nodes.append({
+                "workstream_id": cluster_id,
+                "display_prefix": f"+{len(members)}",
+                "display_name": label,
+                "status": "inactive",
+                "runtime_condition": "collapsed",
+                "lifecycle_phase": "historical",
+                "evidence_freshness": "historical",
+                "scope_status": "historical",
+                "primary_subsystem_id": "历史任务",
+                "source_links": [],
+                "is_cluster": True,
+                "history_group_key": f"{kind}:{identifier}",
+                "cluster_ids": list(members),
+                "cluster_first_id": members[0],
+                "cluster_last_id": members[-1],
+                "cluster_tip_id": "",
+                "history_time_span": [timestamps[0], timestamps[-1]] if timestamps else [],
+                "history_relation_count": sum(
+                    int(nodes_by_id[item].get("history_relation_count", 0)) for item in members
+                ),
+            })
     for chain in chains:
         if chain["expanded"] or not chain["history_ids"]:
             continue
@@ -1371,9 +1514,13 @@ def build_readability_layout(
                 for offset in (14, -width - 14, 32, -width - 32):
                     candidates.append({"x": mid_x + offset, "y": mid_y - height // 2,
                                        "width": width, "height": height})
+        component_label_count = sum(
+            1 for item in label_rects if int(item["component"]) == component_index
+        )
+        component_columns = max(1, (int(owner["width"]) - 20) // (width + 8))
         candidates.append({
-            "x": owner["x"] + 10 + (len(label_rects) % 4) * (width + 8),
-            "y": owner["y"] + 8 + (len(label_rects) // 4) * (height + 4),
+            "x": owner["x"] + 10 + (component_label_count % component_columns) * (width + 8),
+            "y": owner["y"] + 8 + (component_label_count // component_columns) * (height + 4),
             "width": width, "height": height,
         })
         obstacles = [*positions.values(), *component_headers, *label_rects]
@@ -1803,12 +1950,46 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
             '<div class="wg-failure" role="status"><b>当前暂不可用</b>%s</div>'
             % html.escape(str(error.get("message", "当前无法读取完整的任务关系。")))
         )
+    history = projection.get("history_index") if isinstance(projection.get("history_index"), Mapping) else {}
+    archived = projection.get("archived_lineage") if isinstance(projection.get("archived_lineage"), Mapping) else {}
+    lineage_status_counts = archived.get("lineage_status_counts", {}) if isinstance(archived.get("lineage_status_counts"), Mapping) else {}
+    current_lineage_count = int(lineage_status_counts.get("current", 0))
+    recovered_lineage_count = int(archived.get("recovered_edge_count", 0))
+    rejected_current_count = max(0, current_lineage_count - recovered_lineage_count)
+    observed_lifecycle = history.get("observed_lifecycle", {}) if isinstance(history.get("observed_lifecycle"), Mapping) else {}
+    history_note = (
+        "内部保留 %d 条严格历史记录：%d 条已关闭任务、%d 条退役会话（实现中 %d、验证中 %d、待审阅 %d）；归档中 %d 条声明当前 lineage，已恢复 %d 条关系，另 %d 条因证据不足保持无边。画布只显示有关系证据的任务。"
+        % (
+            int(history.get("record_count", 0)), int(history.get("closed_workstream_count", 0)),
+            int(history.get("retired_session_count", 0)), int(observed_lifecycle.get("implementing", 0)),
+            int(observed_lifecycle.get("validating", 0)), int(observed_lifecycle.get("review-ready", 0)),
+            current_lineage_count, recovered_lineage_count, rejected_current_count,
+        )
+        if history.get("status") == "ready" else
+        "历史索引不可用；空白不代表已经验证没有历史任务。"
+    )
+    classification = (
+        projection.get("classification_inventory", {})
+        if isinstance(projection.get("classification_inventory"), Mapping) else {}
+    )
+    classification_note = (
+        "组织分类与生命周期独立：当前 %d 个 Graph 节点中 %d 个未登记 task series、%d 个未登记 program/phase、"
+        "%d 个两者皆未登记；%d 条严格历史中分别有 %d／%d 条未登记。未登记保持未分类，不按任务编号、名称、"
+        "视觉顺序或 lineage 推断；6 closed／31 retired-session 不代表组织分类完成。"
+        % (
+            int(classification.get("graph_node_count", 0)), int(classification.get("missing_series", 0)),
+            int(classification.get("missing_program_phase", 0)), int(classification.get("missing_both", 0)),
+            int(classification.get("history_record_count", 0)),
+            int(classification.get("history_missing_series", 0)),
+            int(classification.get("history_missing_program_phase", 0)),
+        )
+    )
     payload = _canonical_json(dict(projection)).replace("<", "\\u003c")
     return (
         '<article class="page wide" id="workstream-relation-graph" data-kind="workstream-relation-graph" '
         'data-title="任务关系" data-authority="%s" data-read-only="true">'
         '<section class="wg-shell"><header class="wg-mast"><div><p class="wg-kicker">任务关系图 · 只读</p>'
-        '<h2>任务关系</h2><p>从左到右阅读：更早历史 → 直接前置／依赖 → 当前任务。每条链可独立展开，本页不会执行任何操作。</p></div>'
+        '<h2>任务关系</h2><p>从左到右阅读：更早历史 → 直接前置／依赖 → 当前任务。每条链可独立展开，本页不会执行任何操作。</p><p>%s</p><p>%s</p></div>'
         '<div class="wg-seal %s">%s · 技术结构版本 2</div></header>%s'
         '<section class="wg-controls" aria-label="任务关系控制"><div class="wg-lenses" role="group" aria-label="关系类型">'
         '<button class="wg-lens" type="button" data-wg-lens="succession" aria-pressed="true"><span>01</span><b>接续关系</b></button>'
@@ -1817,8 +1998,9 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<div class="wg-filterbar"><label>任务范围<select data-wg-scope><option value="all">全部任务</option><option value="program-w">W · Workstream 协作</option></select></label>'
         '<label>项目模块<select data-wg-subsystem><option value="all">全部模块</option></select></label>'
         '<label>运行状态<select data-wg-runtime><option value="all">全部状态</option></select></label>'
-        '<button class="wg-button" type="button" data-wg-expand-all>展开全部历史</button>'
-        '<button class="wg-button" type="button" data-wg-collapse-all>收起全部历史</button>'
+        '<div class="wg-graph-modes" role="group" aria-label="历史关系显示方式">'
+        '<button class="wg-mode" type="button" data-wg-mode="full" aria-pressed="true">显示完整关系</button>'
+        '<button class="wg-mode" type="button" data-wg-mode="compact" aria-pressed="false">折叠历史</button></div>'
         '<button class="wg-button" type="button" data-wg-reset>重置布局</button>'
         '<button class="wg-button wg-comparison-toggle" type="button" data-wg-comparison-toggle aria-pressed="false">显示比较建议</button>'
         '<details class="wg-context-menu"><summary>扩展任务范围</summary><div>'
@@ -1828,7 +2010,7 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<div class="wg-viewbar" role="toolbar" aria-label="关系图视图工具"><span class="wg-viewbar-note">默认保持 100%% 可读；画布内按住 Ctrl＋滚轮缩放，空白处拖动平移。</span>'
         '<button class="wg-button" type="button" data-wg-zoom-out aria-label="缩小关系图">−</button><span class="wg-zoom-readout" data-wg-zoom-readout>100%%</span>'
         '<button class="wg-button" type="button" data-wg-zoom-in aria-label="放大关系图">＋</button><button class="wg-button" type="button" data-wg-fit>适合窗口</button></div>'
-        '<details class="wg-engine-help"><summary>布局引擎与故障恢复</summary><div><label>布局引擎<select data-wg-engine><option value="elk">ELK 0.11.0（本机）</option><option value="legacy">旧版兼容布局</option></select></label><span data-wg-engine-status>ELK 等待布局</span></div></details>'
+        '<details class="wg-engine-help"><summary>布局引擎与故障恢复</summary><div><label>布局引擎<select data-wg-engine><option value="elk">ELK 0.11.0（本机）</option><option value="legacy">旧版兼容布局</option></select></label><span data-wg-engine-status>ELK 等待布局</span><span data-wg-classification-status>完整图组织分类诊断等待布局</span></div></details>'
         '<div class="wg-legacy-banner" data-wg-legacy-banner hidden>旧版兼容布局 · 手动选择 · 不会自动启用</div></section>'
         '<section class="wg-grid"><div class="wg-graph-panel"><div class="wg-panel-head"><div><p class="wg-panel-index">关系图 / 已验证核心数据</p><h3>分层关系拓扑</h3></div>'
         '<div class="wg-legend" aria-label="关系图例"><span><i></i>接续：实线青</span><span><i class="series"></i>系列：细点线</span><span><i class="dependency"></i>依赖：虚线黄</span><span><i class="conflict"></i>冲突：复合红线</span></div></div>'
@@ -1840,7 +2022,7 @@ def render_workstream_relation_graph_panel(projection: Mapping[str, Any]) -> str
         '<details class="wg-comparison-drawer"><summary><span>需要比较／证据待刷新</span><b data-wg-comparison-count>0</b></summary><p>默认收起；仅是只读审查建议，不属于冲突事实，也不会阻塞任务。</p><div data-wg-comparisons></div></details>'
         '<p class="wg-sr" aria-live="polite" data-wg-live></p><script type="application/json" data-wg-payload>%s</script>'
         '</section></article>'
-        % (html.escape(authority, quote=True), status, html.escape(display_status(status)), failure, payload)
+        % (html.escape(authority, quote=True), html.escape(history_note), html.escape(classification_note), status, html.escape(display_status(status)), failure, payload)
     )
 
 
