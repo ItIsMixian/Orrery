@@ -208,7 +208,7 @@ class ProjectOrreryTests(unittest.TestCase):
         for relative in observatory["managed_tools"]:
             self.assertTrue((REPOSITORY_ROOT / relative).is_file(), relative)
             self.assertTrue((compatibility_root / relative).is_file(), relative)
-        self.assertEqual(len(observatory["managed_runtime"]), 104)
+        self.assertEqual(len(observatory["managed_runtime"]), 106)
         self.assertIn(
             "packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py",
             observatory["managed_runtime"],
