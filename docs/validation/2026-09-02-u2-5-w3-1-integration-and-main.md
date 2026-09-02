@@ -49,3 +49,15 @@ Pending execution.
 - the SHA was not retried and protected `main` was not updated;
 - correction remains limited to compatibility/inventory and stale test expectations. U2.5/W3.1 product semantics,
   public tags, Release assets and publication state are unchanged.
+
+## Corrected integration candidate evidence
+
+- Candidate Freeze owner suite passed 7/7 after the shared Git fixture gained repository-local author identity;
+- the exact failed lineage, LAN harness, ADR relation inventory, machine inventory and immutable brand/schema checks
+  each passed after stale integration expectations were reconciled;
+- the six runnable failed packaging/installation methods passed, including fresh install/build and the deterministic
+  170-entry archive; the AI-settings method remained locally skipped because optional dynamic dependencies were not
+  requested, and will run in Promotion as before;
+- the lazy Graph delivery API fixture and the explicit two-launcher contract each passed their focused rerun;
+- `validate_ci.py --all`, `git diff --check`, manifest/core projection equality and all 111 managed-runtime path checks
+  passed. No Fast, Checkpoint or local Candidate suite was run.
