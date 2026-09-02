@@ -81,3 +81,48 @@ disjoint Workstream's own scope refresh. Current-task conflicts must remain fail
 Central bootstrap exact `33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7` preserves full topology diagnostics and filters only the
 per-Workstream refresh decision/session. The focused three-worktree regression completed 1/1 PASS in 19.308 seconds;
 `git diff --check` passed. No broader suite, peer deletion, scope bypass or W3.1 product implementation occurred.
+
+## 2026-09-02 revision-3 disjoint implementation evidence
+
+Task authority and scope:
+
+- imported exact task-description version `c0cab50e4d5c292ac42b2f08c351178ddb3d6a32`, which includes the narrow
+  finding-isolation bootstrap at `33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7`;
+- rewrote the Git-private W3.1 session to the six revision-3 paths, then ran a normal full-local scope refresh;
+- the first refresh reported `findings=[]` and the expected L2 local confirmation requirement; the confirmed refresh
+  produced scope revision 5 with `allowed=true`, `local_work_allowed=true`, `findings=[]` and runtime `active`;
+- no `--no-local-worktrees`, L3 override, peer deletion, fabricated lineage or peer product write was used.
+
+Implemented disjoint behavior:
+
+- Core loads and dependency-free validates the two centrally owned strict receipt schemas;
+- `worktree freeze-candidate` supports explicit zero-write dry-run and apply, binds the accepted surface fingerprint to
+  exact expected-path bytes, performs only bounded local structural checks, stages only expected paths, creates one
+  commit and atomically writes its Git-private freeze receipt;
+- the product freeze path invokes Git only: it imports or starts no unittest/pytest runner, temporary Git fixture,
+  Fast/Checkpoint/Candidate/Promotion route, site/package build, browser replay or relation/history provider scan;
+- the asynchronous adapter writes an exact-SHA Git-private request for the existing CI7 router and records an existing
+  runner result without product writes. Exact PASS receipts are reused; unchanged failed Candidates refuse a new
+  request or result record.
+
+Focused owner command (the only test surface run):
+
+`python -X utf8 -m unittest tests.test_candidate_freeze`
+
+Final result: **7/7 PASS in 129.039 seconds**. The owner uses separate real-Git fixtures, so its aggregate runtime is
+not the user-facing freeze latency. The bounded apply fixture asserted one commit, a clean worktree, an atomic receipt
+and `elapsed_ms < 30000`; the injected clock asserted the 60-second pre-commit refusal. The same owner covered schema
+positive/negative cases, zero-write dry-run, acceptance drift, unexpected paths, conflict markers, forbidden artifacts,
+exact-copy parity, `git diff --check`, Git-only child-process instrumentation, exact-SHA request/PASS/FAIL immutability,
+PASS reuse and failure no-repeat.
+
+Static checks completed with final exit code 0:
+
+- `py_compile` for the Core owner, CLI owner, asynchronous adapter and focused owner;
+- `git diff --check`;
+- CLI help parsing for `worktree freeze-candidate` and `candidate_validation.py {request,record}`.
+
+This remains **partial W3.1 Candidate evidence**, not full completion. Personal/Graph/Maintenance projections, shared
+owner tests, subsystem State/DEVLOG synchronization, W7.4 manual-adoption evidence and every
+Fast/Checkpoint/Candidate/Promotion/publication gate remain Pending for the common integrated baseline defined by Plan
+revision 3. No integration, push, release, closure, cleanup or worktree deletion occurred.
