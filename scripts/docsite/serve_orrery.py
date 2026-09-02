@@ -40,9 +40,6 @@ from project_orrery_core.subprocess_policy import no_window_options  # noqa: E40
 build_unified_observatory = None
 legacy_serve = None
 maintenance_status = None
-build_active_task_projection = None
-collect_active_task_detail = None
-render_task_fragment = None
 accept_proposal = None
 change_proposal_gate = None
 defer_proposal = None
@@ -50,21 +47,47 @@ local_confirmation_capability = None
 reject_proposal = None
 capability_document = None
 TeamUIState = None
+WorkstreamGraphDelivery = None
+_DEFERRED_CORPUS_BUILDER = None
 _RUNTIME_IMPORT_LOCK = threading.Lock()
+
+
+def build_active_task_projection(*args, **kwargs):
+    from project_orrery_observatory.active_task_projection import build_active_task_projection as implementation
+
+    return implementation(*args, **kwargs)
+
+
+def collect_active_task_detail(*args, **kwargs):
+    from project_orrery_observatory.active_task_projection import collect_active_task_detail as implementation
+
+    return implementation(*args, **kwargs)
+
+
+def render_task_fragment(*args, **kwargs):
+    from project_orrery_observatory.active_task_projection import render_task_fragment as implementation
+
+    return implementation(*args, **kwargs)
 
 
 def _load_runtime_components() -> None:
     global build_unified_observatory, legacy_serve, maintenance_status
-    global build_active_task_projection, collect_active_task_detail, render_task_fragment
     global accept_proposal, change_proposal_gate, defer_proposal
     global local_confirmation_capability, reject_proposal, capability_document, TeamUIState
+    global WorkstreamGraphDelivery, _DEFERRED_CORPUS_BUILDER
     if legacy_serve is not None:
         return
     with _RUNTIME_IMPORT_LOCK:
         if legacy_serve is not None:
             return
         import build_unified_observatory as unified_builder
-        import serve as legacy_runtime
+        import docsite_qa as qa_module
+        original_corpus_builder = qa_module.build_corpus
+        qa_module.build_corpus = lambda _docs, _agents: []
+        try:
+            import serve as legacy_runtime
+        finally:
+            qa_module.build_corpus = original_corpus_builder
         from project_orrery_cli.operating_rules import preflight_repository_query
         from project_orrery_core.maintenance import maintenance_status as maintenance_status_impl
         from project_orrery_core.workstream_relation_capture import (
@@ -74,12 +97,10 @@ def _load_runtime_components() -> None:
             local_confirmation_capability as local_confirmation_capability_impl,
             reject_proposal as reject_proposal_impl,
         )
-        from project_orrery_observatory.active_task_projection import (
-            build_active_task_projection as build_active_task_projection_impl,
-            collect_active_task_detail as collect_active_task_detail_impl,
-            render_task_fragment as render_task_fragment_impl,
-        )
         from project_orrery_observatory.unified_observatory import capability_document as capability_document_impl
+        from project_orrery_observatory.workstream_graph_cache import (
+            WorkstreamGraphDelivery as workstream_graph_delivery_impl,
+        )
         from serve_team_observatory import TeamUIState as team_ui_state_impl
 
         legacy_runtime.docsite_qa.configure_authority_route_preflight(
@@ -88,9 +109,6 @@ def _load_runtime_components() -> None:
         build_unified_observatory = unified_builder
         legacy_serve = legacy_runtime
         maintenance_status = maintenance_status_impl
-        build_active_task_projection = build_active_task_projection_impl
-        collect_active_task_detail = collect_active_task_detail_impl
-        render_task_fragment = render_task_fragment_impl
         accept_proposal = accept_proposal_impl
         change_proposal_gate = change_proposal_gate_impl
         defer_proposal = defer_proposal_impl
@@ -98,10 +116,18 @@ def _load_runtime_components() -> None:
         reject_proposal = reject_proposal_impl
         capability_document = capability_document_impl
         TeamUIState = team_ui_state_impl
+        WorkstreamGraphDelivery = workstream_graph_delivery_impl
+        _DEFERRED_CORPUS_BUILDER = lambda: original_corpus_builder(legacy_runtime.DOCS, legacy_runtime.AGENTS)
 
 
 COOKIE_NAME = "orrery_local_control"
 BODY_LIMIT = 64 * 1024
+
+
+def _project_graph_payload(provider):
+    from project_orrery_observatory.workstream_relation_graph import project_core_relation_graph
+
+    return project_core_relation_graph(provider)
 
 
 def _runtime_page(*, failed: bool = False) -> str:
@@ -339,6 +365,12 @@ class UnifiedState:
         self.closed = False
         self.cancel_render = threading.Event()
         self.render_worker: threading.Thread | None = None
+        self.graph_delivery = None
+        self.graph_activation_worker: threading.Thread | None = None
+        self.corpus_worker: threading.Thread | None = None
+        self.authority_load_lock = threading.Lock()
+        self.relation_capture_ready = threading.Event()
+        self.relation_capture_load_lock = threading.Lock()
         self.port: int | None = None
 
     def current_page(self) -> bytes:
@@ -387,6 +419,103 @@ class UnifiedState:
                 self.identity.publish(port=self.port, status="ready")
         return True
 
+    def start_graph_activation(self) -> None:
+        with self.state_lock:
+            if self.closed or self.graph_activation_worker is not None:
+                return
+            delivery = WorkstreamGraphDelivery(
+                ROOT, logger=lambda message: self.logger.info("graph delivery %s", message),
+            )
+            self.graph_delivery = delivery
+            activation = threading.Thread(
+                target=delivery.start,
+                kwargs={
+                    "provider": lambda: build_unified_observatory.graph_provider_payload(ROOT),
+                    "projector": _project_graph_payload,
+                    "on_provider_payload": self._accept_graph_provider_payload,
+                },
+                daemon=True,
+                name="orrery-workstream-graph-activation",
+            )
+            self.graph_activation_worker = activation
+        activation.start()
+
+    def start_corpus_activation(self) -> None:
+        with self.state_lock:
+            if self.closed or self.corpus_worker is not None or legacy_serve.CORPUS:
+                return
+            worker = threading.Thread(
+                target=self._build_corpus,
+                daemon=True,
+                name="orrery-docsite-corpus-activation",
+            )
+            self.corpus_worker = worker
+        worker.start()
+
+    def _build_corpus(self) -> None:
+        try:
+            corpus = _DEFERRED_CORPUS_BUILDER()
+        except Exception:
+            self.logger.info("deferred corpus activation failed with a sanitized local error")
+            return
+        with self.state_lock:
+            if not self.closed:
+                legacy_serve.CORPUS = corpus
+                self.logger.info("deferred corpus activation ready documents=%d", len(corpus))
+
+    def ensure_corpus(self) -> None:
+        self.start_corpus_activation()
+        worker = self.corpus_worker
+        if worker is not None and worker is not threading.current_thread():
+            worker.join()
+
+    def _accept_graph_provider_payload(self, payload: Mapping[str, Any]) -> None:
+        capture = payload.get("relation_capture")
+        if not isinstance(capture, Mapping):
+            return
+        value = dict(capture)
+        value["local_actions_require_same_origin_cookie"] = True
+        value["central_request_only"] = True
+        with self.state_lock:
+            if self.closed:
+                return
+            self.relation_capture_payload = value
+            self.relation_capture_ready.set()
+
+    def relation_capture_response(self) -> dict[str, Any]:
+        with self.state_lock:
+            current = dict(self.relation_capture_payload)
+        if current.get("status") != "loading":
+            return current
+        delivery = self.graph_delivery
+        if delivery is not None and delivery.health().get("status") == "refreshing":
+            self.relation_capture_ready.wait(timeout=45)
+            with self.state_lock:
+                current = dict(self.relation_capture_payload)
+            if current.get("status") != "loading":
+                return current
+        with self.relation_capture_load_lock:
+            with self.state_lock:
+                current = dict(self.relation_capture_payload)
+            if current.get("status") != "loading" or self.closed:
+                return current
+            try:
+                value = build_unified_observatory.relation_capture_payload(ROOT)
+            except Exception:
+                value = {
+                    "schema_version": 2,
+                    "contract_type": "workstream-relation-capture-inspection",
+                    "status": "unavailable",
+                    "pending_proposals": [],
+                    "read_only": True,
+                    "writes_performed": False,
+                    "network_performed": False,
+                    "reason_code": "relation-capture-refresh-failed",
+                }
+            self._accept_graph_provider_payload({"relation_capture": value})
+            with self.state_lock:
+                return dict(self.relation_capture_payload)
+
     def fail_render(self) -> None:
         with self.state_lock:
             if self.closed or self.cancel_render.is_set():
@@ -399,6 +528,10 @@ class UnifiedState:
     def health(self) -> dict[str, Any]:
         broker = legacy_serve._MANAGED_BROKER_SERVER if legacy_serve is not None else None
         team = self.team
+        graph = self.graph_delivery.health() if self.graph_delivery is not None else {
+            "status": "empty", "cache_state": "empty", "generation": 0,
+            "reason_codes": ["shell-not-activated"],
+        }
         return {
             "schema_version": 1,
             "contract_type": "unified-observatory-health-v1",
@@ -409,9 +542,53 @@ class UnifiedState:
                 "broker": "running" if broker is not None else "not-configured",
                 "team-coordinator": "running" if team is not None and team.coordinator is not None else "stopped",
             },
+            "consumers": {"workstream-graph": graph},
             "team_execution_capability": False,
             "writes_author_documents": False,
         }
+
+    def graph_delivery_payload(self) -> dict[str, Any]:
+        delivery = self.graph_delivery
+        if delivery is None:
+            return {
+                "schema_version": 1,
+                "contract_type": "workstream-graph-delivery-v1",
+                "status": "empty",
+                "cache_state": "empty",
+                "generation": 0,
+                "reason_codes": ["shell-not-activated"],
+                "projection": None,
+                "authority": "derived-read-only",
+                "read_only": True,
+                "writes_author_documents": False,
+                "network_performed": False,
+                "execution_capability": False,
+                "available_actions": [],
+            }
+        return delivery.snapshot()
+
+    def authority_status_response(self) -> dict[str, Any]:
+        with self.state_lock:
+            if self.authority_status is not None:
+                return dict(self.authority_status)
+        with self.authority_load_lock:
+            with self.state_lock:
+                if self.authority_status is not None:
+                    return dict(self.authority_status)
+            try:
+                value = build_unified_observatory.inspect_managed_consumer(
+                    ROOT,
+                    requested_selection="legacy",
+                    selection_authority="system-default",
+                    fact_scope="candidate",
+                    evidence_visibility=("revision-content", "human-or-agent-assertion"),
+                )
+            except Exception:
+                return {"status": "unavailable", "reason_code": "authority-status-load-failed"}
+            with self.state_lock:
+                if not self.closed:
+                    self.authority_status = dict(value)
+                return dict(value)
 
     def capabilities(self) -> dict[str, Any]:
         return capability_document(self.registrations, mode="dynamic")
@@ -440,7 +617,14 @@ class UnifiedState:
                 return
             self.closed = True
             self.cancel_render.set()
+            self.relation_capture_ready.set()
             try:
+                if self.graph_delivery is not None:
+                    self.graph_delivery.close()
+                if self.graph_activation_worker is not None and self.graph_activation_worker is not threading.current_thread():
+                    self.graph_activation_worker.join()
+                if self.corpus_worker is not None and self.corpus_worker is not threading.current_thread():
+                    self.corpus_worker.join()
                 if self.team is not None:
                     self.team.close()
             finally:
@@ -592,6 +776,7 @@ class UnifiedHandler(LegacyCompatibleHandler):
         return True
 
     def _search(self) -> dict[str, Any]:
+        self.server.state.ensure_corpus()
         query = parse_qs(urlsplit(self.path).query).get("q", [""])[0].strip().lower()
         if not query or len(query) > 160:
             raise ValueError("search query must contain 1..160 characters")
@@ -634,7 +819,7 @@ class UnifiedHandler(LegacyCompatibleHandler):
                 self._send_json(HTTPStatus.OK, self._search())
                 return
             if path == "/api/v1/authority/status":
-                self._send_json(HTTPStatus.OK, self.server.state.authority_status or {"status": "unavailable"})
+                self._send_json(HTTPStatus.OK, self.server.state.authority_status_response())
                 return
             if path == "/api/v1/authority/operating-rules":
                 self._send_json(HTTPStatus.OK, self.server.state.fact_rules_projection)
@@ -670,13 +855,10 @@ class UnifiedHandler(LegacyCompatibleHandler):
                 self._send_json(HTTPStatus.OK, self.server.state.team.public_status())
                 return
             if path == "/api/v1/workstreams/graph":
-                self._send_json(HTTPStatus.OK, {
-                    **self.server.state.graph_provider_payload,
-                    "dynamic_delivery": "startup-cached-projection",
-                })
+                self._send_json(HTTPStatus.OK, self.server.state.graph_delivery_payload())
                 return
             if path == "/api/v1/workstreams/relations":
-                self._send_json(HTTPStatus.OK, dict(self.server.state.relation_capture_payload))
+                self._send_json(HTTPStatus.OK, self.server.state.relation_capture_response())
                 return
             if path == "/api/v1/maintenance/status":
                 self._send_json(HTTPStatus.OK, {"maintenance": maintenance_status(ROOT)})
@@ -718,6 +900,8 @@ class UnifiedHandler(LegacyCompatibleHandler):
                 "/api/v1/ai/refresh/radar": "/api/refresh/radar",
             }
             if path in aliases:
+                if path.startswith("/api/v1/ai/ask") or "/refresh/" in path:
+                    self.server.state.ensure_corpus()
                 self.path = aliases[path]
                 super().do_POST()
                 return
@@ -848,6 +1032,7 @@ def _render_background(state: UnifiedState, *, started_at: float) -> None:
         _load_runtime_components()
         page, _stats, registrations, authority, graph_provider_payload, fact_rules_projection = build_unified_observatory.render_unified_site(
             ROOT, mode="dynamic", ai_available=legacy_serve.PROVIDER is not None,
+            base_site=(legacy_serve._page, legacy_serve._stats, legacy_serve._authority_shadow_report),
         )
         activated = state.activate(
             page=page, registrations=registrations, authority_status=authority,
@@ -856,10 +1041,13 @@ def _render_background(state: UnifiedState, *, started_at: float) -> None:
         )
         if activated:
             state.logger.info(
-                "startup phase=render-background status=ready phase_ms=%d total_ms=%d",
+                "startup phase=base-shell status=ready graph_status=%s phase_ms=%d total_ms=%d",
+                state.graph_delivery.health()["status"] if state.graph_delivery is not None else "empty",
                 round((time.perf_counter() - render_started) * 1000),
                 round((time.perf_counter() - started_at) * 1000),
             )
+            state.start_graph_activation()
+            state.start_corpus_activation()
         else:
             state.logger.info(
                 "startup phase=render-background status=cancelled total_ms=%d",
