@@ -17,13 +17,14 @@ CACHE_SCHEMA_VERSION = 1
 CACHE_CONTRACT = "workstream-graph-cache-v1"
 DELIVERY_SCHEMA_VERSION = 1
 DELIVERY_CONTRACT = "workstream-graph-delivery-v1"
-MANIFEST_SCHEMA_VERSION = 1
+MANIFEST_SCHEMA_VERSION = 2
 MANIFEST_CONTRACT = "workstream-graph-input-manifest-v1"
 INVALIDATION_CONTRACT = "workstream-graph-invalidation-v1"
 MAX_CACHE_BYTES = 12 * 1024 * 1024
 MAX_INPUT_FILE_BYTES = 2 * 1024 * 1024
 MAX_INPUT_TOTAL_BYTES = 24 * 1024 * 1024
 MAX_INPUT_FILES = 1024
+MAX_GIT_OUTPUT_BYTES = 512 * 1024
 PROVIDER_SCHEMA_VERSION = 1
 PROJECTION_SCHEMA_VERSION = 2
 _REASON = re.compile(r"^[a-z0-9][a-z0-9-]{0,79}$")
@@ -62,6 +63,8 @@ def _git(project_root: Path, *arguments: str) -> str:
     )
     if completed.returncode:
         raise ValueError("Graph cache requires a local Git repository")
+    if len(completed.stdout.encode("utf-8")) > MAX_GIT_OUTPUT_BYTES:
+        raise ValueError("Graph cache Git identity output exceeds the bounded size")
     return completed.stdout.strip()
 
 
@@ -211,6 +214,31 @@ def _integration_identity(project_root: Path) -> tuple[str, str]:
     return integration_ref, oid
 
 
+def _live_worktree_identity(project_root: Path) -> dict[str, Any]:
+    """Bind cache currentness to every registered live worktree HEAD/ref identity."""
+    raw = _git(project_root, "worktree", "list", "--porcelain", "-z")
+    records = [record for record in raw.split("\0\0") if record]
+    if not records or len(records) > 256:
+        raise ValueError("Graph manifest live worktree registry is invalid or unbounded")
+    for record in records:
+        fields = [field for field in record.split("\0") if field]
+        if not fields or not fields[0].startswith("worktree "):
+            raise ValueError("Graph manifest live worktree identity is malformed")
+        heads = [field.removeprefix("HEAD ") for field in fields if field.startswith("HEAD ")]
+        if len(heads) != 1 or not re.fullmatch(r"[0-9a-f]{40,64}", heads[0]):
+            raise ValueError("Graph manifest live worktree HEAD is invalid")
+        branches = [field.removeprefix("branch ") for field in fields if field.startswith("branch ")]
+        if branches and (
+            len(branches) != 1
+            or not re.fullmatch(r"refs/heads/[A-Za-z0-9._/-]+", branches[0])
+        ):
+            raise ValueError("Graph manifest live worktree ref is invalid")
+    return {
+        "count": len(records),
+        "registry_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+    }
+
+
 def build_input_manifest(project_root: Path) -> dict[str, Any]:
     """Hash only bounded Graph-owned metadata and one configured integration identity."""
     root = Path(project_root).resolve()
@@ -228,6 +256,24 @@ def build_input_manifest(project_root: Path) -> dict[str, Any]:
     total = 0
     currentness = "current"
     reason_codes: list[str] = []
+    primary_session = common / "orrery" / "worktree.json"
+    if primary_session.exists():
+        if _is_link_or_reparse(primary_session):
+            currentness = "unknown"
+            reason_codes.append("unsafe-primary-session")
+        else:
+            metadata = primary_session.stat()
+            if not stat.S_ISREG(metadata.st_mode) or metadata.st_size > MAX_INPUT_FILE_BYTES:
+                currentness = "unknown"
+                reason_codes.append("oversized-primary-session")
+            else:
+                total += metadata.st_size
+                entries.append({
+                    "id": primary_session.relative_to(common).as_posix(),
+                    "size": metadata.st_size,
+                    "mtime_ns": metadata.st_mtime_ns,
+                    "sha256": hashlib.sha256(primary_session.read_bytes()).hexdigest(),
+                })
     for source_root in allowed_roots:
         if not source_root.exists():
             continue
@@ -266,6 +312,7 @@ def build_input_manifest(project_root: Path) -> dict[str, Any]:
                 "sha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
             })
     generation = _read_generation(_ensure_private_root(root))
+    live_worktrees = _live_worktree_identity(root)
     fingerprint_input = {
         "manifest_schema_version": MANIFEST_SCHEMA_VERSION,
         "provider_schema_version": PROVIDER_SCHEMA_VERSION,
@@ -273,6 +320,7 @@ def build_input_manifest(project_root: Path) -> dict[str, Any]:
         "generation": generation,
         "integration_ref": integration_ref,
         "integration_oid": integration_oid,
+        "live_worktrees": live_worktrees,
         "entries": entries,
         "currentness": currentness,
         "reason_codes": sorted(set(reason_codes)),
@@ -391,6 +439,8 @@ class WorkstreamGraphDelivery:
                 self._provider_runs += 1
             started = _timestamp()
             payload = dict(provider())
+            if self._cancel.is_set():
+                return
             if payload.get("provider_schema_version") != PROVIDER_SCHEMA_VERSION:
                 raise ValueError("Graph provider schema is incompatible")
             if on_provider_payload is not None:
@@ -429,10 +479,14 @@ class WorkstreamGraphDelivery:
                 previous = self._load_candidate("current.json")
             except Exception:
                 previous = None
+            if self._cancel.is_set():
+                return
             if previous is not None:
                 _atomic_json(self.cache_root / "last-known.json", previous)
+            if self._cancel.is_set():
+                return
             _atomic_json(self.cache_root / "current.json", value)
-            if previous is None:
+            if previous is None and not self._cancel.is_set():
                 _atomic_json(self.cache_root / "last-known.json", value)
             with self._lock:
                 if self._cancel.is_set():
@@ -491,8 +545,9 @@ class WorkstreamGraphDelivery:
             "generation": value["generation"], "reason_codes": value["reason_codes"],
         }
 
-    def close(self) -> None:
+    def close(self, *, timeout: float = 1.0) -> bool:
         self._cancel.set()
         worker = self._worker
         if worker is not None and worker is not threading.current_thread():
-            worker.join()
+            worker.join(timeout=max(0.0, timeout))
+        return worker is None or not worker.is_alive()

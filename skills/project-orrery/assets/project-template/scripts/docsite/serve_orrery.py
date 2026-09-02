@@ -176,6 +176,33 @@ document.getElementById('stop').addEventListener('click',async()=>{{await fetch(
 {polling}</script></body></html>"""
 
 
+def _bootstrap_shell_page() -> str:
+    """Return an immediately navigable shell while local consumers activate."""
+    return """<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orrery · Local Observatory</title><style>
+:root{color-scheme:dark;--bg:#0f1115;--panel:#171a21;--panel2:#1e232d;--line:#2b303b;--text:#eef1f6;--muted:#aab2c0;--accent:#8db4ff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.shell{min-height:100vh;display:grid;grid-template-columns:230px minmax(0,1fr)}aside{position:sticky;top:0;height:100vh;padding:24px 16px;border-right:1px solid var(--line);background:#12151b}
+.brand{margin:0 8px 24px;color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.brand b{display:block;margin-top:5px;color:var(--text);font-size:1.15rem;letter-spacing:0;text-transform:none}
+nav{display:grid;gap:5px}nav a{padding:9px 11px;border-radius:8px;color:var(--muted);text-decoration:none}nav a:hover,nav a:focus{background:var(--panel2);color:var(--text);outline:none}
+main{width:min(1100px,100%);padding:28px 34px 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px}.top h1{margin:0;font-size:1.55rem}.ready{color:#8fd3a7;font-size:.8rem}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{scroll-margin-top:18px;min-height:160px;padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.card h2{margin:0 0 8px;font-size:1rem}.card p{margin:0;color:var(--muted)}
+.graph{grid-column:1/-1;min-height:230px}.graph-local{display:grid;min-height:155px;place-items:center;margin-top:16px;border:1px dashed #41506a;border-radius:10px;background:#141923;text-align:center}.graph-local b{display:block;margin-bottom:5px}.pulse{display:inline-block;width:8px;height:8px;margin-right:7px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{50%{opacity:.3}}@media(max-width:720px){.shell{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}nav{grid-template-columns:repeat(3,minmax(0,1fr))}main{padding:22px 16px}.grid{grid-template-columns:1fr}.graph{grid-column:auto}}@media(prefers-reduced-motion:reduce){.pulse{animation:none}}
+</style></head><body><div class="shell" data-orrery-runtime-state="starting"><aside><div class="brand">Orrery<b>项目观测台</b></div><nav aria-label="Orrery 导航">
+<a href="#overview">总览</a><a href="#documents">项目文档</a><a href="#personal">个人工作台</a><a href="#team">团队协作</a><a href="#maintenance">工作区维护</a><a href="#workstream-relation-graph">任务关系</a>
+</nav></aside><main><header class="top"><h1 id="overview">Orrery Shell</h1><span class="ready">本机导航已可用</span></header><div class="grid">
+<section class="card" id="documents"><h2>项目文档</h2><p>权威文档阅读入口已保留；完整本机索引激活后会在同一 URL 更新。</p></section>
+<section class="card" id="personal"><h2>个人工作台</h2><p>Personal Mode 保持本机、零网络边界。</p></section>
+<section class="card" id="team"><h2>团队协作</h2><p>中央视图保持只读与 request-only。</p></section>
+<section class="card" id="maintenance"><h2>工作区维护</h2><p>维护动作仍要求同源本机确认。</p></section>
+<section class="card graph" id="workstream-relation-graph"><h2>任务关系</h2><div class="graph-local" role="status"><div><b><span class="pulse" aria-hidden="true"></span>Graph 正在本机加载</b><p>其他导航与页面不等待 Graph provider。</p></div></div></section>
+</div></main></div><script>
+let delay=250;async function poll(){try{const response=await fetch('/api/v1/health',{cache:'no-store'});const health=await response.json();if(health.status==='ready'){location.replace('/'+location.hash);return;}if(health.status==='failed'){location.reload();return;}}catch(_error){}delay=Math.min(1500,delay+150);window.setTimeout(poll,delay)}window.setTimeout(poll,delay);
+</script></body></html>"""
+
+
 def _git_private_path(relative: str) -> Path:
     completed = subprocess.run(
         ["git", "rev-parse", "--git-path", relative], cwd=ROOT,
@@ -338,7 +365,7 @@ class UnifiedState:
         self.lifecycle_status = "ready" if page is not None else "starting"
         self.page = (
             legacy_serve.inject_qa(page).encode("utf-8")
-            if page is not None else _runtime_page().encode("utf-8")
+            if page is not None else _bootstrap_shell_page().encode("utf-8")
         )
         self.registrations = tuple(registrations)
         self.authority_status = authority_status
@@ -371,6 +398,7 @@ class UnifiedState:
         self.authority_load_lock = threading.Lock()
         self.relation_capture_ready = threading.Event()
         self.relation_capture_load_lock = threading.Lock()
+        self.relation_capture_worker: threading.Thread | None = None
         self.port: int | None = None
 
     def current_page(self) -> bytes:
@@ -487,34 +515,40 @@ class UnifiedState:
             current = dict(self.relation_capture_payload)
         if current.get("status") != "loading":
             return current
-        delivery = self.graph_delivery
-        if delivery is not None and delivery.health().get("status") == "refreshing":
-            self.relation_capture_ready.wait(timeout=45)
-            with self.state_lock:
-                current = dict(self.relation_capture_payload)
-            if current.get("status") != "loading":
-                return current
+        self.start_relation_capture_activation()
+        return current
+
+    def start_relation_capture_activation(self) -> None:
         with self.relation_capture_load_lock:
             with self.state_lock:
-                current = dict(self.relation_capture_payload)
-            if current.get("status") != "loading" or self.closed:
-                return current
-            try:
-                value = build_unified_observatory.relation_capture_payload(ROOT)
-            except Exception:
-                value = {
-                    "schema_version": 2,
-                    "contract_type": "workstream-relation-capture-inspection",
-                    "status": "unavailable",
-                    "pending_proposals": [],
-                    "read_only": True,
-                    "writes_performed": False,
-                    "network_performed": False,
-                    "reason_code": "relation-capture-refresh-failed",
-                }
+                if self.closed or self.relation_capture_payload.get("status") != "loading":
+                    return
+                if self.relation_capture_worker is not None and self.relation_capture_worker.is_alive():
+                    return
+                worker = threading.Thread(
+                    target=self._build_relation_capture,
+                    daemon=True,
+                    name="orrery-relation-capture-activation",
+                )
+                self.relation_capture_worker = worker
+            worker.start()
+
+    def _build_relation_capture(self) -> None:
+        try:
+            value = build_unified_observatory.relation_capture_payload(ROOT)
+        except Exception:
+            value = {
+                "schema_version": 2,
+                "contract_type": "workstream-relation-capture-inspection",
+                "status": "unavailable",
+                "pending_proposals": [],
+                "read_only": True,
+                "writes_performed": False,
+                "network_performed": False,
+                "reason_code": "relation-capture-refresh-failed",
+            }
+        if not self.cancel_render.is_set():
             self._accept_graph_provider_payload({"relation_capture": value})
-            with self.state_lock:
-                return dict(self.relation_capture_payload)
 
     def fail_render(self) -> None:
         with self.state_lock:
@@ -620,11 +654,13 @@ class UnifiedState:
             self.relation_capture_ready.set()
             try:
                 if self.graph_delivery is not None:
-                    self.graph_delivery.close()
+                    self.graph_delivery.close(timeout=1.0)
                 if self.graph_activation_worker is not None and self.graph_activation_worker is not threading.current_thread():
-                    self.graph_activation_worker.join()
+                    self.graph_activation_worker.join(timeout=1.0)
                 if self.corpus_worker is not None and self.corpus_worker is not threading.current_thread():
-                    self.corpus_worker.join()
+                    self.corpus_worker.join(timeout=1.0)
+                if self.relation_capture_worker is not None and self.relation_capture_worker is not threading.current_thread():
+                    self.relation_capture_worker.join(timeout=1.0)
                 if self.team is not None:
                     self.team.close()
             finally:
