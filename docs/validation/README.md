@@ -1,5 +1,7 @@
 # Validation
 
+- [S1 Orrery Conductor Codex Plugin Surface](2026-09-02-s1-orrery-conductor-codex-plugin-surface.md) — Pending; independent fixture-backed Codex plugin/MCP UI preview before live U2.5 binding or publication.
+
 Validation records reproducible evidence for implementation and documentation claims.
 
 - [2026-09-01 W3.1 Fast Candidate Freeze and Asynchronous Validation](2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md) — Pending; separates short structural Candidate freeze from immutable-SHA background validation and keeps closure/worktree deletion independent.

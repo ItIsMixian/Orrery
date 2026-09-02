@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Orrery Conductor Codex Plugin Surface](orrery-conductor-codex-plugin-surface.md) — independent read-only Codex plugin, local MCP server and MCP UI adapter over the existing Orrery DAG, under ADR-0031.
 - [Fast Candidate Freeze and Asynchronous Validation Closeout](fast-candidate-freeze-and-asynchronous-validation.md) — sub-30-second structural freeze, honest validation-pending status and immutable-SHA asynchronous checks without weakening integration/release gates, under ADR-0030.
 - [Workstream Classification Calibration and Dispatch Registration](workstream-classification-calibration-and-dispatch-registration.md) — evidence-bound human calibration for missing program/series metadata plus explicit future dispatch envelopes, without name inference or relation/lifecycle effects, under ADR-0029.
 - [Unified Observatory Shell-first Graph Activation and Incremental Cache](unified-observatory-shell-first-graph-activation.md) — decouples usable shell readiness from Graph readiness and specifies a validated Git-private, event-invalidated, non-authoritative Graph cache under ADR-0028.

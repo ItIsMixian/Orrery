@@ -2077,6 +2077,64 @@ def _findings_for_workstream(
     ]
 
 
+def _scope_has_uncommitted_sources(scope: Mapping[str, Any]) -> bool:
+    return any(
+        source in {"staged", "unstaged", "untracked"}
+        for entry in scope.get("path_entries", ())
+        for source in entry.get("sources", ())
+    )
+
+
+def _has_exact_candidate_freeze_receipt(
+    repository: Path, scope: Mapping[str, Any]
+) -> bool:
+    head = scope.get("head")
+    if not isinstance(head, str) or not _OID.fullmatch(head):
+        return False
+    try:
+        git_dir = Path(str(_run_git(repository, "rev-parse", "--absolute-git-dir")).strip())
+        receipt_path = git_dir / "orrery" / "candidate-freeze" / f"{head}.json"
+        metadata = receipt_path.lstat()
+        if not stat.S_ISREG(metadata.st_mode) or metadata.st_size > 65536:
+            return False
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return False
+    if not isinstance(receipt, Mapping):
+        return False
+    fingerprint = receipt.get("accepted_surface_fingerprint")
+    return (
+        receipt.get("contract_type") == "candidate-freeze-receipt-v1"
+        and receipt.get("workstream_id") == scope.get("workstream_id")
+        and receipt.get("candidate_sha") == head
+        and receipt.get("validation_status") in {"pending", "validated"}
+        and isinstance(fingerprint, str)
+        and re.fullmatch(r"[0-9a-f]{64}", fingerprint) is not None
+        and receipt.get("closed", False) is False
+        and receipt.get("cleanup_ready", False) is False
+        and receipt.get("worktree_removed", False) is False
+        and (receipt.get("branch") is None or receipt.get("branch") == scope.get("branch"))
+    )
+
+
+def _scope_refresh_findings(
+    findings: Sequence[Mapping[str, Any]],
+    *,
+    workstream_id: str,
+    inherited_frozen_ancestor_ids: Sequence[str],
+) -> list[dict[str, Any]]:
+    inherited = set(inherited_frozen_ancestor_ids)
+    relevant = _findings_for_workstream(findings, workstream_id)
+    return [
+        finding
+        for finding in relevant
+        if not any(
+            peer_id != workstream_id and peer_id in inherited
+            for peer_id in finding.get("workstream_ids", ())
+        )
+    ]
+
+
 def collect_lineage_ancestry_proofs(
     repository: Path, scopes: Sequence[Mapping[str, Any]],
 ) -> dict[str, list[str]]:
@@ -2271,15 +2329,30 @@ def compute_overlap_findings(
                 )
             for left_entry in left_entries:
                 for right_entry in right_entries:
-                    if not _path_specs_overlap(left_entry, right_entry):
+                    effective_left = left_entry
+                    effective_right = right_entry
+                    left_oid = left_entry.get("committed_last_oid")
+                    right_oid = right_entry.get("committed_last_oid")
+                    if isinstance(left_oid, str) and left_oid == right_oid:
+                        effective_left = _without_inherited_committed_source(
+                            left_entry, {left_oid}
+                        )
+                        effective_right = _without_inherited_committed_source(
+                            right_entry, {left_oid}
+                        )
+                        if effective_left is None or effective_right is None:
+                            continue
+                    if not _path_specs_overlap(effective_left, effective_right):
                         continue
-                    evidence = sorted({left_entry["path"], right_entry["path"]})
+                    evidence = sorted({effective_left["path"], effective_right["path"]})
                     direct = _finding_material("direct", left, right, path_evidence=evidence)
-                    _add_path_provenance(direct, (left, left_entry), (right, right_entry))
+                    _add_path_provenance(
+                        direct, (left, effective_left), (right, effective_right)
+                    )
                     findings.append(direct)
                     shared_authority = sorted(
-                        set(left_entry["authority_surfaces"])
-                        & set(right_entry["authority_surfaces"])
+                        set(effective_left["authority_surfaces"])
+                        & set(effective_right["authority_surfaces"])
                     )
                     if shared_authority:
                         authority = _finding_material(
@@ -2528,6 +2601,7 @@ def inspect_worktree_overlap(
     current = collect_scope_observation(root, session=session)
     scopes = [current]
     unavailable: list[dict[str, str]] = []
+    inherited_frozen_ancestor_ids: list[str] = []
     if include_local_worktrees:
         config = load_collaboration_config(root)
         identity = status["identity"]
@@ -2551,7 +2625,20 @@ def inspect_worktree_overlap(
                         {"workstream_id": peer_hint, "reason": "local-worktree-session-unavailable"}
                     )
                     continue
-                scopes.append(collect_scope_observation(candidate, session=peer_session))
+                peer_scope = collect_scope_observation(candidate, session=peer_session)
+                scopes.append(peer_scope)
+                if (
+                    not _scope_has_uncommitted_sources(peer_scope)
+                    and _has_exact_candidate_freeze_receipt(candidate, peer_scope)
+                    and _git_succeeds(
+                        root,
+                        "merge-base",
+                        "--is-ancestor",
+                        str(peer_scope["head"]),
+                        str(current["head"]),
+                    )
+                ):
+                    inherited_frozen_ancestor_ids.append(str(peer_scope["workstream_id"]))
             except ValueError:
                 unavailable.append(
                     {"workstream_id": peer_hint, "reason": "local-worktree-scope-unavailable"}
@@ -2579,6 +2666,7 @@ def inspect_worktree_overlap(
         "findings": reconciled["active"],
         "retired_findings": reconciled["retired"],
         "unavailable_peers": unavailable,
+        "inherited_frozen_ancestor_ids": sorted(set(inherited_frozen_ancestor_ids)),
         "review_ready_blocked": review_ready_blocked,
         "writes_performed": False,
         "network_performed": False,
@@ -2619,7 +2707,11 @@ def refresh_workstream_scope(
         root, peer_scopes=peer_scopes, include_local_worktrees=include_local_worktrees
     )
     current_findings = reconcile_overlap_findings(
-        _findings_for_workstream(overlap["findings"], str(session["workstream_id"])),
+        _scope_refresh_findings(
+            overlap["findings"],
+            workstream_id=str(session["workstream_id"]),
+            inherited_frozen_ancestor_ids=overlap["inherited_frozen_ancestor_ids"],
+        ),
         session.get("findings", []),
     )
     overlap["findings"] = current_findings["active"]
@@ -2652,8 +2744,10 @@ def refresh_workstream_scope(
             lineage_ancestry_proofs=collect_lineage_ancestry_proofs(root, scopes),
         )
         reconciled = reconcile_overlap_findings(
-            _findings_for_workstream(
-                recomputed["findings"], str(session["workstream_id"])
+            _scope_refresh_findings(
+                recomputed["findings"],
+                workstream_id=str(session["workstream_id"]),
+                inherited_frozen_ancestor_ids=overlap["inherited_frozen_ancestor_ids"],
             ),
             session.get("findings", []),
         )

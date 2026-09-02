@@ -64,3 +64,29 @@ Pending. No product implementation or automated validation is claimed by this ta
 
 The next evidence is the real Phase B self-host preview. Automated suites remain forbidden before that preview is
 accepted.
+
+## 2026-09-02 Phase B scope diagnosis
+
+- exact W7.4 Candidate import completed as merge `78b9c759e9f9628a64a7e6e9be381a2ac3b79eb5` with no Phase B product edit;
+- the subsequent full-local refresh stopped at L3 because imported W7.4 paths appeared as committed on both branches,
+  including paths U2.5 did not intend to edit;
+- U2.5 remained clean and did not use `--no-local-worktrees` or acknowledge L3;
+- Plan revision 3 preserves real expected-write conflicts while authorizing a disjoint delivery slice and exact shared
+  commit deduplication in scope evidence.
+
+This is blocker evidence only. The next admissible U2.5 evidence is an allowed full-local refresh followed by its first
+legal delivery-slice product write.
+
+Central exact `da923ff8ff1d411f8b42032886fae5d0a853fd8a` now removes only identical `committed_last_oid` material before
+pairwise comparison. A focused two-worktree regression proved shared import plus one writer remains allowed, while two
+expected writers still return L3; together with the peer-only isolation regression, 2/2 tests passed in 47.143 seconds.
+No broader suite or U2.5 product write ran.
+
+Revision-3 refresh reduced the blocker to three imported State/DEVLOG paths against the clean frozen W7.4 ancestor.
+Plan revision 4 requires an exact matching freeze receipt, Git ancestry and a clean peer before those inherited
+findings can be excluded from U2.5's own refresh; topology diagnostics and every dirty/non-ancestor negative case remain
+Pending focused evidence.
+
+Central exact `4e64bbb88e2356c729bf69259a58ca96e0e44de3` passed the focused frozen-ancestor regression 1/1 in
+25.511 seconds: full topology retained the conflict, descendant scope refresh proceeded, and one subsequent dirty peer
+byte restored L3. No broader suite, U2.5 product write, peer closure or worktree removal ran.
