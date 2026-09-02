@@ -238,8 +238,12 @@ _DYNAMIC_GRAPH_HYDRATION_JS = r"""
 const endpoint='/api/v1/workstreams/graph',styleId='orrery-workstream-graph-delivery-style';
 let appliedGeneration=-1,appliedHash='',pollCount=0,timer=null,stopped=false;
 const maxPolls=120;
+const runtimeReceipt=window.__orreryGraphDeliveryReceipt={schema_version:1,contract_type:'workstream-graph-browser-runtime-receipt-v1',delivery_attempts:0,offscreen_layouts:0,atomic_swaps:0,visual_samples:0,page_blank_samples:0,content_blank_samples:0,activation_failures:0,generations:[]};
+const receiptNode=document.createElement('script');receiptNode.type='application/json';receiptNode.dataset.wgRuntimeReceipt='';document.body.append(receiptNode);function publishReceipt(){receiptNode.textContent=JSON.stringify(runtimeReceipt)}publishReceipt();
 function slot(){return document.querySelector('#workstream-relation-graph')}
 function schedule(delay){if(stopped||pollCount>=maxPolls)return;clearTimeout(timer);timer=setTimeout(poll,delay)}
+function visible(element){if(!element)return false;const rect=element.getBoundingClientRect(),style=getComputedStyle(element);return rect.width>0&&rect.height>0&&style.display!=='none'&&style.visibility!=='hidden'&&style.opacity!=='0'}
+function sampleVisual(){const visiblePages=[...document.querySelectorAll('article.page')].filter(visible),shellVisible=visible(document.querySelector('header.top'))||visible(document.querySelector('.sidebar'));runtimeReceipt.visual_samples+=1;if(!shellVisible&&!visiblePages.length)runtimeReceipt.page_blank_samples+=1;if(!visiblePages.length)runtimeReceipt.content_blank_samples+=1}
 function remember(){
   const graph=window.__orreryWorkstreamGraph,state=graph?.state,article=slot(),viewport=article?.querySelector('[data-wg-viewport]');
   if(!state)return null;
@@ -263,10 +267,10 @@ async function activate(envelope){
   const delivery=envelope.browser_delivery;if(!delivery||delivery.contract_type!=='workstream-graph-browser-delivery-v1')return false;
   const generation=Number(envelope.generation);if(!Number.isInteger(generation)||generation<appliedGeneration)return false;
   if(generation===appliedGeneration&&delivery.projection_hash===appliedHash)return true;
-  const current=slot();if(!current)return false;const saved=remember(),priorId=current.id;current.id='workstream-relation-graph-previous';
+  const current=slot();if(!current)return false;const saved=remember(),priorId=current.id,wasActive=current.classList.contains('on');current.id='workstream-relation-graph-previous';
   const template=document.createElement('template');template.innerHTML=delivery.panel_html.trim();const article=template.content.firstElementChild;
   if(!article||article.tagName!=='ARTICLE'){current.id=priorId;throw new Error('Graph delivery panel is invalid')}
-  article.classList.add('wg-hydration-offscreen');article.dataset.wgDeliveryGeneration=String(generation);article.dataset.wgDeliveryStatus=envelope.status;current.after(article);
+  article.classList.add('wg-hydration-offscreen');article.dataset.wgDeliveryGeneration=String(generation);article.dataset.wgDeliveryStatus=envelope.status;current.after(article);runtimeReceipt.delivery_attempts+=1;runtimeReceipt.offscreen_layouts+=1;sampleVisual();const visualMonitor=setInterval(sampleVisual,16);
   try{
     installStyle(delivery.style_text);
     if(typeof ELK!=='function')run(delivery.vendor_script,'elk');
@@ -274,8 +278,8 @@ async function activate(envelope){
     await waitFor(()=>article.dataset.wgLayoutReady==='true'||!article.querySelector('[data-wg-layout-failure]')?.hidden);
     restore(article,saved);
     await waitFor(()=>article.dataset.wgLayoutReady==='true'||!article.querySelector('[data-wg-layout-failure]')?.hidden);
-    article.classList.remove('wg-hydration-offscreen');current.replaceWith(article);appliedGeneration=generation;appliedHash=delivery.projection_hash;return true;
-  }catch(error){article.remove();current.id=priorId;throw error}
+    article.classList.remove('wg-hydration-offscreen');if(wasActive)article.classList.add('on');current.replaceWith(article);sampleVisual();clearInterval(visualMonitor);appliedGeneration=generation;appliedHash=delivery.projection_hash;runtimeReceipt.atomic_swaps+=1;runtimeReceipt.generations.push({generation,projection_hash:delivery.projection_hash,layout_ready:article.dataset.wgLayoutReady==='true',geometry_passed:article.dataset.wgGeometryPassed==='true',node_count:article.querySelectorAll('[data-wg-node-id]').length,edge_count:article.querySelectorAll('[data-wg-edge-id]').length});publishReceipt();return true;
+  }catch(error){clearInterval(visualMonitor);runtimeReceipt.activation_failures+=1;article.remove();current.id=priorId;sampleVisual();publishReceipt();throw error}
 }
 function fail(message){const current=slot();if(!current)return;current.dataset.wgDeliveryState='failed';const card=current.querySelector('.wg-activation-card');if(card)card.innerHTML=`<div><b>任务关系暂不可用</b><span>${message}</span></div>`}
 async function poll(){

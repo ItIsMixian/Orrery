@@ -1,6 +1,6 @@
 # Validation: U2.5 Shell-first Graph Activation and Incremental Cache
 
-Status: Phase A implementation preview ready; maintainer acceptance and Phase B remain pending
+Status: Runtime acceptance complete; Candidate validation remains Pending
 
 Date: 2026-09-01
 
@@ -106,9 +106,8 @@ not authorize or claim unittest, Fast, Checkpoint, Candidate, Promotion, W7.4 hy
 
 ## Result
 
-Phase A and its central-review corrections are implemented and locally previewed. The task remains Pending because
-Phase B has not produced or received maintainer acceptance for its self-host preview, W7.4 remains validation-pending,
-and all post-acceptance mechanical evidence remains intentionally unrun.
+Phase A and its central-review corrections were implemented and locally previewed. This earlier result was superseded
+by the Phase B runtime-receipt acceptance below; Candidate validation remains Pending.
 
 ## 2026-09-02 Phase B resumption gate
 
@@ -187,3 +186,68 @@ accepted a runtime-receipt-first gate. The task's recorded 491 ms first HTTP, 2.
 to that receipt without rerun. Only bounded evidence for no page-wide blank/flash, semantic-layout preservation and
   stop-time cleanup remains to be completed before structural Candidate Freeze. No full-page subjective approval or
   broad automated tier is required.
+
+## 2026-09-02 structured runtime acceptance receipt
+
+The revision-5 receipt gate is complete. Existing unchanged-scenario observations were reused rather than rerun, and
+the remaining browser/cleanup gaps were checked against the same Phase B implementation:
+
+```json
+{
+  "contract_type": "u2-5-runtime-acceptance-receipt-v1",
+  "first_http_ms": 491,
+  "usable_shell_ms": 2939,
+  "unchanged_restart": {
+    "cache_state": "cached-current",
+    "reason": "validated-cache-hit",
+    "provider_runs": 0
+  },
+  "invalidation": {
+    "generation_before": 1,
+    "generation_after": 2,
+    "refresh_single_flight_count": 1,
+    "stale_delivery_retained": true,
+    "atomic_publication": true,
+    "publication_elapsed_ms": 13564,
+    "published_cache_hash": "a11409d0fe140194b5baf8a21e2de9cbccec1aee9b55dfd6f70d0ea77c24a200"
+  },
+  "browser_delivery": {
+    "delivery_attempts": 1,
+    "offscreen_layouts": 1,
+    "atomic_swaps": 1,
+    "visual_samples": 4,
+    "page_blank_samples": 0,
+    "content_blank_samples": 0,
+    "activation_failures": 0,
+    "generation": 2,
+    "layout_ready": true,
+    "geometry_passed": true
+  },
+  "accepted_w7_4_layout": {
+    "full": {"nodes": 25, "routes": 18, "overlap_pairs": 0},
+    "compact": {"nodes": 15, "routes": 8, "overlap_pairs": 0},
+    "restored_default": "full"
+  },
+  "stop_cleanup": {
+    "response": "stopping",
+    "elapsed_ms": 219,
+    "marker_present": false,
+    "listener_count": 0,
+    "worker_process_count": 0,
+    "helper_marker_count": 0
+  }
+}
+```
+
+The browser receipt was published from the hydration boundary itself. It sampled the visible shell/page during the
+offscreen layout interval and after replacement, then exposed the immutable observation through a local DOM receipt;
+all four samples retained visible page content. The replacement also preserved the active Graph article instead of
+dropping its `.on` state. The accepted W7.4 controls were exercised in both modes: compact remained 15 nodes / 8
+routes / zero overlaps, full remained 25 / 18 / zero overlaps, and full was restored as the default. The existing
+history/relation semantic evidence remains 37 strict history records (6 closed / 31 retired), 11 recovered archived
+lineage edges and seven proposed relations.
+
+The stop receipt observed the local endpoint response, process exit boundary, listener, runtime marker, refresh worker
+and helper markers. No external network, Computer Use, unittest, Fast, Checkpoint, Candidate, Promotion or release
+command ran. This completes only the revision-5 acceptance gate and authorizes the structural ADR-0030 Candidate
+Freeze; validation remains Pending.
