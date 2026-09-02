@@ -45,6 +45,37 @@ These observations prove the gap. They do not prove any correction.
 This evidence is a local worktree preview, not maintainer acceptance or post-acceptance validation. The cached payload
 was produced from the current pre-W7.4 presentation baseline and cannot satisfy the accepted-W7.4 parity checks.
 
+## Central review correction preview
+
+Product correction commit: `6f492b03e379e57adefcca1d476b80b8d9663574` on the existing U2.5 branch and six-path
+scope. Phase B and W7.4-owned presentation/relation/history files remain untouched.
+
+- The first real HTTP 200 arrived in 446 ms and contained `data-orrery-runtime-state="starting"`, the six-entry Orrery
+  navigation and a Graph-local loading region. It did not contain the former full-page `Orrery 正在启动` card. A second
+  normal launch while that same runtime was still starting reused the same URL and exited successfully in 510 ms.
+- Input manifest schema 2 explicitly included the primary `.git/orrery/worktree.json`, three live worktree session
+  records and a bounded hash over all three registered live worktree HEAD/ref identities. A real Git-private scope
+  refresh changed the source fingerprint from `d0a8253...` to `4c07e4c...`; the product commit changed it again from
+  `eb2bb12...` to `a78be36...` through the live HEAD identity.
+- Launching after that HEAD change returned Graph `refreshing`, cache state `cached-stale`, reason
+  `source-fingerprint-changed` and one provider run instead of `validated-cache-hit`.
+- After one complete provider refresh, an unchanged restart returned `cached-current`, reason `validated-cache-hit`
+  and `provider_runs_since_start: 0`.
+- With a provider deliberately blocked, `close(timeout=0.2)` returned in 201 ms rather than waiting indefinitely.
+  After the preview released the provider, the daemon worker was reclaimed and the current-cache hash remained
+  unchanged, proving cancellation did not publish a new generation.
+- A real runtime stopped while Graph was `refreshing` in 1.201 seconds; the marker and recorded PID were both gone.
+  Graph activation, corpus activation and independent relation-capture workers now use bounded shutdown joins.
+- Dynamic `GET /api/v1/workstreams/relations` returned an honest `loading` payload in 16 ms while background work was
+  active; it no longer waits up to 45 seconds for the Graph provider.
+- The correction used only Python syntax/import checks and local lifecycle previews. One discarded PowerShell preview
+  command accidentally invoked a no-argument Python process because the function-local `$args` automatic variable
+  shadowed its launch arguments; that exact process was terminated before the corrected preview, and it produced no
+  product runtime marker or evidence.
+
+This correction evidence addresses the central review findings but is still pre-acceptance worktree evidence. It does
+not authorize or claim unittest, Fast, Checkpoint, Candidate, Promotion, W7.4 hydration or release validation.
+
 ## Pending maintainer preview
 
 - one shell/URL with no full-page Graph startup gate;
@@ -75,6 +106,7 @@ was produced from the current pre-W7.4 presentation baseline and cannot satisfy 
 
 ## Result
 
-Phase A is implemented and locally previewed. The task remains Pending because the maintainer has not accepted the
-preview, the unique integrator has not supplied an accepted clean W7.4 exact Candidate/import SHA, Phase B has not
-started, and all post-acceptance mechanical evidence remains intentionally unrun.
+Phase A and its central-review corrections are implemented and locally previewed. The task remains Pending because the
+central reviewer has not accepted the corrected exact SHA, the unique integrator has not supplied an accepted clean
+W7.4 exact Candidate/import SHA, Phase B has not started, and all post-acceptance mechanical evidence remains
+intentionally unrun.
