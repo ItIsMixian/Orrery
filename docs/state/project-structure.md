@@ -16,8 +16,9 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
 - ADR-0031 已授权 S1 在独立 `orrery-conductor` repository 中实现只读 Codex plugin/MCP UI 兼容层。当前只有
   Project Orrery authority；外部 repository、实现、安装和 Release 尚未产生，live Graph binding 等待 accepted
   U2.5 delivery envelope。
-- S1 Phase A 已在独立 repository 形成 clean `4e44d27...` 并安装本地开发插件，但其 inline conversation UI 被
-  维护者拒绝。ADR-0032 现要求复用同一实现并以 Codex 既有 right Browser Panel 为主入口；修正版尚未实现。
+- S1 独立 repository 保留 clean Phase A `4e44d27...` 与 right-panel `3ac32ec...`；inline conversation UI 与
+  Browser Panel 均因不够原生被维护者拒绝。任务现长期暂停，等待受支持的 Codex native sidebar/toolbar
+  extension point；没有 live U2.5 binding、原生兼容、发布或 Release。
 - ADR-0033 已接受 Product/Decision 与 Execution Coordination 双平面、focus-safe 事件收件箱、provider-neutral
   task/worktree 绑定和有界 control snapshot。未来 implementation 的 task code 与 repository owner 尚未由维护者
   分配；没有创建 task、worktree、schema、runtime 或 Adapter，且该方向与只读 S1 DAG plugin 无依赖。

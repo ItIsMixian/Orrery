@@ -152,9 +152,9 @@ Updated: 2026-09-02
 
 ## 未来交接（未启动）
 
-- **S1 Orrery Conductor：** 独立 Phase A `4e44d27...` 的 inline MCP UI 已被维护者拒绝；ADR-0032/revision 2
-  要求复用同一 fixture/server/UI，并以 Codex 既有 right Browser Panel 为主入口，inline 仅作回退。live binding
-  等 accepted U2.5 exact envelope；新 toolbar icon、Codex patch、执行能力、remote repo 与 Release 均未授权。
+- **S1 Orrery Conductor（长期暂停）：** Phase A `4e44d27...` 与 right-panel `3ac32ec...` 均 clean 保留；inline
+  MCP UI 和 Browser Panel 先后因不够原生被维护者拒绝。等待未来受支持的 Codex native sidebar/toolbar 扩展点
+  与新的任务说明版本；当前不得继续 client、live binding、测试、安装变更或发布，preview listener 应关闭。
 - **Internal Coordination Efficiency：** ADR-0033/Approved Design/planning/Pending Validation 已建立，但没有
   task code、repository owner、worktree、schema、runtime 或 Adapter。后续先由维护者把 Core、dispatch、host
   coordination Adapter 与 context evaluation 分配到明确 owner，再以 exact scope 分发。当前 self-host 保留两个

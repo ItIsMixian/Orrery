@@ -80,7 +80,7 @@ authority/planning/Pending Validation；task identity 和 repository owner 尚�
 - [ ] [Internal Coordination Efficiency](implementation/plans/2026-09-02-internal-coordination-efficiency.md)：
   双平面、事件 inbox、provider-neutral task binding、control snapshot 和 role-aware context evaluation 已批准；
   task code/repository owner 未分配，未创建任务/worktree，与只读 S1 DAG plugin 无依赖。
-- [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：Phase A inline UI 已被拒绝；ADR-0032/revision 2 改为 Codex 既有 right Browser Panel 主入口，inline 仅回退。live binding 仍等待 accepted exact U2.5 envelope。
+- [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：长期暂停；clean `4e44d27...`/`3ac32ec...` 保留，等待未来官方 native sidebar/toolbar 扩展点和新的维护者授权，不继续 client/live binding/测试或发布。
 - [ ] [W3.1 Fast Candidate Freeze and Asynchronous Validation](implementation/plans/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)：任务已登记；中央 strict receipt-schema bootstrap exact `c142f32...` 已解除 L3，等待原任务导入、scope refresh 后继续实现。
 - [ ] [W7.5 Workstream Classification Calibration](implementation/plans/2026-09-01-w7-5-workstream-classification-calibration.md)：已批准，等待 accepted clean W7.4 exact Candidate 后分发；先做只读分类审计和人类可理解预览，确认前不写分类事件或运行自动测试。
 - [ ] [U2.5 Shell-first Graph Activation and Incremental Cache](implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)：Phase A clean `6596a9f...` 已完成；维护者授权 Phase B 精确导入 W7.4 `fe75fc2...` 并先给出 self-host preview，接受前不跑自动测试。
