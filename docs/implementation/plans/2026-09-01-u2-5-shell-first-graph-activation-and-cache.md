@@ -169,3 +169,15 @@ fabricated lineage or editing W7.4's frozen branch are prohibited.
 The unique integrator completed the shared-import scope correction at exact
 `da923ff8ff1d411f8b42032886fae5d0a853fd8a`. U2.5 must consume it through the next exact task-description version;
 the correction does not suppress any expected/staged/unstaged/untracked overlap.
+
+## 2026-09-02 scope revision 4 — exact frozen-ancestor handoff
+
+After revision 3, the only remaining U2.5 findings are three State/DEVLOG paths committed during the authorized W7.4
+import while W7.4's old session still lists them as expected writes. W7.4 has an exact clean
+`candidate-freeze-receipt-v1`, its frozen SHA is an ancestor of U2.5, and U2.5 does not expect to edit those paths.
+
+The unique integrator may extend scope refresh so an exact clean frozen peer that is mechanically an ancestor of the
+current branch is treated as an inherited, non-writing baseline for the current refresh. Full topology inspection must
+retain the diagnostic. Any missing/mismatched receipt, non-ancestor head, staged/unstaged/untracked peer byte or resumed
+peer write restores normal fail-closed conflict behavior. This creates no semantic lineage and does not validate,
+integrate, close or remove the frozen peer.

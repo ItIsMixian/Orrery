@@ -81,3 +81,8 @@ Central exact `da923ff8ff1d411f8b42032886fae5d0a853fd8a` now removes only identi
 pairwise comparison. A focused two-worktree regression proved shared import plus one writer remains allowed, while two
 expected writers still return L3; together with the peer-only isolation regression, 2/2 tests passed in 47.143 seconds.
 No broader suite or U2.5 product write ran.
+
+Revision-3 refresh reduced the blocker to three imported State/DEVLOG paths against the clean frozen W7.4 ancestor.
+Plan revision 4 requires an exact matching freeze receipt, Git ancestry and a clean peer before those inherited
+findings can be excluded from U2.5's own refresh; topology diagnostics and every dirty/non-ancestor negative case remain
+Pending focused evidence.
