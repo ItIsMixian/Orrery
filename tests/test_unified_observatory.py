@@ -38,6 +38,7 @@ from project_orrery_observatory.unified_observatory import (  # noqa: E402
 from project_orrery_observatory.personal_observatory import inject_personal_observatory  # noqa: E402
 from project_orrery_observatory.relation_inbox import RELATION_INBOX_JS, inject_relation_inbox  # noqa: E402
 from project_orrery_observatory.team_observatory import inject_team_observatory  # noqa: E402
+from project_orrery_observatory.workstream_relation_graph import project_core_relation_graph  # noqa: E402
 
 
 class FakeIdentity:
@@ -264,9 +265,9 @@ class UnifiedRuntimeTests(unittest.TestCase):
         }
         with (
             mock.patch.object(
-                build_unified_observatory.build_personal_observatory,
-                "render_personal_site",
-                side_effect=_bounded_personal_site,
+                build_unified_observatory,
+                "_dynamic_shell_base",
+                side_effect=lambda *_args, **_kwargs: _bounded_personal_site(),
             ),
             mock.patch.object(
                 build_unified_observatory,
@@ -521,13 +522,38 @@ class UnifiedRuntimeTests(unittest.TestCase):
         status, _headers, body = self.request("GET", "/api/v1/docs/search?q=Unified%20Observatory")
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)["bounded"])
-        expected_hash = self.server.state.graph_provider_payload["graph"]["graph_hash"]
-        with mock.patch("project_orrery_core.workstream_relations.build_relation_graph", side_effect=AssertionError("request-time graph recomputation")):
+        graph_provider = dict(self.server.state.graph_provider_payload)
+        graph_provider.pop("relation_capture", None)
+        projection = project_core_relation_graph(lambda: graph_provider)
+        expected_hash = projection["graph_hash"]
+        cached = {
+            "schema_version": 1,
+            "contract_type": "workstream-graph-delivery-v1",
+            "status": "cached-current",
+            "cache_state": "cached-current",
+            "generation": 7,
+            "projection": projection,
+            "browser_delivery": None,
+            "authority": "derived-read-only",
+            "read_only": True,
+            "writes_author_documents": False,
+            "network_performed": False,
+            "execution_capability": False,
+            "available_actions": [],
+        }
+        with (
+            mock.patch.object(self.server.state, "graph_delivery_payload", return_value=cached),
+            mock.patch(
+                "project_orrery_core.workstream_relations.build_relation_graph",
+                side_effect=AssertionError("request-time graph recomputation"),
+            ),
+        ):
             status, _headers, body = self.request("GET", "/api/v1/workstreams/graph")
         value = json.loads(body)
         self.assertEqual(status, 200)
-        self.assertEqual(value["dynamic_delivery"], "startup-cached-projection")
-        self.assertEqual(value["graph"]["graph_hash"], expected_hash)
+        self.assertEqual(value["contract_type"], "workstream-graph-delivery-v1")
+        self.assertEqual(value["status"], "cached-current")
+        self.assertEqual(value["projection"]["graph_hash"], expected_hash)
 
         def projection(revision: str, workstream_id: str):
             return {
