@@ -77,6 +77,7 @@ authority/planning/Pending Validation；task identity 和 repository owner 尚�
 
 ## 活动计划与待办
 
+- [ ] [U2.5 + W3.1 Central Integration and Main Push](implementation/plans/2026-09-02-u2-5-w3-1-integration-and-main.md)：维护者已授权最短整合/推送；复用 child receipts，本地只做结构/语法检查，随后 exact non-main 双平台 Promotion，双绿后同 SHA 推 protected main。
 - [ ] [Internal Coordination Efficiency](implementation/plans/2026-09-02-internal-coordination-efficiency.md)：
   双平面、事件 inbox、provider-neutral task binding、control snapshot 和 role-aware context evaluation 已批准；
   task code/repository owner 未分配，未创建任务/worktree，与只读 S1 DAG plugin 无依赖。

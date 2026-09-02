@@ -1,5 +1,6 @@
 # Validation
 
+- [U2.5 + W3.1 Central Integration and Main Push](2026-09-02-u2-5-w3-1-integration-and-main.md) — Pending; minimal local integration followed by mandatory exact-SHA Windows/Ubuntu Promotion and protected-main push.
 - [Internal Coordination Efficiency](2026-09-02-internal-coordination-efficiency.md) — Pending; covers Core/dispatch/host-adapter ownership, provider-neutral task binding, quiet event delivery, focus-safe Product discussion, bounded control snapshots, reference-only dispatch and role-aware context evaluation; task identity remains unallocated.
 - [S1 Orrery Conductor Codex Plugin Surface](2026-09-02-s1-orrery-conductor-codex-plugin-surface.md) — Pending; inline Phase A was rejected, and the next fixture-backed preview must use Codex's existing right Browser Panel before live U2.5 binding or publication.
 

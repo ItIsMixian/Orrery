@@ -4,6 +4,9 @@ Updated: 2026-09-02
 
 ## 当前停止点
 
+- 维护者已授权 U2.5 `f28cf6d...` + W3.1 `2296853...` 走最短中央整合/推送。W3.1 已机械包含 U2.5；唯一
+  integrator 只合一次，复用 child receipts并做轻量结构/语法门。必须先推 exact non-main Promotion ref，取得
+  Windows/Ubuntu required smoke 双绿后才能推同 SHA 到 protected main；不创建 tag/Release/assets。
 - ADR-0033 已记录维护者接受的双平面事件协调：Product/Decision 与 Execution Coordination 分离，Worker 事件
   使用 focus-safe inbox，平台 task/worktree 采用 provider-neutral Local-only binding，中央默认只读有界 control
   snapshot 并渐进展开证据。task identity/repository owner 尚未分配；该方向与只读 S1 DAG plugin 无关。
