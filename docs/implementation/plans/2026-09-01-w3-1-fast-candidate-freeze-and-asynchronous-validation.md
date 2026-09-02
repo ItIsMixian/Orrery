@@ -166,3 +166,7 @@ existing focused owner test:
 After the exact bootstrap commit, W3.1 must import the new task-description version and refresh the revision-3
 disjoint scope normally. `--no-local-worktrees`, L3 acknowledgement, peer deletion and fabricated lineage are not
 authorized recovery mechanisms.
+
+The unique integrator completed this narrow guard bootstrap at exact
+`33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7`. W3.1 must consume it through the normal exact task-description import and
+scope refresh; it is not a blanket conflict override.

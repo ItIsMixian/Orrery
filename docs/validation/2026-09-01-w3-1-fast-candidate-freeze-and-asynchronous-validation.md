@@ -77,3 +77,7 @@ The revision-3 refresh persisted 21 direct/authority findings, but every finding
 W3.1. W3.1 therefore remained clean and correctly performed no product write. Plan revision 4 authorizes a focused
 regression proving that unrelated peer conflicts remain visible in topology inspection without blocking a third,
 disjoint Workstream's own scope refresh. Current-task conflicts must remain fail-closed.
+
+Central bootstrap exact `33e48fbb8fa671d33c91cb1bd164fb038ab7e4c7` preserves full topology diagnostics and filters only the
+per-Workstream refresh decision/session. The focused three-worktree regression completed 1/1 PASS in 19.308 seconds;
+`git diff --check` passed. No broader suite, peer deletion, scope bypass or W3.1 product implementation occurred.
