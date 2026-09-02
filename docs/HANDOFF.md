@@ -1,9 +1,12 @@
 # 跨会话交接
 
-Updated: 2026-09-01
+Updated: 2026-09-02
 
 ## 当前停止点
 
+- ADR-0033 已记录维护者接受的双平面事件协调：Product/Decision 与 Execution Coordination 分离，Worker 事件
+  使用 focus-safe inbox，平台 task/worktree 采用 provider-neutral Local-only binding，中央默认只读有界 control
+  snapshot 并渐进展开证据。S2 只有 docs authority，未分发、未实现；当前 S1 仍只做 ADR-0032 right panel。
 - W7.4 corrected preview 已接受并冻结为 clean exact
   `fe75fc238ebf876d8565cabda0c8e0f8cfb4cfdd`：strict history 为 6 closed／31 retired，11 条 recovered
   archived lineage，full 25 nodes／18 routes／0 overlaps，compact 15／8／0 overlaps。它诚实保持
@@ -152,6 +155,10 @@ Updated: 2026-09-01
 - **S1 Orrery Conductor：** 独立 Phase A `4e44d27...` 的 inline MCP UI 已被维护者拒绝；ADR-0032/revision 2
   要求复用同一 fixture/server/UI，并以 Codex 既有 right Browser Panel 为主入口，inline 仅作回退。live binding
   等 accepted U2.5 exact envelope；新 toolbar icon、Codex patch、执行能力、remote repo 与 Release 均未授权。
+- **S2 Event-driven Execution Conductor：** ADR-0033/Approved Design/Plan/Pending Validation 已建立，但没有 task、
+  worktree、schema、runtime 或 Adapter。后续必须在 S1 当前 scope 冻结后另行分发；先实现 binding/event/inbox/
+  control snapshot，再以新 Pilot 决定是否修改 `AGENTS.md` 角色入口。当前 self-host 保留两个同路径 Codex 项目：
+  1M Product/Decision 与 implementation/Worker，这是 Local-only host routing，不是仓库或 DAG 分裂。
 - **Brownfield Adoption：** 目前只有保守迁移契约，区分 `scaffold installed`、`authority migration pending` 与 `authority integrated`。尚无研究结论或 Implementation Plan；不得批量覆盖作者文档或补造历史理由。
 - **R4/R5：** alias contract 与 optional default transition 未启动；`orrery` PyPI 名称存在第三方冲突，不能擅自创建同名 distribution/import。
 

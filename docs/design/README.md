@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Dual-plane Event-driven Orrery Coordination](dual-plane-event-driven-orrery-coordination.md) — separates maintainer product discussion from execution events, defines provider-neutral bindings, a focus-safe inbox, bounded control snapshots and role-aware future context entry under ADR-0033.
 - [Orrery Conductor Codex Right Panel](orrery-conductor-codex-right-panel.md) — makes Codex's existing right Browser Panel the primary S1 surface and retains inline MCP UI only as fallback, under ADR-0032.
 - [Orrery Conductor Codex Plugin Surface](orrery-conductor-codex-plugin-surface.md) — independent read-only Codex plugin, local MCP server and MCP UI adapter over the existing Orrery DAG, under ADR-0031.
 - [Fast Candidate Freeze and Asynchronous Validation Closeout](fast-candidate-freeze-and-asynchronous-validation.md) — sub-30-second structural freeze, honest validation-pending status and immutable-SHA asynchronous checks without weakening integration/release gates, under ADR-0030.

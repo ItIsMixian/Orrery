@@ -78,6 +78,8 @@
 
 **S1 host amendment**: [ADR-0032](docs/decisions/0032-codex-right-panel-primary-surface-for-orrery-conductor.md) | [Codex Right Panel Design](docs/design/orrery-conductor-codex-right-panel.md)。
 
+**S2 coordination amendment**: [ADR-0033](docs/decisions/0033-dual-plane-event-driven-orrery-coordination.md) | [Dual-plane Design](docs/design/dual-plane-event-driven-orrery-coordination.md) | [S2 Plan](docs/implementation/plans/2026-09-02-s2-event-driven-execution-conductor.md) | [Pending Validation](docs/validation/2026-09-02-s2-event-driven-execution-conductor.md) | [Baseline Snapshot](docs/snapshots/2026-09-02-central-coordination-context-audit.md)。
+
 ## context-routing research
 
 **ID**: `context-routing-research`

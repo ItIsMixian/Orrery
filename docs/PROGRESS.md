@@ -1,6 +1,6 @@
 # 当前进度
 
-Updated: 2026-09-01
+Updated: 2026-09-02
 
 ## 当前阶段
 
@@ -21,14 +21,20 @@ W7.4 accepted frozen exact `fe75fc2...` 已满足 Phase B 的开发依赖；维�
 维护者拒绝多分钟同任务 closeout。ADR-0030 已接受：预览接受后先在 `<30s` 目标内执行零测试的结构化
 Candidate Freeze，使实现任务停在 `候选已冻结／验证待执行`；耗时验证对 exact SHA 异步运行，PASS/FAIL、
 closure 与 worktree cleanup 保持独立。W7.4 已以 exact `fe75fc2...` 完成首次手工 freeze 并保持 validation
-Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c142f32...` 的严格两-schema bootstrap 解除，
-现可在原任务继续自动化实现。
+ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c142f32...` 的严格两-schema bootstrap 解除，
+ 现可在原任务继续自动化实现。
+
+维护者已接受 ADR-0033 的双平面协调方向：项目级 1M Codex 项目保留 Product/Decision 讨论，实施项目承载
+Execution Conductor 与 Worker；Worker 事件进入 focus-safe inbox，不插入活跃讨论。provider-neutral task
+binding、control snapshot、reference-only transport 和 role-aware context evaluation 归入独立 S2；当前只有
+authority/Plan/Pending Validation，未分发、未实现，也不扩大 S1/W3.1/U2.5/W7.4/W7.5。
 
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Release／工具链 | v0.3.1 Latest Release 已验证并发布；Windows launcher 闪窗与健康 runtime 复用缺陷关闭，v0.3.0 历史资产未替换 | 仅完成本次 docs closeout；后续通用 release 简化必须另立 Plan |
 | Authority Meta Model | 模型 1、Core evaluator、内部 CLI claims、root-only opt-in projection 与本地 release-candidate gate 已进入 Canonical source；默认 production consumer、稳定公共 API 与公开模型 1 release 尚未发生 | 单独审阅 managed consumer switch／rollback，再由维护者选择真实 SemVer 与 candidate manifest |
 | 多 Workstream 协作 | W1–W7 Canonical 基线与 ADR-0017 不变；W7.3 relation capture、program/phase/series projection、pinned ELK 与显式 legacy 后手已进入本地中央 Candidate，Phase 0 exact page 已接受 | Final RC 只消费当前 child receipts；不手工重跑 feature suites |
+| Orrery Conductor | S1 只读 right-panel foundation 已有独立 Phase A，inline UI 被拒绝；ADR-0033/S2 双平面与事件协调已接受但未分发 | 先完成 S1 修正版 preview；S2 另立 exact scope，不向当前 S1 注入 |
 | Unified Observatory | U2.5 Phase A clean `6596a9f...` 已完成 Shell/cache 基础设施；W7.4 accepted frozen `fe75fc2...` 可作为 Phase B 精确依赖 | 在原 U2.5 任务导入依赖并生成异步 Graph hydration self-host preview；接受前不跑自动测试 |
 | Context routing 研究 | C1 Oracle v0.2 静态 controls 已通过；H1／H2／B／S 均未采纳 | 由维护者决定是否注册 C2 设计；不得自动创建或运行 Pilot 010 |
 | 平台与 Adapter | Codex 精确范围和 DeepSeek rc.8 精确范围已有 runtime evidence；Claude 仍在认证前失败关闭；全部 Adapter 均未独立发布 | Claude 只在认证可用且另行授权时继续；其余工作转向发行设计或新的精确 runtime matrix |
@@ -47,6 +53,8 @@ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c1
 - Broker-only docsite 统一模型入口，但同一 OS 用户下的本机 Broker 只提供路由、缓存和预算门，不构成 Provider Key 进程隔离。
 - `codex/u1-u2-integration-baseline` 曾在联合 feature merge `0eaad30` 吸收 W7.2.3 `30d44ff` 与 U2.2 `70e6ac9`；该历史节点组件为 Core 0.1.17、CLI 0.1.21、Observatory 0.1.16。联合 Fast 38/38 与真实 1440/390px 浏览器验收通过；44 项 Checkpoint 在既有 Maintenance fixture 上达到固定 90 秒预算，未冒充通过。它仍只作为后续中央 Candidate 的历史 child evidence。
 - ADR-0018 已接受 authority-first Workstream dispatch：U2.3 已按两次任务说明版本完成并本地集成，W7.3 也已确认其 scope revision；自动 receipt／first-write enforcement 尚未实现。
+- ADR-0033 已接受 Product/Decision 与 Execution Coordination 的职责、上下文和通知隔离；普通 dispatch 不持续
+  polling，task detail 按 summary→turn→command→full history 渐进展开。该方向当前没有产品实现或 release 事实。
 - ADR-0022 已接受 ELK.js 作为 Workstream Graph 唯一正常 layout/routing engine；它不改变现有 Orrery 前端或
   事实选择。GX2 provenance、W7.3 clean Candidate 与中央接线已完成，维护者接受的产品方向保持不变；
   公开 release/default 仍未发生。
@@ -69,6 +77,9 @@ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c1
 
 ## 活动计划与待办
 
+- [ ] [S2 Event-driven Execution Conductor](implementation/plans/2026-09-02-s2-event-driven-execution-conductor.md)：
+  双平面、事件 inbox、provider-neutral task binding、control snapshot 和 role-aware context evaluation 已批准；
+  未创建任务/worktree，必须等待独立 exact scope，不得扩大当前 S1。
 - [ ] [S1 Orrery Conductor Codex Plugin Surface](implementation/plans/2026-09-02-s1-orrery-conductor-codex-plugin-surface.md)：Phase A inline UI 已被拒绝；ADR-0032/revision 2 改为 Codex 既有 right Browser Panel 主入口，inline 仅回退。live binding 仍等待 accepted exact U2.5 envelope。
 - [ ] [W3.1 Fast Candidate Freeze and Asynchronous Validation](implementation/plans/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)：任务已登记；中央 strict receipt-schema bootstrap exact `c142f32...` 已解除 L3，等待原任务导入、scope refresh 后继续实现。
 - [ ] [W7.5 Workstream Classification Calibration](implementation/plans/2026-09-01-w7-5-workstream-classification-calibration.md)：已批准，等待 accepted clean W7.4 exact Candidate 后分发；先做只读分类审计和人类可理解预览，确认前不写分类事件或运行自动测试。
@@ -129,5 +140,6 @@ Pending。W3.1 已登记；首轮 L3 schema gate 由唯一整合者以 exact `c1
 ## 下一里程碑
 
 1. 并行继续 W3.1 自动化与 U2.5 Phase B；U2.5 先交付真实 self-host preview，接受前不运行自动测试。
-2. W7.4 exact Candidate 的异步验证、W7.5 分类校准与 W6.2 cleanup 保持各自独立门，不并入当前两任务。
-3. 后续发布 U2.4/U2.5 或精简通用发布流程时另立任务；alias、scheduler 与独立组件发行继续延期。
+2. S1 只完成 ADR-0032 的 right-panel 修正版 preview；S2 保持 docs-only，后续以独立任务说明版本分发。
+3. W7.4 exact Candidate 的异步验证、W7.5 分类校准与 W6.2 cleanup 保持各自独立门，不并入当前两任务。
+4. 后续发布 U2.4/U2.5 或精简通用发布流程时另立任务；alias、scheduler 与独立组件发行继续延期。

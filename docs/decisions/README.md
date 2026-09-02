@@ -12,6 +12,7 @@ Use `0000-template.md` as the starting point.
 
 ## Project Orrery decisions
 
+- [ADR-0033: Dual-plane, Event-driven Orrery Coordination](0033-dual-plane-event-driven-orrery-coordination.md) — Accepted; separates Product/Decision discussion from model-light Execution coordination, adds a quiet event inbox, provider-neutral task binding and bounded control snapshots, and preserves the current two-project self-host profile without expanding S1.
 - [ADR-0032: Codex Right Panel as the Primary Orrery Conductor Surface](0032-codex-right-panel-primary-surface-for-orrery-conductor.md) — Accepted; moves S1's primary DAG from an inline MCP component to Codex's existing right Browser Panel while keeping inline UI as fallback and forbidding Codex chrome patches.
 - [ADR-0031: Read-only Codex Plugin Surface for Orrery Conductor](0031-read-only-codex-plugin-surface-for-orrery-conductor.md) — Accepted and amended by ADR-0032; creates S1 as an independent read-only Codex plugin/MCP adapter over existing Orrery Graph facts.
 - [ADR-0030: Fast Candidate Freeze and Asynchronous Validation](0030-fast-candidate-freeze-and-asynchronous-validation.md) — Accepted; freezes accepted work into a clean exact Candidate in a short structural step, moves costly checks to immutable-SHA asynchronous validation, and keeps validation, closure and cleanup distinct.

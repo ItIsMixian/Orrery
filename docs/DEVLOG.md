@@ -1355,3 +1355,18 @@
   W3.1 implementation or validation PASS.
 - U2.5 Phase A exact `6596a9f...` may now import accepted frozen W7.4 exact `fe75fc2...` for Phase B. W7.4 remains
   validation-pending, and U2.5 must stop at a real self-host preview before any automated suite.
+
+## 2026-09-02 — Dual-plane event-driven coordination authority
+
+- The maintainer reviewed the central/Worker operating flow and accepted ADR-0033: Product/Decision discussion and
+  Execution Coordination use separate contexts; Worker events enter a focus-safe inbox and unchanged running state is
+  not narrated or polled through a long-lived central turn.
+- A dated Snapshot records the bounded central/task/document observations without preserving Prompt/transcript bodies
+  or claiming exact token causality. The Approved Design adds provider-neutral Local-only task binding, independent
+  task/Workstream status axes, a regenerable bounded control snapshot, progressive task inspection and reference-only
+  dispatch.
+- The maintainer clarified that two saved Codex projects over the same repository are intentional on the current host:
+  the project-scoped 1M profile serves Product/Decision work and the implementation project serves coordination and
+  Workers. The profile is not a second repository or public requirement.
+- S2 Plan and Pending Validation are documentation-only. No task/worktree was created, no current S1/W3.1/U2.5/W7.4/
+  W7.5 scope changed, and no product, plugin, remote or release action occurred.
