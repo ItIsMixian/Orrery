@@ -6,7 +6,8 @@ Updated: 2026-09-01
 
 - ADR-0030 将 Candidate Freeze 从验证执行中分离：freeze 目标 `<30s` 且禁止运行 unittest/Fast/Checkpoint/
   Candidate/Promotion、临时 Git fixture、site/package/provider scan；异步阶段继续使用现有 exact-SHA 路由、
-  budgets、leases 与 no-repeat。W3.1 automation 尚未实现。
+  budgets、leases 与 no-repeat。W3.1 automation 尚未实现；中央 `c142f32...` 只完成两份 receipt schema 的
+  JSON decode/Draft self-check。
 - ADR-0024 的 v0.3.1 emergency patch 已完成。它没有重放无关 child suites 或本地完整 Candidate；最终 exact
   `1d9223c...` 只运行六个旧 Promotion 失败 ID、两次 exact-Git build、一次 installed-project Windows launcher
   smoke 与一次 exact-SHA Windows/Ubuntu Promotion。同 SHA non-green 没有重试。
@@ -22,10 +23,11 @@ Updated: 2026-09-01
 
 ## 当前通过证据
 
-- W3.1 当前只有 Accepted ADR、Approved Design、Plan 与 Pending Validation；没有 freeze command/receipt、
-  asynchronous validator 或产品测试。W7.4 manual adoption 将单独记录 process evidence。
+- W3.1 已登记但尚无 freeze command/receipt、asynchronous validator 或产品测试。首轮 L3 后中央
+  `c142f32...` 完成严格两-schema bootstrap；原任务需精确导入并刷新 allowed scope 后才可继续。
 - W7.5 当前只有 Accepted ADR、Approved Design、Implementation Plan 与 Pending Validation；没有任务/worktree、
-  分类 proposal/event、产品写入、preview 或测试证据。W7.4 clean Candidate 前禁止创建实现任务。
+  分类 proposal/event、产品写入、preview 或测试证据。accepted frozen W7.4 exact Candidate 已存在，但本轮没有
+  获得创建 W7.5 任务的指令。
 - U2.5 Phase A clean `6596a9f...` 只有 syntax/import 与真实 lifecycle preview evidence：首个导航 Shell
   446 ms、unchanged cache hit provider-runs 0、active-refresh stop 1.201s、relations loading 16ms；没有
   unittest/Fast/Checkpoint/Candidate/Promotion。Phase B 与最终维护者验收仍 Pending。

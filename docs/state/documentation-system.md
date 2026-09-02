@@ -23,12 +23,13 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - ADR-0016 与 Approved Unified Observatory Design 已接受“一个用户入口／URL／导航壳、受管隐藏 helper”的目标。当前本地中央 Candidate 在现有 docsite 阅读、搜索、AI 与作者信息架构上，用一个连续 sidebar/scroll rail 组合中文 app 入口和可折叠项目文档树，并加入 A4 规则帮助、U2.3 活动任务、W7.3 关系待确认与 ELK 只读 Graph；Maintenance 使用密集有界队列和折叠技术详情。协议值只在技术详情显示，U1 synthetic prototype 仍不是 UI 规范，公开默认尚未切换。
 - ADR-0028 已接受 Shell-first 启动与增量 Graph cache。U2.5 Phase A clean exact `6596a9f...` 已在独立
   Worktree 实现可导航 bootstrap shell、Graph 独立 lifecycle、Git-private validated cache、HEAD/session
-  currentness 与 bounded shutdown；尚未本地整合或取得维护者最终验收。真实 Graph hydration 仍等待 accepted
-  clean W7.4 Candidate。
+  currentness 与 bounded shutdown；尚未本地整合。维护者已授权 Phase B 消费 accepted frozen W7.4 exact
+  `fe75fc2...`，真实 Graph hydration preview 仍 Pending。
 - ADR-0029 已接受分类校准与未来 dispatch 显式登记。当前没有 `任务分类待确认` consumer、分类 envelope
   强制门或历史分类事件；W7.5 必须先展示证据来源和批次内容，维护者接受前保持零分类写入。
 - ADR-0030 已把阻塞式 closeout 拆为快速 Candidate Freeze 与异步 Validation。冻结阶段只写最小 receipt/Pending
-  指针；详细 Validation/State/DEVLOG 在异步结果或 integration 时事件驱动同步。W3.1 自动化尚未实现。
+  指针；详细 Validation/State/DEVLOG 在异步结果或 integration 时事件驱动同步。W3.1 自动化尚未实现；中央
+  `c142f32...` 只提供其 L3 所需的两份严格 receipt schema bootstrap。
 - U2.3 local integrated Candidate 将 app rail 收敛为七个固定入口，把路线与趋势从作者文档树移入 app 区，并以唯一 floating Ask Docs 和顶栏只读帮助／系统状态面板替代独立问答／Authority 页面。Personal 使用 Git registry、Git-common-private 有界 session metadata 与现有 Maintenance cache 的轻量 active-task projection；启动不逐 worktree 读取源码、Scope、ignored 或 diff，重证据只在目标详情／刷新时读取。
 - W7.2.3 integrated Candidate 将真实只读 Graph 改为单一从左到右 DAG：固定可读卡片、中文 rank lane、工程图式实线／虚线／复合线、固定 10px 箭头、每链独立展开和收起、锚点式 `Ctrl + 滚轮` 缩放，以及默认关闭的画布内技术详情抽屉。dependency／conflict 只从各自真实端点建图；空 dependency 不显示孤立 active tips。桌面以 88px rank 通道和 44px 独立链间隔显示主图并保留 1×1px 语义 ledger，390px 用同事实列表替代微型图；文档根、侧栏、画布与详情滚动条共享深浅主题变量。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。

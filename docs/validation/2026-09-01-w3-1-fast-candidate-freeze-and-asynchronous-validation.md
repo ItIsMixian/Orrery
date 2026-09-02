@@ -55,3 +55,7 @@ Pending. ADR/Design/Plan exist; no W3.1 task/worktree/product/receipt or asynchr
   imports the exact bootstrap, refreshes scope to allowed and implements the behavior.
 
 This is blocker evidence, not implementation or validation PASS.
+
+The unique integration branch subsequently added only the two approved strict JSON Schema resources at exact
+`c142f325d643827c47ce14fb7a489ea1ff39a295`; JSON decode and Draft 2020-12 schema self-check passed. This removes the
+bootstrap dependency but still proves no W3.1 command, receipt writer or validator behavior.

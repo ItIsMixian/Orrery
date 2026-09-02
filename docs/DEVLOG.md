@@ -1346,3 +1346,12 @@
   plus U2.4 Validation conflicts. Integrated product/test/template bytes match the Candidate; compile, JSON,
   root/template runtime parity and diff checks passed without replaying the focused unittest suite. No push/main,
   Promotion or release action ran.
+
+## 2026-09-02 — Resume W3.1 and U2.5
+
+- The maintainer authorized both existing tasks to continue; no duplicate task or worktree was created.
+- W3.1's clean L3 `schema-migration` stop was resolved by an integrator-owned, two-file strict schema bootstrap at
+  exact `c142f325d643827c47ce14fb7a489ea1ff39a295`. Only JSON decode and Draft 2020-12 schema self-check ran; this is not
+  W3.1 implementation or validation PASS.
+- U2.5 Phase A exact `6596a9f...` may now import accepted frozen W7.4 exact `fe75fc2...` for Phase B. W7.4 remains
+  validation-pending, and U2.5 must stop at a real self-host preview before any automated suite.

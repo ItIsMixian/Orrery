@@ -49,8 +49,9 @@ Governing ADRs: [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-b
   内 duplicate／坏 path／未解析 group 继续失败关闭。self-host projection 为 ready 33 nodes/20 edges 且未创建
   W5D placeholder；Core relation/program store、Team/Authority 权限、组件版本和发布契约均未改变。
 - U2.5 Phase A clean Candidate `6596a9f...` 已实现 Shell/Graph readiness 解耦和 unchanged restart 的
-  Git-private validated cache reuse；它尚未合入当前 integration branch，Phase B、组件版本、manifest、
-  protected-main/Promotion/publication 均未发生。
+  Git-private validated cache reuse；它尚未合入当前 integration branch。维护者已授权 Phase B 消费 accepted
+  frozen W7.4 exact `fe75fc2...`，但 hydration preview、组件版本、manifest、protected-main/Promotion/publication
+  均未发生。
 - ADR-0029/W7.5 已获授权但尚未分发。后续 source `orrery-dispatch` 只负责传递完整 classification envelope
   并拒绝遗漏，不拥有分类推断/确认；本地已安装副本、公开 Skill、manifest 与版本均未改变。
 - U2.4 revision 3 本地整合内容已将 active retired-session archive 收口为 37 份 bounded

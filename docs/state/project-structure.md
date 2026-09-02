@@ -19,20 +19,24 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - ADR-0016／ADR-0025 的生产 Unified Shell 已在本地 integrated Candidate 实现：一个用户可见 listener／URL／导航壳，Broker／Coordinator 等内部 capability 由 supervisor 隐藏管理；legacy whole-shell rollback 改为内部 `serve_orrery.py --legacy`，不再作为第三个根启动文件。公开 v0.3.1 仍未切换到这组 U2.4 bytes。
 - ADR-0028 已把 U2.5 注册为独立后续边界。Phase A clean `6596a9f...` 位于
   `codex/u2-5-shell-first-graph-cache` 独立 worktree，实现 Shell-first/cache 基础设施且未修改 W7.4-owned
-  Graph presentation；当前 integration branch 未包含该产品，Phase B 等待 accepted clean W7.4 Candidate。
+  Graph presentation；当前 integration branch 未包含该产品。维护者已授权 Phase B 精确导入 accepted frozen
+  W7.4 `fe75fc2...` 后继续，预览前仍无自动测试权限。
 - ADR-0029 已接受显式 Workstream 分类与 dispatch 登记：当前 provider 42 nodes 中 33 无 series、35 无
   program/phase、27 两者皆无；strict history 37 records 中 29 无 series、30 无 program/phase。W7.5 尚未
   创建任务或写分类事件，现有缺口继续诚实显示为未登记且不得从名称/lineage推断。
 - ADR-0030 已接受 fast Candidate freeze：实现任务在短结构检查/commit 后可停止为 validation-pending，耗时
-  exact-SHA validation 独立运行。当前尚无 `freeze-candidate` command/receipt/async orchestration；W7.4 将先
-  手工采用，worktree removal 仍由 W6/W6.2 独立持有。
+  exact-SHA validation 独立运行。W7.4 已以 clean `fe75fc2...` 手工采用；`freeze-candidate` command/async
+  orchestration 仍未实现。W3.1 已登记，中央 exact `c142f32...` 仅 bootstrap 两份严格 receipt schema；
+  worktree removal 仍由 W6/W6.2 独立持有。
 - U2.1 integrated Candidate 修复首轮体验：中文 app 导航、全页 stop、历史 Maintenance 证据降级和 W7.1 legacy/archive graph 显示；它没有创建 relation root、赋予 archive 执行权或放宽 Quick Remove 当前资格。
 - W7.2.3 integrated Candidate 只重构 Observatory Graph presentation：从左到右的确定性 rank、固定可读节点、按 connected component 对齐的工程图路线、按链双向展开／收起、三 lens 真实端点、画布内 inspector 与移动 relation ledger。关系由实线／虚线／复合线和固定视觉尺寸箭头表达，不在线路上覆盖文字；画布支持锚点式 `Ctrl + 滚轮` 缩放。rank 通道为 88px，独立链只保留 44px 分组空隙；全站滚动条使用深浅主题适配。Core relation schema／facts、W7.1 archive 证据与执行边界未改。
 - U2.2 integrated Candidate 把 app 入口和作者文档树组合进一个连续 sidebar/scroll rail，并把 Maintenance 改为 header refresh、四类筛选、8 行分页、折叠技术详情与仅 eligible 行可见的安全删除入口。它只改变展示和有界浏览器状态，不复制或改变 Core eligibility／preflight／authorization／receipt，也没有执行删除。
 - U2.3 local integrated Candidate 的 Personal active-task projection 只读取共享 Git worktree registry、Git-common-private bounded session JSON 和 Maintenance cache；公开 HTML/JSON 隐藏本机完整路径与原始 finding，缺失／损坏／cache stale 的已登记任务保持身份可见并标为待刷新。Git-private 数据仍不进入作者文档、发布包或远程同步。
 - W7.1 integrated Candidate 只为 relation 已引用且 live endpoint 缺失的 Workstream 读取有界 Git-common-private retired-session archive，恢复 closed/offline/current/superseded 轴；archive 不进入 active tip、apply/undo、Review Ready 或执行面。
-- 当前 W7.4 未提交实现已保存 37 个历史身份，却先后把它们灌入 ELK 或新增完整历史目录，同时只读取新 relation store，漏掉 archived session 的 lineage。中央只读盘点证明 33/37 有 lineage，至少 11 个 current archived pair 可按 exact task-base/validated-head 继续验证。ADR-0027 已要求移除 bulk history UI 并在原 Graph 恢复这些关系；尚无通过的 Candidate。
-- 当前 integration line 已由唯一 integrator 加入 strict `workstream-history-index-v1.json` schema bootstrap；它区分 `closed-workstream` 与未闭合的 `retired-session`，禁止任意 display/classification/reference 字段。W7.4 尚未合入该基线或实现通过验证的 writer/consumer。
+- W7.4 accepted frozen `fe75fc2...` 已保存 37 个历史身份、移除 bulk history UI，并恢复 11 条可验证 archived
+  lineage；full/compact 预览均为零重叠。它仍是 validation-pending Candidate，不是 Canonical、closed 或
+  cleanup-ready。
+- 当前 integration line 已由唯一 integrator 加入 strict `workstream-history-index-v1.json` schema bootstrap；它区分 `closed-workstream` 与未闭合的 `retired-session`，禁止任意 display/classification/reference 字段。W7.4 `fe75fc2...` 已消费该基线并实现 writer/consumer，但异步验证仍 Pending。
 - W1–W7 协作源码已经进入 main：Git-private Workstream session、Scope/finding、review/integration/cleanup、Personal／Team projection、workspace maintenance、LAN discovery／manual Host switch、stacked lineage、relation event/graph、apply/undo/recovery contract 和只读 Graph consumer 均存在。
 - W7.3 Candidate 已实现 ADR-0017 relation capture：versioned append-only Git-common-private proposal／confirmation／role／series store，exact same-project ancestry `derived_from` 自动写入，四类 gate `depends_on`、Integrator-only `absorbs`、Personal／Team human integrator CAS，以及 CLI／Harness suggest/inspect/decision 边界。Agent、session、remote central request 与旧 revision 均不能确认；旧 v1 无 gate 关系保持 Unknown。
 - 当前 self-host 已显式登记 Authority A、CI、Unified U 系列，并保留 A4→A3、CI7→CI6 为待确认修复建议；没有从名称前缀推断或回写 effective 历史。另有真实 `W7.3-integration-acceptance` linked worktree 从 exact W7.3 implementation commit 自动形成 `derived_from`，对 CI6 的 integration gate 仍是非阻塞 proposal。
@@ -115,6 +119,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - workspace maintenance 没有自动 removal 或 OS scheduler；关闭应用后不会定时执行。
 - 当前 integrated U2.4 runtime 仍用全页 startup gate；U2.5 Phase A cache/input currentness/per-consumer
   readiness 只在 `6596a9f...` Worktree preview 有机械证据，browser hydration 尚未实现或验证。
-- 没有已接受的 closed-Workstream history/archived-lineage Candidate；W7.4 当前预览仍未把至少 11 个可验证 legacy lineage pair 恢复进原 Graph，且新增 bulk history UI 已被维护者拒绝。
+- 已有 accepted frozen W7.4 history/archived-lineage Candidate `fe75fc2...`，但其异步 validation、中央整合、
+  closure 与 cleanup authorization 均未完成。
 - Claude Code 尚未完成认证后的真实模型路由；DeepSeek 与 Codex evidence 只覆盖各自记录的精确 runtime 范围。
 - 自动 R1 脱敏导出器、跨平台 byte-for-byte archive 与 Brownfield Adoption 研究／Plan 均未实现。

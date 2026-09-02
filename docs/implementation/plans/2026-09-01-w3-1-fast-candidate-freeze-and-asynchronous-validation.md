@@ -117,3 +117,6 @@ commit exists, W3.1 may:
 
 The bootstrap does not implement freeze behavior, validation orchestration, integration, cleanup, push or release.
 All original W3.1 safety and validation boundaries remain in force.
+
+The unique integrator completed that strict two-file bootstrap at exact
+`c142f325d643827c47ce14fb7a489ea1ff39a295`. W3.1 may consume it only through the import/scope-refresh sequence above.
