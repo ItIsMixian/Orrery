@@ -61,3 +61,15 @@ Pending execution.
 - the lazy Graph delivery API fixture and the explicit two-launcher contract each passed their focused rerun;
 - `validate_ci.py --all`, `git diff --check`, manifest/core projection equality and all 111 managed-runtime path checks
   passed. No Fast, Checkpoint or local Candidate suite was run.
+
+## 2026-09-02 third Promotion result
+
+- exact candidate `effc5a252b5a96c067f586d3f91173857afe4ef4` entered Promotion run `33679435608`;
+- exact-SHA preflight and the Ubuntu repository/package gate passed; completed Ubuntu lanes other than lane-03 were
+  green when the remaining run was cancelled;
+- lane-03 had one stale assertion that expected the starting shell to force `#overview`, while accepted U2.5 preserves
+  the user's current hash with `location.replace('/'+location.hash)`;
+- the run was cancelled once that sole failing fingerprint was available, avoiding unnecessary completion of an
+  already non-green SHA. It will not be retried and `main` was not updated.
+- the exact close/reclaim method then passed locally after its same stale block was aligned with current-hash
+  navigation and the bounded 1500 ms polling backoff.

@@ -623,8 +623,8 @@ class UnifiedRuntimeTests(unittest.TestCase):
                         self.assertNotIn(str(ROOT), body)
                     if expected_status == "starting":
                         self.assertIn("/api/v1/health", body)
-                        self.assertIn("location.replace('/#overview')", body)
-                        self.assertIn("const maxDelay=2000", body)
+                        self.assertIn("location.replace('/'+location.hash)", body)
+                        self.assertIn("Math.min(1500,delay+150)", body)
                     connection.close()
                     connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
                     connection.request("GET", "/api/v1/health", headers={"Host": f"127.0.0.1:{port}"})
