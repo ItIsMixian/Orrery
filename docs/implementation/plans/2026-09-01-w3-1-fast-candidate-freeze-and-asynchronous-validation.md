@@ -97,3 +97,23 @@ Fast/Checkpoint/Candidate/Promotion and publication remain separate.
 - PASS/FAIL/closed/cleanup states remain distinct;
 - W7.4 manual adoption demonstrates the process without waiting on tests;
 - focused W3.1 checks pass and the task branch is clean.
+
+## 2026-09-02 scope revision 2 — integrator-owned receipt schema bootstrap
+
+The initial W3.1 scope refresh correctly stopped at `L3 / schema-migration`: the approved Plan requires two new Core
+receipt schemas, while all `schema/**` paths are exclusive to the unique integration worktree. W3.1 remained clean and
+made no product write.
+
+This revision authorizes the unique integrator to add strict, versioned
+`candidate-freeze-receipt-v1.json` and `candidate-validation-receipt-v1.json` resources only. After the exact bootstrap
+commit exists, W3.1 may:
+
+1. import that exact bootstrap into its existing branch without rewriting either schema;
+2. remove the two schema resource paths from task-owned expected writes and refresh its Git-private scope against the
+   new task-description version;
+3. resume the already approved Core loader/validator, CLI command, asynchronous handoff, projection and focused-owner
+   implementation only after the exclusive schema finding is absent and scope is allowed;
+4. return any required schema-field change to the unique integrator instead of bypassing or locally acknowledging L3.
+
+The bootstrap does not implement freeze behavior, validation orchestration, integration, cleanup, push or release.
+All original W3.1 safety and validation boundaries remain in force.

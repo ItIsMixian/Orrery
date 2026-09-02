@@ -44,3 +44,14 @@ worktree-removal performance problem; no physical cleanup ran.
 ## Result
 
 Pending. ADR/Design/Plan exist; no W3.1 task/worktree/product/receipt or asynchronous validator has been implemented.
+
+## 2026-09-02 dispatch observation — schema gate
+
+- W3.1 registered from task-description version `830619475258c0c257dea4ec162026c51ec29a0a` on its independent branch;
+- its first scope refresh returned the expected L3 exclusive `schema-migration` hard gate for the two planned receipt
+  schemas;
+- the task stopped clean with no Candidate and no product changes;
+- Plan revision 2 assigns only those strict schema resources to the unique integrator. W3.1 remains Pending until it
+  imports the exact bootstrap, refreshes scope to allowed and implements the behavior.
+
+This is blocker evidence, not implementation or validation PASS.

@@ -122,3 +122,26 @@ it. Do not repeat unchanged evidence.
 - accepted W7.4 full/compact behavior and evidence counts are unchanged after delivery wiring;
 - maintainer preview is accepted, focused post-acceptance checks pass and the task branch is clean;
 - no integration, release or public capability is claimed.
+
+## 2026-09-02 scope revision 2 — resume Phase B from the accepted frozen W7.4 Candidate
+
+The maintainer authorizes U2.5 to continue. Phase A is preserved as clean exact
+`6596a9f8e0e79cf0e5bc76b8ae46b0f323056040`. The W7.4 dependency is now an accepted, clean frozen Candidate at exact
+`fe75fc238ebf876d8565cabda0c8e0f8cfb4cfdd`; its validation status remains Pending under ADR-0030.
+
+U2.5 may now:
+
+1. import that exact W7.4 Candidate into the existing `codex/u2-5-shell-first-graph-cache` branch while preserving the
+   committed Phase A implementation;
+2. refresh its Git-private scope against this task-description revision and resume only when the reconciled Phase B
+   write set is allowed;
+3. implement the already approved dynamic hydration/invalidation delivery boundary and produce a real self-host
+   preview;
+4. preserve W7.4's accepted history split (6 closed and 31 retired records), 11 recovered archived-lineage edges,
+   seven pending proposals, full graph (25 nodes / 18 routes / 0 overlaps) and compact graph
+   (15 nodes / 8 routes / 0 overlaps) semantics.
+
+Because the dependency is frozen but not validated, neither task may claim validated, integrated, cleanup-ready or
+release-ready status. A later W7.4 validation failure blocks integration and requires U2.5 to resynchronize. Before the
+maintainer accepts the Phase B preview, U2.5 may run only syntax/import checks needed to serve it—no unittest, Fast,
+Checkpoint, Candidate or Promotion.

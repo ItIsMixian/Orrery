@@ -52,3 +52,15 @@ These observations prove the gap. They do not prove any correction.
 ## Result
 
 Pending. No product implementation or automated validation is claimed by this task-description version.
+
+## 2026-09-02 Phase B resumption gate
+
+- Phase A is present as clean exact `6596a9f8e0e79cf0e5bc76b8ae46b0f323056040`; its task-owned evidence remains
+  limited to syntax/import and real lifecycle preview observations, not an automated test PASS;
+- the maintainer has authorized continuation;
+- the accepted W7.4 dependency is frozen at exact `fe75fc238ebf876d8565cabda0c8e0f8cfb4cfdd` with validation Pending;
+- U2.5 may import that exact Candidate and build the Phase B preview, but validation, integration and release claims
+  remain blocked by their existing gates.
+
+The next evidence is the real Phase B self-host preview. Automated suites remain forbidden before that preview is
+accepted.
