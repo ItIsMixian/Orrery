@@ -1,5 +1,17 @@
 # 开发日志
 
+## 2026-09-02 — W3.1 Deferred Candidate Lifecycle Projection
+
+- 无损导入 task-description `7ca71c1...` 与 U2.5 Candidate `f28cf6d...`；W3.1 infrastructure `6eab279...`
+  保持祖先。完整本地 worktree scope 在 Plan revision 5 的 L2 确认后为 revision 9、0 findings、
+  `allowed/local_work_allowed=true`；未用 local-worktree 跳过、L3 override 或 peer deletion。
+- 新增 bounded Git-private receipt reader，把 candidate freeze、validation result 与 closure 分成独立轴。
+  Personal 显示“候选已冻结 · 等待验证”等状态；Graph 只接收 supplemental metadata，不改 Core graph/hash、
+  relation/history、active tip 或 full/compact；Maintenance 明示 pending/validated-open/failed 均不可仅凭验证清理。
+- focused owners 为 Candidate 7/7、Personal 14/14、Graph 12/12、Maintenance 8/8；compile、diff check 与真实
+  read-only Graph 28 nodes/22 edges 均通过。未编辑 U2.5 Shell/cache/delivery owners，未运行 Fast/Checkpoint/
+  Candidate/Promotion，未 integration、cleanup、push 或 release。
+
 ## 2026-09-01 — U2.4 Scope Revision 3 Archive and Launcher Surface
 
 - 确认 exact task-description `2dc22cb...` 并刷新 Git-private scope revision 3；既有 product commit

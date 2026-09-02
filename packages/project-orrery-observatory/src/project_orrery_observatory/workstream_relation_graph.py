@@ -237,6 +237,14 @@ def _plain_state(node: Mapping[str, Any]) -> tuple[str, str]:
         return "缺少任务记录", "session-missing"
     if node.get("lifecycle_phase") in {"closed", "integrated", "historical"} or node.get("status") in {"inactive", "completed", "cancelled"}:
         return "历史任务", "historical"
+    if node.get("candidate_status_code") == "candidate-validation-pending":
+        return "候选已冻结 · 等待验证", "candidate-validation-pending"
+    if node.get("candidate_status_code") == "candidate-validated":
+        return "候选已验证 · 尚未关闭", "candidate-validated"
+    if node.get("candidate_status_code") == "candidate-validation-failed":
+        return "候选验证失败 · 尚未关闭", "candidate-validation-failed"
+    if node.get("candidate_status_code") == "candidate-evidence-unknown":
+        return "候选证据待确认", "candidate-evidence-unknown"
     if node.get("session_state") == "stale" or node.get("evidence_freshness") == "stale" or node.get("scope_status") == "stale":
         return "状态待刷新／证据过期", "stale-evidence"
     if node.get("evidence_freshness") == "unknown" or node.get("scope_status") == "unknown" or node.get("status") == "unknown":
@@ -457,6 +465,41 @@ def build_relation_graph_projection(provider_payload: Mapping[str, Any]) -> dict
     node_ids = {item["workstream_id"] for item in nodes}
     if len(node_ids) != len(nodes) or not active_tip_ids.issubset(node_ids):
         raise RelationGraphUnavailable("dangling-node", "Core node identity is duplicate or missing.")
+    candidate_payload = provider_payload.get("candidate_lifecycle", {})
+    if not isinstance(candidate_payload, Mapping):
+        raise RelationGraphUnavailable("invalid-provider", "Candidate lifecycle projection is malformed.")
+    allowed_candidate_states = {"not-frozen", "candidate-frozen", "unknown"}
+    allowed_validation_states = {"not-requested", "pending", "validated", "validation-failed", "unknown"}
+    allowed_closure_states = {"open", "closed", "unknown"}
+    for node in nodes:
+        candidate = candidate_payload.get(node["workstream_id"])
+        if candidate is None:
+            continue
+        if not isinstance(candidate, Mapping):
+            raise RelationGraphUnavailable("invalid-provider", "Candidate lifecycle item is malformed.")
+        candidate_state = str(candidate.get("candidate_state", "unknown"))
+        validation_status = str(candidate.get("validation_status", "unknown"))
+        closure_state = str(candidate.get("closure_state", "unknown"))
+        status_code = str(candidate.get("status_code", "candidate-evidence-unknown"))
+        candidate_sha = candidate.get("candidate_sha")
+        if (
+            candidate_state not in allowed_candidate_states
+            or validation_status not in allowed_validation_states
+            or closure_state not in allowed_closure_states
+            or len(status_code) > 80
+            or (
+                candidate_state == "candidate-frozen"
+                and (not isinstance(candidate_sha, str) or not OID.fullmatch(candidate_sha))
+            )
+        ):
+            raise RelationGraphUnavailable("invalid-provider", "Candidate lifecycle axes are invalid.")
+        if candidate_state == "candidate-frozen" and candidate_sha != node.get("head_oid"):
+            continue
+        node["candidate_state"] = candidate_state
+        node["validation_status"] = validation_status
+        node["closure_state"] = closure_state
+        node["candidate_status_code"] = status_code
+        node["plain_status"], node["plain_status_code"] = _plain_state(node)
     edges = [_sanitize_edge(item, node_ids) for item in raw_edges]
     capture_payload = provider_payload.get("relation_capture")
     capture_gate_by_relation: dict[str, str | None] = {}

@@ -27,9 +27,10 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
   `fe75fc2...`，真实 Graph hydration preview 仍 Pending。
 - ADR-0029 已接受分类校准与未来 dispatch 显式登记。当前没有 `任务分类待确认` consumer、分类 envelope
   强制门或历史分类事件；W7.5 必须先展示证据来源和批次内容，维护者接受前保持零分类写入。
-- ADR-0030 已把阻塞式 closeout 拆为快速 Candidate Freeze 与异步 Validation。冻结阶段只写最小 receipt/Pending
-  指针；详细 Validation/State/DEVLOG 在异步结果或 integration 时事件驱动同步。W3.1 自动化尚未实现；中央
-  `c142f32...` 只提供其 L3 所需的两份严格 receipt schema bootstrap。
+- ADR-0030 已把阻塞式 closeout 拆为快速 Candidate Freeze 与异步 Validation。W3.1 Worktree 已实现最小
+  Git-private freeze/validation receipts、异步 exact-SHA handoff/result，以及 Personal/Graph/Maintenance 的
+  独立 candidate／validation／closure 状态投影；详细 Validation/State/DEVLOG 仍在结果或 integration 时同步。
+  该实现未进入 Canonical、默认站点或公开 release，缺失新格式 receipt 时保持 Unknown／not-frozen。
 - ADR-0033 已接受一个人类入口、两个隔离上下文：Product/Decision 只处理讨论与权威，Execution Coordination
   只处理 committed handoff、platform binding、事件收件箱和有界 control snapshot。Worker 状态变化不得插入
   活跃维护者讨论；不变状态不重复播报。implementation task/repository owner 尚未分配，当前 `AGENTS.md` 全量入口继续生效。
@@ -104,6 +105,7 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - [S0 Orrery Dispatch Skill Validation](../validation/2026-08-30-s0-orrery-dispatch-skill.md)
 - [PO1 Decision Allocation Validation](../validation/2026-08-30-po-decision-allocation-enforcement.md)
 - [W7.3 Relation Capture & Confirmation Validation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)
+- [W3.1 Fast Candidate Freeze and Asynchronous Validation](../validation/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)
 
 ## 已知缺口
 

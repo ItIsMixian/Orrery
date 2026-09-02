@@ -133,3 +133,43 @@ revision 3. No integration, push, release, closure, cleanup or worktree deletion
 - U2.5 exact `f28cf6d1dc9ebb6fbf58a73071c705a4339337d1` is clean and frozen with validation Pending;
 - the maintainer explicitly authorized W3.1 to resume its deferred projection phase from that common baseline;
 - no projection implementation, focused evidence, integration or completion claim exists yet under revision 5.
+
+## 2026-09-02 revision-5 deferred projection evidence
+
+Authority and scope:
+
+- losslessly imported task-description exact `7ca71c11bba59200479e633a1ffb52b15084482f` and U2.5 Candidate exact
+  `f28cf6d1dc9ebb6fbf58a73071c705a4339337d1`; infrastructure exact
+  `6eab27964e22cb0e22b6ebb34ab175869a6505fc` remains in ancestry;
+- rewrote the Git-private expected-write/validation surface set, then ran the complete local-worktree scope guard;
+- the first revision-8 refresh returned the expected L2 confirmation requirement with `findings=[]`; the Plan-revision-5
+  confirmation produced scope revision 9 with `allowed=true`, `local_work_allowed=true`, `findings=[]` and no review block;
+- did not use `--no-local-worktrees`, L3 acknowledgement, peer deletion, fabricated lineage, integration or cleanup.
+
+Implemented projection:
+
+- Core now reads only bounded regular Git-private receipt files (maximum 256 entries per ledger and 512 KiB per file),
+  validates both strict central schemas and projects candidate, validation and closure as independent axes;
+- Personal startup adds those axes and a visible status label while preserving two registry calls, one Maintenance cache
+  snapshot, zero source/scope/diff reads, zero network and zero writes;
+- Graph receives candidate lifecycle as supplemental provider metadata. It does not change Core graph/schema/hash, node
+  or edge selection, active-tip calculation, relation/history authority, layout, or full/compact folding semantics;
+- Maintenance inventory exposes the same axes and adds explicit pending/validated-but-open/failed reasons. Validation
+  alone never changes cleanup eligibility; only the existing closure/integration/review gates can do that;
+- missing legacy/new-format receipts remain `not-frozen` or Unknown rather than deriving a freeze fact from branch names,
+  clean worktrees, prose or agent self-report.
+
+Focused owners (the only automated test surfaces run):
+
+- `python -X utf8 -m unittest tests.test_candidate_freeze` — **7/7 PASS in 210.238 seconds**;
+- `python -X utf8 -m unittest tests.test_personal_observatory` — **14/14 PASS in 107.848 seconds**;
+- `python -X utf8 -m unittest tests.test_workstream_relation_graph_observatory` — **12/12 PASS in 2.315 seconds**;
+- `python -X utf8 -m unittest tests.test_workspace_maintenance` — **8/8 PASS in 468.904 seconds**.
+
+Static checks and bounded live projection completed with exit code 0: changed Python files compiled, `git diff --check`
+passed, Personal remained source/scope/diff-free, and the real local Graph projection remained `ready` with 28 nodes and
+22 edges. U2.5 Shell/cache/delivery owners and their project-template copies were not edited. No Fast, Checkpoint,
+Candidate, Promotion, push, release, worktree removal, branch deletion or network action occurred.
+
+Result: W3.1 implementation and focused owner evidence are complete in this Worktree. This is not Canonical integration,
+hosted validation, closure, cleanup authorization, Promotion or release evidence.

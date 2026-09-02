@@ -16,6 +16,7 @@ sys.path[:0] = [str(CORE_SOURCE), str(CLI_SOURCE), str(REPOSITORY_ROOT)]
 import project_orrery_core.candidate_freeze as candidate_freeze  # noqa: E402
 from project_orrery_core.candidate_freeze import (  # noqa: E402
     freeze_candidate,
+    inspect_candidate_lifecycle,
     inspect_candidate_surface,
     record_candidate_validation,
     request_candidate_validation,
@@ -185,6 +186,12 @@ class CandidateFreezeTests(unittest.TestCase):
             self._edit(root)
             freeze = self._freeze(root, head)
             candidate = str(freeze["candidate_sha"])
+            private_root = Path(str(freeze["receipt_path"])).parents[2]
+            pending_status = inspect_candidate_lifecycle(
+                private_root, workstream_id="W3.1-fixture", head_oid=candidate
+            )
+            self.assertEqual(pending_status["status_code"], "candidate-validation-pending")
+            self.assertEqual(pending_status["closure_state"], "open")
             clean = fixture.git(root, "status", "--porcelain=v1").stdout
             request = request_candidate_validation(
                 root, freeze_receipt_id=str(freeze["receipt_id"])
@@ -205,6 +212,15 @@ class CandidateFreezeTests(unittest.TestCase):
             stored = json.loads(Path(str(passed["receipt_path"])).read_text(encoding="utf-8"))
             validate_candidate_validation_receipt(stored)
             self.assertEqual(passed["validation_status"], "validated")
+            validated_status = inspect_candidate_lifecycle(
+                private_root, workstream_id="W3.1-fixture", head_oid=candidate
+            )
+            self.assertEqual(validated_status["status_code"], "candidate-validated")
+            closed_status = inspect_candidate_lifecycle(
+                private_root, workstream_id="W3.1-fixture", head_oid=candidate,
+                lifecycle_phase="closed", closure_reason="integrated",
+            )
+            self.assertEqual(closed_status["status_code"], "workstream-closed")
             self.assertEqual(fixture.git(root, "rev-parse", "HEAD").stdout.strip(), candidate)
             self.assertEqual(fixture.git(root, "status", "--porcelain=v1").stdout, clean)
             reused = request_candidate_validation(
@@ -233,6 +249,11 @@ class CandidateFreezeTests(unittest.TestCase):
                 result_receipt=failure_result, validation_stage="focused",
             )
             self.assertEqual(failed["validation_status"], "validation-failed")
+            failed_status = inspect_candidate_lifecycle(
+                Path(str(failed["receipt_path"])).parents[2],
+                workstream_id="W3.1-fixture", head_oid=candidate,
+            )
+            self.assertEqual(failed_status["status_code"], "candidate-validation-failed")
             with self.assertRaisesRegex(ValueError, "cannot be retried"):
                 record_candidate_validation(
                     root, freeze_receipt_id=str(freeze["receipt_id"]),

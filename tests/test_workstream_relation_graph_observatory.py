@@ -99,10 +99,36 @@ class WorkstreamRelationGraphObservatoryTests(unittest.TestCase):
             ({"session_state": "missing"}, ("缺少任务记录", "session-missing")),
             ({"status": "unregistered"}, ("未登记", "unregistered")),
             ({"evidence_freshness": "unknown"}, ("关系证据不足", "relation-evidence-insufficient")),
+            ({"candidate_status_code": "candidate-validation-pending"}, ("候选已冻结 · 等待验证", "candidate-validation-pending")),
+            ({"candidate_status_code": "candidate-validated"}, ("候选已验证 · 尚未关闭", "candidate-validated")),
+            ({"candidate_status_code": "candidate-validation-failed"}, ("候选验证失败 · 尚未关闭", "candidate-validation-failed")),
         )
         for axes, expected in cases:
             with self.subTest(axes=axes):
                 self.assertEqual(graph_ui._plain_state(axes), expected)
+
+    def test_candidate_lifecycle_is_supplemental_and_preserves_graph_semantics(self) -> None:
+        payload = json.loads(json.dumps(self.provider))
+        before = graph_ui.build_relation_graph_projection(payload)
+        candidate_head = next(
+            item["head_oid"] for item in before["nodes"] if item["workstream_id"] == "CI2-late"
+        )
+        payload["candidate_lifecycle"] = {
+            "CI2-late": {
+                "candidate_state": "candidate-frozen", "validation_status": "pending",
+                "closure_state": "open", "status_code": "candidate-validation-pending",
+                "candidate_sha": candidate_head,
+            }
+        }
+        after = graph_ui.build_relation_graph_projection(payload)
+        node = next(item for item in after["nodes"] if item["workstream_id"] == "CI2-late")
+        self.assertEqual(node["plain_status_code"], "candidate-validation-pending")
+        self.assertEqual(node["validation_status"], "pending")
+        self.assertEqual(
+            [(item["relation_id"], item["source_workstream_id"], item["target_workstream_id"]) for item in before["edges"]],
+            [(item["relation_id"], item["source_workstream_id"], item["target_workstream_id"]) for item in after["edges"]],
+        )
+        self.assertEqual(before["active_tip_workstream_ids"], after["active_tip_workstream_ids"])
 
     def test_core_payload_maps_three_lenses_and_independent_axes(self) -> None:
         projection = self.projection

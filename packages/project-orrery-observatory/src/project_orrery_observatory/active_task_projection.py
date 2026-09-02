@@ -17,6 +17,7 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from project_orrery_core.candidate_freeze import inspect_candidate_lifecycle
 from project_orrery_core.subprocess_policy import no_window_options
 
 
@@ -114,6 +115,43 @@ def _bounded_session(path_value: object, common_dir: Path) -> tuple[dict[str, An
     return value, "available", size
 
 
+def _candidate_status(record: Mapping[str, Any], session: Mapping[str, Any] | None) -> dict[str, Any]:
+    session_path = record.get("session_path")
+    if not session_path or session is None:
+        return {
+            "candidate_state": "unknown", "validation_status": "unknown",
+            "closure_state": "unknown", "status_code": "candidate-evidence-unknown",
+            "display_label": "候选证据待确认", "candidate_sha": None,
+            "freeze_receipt_id": None, "validation_receipt_ids": [],
+            "receipt_files_read": 0, "receipt_bytes_read": 0, "broken_receipt_files": 0,
+            "writes_performed": False, "network_performed": False,
+        }
+    return inspect_candidate_lifecycle(
+        Path(str(session_path)).parent,
+        workstream_id=str(session.get("workstream_id", "")),
+        head_oid=str(record.get("HEAD", "")) or None,
+        lifecycle_phase=str(session.get("lifecycle_phase", "unknown")),
+        closure_reason=str(session["closure_reason"]) if session.get("closure_reason") else None,
+    )
+
+
+def candidate_lifecycle_by_workstream(
+    project_root: Path,
+    *,
+    registry_provider: Callable[[Path], Mapping[str, Any]] = discover_worktree_registry,
+) -> dict[str, dict[str, Any]]:
+    """Return bounded Git-private candidate axes keyed by registered Workstream ID."""
+    root = Path(project_root).resolve()
+    registry = registry_provider(root)
+    common = Path(registry["common_dir"]).resolve()
+    result: dict[str, dict[str, Any]] = {}
+    for record in registry.get("records", []):
+        session, _, _ = _bounded_session(record.get("session_path"), common)
+        if session and session.get("workstream_id"):
+            result[str(session["workstream_id"])] = _candidate_status(record, session)
+    return result
+
+
 def _maintenance_entries(snapshot: Mapping[str, Any] | None) -> tuple[dict[str, Mapping[str, Any]], str]:
     cache = snapshot.get("cache", {}) if isinstance(snapshot, Mapping) else {}
     summary = cache.get("summary", {}) if isinstance(cache, Mapping) else {}
@@ -164,11 +202,18 @@ def build_active_task_projection(
     tasks: list[dict[str, Any]] = []
     session_reads = 0
     session_bytes = 0
+    receipt_reads = 0
+    receipt_bytes = 0
+    broken_receipts = 0
     revision_parts: list[str] = []
     for index, record in enumerate(registry.get("records", [])):
         session, session_status, byte_count = _bounded_session(record.get("session_path"), common)
         session_reads += 1
         session_bytes += byte_count
+        candidate = _candidate_status(record, session)
+        receipt_reads += int(candidate["receipt_files_read"])
+        receipt_bytes += int(candidate["receipt_bytes_read"])
+        broken_receipts += int(candidate["broken_receipt_files"])
         workstream_id, task_code, display_name = _task_identity(session, record)
         branch = str(record.get("branch", "")).removeprefix("refs/heads/") or "detached"
         maintenance_entry = cache_by_path.get(_normalized(record.get("worktree", "")), {})
@@ -199,6 +244,11 @@ def build_active_task_projection(
             "head": str(record.get("HEAD", "Unknown"))[:12],
             "phase": phase,
             "runtime_condition": runtime,
+            "candidate_state": candidate["candidate_state"],
+            "validation_status": candidate["validation_status"],
+            "closure_state": candidate["closure_state"],
+            "candidate_status_code": candidate["status_code"],
+            "candidate_status_label": candidate["display_label"],
             "primary_subsystem_id": str(session.get("primary_subsystem_id", "Unknown")) if session else "Unknown",
             "affected_subsystem_ids": list(session.get("affected_subsystem_ids", [])) if session else [],
             "evidence_freshness": evidence_freshness,
@@ -214,7 +264,7 @@ def build_active_task_projection(
             "technical_detail_available": bool(record.get("worktree_exists") and session_status == "available"),
             "_registry_index": index,
         })
-        revision_parts.append("|".join((branch, str(record.get("HEAD")), workstream_id, str(session and session.get("captured_at")), cache_state)))
+        revision_parts.append("|".join((branch, str(record.get("HEAD")), workstream_id, str(session and session.get("captured_at")), cache_state, str(candidate["status_code"]))))
     tasks.sort(key=lambda item: (
         {"current": 0, "history": 1, "primary": 2}.get(str(item["category"]), 3),
         item["runtime_condition"] != "active",
@@ -248,6 +298,9 @@ def build_active_task_projection(
             "registry_calls": int(registry.get("registry_calls", 0)),
             "session_files_attempted": session_reads,
             "session_bytes_read": session_bytes,
+            "candidate_receipt_files_read": receipt_reads,
+            "candidate_receipt_bytes_read": receipt_bytes,
+            "candidate_receipt_files_broken": broken_receipts,
             "maintenance_cache_snapshots": 1,
             "worktree_source_files_read": 0,
             "scope_observations": 0,
@@ -334,16 +387,17 @@ def render_task_fragment(projection: Mapping[str, Any]) -> str:
             '<span class="at-detail-unavailable">技术详情暂不可用</span>'
         )
         return (
-            '<article class="at-row" data-task-id="%s" data-task-category="%s">'
+            '<article class="at-row" data-task-id="%s" data-task-category="%s" data-candidate-status="%s">'
             '<div class="at-identity"><span class="at-code">%s</span><div><b>%s</b><small>%s</small></div></div>'
-            '<div class="at-cell"><small>阶段</small><b>%s</b><span>%s</span></div>'
+            '<div class="at-cell"><small>阶段</small><b>%s</b><span>%s · %s</span></div>'
             '<div class="at-cell"><small>主要模块</small><b>%s</b><span>%s</span></div>'
             '<div class="at-cell"><small>证据</small><b class="%s">%s</b><span>%s</span></div>%s</article>'
             % (
-                _esc(item.get("task_id")), _esc(item.get("category")),
+                _esc(item.get("task_id")), _esc(item.get("category")), _esc(item.get("candidate_status_code")),
                 _esc(item.get("task_code")), _esc(item.get("display_name")), _esc(item.get("branch")),
                 _esc(PHASE_LABELS.get(str(item.get("phase")), item.get("phase"))),
                 _esc(RUNTIME_LABELS.get(str(item.get("runtime_condition")), item.get("runtime_condition"))),
+                _esc(item.get("candidate_status_label", "候选证据待确认")),
                 _esc(item.get("primary_subsystem_id", "Unknown")),
                 _esc(" + ".join(str(value) for value in modules[1:]) or "无关联模块"),
                 "current" if item.get("evidence_freshness") == "current" else "refresh",
@@ -415,6 +469,6 @@ ACTIVE_TASK_JS = r"""
 
 __all__ = [
     "ACTIVE_TASK_CSS", "ACTIVE_TASK_JS", "PROJECTION_CONTRACT",
-    "build_active_task_projection", "collect_active_task_detail",
+    "build_active_task_projection", "candidate_lifecycle_by_workstream", "collect_active_task_detail",
     "discover_worktree_registry", "render_active_task_panel", "render_task_fragment",
 ]

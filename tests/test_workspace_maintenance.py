@@ -605,6 +605,11 @@ class WorkspaceMaintenanceTests(unittest.TestCase):
             self.assertEqual(preflight["cache_metrics"]["target_provider_scans"], 1)
             eligibility = compute_workspace_cleanup_eligibility(fixture.repository, workspace_path=fixture.worktree_b)
             self.assertFalse(eligibility["actions"]["delete-remote-branch"]["eligible"])
+            self.assertEqual(
+                eligibility["workspace"]["candidate_lifecycle"]["status_code"],
+                "workstream-closed",
+            )
+            self.assertTrue(eligibility["eligible"])
 
             server_path = REPOSITORY_ROOT / "scripts" / "docsite" / "serve_orrery_control.py"
             spec = importlib.util.spec_from_file_location("orrery_control_test", server_path)

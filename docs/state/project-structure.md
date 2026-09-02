@@ -38,9 +38,9 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
   program/phase、27 两者皆无；strict history 37 records 中 29 无 series、30 无 program/phase。W7.5 尚未
   创建任务或写分类事件，现有缺口继续诚实显示为未登记且不得从名称/lineage推断。
 - ADR-0030 已接受 fast Candidate freeze：实现任务在短结构检查/commit 后可停止为 validation-pending，耗时
-  exact-SHA validation 独立运行。W7.4 已以 clean `fe75fc2...` 手工采用；`freeze-candidate` command/async
-  orchestration 仍未实现。W3.1 已登记，中央 exact `c142f32...` 仅 bootstrap 两份严格 receipt schema；
-  worktree removal 仍由 W6/W6.2 独立持有。
+  exact-SHA validation 独立运行。W3.1 Worktree 已实现 `freeze-candidate`、Git-private freeze/validation receipt、
+  exact-SHA async request/result 与 Personal/Graph/Maintenance 只读状态投影；该实现尚未进入 Canonical 或公开
+  release。worktree removal 仍由 W6/W6.2 独立持有，validated 不等于 closed 或 cleanup-eligible。
 - U2.1 integrated Candidate 修复首轮体验：中文 app 导航、全页 stop、历史 Maintenance 证据降级和 W7.1 legacy/archive graph 显示；它没有创建 relation root、赋予 archive 执行权或放宽 Quick Remove 当前资格。
 - W7.2.3 integrated Candidate 只重构 Observatory Graph presentation：从左到右的确定性 rank、固定可读节点、按 connected component 对齐的工程图路线、按链双向展开／收起、三 lens 真实端点、画布内 inspector 与移动 relation ledger。关系由实线／虚线／复合线和固定视觉尺寸箭头表达，不在线路上覆盖文字；画布支持锚点式 `Ctrl + 滚轮` 缩放。rank 通道为 88px，独立链只保留 44px 分组空隙；全站滚动条使用深浅主题适配。Core relation schema／facts、W7.1 archive 证据与执行边界未改。
 - U2.2 integrated Candidate 把 app 入口和作者文档树组合进一个连续 sidebar/scroll rail，并把 Maintenance 改为 header refresh、四类筛选、8 行分页、折叠技术详情与仅 eligible 行可见的安全删除入口。它只改变展示和有界浏览器状态，不复制或改变 Core eligibility／preflight／authorization／receipt，也没有执行删除。
@@ -116,8 +116,9 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
 - W7B transaction 只写 Git-private confirmation／journal／receipt／compensation；真实 self-host 尚未执行 relation apply。Graph 只读，不提供 apply／undo／close／delete 按钮。
 - Workspace Maintenance Phase 0–2 已实现；Phase 3 自动 worktree removal 和 Phase 4 OS scheduler 尚未实现。没有后台默认删除、daemon 或远程执行。
 - authority-first 当前是作者流程硬边界；自动 Git-private dispatch receipt、CLI acknowledgment 和首次写入阻断尚未实现，不能把人工遵守写成宿主级强制执行。
-- fast Candidate freeze 当前也是人工流程；没有命令或 scheduler。冻结不等于 validated、closed、integrated
-  或 cleanup-eligible。
+- fast Candidate freeze 在 W3.1 Worktree 已有显式 CLI 命令与异步 receipt adapter，但没有 scheduler、默认
+  consumer 或中央自动执行。冻结不等于 validated、closed、integrated 或 cleanup-eligible；验证 PASS 仍须
+  独立 closure/integration 证据才能进入清理资格。
 
 ## 实现证据
 
@@ -136,6 +137,7 @@ Additional governing amendment: [ADR-0032](../decisions/0032-codex-right-panel-p
 - [U2.1 UX Acceptance Fixes Validation](../validation/2026-08-29-u2-1-unified-observatory-ux-acceptance-fixes.md)
 - [U2.2／W7.2 Joint Acceptance](../validation/2026-08-29-u2-2-w7-2-unified-observatory-joint-acceptance.md)
 - [U2.3 Navigation & Live Task Visibility](../validation/2026-08-30-u2-3-navigation-live-task-visibility.md)
+- [W3.1 Fast Candidate Freeze and Asynchronous Validation](../validation/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)
 - [W7.1 Archived Session Relation Projection](../validation/2026-08-29-w7-1-archived-session-relation-projection.md)
 - [W7.2 Graph Readability](../validation/2026-08-29-w7-2-workstream-graph-readability-progressive-disclosure.md)
 - [W7.3 Relation Capture & Confirmation](../validation/2026-08-30-w7-3-workstream-relation-capture-confirmation.md)

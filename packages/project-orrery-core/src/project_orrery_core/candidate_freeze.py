@@ -30,6 +30,101 @@ _FREEZE_CHECKS = (
     "acceptance_fingerprint_match", "conflict_markers_absent", "forbidden_artifacts_absent",
     "diff_check_passed", "exact_copy_parity_passed", "no_validation_invoked",
 )
+_STATUS_RECEIPT_LIMIT = 256
+_STATUS_RECEIPT_BYTES = 512 * 1024
+
+
+def _bounded_private_receipts(directory: Path, validator: Callable[[Mapping[str, Any]], None]) -> tuple[list[dict[str, Any]], int, int]:
+    """Read a bounded regular-file receipt ledger without following links."""
+    if not directory.is_dir():
+        return [], 0, 0
+    values: list[dict[str, Any]] = []
+    broken = 0
+    bytes_read = 0
+    try:
+        paths = sorted(directory.iterdir())[:_STATUS_RECEIPT_LIMIT]
+    except OSError:
+        return [], 1, 0
+    for path in paths:
+        try:
+            metadata = path.lstat()
+            if path.is_symlink() or not stat.S_ISREG(metadata.st_mode) or metadata.st_size > _STATUS_RECEIPT_BYTES:
+                broken += 1
+                continue
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(payload, Mapping):
+                raise ValueError("receipt is not an object")
+            validator(payload)
+            values.append(dict(payload))
+            bytes_read += metadata.st_size
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
+            broken += 1
+    return values, broken, bytes_read
+
+
+def inspect_candidate_lifecycle(
+    private_orrery_root: Path,
+    *,
+    workstream_id: str,
+    head_oid: str | None,
+    lifecycle_phase: str = "unknown",
+    closure_reason: str | None = None,
+) -> dict[str, Any]:
+    """Project freeze, validation, and closure as independent read-only axes."""
+    root = Path(private_orrery_root).resolve()
+    freeze_values, freeze_broken, freeze_bytes = _bounded_private_receipts(
+        root / "candidate-freeze" / "receipts", validate_candidate_freeze_receipt
+    )
+    validation_values, validation_broken, validation_bytes = _bounded_private_receipts(
+        root / "candidate-validation" / "receipts", validate_candidate_validation_receipt
+    )
+    matching_freezes = [
+        item for item in freeze_values
+        if item.get("workstream_id") == workstream_id
+        and (not head_oid or item.get("candidate_sha") == head_oid)
+    ]
+    freeze = matching_freezes[-1] if matching_freezes else None
+    matching_validations = [
+        item for item in validation_values
+        if freeze is not None
+        and item.get("freeze_receipt_id") == freeze.get("receipt_id")
+        and item.get("candidate_sha") == freeze.get("candidate_sha")
+    ]
+    validation_status = "not-requested"
+    if freeze is not None:
+        validation_status = "pending"
+        if any(item.get("validation_status") == "validation-failed" for item in matching_validations):
+            validation_status = "validation-failed"
+        elif any(item.get("validation_status") == "validated" for item in matching_validations):
+            validation_status = "validated"
+    closure_state = "closed" if lifecycle_phase in {"integrated", "closed", "superseded"} or closure_reason else "open"
+    if closure_state == "closed":
+        status_code, label = "workstream-closed", "已关闭"
+    elif freeze is None and (freeze_broken or validation_broken):
+        status_code, label = "candidate-evidence-unknown", "候选证据待确认"
+    elif freeze is None:
+        status_code, label = "candidate-not-frozen", "尚未冻结候选"
+    elif validation_status == "validated":
+        status_code, label = "candidate-validated", "候选已验证"
+    elif validation_status == "validation-failed":
+        status_code, label = "candidate-validation-failed", "候选验证失败"
+    else:
+        status_code, label = "candidate-validation-pending", "候选已冻结 · 等待验证"
+    return {
+        "candidate_state": "candidate-frozen" if freeze is not None else ("unknown" if freeze_broken else "not-frozen"),
+        "validation_status": validation_status,
+        "closure_state": closure_state,
+        "status_code": status_code,
+        "display_label": label,
+        "candidate_sha": freeze.get("candidate_sha") if freeze else None,
+        "freeze_receipt_id": freeze.get("receipt_id") if freeze else None,
+        "validation_receipt_ids": [str(item["receipt_id"]) for item in matching_validations],
+        "receipt_files_read": len(freeze_values) + len(validation_values),
+        "receipt_bytes_read": freeze_bytes + validation_bytes,
+        "broken_receipt_files": freeze_broken + validation_broken,
+        "writes_performed": False,
+        "network_performed": False,
+    }
 
 
 def _utc_now() -> str:
