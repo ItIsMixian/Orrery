@@ -25,9 +25,10 @@ future authority-first task registration explicit enough that accidental unclass
 
 ## Dependency gate
 
-Do not create or start product work until the unique integrator provides the accepted clean W7.4 exact Candidate and
-an integration/import SHA. The W7.4 lifecycle split, 11 recovered archived-lineage edges, full/compact zero-overlap
-geometry and classification diagnostics are immutable inputs to W7.5, not work to redo.
+Do not create or start product work until the unique integrator provides the accepted frozen clean W7.4 exact
+Candidate. W7.5 Phase A may begin while that Candidate's asynchronous validation is pending, but W7.5 integration and
+classification apply cannot outrun required W7.4 validation. The lifecycle split, 11 recovered archived-lineage edges,
+full/compact zero-overlap geometry and classification diagnostics are immutable inputs to W7.5, not work to redo.
 
 ## Phase A — read-only audit and review preview
 

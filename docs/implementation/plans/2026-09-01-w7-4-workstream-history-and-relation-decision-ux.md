@@ -180,3 +180,24 @@ Revision 5 authorizes W7.4 to:
 Identity-only records remain stored but absent from both graph modes. Revision 5 does not authorize a new UI surface,
 relation inference, semantic confirmation, W6.2, or any unittest/Fast/Checkpoint/Candidate/Promotion before preview
 acceptance.
+
+## 2026-09-01 scope revision 6 — fast Candidate freeze after accepted preview
+
+The maintainer accepted the corrected W7.4 preview but rejected the multi-minute same-task closeout. ADR-0030 now
+separates Candidate freeze from asynchronous validation.
+
+Revision 6 authorizes W7.4 to:
+
+1. stop any still-running post-acceptance test command and preserve completed output only when it has a final exit code;
+2. perform only the bounded Candidate Freeze checks in ADR-0030/Approved Design: authority/scope/expected paths,
+   accepted-tree fingerprint, conflict/forbidden scan, `git diff --check`, required root/template parity and one commit;
+3. run no new unittest, temporary Git fixture, Fast, Checkpoint, Candidate, Promotion, browser replay, provider scan,
+   package/site build or release operation during freeze;
+4. record minimal Pending Validation plus `candidate-frozen / validation-pending`, commit one clean exact Candidate,
+   refresh Git-private session/scope to that SHA and stop the implementation task;
+5. leave missing/failed validation to an asynchronous exact-SHA stage; no PASS may be inferred from freeze;
+6. preserve the accepted 6/31 lifecycle split, 11 recovered lineage edges, classification diagnostics and full/compact
+   zero-overlap preview without product changes. Any product-byte change requires a new preview instead of freeze.
+
+Revision 6 does not close or remove the worktree, integrate the Candidate, authorize W7.5/W6.2 product writes, or
+weaken validation/integration/release gates.

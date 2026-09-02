@@ -4,6 +4,8 @@ Updated: 2026-09-01
 
 ## 当前停止点
 
+- 维护者要求更简单的收口。ADR-0030 生效：W7.4 已暂停继续测试，等待 revision 6 任务说明后只做结构化
+  Candidate Freeze/commit，状态为 validation-pending；耗时验证移出实现任务。W3.1 authority 已准备，尚无任务。
 - 维护者已接受 W7.4 corrected preview：strict history 为 6 closed／31 retired，full 25 nodes／18 routes／0
   overlaps，compact 15／8／0 overlaps；组织分类仍独立不完整。W7.4 现只允许 focused post-acceptance closeout
   与 clean commit。ADR-0029/W7.5 authority 已准备，必须等该 exact Candidate 后才创建任务。

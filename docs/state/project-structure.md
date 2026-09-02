@@ -2,7 +2,7 @@
 
 Updated: 2026-09-01
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0026](../decisions/0026-durable-workstream-history-and-human-readable-relation-decisions.md), [ADR-0027](../decisions/0027-retain-history-without-bulk-ui-and-recover-archived-lineage.md), [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md), [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md), [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md), [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md), [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md), [ADR-0013](../decisions/0013-claude-code-and-deepseek-harness-adapters.md), [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md), [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md), [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md), [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md), [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md), [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md), [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md), [ADR-0021](../decisions/0021-v0-3-0-release-scope-default-matrix.md), [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md), [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md), [ADR-0026](../decisions/0026-durable-workstream-history-and-human-readable-relation-decisions.md), [ADR-0027](../decisions/0027-retain-history-without-bulk-ui-and-recover-archived-lineage.md), [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md), [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md), [ADR-0030](../decisions/0030-fast-candidate-freeze-and-asynchronous-validation.md)
 
 ## 当前事实
 
@@ -23,6 +23,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - ADR-0029 已接受显式 Workstream 分类与 dispatch 登记：当前 provider 42 nodes 中 33 无 series、35 无
   program/phase、27 两者皆无；strict history 37 records 中 29 无 series、30 无 program/phase。W7.5 尚未
   创建任务或写分类事件，现有缺口继续诚实显示为未登记且不得从名称/lineage推断。
+- ADR-0030 已接受 fast Candidate freeze：实现任务在短结构检查/commit 后可停止为 validation-pending，耗时
+  exact-SHA validation 独立运行。当前尚无 `freeze-candidate` command/receipt/async orchestration；W7.4 将先
+  手工采用，worktree removal 仍由 W6/W6.2 独立持有。
 - U2.1 integrated Candidate 修复首轮体验：中文 app 导航、全页 stop、历史 Maintenance 证据降级和 W7.1 legacy/archive graph 显示；它没有创建 relation root、赋予 archive 执行权或放宽 Quick Remove 当前资格。
 - W7.2.3 integrated Candidate 只重构 Observatory Graph presentation：从左到右的确定性 rank、固定可读节点、按 connected component 对齐的工程图路线、按链双向展开／收起、三 lens 真实端点、画布内 inspector 与移动 relation ledger。关系由实线／虚线／复合线和固定视觉尺寸箭头表达，不在线路上覆盖文字；画布支持锚点式 `Ctrl + 滚轮` 缩放。rank 通道为 88px，独立链只保留 44px 分组空隙；全站滚动条使用深浅主题适配。Core relation schema／facts、W7.1 archive 证据与执行边界未改。
 - U2.2 integrated Candidate 把 app 入口和作者文档树组合进一个连续 sidebar/scroll rail，并把 Maintenance 改为 header refresh、四类筛选、8 行分页、折叠技术详情与仅 eligible 行可见的安全删除入口。它只改变展示和有界浏览器状态，不复制或改变 Core eligibility／preflight／authorization／receipt，也没有执行删除。
@@ -70,6 +73,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md), [A
 - W7B transaction 只写 Git-private confirmation／journal／receipt／compensation；真实 self-host 尚未执行 relation apply。Graph 只读，不提供 apply／undo／close／delete 按钮。
 - Workspace Maintenance Phase 0–2 已实现；Phase 3 自动 worktree removal 和 Phase 4 OS scheduler 尚未实现。没有后台默认删除、daemon 或远程执行。
 - authority-first 当前是作者流程硬边界；自动 Git-private dispatch receipt、CLI acknowledgment 和首次写入阻断尚未实现，不能把人工遵守写成宿主级强制执行。
+- fast Candidate freeze 当前也是人工流程；没有命令或 scheduler。冻结不等于 validated、closed、integrated
+  或 cleanup-eligible。
 
 ## 实现证据
 

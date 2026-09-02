@@ -2,7 +2,7 @@
 
 Updated: 2026-08-31
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md) | [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md) | [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md) | [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md) | [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md) | [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md) | [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md) | [ADR-0030](../decisions/0030-fast-candidate-freeze-and-asynchronous-validation.md)
 
 ## 当前事实
 
@@ -27,6 +27,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
   clean W7.4 Candidate。
 - ADR-0029 已接受分类校准与未来 dispatch 显式登记。当前没有 `任务分类待确认` consumer、分类 envelope
   强制门或历史分类事件；W7.5 必须先展示证据来源和批次内容，维护者接受前保持零分类写入。
+- ADR-0030 已把阻塞式 closeout 拆为快速 Candidate Freeze 与异步 Validation。冻结阶段只写最小 receipt/Pending
+  指针；详细 Validation/State/DEVLOG 在异步结果或 integration 时事件驱动同步。W3.1 自动化尚未实现。
 - U2.3 local integrated Candidate 将 app rail 收敛为七个固定入口，把路线与趋势从作者文档树移入 app 区，并以唯一 floating Ask Docs 和顶栏只读帮助／系统状态面板替代独立问答／Authority 页面。Personal 使用 Git registry、Git-common-private 有界 session metadata 与现有 Maintenance cache 的轻量 active-task projection；启动不逐 worktree 读取源码、Scope、ignored 或 diff，重证据只在目标详情／刷新时读取。
 - W7.2.3 integrated Candidate 将真实只读 Graph 改为单一从左到右 DAG：固定可读卡片、中文 rank lane、工程图式实线／虚线／复合线、固定 10px 箭头、每链独立展开和收起、锚点式 `Ctrl + 滚轮` 缩放，以及默认关闭的画布内技术详情抽屉。dependency／conflict 只从各自真实端点建图；空 dependency 不显示孤立 active tips。桌面以 88px rank 通道和 44px 独立链间隔显示主图并保留 1×1px 语义 ledger，390px 用同事实列表替代微型图；文档根、侧栏、画布与详情滚动条共享深浅主题变量。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
@@ -40,6 +42,8 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 
 - 新建 Workstream 或追加实质范围前，先提交 authority baseline；Agent 必须在首次／恢复产品写入前读取 exact paths、确认 source revision 并更新 Git-private Scope。只有紧急 stop 可以先发送，后续实现方向仍须等待文档提交。
 - 实现或验证完成后，同步受影响 State、Validation 与 DEVLOG；停止点或风险变化时同步 HANDOFF；当前线路改变时同步 PROGRESS。
+- Preview acceptance 后的 Candidate Freeze 不要求先完成详细证据叙述；它只绑定接受指纹、结构检查与 exact
+  commit。耗时验证完成后再同步完整证据，避免文档写作阻塞实现任务退出。
 - Accepted ADR、Approved Design、Plan checklist、Agent 回执或 Git commit 都不能单独证明 implemented／validated／released。
 - State 只保留当前事实与缺口；逐次命令、失败轮、性能数字和 exact SHA 进入 Validation／DEVLOG。
 - Documentation finding 只是 `info`／`warning`／`review-required` observation；长度、密度和风格不能单独成为硬门。

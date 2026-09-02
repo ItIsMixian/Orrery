@@ -18,6 +18,10 @@ Workstream Graph，并以 Git-private、可验证、事件失效的缓存避免 
 当前 provider 42 个节点中 33 无 series、35 无 program/phase、27 两者皆无；W7.5 将以显式证据和人工确认
 校准历史分类，并要求未来 dispatch 登记分类或明确缺省原因，禁止名称/编号/lineage 推断。
 
+维护者拒绝多分钟同任务 closeout。ADR-0030 已接受：预览接受后先在 `<30s` 目标内执行零测试的结构化
+Candidate Freeze，使实现任务停在 `候选已冻结／验证待执行`；耗时验证对 exact SHA 异步运行，PASS/FAIL、
+closure 与 worktree cleanup 保持独立。W7.4 是首个手工采用任务，W3.1 负责后续自动化。
+
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Release／工具链 | v0.3.1 Latest Release 已验证并发布；Windows launcher 闪窗与健康 runtime 复用缺陷关闭，v0.3.0 历史资产未替换 | 仅完成本次 docs closeout；后续通用 release 简化必须另立 Plan |
@@ -63,6 +67,7 @@ Workstream Graph，并以 Git-private、可验证、事件失效的缓存避免 
 
 ## 活动计划与待办
 
+- [ ] [W3.1 Fast Candidate Freeze and Asynchronous Validation](implementation/plans/2026-09-01-w3-1-fast-candidate-freeze-and-asynchronous-validation.md)：已批准；实现 sub-30-second structural freeze/receipt 与 immutable-SHA async validation。W7.4 先手工采用，不在 freeze 内运行测试。
 - [ ] [W7.5 Workstream Classification Calibration](implementation/plans/2026-09-01-w7-5-workstream-classification-calibration.md)：已批准，等待 accepted clean W7.4 exact Candidate 后分发；先做只读分类审计和人类可理解预览，确认前不写分类事件或运行自动测试。
 - [ ] [U2.5 Shell-first Graph Activation and Incremental Cache](implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)：已批准分发；Phase A 只做不与 W7.4 重叠的 Shell／Git-private cache 基础设施，Phase B 等待 accepted clean W7.4 exact Candidate。维护者预览前不跑 unittest/Fast/Checkpoint/Candidate/Promotion。
 - [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：完整关系恢复已获维护者接受；revision 5 冻结该图为默认 `显示完整关系`，新增同画布 `折叠历史` 预览。只折叠深层无待办历史链，不新增UI；接受前不跑自动测试。
