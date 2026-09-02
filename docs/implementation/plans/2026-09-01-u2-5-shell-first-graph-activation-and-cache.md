@@ -181,3 +181,6 @@ current branch is treated as an inherited, non-writing baseline for the current 
 retain the diagnostic. Any missing/mismatched receipt, non-ancestor head, staged/unstaged/untracked peer byte or resumed
 peer write restores normal fail-closed conflict behavior. This creates no semantic lineage and does not validate,
 integrate, close or remove the frozen peer.
+
+The unique integrator completed this correction at exact `4e64bbb88e2356c729bf69259a58ca96e0e44de3`. U2.5 must
+import it through the next exact task-description version and then rerun the full local-worktree refresh.

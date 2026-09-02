@@ -86,3 +86,7 @@ Revision-3 refresh reduced the blocker to three imported State/DEVLOG paths agai
 Plan revision 4 requires an exact matching freeze receipt, Git ancestry and a clean peer before those inherited
 findings can be excluded from U2.5's own refresh; topology diagnostics and every dirty/non-ancestor negative case remain
 Pending focused evidence.
+
+Central exact `4e64bbb88e2356c729bf69259a58ca96e0e44de3` passed the focused frozen-ancestor regression 1/1 in
+25.511 seconds: full topology retained the conflict, descendant scope refresh proceeded, and one subsequent dirty peer
+byte restored L3. No broader suite, U2.5 product write, peer closure or worktree removal ran.
