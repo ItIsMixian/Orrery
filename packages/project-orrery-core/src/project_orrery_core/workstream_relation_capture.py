@@ -1198,6 +1198,81 @@ def _proposal_fresh(proposal: Mapping[str, Any], sessions: Mapping[str, Mapping[
     return not reasons, reasons
 
 
+_DECISION_GATE_COPY = {
+    "implementation": ("开始实现前", "开发尚不能开始"),
+    "validation": ("开始验证前", "开发可以继续，但验证必须等待"),
+    "integration": ("合入主线前", "分支开发可以继续，但合入主线必须等待"),
+    "release": ("发布前", "合入可以继续，但发布必须等待"),
+}
+
+
+def relation_decision_presentation(proposal: Mapping[str, Any]) -> dict[str, Any]:
+    """Return deterministic, localized decision semantics owned by Core."""
+    source = _identifier(proposal.get("source_workstream_id"), "decision source workstream_id")
+    target = _identifier(proposal.get("target_workstream_id"), "decision target workstream_id")
+    relation_type = proposal.get("relation_type")
+    gate = proposal.get("required_for")
+    evidence = proposal.get("evidence")
+    if not isinstance(evidence, list) or not evidence:
+        return {
+            "complete": False, "actionable": False, "accept_allowed": False,
+            "question": "这条关系建议缺少可解释的证据。",
+            "why_suggested": "Core 无法生成完整的建议原因。",
+            "accept_effect": "当前不能接受。",
+            "reject_effect": "可以暂缓或拒绝；不会形成有效关系。",
+            "evidence_note": "请先补充有界证据。",
+            "decision_kind": str(relation_type or "unknown"), "gate": gate,
+        }
+    categories = sorted({str(item.get("category")) for item in evidence if isinstance(item, Mapping)})
+    category_copy = {
+        "workstream-session": "任务注册与本机会话记录",
+        "validation": "验证记录",
+        "scope": "已登记的任务范围",
+        "relation": "已有关系记录",
+        "git-commit": "精确 Git 提交证据",
+        "other": "有界项目证据",
+    }
+    why = "建议来自" + "、".join(category_copy.get(item, "待确认类别") for item in categories) + "，不是从任务名称推断。"
+    evidence_note = "当前证据只证明建议来源；接受权限、CAS 与端点新鲜度仍由 Core 逐项校验。"
+    if relation_type == "depends_on" and gate in _DECISION_GATE_COPY:
+        gate_label, effect = _DECISION_GATE_COPY[str(gate)]
+        return {
+            "complete": True, "actionable": True, "accept_allowed": True,
+            "question": f"{source} 在{gate_label}是否必须等待 {target} 完成？",
+            "why_suggested": why,
+            "accept_effect": f"接受后，{effect}，直到 {target} 完成；这不会阻止更早阶段继续。",
+            "reject_effect": "拒绝后，两项任务不会因这条建议形成依赖；暂缓则保持 Unknown，不产生 gate。",
+            "evidence_note": evidence_note,
+            "decision_kind": "depends-on", "gate": gate,
+        }
+    if relation_type == "derived_from":
+        return {
+            "complete": True, "actionable": True, "accept_allowed": False,
+            "question": f"能否机械确认 {source} 从 {target} 的精确任务基线接续而来？",
+            "why_suggested": why,
+            "accept_effect": "只有 Core 验证精确基线与 Git ancestry 后才会自动形成来源关系；人不能手工接受 Unknown lineage。",
+            "reject_effect": "拒绝或暂缓不会创建来源关系，也不会从分支名或标题猜测 ancestry。",
+            "evidence_note": "当前机械 lineage 仍为 Unknown，因此没有“接受”操作。",
+            "decision_kind": "derived-from", "gate": None,
+        }
+    if relation_type == "absorbs":
+        return {
+            "complete": True, "actionable": True, "accept_allowed": True,
+            "question": f"是否由 {source} 接管 {target} 尚未完成的责任？",
+            "why_suggested": why,
+            "accept_effect": "接受后，责任接管会形成有效关系；目标 closure、Validation 与未完成责任仍保留可审计。",
+            "reject_effect": "拒绝后不会发生责任转移；暂缓则保持待确认。",
+            "evidence_note": evidence_note,
+            "decision_kind": "absorbs", "gate": None,
+        }
+    return {
+        "complete": False, "actionable": False, "accept_allowed": False,
+        "question": "这条关系类型目前无法解释。", "why_suggested": why,
+        "accept_effect": "当前不能接受。", "reject_effect": "可以暂缓或拒绝，不会形成有效关系。",
+        "evidence_note": "未知关系类型失败关闭。", "decision_kind": "unknown", "gate": gate,
+    }
+
+
 def inspect_relation_capture(project_root: Path, *, proposal_id: str | None = None) -> dict[str, Any]:
     histories = _load_proposal_history(project_root, proposal_id)
     confirmations = _confirmation_history(project_root, proposal_id)
@@ -1223,6 +1298,7 @@ def inspect_relation_capture(project_root: Path, *, proposal_id: str | None = No
             "effective_current_relation": effective_current,
             "display_status": "stale" if status == "accepted" and not fresh else status,
             "local_confirmation": _capability_for_proposal(current, roles, sessions),
+            "decision_presentation": relation_decision_presentation(current),
         }
         proposals.append(projection)
         if effective_current:
@@ -1500,6 +1576,6 @@ __all__ = [
     "capture_storage_root", "change_integrator_role", "change_proposal_gate",
     "defer_proposal", "evidence_reference", "inspect_integrator_roles",
     "inspect_relation_capture", "relation_gate_eligibility", "reject_proposal",
-    "suggest_relation", "validate_confirmation_event", "validate_proposal_event",
+    "relation_decision_presentation", "suggest_relation", "validate_confirmation_event", "validate_proposal_event",
     "validate_role_event",
 ]

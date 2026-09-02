@@ -205,7 +205,8 @@ class UnifiedRegistrationTests(unittest.TestCase):
         self.assertLess(first_inbox, maintenance_at)
         self.assertLess(team_at, second_inbox)
         self.assertIn('data-request-only="true"', page[second_inbox:])
-        self.assertIn("canAccept=p.relation_type!=='derived_from'", RELATION_INBOX_JS)
+        self.assertIn("canAccept=view.accept_allowed===true", RELATION_INBOX_JS)
+        self.assertNotIn("canAccept=p.relation_type!=='derived_from'", RELATION_INBOX_JS)
         self.assertIn("canChangeGate=p.relation_type==='depends_on'", RELATION_INBOX_JS)
 
 

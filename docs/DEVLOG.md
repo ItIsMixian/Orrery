@@ -1373,3 +1373,122 @@
   remain unallocated, model selection is non-binding advice, and the DAG plugin is not a dependency or owner.
 - The corrected planning record and Pending Validation remain documentation-only. No task/worktree was created, no
   existing task scope changed, and no product, plugin, remote or release action occurred.
+
+## 2026-09-01 — W7.4 durable history and relation-decision preview
+
+- 从 U2.4 exact Candidate `00b2eb4...` 建立独立 W7.4 分支，并在首次产品写入前读取 task-description
+  `c9fce26...` 的 ADR-0026／Design／Plan／Pending Validation，登记 Git-private scope revision 1。现有 session
+  schema 不能把 program/phase membership 与 task series 分开登记，因此没有伪造 integrator membership event。
+- 零写入盘点确认 retired archive 37 条、Graph 8 nodes，六条 strict closed records 全部遗漏。hash-bound
+  preview `633e286d...` 只迁移这六条 compact summary；9 条漂移 quarantine、22 条非 closed 跳过。append-only
+  receipt 的 inspection hash 为 `cf86b1d...`，archive/relation 均未改变。
+- Core 新增 history index/schema、closure snapshot readiness 与 deterministic relation decision presentation；
+  Graph 默认折叠为 W5 phase 1 条和其他历史 5 条，展开显示 6/6。Personal inbox 先显示问题、原因、接受／拒绝
+  后果和证据边界，技术字段折叠；Unknown lineage 不提供 Accept。
+- 独立 `43741` loopback preview HTTP 200，页面包含上述真实 self-host 数据。只运行 import/syntax/JSON 和启动
+  preview 所需检查；没有 unittest、Fast、Checkpoint、Candidate、Promotion、Computer Use、push 或发布。
+
+## 2026-09-01 — W7.4 complete bounded-history preview correction
+
+- 维护者拒绝只显示六条 strict-closure records 的首版预览。重新对账完整 dated-v1 输入得到 37 records／37
+  valid envelopes／37 unique Workstreams；首版 9 quarantine + 22 skip 都是仍存在的退休任务，不得当作不存在。
+- 修订 legacy migration 以 immutable archive entry 的 branch slug + exact retirement HEAD 为身份边界；旧
+  session 未收口的 31 条使用 Unknown closure reason／exact time，8 条 session/envelope HEAD 差异显式登记为
+  unknown field。hash-bound preview `81ff5321...` 追加 31 records，receipt inspection `c6c07443...`；archive、
+  relation、branch、commit 与 evidence 未改写。
+- Core/Graph history candidate set 现为 37/37；默认七组计数合计 37，`history:all` 展开显示 37/37。一个位于
+  extras 的 126,892-byte `V0.3.0-final-rc` session 超出 64 KiB dated-v1 边界，作为明确 non-input observation
+  记录而未迁移。维护者第二次预览接受前仍未运行 unittest、Fast、Checkpoint、Candidate 或 Promotion。
+- 修订 loopback 页面 HTTP 200，Graph 为 ready 而非 unavailable fallback；页面显示 37 条历史提示、展开全部历史、
+  relation question、技术详情和 Unknown 不可接受说明。三种 lens 的 folded/expanded render-readiness geometry
+  均为零违规；这些只属于预览启动证据，不是自动测试或维护者接受。
+
+## 2026-09-01 — W7.4 ELK compound hierarchy preview correction
+
+- 维护者截图否决“HTTP 200／机械 geometry 即可读”的判断：真实 `elkjs@0.11.0` 报
+  `UnsupportedGraphException`，因为 component-level 接续边引用了 series compound 内的叶子 port。Validation
+  已回写该证据缺口；没有把同事实 ledger 或手动 legacy engine 冒充 ELK 成功。
+- Graph presentation 现在只为没有跨组语义边的 series 创建 compound；任何被跨组边触及的 series 都把叶子
+  展示节点放回同一 component 层。semantic edge、显式端口、relation authority 与 fail-closed 行为均保持不变，
+  没有启用自动旧布局兜底。
+- 重启独立 `43741` loopback 后，真实 in-app browser 在默认折叠态和“展开全部历史”后均读取到
+  `data-wg-engine=elk`、`data-wg-layout-ready=true`、错误面板隐藏且 console error 为 0；展开 DOM 精确包含 37
+  张历史任务卡。只运行 Python syntax/import 与预览启动检查，仍未运行 unittest、Fast、Checkpoint、Candidate、
+  Promotion 或 `git diff --check`，等待维护者接受页面。
+
+## 2026-09-01 — W7.4 historical relation visibility correction
+
+- 维护者再次拒绝预览：37 个任务身份虽然存在，但展开图只画四条接续线，大量卡片成为散点。盘点证明 provider
+  仍有 10 条 semantic records／proposals，其中 5 条触及历史身份；真正被 presentation 删除的是四条显式
+  series adjacency。旧 `seriesDisplayEdges()` 对任一 history endpoint 一律 `continue`，W7.4 将 37 个节点纳入
+  history candidate 后触发了这条 blanket suppression。
+- 移除浏览器语义输入中的 suppression，恢复 A3→A4、CI6→CI7、U1→U2、U2→U2.2 四条细系列线；它们继续
+  明示为 presentation-only，不升级为接续、依赖或 gate。旧 Python geometry 近似器继续不复刻历史 series
+  坐标，避免把其 legacy crossing 当作 ELK 失败；真实 ELK 仍以显式 ports 处理完整输入。
+- 页面现在披露 8/37 历史身份具有已登记 relation 或显式系列顺序，29/37 显示“仅找回身份／关系未登记”。真实
+  browser 展开接续 lens 为 8 线（4 semantic + 4 series），依赖 lens 为 5 线（3 dependency + 2 series）；两者
+  均 `ELK ready`、console error 0。仍未运行 unittest、Fast、Checkpoint、Candidate、Promotion 或
+  `git diff --check`，等待维护者接受。
+- 默认折叠进一步只收起 29 条 identity-only records；8 条 relation-backed history identities 与全部四条接续、
+  四条系列线无需先展开即可看到。再展开后仍为 37 cards／29 identity-only labels／8 routes，ELK ready 且
+  console error 0。
+
+## 2026-09-01 — W7.4 history directory separation correction
+
+- 维护者再次拒绝预览：`history:all` 虽恢复了 37/37 身份，却把 29 条 relation-unregistered records 灌入
+  关系画布，形成全局任务散点。产品移除该 canvas expansion；无关系历史按 accepted phase／series／
+  “其他历史任务”留作四个紧凑图内入口，完整 37 条改由独立七组历史目录承载。分组只用于查找，不生成关系。
+- 真实 in-app browser 验证默认画布为 16 nodes／8 edges／4 compact entrances；完整目录为 37 items／7 groups，
+  其中 8 relation-backed、29 identity-only。打开目录、点击“其他历史任务”入口和查看 identity-only 详情后，
+  画布均保持 16／8。最终预览已 reload 到目录关闭、inspector 关闭、ELK ready 的默认态。
+- 仅运行 Python `py_compile` 与真实 loopback 浏览器预览；按维护者边界未运行 unittest、Fast、Checkpoint、
+  Candidate、Promotion 或 `git diff --check`。
+
+## 2026-09-01 — W7.4 archived lineage recovery correction
+
+- 维护者拒绝“完整历史目录”：历史身份虽保留，但归档 lineage 没有回到关系画布。产品删除目录、bulk controls、
+  identity-only cards 与所有 phase／series／other 目录入口；37 条历史仍在 Git-common-private storage 内保留。
+- 新增 bounded retired-session lineage 投影。37 条唯一归档中 14 条声明 current lineage；精确端点、OID、Git
+  祖先与无环校验恢复 11 条只读 `derived_from`，3 条因目标归档缺失／不唯一保持无边。source retirement drift
+  或 target 在 task base 后前进只降为 stale/currentness 诊断，不抹去已证明的历史关系。
+- 重启 `43741` 后，真实 in-app browser 显示 ELK `1954×1116`、layout ready、failure hidden；默认接续 lens 为
+  23 cards／15 routes，DOM 中无完整历史目录、history item 或 bulk expand/collapse。七条 pending capture proposals
+  保持不变，未自动接受、删除或改写。仍未运行 unittest、Fast、Checkpoint、Candidate、Promotion 或 diff gate。
+
+## 2026-09-01 — W7.4 same-canvas compact-history preview
+
+- 读取 task-description `5907178...` 的 Design／Plan revision 5 与 Pending Validation；Git-private scope refresh
+  无 findings，L2 本地确认后记录 scope revision 4／`local_work_allowed: true`，再恢复产品写入。
+- 在同一关系画布加入 `显示完整关系`／`折叠历史`。full 默认保持已接受的 23 nodes／15 routes；compact 保护
+  current、attention、pending、Unknown、dependency、conflict、selected 和一跳历史上下文，只把更深的只读
+  历史 maximal connected subgraph 折为 presentation summary。
+- 初始 compact 为 12 nodes／4 summaries／4 visible routes；四个摘要分别保留 9/2/2/2 tasks 与 8/1/1/1
+  underlying relations。单组原地展开变为 20 nodes／3 summaries／12 routes，并提供重新折叠控件。
+- ELK 在旧画布仍可读时离屏计算并原子替换，保留 zoom 和可行的比例 scroll anchor；无新目录、面板、列表、
+  identity-only card 或事实／确认写入。仅运行 syntax/import 与真实 preview，未运行任何自动测试或发布门。
+
+## 2026-09-01 — W7.4 strict history lifecycle correction
+
+- 从 exact task-description `5907178...` 重新读取 ADR-0026／0027、Design revision 4、Plan revision 5 与
+  Pending Validation；scope refresh 绑定当前 integration `4e56e3e...`，L2 本地确认后记录 scope revision 5、
+  0 findings、`local_work_allowed: true`。
+- 只读重算确认旧 history index 的 37 条 records 全部是被拒绝的 `closed-workstream-summary/closed`，而 37 份
+  原 archive 实际为 6 closed、12 implementing、18 validating、1 review-ready。实现改为直接消费中央 strict
+  schema，区分 `closed-workstream`／`retired-session` 并保留实际 lifecycle/runtime/lineage。
+- 旧 37 份错误 bytes 不删除、不覆盖，aggregate SHA-256 `9ee7925d...` 修复前后相同。hash-bound preview
+  `6ec42b9...` 向独立 `strict-records/` 追加 37 条 strict records，并写 repair receipt；0 excluded、
+  `history_snapshot_ready: true`，archive／relation／capture／series bytes 均未改变。
+- 修复后只读 Graph 仍恢复 11 条 archived lineage；拒绝计数保持 13 legacy Unknown、6 parent-unverified
+  Unknown、3 target missing/ambiguous。仅运行 preview 所需 syntax/import 和只读计数，自动测试与发布门继续禁止。
+- 重启后的真实 in-app browser 最终为 ELK ready／failure hidden。当前 Git-private U2.4/U2.5 输入把完整图增量为
+  25 nodes／18 routes；逐项核对确认已接受的 23 nodes／15 routes 全部仍在。compact 为 15 nodes／8 routes／
+  3 summaries，原地展开一组为 23／16／2，最后恢复完整默认。未修改 U2.5 文件或运行自动验证门。
+- 中央最终 SVG 几何复核发现 full 中 CI7 与 U1 integration baseline 交叠 173×81；compact 为 0，定位为顶层
+  rectpacking 未覆盖 nested-series 叶子最终伸展范围。通用修复改用 ELK box 合成独立 compound 边界，无 ID
+  特判或坐标微调，并在实际 SVG rect 绘制后增加全节点 pairwise overlap postcondition，非零不得 ready。
+- 重启 `43741` 后，full 25 nodes／18 routes／0 overlaps、compact 15／8／3 summaries／0 overlaps；两者均 ELK
+  ready、failure hidden，最终恢复 full 默认。只运行 syntax/import、只读 DOM 几何与 browser preview。
+- 分类诊断保持 lifecycle 与 organization 分轴：provider 42 nodes 中 missing series／program-phase／both 为
+  33／35／27，strict history 37 records 为 29／30，full 可见 25 nodes 为 17／21／14。14 张可见卡明确显示
+  “组织分类未登记”，技术详情逐轴显示“未登记”；没有按编号、名称、视觉顺序或 lineage 推断，没有写 program
+  membership／task-series event，也没有把 `derived_from` 当 series。
