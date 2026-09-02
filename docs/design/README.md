@@ -6,6 +6,7 @@ Draft Design may explore options. Only Approved Design can constrain an Implemen
 
 ## Approved designs
 
+- [Workstream Classification Calibration and Dispatch Registration](workstream-classification-calibration-and-dispatch-registration.md) — evidence-bound human calibration for missing program/series metadata plus explicit future dispatch envelopes, without name inference or relation/lifecycle effects, under ADR-0029.
 - [Unified Observatory Shell-first Graph Activation and Incremental Cache](unified-observatory-shell-first-graph-activation.md) — decouples usable shell readiness from Graph readiness and specifies a validated Git-private, event-invalidated, non-authoritative Graph cache under ADR-0028.
 - [ELK Cutover and Explicit Legacy Fallback](elkjs-cutover-and-explicit-legacy-fallback.md) — preview-first cutover, one shared semantic projection, frozen/manual/visibly-labelled legacy recovery and no silent fallback under ADR-0023.
 - [ELK.js Workstream Graph Layout and Orrery Rendering](elkjs-workstream-graph-layout-and-rendering.md) — pinned local ELK compound/orthogonal geometry with Orrery-owned facts, SVG/frontend, zero-network packaging and ledger failure path under ADR-0022, amended by ADR-0023.

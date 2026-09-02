@@ -2,7 +2,7 @@
 
 Updated: 2026-08-31
 
-Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md) | [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md) | [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md)
+Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [ADR-0003](../decisions/0003-provider-bound-credentials-and-optional-local-broker.md) | [ADR-0004](../decisions/0004-platform-neutral-core-and-adapter-boundaries.md) | [ADR-0006](../decisions/0006-broker-only-docsite-provider-gateway.md) | [ADR-0007](../decisions/0007-multi-worktree-collaboration-and-branch-fact-scopes.md) | [ADR-0008](../decisions/0008-local-first-team-coordination-and-cross-machine-metadata.md) | [ADR-0009](../decisions/0009-authority-meta-model-and-semantic-conformance.md) | [ADR-0012](../decisions/0012-document-governance-and-information-lifecycle.md) | [ADR-0014](../decisions/0014-dynamic-workstream-succession-contract.md) | [ADR-0015](../decisions/0015-orrery-brand-and-compatibility-contract.md) | [ADR-0016](../decisions/0016-unified-observatory-shell-and-single-local-entry.md) | [ADR-0017](../decisions/0017-workstream-relation-capture-and-confirmation-authority.md) | [ADR-0018](../decisions/0018-authority-first-workstream-dispatch.md) | [ADR-0019](../decisions/0019-portable-operating-rules-and-authority-route-preflight.md) | [ADR-0020](../decisions/0020-workstream-program-and-phase-hierarchy.md) | [ADR-0022](../decisions/0022-elkjs-workstream-graph-layout-engine.md) | [ADR-0023](../decisions/0023-explicit-legacy-graph-layout-fallback.md) | [ADR-0028](../decisions/0028-shell-first-observatory-and-incremental-graph-cache.md) | [ADR-0029](../decisions/0029-explicit-workstream-classification-and-dispatch-registration.md)
 
 ## 当前事实
 
@@ -21,7 +21,12 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Authority shadow、diagnostic 与完整 projection 使用彼此独立的显式开关；默认 legacy build 保持。完整 M2.2 projection 仅由 root-only `build_authority_projection.py` 启用，失败关闭回无 claim 的 legacy 页面。
 - Personal／Team／Maintenance／Graph 已作为 root-only/default-off sibling page 进入 Canonical source。U2.1 Candidate 的主视图用“交付／待确认的任务或历史状态／工作区清理建议”表达 Personal；Team 为 metadata-only/request-only，Maintenance 只显示当前资格与本机确认，Graph 只读消费完整且验证有效、hash-bound 的 native 或 legacy/archive relation evidence。
 - ADR-0016 与 Approved Unified Observatory Design 已接受“一个用户入口／URL／导航壳、受管隐藏 helper”的目标。当前本地中央 Candidate 在现有 docsite 阅读、搜索、AI 与作者信息架构上，用一个连续 sidebar/scroll rail 组合中文 app 入口和可折叠项目文档树，并加入 A4 规则帮助、U2.3 活动任务、W7.3 关系待确认与 ELK 只读 Graph；Maintenance 使用密集有界队列和折叠技术详情。协议值只在技术详情显示，U1 synthetic prototype 仍不是 UI 规范，公开默认尚未切换。
-- ADR-0028 已接受 Shell-first 启动与增量 Graph cache：动态 shell/非 Graph consumer 的可用性不得等待 Graph，Graph 使用页面内异步状态和 Git-private、版本绑定、事件失效的派生缓存。当前代码仍是 U2.4 全页 starting gate 加进程内 startup cache；U2.5 尚未实现，且最终 Graph 接线必须等待 accepted clean W7.4 Candidate。
+- ADR-0028 已接受 Shell-first 启动与增量 Graph cache。U2.5 Phase A clean exact `6596a9f...` 已在独立
+  Worktree 实现可导航 bootstrap shell、Graph 独立 lifecycle、Git-private validated cache、HEAD/session
+  currentness 与 bounded shutdown；尚未本地整合或取得维护者最终验收。真实 Graph hydration 仍等待 accepted
+  clean W7.4 Candidate。
+- ADR-0029 已接受分类校准与未来 dispatch 显式登记。当前没有 `任务分类待确认` consumer、分类 envelope
+  强制门或历史分类事件；W7.5 必须先展示证据来源和批次内容，维护者接受前保持零分类写入。
 - U2.3 local integrated Candidate 将 app rail 收敛为七个固定入口，把路线与趋势从作者文档树移入 app 区，并以唯一 floating Ask Docs 和顶栏只读帮助／系统状态面板替代独立问答／Authority 页面。Personal 使用 Git registry、Git-common-private 有界 session metadata 与现有 Maintenance cache 的轻量 active-task projection；启动不逐 worktree 读取源码、Scope、ignored 或 diff，重证据只在目标详情／刷新时读取。
 - W7.2.3 integrated Candidate 将真实只读 Graph 改为单一从左到右 DAG：固定可读卡片、中文 rank lane、工程图式实线／虚线／复合线、固定 10px 箭头、每链独立展开和收起、锚点式 `Ctrl + 滚轮` 缩放，以及默认关闭的画布内技术详情抽屉。dependency／conflict 只从各自真实端点建图；空 dependency 不显示孤立 active tips。桌面以 88px rank 通道和 44px 独立链间隔显示主图并保留 1×1px 语义 ledger，390px 用同事实列表替代微型图；文档根、侧栏、画布与详情滚动条共享深浅主题变量。
 - Team 页面没有远程执行权；W7 Graph 没有 apply／undo／close／delete 按钮；Maintenance 不把建议或 receipt 升级成作者事实。
@@ -80,7 +85,9 @@ Governing ADRs: [ADR-0001](../decisions/0001-project-orrery-self-hosting.md) | [
 - Authority portable inventory/route 已作为 A4 source Candidate 接线，但没有稳定公共 parser/domain API、默认 production projection、通用宿主 Hook 或公开模型 1 release。
 - Personal／Team／Maintenance／Graph 尚未接入默认 docsite、Skill template 或公开 release。
 - Unified Observatory 仍只是本地 root-only/default-off integrated Candidate；尚未进入默认 docsite、Skill template、managed-tool inventory、installer 或公开 Release。`start-docsite.bat`／`serve.py` 继续作为 legacy rollback 与当前公开兼容入口。
-- U2.4 的即时 listener 仍以全页启动卡等待完整 Unified render，且每次冷启动重算 Graph。U2.5 只完成 Accepted ADR／Approved Design／Plan／Pending Validation；不存在持久 Graph cache、per-consumer readiness 或已验证的 shell-first runtime。
+- 当前 integration branch 仍是 U2.4 的全页启动卡；U2.5 Phase A 产品只存在于 clean Worktree Candidate
+  `6596a9f...`，未接入 integration/public runtime。Phase B Graph hydration、post-acceptance focused tests 与
+  publication evidence 均不存在。
 - Team 真实双机、云 relay、多设备、远程执行与 Graph 图形执行入口不存在。
 - authority-first 的自动 dispatch receipt、scope revision CAS、CLI acknowledge 与宿主首次写入阻断尚未实现；当前只有已接受且人工执行的作者流程契约。
 - `orrery-dispatch` 已在当前本机安装但未发布；它只能指导宿主遵守流程，不能机械阻断绕过 Skill 的写入，也不能外推为其他主机可用。

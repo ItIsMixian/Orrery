@@ -19,9 +19,11 @@ Updated: 2026-09-01
 
 ## 当前通过证据
 
-- U2.5 当前只有 Accepted ADR、Approved Design、Implementation Plan 与 Pending Validation；没有产品写入、
-  preview、unittest、Fast、Checkpoint、Candidate 或 Promotion 证据。任务要求先看真实 shell-first/Graph
-  cache 页面，维护者接受前只允许运行启动预览所需的语法/import检查。
+- W7.5 当前只有 Accepted ADR、Approved Design、Implementation Plan 与 Pending Validation；没有任务/worktree、
+  分类 proposal/event、产品写入、preview 或测试证据。W7.4 clean Candidate 前禁止创建实现任务。
+- U2.5 Phase A clean `6596a9f...` 只有 syntax/import 与真实 lifecycle preview evidence：首个导航 Shell
+  446 ms、unchanged cache hit provider-runs 0、active-refresh stop 1.201s、relations loading 16ms；没有
+  unittest/Fast/Checkpoint/Candidate/Promotion。Phase B 与最终维护者验收仍 Pending。
 - W7.4 history schema bootstrap 只完成 JSON decode 与 Draft 2020-12 schema self-check；没有运行产品 unittest，
   也不证明 W7.4 writer、migration、archived-lineage projection 或 UI 已实现。
 - U2.4 Worktree Candidate 保持既有 owner IDs：Unified 16、Graph membership 正负 1、root/template parity 1，

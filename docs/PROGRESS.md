@@ -14,6 +14,10 @@ Windows 用户引导到 v0.3.1。当前 closeout merge 正在把 exact authority
 Workstream Graph，并以 Git-private、可验证、事件失效的缓存避免 unchanged restart 全量重扫。U2.5 可先做
 与 W7.4 不重叠的 Shell／缓存基础设施；Graph 展示接线必须等待 W7.4 的 accepted clean exact Candidate。
 
+维护者已接受 W7.4 最终 full/compact 零重叠预览，并确认组织分类仍是独立缺口。ADR-0029/W7.5 已批准：
+当前 provider 42 个节点中 33 无 series、35 无 program/phase、27 两者皆无；W7.5 将以显式证据和人工确认
+校准历史分类，并要求未来 dispatch 登记分类或明确缺省原因，禁止名称/编号/lineage 推断。
+
 | 线路 | 当前状态 | 下一安全动作 |
 |---|---|---|
 | Release／工具链 | v0.3.1 Latest Release 已验证并发布；Windows launcher 闪窗与健康 runtime 复用缺陷关闭，v0.3.0 历史资产未替换 | 仅完成本次 docs closeout；后续通用 release 简化必须另立 Plan |
@@ -59,6 +63,7 @@ Workstream Graph，并以 Git-private、可验证、事件失效的缓存避免 
 
 ## 活动计划与待办
 
+- [ ] [W7.5 Workstream Classification Calibration](implementation/plans/2026-09-01-w7-5-workstream-classification-calibration.md)：已批准，等待 accepted clean W7.4 exact Candidate 后分发；先做只读分类审计和人类可理解预览，确认前不写分类事件或运行自动测试。
 - [ ] [U2.5 Shell-first Graph Activation and Incremental Cache](implementation/plans/2026-09-01-u2-5-shell-first-graph-activation-and-cache.md)：已批准分发；Phase A 只做不与 W7.4 重叠的 Shell／Git-private cache 基础设施，Phase B 等待 accepted clean W7.4 exact Candidate。维护者预览前不跑 unittest/Fast/Checkpoint/Candidate/Promotion。
 - [ ] [W7.4 Workstream History and Relation Decision UX](implementation/plans/2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md)：完整关系恢复已获维护者接受；revision 5 冻结该图为默认 `显示完整关系`，新增同画布 `折叠历史` 预览。只折叠深层无待办历史链，不新增UI；接受前不跑自动测试。
 - [x] [U2.4 Immediate Launcher Readiness](implementation/plans/2026-08-31-u2-4-immediate-launcher-readiness.md)：
@@ -115,6 +120,6 @@ Workstream Graph，并以 Git-private、可验证、事件失效的缓存避免 
 
 ## 下一里程碑
 
-1. 完成并接受 W7.4 compact preview，冻结 clean exact Candidate；W6.2 继续等待该历史快照门。
-2. 分发 U2.5，先完成不重叠的 Shell／缓存基础设施，再消费 W7.4 exact Candidate 做 Graph 异步接线与真实预览。
-3. 后续如需发布 U2.4/U2.5、精简通用发布流程或启动 W6.2，分别建立独立推广／实现任务；alias、scheduler 与独立组件发行继续延期。
+1. 完成 W7.4 focused post-acceptance closeout并冻结 clean exact Candidate；W6.2 继续等待该历史快照门。
+2. 从该 exact Candidate 分发 W7.5 分类校准；U2.5 Phase B 也只消费同一 accepted Graph baseline。
+3. 后续启动 W6.2、发布 U2.4/U2.5 或精简通用发布流程时分别使用独立任务；alias、scheduler 与独立组件发行继续延期。

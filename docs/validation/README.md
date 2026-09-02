@@ -2,6 +2,7 @@
 
 Validation records reproducible evidence for implementation and documentation claims.
 
+- [2026-09-01 W7.5 Workstream Classification Calibration](2026-09-01-w7-5-workstream-classification-calibration.md) — Pending; audits missing program/series metadata, previews evidence-bound human decisions and later enforces explicit classification at dispatch without inference or relation effects.
 - [2026-09-01 U2.5 Shell-first Graph Activation and Incremental Cache](2026-09-01-u2-5-shell-first-graph-activation-and-cache.md) — Pending; requires a non-blocking real shell/Graph preview and unchanged-restart cache reuse before any automated test stage.
 - [2026-09-01 W7.4 Workstream History and Relation Decision UX](2026-09-01-w7-4-workstream-history-and-relation-decision-ux.md) — Pending; requires a real self-host preview of complete folded history and human-readable dependency/Unknown cards before any automated test stage.
 - [2026-08-30 Orrery v0.3.0 Final RC and Promotion](2026-08-30-v0-3-0-final-rc-promotion.md) — exact

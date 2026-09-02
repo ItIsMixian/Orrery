@@ -4,6 +4,9 @@ Updated: 2026-09-01
 
 ## 当前停止点
 
+- 维护者已接受 W7.4 corrected preview：strict history 为 6 closed／31 retired，full 25 nodes／18 routes／0
+  overlaps，compact 15／8／0 overlaps；组织分类仍独立不完整。W7.4 现只允许 focused post-acceptance closeout
+  与 clean commit。ADR-0029/W7.5 authority 已准备，必须等该 exact Candidate 后才创建任务。
 - ADR-0028 与 U2.5 Design/Plan/Pending Validation 已获维护者接受，准备按既有 `unified-u` task series
   Workstream 分发。Phase A 只允许修改与 W7.4 不重叠的 Shell／Git-private Graph cache 基础设施；Phase B
   的 Graph hydration/展示接线必须等待 accepted clean W7.4 exact Candidate。维护者预览前不得跑自动测试。
