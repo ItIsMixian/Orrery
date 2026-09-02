@@ -6477,7 +6477,7 @@
       "reason": "v0.3.1 launcher-hotfix promotion-only regression"
     },
     {
-      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_normal_main_reuses_before_render_and_console_legacy_keeps_console",
+      "test_id": "test_unified_observatory.UnifiedLifecycleAndLauncherTests.test_both_launchers_reuse_before_render_and_console_legacy_keeps_console",
       "owner_surface": "Packaging/Adapters/docsite",
       "owner_shard": "packaging-project",
       "allowed_stages": [
@@ -6800,6 +6800,39 @@
     },
     {
       "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_plain_chinese_status_taxonomy_has_no_generic_pending_fallback", "owner_surface": "Team/LAN", "owner_shard": "team-ui-server", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["observatory-graph"], "reason": "low W7.3 Observatory taxonomy evidence via the provider-neutral observatory-graph surface"
+    },
+    {
+      "test_id": "test_candidate_freeze.CandidateFreezeTests.test_acceptance_drift_and_unexpected_path_refuse_before_commit", "owner_surface": "W3", "owner_shard": "w3-c", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only W3.1 Candidate freeze refusal evidence"
+    },
+    {
+      "test_id": "test_candidate_freeze.CandidateFreezeTests.test_async_pass_fail_are_immutable_and_failed_candidate_is_not_retried", "owner_surface": "W3", "owner_shard": "w3-c", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only W3.1 immutable validation and no-repeat evidence"
+    },
+    {
+      "test_id": "test_candidate_freeze.CandidateFreezeTests.test_conflict_forbidden_parity_and_diff_fail_before_commit", "owner_surface": "W3", "owner_shard": "w3-c", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only W3.1 structural refusal evidence"
+    },
+    {
+      "test_id": "test_candidate_freeze.CandidateFreezeTests.test_dry_run_is_zero_write_and_apply_creates_one_commit_and_private_receipt", "owner_surface": "W3", "owner_shard": "w3-c", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only W3.1 dry-run/apply receipt evidence"
+    },
+    {
+      "test_id": "test_candidate_freeze.CandidateFreezeTests.test_freeze_subprocess_boundary_invokes_git_only_and_no_validation", "owner_surface": "W3", "owner_shard": "w3-c", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only W3.1 zero-validation subprocess boundary evidence"
+    },
+    {
+      "test_id": "test_candidate_freeze.CandidateFreezeTests.test_hard_timeout_refuses_before_commit", "owner_surface": "W3", "owner_shard": "w3-c", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only W3.1 hard-timeout refusal evidence"
+    },
+    {
+      "test_id": "test_candidate_freeze.CandidateFreezeTests.test_schema_validation_accepts_generated_receipts_and_rejects_extra_fields", "owner_surface": "W3", "owner_shard": "w3-c", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only W3.1 strict receipt schema evidence"
+    },
+    {
+      "test_id": "test_collaboration_contract.CollaborationContractTests.test_exact_clean_frozen_ancestor_does_not_block_descendant_scope_refresh", "owner_surface": "W1-W2", "owner_shard": "w1-w2-b", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only exact frozen-ancestor scope evidence"
+    },
+    {
+      "test_id": "test_collaboration_contract.CollaborationContractTests.test_scope_refresh_ignores_conflicts_between_other_local_workstreams", "owner_surface": "W1-W2", "owner_shard": "w1-w2-b", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only peer-only finding isolation evidence"
+    },
+    {
+      "test_id": "test_collaboration_contract.CollaborationContractTests.test_shared_imported_commit_conflicts_only_when_both_workstreams_expect_writes", "owner_surface": "W1-W2", "owner_shard": "w1-w2-b", "allowed_stages": ["promotion"], "cost_class": "heavy", "budget_seconds": 600.0, "dependencies": ["collaboration-maintenance"], "reason": "Promotion-only shared-import write-conflict evidence"
+    },
+    {
+      "test_id": "test_workstream_relation_graph_observatory.WorkstreamRelationGraphObservatoryTests.test_candidate_lifecycle_is_supplemental_and_preserves_graph_semantics", "owner_surface": "Team/LAN", "owner_shard": "team-ui-server", "allowed_stages": ["promotion"], "cost_class": "low", "budget_seconds": 15.0, "dependencies": ["observatory-graph"], "reason": "Promotion-only W3.1 supplemental lifecycle projection evidence"
     }
   ],
   "reuse": {
