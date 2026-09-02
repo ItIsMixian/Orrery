@@ -147,3 +147,34 @@ Pending focused evidence.
 Central exact `4e64bbb88e2356c729bf69259a58ca96e0e44de3` passed the focused frozen-ancestor regression 1/1 in
 25.511 seconds: full topology retained the conflict, descendant scope refresh proceeded, and one subsequent dirty peer
 byte restored L3. No broader suite, U2.5 product write, peer closure or worktree removal ran.
+
+## 2026-09-02 Phase B delivery-slice preview
+
+- U2.5 imported task-description exact `e7c9478ad7d721a86e9b483d1dfd9ca5adbc9d8c`, including frozen-ancestor
+  correction `4e64bbb88e2356c729bf69259a58ca96e0e44de3`. Full local-worktree scope refresh retained topology
+  diagnostics, returned zero findings, and after the revision-4-authorized local L2 confirmation recorded scope
+  revision 13 with both `allowed=true` and `local_work_allowed=true`.
+- The expected-write set remained the seven revision-3 delivery paths with empty validation surfaces. No W7.4 Core
+  relation/history, Graph presentation/adapter, shared mapping/test, State or DEVLOG path was edited.
+- New `workstream_graph_delivery.py` maps a complete cached projection to one bounded browser generation containing the
+  exact frozen W7.4 panel renderer, CSS, pinned local ELK bundle and presentation script. The dynamic endpoint adds this
+  bundle only for a complete ready projection; cache authority and relation truth remain unchanged.
+- The dynamic shell polls only while Graph is empty/refreshing, rejects older generations, lays out the new article
+  offscreen and replaces only the Graph article after layout completes or exposes the existing W7.4 ledger/failure
+  state. Compatible lens/mode/filter/expansion/selection/zoom/viewport state is carried into later generations.
+- Python syntax/import checks passed for the root/template runtime and builder, cache owner and new delivery owner. A
+  Node syntax parse of the emitted hydration JavaScript also passed. These were startup checks, not automated tests.
+- A real self-host restart reached first HTTP in 491 ms and logged base-shell ready in 2.939 seconds. The unchanged
+  generation-2 restart returned `cached-current`, `validated-cache-hit`, a complete browser delivery and
+  `provider_runs_since_start: 0`.
+- One explicit Git-private preview invalidation advanced generation 1 to 2. The running owner observed it without a
+  duplicate worker, exposed `refreshing / cached-stale` with the prior complete delivery and exactly one provider run,
+  then atomically published generation 2 after 13.564 seconds. The projection hash remained
+  `a11409d0fe140194b5baf8a21e2de9cbccec1aee9b55dfd6f70d0ea77c24a200`.
+- The delivered live projection retained 37 strict history records (6 closed / 31 retired), 11 recovered archived
+  lineage edges and seven proposed relations. Its live topology now contains 28 nodes / 22 relations because newer
+  registered tasks are real current inputs; this observation does not replace W7.4's accepted frozen 25/18 full and
+  15/8 compact preview baselines.
+- The preview remains running at `http://127.0.0.1:8765/` for maintainer inspection. No Computer Use, external network,
+  unittest, Fast, Checkpoint, Candidate, Promotion, cleanup or release action ran. Full/compact visual parity and the
+  atomic browser swap remain pending maintainer acceptance.

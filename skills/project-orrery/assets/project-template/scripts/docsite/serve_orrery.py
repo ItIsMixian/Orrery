@@ -592,6 +592,7 @@ class UnifiedState:
                 "generation": 0,
                 "reason_codes": ["shell-not-activated"],
                 "projection": None,
+                "browser_delivery": None,
                 "authority": "derived-read-only",
                 "read_only": True,
                 "writes_author_documents": False,
@@ -599,7 +600,19 @@ class UnifiedState:
                 "execution_capability": False,
                 "available_actions": [],
             }
-        return delivery.snapshot()
+        value = delivery.snapshot()
+        projection = value.get("projection")
+        if isinstance(projection, Mapping):
+            try:
+                from project_orrery_observatory.workstream_graph_delivery import build_browser_delivery
+
+                value["browser_delivery"] = build_browser_delivery(projection)
+            except (OSError, ValueError):
+                value["browser_delivery"] = None
+                value["reason_codes"] = [*value.get("reason_codes", []), "browser-delivery-unavailable"]
+        else:
+            value["browser_delivery"] = None
+        return value
 
     def authority_status_response(self) -> dict[str, Any]:
         with self.state_lock:

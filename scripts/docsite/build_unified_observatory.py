@@ -233,6 +233,67 @@ def graph_provider_payload(root: Path) -> dict[str, Any]:
     return module.core_relation_provider(root)
 
 
+_DYNAMIC_GRAPH_HYDRATION_JS = r"""
+(()=>{'use strict';
+const endpoint='/api/v1/workstreams/graph',styleId='orrery-workstream-graph-delivery-style';
+let appliedGeneration=-1,appliedHash='',pollCount=0,timer=null,stopped=false;
+const maxPolls=120;
+function slot(){return document.querySelector('#workstream-relation-graph')}
+function schedule(delay){if(stopped||pollCount>=maxPolls)return;clearTimeout(timer);timer=setTimeout(poll,delay)}
+function remember(){
+  const graph=window.__orreryWorkstreamGraph,state=graph?.state,article=slot(),viewport=article?.querySelector('[data-wg-viewport]');
+  if(!state)return null;
+  const item=state.selection?.item||null;
+  return{lens:state.lens,graphMode:state.graphMode,expandedChains:[...(state.expandedChains||[])],expandedFolds:[...(state.expandedFolds||[])],scope:state.scope,subsystem:state.subsystem,runtime:state.runtime,zoom:state.zoom,comparisons:state.comparisons,externalContext:state.externalContext,affectedContext:state.affectedContext,selection:state.selection?{kind:state.selection.kind,id:item?.workstream_id||item?.displayEdgeId||item?.relation_id||item?.id||null,item}:null,scrollX:viewport&&viewport.scrollWidth>viewport.clientWidth?viewport.scrollLeft/(viewport.scrollWidth-viewport.clientWidth):0,scrollY:viewport&&viewport.scrollHeight>viewport.clientHeight?viewport.scrollTop/(viewport.scrollHeight-viewport.clientHeight):0};
+}
+function installStyle(text){let style=document.getElementById(styleId);if(!style){style=document.createElement('style');style.id=styleId;document.head.append(style)}if(style.textContent!==text)style.textContent=text}
+function run(text,label){const script=document.createElement('script');script.dataset.wgDeliveryAsset=label;script.textContent=text;document.body.append(script);script.remove()}
+function waitFor(test,timeout=45000){return new Promise((resolve,reject)=>{const started=performance.now();function check(){if(test())return resolve();if(performance.now()-started>timeout)return reject(new Error('Graph delivery layout timed out'));requestAnimationFrame(check)}check()})}
+function restore(article,saved){
+  if(!saved)return;
+  const current=window.__orreryWorkstreamGraph?.state;if(!current)return;
+  current.expandedChains=new Set(saved.expandedChains||[]);current.expandedFolds=new Set(saved.expandedFolds||[]);current.zoom=Number.isFinite(saved.zoom)?saved.zoom:1;current.comparisons=Boolean(saved.comparisons);current.externalContext=Boolean(saved.externalContext);current.affectedContext=Boolean(saved.affectedContext);current.viewportAnchor={x:saved.scrollX,y:saved.scrollY};
+  const mode=article.querySelector(`[data-wg-mode="${saved.graphMode||'full'}"]`);if(mode)mode.click();
+  for(const [selector,value] of [['[data-wg-scope]',saved.scope],['[data-wg-subsystem]',saved.subsystem],['[data-wg-runtime]',saved.runtime]]){const control=article.querySelector(selector);if(control&&[...control.options].some(option=>option.value===value)){control.value=value;control.dispatchEvent(new Event('change'))}}
+  for(const [selector,value] of [['[data-wg-semantic-context]',saved.externalContext],['[data-wg-affected-context]',saved.affectedContext]]){const control=article.querySelector(selector);if(control){control.checked=Boolean(value);control.dispatchEvent(new Event('change'))}}
+  const lens=article.querySelector(`[data-wg-lens="${saved.lens||'succession'}"]`);if(lens)lens.click();
+  if(saved.selection?.id){const node=article.querySelector(`[data-wg-node-id="${CSS.escape(saved.selection.id)}"]`),edge=article.querySelector(`[data-wg-edge-id="${CSS.escape(saved.selection.id)}"]`);(node||edge)?.dispatchEvent(new MouseEvent('click',{bubbles:true}))}
+}
+async function activate(envelope){
+  const delivery=envelope.browser_delivery;if(!delivery||delivery.contract_type!=='workstream-graph-browser-delivery-v1')return false;
+  const generation=Number(envelope.generation);if(!Number.isInteger(generation)||generation<appliedGeneration)return false;
+  if(generation===appliedGeneration&&delivery.projection_hash===appliedHash)return true;
+  const current=slot();if(!current)return false;const saved=remember(),priorId=current.id;current.id='workstream-relation-graph-previous';
+  const template=document.createElement('template');template.innerHTML=delivery.panel_html.trim();const article=template.content.firstElementChild;
+  if(!article||article.tagName!=='ARTICLE'){current.id=priorId;throw new Error('Graph delivery panel is invalid')}
+  article.classList.add('wg-hydration-offscreen');article.dataset.wgDeliveryGeneration=String(generation);article.dataset.wgDeliveryStatus=envelope.status;current.after(article);
+  try{
+    installStyle(delivery.style_text);
+    if(typeof ELK!=='function')run(delivery.vendor_script,'elk');
+    run(delivery.presentation_script,'presentation');
+    await waitFor(()=>article.dataset.wgLayoutReady==='true'||!article.querySelector('[data-wg-layout-failure]')?.hidden);
+    restore(article,saved);
+    await waitFor(()=>article.dataset.wgLayoutReady==='true'||!article.querySelector('[data-wg-layout-failure]')?.hidden);
+    article.classList.remove('wg-hydration-offscreen');current.replaceWith(article);appliedGeneration=generation;appliedHash=delivery.projection_hash;return true;
+  }catch(error){article.remove();current.id=priorId;throw error}
+}
+function fail(message){const current=slot();if(!current)return;current.dataset.wgDeliveryState='failed';const card=current.querySelector('.wg-activation-card');if(card)card.innerHTML=`<div><b>任务关系暂不可用</b><span>${message}</span></div>`}
+async function poll(){
+  if(stopped)return;pollCount+=1;
+  try{
+    const response=await fetch(endpoint,{cache:'no-store',headers:{Accept:'application/json'}});if(!response.ok)throw new Error('Graph delivery request failed');const envelope=await response.json();
+    const generation=Number(envelope.generation);if(Number.isInteger(generation)&&generation<appliedGeneration)return;
+    if(envelope.browser_delivery)await activate(envelope);
+    const current=slot();if(current){current.dataset.wgDeliveryState=envelope.status;current.dataset.wgCacheState=envelope.cache_state||'empty'}
+    if(envelope.status==='empty'||envelope.status==='refreshing'){schedule(Math.min(1500,250+pollCount*75));return}
+    if(envelope.status==='failed'&&!envelope.browser_delivery)fail('本机 Graph provider 未能生成完整投影；其他页面仍可使用。');
+  }catch(_error){if(pollCount<maxPolls)schedule(Math.min(1500,300+pollCount*100));else fail('本机 Graph delivery 超时；其他页面仍可使用。')}
+}
+addEventListener('pagehide',()=>{stopped=true;clearTimeout(timer)},{once:true});poll();
+})();
+"""
+
+
 def _inject_dynamic_graph_slot(page: str) -> tuple[str, dict[str, Any]]:
     content_marker = '</main><aside class="toc" id="toc">'
     nav_candidates = (
@@ -247,6 +308,7 @@ def _inject_dynamic_graph_slot(page: str) -> tuple[str, dict[str, Any]]:
         '.wg-activation-shell{margin:0 auto;max-width:1180px}.wg-activation-card{min-height:280px;display:grid;'
         'place-items:center;padding:32px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);text-align:center}'
         '.wg-activation-card b{display:block;margin-bottom:8px;font-size:18px}.wg-activation-card span{color:var(--mut);font-size:11px}'
+        '.wg-hydration-offscreen{position:fixed!important;left:-200vw!important;top:0!important;width:min(1180px,100vw)!important;visibility:hidden!important;pointer-events:none!important}'
     )
     panel = (
         '<article class="page wide wg-activation-shell" id="workstream-relation-graph" '
@@ -258,6 +320,7 @@ def _inject_dynamic_graph_slot(page: str) -> tuple[str, dict[str, Any]]:
     result = page.replace("</style>", css + "</style>", 1)
     result = result.replace(marker, marker + nav, 1)
     result = result.replace(content_marker, panel + content_marker, 1)
+    result = result.replace("</body>", "<script>" + _DYNAMIC_GRAPH_HYDRATION_JS + "</script></body>", 1)
     projection = {
         "projection_schema_version": 2,
         "contract_type": "workstream-relation-graph-observatory",

@@ -347,6 +347,11 @@ class WorkstreamGraphDelivery:
         self._lock = threading.RLock()
         self._cancel = threading.Event()
         self._worker: threading.Thread | None = None
+        self._watcher: threading.Thread | None = None
+        self._provider: Callable[[], Mapping[str, Any]] | None = None
+        self._projector: Callable[[Callable[[], Mapping[str, Any]]], Mapping[str, Any]] | None = None
+        self._on_provider_payload: Callable[[Mapping[str, Any]], None] | None = None
+        self._observed_invalidation_generation = 0
         self._state = "empty"
         self._reason_codes: list[str] = ["cache-not-inspected"]
         self._projection: dict[str, Any] | None = None
@@ -368,6 +373,9 @@ class WorkstreamGraphDelivery:
         projector: Callable[[Callable[[], Mapping[str, Any]]], Mapping[str, Any]],
         on_provider_payload: Callable[[Mapping[str, Any]], None] | None = None,
     ) -> dict[str, Any]:
+        self._provider = provider
+        self._projector = projector
+        self._on_provider_payload = on_provider_payload
         if self._cancel.is_set():
             with self._lock:
                 self._state = "failed"
@@ -377,6 +385,10 @@ class WorkstreamGraphDelivery:
             manifest = build_input_manifest(self.project_root)
         except Exception:
             manifest = None
+        try:
+            self._observed_invalidation_generation = _read_generation(self.cache_root)
+        except Exception:
+            self._observed_invalidation_generation = 0
         cached: dict[str, Any] | None = None
         cache_reason = "cache-absent"
         for name in ("current.json", "last-known.json"):
@@ -405,6 +417,7 @@ class WorkstreamGraphDelivery:
                 self._state = "cached-current"
                 self._reason_codes = ["validated-cache-hit"]
                 self.logger("Graph cache validated; background provider skipped")
+                self._start_watcher()
                 return self.snapshot()
             self._state = "refreshing"
             self._reason_codes = [
@@ -422,7 +435,58 @@ class WorkstreamGraphDelivery:
             )
             self._worker = worker
             worker.start()
+            self._start_watcher()
             return self.snapshot()
+
+    def _start_watcher(self) -> None:
+        with self._lock:
+            if self._watcher is not None and self._watcher.is_alive():
+                return
+            watcher = threading.Thread(
+                target=self._watch_invalidations,
+                daemon=True,
+                name="orrery-workstream-graph-invalidation-watch",
+            )
+            self._watcher = watcher
+            watcher.start()
+
+    def _watch_invalidations(self) -> None:
+        while not self._cancel.wait(0.25):
+            try:
+                generation = _read_generation(self.cache_root)
+            except Exception:
+                continue
+            with self._lock:
+                worker_active = self._worker is not None and self._worker.is_alive()
+                if generation == self._observed_invalidation_generation or worker_active:
+                    continue
+                provider = self._provider
+                projector = self._projector
+                if provider is None or projector is None:
+                    continue
+            try:
+                manifest = build_input_manifest(self.project_root)
+            except Exception:
+                manifest = None
+            with self._lock:
+                if self._cancel.is_set() or (self._worker is not None and self._worker.is_alive()):
+                    continue
+                self._observed_invalidation_generation = generation
+                self._state = "refreshing"
+                self._reason_codes = ["invalidation-generation-changed"]
+                worker = threading.Thread(
+                    target=self._refresh,
+                    kwargs={
+                        "manifest": manifest,
+                        "provider": provider,
+                        "projector": projector,
+                        "on_provider_payload": self._on_provider_payload,
+                    },
+                    daemon=True,
+                    name="orrery-workstream-graph-refresh",
+                )
+                self._worker = worker
+                worker.start()
 
     def _refresh(
         self,
@@ -548,6 +612,9 @@ class WorkstreamGraphDelivery:
     def close(self, *, timeout: float = 1.0) -> bool:
         self._cancel.set()
         worker = self._worker
+        watcher = self._watcher
         if worker is not None and worker is not threading.current_thread():
             worker.join(timeout=max(0.0, timeout))
-        return worker is None or not worker.is_alive()
+        if watcher is not None and watcher is not threading.current_thread():
+            watcher.join(timeout=max(0.0, timeout))
+        return (worker is None or not worker.is_alive()) and (watcher is None or not watcher.is_alive())
