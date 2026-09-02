@@ -212,7 +212,7 @@ class CIValidationTests(unittest.TestCase):
             with self.subTest(flag=flag):
                 self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
                 self.assertEqual(completed.stdout.splitlines(), [json.dumps(expected, separators=(",", ":"))])
-                self.assertIn("building reader…", completed.stderr)
+                self.assertEqual(completed.stderr, "")
 
     def test_machine_inventory_gives_every_test_owner_stage_cost_budget_and_reason(self) -> None:
         inventory = machine_inventory(self.manifest)

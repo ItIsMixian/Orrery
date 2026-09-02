@@ -24,6 +24,7 @@ for source in (OBSERVATORY_SOURCE, CLI_SOURCE, CORE_SOURCE, DOCSITE):
     sys.path.insert(0, str(source))
 
 import build_unified_observatory  # noqa: E402
+import build_workstream_relation_graph  # noqa: E402
 import serve_orrery  # noqa: E402
 from project_orrery_core import subprocess_policy  # noqa: E402
 from project_orrery_observatory.unified_observatory import (  # noqa: E402
@@ -220,7 +221,7 @@ class UnifiedRuntimeTests(unittest.TestCase):
         cls.logger.handlers.clear()
         cls.logger.addHandler(logging.FileHandler(cls.identity.log_path, encoding="utf-8"))
         cls.logger.setLevel(logging.INFO)
-        synthetic_graph = build_unified_observatory.build_workstream_relation_graph.synthetic_browser_provider()
+        synthetic_graph = build_workstream_relation_graph.synthetic_browser_provider()
         synthetic_capture = {
             "schema_version": 2,
             "privacy": {"prompt": False, "answer": False, "source": False, "diff": False, "credentials": False},
@@ -268,11 +269,6 @@ class UnifiedRuntimeTests(unittest.TestCase):
                 side_effect=_bounded_personal_site,
             ),
             mock.patch.object(
-                build_unified_observatory.build_workstream_relation_graph,
-                "core_relation_provider",
-                return_value=synthetic_graph,
-            ),
-            mock.patch.object(
                 build_unified_observatory,
                 "relation_capture_payload",
                 return_value=synthetic_capture,
@@ -281,6 +277,8 @@ class UnifiedRuntimeTests(unittest.TestCase):
             page, _stats, registrations, authority, graph_payload, fact_rules_projection = build_unified_observatory.render_unified_site(
                 ROOT, mode="dynamic",
             )
+        graph_payload = dict(synthetic_graph)
+        graph_payload["relation_capture"] = synthetic_capture
         cls.rendered_page = page
         state = serve_orrery.UnifiedState(
             page=page, registrations=registrations, authority_status=authority,
@@ -887,11 +885,9 @@ class UnifiedLifecycleAndLauncherTests(unittest.TestCase):
             ROOT / "packages" / "project-orrery-core" / "src" / "project_orrery_core"
             / "schema" / "authority-v1.json"
         ).read_text(encoding="utf-8"))
-        self.assertTrue(
-            {"Start Orrery.vbs", "Start Orrery Console.bat"}
-            .issubset(authority_schema["required_scaffold_files"])
-        )
-        self.assertNotIn("start-docsite.bat", authority_schema["required_scaffold_files"])
+        self.assertIn("start-docsite.bat", authority_schema["required_scaffold_files"])
+        self.assertNotIn("Start Orrery.vbs", authority_schema["required_scaffold_files"])
+        self.assertNotIn("Start Orrery Console.bat", authority_schema["required_scaffold_files"])
         with mock.patch.object(serve_orrery, "_legacy", return_value=7) as rollback:
             self.assertEqual(serve_orrery.main(["--legacy", "--no-browser"]), 7)
         rollback.assert_called_once_with(False, True)

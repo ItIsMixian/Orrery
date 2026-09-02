@@ -93,15 +93,24 @@ class ProjectOrreryTests(unittest.TestCase):
         )
         self.assertEqual(published["archive_entry_count"], len(published["skill_paths"]))
 
-        current_skill_paths = {
-            path.relative_to(SKILL_ROOT).as_posix()
-            for path in SKILL_ROOT.rglob("*")
-            if path.is_file() and "__pycache__" not in path.parts and path.suffix not in {".pyc", ".pyo"}
+        historical = subprocess.run(
+            ["git", "ls-tree", "-r", "--name-only", "v0.2.0", "--", "skills/project-orrery"],
+            cwd=REPOSITORY_ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+        self.assertEqual(historical.returncode, 0, historical.stdout + historical.stderr)
+        historical_skill_paths = {
+            path.removeprefix("skills/project-orrery/")
+            for path in historical.stdout.splitlines()
         }
-        self.assertTrue(set(published["skill_paths"]).issubset(current_skill_paths))
+        self.assertTrue(set(published["skill_paths"]).issubset(historical_skill_paths))
         packaged_managed_tools = {f"assets/project-template/{path}" for path in published["managed_tools"]}
-        self.assertTrue(packaged_managed_tools.issubset(current_skill_paths))
-        self.assertTrue(set(baseline["cli_entrypoints"].values()).issubset(current_skill_paths))
+        self.assertTrue(packaged_managed_tools.issubset(historical_skill_paths))
+        self.assertTrue(set(baseline["cli_entrypoints"].values()).issubset(historical_skill_paths))
 
         release_manifest = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
         self.assertTrue(set(baseline["release_manifest_required_fields"]).issubset(release_manifest))
@@ -145,7 +154,12 @@ class ProjectOrreryTests(unittest.TestCase):
             project_manifest = json.loads((target / ".project-orrery.json").read_text(encoding="utf-8"))
             self.assertTrue(set(baseline["project_manifest_required_fields"]).issubset(project_manifest))
             self.assertTrue(
-                set(baseline["published_release"]["managed_tools"]).issubset(project_manifest["managed_tools"])
+                {"Start Orrery.vbs", "Start Orrery Console.bat"}
+                .issubset(project_manifest["managed_tools"])
+            )
+            self.assertFalse(
+                {"start-orrery.bat", "start-orrery-control.bat", "start-docsite.bat"}
+                & set(project_manifest["managed_tools"])
             )
 
             validated = run_python(VALIDATOR, "--target", str(target))
@@ -208,7 +222,7 @@ class ProjectOrreryTests(unittest.TestCase):
         for relative in observatory["managed_tools"]:
             self.assertTrue((REPOSITORY_ROOT / relative).is_file(), relative)
             self.assertTrue((compatibility_root / relative).is_file(), relative)
-        self.assertEqual(len(observatory["managed_runtime"]), 106)
+        self.assertEqual(len(observatory["managed_runtime"]), 111)
         self.assertIn(
             "packages/project-orrery-core/src/project_orrery_core/subprocess_policy.py",
             observatory["managed_runtime"],
@@ -218,7 +232,7 @@ class ProjectOrreryTests(unittest.TestCase):
 
         for relative in (
             "Start Orrery.vbs",
-            "start-orrery.bat",
+            "Start Orrery Console.bat",
             "scripts/docsite/docsite_insights.py",
             "scripts/docsite/serve_orrery.py",
         ):
@@ -536,7 +550,7 @@ class ProjectOrreryTests(unittest.TestCase):
             self.assertIn("project-orrery/packages/project-orrery-cli/src/project_orrery_cli/scaffold.py", names)
             self.assertIn("project-orrery/packages/project-orrery-observatory/src/project_orrery_observatory/unified_observatory.py", names)
             self.assertIn("project-orrery/adapters/harness-json/run_harness.py", names)
-            self.assertEqual(len(names), 164)
+            self.assertEqual(len(names), 170)
             manifest = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
             self.assertEqual(names, manifest["distribution"]["archive_paths"])
             path_list = "".join(f"{name}\n" for name in names).encode("utf-8")

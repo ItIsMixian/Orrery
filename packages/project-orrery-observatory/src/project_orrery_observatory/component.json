@@ -59,6 +59,7 @@
     "packages/project-orrery-core/src/project_orrery_core/authority_migration.py",
     "packages/project-orrery-core/src/project_orrery_core/authority_route.py",
     "packages/project-orrery-core/src/project_orrery_core/authority.py",
+    "packages/project-orrery-core/src/project_orrery_core/candidate_freeze.py",
     "packages/project-orrery-core/src/project_orrery_core/collaboration.py",
     "packages/project-orrery-core/src/project_orrery_core/compatibility.py",
     "packages/project-orrery-core/src/project_orrery_core/data/documentation-governance-rules-v1.json",
@@ -76,6 +77,8 @@
     "packages/project-orrery-core/src/project_orrery_core/schema/authority-managed-consumer-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/authority-route-preflight-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/authority-v1.json",
+    "packages/project-orrery-core/src/project_orrery_core/schema/candidate-freeze-receipt-v1.json",
+    "packages/project-orrery-core/src/project_orrery_core/schema/candidate-validation-receipt-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/collaboration-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/documentation-governance-finding-v1.json",
     "packages/project-orrery-core/src/project_orrery_core/schema/maintenance-v1.json",
@@ -136,6 +139,8 @@
     "packages/project-orrery-observatory/src/project_orrery_observatory/vendor/LICENSE.elkjs.md",
     "packages/project-orrery-observatory/src/project_orrery_observatory/vendor/package.elkjs.json",
     "packages/project-orrery-observatory/src/project_orrery_observatory/vendor/PROVENANCE.elkjs.json",
+    "packages/project-orrery-observatory/src/project_orrery_observatory/workstream_graph_cache.py",
+    "packages/project-orrery-observatory/src/project_orrery_observatory/workstream_graph_delivery.py",
     "packages/project-orrery-observatory/src/project_orrery_observatory/workstream_graph_presentation.py",
     "packages/project-orrery-observatory/src/project_orrery_observatory/workstream_relation_graph.py"
   ]

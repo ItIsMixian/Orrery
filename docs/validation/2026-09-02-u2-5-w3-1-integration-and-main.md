@@ -36,3 +36,16 @@ Pending execution.
   ID was replaced rather than duplicated;
 - JSON decode, `validate_ci.py --all` and `git diff --check` passed locally. A new SHA is required; the failed SHA will
   not be rerun.
+
+## 2026-09-02 second Promotion result
+
+- corrected registry source `01a3e9ac80f96b610deb1353d09b546ac5c8a4c8` was pushed to the same non-main
+  Promotion ref;
+- Promotion run `33659625925` passed exact-SHA preflight and then failed closed in repository packaging gates and five
+  logical test lanes on both operating systems;
+- the failures were integration drift at already-accepted boundaries: the two-launcher/new-module package inventory,
+  installed-runtime inventory, immutable Authority v1 compatibility, fixture Git identity, lazy Graph test setup,
+  exact-blob overlap expectations, ADR relation inventory and machine-list stderr expectation;
+- the SHA was not retried and protected `main` was not updated;
+- correction remains limited to compatibility/inventory and stale test expectations. U2.5/W3.1 product semantics,
+  public tags, Release assets and publication state are unchanged.

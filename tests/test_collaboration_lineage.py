@@ -152,7 +152,7 @@ class StackedLineageTests(unittest.TestCase):
                 for kind in ("direct", "authority")
             }
             self.assertGreater(before_counts["direct"], 0)
-            self.assertGreater(before_counts["authority"], 0)
+            self.assertEqual(before_counts["authority"], 0)
 
             proofs = collect_lineage_ancestry_proofs(fixture.repository, scopes)
             after = compute_overlap_findings(scopes, lineage_ancestry_proofs=proofs)

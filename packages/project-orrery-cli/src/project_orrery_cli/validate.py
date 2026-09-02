@@ -18,6 +18,11 @@ from .context import CliContext, repository_context
 from .protocol import JsonExitCode, emit, issue, response
 
 
+LEGACY_LAUNCHER_REPLACEMENTS = {
+    "start-docsite.bat": ("Start Orrery.vbs", "Start Orrery Console.bat"),
+}
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Validate an installed Project Orrery scaffold"
@@ -65,7 +70,10 @@ def run(args: argparse.Namespace, context: CliContext) -> int:
         warnings.append(issue(code, message, **details))
 
     for relative in REQUIRED_SCAFFOLD_FILES:
-        if not (root / relative).is_file():
+        replacements = LEGACY_LAUNCHER_REPLACEMENTS.get(relative, ())
+        if not (root / relative).is_file() and not (
+            replacements and all((root / replacement).is_file() for replacement in replacements)
+        ):
             problem(
                 "required_file_missing",
                 f"missing required file: {relative}",

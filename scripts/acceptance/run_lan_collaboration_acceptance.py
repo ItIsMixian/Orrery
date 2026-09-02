@@ -234,8 +234,8 @@ def _run_lineage_stage() -> dict[str, Any]:
         "W6", postfork_oid, [(w6_path, postfork_oid)], parent="W5C", task_base=w5c_oid,
     )
     collided = compute_overlap_findings(postfork, lineage_ancestry_proofs=proofs)
-    if before_counts["direct"] == 0 or before_counts["authority"] == 0:
-        raise AssertionError("legacy lineage fixture did not reproduce duplicate findings")
+    if before_counts["direct"] == 0 or before_counts["authority"] != 0:
+        raise AssertionError("legacy lineage fixture did not preserve exact-blob authority deduplication")
     if after_counts != {"direct": 0, "authority": 0}:
         raise AssertionError("verified stacked inheritance remained in the conflict finding set")
     if not any(

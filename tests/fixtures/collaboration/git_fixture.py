@@ -58,6 +58,8 @@ class CollaborationGitFixture:
         self.repository.mkdir()
         self.git(self.repository, "init")
         self.git(self.repository, "branch", "-M", "main")
+        self.git(self.repository, "config", "user.name", "Orrery Fixture")
+        self.git(self.repository, "config", "user.email", "fixture@example.invalid")
         (self.repository / "README.md").write_text("# fixture\n", encoding="utf-8")
         (self.repository / ".project-orrery.json").write_text(
             '{"name":"project-orrery","manifest_format":1}\n', encoding="utf-8"

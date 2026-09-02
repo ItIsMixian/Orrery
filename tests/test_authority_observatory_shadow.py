@@ -267,6 +267,18 @@ class AuthorityObservatoryShadowTests(unittest.TestCase):
                 },
                 "ADR-0022": {"amends": ["ADR-0020"]},
                 "ADR-0023": {"amends": ["ADR-0022"]},
+                "ADR-0024": {"amends": ["ADR-0021"]},
+                "ADR-0025": {"amends": ["ADR-0016"]},
+                "ADR-0026": {
+                    "amends": ["ADR-0007", "ADR-0017", "ADR-0020"]
+                },
+                "ADR-0027": {"amends": ["ADR-0026"]},
+                "ADR-0028": {"amends": ["ADR-0016"]},
+                "ADR-0029": {"amends": ["ADR-0018", "ADR-0020"]},
+                "ADR-0030": {"amends": ["ADR-0007", "ADR-0018"]},
+                "ADR-0031": {"amends": ["ADR-0017"]},
+                "ADR-0032": {"amends": ["ADR-0031"]},
+                "ADR-0033": {"amends": ["ADR-0007", "ADR-0018"]},
             },
         )
 
