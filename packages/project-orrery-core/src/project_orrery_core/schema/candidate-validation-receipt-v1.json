@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schema/candidate-validation-receipt-v1.json",
+  "title": "Orrery immutable Candidate validation receipt",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_type",
+    "receipt_id",
+    "workstream_id",
+    "task_description_sha",
+    "freeze_receipt_id",
+    "candidate_sha",
+    "accepted_surface_fingerprint",
+    "relevant_tree_hash",
+    "validation_stage",
+    "selected_test_ids",
+    "passed_test_ids",
+    "failed_test_ids",
+    "error_test_ids",
+    "result_receipt_ids",
+    "failure_codes",
+    "validation_status",
+    "candidate_unchanged",
+    "unchanged_retry_performed",
+    "writes_product",
+    "elapsed_ms",
+    "started_at",
+    "completed_at",
+    "environment",
+    "visibility"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_type": {"const": "candidate-validation-receipt-v1"},
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^candidate-validation-receipt-[0-9a-f]{24}$"
+    },
+    "workstream_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "task_description_sha": {"$ref": "#/$defs/objectOid"},
+    "freeze_receipt_id": {
+      "type": "string",
+      "pattern": "^candidate-freeze-receipt-[0-9a-f]{24}$"
+    },
+    "candidate_sha": {"$ref": "#/$defs/objectOid"},
+    "accepted_surface_fingerprint": {"$ref": "#/$defs/sha256"},
+    "relevant_tree_hash": {"$ref": "#/$defs/objectOid"},
+    "validation_stage": {
+      "enum": ["focused", "fast", "checkpoint", "candidate", "promotion"]
+    },
+    "selected_test_ids": {"$ref": "#/$defs/boundedIds"},
+    "passed_test_ids": {"$ref": "#/$defs/boundedIds"},
+    "failed_test_ids": {"$ref": "#/$defs/boundedIds"},
+    "error_test_ids": {"$ref": "#/$defs/boundedIds"},
+    "result_receipt_ids": {"$ref": "#/$defs/boundedIds"},
+    "failure_codes": {"$ref": "#/$defs/boundedIds"},
+    "validation_status": {"enum": ["validated", "validation-failed"]},
+    "candidate_unchanged": {"const": true},
+    "unchanged_retry_performed": {"const": false},
+    "writes_product": {"const": false},
+    "elapsed_ms": {"type": "integer", "minimum": 0},
+    "started_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "environment": {
+      "type": "object",
+      "required": ["platform", "runtime", "runner"],
+      "properties": {
+        "platform": {"type": "string", "minLength": 1, "maxLength": 128},
+        "runtime": {"type": "string", "minLength": 1, "maxLength": 128},
+        "runner": {"type": "string", "minLength": 1, "maxLength": 128}
+      },
+      "additionalProperties": false
+    },
+    "visibility": {"const": "git-private-local-only"}
+  },
+  "$defs": {
+    "objectOid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "boundedIds": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 256},
+      "maxItems": 2048,
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}

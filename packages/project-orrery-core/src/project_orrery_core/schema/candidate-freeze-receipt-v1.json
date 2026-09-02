@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-orrery.local/schema/candidate-freeze-receipt-v1.json",
+  "title": "Orrery fast Candidate freeze receipt",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_type",
+    "receipt_id",
+    "workstream_id",
+    "task_description_sha",
+    "scope_revision",
+    "accepted_surface_fingerprint",
+    "relevant_tree_hash",
+    "target_branch",
+    "candidate_sha",
+    "expected_paths",
+    "staged_paths",
+    "structural_checks",
+    "elapsed_ms",
+    "frozen_at",
+    "validation_status",
+    "network_performed",
+    "worktree_removed",
+    "visibility"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_type": {"const": "candidate-freeze-receipt-v1"},
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^candidate-freeze-receipt-[0-9a-f]{24}$"
+    },
+    "workstream_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "task_description_sha": {"$ref": "#/$defs/objectOid"},
+    "scope_revision": {"type": "integer", "minimum": 1},
+    "accepted_surface_fingerprint": {"$ref": "#/$defs/sha256"},
+    "relevant_tree_hash": {"$ref": "#/$defs/objectOid"},
+    "target_branch": {
+      "type": "string",
+      "pattern": "^refs/heads/[A-Za-z0-9._/-]+$",
+      "maxLength": 255
+    },
+    "candidate_sha": {"$ref": "#/$defs/objectOid"},
+    "expected_paths": {"$ref": "#/$defs/repositoryPaths"},
+    "staged_paths": {
+      "allOf": [
+        {"$ref": "#/$defs/repositoryPaths"},
+        {"minItems": 1}
+      ]
+    },
+    "structural_checks": {
+      "type": "object",
+      "required": [
+        "authority_current",
+        "scope_allowed",
+        "branch_current",
+        "expected_paths_only",
+        "acceptance_fingerprint_match",
+        "conflict_markers_absent",
+        "forbidden_artifacts_absent",
+        "diff_check_passed",
+        "exact_copy_parity_passed",
+        "no_validation_invoked"
+      ],
+      "properties": {
+        "authority_current": {"const": true},
+        "scope_allowed": {"const": true},
+        "branch_current": {"const": true},
+        "expected_paths_only": {"const": true},
+        "acceptance_fingerprint_match": {"const": true},
+        "conflict_markers_absent": {"const": true},
+        "forbidden_artifacts_absent": {"const": true},
+        "diff_check_passed": {"const": true},
+        "exact_copy_parity_passed": {"const": true},
+        "no_validation_invoked": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "elapsed_ms": {"type": "integer", "minimum": 0, "maximum": 60000},
+    "frozen_at": {"type": "string", "format": "date-time"},
+    "validation_status": {"const": "pending"},
+    "network_performed": {"const": false},
+    "worktree_removed": {"const": false},
+    "visibility": {"const": "git-private-local-only"}
+  },
+  "$defs": {
+    "objectOid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "repositoryPaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512,
+        "pattern": "^(?!/)(?![A-Za-z]:)[^\\u0000]+$"
+      },
+      "maxItems": 512,
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}
