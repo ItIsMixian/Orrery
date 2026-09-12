@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="310" viewBox="0 0 1200 310" role="img" aria-labelledby="title description">
+  <title id="title">Orrery — Project memory, visible progress</title>
+  <desc id="description">A traceable documentation system and local project observatory. Brand illustration, not live project data.</desc>
+  <rect width="1200" height="310" rx="12" fill="#10191c"/>
+  <g font-family="Segoe UI,Microsoft YaHei,sans-serif">
+    <text x="54" y="54" fill="#a5b6b9" font-size="18" letter-spacing="3">PROJECT MEMORY / LOCAL OBSERVATORY</text>
+    <text x="48" y="172" fill="#e5eeeb" font-family="Georgia,serif" font-size="112">Orrery</text>
+    <text x="55" y="219" fill="#a4ddc8" font-size="28">Project memory. Visible progress.</text>
+    <path d="M570 164H674V94H726 M674 164H726 M674 164V234H726" fill="none" stroke="#577a72" stroke-width="2"/>
+    <circle cx="570" cy="164" r="5" fill="#a4ddc8"/>
+    <g fill="#152421" stroke="#52776b"><rect x="726" y="67" width="420" height="54" rx="4"/><rect x="726" y="137" width="420" height="54" rx="4"/><rect x="726" y="207" width="420" height="54" rx="4"/></g>
+    <g fill="#e5eeeb" font-size="23"><text x="746" y="102">Decisions <tspan x="874" fill="#a5b6b9">Why this choice?</tspan></text><text x="746" y="172">Tasks <tspan x="874" fill="#a5b6b9">What is moving?</tspan></text><text x="746" y="242">Evidence <tspan x="874" fill="#a5b6b9">What proves it?</tspan></text></g>
+    <path d="M55 273H617" stroke="#304441"/>
+  </g>
+</svg>

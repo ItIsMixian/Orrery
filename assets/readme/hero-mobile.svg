@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="310" viewBox="0 0 600 310" role="img" aria-labelledby="title description">
+  <title id="title">Orrery</title><desc id="description">连接决定、任务与证据，让 Agent 的工作有迹可循。</desc>
+  <rect width="600" height="310" rx="12" fill="#10191c"/>
+  <text x="32" y="51" fill="#a5b6b9" font-size="20" font-family="Segoe UI,sans-serif" letter-spacing="2">PROJECT MEMORY</text>
+  <text x="26" y="157" fill="#e5eeeb" font-size="105" font-family="Georgia,serif">Orrery</text>
+  <text x="32" y="218" fill="#a4ddc8" font-size="31" font-family="Segoe UI,Microsoft YaHei,sans-serif">让 Agent 的工作，有迹可循。</text>
+  <path d="M32 255H556" stroke="#577a72" stroke-width="2"/>
+  <circle cx="32" cy="255" r="4" fill="#a4ddc8"/><circle cx="290" cy="255" r="4" fill="#a4ddc8"/><circle cx="556" cy="255" r="4" fill="#a4ddc8"/>
+</svg>
