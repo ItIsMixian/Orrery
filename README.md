@@ -6,7 +6,7 @@
 
 Connect the decisions, plans and deliveries scattered across your repository. See what is moving—and find out why it was built that way.
 
-[简体中文](README.zh-CN.md) · [Get started](#get-started) · [Download demo (EN / 中文)](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [Documentation](https://github.com/ItIsMixian/Orrery/tree/main/docs) · [Stable releases](https://github.com/ItIsMixian/Orrery/releases/latest)
+[简体中文](README.zh-CN.md) · [Get started](#get-started) · [Try the live demo](https://itismixian.github.io/Orrery/demo.en.html) · [Documentation](https://github.com/ItIsMixian/Orrery/tree/main/docs) · [Stable releases](https://github.com/ItIsMixian/Orrery/releases/latest)
 
 ## See how work connects
 
@@ -16,9 +16,9 @@ A new workstream does not have to start from scratch. Reuse existing deliveries,
 
 **New work joins → inputs become ready → targeted rework → shared delivery.**
 
-[Download the interactive story](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [Static graph](assets/readme/graph-en.svg) · [Chinese edition in the same download](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip)
+[Open the English interactive story](https://itismixian.github.io/Orrery/demo.en.html) · [中文版](https://itismixian.github.io/Orrery/demo.html) · [Download both editions](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [Static graph](assets/readme/graph-en.svg)
 
-> The animation is a simulated design scenario, not live project data. The offline English story preserves playback, chapters and dependency inspection. Original historical records and the relationship-model source remain in Chinese and are clearly linked. Download and unzip the demo, then open demo.en.html or demo.html in your browser. GitHub plays the GIF above; the interactive HTML runs separately.
+> The animation is a simulated design scenario, not live project data. The English story preserves playback, chapters and dependency inspection. Original historical records and the relationship-model source remain in Chinese and are clearly linked. Open the hosted demo above, or download and unzip both editions for offline use. GitHub plays the GIF in this README; the interactive HTML runs separately on GitHub Pages without an Orrery backend.
 
 ## Three useful starting points
 

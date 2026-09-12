@@ -6,19 +6,19 @@
 
 把散落的决定、计划和交付串成可追溯的项目脉络。看清现在在做什么，也能找到当初为什么这么做。
 
-[English](README.md) · [快速开始](#快速开始) · [中文演示](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [English demo](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [项目文档](https://github.com/ItIsMixian/Orrery/tree/main/docs) · [稳定版本](https://github.com/ItIsMixian/Orrery/releases/latest)
+[English](README.md) · [快速开始](#快速开始) · [在线中文演示](https://itismixian.github.io/Orrery/demo.html) · [English demo](https://itismixian.github.io/Orrery/demo.en.html) · [项目文档](https://github.com/ItIsMixian/Orrery/tree/main/docs) · [稳定版本](https://github.com/ItIsMixian/Orrery/releases/latest)
 
 ## 先看工作如何连接
 
 ![Graph 演示场景：新工作线复用已有交付，各输入独立判断是否就绪；这是模拟场景，不是实时项目数据。](assets/readme/graph-zh.gif)
 
-[完整中文演示](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [英文交互演示](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [静态图](assets/readme/graph-zh.svg)
+[完整中文演示](https://itismixian.github.io/Orrery/demo.html) · [英文交互演示](https://itismixian.github.io/Orrery/demo.en.html) · [下载双语离线版](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip) · [静态图](assets/readme/graph-zh.svg)
 
 一条新工作线不必从零开始：它可以复用已有交付，等待真正缺失的输入，并保留一路走来的历史。
 
 **新线加入 → 输入就绪 → 局部返工 → 共享交付。**
 
-> 图为已有动态演示的模拟场景，不是实时执行状态。完整 HTML 保留播放、暂停、章节切换和依赖探索。下载并解压演示包后，在浏览器中打开 demo.html 或 demo.en.html。README 播放上方 GIF，完整 HTML 在独立页面运行。
+> 图为已有动态演示的模拟场景，不是实时执行状态。完整 HTML 保留播放、暂停、章节切换和依赖探索。点击上方链接在线体验，也可下载双语包离线打开。README 播放 GIF，完整 HTML 在 GitHub Pages 独立运行，不连接 Orrery 后台。
 
 ## 三件值得先用起来的事
 

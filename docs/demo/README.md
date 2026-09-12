@@ -2,6 +2,8 @@
 
 [Download both language editions](https://github.com/ItIsMixian/Orrery/raw/refs/heads/main/docs/demo/orrery-demo.zip)
 
+Online: [English story](https://itismixian.github.io/Orrery/demo.en.html) · [中文演示](https://itismixian.github.io/Orrery/demo.html) · [Language selection](https://itismixian.github.io/Orrery/)
+
 Unzip and open `demo.en.html` for the English animated story or `demo.html` for the Chinese original in a local browser. Keep both files together. The files are self-contained and do not require an Orrery service.
 
 下载并解压后，在本地浏览器打开 `demo.en.html`（英文故事）或 `demo.html`（中文原版）。两个文件放在同一目录，无需启动 Orrery 服务。
@@ -21,6 +23,6 @@ The historical snapshot packaged in the Chinese demo was captured on 2026-09-09 
 
 ## Publication boundary
 
-This change publishes documentation and demonstration assets only. It does not publish the local development branch, install new Skills, change permissions, create a product release or deploy an interactive web service. Consult the selected Release notes for installable capabilities.
+Only documentation and demonstration assets are published. A dedicated GitHub Pages branch serves the two static HTML files and a language-selection page; no Orrery backend, credentials or model API is deployed. This does not publish the local development branch, install new Skills or create a product release. Consult the selected Release notes for installable capabilities.
 
 Static checks covered local asset references, SVG basics, English story identity/timing preservation, JavaScript syntax, GIF frame/size/loop metadata, and source-file preservation. Local browser automation was blocked by a URL policy and was not bypassed; no full automated browser-verification claim is made.
