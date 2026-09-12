@@ -68,6 +68,15 @@ python Orrery/skills/project-orrery/scripts/install_project_orrery.py \
 - AI 问答和综合能力为可选项；基础文档与静态阅读不依赖模型服务。
 
 <details>
+<summary>兼容性术语与历史发行边界</summary>
+
+`experimental` 表示集成只覆盖其说明中列明的实现与验证范围，不承诺所有宿主版本都兼容。`target` 表示规划中的集成，尚无已验证的兼容性声明。
+
+历史 v0.2.0 通过旧 Codex Skill 分发脚本，当时尚未作为独立 Core/CLI 包发布。这是该历史版本的边界，不代表之后版本的发行状态；当前安装与兼容性以所选 Release manifest 和 Adapter 说明为准。
+
+</details>
+
+<details>
 <summary>文档、贡献与许可证</summary>
 
 [文档入口](https://github.com/ItIsMixian/Orrery/tree/main/docs) · [反馈问题](https://github.com/ItIsMixian/Orrery/issues) · [贡献代码](https://github.com/ItIsMixian/Orrery/pulls) · [MIT License](https://github.com/ItIsMixian/Orrery/blob/main/LICENSE)

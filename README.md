@@ -68,6 +68,15 @@ Review the proposed creates, skips and upgrades before proceeding. For stable in
 - AI-assisted Q&A and synthesis are optional. Basic documentation and static reading do not require a model service.
 
 <details>
+<summary>Compatibility terminology and historical distribution</summary>
+
+`experimental` means an integration is limited to its documented implementation and validation scope; it is not a promise of support across all host versions. `target` identifies a planned integration without a verified compatibility claim.
+
+The historical v0.2.0 release delivered scripts through the legacy Codex Skill; it was not yet a separately packaged Core/CLI distribution. This describes that historical release, not the availability of later versions. Use the selected release manifest and adapter documentation for current installation and compatibility requirements.
+
+</details>
+
+<details>
 <summary>Documentation, contributions and license</summary>
 
 [Docs](https://github.com/ItIsMixian/Orrery/tree/main/docs) · [Issues](https://github.com/ItIsMixian/Orrery/issues) · [Pull requests](https://github.com/ItIsMixian/Orrery/pulls) · [MIT License](https://github.com/ItIsMixian/Orrery/blob/main/LICENSE)
